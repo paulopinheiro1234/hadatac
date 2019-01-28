@@ -19,7 +19,7 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+//import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
@@ -487,14 +487,22 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     public void setEventUri(String daseUri) {
         this.daseUri = daseUri;
     }
-
+    
+    /*
     public DataAcquisitionSchemaEvent getEvent() {
         if (daseUri == null || daseUri.equals("")) {
             return null;
         }
         return DataAcquisitionSchemaEvent.find(daseUri);
+	}*/
+    
+    public DataAcquisitionSchemaObject getEvent() {
+        if (daseUri == null || daseUri.equals("")) {
+            return null;
+        }
+        return DataAcquisitionSchemaObject.find(daseUri);
     }
-
+    
     public String getEventNamespace() {
         if (daseUri == null || daseUri.equals("")) {
             return "";
@@ -512,7 +520,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             }
             return "";
         } else {
-            DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(daseUri);
+            //DataAcquisitionSchemaEvent dase = DataAcquisitionSchemaEvent.find(daseUri);
+            DataAcquisitionSchemaObject dase = DataAcquisitionSchemaObject.find(daseUri);
             if (dase == null || dase.getLabel() == null || dase.getLabel().equals("")) {
                 return daseUri;
             }
@@ -770,11 +779,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?uri ?hasEntity ?hasAttribute " + 
-                " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { \n" + 
+                "SELECT ?uri ?label WHERE { \n" + 
                 " ?uri a hasco:DASchemaAttribute . \n" + 
                 " ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
-                "} ";
+                " ?uri rdfs:label ?label . \n" + 
+                " } " + 
+                " ORDER BY ?label";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);

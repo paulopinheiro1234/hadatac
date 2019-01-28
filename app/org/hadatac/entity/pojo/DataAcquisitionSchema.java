@@ -82,7 +82,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public static void resetCache() {
 	DataAcquisitionSchemaAttribute.resetCache();
-	DataAcquisitionSchemaEvent.resetCache();
+	//DataAcquisitionSchemaEvent.resetCache();
 	DataAcquisitionSchemaObject.resetCache();
 	DASCache = null;
     }
@@ -323,11 +323,11 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return null;
     }
 
-    public List<DataAcquisitionSchemaEvent> getEvents() {
-        return DataAcquisitionSchemaEvent.findBySchema(this.getUri());
-    }
+    //public List<DataAcquisitionSchemaEvent> getEvents() {
+    //    return DataAcquisitionSchemaEvent.findBySchema(this.getUri());
+    //}
 
-    public void setEvents(List<String> events) {
+    /*public void setEvents(List<String> events) {
         if (events == null) {
             System.out.println("[WARNING] No DataAcquisitionSchemaEvent for " + uri + " is defined in the knowledge base. ");
         } else {
@@ -337,15 +337,19 @@ public class DataAcquisitionSchema extends HADatAcThing {
             //            "Label: \""  + dase.getLabel() + "\"");
 	    //}
         }
-    }
+	}*/
     
-    public DataAcquisitionSchemaEvent getEvent(String daseUri) {
+    /*public DataAcquisitionSchemaEvent getEvent(String daseUri) {
         for (String dase : events) {
             if (dase.equals(daseUri)) {
                 return DataAcquisitionSchemaEvent.find(dase);
             }
         }
         return null;
+	}*/
+
+    public DataAcquisitionSchemaObject getEvent(String daseUri) {
+	return DataAcquisitionSchemaObject.find(daseUri);
     }
 
     public List<String> defineTemporaryPositions(List<String> csvHeaders) {
@@ -451,7 +455,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 	    //schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
 	    schema.setObjects(DataAcquisitionSchemaObject.findUriBySchema(schemaUri));
 	    //schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-	    schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
+	    //schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
 	    //System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
 	    //        "It has " + schema.getAttributes().size() + " attributes, " + 
 	    //        schema.getObjects().size() + " objects, and " + 

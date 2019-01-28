@@ -232,22 +232,29 @@ public class SDD {
 	return false;
     }
 
-    public Map<String, List<String>> readDDforEAmerge(RecordFile file) {
+    public List<Map<String, List<String>>> readDDforEAmerge(RecordFile file) {
 	
         //System.out.println("SDD: initiating readDDforEAmerge()");
         Map<String, List<String>> mapEAmerge = new HashMap<String, List<String>>();
-        List<String> l_dasa = new ArrayList<String>();
+        Map<String, List<String>> mapAAmerge = new HashMap<String, List<String>>();
+	List<Map<String, List<String>>> response = new ArrayList<Map<String, List<String>>>(); 
+	response.add(mapEAmerge);
+	response.add(mapAAmerge);
+        Map<String, List<String>> dasaContent = new HashMap<String, List<String>>();
 	
         if (!file.isValid()) {
-            return mapEAmerge;
+            return response;
         }
 	
         for (Record record : file.getRecords()) {
             if (checkCellValue(record.getValueByColumnIndex(0))) {
                 if (record.getValueByColumnName("Attribute") != null
 		    && record.getValueByColumnName("Attribute").length() > 0) {
-                    if (!l_dasa.contains(record.getValueByColumnIndex(0))) {
-                        l_dasa.add(record.getValueByColumnIndex(0));
+                    if (!dasaContent.containsKey(record.getValueByColumnIndex(0))) {
+			List<String> dasa_entry = new ArrayList<String>();
+			dasa_entry.add(record.getValueByColumnName("Attribute"));
+			dasa_entry.add(record.getValueByColumnName("attributeOf"));
+                        dasaContent.put(record.getValueByColumnIndex(0),dasa_entry);
                     }
                 }
             }
@@ -267,13 +274,13 @@ public class SDD {
                 String attributeOfCell = record.getValueByColumnName("attributeOf");
                 String dfCell = record.getValueByColumnName("wasDerivedFrom");
 		
-                if (l_dasa.contains(columnCell)) {
+                if (dasaContent.containsKey(columnCell) && (attributeOfCell.startsWith("??"))) {
 
                     //System.out.println("listEAmergeTrigger: " + columnCell + " " + attributeOfCell);
 		    
                     List<String> listEAmerge = new ArrayList<String>();
 		    
-                    if (l_dasa.contains(attributeOfCell)) {
+                    if (dasaContent.containsKey(attributeOfCell)) {
 			
                         if (columnCell != null) {
                             listEAmerge.add(columnCell);
@@ -304,16 +311,43 @@ public class SDD {
                         } else {
                             listEAmerge.add("");
                         }
-
+			
                         mapEAmerge.put(attributeOfCell, listEAmerge);
                     }
                     //System.out.println("listEAmerge :" + listEAmerge);
-                }
-            }
+		} else if (dasaContent.containsKey(columnCell)) {
+
+                    List<String> listAAmerge = new ArrayList<String>();
+		    
+                    if (dasaContent.containsKey(attributeOfCell)) {
+			
+                        if (attributeOfCell != null) {
+                            listAAmerge.add(attributeOfCell);
+                        } else {
+                            listAAmerge.add("");
+                        }
+
+                        if (dasaContent.get(attributeOfCell).get(0) != null) {
+                            listAAmerge.add(dasaContent.get(attributeOfCell).get(0));
+                        } else {
+                            listAAmerge.add("");
+                        }
+			
+                        if (dasaContent.get(attributeOfCell).get(1) != null) {
+                            listAAmerge.add(dasaContent.get(attributeOfCell).get(1));
+                        } else {
+                            listAAmerge.add("");
+                        }
+			
+                        mapAAmerge.put(columnCell, listAAmerge);
+                    }
+		}
+	    }
         }
+ 
         //System.out.println("SDD: l_dasa :" + l_dasa);
         //System.out.println("SDD: mapEAmerge :" + mapEAmerge.keySet());
-        return mapEAmerge;
+        return response;
     }
 
     public boolean readDataDictionary(RecordFile file) {

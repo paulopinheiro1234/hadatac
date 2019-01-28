@@ -21,7 +21,7 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+//import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.EntityRole;
@@ -40,7 +40,8 @@ public class MeasurementGenerator extends BaseGenerator {
 
     private DataAcquisitionSchema schema = null;
     private Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
-    private Map<String, DataAcquisitionSchemaEvent> mapSchemaEvents = new HashMap<String, DataAcquisitionSchemaEvent>();
+    //private Map<String, DataAcquisitionSchemaEvent> mapSchemaEvents = new HashMap<String, DataAcquisitionSchemaEvent>();
+    private Map<String, DataAcquisitionSchemaObject> mapSchemaEvents = new HashMap<String, DataAcquisitionSchemaObject>();
 
     // ASSIGN positions for MetaDASAs
     private int posTimestamp = -1;
@@ -349,7 +350,8 @@ public class MeasurementGenerator extends BaseGenerator {
                     measurement.setAbstractTime("");
                 }
             } else if (dasa.getEventUri() != null && !dasa.getEventUri().equals("")) {
-                DataAcquisitionSchemaEvent dase = null;
+                //DataAcquisitionSchemaEvent dase = null;
+                DataAcquisitionSchemaObject dase = null;
                 String daseUri = dasa.getEventUri();
                 if (mapSchemaEvents.containsKey(daseUri)) {
                     dase = mapSchemaEvents.get(daseUri);

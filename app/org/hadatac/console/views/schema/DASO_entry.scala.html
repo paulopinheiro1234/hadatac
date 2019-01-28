@@ -5,12 +5,12 @@
 @import org.hadatac.utils._
 
 <tr>
-   <td>@if(daso != null && daso.getLabel() != null) { <b> @daso.getLabel() </b>}</td> 
+   <td>@if(daso != null && daso.getLabel() != null) { <b id="@daso.getLabel()"> @daso.getLabel() </b>}</td> 
    <!-- <td>@if(daso != null && daso.getUri() != null) { @daso.getUriNamespace() }</td> --> 
    <td>@if(daso != null && daso.getEntityLabel() != null) { @daso.getEntityLabel() }</td> 
    <td>@if(daso != null && daso.getRoleLabel() != null) { @daso.getRoleLabel() }</td> 
    <td>@if(daso != null && daso.getRelationLabel() != null) { @daso.getRelationLabel() }</td> 
-   <td>@if(daso != null && daso.getInRelationToLabel() != null) { @daso.getInRelationToLabel() }</td> 
+   <td>@if(daso != null && daso.getInRelationToLabel() != null) { <a href="#@daso.getInRelationToLabel()">@daso.getInRelationToLabel()</a> }</td> 
    <td>@if(daso != null && daso.getWasDerivedFrom() != null) { @daso.getWasDerivedFrom() }</td> 
    @if(mode == "edit") {
       <td><a href="@org.hadatac.console.controllers.schema.routes.EditDASO.index(daso.getUri(),daso.getPartOfSchema())" class="btn-sm btn-primary" role="button">Edit</a>

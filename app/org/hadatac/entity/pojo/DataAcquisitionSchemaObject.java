@@ -459,7 +459,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { \n" + 
                 "   ?uri a hasco:DASchemaObject . \n" + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
-                "}";
+                "   ?uri rdfs:label ?label . \n" + 
+                "} " +
+	        "ORDER BY ?label";
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);

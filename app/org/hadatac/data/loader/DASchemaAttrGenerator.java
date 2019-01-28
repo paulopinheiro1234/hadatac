@@ -23,16 +23,19 @@ public class DASchemaAttrGenerator extends BaseGenerator {
     Map<String, String> codeMap;
     Map<String, List<String>> hasEntityMap = new HashMap<String, List<String>>();
     Map<String, List<String>> mergedEA = new HashMap<String, List<String>>();
+    Map<String, List<String>> mergedAA = new HashMap<String, List<String>>();
     List<String> AttrList = new ArrayList<String>();
     Map<String, String> currentHasEntity = new HashMap<String, String>();
 
-    public DASchemaAttrGenerator(RecordFile file, String SDDName, Map<String, String> codeMap, Map<String, List<String>> mergeEA) {
+    public DASchemaAttrGenerator(RecordFile file, String SDDName, Map<String, String> codeMap, List<Map<String, List<String>>> merging) {
         super(file);
         this.codeMap = codeMap;
         this.SDDName = SDDName;
-        this.mergedEA = mergeEA;
+        this.mergedEA = merging.get(0);
+        this.mergedAA = merging.get(1);
         this.fileName = file.getFile().getName();
         AnnotationLog.println("[Merged Attributes] : " + mergedEA.keySet(), fileName);
+        AnnotationLog.println("[Derived Attributes] : " + mergedAA.keySet(), fileName);
 
         initMapping();
 
@@ -81,6 +84,14 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         return kbPrefix + "DASO-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("AttributeOf")).replace(" ", "").replace("_","-").replace("??", "");
     }
 
+    private String getAttributeOf(String str) {
+	if (str == null || str.equals("")) {
+	    return "";
+	}
+        String attr = str.trim();
+        return kbPrefix + "DASO-" + SDDName + "-" + attr.replace(" ", "").replace("_","-").replace("??", "");
+    }
+
     private String getUnit(Record rec) {
         String original = rec.getValueByColumnName(mapCol.get("Unit"));
         if (URIUtils.isValidURI(original)) {
@@ -97,7 +108,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             return "";
         }
         
-        return kbPrefix + "DASE-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-");
+        return kbPrefix + "DASO-" + SDDName + "-" + rec.getValueByColumnName(mapCol.get("Time")).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-");
     }
 
     private String getEntity(Record rec) {
@@ -237,11 +248,18 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         }
         
         if (mergedEA != null && mergedEA.keySet().size() > 0) {
-        	for (String attr : mergedEA.keySet()) {
-        		if (attr.length()>0) {
-        			rows.add(createMergeAttrRow(attr, mergedEA));
-        		}
-        	}
+	    for (String attr : mergedEA.keySet()) {
+		if (attr.length() > 0) {
+		    rows.add(createMergeEAAttrRow(attr, mergedEA));
+		}
+	    }
+        }
+        if (mergedAA != null && mergedAA.keySet().size() > 0) {
+	    for (String attr : mergedAA.keySet()) {
+		if (attr.length() > 0) {
+		    rows.add(createMergeAAAttrRow(attr, mergedAA));
+		}
+	    }
         }
     }
 
@@ -293,7 +311,8 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             row.put("hasco:hasAttribute", getAttribute(rec));
             row.put("hasco:hasUnit", mergedEA.get(getLabel(rec)).get(2));
             if (mergedEA.get(getLabel(rec)).get(3).length()>0){
-                row.put("hasco:hasEvent", kbPrefix + "DASE-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(3).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
+                //row.put("hasco:hasEvent", kbPrefix + "DASE-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(3).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
+                row.put("hasco:hasEvent", kbPrefix + "DASO-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(3).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
             }
             row.put("hasco:hasSource", "");
             row.put("hasco:isAttributeOf", getAttributeOf(rec));
@@ -303,6 +322,15 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             	row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
             }
         } else if (!tmp.contains(getLabel(rec))) {
+	    if (mergedAA.containsKey(getLabel(rec))) {
+		AnnotationLog.println("[Derived Attribute] : " + getLabel(rec) + " ---> " + mergedAA.get(getLabel(rec)), file.getFile().getName());
+		row.put("hasco:isAttributeOf", getAttributeOf(mergedAA.get(getLabel(rec)).get(2)));
+		row.put("hasco:hasAttribute", getAttribute(rec)); 
+		//row.put("hasco:hasAttribute", URIUtils.replacePrefixEx(mergedAA.get(getLabel(rec)).get(1)));
+	    } else {
+		row.put("hasco:isAttributeOf", getAttributeOf(rec));
+		row.put("hasco:hasAttribute", getAttribute(rec));
+	    }
 	    row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
             row.put("rdfs:label", getLabel(rec));
@@ -323,11 +351,9 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                     row.put("sio:Relation", "sio:inRelationTo");
                 }
             }
-            row.put("hasco:hasAttribute", getAttribute(rec));
             row.put("hasco:hasUnit", getUnit(rec));
             row.put("hasco:hasEvent", getTime(rec));
             row.put("hasco:hasSource", "");
-            row.put("hasco:isAttributeOf", getAttributeOf(rec));
             row.put("hasco:isVirtual", checkVirtual(rec).toString());
             row.put("hasco:isPIConfirmed", "false");
             if (getWasGeneratedBy(rec).length() > 0) {
@@ -367,10 +393,17 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         return row;
     }
     
-    Map<String, Object> createMergeAttrRow(String attr, Map<String, List<String>> mergedEA) throws Exception {
+    Map<String, Object> createMergeEAAttrRow(String attr, Map<String, List<String>> mergedEA) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(attr).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
         row.put("hasco:hasAttribute", mergedEA.get(attr).get(4));
+        return row;
+    }
+
+    Map<String, Object> createMergeAAAttrRow(String attr, Map<String, List<String>> mergedAA) throws Exception {
+        Map<String, Object> row = new HashMap<String, Object>();
+        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + attr.trim().replace(" ", "").replace("_","-").replace("??", ""));
+        row.put("hasco:hasAttribute", mergedAA.get(attr).get(1));
         return row;
     }
 
