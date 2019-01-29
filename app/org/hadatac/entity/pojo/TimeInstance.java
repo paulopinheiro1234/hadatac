@@ -247,22 +247,12 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             TimeInstance time = new TimeInstance();
             if (pivot_ent.getValue().startsWith("http")) {
                 time.setUri(pivot_ent.getValue());
-                DataAcquisitionSchemaEvent event = DataAcquisitionSchemaEvent.find(pivot_ent.getValue());
-                if (event != null) {
-                    if (!event.getEntity().equals("")) {
-                        Entity entity = Entity.find(event.getEntity());
-                        if (entity != null) {
-                            time.setLabel(WordUtils.capitalize(entity.getLabel()));
-                        }
-                    } else {
-                        time.setLabel(WordUtils.capitalize(event.getLabel()));
-                    }
-                } else {
-                    Entity entity = Entity.find(pivot_ent.getValue());
-                    if (entity != null) {
-                        time.setLabel(WordUtils.capitalize(entity.getLabel()));
-                    }
+                
+                Entity entity = Entity.find(pivot_ent.getValue());
+                if (entity != null) {
+                    time.setLabel(WordUtils.capitalize(entity.getLabel()));
                 }
+                
                 if (time.getLabel().isEmpty()) {
                     String uri = pivot_ent.getValue();
                     time.setLabel(WordUtils.capitalize(URIUtils.getBaseName(uri)));

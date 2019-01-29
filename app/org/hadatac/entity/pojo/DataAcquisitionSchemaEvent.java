@@ -52,14 +52,14 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     private String unitLabel = "";
 
     private static Map<String, DataAcquisitionSchemaEvent> getCache() {
-	if (DASECache == null) {
-	    DASECache = new HashMap<String, DataAcquisitionSchemaEvent>(); 
-	}
-	return DASECache;
+        if (DASECache == null) {
+            DASECache = new HashMap<String, DataAcquisitionSchemaEvent>(); 
+        }
+        return DASECache;
     }
 
     public static void resetCache() {
-	DASECache = null;
+        DASECache = null;
     }
 
     public DataAcquisitionSchemaEvent() {
@@ -76,7 +76,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         this.partOfSchema = partOfSchema;
         this.setEntity(entity);
         this.setUnit(unit);
-	getCache();
+        getCache();
     }
 
     public String getUri() {
@@ -160,8 +160,8 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (entity == null || entity.equals("")) {
             this.entityLabel = "";
         } else {
-	    this.entityLabel = entity;
-	    // this.entityLabel = FirstLabel.getPrettyLabel(entity);
+            this.entityLabel = entity;
+            // this.entityLabel = FirstLabel.getPrettyLabel(entity);
         }
     }
 
@@ -225,18 +225,18 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaEvent find(String uri) {
-	if (getCache().get(uri) != null) {
-	    return getCache().get(uri);
-	}
+        if (getCache().get(uri) != null) {
+            return getCache().get(uri);
+        }
         DataAcquisitionSchemaEvent event = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?partOfSchema ?entity ?unit WHERE { " + 
                 "   <" + uri + "> a hasco:DASchemaEvent . " + 
                 "   <" + uri + "> hasco:partOfSchema ?partOfSchema. " +
-                "   OPTIONAL { <" + uri + ">  hasco:hasEntity ?entity } ." + 
+                "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } ." + 
                 "   OPTIONAL { <" + uri + "> hasco:hasUnit ?unit } ." + 
                 "}";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -289,7 +289,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
             System.out.println("[ERROR] DataAcquisitionSchemaEvent. uri: e.Message: " + e.getMessage());
         }
 
-	getCache().put(uri,event);
+        getCache().put(uri, event);
         return event;
     }
 
@@ -300,7 +300,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 "   ?uri a hasco:DASchemaEvent . " + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
                 "}";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -333,7 +333,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
                 "   ?uri a hasco:DASchemaEvent . " + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> .  " + 
                 "}";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -426,11 +426,11 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-        
+
         insert += " <" + getUri() + "> a hasco:DASchemaEvent . ";
         for (String type : getTypes()) {
             insert += " <" + getUri() + "> a <" + type + "> . ";
@@ -460,7 +460,7 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         if (!getIsPIConfirmed().equals("")) {
             insert += " <" + getUri() + "> hasco:isPIConfirmed \"" + getIsPIConfirmed() + "\" . ";
         }
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
@@ -499,7 +499,8 @@ public class DataAcquisitionSchemaEvent extends HADatAcThing {
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
-	DataAcquisitionSchemaEvent.resetCache();
+        
+        DataAcquisitionSchemaEvent.resetCache();
     }
 
     @Override

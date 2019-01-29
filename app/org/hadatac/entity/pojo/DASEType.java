@@ -19,7 +19,7 @@ import org.hadatac.utils.NameSpaces;
 
 public class DASEType extends HADatAcThing implements Comparable<DASEType> {
 
-    public DASEType () {}
+    public DASEType() {}
 
     @Override
     public boolean equals(Object o) {
@@ -55,9 +55,10 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
         
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?daseUri ?daseTypeUri ?daseLabel ?daseTypeLabel WHERE { \n"
+        query += "SELECT DISTINCT ?daseUri ?daseTypeUri ?daseLabel ?daseTypeLabel WHERE { \n"
                 + valueConstraint + " \n"
-                + " ?daseUri a hasco:DASchemaEvent . \n"
+                + " ?daseUri a hasco:DASchemaObject . \n"
+                + " ?dasa hasco:hasEvent ?daseUri . \n"
                 + " { \n"
                 + " ?daseUri a ?daseTypeUri . \n"
                 + " } UNION { \n"
@@ -67,7 +68,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 + " ?daseTypeUri rdfs:label ?daseTypeLabel . \n"
                 + "}";
         
-        // System.out.println("DASE query: " + query);
+        // System.out.println("DASEType query: " + query);
         
         Map<Facetable, List<Facetable>> mapTypeToInstanceList = new HashMap<Facetable, List<Facetable>>();
         try {
@@ -95,7 +96,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
                 }
                 
                 Facet subFacet = facet.getChildById(daseType.getUri());
-                DataAcquisitionSchemaEvent event = DataAcquisitionSchemaEvent.find(soln.get("daseUri").toString());
+                DataAcquisitionSchemaObject event = DataAcquisitionSchemaObject.find(soln.get("daseUri").toString());
                 if (event != null && event.getEntity().equals(soln.get("daseTypeUri").toString())) {
                     subFacet.putFacet("named_time_str", soln.get("daseTypeUri").toString());
                 } else {

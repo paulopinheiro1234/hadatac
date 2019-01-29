@@ -103,8 +103,8 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
 
     private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
         facet.clearFieldValues("role_uri_str");
-
-	System.out.println("StudyObjectRole: Query is [" + query + "]"); 
+        
+        // System.out.println("StudyObjectRole: Query is [" + query + "]");
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         for (Pivot pivot_ent : pivot.children) {

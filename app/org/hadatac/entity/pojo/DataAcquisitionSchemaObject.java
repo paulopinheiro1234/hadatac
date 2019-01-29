@@ -60,6 +60,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     public static void resetCache() {
 	DASOCache = null;
     }
+    
+    public DataAcquisitionSchemaObject() {}
 
     public DataAcquisitionSchemaObject(String uri, 
             String label, 

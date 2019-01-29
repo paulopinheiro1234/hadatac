@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -194,15 +195,31 @@ public class LoadOnt extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result exportNamespaces() {
-        File file = new File(ConfigProp.getPathDownload() + "/namespaces.properties");
-        FileOutputStream outputStream;
+        String path = ConfigProp.getPathDownload();
+        File folder = new File(path);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        
+        File file = new File(path + "/namespaces.properties");
         try {
             List<String> lines = new ArrayList<String>();
-            outputStream = new FileOutputStream(file);
-            for (NameSpace ns : NameSpace.findAll()) {
+            List<NameSpace> nameSpaces = NameSpace.findAll();
+            
+            nameSpaces.sort(new Comparator<NameSpace>() {
+                @Override
+                public int compare(NameSpace o1, NameSpace o2) {
+                    return o1.getAbbreviation().toLowerCase().compareTo(
+                            o2.getAbbreviation().toLowerCase());
+                }
+            });
+            
+            for (NameSpace ns : nameSpaces) {
                 lines.add(ns.getAbbreviation() + "=" + String.join(",", Arrays.asList(
                         ns.getName(), ns.getType(), ns.getURL())));
             }
+            
+            FileOutputStream outputStream = new FileOutputStream(file);
             outputStream.write(String.join("\n", lines).getBytes());
             outputStream.close();
         } catch (IOException e) {
