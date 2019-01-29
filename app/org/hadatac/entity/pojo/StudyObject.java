@@ -64,7 +64,9 @@ public class StudyObject extends HADatAcThing {
     public static final String SOC_TYPE = "SOC_TYPE";
     //         soc's label
     public static final String SOC_LABEL = "SOC_LABEL";
-
+    public static final String OBJECT_ORIGINAL_ID = "OBJECT_ORIGINAL_ID";
+    public static final String OBJECT_TIME = "OBJECT_TYME";
+ 
     String originalId;
     String isMemberOf;
     String roleUri = "";
@@ -479,7 +481,32 @@ public class StudyObject extends HADatAcThing {
                 }
             }
         } else {
-            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for Scope URI I: " + scopeUri);
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for Scope URI: " + scopeUri);
+            return "";
+        }
+
+        return "";
+    }
+
+    public static String findUriBySocAndObjectScopeUri(String socUri, String objUri) {
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?scopeUri WHERE { " + 
+		"      <" + objUri + "> hasco:hasObjectScope ?scopeUri .  " + 
+		"      <" + objUri + "> hasco:isMemberOf <" + socUri + "> . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.getResource("scopeUri") != null) {
+                    return soln.getResource("scopeUri").toString();
+                }
+            }
+        } else {
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for Scope Object URI: " + objUri);
             return "";
         }
 
