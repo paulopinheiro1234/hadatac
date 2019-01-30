@@ -86,7 +86,7 @@ function parseSolrFacetToMergedTree(facet_name, selected_elems) {
 	tree_id = 0;
 	dataTree.id = tree_id++;
 	items = create_merged_item(json.extra_facets[facet_name], selected_elems,
-			0, 0, dataTree, [], [], [], []);
+			0, 0, [0, 1, 3, 2], dataTree, [], [], [], []);
 	if (null == items) {
 		items = [];
 	}
@@ -121,7 +121,7 @@ function getNodeText(node) {
 }
 
 function create_merged_item(data, selected_elems, curLevel, 
-		levelToBegin, pivot, text, tooltips, facets, retChildren) {
+		levelToBegin, order, pivot, text, tooltips, facets, retChildren) {
 	if (null == data) {
 		return;
 	}
@@ -129,9 +129,15 @@ function create_merged_item(data, selected_elems, curLevel,
 	var items = [];
 	
 	if (data.children.length == 0 && curLevel > levelToBegin) {
-		pivot.text = text.join(' ') + ' (' + data.count + ')';
+		// sort text by given order
+		var new_text = [];
+		for (var i = 0; i < order.length; i++) {
+			new_text.push(text[order[i]]);
+		}
+		
+		pivot.text = new_text.join(' ') + ' (' + data.count + ')';
 		pivot.tooltip = tooltips.join(' ');
-		pivot.label = text.join(' ');
+		pivot.label = new_text.join(' ');
 		pivot.count = data.count;
 		pivot.userdata.push({"name": "facet", "content": createFacet(facets, 0)});
 		retChildren.push(pivot);
@@ -157,7 +163,7 @@ function create_merged_item(data, selected_elems, curLevel,
 				items.push(element);
 			} else if (curLevel <= levelToBegin) {				
 				element.item = create_merged_item(children[i_child], selected_elems,
-						curLevel + 1, levelToBegin, element, [], [], facets, retChildren);
+						curLevel + 1, levelToBegin, order, element, [], [], facets, retChildren);
 				
 				if (curLevel == levelToBegin) {
 					element.item = [];
@@ -178,25 +184,17 @@ function create_merged_item(data, selected_elems, curLevel,
 				
 				items.push(element);
 			} else {
-				if (children[i_child].value.length > 0) {
-					text.push(children[i_child].value);
-				}
-				if (children[i_child].tooltip.length > 0) {
-					tooltips.push('<' + children[i_child].tooltip + '>');
-				}
+				text.push(children[i_child].value);
+				tooltips.push('<' + children[i_child].tooltip + '>');
 				facets.push({
 					"field": children[i_child].field, 
 					"value": children[i_child].tooltip});
 				
 				create_merged_item(children[i_child], selected_elems,
-						curLevel + 1, levelToBegin, element, text, tooltips, facets, retChildren);
+						curLevel + 1, levelToBegin, order, element, text, tooltips, facets, retChildren);
 				
-				if (children[i_child].value.length > 0) {
-					text.pop();
-				}
-				if (children[i_child].tooltip.length > 0) {
-					tooltips.pop();
-				}
+				text.pop();
+				tooltips.pop();
 				facets.pop();
 			}
 		}

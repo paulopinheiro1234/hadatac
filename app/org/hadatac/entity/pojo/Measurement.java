@@ -578,16 +578,14 @@ public class Measurement extends HADatAcThing implements Runnable {
             return result;
         }
 
-        System.out.println("facets for measurement's find(); " + facets);
-
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacets(facets);
 
         FacetHandler retFacetHandler = new FacetHandler();
         retFacetHandler.loadFacets(facets);
 
-        //System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
-        //System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
+        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+        // System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
 
         // Run one time
         // getAllFacetStats(facetHandler, retFacetHandler, result, false);
@@ -610,24 +608,13 @@ public class Measurement extends HADatAcThing implements Runnable {
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
         if (page != -1) {
-            query.setStart((page - 1) * qtd + 1);
+            query.setStart((page - 1) * qtd);
             query.setRows(qtd);
         } else {
             query.setRows(99999999);
         }
         query.setFacet(true);
         query.setFacetLimit(-1);
-        query.setParam("json.facet", "{ "
-                + "object_uri_str: { "
-                + "type: terms, "
-                + "field: object_uri_str, "
-                + "limit: 100000000 }, "
-                + "characteristic_uri_str_multi: { "
-                + "type: terms, "
-                + "field: characteristic_uri_str_multi, "
-                + "limit: 10000 } }");
-        //query.set("group.field", "study_uri_str");
-        //query.set("group", "true");
 
         try {
             SolrClient solr = new HttpSolrClient.Builder(
@@ -636,22 +623,13 @@ public class Measurement extends HADatAcThing implements Runnable {
             solr.close();
             SolrDocumentList docs = queryResponse.getResults();
             docSize = docs.getNumFound();
-            //System.out.println("Num of results: " + docSize);
-
-            //System.out.println("\n\n\nqueryResponse: " + queryResponse);
-            Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-
-            //System.out.println("PRINTING PIVOT");
-            //for (Pivot p : pivot.children) {
-            //	System.out.println("Field: " + p.getField() + "   Value: " + p.getValue());
-            //}
-
-            result.extra_facets.put(FacetHandler.SUBJECT_CHARACTERISTIC_FACET, pivot);
+            System.out.println("Num of results: " + docSize);
 
             Set<String> uri_set = new HashSet<String>();
-            Iterator<SolrDocument> iterDoc = docs.iterator();
             Map<String, ObjectAccessSpec> cachedDA = new HashMap<String, ObjectAccessSpec>();
             Map<String, String> mapClassLabel = generateCodeClassLabel();
+            
+            Iterator<SolrDocument> iterDoc = docs.iterator();
             while (iterDoc.hasNext()) {
                 Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
                 result.addDocument(measurement);
@@ -700,13 +678,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeEC = new FacetTree();
-        // fTreeEC.setTargetFacet(AttributeInstance.class);
-        fTreeEC.setTargetFacet(EntityInstance.class);
+        fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
-        // fTreeEC.addUpperFacet(EntityInstance.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
-        fTreeEC.addUpperFacet(AttributeInstance.class);
+        fTreeEC.addUpperFacet(EntityInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
                 facetHandler);
