@@ -438,9 +438,11 @@ public class MeasurementGenerator extends BaseGenerator {
 			    }
 			    
 			    // from ground obj.
-			    measurement.setStudyObjectUri(groundObj.get(StudyObject.STUDY_OBJECT_URI));
-                            measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
-                            measurement.setPID(groundObj.get(StudyObject.SUBJECT_ID));
+			    if (groundObj != null) {
+				measurement.setStudyObjectUri(groundObj.get(StudyObject.STUDY_OBJECT_URI));
+				measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
+				measurement.setPID(groundObj.get(StudyObject.SUBJECT_ID));
+			    }
                         }
                         //System.out.println("[MeasurementGenerator] For Id=[" + id + "] and reference=[" + reference + "] it was assigned Obj URI=[" + measurement.getObjectUri() + "]");
                     } else {

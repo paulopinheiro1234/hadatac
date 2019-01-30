@@ -568,19 +568,22 @@ public class DASOInstanceGenerator{
 	    }
 	    
 	    StudyObject obj = StudyObject.find(currentObjUri);
-	    List<String> objTimes = StudyObject.retrieveTimeScopeUris(currentObjUri);
-	    Map<String,String> referenceEntry = new HashMap<String,String>();
-	    referenceEntry.put(StudyObject.STUDY_OBJECT_URI, currentObjUri);
-	    referenceEntry.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
-	    referenceEntry.put(StudyObject.SOC_TYPE, currentSoc.getTypeUri());
-	    referenceEntry.put(StudyObject.SOC_LABEL, socLabels.get(currentSoc.getSOCReference()));
-	    referenceEntry.put(StudyObject.OBJECT_SCOPE_URI, id);
-	    referenceEntry.put(StudyObject.OBJECT_ORIGINAL_ID, obj.getOriginalId());
-	    if (objTimes != null && objTimes.size() > 0) {
-		referenceEntry.put(StudyObject.OBJECT_TIME, objTimes.get(0));
+	    if (obj != null) { 
+		List<String> objTimes = StudyObject.retrieveTimeScopeUris(currentObjUri);
+		Map<String,String> referenceEntry = new HashMap<String,String>();
+		referenceEntry.put(StudyObject.STUDY_OBJECT_URI, currentObjUri);
+		referenceEntry.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
+		referenceEntry.put(StudyObject.SOC_TYPE, currentSoc.getTypeUri());
+		referenceEntry.put(StudyObject.SOC_LABEL, socLabels.get(currentSoc.getSOCReference()));
+		referenceEntry.put(StudyObject.OBJECT_SCOPE_URI, id);
+		referenceEntry.put(StudyObject.OBJECT_ORIGINAL_ID, obj.getOriginalId());
+		if (objTimes != null && objTimes.size() > 0) {
+		    referenceEntry.put(StudyObject.OBJECT_TIME, objTimes.get(0));
+		}
+		
+		objMapList.put(currentSoc.getSOCReference(),referenceEntry);
+		
 	    }
-	    
-	    objMapList.put(currentSoc.getSOCReference(),referenceEntry);
 	    
 	}
 	
@@ -703,10 +706,13 @@ public class DASOInstanceGenerator{
 
 	if (groundingPath == null || groundingPath.size() <= 0) {
 	    obj = StudyObject.find(currentObjUri);
-	    groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());
-	    groundObj.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
-	    groundObj.put(StudyObject.SUBJECT_ID, obj.getOriginalId());
-	    return groundObj;
+	    if (obj != null) {
+		groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());
+		groundObj.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
+		groundObj.put(StudyObject.SUBJECT_ID, obj.getOriginalId());
+		return groundObj;
+	    } 
+	    return null;
 	}
 
 	//System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
