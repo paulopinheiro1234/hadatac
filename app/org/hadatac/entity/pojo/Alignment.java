@@ -23,7 +23,6 @@ public class Alignment {
     private Map<String, Unit> unitCache;
     private Map<String, AlignmentEntityRole> roles;
     private Map<String, AlignmentAttribute> alignAttrs;
-    private Map<String, String> replacementUris;
     private Map<String, String> hCodeBook;
 
     Attribute ID = new Attribute();
@@ -36,7 +35,6 @@ public class Alignment {
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
         alignAttrs = new HashMap<String, AlignmentAttribute>();
-        replacementUris = new HashMap<String, String>();
 	hCodeBook = new HashMap<String, String>();
         ID.setLabel("ID");
     }
@@ -67,7 +65,7 @@ public class Alignment {
 
         /* Look for existing alignment attributes
          */
-        //System.out.println("Measurement Key");
+        //System.out.println("Align-Debug: Measurement Key");
 
         Entity irt = null;
         String mInRelationTo = "";
@@ -118,12 +116,13 @@ public class Alignment {
             }
         } 
 
-        String mRole = inferRole(m);
+        //String mRole = inferRole(m);
+	String mRole = m.getRole().replace(" ","");
 
         String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
 
-        //System.out.println("Measurement: " + mKey);
-        //System.out.println("Vector: " + alignAttrs); 
+        //System.out.println("Align-Debug: Measurement: " + mKey);
+        //System.out.println("Align-Debug: Vector: " + alignAttrs); 
 
         if (alignAttrs.containsKey(mKey)) {
             return alignAttrs.get(mKey).toString();
@@ -137,13 +136,17 @@ public class Alignment {
             System.out.println("[ERROR] retrieving entity " + m.getEntityUri());
             return null;
         }
+        //System.out.println("Align-Debug: new alignment attribute 1"); 
         AlignmentEntityRole newRole = new AlignmentEntityRole(entity,mRole);
 
+        System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris() + "]"); 
         Attribute attribute = Attribute.find(m.getCharacteristicUris().get(0));
         if (attribute == null) {
             System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
             return null;
         }
+
+        //System.out.println("Align-Debug: new alignment attribute 1.2"); 
 	if (m.getDasaUri() != null && !m.getDasaUri().equals("")) {
 	    if (!containsCode(m.getDasaUri())) {
 		String code = Attribute.findHarmonizedCode(m.getDasaUri());
@@ -152,6 +155,7 @@ public class Alignment {
 		}
 	    }
 	}
+        //System.out.println("Align-Debug: new alignment attribute 2"); 
 
         if (!mInRelationTo.equals("")) {
             System.out.println("Adding the following inRelationTo " + mInRelationTo);
@@ -168,6 +172,7 @@ public class Alignment {
         }
 
         newAA = new AlignmentAttribute(newRole, newAttrInRel, unit, timeAttr);
+        //System.out.println("Align-Debug: new alignment attribute 3"); 
 
         if (!alignAttrs.containsKey(newAA.getKey())) {
             alignAttrs.put(newAA.getKey(), newAA);
@@ -176,14 +181,6 @@ public class Alignment {
 
         return null;
 
-    }
-
-    public String replaceUri(String origUri) {
-        String responseUri = origUri;
-        if (replacementUris.containsKey(origUri)) {
-            responseUri = replacementUris.get(origUri);
-        }
-        return responseUri;
     }
 
     /* CONTAINS METHODS
@@ -195,10 +192,6 @@ public class Alignment {
 
     public boolean containsRole(String key) {
         return roles.containsKey(key);
-    }
-
-    public boolean containsReplacementUri(String uri) {
-        return replacementUris.containsKey(uri);
     }
 
     public boolean containsCode(String uri) {
@@ -250,10 +243,6 @@ public class Alignment {
         objects.put(obj.getUri(), obj);
     }
 
-    public void addReplacementUri(String orig, String replace) {
-        replacementUris.put(orig, replace);
-    }
-
     public void addRole(AlignmentEntityRole entRole) {
         roles.put(entRole.getKey(), entRole);
         System.out.println("Adding NEW ROLE: " + entRole);
@@ -264,36 +253,4 @@ public class Alignment {
     public void addCode(String attrUri, String code) {
         hCodeBook.put(attrUri, code);
     }
-
-    public String inferRole(Measurement m) {
-        String result = "";
-        String query = "";
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "SELECT ?roleLabel WHERE { \n" +
-                " <" + m.getDasaUri() + "> hasco:isAttributeOf <" + m.getDasoUri() + "> . \n" +
-                " <" + m.getDasoUri() + "> hasco:hasRole ?roleUri . \n" +
-                " <" + m.getDasaUri() + "> hasco:hasEntity <" + m.getEntityUri() + "> . \n" +
-                " <" + m.getDasaUri() + "> hasco:hasAttribute <" + m.getCharacteristicUris().get(0) + "> .  \n" +
-                " ?roleUri rdfs:label ?roleLabel . \n" +
-                "} \n"; 
-
-        try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-
-            if (resultsrw.hasNext()) {
-                QuerySolution soln = resultsrw.next();
-                if (soln.get("roleLabel") != null && !soln.get("roleLabel").toString().isEmpty()) {
-                    result = soln.get("roleLabel").toString();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //System.out.println("Find role: [" + result + "]");
-
-        return result;
-    }
-
 }
