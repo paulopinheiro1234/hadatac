@@ -32,8 +32,9 @@
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()" id="analytes" class="btn btn-primary btn-block disabled" role="button">Search Analytes</a>
            <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()" id="downloader" class="btn btn-primary btn-block disabled" role="button">Data Download</a>
            <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Ontologies and Metadata</a>
-           <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
-           <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a>
+           <a href="" class="btn btn-primary btn-block disabled" role="button">URI Lookup</a>
+       @*  <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
+           <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a> *@
         </div>
         <div class="col-md-3 col-xs-2">
            <h4>Metadata Recording and Data Upload</h4>  
@@ -79,6 +80,8 @@
         }
         <div class="col-md-1 col-xs-0"></div>
       </div>
+
+      @*
       <div class="row">
         <div class="col-md-1 col-xs-0"></div>
 		@restrict(roles = anyOf(allOf("data_manager"))) {
@@ -90,7 +93,9 @@
         </div>
 		}
 		}
-      </div>
+      </div> *@
+
+
       <div class="row">
          <div class="col-md-1 col-xs-0"></div>
          <div class="col-md-8 col-xs-0">
@@ -101,14 +106,16 @@
       </div>
       <div class="row">
          <div class="col-md-1 col-xs-0"></div>
-         <div class="col-md-3 col-xs-0">
+         @* <div class="col-md-3 col-xs-0">
              <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
-         </div>
+         </div> *@
          <div class="col-md-3 col-xs-0">
-             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-User-Guide" class="btn btn-default btn-block" role="button">User Guide</a>
+             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-User-Guide" class="btn btn-warning btn-block" role="button">User Guide</a>
          </div>
          <div class="col-md-2 col-xs-0"></div>
       </div>
+
+      @*
       <div class="row">
          <div class="col-md-1 col-xs-0"></div>
          <div class="col-md-8 col-xs-0">
@@ -123,6 +130,7 @@
          <div class="col-md-1 col-xs-0"></div>
       </div>
     </div>
+    *@
 
     <script type="text/javascript">
         $( document ).ready(function() {

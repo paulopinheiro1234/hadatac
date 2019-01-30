@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -926,7 +927,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setTimeValueUnitUri(SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
         m.setOriginalValue(SolrUtils.getFieldValue(doc, "original_value_str"));
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
-        m.setCharacteristicUris(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
+        List<String> uris = Measurement.tokenizeSolr(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
+        m.setCharacteristicUris(uris);
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         String value = SolrUtils.getFieldValue(doc, "value_str");
@@ -966,6 +968,16 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
         return m;
+    }
+
+    public static List<String> tokenizeSolr(List<String> solrInput) {
+	List<String> response = new ArrayList<String>();
+	for (String str : solrInput) {
+	    StringTokenizer st = new StringTokenizer(str, ";"); 
+	    while (st.hasMoreTokens()) 
+		response.add(st.nextToken().trim()); 
+	}
+	return response;
     }
 
     public static List<String> getFieldNames() {
@@ -1053,85 +1065,57 @@ public class Measurement extends HADatAcThing implements Runnable {
             //System.out.println("Align-Debug: Measurement size is " + total);
             DataFile dataFile = null;
             for (Measurement m : measurements) {
-                StudyObject obj = null;
+                StudyObject referenceObj = null;
 
-                String replacementUri = null;
-                StudyObject replacementObj = null;
-
-                //System.out.println("Align-Debug: measurment's object URI is [" + m.getObjectUri() + "]");
                 if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
 
+		    //System.out.println("Align-Debug: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
+
                     // Perform following actions required if the object of the measurement has not been processed yet
-                    //   - identify aligning object (replacement object)
                     //   - add a row in the result set for aligning object, if such row does not exist
                     //   - add entity-role to the collection of entity-roles of the alignment
                     //   - add object to the collection of objects of the alignment 
-                    if (!results.containsKey(m.getObjectUri())) {
-                        obj = StudyObject.find(m.getObjectUri());
-                        if (obj == null) {
-                            System.out.println("[ERROR] could not find object with uri " + m.getObjectUri());
-                        } else {
-
-                            List<String> scope = StudyObject.retrieveScopeUris(obj.getUri());
-                            if (scope != null && scope.size() > 0) {
-                                //for (String str : scope) {
-                                //    System.out.println("Align-Debug: A scope for [" + obj.getUri() + "] is [" + str + "]");
-                                //}
-                                replacementUri = scope.get(0);
-                                if (alignment.containsObject(replacementUri)) {
-                                    replacementObj = alignment.getObject(replacementUri);
-                                } else {
-                                    replacementObj = StudyObject.find(replacementUri);
-                                }
-                            }
-
+		    referenceObj = StudyObject.find(m.getStudyObjectUri());
+		    if (referenceObj == null) {
+			System.out.println("[ERROR] could not find reference object with uri " + m.getObjectUri());
+		    } else {
+			if (!results.containsKey(referenceObj.getUri())) {
                             //System.out.println("Align-Debug: adding entity-role");
-                            Entity objEntity = Entity.find(obj.getTypeUri());
-                            AlignmentEntityRole entRole = new AlignmentEntityRole(objEntity,"");
-                            if (!alignment.containsRole(entRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
-                                alignment.addRole(entRole);
+			    Entity referenceObjEntity = Entity.find(referenceObj.getTypeUri());
+			    AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,"");
+			    if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
+                                alignment.addRole(referenceEntRole);
                             }
-
-                            //System.out.println("Align-Debug: adding replacement");
-                            if (replacementObj != null && replacementObj.getUri() != null && !replacementObj.getUri().equals("")) {
-                                //System.out.println("Align-Debug: replacing " + obj.getUri() + " [" + entRole + "] with " + replacementObj.getUri());
-                                if (!alignment.containsReplacementUri(obj.getUri())) {
-                                    alignment.addReplacementUri(obj.getUri(),replacementObj.getUri());
-                                }
-                                obj = replacementObj;
-                            }
-
+			    
                             //System.out.println("Align-Debug: adding object");
                             // add object identifiers to the results
-                            if (!alignment.containsObject(obj.getUri())) {
-                                alignment.addObject(obj);
+                            if (!alignment.containsObject(referenceObj.getUri())) {
+                                alignment.addObject(referenceObj);
                                 //System.out.println("Align-Debug: adding object STEP 2 Object URI [" + m.getObjectUri() + "]");
-                                results.put(obj.getUri(), new HashMap<String, String>());
-                                //System.out.println("Align-Debug: adding object STEP 3 EntRole: [" + alignment.objectKey(entRole) +  "] PID: [" + m.getObjectPID() + "]");
-                                //System.out.println("Align-Debug: adding object STEP 3 Show Object URI [" + results.get(m.getObjectUri()) + "]");                                
-                                //results.get(m.getObjectUri()).put(alignment.objectKey(entRole), m.getObjectPID());
-                                if (results.get(obj.getUri()) != null && alignment.objectKey(entRole) != null && m.getObjectPID() != null) {
-                                    results.get(obj.getUri()).put(alignment.objectKey(entRole), m.getObjectPID());
-                                }
-                            }
+                                //System.out.println("Align-Debug: EntRole: [" + alignment.objectKey(referenceEntRole) +  "] PID: [" + m.getObjectPID() + "]");
 
-                            //System.out.println("Align-Debug: show SID");
-                            if (replacementUri != null) {
-                                System.out.println("SID: " + m.getObjectSID());
-                                //results.get(m.getObjectUri()).put(alignment.objectKey(entRole), m.getObjectSID());
-                            }
-
-                            //System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
+				if (results.get(referenceObj.getUri()) == null) {
+				    results.put(referenceObj.getUri(), new HashMap<String, String>());
+				    if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null && 
+					referenceObj.getOriginalId() != null) {
+					//System.out.println("Align-Debug: adding PID to result's map as a key"); 
+ 				    	results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
+				    } 
+				}
+			    }
                         }
                     }
-
+		    
+		    //System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
+		    
                     // assign values to results
                     String key = alignment.measurementKey(m);
+		    //System.out.println("Align-Debug: computed measurement key [" + key + "]");
                     if (key != null) {
                         String finalValue = "";
                         /*if (alignment.containsCode(m.getCharacteristicUri())) {
-			    finalValue = alignment.getCode(m.getCharacteristicUri()); */
-
+			  finalValue = alignment.getCode(m.getCharacteristicUri()); */
+			
                         if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
                             // get code for qualitative variables
                             finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
@@ -1140,7 +1124,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                             finalValue = m.getValue();
                         }
 
-                        results.get(alignment.replaceUri(m.getObjectUri())).put(key, finalValue);
+			//System.out.println("Align-Debug: final value [" + finalValue + "]");
+                        results.get(referenceObj.getUri()).put(key, finalValue);
                     } else {
                         System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
                                 "attribute could be created for this measurement): " + 
