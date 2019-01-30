@@ -2,6 +2,8 @@ package org.hadatac.data.loader;
 
 import java.time.Instant;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -671,6 +673,8 @@ public class MeasurementGenerator extends BaseGenerator {
     @Override
     public String getErrorMsg(Exception e) {
         e.printStackTrace();
-        return "Error in MeasurementGenerator: " + e.getMessage();
+	StringWriter errors = new StringWriter();
+	e.printStackTrace(new PrintWriter(errors));
+        return "Error in MeasurementGenerator: " + e.getMessage() + " " + errors.toString();
     }
 }
