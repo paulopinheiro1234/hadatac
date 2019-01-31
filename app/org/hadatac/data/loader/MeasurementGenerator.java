@@ -23,10 +23,8 @@ import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-//import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.EntityRole;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
@@ -237,7 +235,7 @@ public class MeasurementGenerator extends BaseGenerator {
                 id = record.getValueByColumnIndex(posId);
             }
             objList = dasoiGen.generateRowInstances(id);
-	    groundObj = dasoiGen.retrieveGroundObject(id);
+            groundObj = dasoiGen.retrieveGroundObject(id);
         }
 
         Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
@@ -393,7 +391,7 @@ public class MeasurementGenerator extends BaseGenerator {
             measurement.setPID("");
             measurement.setSID("");
             measurement.setRole("");
-	    measurement.setEntityUri("");
+            measurement.setEntityUri("");
 
             if (da.hasCellScope()) {
                 System.out.println("da.hasCellScope() ===============");
@@ -423,26 +421,26 @@ public class MeasurementGenerator extends BaseGenerator {
                         if (objList.get(reference) == null) {
                             System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
                         } else {
-			    // from obj. list
+                            // from obj. list
                             measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
                             measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
                             measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
-			    if (objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE) != null && !objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE).equals("")) {
-				measurement.setEntityUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE));
-			    }
-			    if (objList.get(reference).get(StudyObject.SOC_TYPE).equals(ObjectCollection.SAMPLE_COLLECTION)) {
-				measurement.setSID(objList.get(reference).get(StudyObject.OBJECT_ORIGINAL_ID));
-			    }
-			    if (objList.get(reference).get(StudyObject.OBJECT_TIME) != null && !objList.get(reference).get(StudyObject.OBJECT_TIME).equals("")) {
-				measurement.setAbstractTime(objList.get(reference).get(StudyObject.OBJECT_TIME));
-			    }
-			    
-			    // from ground obj.
-			    if (groundObj != null) {
-				measurement.setStudyObjectUri(groundObj.get(StudyObject.STUDY_OBJECT_URI));
-				measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
-				measurement.setPID(groundObj.get(StudyObject.SUBJECT_ID));
-			    }
+                            if (objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE) != null && !objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE).equals("")) {
+                                measurement.setEntityUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE));
+                            }
+                            if (objList.get(reference).get(StudyObject.SOC_TYPE).equals(ObjectCollection.SAMPLE_COLLECTION)) {
+                                measurement.setSID(objList.get(reference).get(StudyObject.OBJECT_ORIGINAL_ID));
+                            }
+                            if (objList.get(reference).get(StudyObject.OBJECT_TIME) != null && !objList.get(reference).get(StudyObject.OBJECT_TIME).equals("")) {
+                                measurement.setAbstractTime(objList.get(reference).get(StudyObject.OBJECT_TIME));
+                            }
+
+                            // from ground obj.
+                            if (groundObj != null) {
+                                measurement.setStudyObjectUri(groundObj.get(StudyObject.STUDY_OBJECT_URI));
+                                measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
+                                measurement.setPID(groundObj.get(StudyObject.SUBJECT_ID));
+                            }
                         }
                         //System.out.println("[MeasurementGenerator] For Id=[" + id + "] and reference=[" + reference + "] it was assigned Obj URI=[" + measurement.getObjectUri() + "]");
                     } else {
@@ -467,7 +465,7 @@ public class MeasurementGenerator extends BaseGenerator {
                                 //measurement.setPID(mapIDStudyObjects.get(id).get(StudyObject.OBJECT_SCOPE_URI));
                                 // test to see if object is member of a sample collection
                                 //if (URIUtils.replacePrefixEx("hasco:SampleCollection").equals(mapIDStudyObjects.get(id).get(StudyObject.SOC_TYPE))) {
-				//measurement.setSID(mapIDStudyObjects.get(id).get(StudyObject.SUBJECT_ID));
+                                //measurement.setSID(mapIDStudyObjects.get(id).get(StudyObject.SUBJECT_ID));
                                 //}
                                 //measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(StudyObject.SOC_TYPE));
                                 //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
@@ -517,30 +515,30 @@ public class MeasurementGenerator extends BaseGenerator {
                 mapSchemaObjects.put(dasoUri, daso);
             }
 
-	    if (measurement.getEntityUri().equals("")) {
-		if (null != daso) {
-		    if (daso.getTempPositionInt() > 0) {
-			// values of daso exist in the columns
-			String dasoValue = record.getValueByColumnIndex(daso.getTempPositionInt());
-			if (possibleValues.containsKey(dasa.getObjectUri())) {
-			    if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
-				measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
-			    } else {
-				measurement.setEntityUri(dasoValue);
-			    }
-			} else {
-			    measurement.setEntityUri(dasoValue);
-			}
-		    } else {
-			measurement.setEntityUri(daso.getEntity());
-		    }
-		} else {
-		    measurement.setEntityUri(dasa.getObjectUri());
-		}
-	    }
-            
+            if (measurement.getEntityUri().equals("")) {
+                if (null != daso) {
+                    if (daso.getTempPositionInt() > 0) {
+                        // values of daso exist in the columns
+                        String dasoValue = record.getValueByColumnIndex(daso.getTempPositionInt());
+                        if (possibleValues.containsKey(dasa.getObjectUri())) {
+                            if (possibleValues.get(dasa.getObjectUri()).containsKey(dasoValue.toLowerCase())) {
+                                measurement.setEntityUri(possibleValues.get(dasa.getObjectUri()).get(dasoValue.toLowerCase()));
+                            } else {
+                                measurement.setEntityUri(dasoValue);
+                            }
+                        } else {
+                            measurement.setEntityUri(dasoValue);
+                        }
+                    } else {
+                        measurement.setEntityUri(daso.getEntity());
+                    }
+                } else {
+                    measurement.setEntityUri(dasa.getObjectUri());
+                }
+            }
+
             measurement.setCharacteristicUris(Arrays.asList(dasa.getReversedAttributeString()));
-            
+
             /*======================================*
              *                                      *
              *   SET IN RELATION TO URI             *
@@ -675,8 +673,8 @@ public class MeasurementGenerator extends BaseGenerator {
     @Override
     public String getErrorMsg(Exception e) {
         e.printStackTrace();
-	StringWriter errors = new StringWriter();
-	e.printStackTrace(new PrintWriter(errors));
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
         return "Error in MeasurementGenerator: " + e.getMessage() + " " + errors.toString();
     }
 }

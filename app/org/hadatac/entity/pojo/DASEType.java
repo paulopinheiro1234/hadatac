@@ -23,7 +23,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
 
     @Override
     public boolean equals(Object o) {
-        if((o instanceof DASEType) && (((DASEType)o).getLabel().equals(this.getLabel()))) {
+        if((o instanceof DASEType) && (((DASEType)o).getUri().equals(this.getUri()))) {
             return true;
         } else {
             return false;
@@ -112,9 +112,6 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
 
     @Override
     public int compareTo(DASEType another) {
-        if (getLabel() != null && another.getLabel() != null) {
-            return getLabel().compareTo(another.getLabel());
-        }
         return getUri().compareTo(another.getUri());
     }
 

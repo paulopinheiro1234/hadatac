@@ -42,15 +42,15 @@ public abstract class BaseGenerator {
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
     protected String fileName = "";
     protected String relativePath = "";
-    
+
     protected String studyUri = "";
     protected String namedGraphUri = "";
-    
+
     public BaseGenerator(RecordFile file) {
         this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
-        
+
         String parentDir = file.getFile().getParent();
         parentDir = parentDir.replace(ConfigProp.getPathUnproc().replace("/", ""), "")
                 .replace(ConfigProp.getPathProc().replace("/", ""), "")
@@ -60,7 +60,7 @@ public abstract class BaseGenerator {
         } else {
             relativePath = parentDir + "/" + fileName;
         }
-        
+
         initMapping();
     }
 
@@ -73,22 +73,22 @@ public abstract class BaseGenerator {
     public String getFileName() {
         return fileName;
     }
-    
+
     public String getRelativePath() {
         return relativePath;
     }
-    
+
     public RecordFile getRecordFile() {
         return file;
     }
-    
+
     public String getStudyUri() {
         return studyUri;
     }
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
     }
-    
+
     public String getNamedGraphUri() {
         return namedGraphUri;
     }
@@ -96,7 +96,7 @@ public abstract class BaseGenerator {
     public void setNamedGraphUri(String namedGraphUri) {
         this.namedGraphUri = namedGraphUri;
     }
-    
+
     public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception { return null; }
 
     public HADatAcThing createObject(Record rec, int rowNumber) throws Exception { return null; }
@@ -175,10 +175,10 @@ public abstract class BaseGenerator {
             result += "\n";
             result += String.join(",", values);
         }
-        
+
         return result;
     }
-    
+
     @SuppressWarnings("unused")
     private Model createModel(List<Map<String, Object>> rows) {
         return createModel(rows, "");
@@ -193,7 +193,7 @@ public abstract class BaseGenerator {
         if (!namedGraphUri.isEmpty()) {
             namedGraph = factory.createIRI(namedGraphUri);
         }
-        
+
         for (Map<String, Object> row : rows) {
             IRI sub = factory.createIRI(URIUtils.replacePrefixEx((String)row.get("hasURI")));
             for (String key : row.keySet()) {
@@ -208,19 +208,20 @@ public abstract class BaseGenerator {
                     String cellValue = (String)row.get(key);
                     if (URIUtils.isValidURI(cellValue)) {
                         IRI obj = factory.createIRI(URIUtils.replacePrefixEx(cellValue));
-                        
+
                         if (namedGraph == null) {
                             model.add(sub, pred, obj);
                         } else {
                             model.add(sub, pred, obj, (Resource)namedGraph);
                         }
                     } else {
-			if (cellValue == null) {
-			    cellValue = "NULL";
-			}
+                        if (cellValue == null) {
+                            cellValue = "NULL";
+                        }
+                        
                         Literal obj = factory.createLiteral(
                                 cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
-                        
+
                         if (namedGraph == null) {
                             model.add(sub, pred, obj);
                         } else {
@@ -292,11 +293,11 @@ public abstract class BaseGenerator {
 
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
         Model model = createModel(rows, getNamedGraphUri());
-        
+
         Repository repo = new SPARQLRepository(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH));
         repo.initialize();
-        
+
         RepositoryConnection con = repo.getConnection();
         con.add(model);
 
@@ -327,7 +328,7 @@ public abstract class BaseGenerator {
         int count = 0;
         for (HADatAcThing obj : objects) {
             obj.setNamedGraph(getNamedGraphUri());
-            
+
             if (obj.saveToTripleStore()) {
                 count++;
             }
@@ -357,11 +358,11 @@ public abstract class BaseGenerator {
 
     public void deleteRowsFromTripleStore(List<Map<String, Object>> rows) {
         Model model = createModel(rows, "");
-        
+
         Repository repo = new SPARQLRepository(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         repo.initialize();
-        
+
         RepositoryConnection con = repo.getConnection();
         con.remove(model);
     }

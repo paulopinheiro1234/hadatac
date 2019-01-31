@@ -299,10 +299,11 @@ public class Facet {
 	public String bottommostFacetsToSolrQuery() {
 		List<String> fieldQueries = new ArrayList<>();
 		
-		if (getChildrenAsList().isEmpty()) {
+		List<Facet> children = getChildrenAsList();
+		if (children.isEmpty()) {
 			fieldQueries.add(fieldValuesToSolrQuery(getFieldValues()));
 		} else {
-			for (Facet f : getChildrenAsList()) {
+			for (Facet f : children) {
 				fieldQueries.add(f.bottommostFacetsToSolrQuery());
 			}
 		}

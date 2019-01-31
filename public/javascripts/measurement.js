@@ -131,12 +131,14 @@ function create_merged_item(data, selected_elems, curLevel,
 	if (data.children.length == 0 && curLevel > levelToBegin) {
 		// sort text by given order
 		var new_text = [];
+		var new_tooltips = [];
 		for (var i = 0; i < order.length; i++) {
 			new_text.push(text[order[i]]);
+			new_tooltips.push(tooltips[order[i]]);
 		}
 		
 		pivot.text = new_text.join(' ') + ' (' + data.count + ')';
-		pivot.tooltip = tooltips.join(' ');
+		pivot.tooltip = new_tooltips.join(' ');
 		pivot.label = new_text.join(' ');
 		pivot.count = data.count;
 		pivot.userdata.push({"name": "facet", "content": createFacet(facets, 0)});

@@ -25,6 +25,8 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import io.ebeaninternal.server.lib.util.Str;
+
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 
@@ -282,9 +284,17 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         if (attributes == null) {
             return "";
         }
+        
+        // Remove duplicates
+        List<String> uniqueAttributes = new ArrayList<String>();
+        for (String attrib : attributes) {
+            if (!uniqueAttributes.contains(attrib)) {
+                uniqueAttributes.add(attrib);
+            }
+        }
 
         String result = "";
-        for (String attrib : attributes) {
+        for (String attrib : uniqueAttributes) {
             if (result.equals("")) {
                 result = attrib;
             } else {

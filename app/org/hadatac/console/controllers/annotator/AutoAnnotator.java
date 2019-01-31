@@ -285,11 +285,11 @@ public class AutoAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result moveDataFile(String fileName) {        
         final SysUser user = AuthApplication.getLocalUser(session());
+        
         DataFile dataFile = null;
         if (user.isDataManager()) {
             dataFile = DataFile.findByName(null, fileName);
-        }
-        else {
+        } else {
             dataFile = DataFile.findByName(user.getEmail(), fileName);
         }
 
@@ -306,7 +306,7 @@ public class AutoAnnotator extends Controller {
             Measurement.deleteFromSolr(dataFile.getDatasetUri());
             NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         } else {
-            deleteAddedTriples(file);
+            deleteAddedTriples(file, dataFile);
         }
 
         dataFile.setStatus(DataFile.UNPROCESSED);
@@ -359,6 +359,7 @@ public class AutoAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteDataFile(String fileName, boolean isProcessed) {
         final SysUser user = AuthApplication.getLocalUser(session());
+        
         DataFile dataFile = null;
         if (user.isDataManager()) {
             dataFile = DataFile.findByName(null, fileName);
@@ -384,24 +385,26 @@ public class AutoAnnotator extends Controller {
             NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         } else {
             try {
-                deleteAddedTriples(file);
+                deleteAddedTriples(file, dataFile);
             } catch (Exception e) {
                 System.out.print("Can not delete triples ingested by " + fileName + " ..");
                 file.delete();
                 dataFile.delete();
                 AnnotationLog.delete(fileName);
+                AnnotationLog.delete(pureFileName);
                 return redirect(routes.AutoAnnotator.index());
             }
         }
         file.delete();
         dataFile.delete();
         AnnotationLog.delete(fileName);
+        AnnotationLog.delete(pureFileName);
 
         return redirect(routes.AutoAnnotator.index());
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public static void deleteAddedTriples(File file){
+    public static void deleteAddedTriples(File file, DataFile dataFile) {
         System.out.println("Deleting the added triples from the moving file ...");
 
         RecordFile recordFile = null;
@@ -416,27 +419,9 @@ public class AutoAnnotator extends Controller {
             return;
         }
 
-        String file_name = file.getName();
-        GeneratorChain chain = null;
+        String fileName = file.getName();
+        GeneratorChain chain = AnnotationWorker.getGeneratorChain(fileName, dataFile, recordFile);
         
-        if (file_name.startsWith("STD")) {
-            chain = AnnotationWorker.annotateStudyIdFile(recordFile);
-        } else if (file_name.startsWith("DPL")) {
-            if (file_name.endsWith(".xlsx")) {
-                recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
-            }
-            chain = AnnotationWorker.annotateDPLFile(recordFile);
-        } else if (file_name.startsWith("ACQ")) {
-            chain = AnnotationWorker.annotateACQFile(recordFile, false);
-        } else if (file_name.startsWith("OAS")) {
-            chain = AnnotationWorker.annotateOASFile(recordFile, false);
-        } else if (file_name.startsWith("SDD")) {
-            if (file_name.endsWith(".xlsx")) {
-                recordFile = new SpreadsheetRecordFile(file, "InfoSheet");
-            }
-            chain = AnnotationWorker.annotateSDDFile(recordFile);
-        }
-
         if (chain != null) {
             chain.delete();
         }

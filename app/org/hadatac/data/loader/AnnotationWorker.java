@@ -49,9 +49,53 @@ public class AnnotationWorker {
                 ConfigProp.getPathUnproc(), 
                 ConfigProp.getDefaultOwnerEmail());
     }
+    
+    public static GeneratorChain getGeneratorChain(
+            String fileName, DataFile dataFile, RecordFile recordFile) {
+        GeneratorChain chain = null;
+
+        if (fileName.startsWith("DA-")) {
+            chain = annotateDAFile(dataFile, recordFile);
+        } else if (fileName.startsWith("STD-")) {
+            chain = annotateStudyIdFile(recordFile);
+        } else if (fileName.startsWith("DPL-")) {
+            if (fileName.endsWith(".xlsx")) {
+                recordFile = new SpreadsheetRecordFile(recordFile.getFile(), "InfoSheet");
+                if (!recordFile.isValid()) {
+                    AnnotationLog.printException("Missing InfoSheet. ", fileName);
+                    return null;
+                }
+            }
+            chain = annotateDPLFile(recordFile);
+        } else if (fileName.startsWith("ACQ-")) {
+            chain = annotateACQFile(recordFile, true);
+        } else if (fileName.startsWith("OAS-")) {
+            checkOASFile(recordFile);
+            chain = annotateOASFile(recordFile, true);
+        } else if (fileName.startsWith("SDD-")) {
+            if (fileName.endsWith(".xlsx")) {
+                recordFile = new SpreadsheetRecordFile(recordFile.getFile(), "InfoSheet");
+                if (!recordFile.isValid()) {
+                    AnnotationLog.printException("The Info sheet is missing in this SDD file. ", fileName);
+                    return null;
+                }
+            }
+            chain = annotateSDDFile(recordFile);
+
+        } else if (fileName.startsWith("SSD-")) {
+            chain = annotateSSDFile(recordFile);
+        } else {
+            AnnotationLog.printException(
+                    "Unsupported file name prefix, only accept prefixes "
+                    + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. ", fileName);
+            return null;
+        }
+        
+        return chain;
+    }
 
     public static void autoAnnotate() {
-        if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")){
+        if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")) {
             return;
         }
 
@@ -69,14 +113,14 @@ public class AnnotationWorker {
             }
         });
 
-        for (DataFile file : unprocFiles) {
-            file.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            file.save();
+        for (DataFile dataFile : unprocFiles) {
+            dataFile.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.save();
 
-            String fileName = file.getFileName();
+            String fileName = dataFile.getFileName();
             String filePath = pathUnproc + "/" + fileName;
 
-            if (procFiles.contains(file)) {
+            if (procFiles.contains(dataFile)) {
                 AnnotationLog.printException(String.format(
                         "Already processed a file with the same name %s . "
                         + "Please delete the old file before moving forward ", fileName), 
@@ -87,10 +131,11 @@ public class AnnotationWorker {
             AnnotationLog.println(String.format("Processing file: %s", fileName), fileName);
 
             RecordFile recordFile = null;
+            File file = new File(filePath);
             if (fileName.endsWith(".csv")) {
-                recordFile = new CSVRecordFile(new File(filePath));
+                recordFile = new CSVRecordFile(file);
             } else if (fileName.endsWith(".xlsx")) {
-                recordFile = new SpreadsheetRecordFile(new File(filePath));
+                recordFile = new SpreadsheetRecordFile(file);
             } else {
                 AnnotationLog.printException(
                         String.format("Unknown file format: %s", fileName), 
@@ -99,44 +144,7 @@ public class AnnotationWorker {
             }
 
             boolean bSucceed = false;
-            GeneratorChain chain = null;
-
-            if (fileName.startsWith("DA-")) {
-                chain = annotateDAFile(file, recordFile);
-            } else if (fileName.startsWith("STD-")) {
-                chain = annotateStudyIdFile(recordFile);
-            } else if (fileName.startsWith("DPL-")) {
-                if (fileName.endsWith(".xlsx")) {
-                    recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
-                    if (!recordFile.isValid()) {
-                        AnnotationLog.printException("Missing InfoSheet. ", fileName);
-                        return;
-                    }
-                }
-                chain = annotateDPLFile(recordFile);
-            } else if (fileName.startsWith("ACQ-")) {
-                chain = annotateACQFile(recordFile, true);
-            } else if (fileName.startsWith("OAS-")) {
-                checkOASFile(recordFile);
-                chain = annotateOASFile(recordFile, true);
-            } else if (fileName.startsWith("SDD-")) {
-                if (fileName.endsWith(".xlsx")) {
-                    recordFile = new SpreadsheetRecordFile(new File(filePath), "InfoSheet");
-                    if (!recordFile.isValid()) {
-                        AnnotationLog.printException("The Info sheet is missing in this SDD file. ", fileName);
-                        return;
-                    }
-                }
-                chain = annotateSDDFile(recordFile);
-
-            } else if (fileName.startsWith("SSD-")) {
-                chain = annotateSSDFile(recordFile);
-            } else {
-                AnnotationLog.printException(
-                        "Unsupported file name prefix, only accept prefixes "
-                        + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. ", fileName);
-                return;
-            }
+            GeneratorChain chain = getGeneratorChain(fileName, dataFile, recordFile);
 
             if (chain != null) {
                 bSucceed = chain.generate();
@@ -157,35 +165,35 @@ public class AnnotationWorker {
                     destFolder.mkdirs();
                 }
 
-                file.delete();
+                dataFile.delete();
 
-                file.setStatus(DataFile.PROCESSED);
-                file.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                dataFile.setStatus(DataFile.PROCESSED);
+                dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
                 if (study.isEmpty()) {
-                    file.setFileName(file.getFileName());
-                    file.setStudyUri("");
+                    dataFile.setFileName(dataFile.getFileName());
+                    dataFile.setStudyUri("");
                 } else {
-                    file.setFileName(study + "/" + file.getFileName());
-                    file.setStudyUri(chain.getStudyUri());
+                    dataFile.setFileName(study + "/" + dataFile.getFileName());
+                    dataFile.setStudyUri(chain.getStudyUri());
                 }
-                file.save();
+                dataFile.save();
                 
                 File f = new File(pathUnproc + "/" + fileName);
                 f.renameTo(new File(destFolder + "/" + fileName));
                 f.delete();
                 
                 AnnotationLog log = AnnotationLog.find(fileName);
-                if (null != log) {
-                    AnnotationLog newLog = new AnnotationLog(file.getFileName());
+                if (null != log) {                    
+                    AnnotationLog newLog = new AnnotationLog(dataFile.getFileName());
                     newLog.setLog(log.getLog());
                     log.delete();
                     newLog.save();
                 }
             } else {
                 // Freeze file
-                System.out.println("Freezed file " + file.getFileName());
-                file.setStatus(DataFile.FREEZED);
-                file.save();
+                System.out.println("Freezed file " + dataFile.getFileName());
+                dataFile.setStatus(DataFile.FREEZED);
+                dataFile.save();
             }
         }
     }

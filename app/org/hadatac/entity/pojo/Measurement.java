@@ -506,7 +506,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         String facet_query = "";
         String q = "";
         if (handler != null) {
-            facet_query = handler.bottommostFacetsToSolrQuery();
+            facet_query = handler.toSolrQuery();
         }
 
         if (facet_query.trim().equals("") || facet_query.trim().equals("*:*")) {
@@ -604,7 +604,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         //String q = buildQuery(ownedDAs, retFacetHandler);
         String q = buildQuery(ownedDAs, facetHandler);
 
-        //System.out.println("measurement solr query: " + q);
+        System.out.println("measurement solr query: " + q);
 
         SolrQuery query = new SolrQuery();
         query.setQuery(q);

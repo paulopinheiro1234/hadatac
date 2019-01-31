@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -81,26 +82,26 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
     }
 
     public static Entity find(String uri) {
-        Entity entity = null;
-        Model model;
-        Statement statement;
-        RDFNode object;
-
         String queryString = "DESCRIBE <" + uri + ">";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.sparqlService(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        model = qexec.execDescribe();
+        Model model = qexec.execDescribe();
 
-        entity = new Entity();
+        Entity entity = new Entity();
         StmtIterator stmtIterator = model.listStatements();
 
         while (stmtIterator.hasNext()) {
-            statement = stmtIterator.next();
-            object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-                entity.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+            Statement statement = stmtIterator.next();
+            RDFNode object = statement.getObject();
+            if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:label"))) {
+                String label = object.asLiteral().getString();
+                
+                // prefer longer one
+                if (label.length() > entity.getLabel().length()) {
+                    entity.setLabel(label);
+                }
+            } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:subClassOf"))) {
                 entity.setSuperUri(object.asResource().getURI());
             }
         }

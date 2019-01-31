@@ -248,7 +248,7 @@ public class OASGenerator extends BaseGenerator {
             throw new Exception(String.format("SDD <%s> cannot be found. Please ingest proper SDD file first. ", da.getSchemaUri()));
         }
 
-	DASOInstanceGenerator dasoInstGen = new DASOInstanceGenerator(da.getStudyUri(), schema, this.getRecordFile().getFileName()); 
+        DASOInstanceGenerator dasoInstGen = new DASOInstanceGenerator(da.getStudyUri(), schema, this.getRecordFile().getFileName());
 
         return da;
     }

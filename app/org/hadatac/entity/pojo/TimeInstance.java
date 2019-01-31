@@ -254,8 +254,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
                 }
                 
                 if (time.getLabel().isEmpty()) {
-                    String uri = pivot_ent.getValue();
-                    time.setLabel(WordUtils.capitalize(URIUtils.getBaseName(uri)));
+                    time.setLabel(WordUtils.capitalize(URIUtils.getBaseName(time.getUri())));
                 }
             } else {
                 time.setUri("");
