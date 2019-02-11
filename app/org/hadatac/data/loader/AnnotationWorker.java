@@ -49,7 +49,7 @@ public class AnnotationWorker {
                 ConfigProp.getPathUnproc(), 
                 ConfigProp.getDefaultOwnerEmail());
     }
-    
+
     public static GeneratorChain getGeneratorChain(
             String fileName, DataFile dataFile, RecordFile recordFile) {
         GeneratorChain chain = null;
@@ -81,16 +81,15 @@ public class AnnotationWorker {
                 }
             }
             chain = annotateSDDFile(recordFile);
-
         } else if (fileName.startsWith("SSD-")) {
             chain = annotateSSDFile(recordFile);
         } else {
             AnnotationLog.printException(
                     "Unsupported file name prefix, only accept prefixes "
-                    + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. ", fileName);
+                            + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. ", fileName);
             return null;
         }
-        
+
         return chain;
     }
 
@@ -123,11 +122,11 @@ public class AnnotationWorker {
             if (procFiles.contains(dataFile)) {
                 AnnotationLog.printException(String.format(
                         "Already processed a file with the same name %s . "
-                        + "Please delete the old file before moving forward ", fileName), 
+                                + "Please delete the old file before moving forward ", fileName), 
                         fileName);
                 return;
             }
-            
+
             AnnotationLog.println(String.format("Processing file: %s", fileName), fileName);
 
             RecordFile recordFile = null;
@@ -159,7 +158,7 @@ public class AnnotationWorker {
                 } else {
                     new_path = pathProc + "/" + study;
                 }
-                
+
                 File destFolder = new File(new_path);
                 if (!destFolder.exists()){
                     destFolder.mkdirs();
@@ -177,11 +176,11 @@ public class AnnotationWorker {
                     dataFile.setStudyUri(chain.getStudyUri());
                 }
                 dataFile.save();
-                
+
                 File f = new File(pathUnproc + "/" + fileName);
                 f.renameTo(new File(destFolder + "/" + fileName));
                 f.delete();
-                
+
                 AnnotationLog log = AnnotationLog.find(fileName);
                 if (null != log) {                    
                     AnnotationLog newLog = new AnnotationLog(dataFile.getFileName());
@@ -197,7 +196,7 @@ public class AnnotationWorker {
             }
         }
     }
-    
+
     public static void checkOASFile(RecordFile recordFile) {
         System.out.println("OAS HERE!");
         final String kbPrefix = ConfigProp.getKbPrefix();
@@ -245,7 +244,7 @@ public class AnnotationWorker {
                 if (null == daso) {
                     continue;
                 }
-                
+
                 if (daso.getEntityLabel() == null || daso.getEntityLabel().length() == 0) {
                     AnnotationLog.printException("The Entity Label of DASO : " + daso.getLabel() + " can not be found. Check SDD.", fileName);
                 } else if (!refList.containsKey(daso.getLabel())) {
@@ -371,7 +370,7 @@ public class AnnotationWorker {
     public static GeneratorChain annotateDPLFile(RecordFile file) {
         DPL dpl = new DPL(file);
         Map<String, String> mapCatalog = dpl.getCatalog();
-        
+
         GeneratorChain chain = new GeneratorChain();
         for (String key : mapCatalog.keySet()) {
             if (mapCatalog.get(key).length() > 0) {
@@ -463,13 +462,13 @@ public class AnnotationWorker {
             codeMappingFile = sdd.downloadFile(mapCatalog.get("Code_Mappings"), 
                     "sddtmp/" + file.getFileName().replace(".xlsx", "") + "-code-mappings.csv");
 
-	    if (mapCatalog.get("Codebook") != null) { 
-		codeBookRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
+            if (mapCatalog.get("Codebook") != null) { 
+                codeBookRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Codebook").replace("#", ""));
             }
             dictionaryRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Data_Dictionary").replace("#", ""));
-	    if (mapCatalog.get("Timeline") != null) {
-		timelineRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", ""));
-	    }
+            if (mapCatalog.get("Timeline") != null) {
+                timelineRecordFile = new SpreadsheetRecordFile(file.getFile(), mapCatalog.get("Timeline").replace("#", ""));
+            }
         }
 
         if (null != codeMappingFile) {
@@ -482,7 +481,7 @@ public class AnnotationWorker {
         } else {
             AnnotationLog.printWarning(String.format("Failed to download the CodeMapping of this SDD.", fileName), fileName);
         }
-        
+
         if (!sdd.readDataDictionary(dictionaryRecordFile)) {
             AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFileName());
             return null;
@@ -539,7 +538,7 @@ public class AnnotationWorker {
             String studyUri = gen.getStudyUri();
             chain.addGenerator(gen);
             if (studyUri == null || studyUri == "") {
-            	return null;
+                return null;
             } else {
                 chain.setStudyUri(studyUri);
                 Study study = Study.find(studyUri);
@@ -628,7 +627,17 @@ public class AnnotationWorker {
             dataFile.setDatasetUri(DataFactory.getNextDatasetURI(oas.getUri()));
             oas.addDatasetUri(dataFile.getDatasetUri());
 
-            chain.addGenerator(new MeasurementGenerator(recordFile, oas, dataFile));
+            DataAcquisitionSchema schema = DataAcquisitionSchema.find(oas.getSchemaUri());
+            if (schema == null) {
+                AnnotationLog.printException(String.format("Schema %s cannot be found", oas.getSchemaUri()), fileName);
+                chain.setInvalid();
+            }
+
+            // Need to be fixed here by getting codeMap and codebook from sparql query
+            DASOInstanceGenerator dasoInstanceGen = new DASOInstanceGenerator(recordFile, oas.getStudyUri(), oas.getUri(), schema, dataFile.getFileName());
+
+            chain.addGenerator(dasoInstanceGen);
+            chain.addGenerator(new MeasurementGenerator(recordFile, oas, schema, dataFile, dasoInstanceGen));
             chain.setNamedGraphUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         }
 

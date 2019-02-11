@@ -156,7 +156,7 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
             message += Feedback.println(mode," ");
 
-            for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
+            for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getNamespaces().entrySet()) {
                 String abbrev = entry.getKey().toString();
                 NameSpace ns = entry.getValue();
                 String nsURL = ns.getURL();

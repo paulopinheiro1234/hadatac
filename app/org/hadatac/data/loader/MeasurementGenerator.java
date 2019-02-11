@@ -2,8 +2,6 @@ package org.hadatac.data.loader;
 
 import java.time.Instant;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -40,7 +38,6 @@ public class MeasurementGenerator extends BaseGenerator {
 
     private DataAcquisitionSchema schema = null;
     private Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
-    //private Map<String, DataAcquisitionSchemaEvent> mapSchemaEvents = new HashMap<String, DataAcquisitionSchemaEvent>();
     private Map<String, DataAcquisitionSchemaObject> mapSchemaEvents = new HashMap<String, DataAcquisitionSchemaObject>();
 
     // ASSIGN positions for MetaDASAs
@@ -64,10 +61,13 @@ public class MeasurementGenerator extends BaseGenerator {
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
     private DASOInstanceGenerator dasoiGen = null; 
 
-    public MeasurementGenerator(RecordFile file, ObjectAccessSpec da, DataFile dataFile) {
+    public MeasurementGenerator(RecordFile file, ObjectAccessSpec da, 
+            DataAcquisitionSchema schema, DataFile dataFile, DASOInstanceGenerator dasoiGen) {
         super(file);
         this.da = da;
+        this.schema = schema;
         this.dataFile = dataFile;
+        this.dasoiGen = dasoiGen;
 
         setStudyUri(da.getStudyUri());
     }
@@ -112,12 +112,7 @@ public class MeasurementGenerator extends BaseGenerator {
 
         AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
 
-        schema = DataAcquisitionSchema.find(da.getSchemaUri());
-        if (schema == null) {
-            throw new Exception(da.getSchemaUri() + " cannot be found!");
-        }
-
-        createVirtualObjectCollections(schema);
+        // createVirtualObjectCollections(schema);
 
         /*
         if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
@@ -187,13 +182,9 @@ public class MeasurementGenerator extends BaseGenerator {
         dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
 
         //System.out.println("possibleValues: " + possibleValues);
-
+        
         // Comment out row instance generation
-
-        // Need to be fixed here by getting codeMap and codebook from sparql query
-        dasoiGen = new DASOInstanceGenerator(da.getStudyUri(),schema, dataFile.getFileName()); 
-        //Map<String, DASOInstance> rowInstances = new HashMap<String,DASOInstance>();
-
+        // Map<String, DASOInstance> rowInstances = new HashMap<String, DASOInstance>();
     }
 
     @Override
@@ -668,13 +659,5 @@ public class MeasurementGenerator extends BaseGenerator {
     @Override
     public String getTableName() {
         return "";
-    }
-
-    @Override
-    public String getErrorMsg(Exception e) {
-        e.printStackTrace();
-        StringWriter errors = new StringWriter();
-        e.printStackTrace(new PrintWriter(errors));
-        return "Error in MeasurementGenerator: " + e.getMessage() + " " + errors.toString();
     }
 }
