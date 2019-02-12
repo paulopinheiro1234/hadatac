@@ -439,7 +439,7 @@ public class StudyObject extends HADatAcThing {
 
     public static String findUriBySocAndOriginalId(String socUri, String original_id) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT  ?objuri WHERE { " + 
+                "SELECT ?objuri WHERE { " + 
                 "	?objuri hasco:originalID \"" + original_id + "\" . " + 
                 "	?objuri hasco:isMemberOf <" + socUri + "> . " + 
                 "}";

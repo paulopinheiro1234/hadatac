@@ -10,24 +10,14 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.console.models.SysUser;
-import org.hadatac.console.views.html.metadata.*;
-import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpace;
-import org.json.simple.JSONObject;
-import org.labkey.remoteapi.query.*;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
+
 
 public class DynamicFunctions extends Controller {
 
@@ -39,7 +29,7 @@ public class DynamicFunctions extends Controller {
     public static Map<String,String> getPrefixMap() {
         NameSpaces.getInstance();
         Map<String,String> prefixMap = new HashMap<String,String>();
-        for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getTable().entrySet()) {
+        for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getNamespaces().entrySet()) {
             String abbrev = entry.getKey().toString();
             NameSpace ns = entry.getValue();
             prefixMap.put(abbrev, ns.getName());

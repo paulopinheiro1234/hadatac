@@ -63,8 +63,8 @@ public class LoadOnt extends Controller {
                 }
             }
         }
-
-        return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getNamespaces()));
+        
+        return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -97,7 +97,7 @@ public class LoadOnt extends Controller {
             }
         }
 
-        return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getNamespaces()));
+        return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList()));
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -204,17 +204,8 @@ public class LoadOnt extends Controller {
         File file = new File(path + "/namespaces.properties");
         try {
             List<String> lines = new ArrayList<String>();
-            List<NameSpace> nameSpaces = NameSpace.findAll();
             
-            nameSpaces.sort(new Comparator<NameSpace>() {
-                @Override
-                public int compare(NameSpace o1, NameSpace o2) {
-                    return o1.getAbbreviation().toLowerCase().compareTo(
-                            o2.getAbbreviation().toLowerCase());
-                }
-            });
-            
-            for (NameSpace ns : nameSpaces) {
+            for (NameSpace ns : NameSpaces.getInstance().getOrderedNamespacesAsList()) {
                 lines.add(ns.getAbbreviation() + "=" + String.join(",", Arrays.asList(
                         ns.getName(), ns.getType(), ns.getURL())));
             }

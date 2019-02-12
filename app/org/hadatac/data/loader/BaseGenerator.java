@@ -1,5 +1,7 @@
 package org.hadatac.data.loader;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,9 +68,16 @@ public abstract class BaseGenerator {
 
     public void initMapping() {}
 
-    abstract public String getTableName();
+    public String getTableName() {
+        return null;
+    }
 
-    abstract public String getErrorMsg(Exception e);
+    public String getErrorMsg(Exception e) {
+        e.printStackTrace();
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
+        return "Errors in " + getClass().getSimpleName() + ": " + e.getMessage() + " " + errors.toString();
+    }
 
     public String getFileName() {
         return fileName;
@@ -107,6 +116,14 @@ public abstract class BaseGenerator {
 
     public List<HADatAcThing> getObjects() {
         return objects;
+    }
+    
+    public void addRow(Map<String, Object> row) {
+        rows.add(row);
+    }
+    
+    public void addObject(HADatAcThing object) {
+        objects.add(object);
     }
 
     public void preprocess() throws Exception {}
@@ -258,33 +275,42 @@ public abstract class BaseGenerator {
         if (rows.isEmpty()) {
             return true;
         }
+        
+        String tableName = getTableName();
+        if (null == tableName) {
+            AnnotationLog.printException("No LabKey table name is specified", fileName);
+            return false;
+        }
 
         try {
             checkRows(rows, "hasURI");
         } catch (Exception e) {
             AnnotationLog.printException(String.format(
-                    "Trying to commit invalid rows to LabKey Table %s: ", getTableName())
+                    "Trying to commit invalid rows to LabKey Table %s: ", tableName)
                     + e.getMessage(), fileName);
+            return false;
         }
 
         Credential cred = Credential.find();
         if (null == cred) {
             AnnotationLog.printException("No LabKey credentials are provided!", fileName);
+            return false;
         }
 
         LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
                 cred.getUserName(), cred.getPassword());
         try {
-            int nRows = labkeyDataHandler.insertRows(getTableName(), rows);
+            int nRows = labkeyDataHandler.insertRows(tableName, rows);
             AnnotationLog.println(String.format(
-                    "%d row(s) have been inserted into Table %s ", nRows, getTableName()), fileName);
+                    "%d row(s) have been inserted into Table %s ", nRows, tableName), fileName);
         } catch (CommandException e1) {
             try {
-                labkeyDataHandler.deleteRows(getTableName(), rows);
-                int nRows = labkeyDataHandler.insertRows(getTableName(), rows);
-                AnnotationLog.println(String.format("%d row(s) have been updated into Table %s ", nRows, getTableName()), fileName);
+                labkeyDataHandler.deleteRows(tableName, rows);
+                int nRows = labkeyDataHandler.insertRows(tableName, rows);
+                AnnotationLog.println(String.format("%d row(s) have been updated into Table %s ", nRows, tableName), fileName);
             } catch (CommandException e) {
                 AnnotationLog.printException("CommitRows inside AutoAnnotator: " + e, fileName);
+                return false;
             }
         }
 
@@ -381,8 +407,13 @@ public abstract class BaseGenerator {
 
         LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
                 cred.getUserName(), cred.getPassword());
+        
         try {
-            labkeyDataHandler.deleteRows(getTableName(), rows);
+            String tableName = getTableName();
+            if (null == tableName) {
+                AnnotationLog.printException("No LabKey table name is specified", fileName);
+            }
+            labkeyDataHandler.deleteRows(tableName, rows);
         } catch (CommandException e) {
             AnnotationLog.printException("Delete rows from LabKey: " + e, fileName);
             throw new LabKeyException("[ERROR] Delete rows from LabKey: " + e);

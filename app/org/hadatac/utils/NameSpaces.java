@@ -60,10 +60,6 @@ public class NameSpaces {
         }
     }
     
-    public Map<String, NameSpace> getTable() {
-        return table;
-    }
-    
     public Map<String, Integer> getLoadedOntologies() {
         return loadedOntologies;
     }
@@ -119,6 +115,20 @@ public class NameSpaces {
     
     public Map<String, NameSpace> getNamespaces() {
         return table;
+    }
+    
+    public List<NameSpace> getOrderedNamespacesAsList() {
+        List<NameSpace> nameSpaces = new ArrayList<NameSpace>(table.values());
+        
+        nameSpaces.sort(new Comparator<NameSpace>() {
+            @Override
+            public int compare(NameSpace o1, NameSpace o2) {
+                return o1.getAbbreviation().toLowerCase().compareTo(
+                        o2.getAbbreviation().toLowerCase());
+            }
+        });
+        
+        return nameSpaces;
     }
     
     private String getTurtleNameSpaceList() {
