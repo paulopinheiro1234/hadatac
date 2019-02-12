@@ -23,7 +23,7 @@ public class Alignment {
     private Map<String, Unit> unitCache;
     private Map<String, AlignmentEntityRole> roles;
     private Map<String, AlignmentAttribute> alignAttrs;
-    private Map<String, String> hCodeBook;
+    private Map<String, List<String>> hCodeBook;
 
     Attribute ID = new Attribute();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
@@ -35,7 +35,7 @@ public class Alignment {
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
         alignAttrs = new HashMap<String, AlignmentAttribute>();
-	hCodeBook = new HashMap<String, String>();
+	hCodeBook = new HashMap<String, List<String>>();
         ID.setLabel("ID");
     }
 
@@ -136,25 +136,28 @@ public class Alignment {
             System.out.println("[ERROR] retrieving entity " + m.getEntityUri());
             return null;
         }
-        //System.out.println("Align-Debug: new alignment attribute 1"); 
+        //System.out.println("Align-Debug: new alignment attribute"); 
         AlignmentEntityRole newRole = new AlignmentEntityRole(entity,mRole);
 
-        System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris() + "]"); 
+        System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
         Attribute attribute = Attribute.find(m.getCharacteristicUris().get(0));
         if (attribute == null) {
             System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
             return null;
         }
 
-        //System.out.println("Align-Debug: new alignment attribute 1.2"); 
+	/*
+        System.out.println("Align-Debug: new alignment attribute DASA URI :[" + m.getDasaUri() + "]"); 
 	if (m.getDasaUri() != null && !m.getDasaUri().equals("")) {
 	    if (!containsCode(m.getDasaUri())) {
 		String code = Attribute.findHarmonizedCode(m.getDasaUri());
+		System.out.println("Align-Debug: new alignment attribute Code for DASA URI :[" + code + "]"); 
 		if (code != null && !code.equals("")) {
 		    addCode(m.getCharacteristicUris().get(0), code);
 		}
 	    }
-	}
+	    }*/
+
         //System.out.println("Align-Debug: new alignment attribute 2"); 
 
         if (!mInRelationTo.equals("")) {
@@ -209,11 +212,11 @@ public class Alignment {
         return roles.get(key);
     }
 
-    public String getCode(String key) {
+    public List<String> getCode(String key) {
         return hCodeBook.get(key);
     }
 
-    public Map<String, String> getCodeBook() {
+    public Map<String, List<String>> getCodeBook() {
 	return hCodeBook;
     }
 
@@ -232,8 +235,8 @@ public class Alignment {
         return new ArrayList<AlignmentAttribute>(alignAttrs.values());
     }
 
-    public List<String> getCodes() {
-        return new ArrayList<String>(hCodeBook.values());
+    public List<List<String>> getCodes() {
+        return new ArrayList<List<String>>(hCodeBook.values());
     }
 
     /* ADD METHODS
@@ -250,7 +253,7 @@ public class Alignment {
         alignAttrs.put(newAA.getKey(),newAA);
     }
 
-    public void addCode(String attrUri, String code) {
+    public void addCode(String attrUri, List<String> code) {
         hCodeBook.put(attrUri, code);
     }
 }

@@ -226,8 +226,8 @@ public class DASOInstanceGenerator{
 	for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
 	    String key = entry.getKey();
 	    ObjectCollection soc = entry.getValue();
-	    AnnotationLog.println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference() + 
-			       "    with hasScope: " + soc.getHasScopeUri(), fileName);
+	    //AnnotationLog.println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference() + 
+	    //		  "    with hasScope: " + soc.getHasScopeUri(), fileName);
 	}
 	
 	/* 
@@ -511,11 +511,11 @@ public class DASOInstanceGenerator{
 	 */
 	
 	if (id == null || id.equals("")) {
-	    System.out.println("DASOInstanceGenerator: no identifier provided. SEe if your SDD contains an identifier," + 
+	    System.out.println("DASOInstanceGenerator: no identifier provided. See if your SDD contains an identifier," + 
 			       " and if the corresponding label in ths file is a valid identifier.");
 	    return null;
 	}
-	//System.out.println("DASOInstanceGenerator: generate row instances for : " + id);
+	System.out.println("DASOInstanceGenerator: generate row instances for : " + id);
 	
 	Map<String,Map<String,String>> objMapList = new HashMap<String,Map<String,String>>();
 	
@@ -587,12 +587,12 @@ public class DASOInstanceGenerator{
 	    
 	}
 	
-	//System.out.println("DASOInstanceGenerator:     Response >>> ");
+	/*System.out.println("DASOInstanceGenerator:     Response >>> ");
 	for (Map.Entry<String, Map<String,String>> entry : objMapList.entrySet()) {
 	    String label = entry.getKey();
 	    Map<String,String> objMapEntry = entry.getValue();
-	    //System.out.println("DASOInstanceGenerator:          Label=[" + label + "]    Obj Uri=[" + objMapEntry.get(StudyObject.STUDY_OBJECT_URI) + "]");
-	}
+	    System.out.println("DASOInstanceGenerator:          Label=[" + label + "]    Obj Uri=[" + objMapEntry.get(StudyObject.STUDY_OBJECT_URI) + "]");
+	    }*/
 	
 	return objMapList;
 	
@@ -706,14 +706,15 @@ public class DASOInstanceGenerator{
 
 	if (groundingPath == null || groundingPath.size() <= 0) {
 	    obj = StudyObject.find(currentObjUri);
-	    if (obj != null) {
-		groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());
-		groundObj.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
-		groundObj.put(StudyObject.SUBJECT_ID, obj.getOriginalId());
-		return groundObj;
-	    } 
-	    return null;
-	}
+	    if (obj == null) {
+		System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve first Study Object for URI=[" + currentObjUri + "]");
+		return null;
+	    }
+	    groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());
+	    groundObj.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
+	    groundObj.put(StudyObject.SUBJECT_ID, obj.getOriginalId());
+	    return groundObj;
+	} 
 
 	//System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
 	
@@ -735,6 +736,10 @@ public class DASOInstanceGenerator{
 	}
 	
 	obj = StudyObject.find(currentObjUri);
+	if (obj == null) {
+	    System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve Study Object for URI=[" + currentObjUri + "]");
+	    return null;
+	}
 	groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());
 	groundObj.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
 	groundObj.put(StudyObject.SUBJECT_ID, obj.getOriginalId());

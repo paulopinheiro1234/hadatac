@@ -37,6 +37,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -68,6 +69,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String timeValueUnitUri;
     @Field("value_str")
     private String value;
+    private String valueClass;
     @Field("original_value_str")
     private String originalValue;
     @Field("lod_str")
@@ -106,6 +108,10 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String instrumentModel;
     private String instrumentUri;
     private String strTimestamp;
+
+    public static String WITH_CODES = "withCodes";
+    public static String WITH_VALUES = "withValues";
+    public static String WITH_CODE_BOOK = "withCodeBook";
 
     public Measurement() {
         characteristicUris = new ArrayList<String>();
@@ -286,8 +292,16 @@ public class Measurement extends HADatAcThing implements Runnable {
         return value;
     }
 
+    public String getValueClass() {
+        return valueClass;
+    }
+
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public void setValueClass(String valueClass) {
+        this.valueClass = valueClass;
     }
 
     public String getOriginalValue() {
@@ -907,11 +921,11 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setCharacteristicUris(uris);
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
-        String value = SolrUtils.getFieldValue(doc, "value_str");
-        if (cachedURILabels.containsKey(value)) {
-            m.setValue(cachedURILabels.get(value));
+        m.setValueClass(SolrUtils.getFieldValue(doc, "value_str"));
+        if (cachedURILabels.containsKey(m.getValueClass())) {
+            m.setValue(cachedURILabels.get(m.getValueClass()));
         } else {
-            m.setValue(value);
+            m.setValue(m.getValueClass());
         }
 
         ObjectAccessSpec da = null;
@@ -1019,7 +1033,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file) {        
+    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file, String categoricalOption) {        
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
@@ -1092,13 +1106,32 @@ public class Measurement extends HADatAcThing implements Runnable {
                         /*if (alignment.containsCode(m.getCharacteristicUri())) {
 			  finalValue = alignment.getCode(m.getCharacteristicUri()); */
 			
-                        if (alignment.containsCode(m.getCharacteristicUris().get(0))) {
-                            // get code for qualitative variables
-                            finalValue = alignment.getCode(m.getCharacteristicUris().get(0));
-                        } else {
-                            // get actual value for quantitative variables
-                            finalValue = m.getValue();
-                        }
+			if (categoricalOption.equals(WITH_VALUES)){
+			    finalValue = m.getValue();
+			} else {
+			    //System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
+			    if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
+				if (!alignment.containsCode(m.getValueClass())) {
+				    String code = Attribute.findHarmonizedCode(m.getValueClass());
+				    //System.out.println("Align-Debug: new alignment attribute Code for URI-value :[" + code + "]"); 
+				    if (code != null && !code.equals("")) {
+					List<String> newEntry = new ArrayList<String>();
+					newEntry.add(code);
+					newEntry.add(m.getValue());
+					alignment.addCode(m.getValueClass(), newEntry);
+				    }
+				}
+			    }
+			    
+			    if (alignment.containsCode(m.getValueClass())) {
+				// get code for qualitative variables
+				List<String> entry = alignment.getCode(m.getValueClass()); 
+				finalValue = entry.get(0);
+			    } else {
+				// get actual value for quantitative variables
+				finalValue = m.getValue();
+			    }
+			}
 
 			//System.out.println("Align-Debug: final value [" + finalValue + "]");
                         results.get(referenceObj.getUri()).put(key, finalValue);
@@ -1181,11 +1214,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             System.out.println("Finished writing!");
 
-            // Write harmonized code book
-            outputHarmonizedCodebook(alignment, null);
-
             dataFile = DataFile.findByName(file.getName());
             if (dataFile != null) {
+
+		// Write harmonized code book
+		if (categoricalOption.equals(WITH_CODE_BOOK)) {
+		    outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
+		}
+		
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
                     return;
@@ -1200,32 +1236,37 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputHarmonizedCodebook(Alignment alignment, File file) {        
-        // Write empty string to create the file
-        //FileUtils.writeStringToFile(file, "", "utf-8", true);
+    public static void outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
+	try {
+	    File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
+	    Date date = new Date();
+	    DataFile dataFile = new DataFile(codeBookFile.getName());
+	    dataFile.setOwnerEmail(ownerEmail);
+	    dataFile.setStatus(DataFile.CREATING);
+	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+	    dataFile.save();
 
-        //System.out.println("Harmonized code book");
-        //System.out.println("Class, code, description");
-
-        // Wrte code book
-        /*for (String key : alignment.getCodeBook().keySet()) {
-	    Attribute attr = Attribute.find(key);
-	    if (attr != null && attr.getDasaUri() != null && !attr.getDasaUri().equals("")) {
-		System.out.print(key);
-		String code = attr.findHarmonizedCode(attr.getDasaUri());
-		if (code != null) {
-		    System.out.print(", " + code);
-		} else {
-		    System.out.print(",");
-		}
-		if (attr.getLabel() != null) {
-		    System.out.print(", " + attr.getLabel());
-		} else {
-		    System.out.print(",");
-		}
-		System.out.println();
+	    // Write empty string to create the file
+	    FileUtils.writeStringToFile(codeBookFile, "", "utf-8", true);
+	    
+	    System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
+	    
+	    FileUtils.writeStringToFile(codeBookFile, "code, value, class\n", "utf-8", true);
+	    // Wrte code book
+	    for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
+		List<String> list = entry.getValue();
+		System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
+		FileUtils.writeStringToFile(codeBookFile, list.get(0) + ",\"" + list.get(1) + "\", " + entry.getKey() + "\n", "utf-8", true);
 	    }
-	    }*/
+
+	    dataFile.setCompletionPercentage(100);
+	    dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+	    dataFile.setStatus(DataFile.CREATED);
+	    dataFile.save();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String toCSVRow(List<String> fieldNames) {

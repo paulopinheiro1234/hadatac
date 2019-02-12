@@ -55,32 +55,36 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 	}
 
 	public static String findHarmonizedCode(String dasa_uri) {
+                String fullUri = URIUtils.replacePrefix(dasa_uri);
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
 				+ " SELECT ?code WHERE {"
-				+ " <" + dasa_uri + "> skos:notation ?code . "
+				+ " " + fullUri + " skos:notation ?code . "
 				+ " }";
 
 		Query query = QueryFactory.create(queryString);
+		//System.out.println("Attribute: query [" +  queryString + "]");
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(
 				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		ResultSet results = qexec.execSelect();
 		ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
 		qexec.close();
 
+		//System.out.println("Attribute: size of answer [" +  resultsrw.size() + "]");
 		if (resultsrw.size() > 0) {
-			QuerySolution soln = resultsrw.next();
-			try {
-				if (null != soln.getResource("code")) {
-					String answer = soln.getResource("code").toString();
-					if (answer.length() != 0) {
-						return answer;
-					}
-				}
-			} catch (Exception e1) {
-				return null;
+		    QuerySolution soln = resultsrw.next();
+		    try {
+			if (soln.getLiteral("code") != null) {
+			    String answer = soln.getLiteral("code").getString();
+			    if (answer.length() != 0) {
+				return answer;
+			    }
 			}
+		    } catch (Exception e1) {
+			//e1.printStackTrace();
+			return null;
+		    }
 		}
-
+		
 		return null;
 	}
 	
