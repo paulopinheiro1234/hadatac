@@ -37,6 +37,9 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
 
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
+
 
 public class StudyObject extends HADatAcThing {
 
@@ -67,11 +70,22 @@ public class StudyObject extends HADatAcThing {
     public static final String OBJECT_ORIGINAL_ID = "OBJECT_ORIGINAL_ID";
     public static final String OBJECT_TIME = "OBJECT_TYME";
  
+    @PropertyField(uri="hasco:originalID")
     String originalId;
+    
+    @PropertyField(uri="hasco:isMemberOf", valueType=PropertyValueType.URI)
     String isMemberOf;
+    
+    @PropertyField(uri="hasco:hasRole", valueType=PropertyValueType.URI)
     String roleUri = "";
+    
+    @PropertyField(uri="hasco:hasObjectScope", valueType=PropertyValueType.URI)
     List<String> scopeUris = new ArrayList<String>();
+    
+    @PropertyField(uri="hasco:hasTimeObjectScope", valueType=PropertyValueType.URI)
     List<String> timeScopeUris = new ArrayList<String>();
+    
+    @PropertyField(uri="hasco:hasSpaceObjectScope", valueType=PropertyValueType.URI)
     List<String> spaceScopeUris = new ArrayList<String>();
 
     public StudyObject() {
@@ -919,30 +933,6 @@ public class StudyObject extends HADatAcThing {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    @Override
-    public void deleteFromTripleStore() {
-        System.out.println("Deleting study object " + getUri() + " from triple store");
-
-        String query = "";
-        if (this.getUri() == null || this.getUri().equals("")) {
-            return;
-        }
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        if (this.getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
-        } else {
-            query += this.getUri();
-        }
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
     }
 
     @Override
