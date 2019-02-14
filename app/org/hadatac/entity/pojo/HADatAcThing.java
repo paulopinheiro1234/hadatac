@@ -1,7 +1,5 @@
 package org.hadatac.entity.pojo;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,13 +34,17 @@ public abstract class HADatAcThing implements Facetable {
 
     @Subject
     String uri = "";
+    
+    @PropertyField(uri="rdf:type")
+    String typeUri = "";
 
     @PropertyField(uri="rdfs:label")
     String label = "";
-
-    String typeUri = "";
-    String field = "";
+    
+    @PropertyField(uri="hasco:hasComment")
     String comment = "";
+    
+    String field = "";
     String query = "";
     int count = 0;
 
@@ -249,7 +251,7 @@ public abstract class HADatAcThing implements Facetable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return -1;
     }
 
@@ -260,43 +262,57 @@ public abstract class HADatAcThing implements Facetable {
     public boolean saveToTripleStore() {
         Map<String, Object> row = new HashMap<String, Object>();
 
-        try {
-            Class<?> objectClass = getClass();
-            for (Field field: objectClass.getDeclaredFields()) {
-                field.setAccessible(true);
-                if (field.isAnnotationPresent(Subject.class)) {
-                    row.put("hasURI", (String)field.get(this));
-                }
-
-                if (field.isAnnotationPresent(PropertyField.class)) {
-                    PropertyField propertyField = field.getAnnotation(PropertyField.class);
-                    String propertyUri = propertyField.uri();
-
-                    if (field.getType().equals(String.class)) {
-                        row.put(propertyUri, (String)field.get(this));
-                    }
-
-                    if (field.getType().equals(List.class)) {
-                        List<?> list = (List<?>)field.get(this);
-                        if (!list.isEmpty() && list.get(0) instanceof String) {
-                            for (String element : (List<String>)list) {
-                                row.put(propertyUri, element);
-                            }
+        try {            
+            Class<?> currentClass = getClass();
+            while(currentClass != null) {                
+                for (Field field: currentClass.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (field.isAnnotationPresent(Subject.class)) {
+                        String uri = (String)field.get(this);
+                        if (URIUtils.isValidURI(uri)) {
+                            row.put("hasURI", uri);
+                        } else {
+                            return false;
                         }
                     }
 
-                    if (field.getType().equals(Integer.class)) {
-                        row.put(propertyUri, ((Integer)field.get(this)).toString());
-                    }
+                    if (field.isAnnotationPresent(PropertyField.class)) {
+                        PropertyField propertyField = field.getAnnotation(PropertyField.class);
+                        String propertyUri = propertyField.uri();
 
-                    if (field.getType().equals(Double.class)) {
-                        row.put(propertyUri, ((Double)field.get(this)).toString());
-                    }
+                        if (field.getType().equals(String.class)) {
+                            String value = (String)field.get(this);
+                            if (!value.isEmpty()) {
+                                row.put(propertyUri, value);
+                            }
+                        }
 
-                    if (field.getType().equals(Long.class)) {
-                        row.put(propertyUri, ((Long)field.get(this)).toString());
+                        if (field.getType().equals(List.class)) {
+                            List<?> list = (List<?>)field.get(this);
+                            if (!list.isEmpty() && list.get(0) instanceof String) {
+                                for (String element : (List<String>)list) {
+                                    if (!element.isEmpty()) {
+                                        row.put(propertyUri, element);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (field.getType().equals(Integer.class)) {
+                            row.put(propertyUri, ((Integer)field.get(this)).toString());
+                        }
+
+                        if (field.getType().equals(Double.class)) {
+                            row.put(propertyUri, ((Double)field.get(this)).toString());
+                        }
+
+                        if (field.getType().equals(Long.class)) {
+                            row.put(propertyUri, ((Long)field.get(this)).toString());
+                        }
                     }
                 }
+                
+                currentClass = currentClass.getSuperclass();
             }
         } catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
@@ -305,12 +321,12 @@ public abstract class HADatAcThing implements Facetable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         Model model = MetadataFactory.createModel(Arrays.asList(row), getNamedGraph());
         int numCommitted = MetadataFactory.commitModelToTripleStore(
                 model, CollectionUtil.getCollectionPath(
                         CollectionUtil.Collection.METADATA_GRAPH));
-        
+
         return numCommitted >= 0;
     }
 
@@ -319,7 +335,7 @@ public abstract class HADatAcThing implements Facetable {
         if (getUri() == null || getUri().equals("")) {
             return;
         }
-        
+
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += " DELETE WHERE { \n";
         if (getUri().startsWith("http")) {
@@ -329,12 +345,12 @@ public abstract class HADatAcThing implements Facetable {
         }
         query += " ?p ?o . \n";
         query += " } ";
-        
+
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
-        
+
         System.out.println("Deleting <" + getUri() + "> from triple store");
     }
 

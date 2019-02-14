@@ -14,11 +14,11 @@ import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -756,110 +756,6 @@ public class StudyObject extends HADatAcThing {
         }
 
         return results;
-    }
-
-    @Override
-    public boolean saveToTripleStore() {
-        if (uri == null || uri.equals("")) {
-            System.out.println("[ERROR] Trying to save OBJ without assigning an URI");
-            return false;
-        }
-        if (isMemberOf == null || isMemberOf.equals("")) {
-            System.out.println("[ERROR] Trying to save OBJ without assigning DAS's URI");
-            return false;
-        }
-        String insert = "";
-
-        String obj_uri = "<" + getUri() + ">";
-
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-
-        if(!typeUri.isEmpty()) {
-            if (typeUri.startsWith("http")) {
-                insert += obj_uri + " a <" + typeUri + "> . ";
-            } else {
-                insert += obj_uri + " a " + typeUri + " . ";
-            }
-        }
-        if(!roleUri.isEmpty()) {
-            if (roleUri.startsWith("http")) {
-                insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
-            } else {
-                insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
-            }	
-        }
-        if (!originalId.equals("")) {
-            insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
-        }   
-        if (!label.equals("")) {
-            insert += obj_uri + " rdfs:label  \"" + label + "\" . ";
-        }
-        if (!isMemberOf.equals("")) {
-            if (isMemberOf.startsWith("http")) {
-                insert += obj_uri + " hasco:isMemberOf <" + isMemberOf + "> .  "; 
-            } else {
-                insert += obj_uri + " hasco:isMemberOf " + isMemberOf + " .  "; 
-            } 
-        }
-        if (!comment.equals("")) {
-            insert += obj_uri + " hasco:hasComment \""  + comment + "\" .  ";
-        }
-        if (scopeUris != null && scopeUris.size() > 0) {
-            for (String scope : scopeUris) {
-                if (!scope.equals("")) {
-                    if (scope.startsWith("http")) {
-                        insert += obj_uri + " hasco:hasObjectScope <" + scope + "> .  "; 
-                    } else {
-                        insert += obj_uri + " hasco:hasObjectScope " + scope + " .  "; 
-                    }
-                }
-            } 
-        }
-        if (timeScopeUris != null && timeScopeUris.size() > 0) {
-            for (String scope : timeScopeUris) {
-                if (!scope.equals("")) {
-                    if (scope.startsWith("http")) {
-                        insert += obj_uri + " hasco:hasTimeObjectScope <" + scope + "> .  "; 
-                    } else {
-                        insert += obj_uri + " hasco:hasTimeObjectScope " + scope + " .  "; 
-                    }
-                }
-            } 
-        }
-
-        if (spaceScopeUris != null && spaceScopeUris.size() > 0) {
-            for (String scope : spaceScopeUris) {
-                if (!scope.equals("")) {
-                    if (scope.startsWith("http")) {
-                        insert += obj_uri + " hasco:hasSpaceObjectScope <" + scope + "> .  "; 
-                    } else {
-                        insert += obj_uri + " hasco:hasSpaceObjectScope " + scope + " .  "; 
-                    }
-                }
-            } 
-        }
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-
-        insert += LINE_LAST;
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-
-        return true;
     }
 
     @Override

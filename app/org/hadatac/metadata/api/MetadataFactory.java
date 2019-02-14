@@ -16,7 +16,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.CollectionUtil;
+
 
 public class MetadataFactory {
     
