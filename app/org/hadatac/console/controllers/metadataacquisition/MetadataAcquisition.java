@@ -212,10 +212,6 @@ public class MetadataAcquisition extends Controller {
 							for(int i=0;i<val.length();i++){
 								valCharVal += (int)val.charAt(i);
 							}
-							if(valueCharVal<valCharVal){
-								//arrValues.remove(val);
-								//arrValues.add(value);
-							}
 						}
 					}
 					if(!dupl){

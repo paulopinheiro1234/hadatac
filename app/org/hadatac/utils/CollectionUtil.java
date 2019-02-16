@@ -24,10 +24,10 @@ public class CollectionUtil {
         NAMESPACE ("/namespace"),
         LABKEY_CREDENTIAL ("/labkey"),
         URI_GENERATOR ("/uri_generator"),
-        STUDY_ACQUISITION ("/studies/select"),
-        METADATA_DA ("/data_acquisitions/select"),
-        ANALYTES_ACQUISITION ("/analytes/select"),
-        SCHEMA_ATTRIBUTES ("/schema_attributes/select"),
+        STUDY_ACQUISITION ("/studies"),
+        METADATA_DA ("/data_acquisitions"),
+        ANALYTES_ACQUISITION ("/analytes"),
+        SCHEMA_ATTRIBUTES ("/schema_attributes"),
         
         // triplestore
         METADATA_SPARQL ("/store/query"),
@@ -83,6 +83,7 @@ public class CollectionUtil {
             }
         }
 
+        System.out.println("collection: " + collection);
         return collection;
     }
     

@@ -731,8 +731,8 @@ public class RestApi extends Controller {
     public Result getStudy(String studyUri){
         ObjectMapper mapper = new ObjectMapper();
         Study result = Study.find(studyUri);
-        System.out.println("[RestAPI] type: " + result.getType());
-        if(result == null || result.getType() == null || result.getType() == ""){
+        System.out.println("[RestAPI] type: " + result.getTypeUri());
+        if(result == null || result.getTypeUri() == null || result.getTypeUri() == ""){
             return notFound(ApiUtil.createResponse("Study with name/ID " + studyUri + " not found", false));
         } 
         // get the list of variables in that study

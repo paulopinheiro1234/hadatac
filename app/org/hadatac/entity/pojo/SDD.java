@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.Templates;
@@ -32,38 +31,38 @@ public class SDD {
     private RecordFile sddfile = null;
 
     private static List<String> metaAttributes;
-    
+
     private static List<String> getMetaAttributes() {
         if (metaAttributes == null) {
             metaAttributes = new ArrayList<String>() {{
-		    add("sio:TimeStamp");
-		    add("sio:TimeInstant");
-		    add("hasco:namedTime");
-		    add("hasco:originalID");
-		    add("hasco:uriId");
-		    add("hasco:hasMetaEntity");
-		    add("hasco:hasMetaEntityURI");
-		    add("hasco:hasMetaAttribute");
-		    add("hasco:hasMetaAttributeURI");
-		    add("hasco:hasMetaUnit");
-		    add("hasco:hasMetaUnitURI");
-		    add("sio:InRelationTo");
-		    add("hasco:hasLOD");
-		    add("hasco:hasCalibration");
-		    add("hasco:hasElevation");
-		    add("hasco:hasLocation");
-		    add("chear:AnalysisMode");
-		    add("chear:LabHubAccession");
-		    add("chear:LevelOfDetection");
-		    add("chear:ReplicateNumber");
-		}};
+                add("sio:TimeStamp");
+                add("sio:TimeInstant");
+                add("hasco:namedTime");
+                add("hasco:originalID");
+                add("hasco:uriId");
+                add("hasco:hasMetaEntity");
+                add("hasco:hasMetaEntityURI");
+                add("hasco:hasMetaAttribute");
+                add("hasco:hasMetaAttributeURI");
+                add("hasco:hasMetaUnit");
+                add("hasco:hasMetaUnitURI");
+                add("sio:InRelationTo");
+                add("hasco:hasLOD");
+                add("hasco:hasCalibration");
+                add("hasco:hasElevation");
+                add("hasco:hasLocation");
+                add("chear:AnalysisMode");
+                add("chear:LabHubAccession");
+                add("chear:LevelOfDetection");
+                add("chear:ReplicateNumber");
+            }};
         }
         return metaAttributes;
     }
-    
+
     public SDD(RecordFile file) {
         this.sddfile = file;
-	this.getMetaAttributes();
+        getMetaAttributes();
         readCatalog(file);
     }
 
@@ -156,22 +155,22 @@ public class SDD {
                 return false;
             }
         } 
-	return true;
+        return true;
     }
 
     public boolean checkCellLabel(String str) {
         if (str == null) {
             return true;
         }
-	if (!str.contains(":")) {
-	    return true;
-	}
-	if (metaAttributes.contains(str)) {
+        if (!str.contains(":")) {
             return true;
         }
-	
-	String foundLabel = foundLabel = FirstLabel.getLabel(URIUtils.replacePrefixEx(str));
-	return (foundLabel != null && !foundLabel.equals(""));
+        if (metaAttributes.contains(str)) {
+            return true;
+        }
+
+        String foundLabel = FirstLabel.getLabel(URIUtils.replacePrefixEx(str));
+        return (foundLabel != null && !foundLabel.equals(""));
     }
 
     /*
@@ -195,14 +194,14 @@ public class SDD {
 
     public boolean checkIndicatorPath(String str) {
 
-	if (metaAttributes.contains(str)) {
+        if (metaAttributes.contains(str)) {
             return true;
         }
-	
-	String expanded = URIUtils.replacePrefixEx(str);
+
+        String expanded = URIUtils.replacePrefixEx(str);
         String indvIndicatorQuery = "";
-	String STUDY_INDICATOR = URIUtils.replacePrefixEx("hasco:StudyIndicator");
-	String SAMPLE_INDICATOR = URIUtils.replacePrefixEx("hasco:SampleIndicator");
+        String STUDY_INDICATOR = URIUtils.replacePrefixEx("hasco:StudyIndicator");
+        String SAMPLE_INDICATOR = URIUtils.replacePrefixEx("hasco:SampleIndicator");
 
         indvIndicatorQuery += NameSpaces.getInstance().printSparqlNameSpaceList();
         indvIndicatorQuery += " SELECT * WHERE {  <" + expanded + "> rdfs:subClassOf*  ?super . }";
@@ -220,50 +219,50 @@ public class SDD {
             QuerySolution soln = resultsrw.next();
             if (soln.get("super") != null) {
                 superStr = soln.get("super").toString();
-		// System.out.println("SDD:  Response for [" + expanded + "] is [" + superStr + "]");
-		if (superStr.equals(STUDY_INDICATOR) || superStr.equals(SAMPLE_INDICATOR)) {
-		    return true;
-		}
+                // System.out.println("SDD:  Response for [" + expanded + "] is [" + superStr + "]");
+                if (superStr.equals(STUDY_INDICATOR) || superStr.equals(SAMPLE_INDICATOR)) {
+                    return true;
+                }
             }
 
-	}
+        }
 
-	// System.out.println("SDD: [WARNING] " + expanded + " is not an indicator");
-	return false;
+        // System.out.println("SDD: [WARNING] " + expanded + " is not an indicator");
+        return false;
     }
 
     public List<Map<String, List<String>>> readDDforEAmerge(RecordFile file) {
-	
+
         //System.out.println("SDD: initiating readDDforEAmerge()");
         Map<String, List<String>> mapEAmerge = new HashMap<String, List<String>>();
         Map<String, List<String>> mapAAmerge = new HashMap<String, List<String>>();
-	List<Map<String, List<String>>> response = new ArrayList<Map<String, List<String>>>(); 
-	response.add(mapEAmerge);
-	response.add(mapAAmerge);
+        List<Map<String, List<String>>> response = new ArrayList<Map<String, List<String>>>(); 
+        response.add(mapEAmerge);
+        response.add(mapAAmerge);
         Map<String, List<String>> dasaContent = new HashMap<String, List<String>>();
-	
+
         if (!file.isValid()) {
             return response;
         }
-	
+
         for (Record record : file.getRecords()) {
             if (checkCellValue(record.getValueByColumnIndex(0))) {
                 if (record.getValueByColumnName("Attribute") != null
-		    && record.getValueByColumnName("Attribute").length() > 0) {
+                        && record.getValueByColumnName("Attribute").length() > 0) {
                     if (!dasaContent.containsKey(record.getValueByColumnIndex(0))) {
-			List<String> dasa_entry = new ArrayList<String>();
-			dasa_entry.add(record.getValueByColumnName("Attribute"));
-			dasa_entry.add(record.getValueByColumnName("attributeOf"));
+                        List<String> dasa_entry = new ArrayList<String>();
+                        dasa_entry.add(record.getValueByColumnName("Attribute"));
+                        dasa_entry.add(record.getValueByColumnName("attributeOf"));
                         dasaContent.put(record.getValueByColumnIndex(0),dasa_entry);
                     }
                 }
             }
         }
-	
+
         for (Record record : file.getRecords()) {
-	    
+
             if (checkCellValue(record.getValueByColumnIndex(0))) {
-		
+
                 String columnCell = record.getValueByColumnIndex(0);
                 String labelCell = record.getValueByColumnName("Label");
                 String attrCell = record.getValueByColumnName("Attribute");
@@ -273,15 +272,15 @@ public class SDD {
                 String inRelationToCell = record.getValueByColumnName("inRelationTo");
                 String attributeOfCell = record.getValueByColumnName("attributeOf");
                 String dfCell = record.getValueByColumnName("wasDerivedFrom");
-		
+
                 if (dasaContent.containsKey(columnCell) && (attributeOfCell.startsWith("??"))) {
 
                     //System.out.println("listEAmergeTrigger: " + columnCell + " " + attributeOfCell);
-		    
+
                     List<String> listEAmerge = new ArrayList<String>();
-		    
+
                     if (dasaContent.containsKey(attributeOfCell)) {
-			
+
                         if (columnCell != null) {
                             listEAmerge.add(columnCell);
                         } else {
@@ -311,16 +310,16 @@ public class SDD {
                         } else {
                             listEAmerge.add("");
                         }
-			
+
                         mapEAmerge.put(attributeOfCell, listEAmerge);
                     }
                     //System.out.println("listEAmerge :" + listEAmerge);
-		} else if (dasaContent.containsKey(columnCell)) {
+                } else if (dasaContent.containsKey(columnCell)) {
 
                     List<String> listAAmerge = new ArrayList<String>();
-		    
+
                     if (dasaContent.containsKey(attributeOfCell)) {
-			
+
                         if (attributeOfCell != null) {
                             listAAmerge.add(attributeOfCell);
                         } else {
@@ -332,19 +331,19 @@ public class SDD {
                         } else {
                             listAAmerge.add("");
                         }
-			
+
                         if (dasaContent.get(attributeOfCell).get(1) != null) {
                             listAAmerge.add(dasaContent.get(attributeOfCell).get(1));
                         } else {
                             listAAmerge.add("");
                         }
-			
+
                         mapAAmerge.put(columnCell, listAAmerge);
                     }
-		}
-	    }
+                }
+            }
         }
- 
+
         //System.out.println("SDD: l_dasa :" + l_dasa);
         //System.out.println("SDD: mapEAmerge :" + mapEAmerge.keySet());
         return response;
@@ -394,12 +393,12 @@ public class SDD {
                 String attributeOfCell = record.getValueByColumnName("attributeOf");
                 String dfCell = record.getValueByColumnName("wasDerivedFrom");
 
-		//System.out.println("A: " + attributeCell + " (" + FirstLabel.getLabel(attributeCell)+ ")");
-		//System.out.println("E: " + entityCell + " (" + FirstLabel.getLabel(entityCell)+ ")");
-		//System.out.println("R: " + roleCell + " (" + FirstLabel.getLabel(roleCell)+ ")");
-		//System.out.println("Rel: " + relationCell + " (" + FirstLabel.getLabel(relationCell)+ ")");
+                //System.out.println("A: " + attributeCell + " (" + FirstLabel.getLabel(attributeCell)+ ")");
+                //System.out.println("E: " + entityCell + " (" + FirstLabel.getLabel(entityCell)+ ")");
+                //System.out.println("R: " + roleCell + " (" + FirstLabel.getLabel(roleCell)+ ")");
+                //System.out.println("Rel: " + relationCell + " (" + FirstLabel.getLabel(relationCell)+ ")");
 
-		/*
+                /*
                 if (checkCellUriResolvable(attributeCell)) {
                     if (checkCellUriResolvable(entityCell)) {
                         if (checkCellUriResolvable(roleCell)) {
@@ -422,73 +421,73 @@ public class SDD {
                     checkUriResolveResults.add(attributeCell);
 		    }*/
 
-		/* 
-		 *  Check if cell has valid namespace. If yes, further check 
+                /* 
+                 *  Check if cell has valid namespace. If yes, further check 
                  *  if a label can be retrived from the cell's value
                  */
 
                 if (attributeCell != null && !attributeCell.equals("")) {
-		    if (!checkCellNamespace(attributeCell)) {
-			namespaceRegistered = false;
-			if (!checkUriNamespaceResults.contains(attributeCell)) {
-			    checkUriNamespaceResults.add(attributeCell);
-			}
-		    } else if (!checkCellLabel(attributeCell)) {
-			hasLabel = false;
-			if (!checkUriLabelResults.contains(attributeCell)) {
-			    checkUriLabelResults.add(attributeCell);
-			}
-		    } 
-		}
-		if (entityCell != null && !entityCell.equals("")) {
-		    if (!checkCellNamespace(entityCell)) {
-			namespaceRegistered = false;
-			if (!checkUriNamespaceResults.contains(entityCell)) {
-			    checkUriNamespaceResults.add(entityCell);
-			}
-		    } else if (!checkCellLabel(entityCell)) {
-			hasLabel = false;
-			if (!checkUriLabelResults.contains(entityCell)) {
-			    checkUriLabelResults.add(entityCell);
-			}
-		    }
-		} 
-		if (roleCell != null && !roleCell.equals("")) {
-		    if (!checkCellNamespace(roleCell)) {
-			namespaceRegistered = false;
-			if (!checkUriNamespaceResults.contains(roleCell)) {
-			    checkUriNamespaceResults.add(roleCell);
-			}
-		    } else if (!checkCellLabel(roleCell)) {
-			hasLabel = false;
-			if (!checkUriLabelResults.contains(roleCell)) {
-			    checkUriLabelResults.add(roleCell);
-			}
-		    } 
-		}
-		if (relationCell != null && !relationCell.equals("")) {
-		    if (!checkCellNamespace(relationCell)) {
-			namespaceRegistered = false;
-			if (!checkUriNamespaceResults.contains(relationCell)) {
-			    checkUriNamespaceResults.add(relationCell);
-			}
-		    } else if (!checkCellLabel(relationCell)) {
-			hasLabel = false;
-			if (!checkUriLabelResults.contains(relationCell)) {
-			    checkUriLabelResults.add(relationCell);
-			}
-		    } 
-		}
-		    
-		/* 
-		 *  Check if the values of attribute cells are subclasses of  
+                    if (!checkCellNamespace(attributeCell)) {
+                        namespaceRegistered = false;
+                        if (!checkUriNamespaceResults.contains(attributeCell)) {
+                            checkUriNamespaceResults.add(attributeCell);
+                        }
+                    } else if (!checkCellLabel(attributeCell)) {
+                        hasLabel = false;
+                        if (!checkUriLabelResults.contains(attributeCell)) {
+                            checkUriLabelResults.add(attributeCell);
+                        }
+                    } 
+                }
+                if (entityCell != null && !entityCell.equals("")) {
+                    if (!checkCellNamespace(entityCell)) {
+                        namespaceRegistered = false;
+                        if (!checkUriNamespaceResults.contains(entityCell)) {
+                            checkUriNamespaceResults.add(entityCell);
+                        }
+                    } else if (!checkCellLabel(entityCell)) {
+                        hasLabel = false;
+                        if (!checkUriLabelResults.contains(entityCell)) {
+                            checkUriLabelResults.add(entityCell);
+                        }
+                    }
+                } 
+                if (roleCell != null && !roleCell.equals("")) {
+                    if (!checkCellNamespace(roleCell)) {
+                        namespaceRegistered = false;
+                        if (!checkUriNamespaceResults.contains(roleCell)) {
+                            checkUriNamespaceResults.add(roleCell);
+                        }
+                    } else if (!checkCellLabel(roleCell)) {
+                        hasLabel = false;
+                        if (!checkUriLabelResults.contains(roleCell)) {
+                            checkUriLabelResults.add(roleCell);
+                        }
+                    } 
+                }
+                if (relationCell != null && !relationCell.equals("")) {
+                    if (!checkCellNamespace(relationCell)) {
+                        namespaceRegistered = false;
+                        if (!checkUriNamespaceResults.contains(relationCell)) {
+                            checkUriNamespaceResults.add(relationCell);
+                        }
+                    } else if (!checkCellLabel(relationCell)) {
+                        hasLabel = false;
+                        if (!checkUriLabelResults.contains(relationCell)) {
+                            checkUriLabelResults.add(relationCell);
+                        }
+                    } 
+                }
+
+                /* 
+                 *  Check if the values of attribute cells are subclasses of  
                  *  study indicators
                  */
 
                 if (URIUtils.isValidURI(attributeCell)) {
                     isIndicator = checkIndicatorPath(attributeCell);
                     if (!isIndicator) {
-			System.out.println("Adding " + attributeCell);
+                        System.out.println("Adding " + attributeCell);
                         checkStudyIndicatorPathResults.add(attributeCell);
                     }
                 } else {
@@ -500,8 +499,8 @@ public class SDD {
                     }
                 }
 
-		/* 
-		 *  Check if the values of attributeOf cells references to   
+                /* 
+                 *  Check if the values of attributeOf cells references to   
                  *  objects defined in the SDD
                  */
 
@@ -512,7 +511,7 @@ public class SDD {
                     } else {
                         AnnotationLog.printException(
                                 "Attribute " + record.getValueByColumnIndex(0)
-                                        + " is not attributeOf any object. Please fix the content.",
+                                + " is not attributeOf any object. Please fix the content.",
                                 sddfile.getFileName());
                     }
                 }
@@ -566,10 +565,10 @@ public class SDD {
                         AnnotationLog.printException(
                                 "The Entity Cell \"" + entityCell + "\" in the [Entity] column is either not "
                                         + "valid uri or it can not be resolved by replaceNameSpaceEx().",
-                                sddfile.getFile().getName());
+                                        sddfile.getFile().getName());
                         return false;
                     }
-		}
+                }
 
                 if (checkCellValue(record.getValueByColumnName("attributeOf"))) {
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
@@ -612,7 +611,7 @@ public class SDD {
         if (checkStudyIndicatorPathResults.size() > 0) {
             AnnotationLog.printWarning(
                     "The Attributes: [" + String.join(", ", checkStudyIndicatorPathResults)
-                            + "] are subclasses of neither hasco:StudyIndicator nor hasco:SampleIndicator .",
+                    + "] are subclasses of neither hasco:StudyIndicator nor hasco:SampleIndicator .",
                     sddfile.getFileName());
         }
 

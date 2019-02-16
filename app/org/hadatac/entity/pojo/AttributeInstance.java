@@ -144,11 +144,6 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
     }
 
     @Override
-    public boolean saveToTripleStore() {
-        return false;
-    }
-
-    @Override
     public boolean saveToSolr() {
         return false;
     }

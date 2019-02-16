@@ -41,7 +41,7 @@ public abstract class HADatAcThing implements Facetable {
     @PropertyField(uri="rdfs:label")
     String label = "";
     
-    @PropertyField(uri="hasco:hasComment")
+    @PropertyField(uri="rdfs:comment")
     String comment = "";
     
     String field = "";
@@ -260,6 +260,8 @@ public abstract class HADatAcThing implements Facetable {
 
     @SuppressWarnings("unchecked")
     public boolean saveToTripleStore() {
+        deleteFromTripleStore();
+        
         Map<String, Object> row = new HashMap<String, Object>();
 
         try {            

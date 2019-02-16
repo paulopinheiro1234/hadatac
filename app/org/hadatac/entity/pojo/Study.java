@@ -8,13 +8,8 @@ import java.util.Map;
 
 import org.labkey.remoteapi.CommandException;
 
-import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -27,6 +22,8 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
@@ -56,33 +53,41 @@ public class Study extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "STD-";
 
+    @PropertyField(uri="hasco:hasId")
     private String id;
 
     @Field("studyUri")
     private String studyUri;
 
-    private String studyType;
-
     @Field("studyLabel_str")
     private String label;
 
     @Field("studyTitle_str")
+    @PropertyField(uri="hasco:hasTitle")
     private String title;
 
     @Field("proj_str")
+    @PropertyField(uri="hasco:hasProject")
     private String project;
 
     @Field("studyComment_str")
+    @PropertyField(uri="rdfs:comment")
     private String comment;
 
+    @PropertyField(uri="hasco:hasExternalSource")
     private String externalSource;
 
     @Field("institutionName_str")
+    @PropertyField(uri="hasco:hasInstitution", valueType=PropertyValueType.URI)
     private String institutionUri;
 
     @Field("agentName_str")
+    @PropertyField(uri="hasco:hasAgent", valueType=PropertyValueType.URI)
     private String agentUri;
-
+    
+    @PropertyField(uri="hasco:hasLastId")
+    private String lastId;
+    
     private DateTime startedAt;
 
     private DateTime endedAt;
@@ -94,8 +99,6 @@ public class Study extends HADatAcThing {
     private Agent agent;
 
     private Agent institution;
-
-    private String lastId;
 
     public Study(String id,
 		 String studyUri,
@@ -111,7 +114,7 @@ public class Study extends HADatAcThing {
 		 String endDateTime) {
         this.id = id;
         this.studyUri = studyUri;
-        this.studyType = studyType;
+        this.typeUri = studyType;
         this.label = label;
         this.title = title;
         this.project = project;
@@ -129,7 +132,6 @@ public class Study extends HADatAcThing {
     public Study() {
         this.id = "";
         this.studyUri = "";
-        this.studyType = "";
         this.label = "";
         this.title = "";
         this.project = "";
@@ -200,10 +202,6 @@ public class Study extends HADatAcThing {
         return title;
     }
 
-    public String getType() {
-        return studyType;
-    }
-
     public long getLastId() {
         if (this.lastId == null) {
             return 0;
@@ -263,10 +261,6 @@ public class Study extends HADatAcThing {
 
     public void setUri(String uri) {
         this.studyUri = uri;
-    }
-
-    public void setType(String studyType) {
-        this.studyType = studyType;
     }
 
     public void setLabel(String label) {
@@ -587,7 +581,7 @@ public class Study extends HADatAcThing {
                     returnStudy.setLabel(soln.get("studyLabel").toString());
                 }
                 if (soln.contains("studyType")) {
-                    returnStudy.setType(soln.get("studyType").toString());
+                    returnStudy.setTypeUri(soln.get("studyType").toString());
                 }
                 if (soln.contains("title")) {
                     returnStudy.setTitle(soln.get("title").toString());
@@ -665,7 +659,7 @@ public class Study extends HADatAcThing {
                     returnStudy.setLabel(soln.get("studyLabel").toString());
                 }
                 if (soln.contains("studyType")) {
-                    returnStudy.setType(soln.get("studyType").toString());
+                    returnStudy.setTypeUri(soln.get("studyType").toString());
                 }
                 if (soln.contains("title")) {
                     returnStudy.setTitle(soln.get("title").toString());
@@ -1011,7 +1005,7 @@ public class Study extends HADatAcThing {
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", URIUtils.replaceNameSpaceEx(studyType));
+        row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
         row.put("rdfs:label", getLabel());
         row.put("hasco:hasTitle", getTitle());
         row.put("hasco:hasProject", URIUtils.replaceNameSpaceEx(getProject()));
@@ -1071,87 +1065,6 @@ public class Study extends HADatAcThing {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    @Override
-    public boolean saveToTripleStore() {
-        if (studyUri == null || studyUri.equals("")) {
-            System.out.println("[ERROR] Trying to save Study without assigning an URI");
-            return false;
-        }
-
-        deleteFromTripleStore();
-
-        String insert = "";
-        String std_uri = "";
-
-        if (this.getUri().startsWith("<")) {
-            std_uri = this.getUri();
-        } else {
-            std_uri = "<" + this.getUri() + ">";
-        }
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-        if (studyType.startsWith("<")) {
-            insert += std_uri + " a " + studyType + " . ";
-        } else {
-            insert += std_uri + " a <" + studyType + "> . ";
-        }
-        if (id != null && !id.equals("")) {
-            insert += std_uri + " hasco:hasId \"" + id + "\" .  "; 
-        } 
-        insert += std_uri + " rdfs:label  \"" + label + "\" . ";
-        if (title != null && !title.equals("")) {
-            insert += std_uri + " hasco:hasTitle \"" + title + "\" .  "; 
-        } 
-        if (project != null && !project.equals("")) {
-            insert += std_uri + " hasco:hasProject \""  + project + "\" .  ";
-        }   
-        if (comment != null && !comment.equals("")) {
-            insert += std_uri + " rdfs:comment \"" + comment + "\" .  ";
-        }
-        if (externalSource != null && !externalSource.equals("")) {
-            insert += std_uri + " hasco:hasExternalSource \"" + externalSource + "\" .  ";
-        }
-        if (agentUri != null && !agentUri.equals("")) {
-            if (agentUri.startsWith("<")) {
-                insert += std_uri + " hasco:hasAgent " + agentUri + " .  ";
-            } else {
-                insert += std_uri + " hasco:hasAgent <" + agentUri + "> .  ";
-            }
-        }
-        if (institutionUri != null && !institutionUri.equals("")) {
-            if (institutionUri.startsWith("<")) {
-                insert += std_uri + " hasco:hasInstitution " + institutionUri + " .  ";
-            } else {
-                insert += std_uri + " hasco:hasInstitution <" + institutionUri + "> .  ";
-            }
-        }
-        if (lastId != null) {
-            insert += std_uri + " hasco:hasLastId  \"" + lastId + "\" .  ";
-        }
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-
-        insert += LINE_LAST;
-
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-
-        return true;
     }
 
     @Override
