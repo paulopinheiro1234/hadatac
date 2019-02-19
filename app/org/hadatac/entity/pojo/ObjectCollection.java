@@ -1018,29 +1018,6 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     @Override
-    public void deleteFromTripleStore() {
-        String query = "";
-
-        String oc_uri = "";
-        if (this.getUri().startsWith("<")) {
-            oc_uri = this.getUri();
-        } else {
-            oc_uri = "<" + this.getUri() + ">";
-        }
-
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        query += " " + oc_uri + "  ";
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
-    }
-
-    @Override
     public boolean saveToSolr() {
         return false;
     }

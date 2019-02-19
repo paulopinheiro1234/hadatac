@@ -116,11 +116,6 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
     }
 
     @Override
-    public boolean saveToTripleStore() {
-        return false;
-    }
-
-    @Override
     public void deleteFromTripleStore() {
     }
 

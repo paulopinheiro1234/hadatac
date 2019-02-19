@@ -1,37 +1,55 @@
 package org.hadatac.entity.pojo;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.text.WordUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.views.dataacquisitionsearch.Facetable;
+import org.hadatac.metadata.api.MetadataFactory;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
+import org.eclipse.rdf4j.model.Model;
 import org.hadatac.utils.NameSpaces;
 
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.Subject;
 import org.hadatac.console.http.SPARQLUtils;
 
 
 public abstract class HADatAcThing implements Facetable {
+
+    @Subject
     String uri = "";
+    
+    @PropertyField(uri="rdf:type")
     String typeUri = "";
-    String field = "";
+
+    @PropertyField(uri="rdfs:label")
     String label = "";
+    
+    @PropertyField(uri="rdfs:comment")
     String comment = "";
+    
+    String field = "";
     String query = "";
     int count = 0;
 
     String namedGraph = "";
-    
+
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return null;
@@ -41,7 +59,7 @@ public abstract class HADatAcThing implements Facetable {
             Facet facet, FacetHandler facetHandler) {
         return null;
     }
-    
+
     public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
         return null;
@@ -50,11 +68,11 @@ public abstract class HADatAcThing implements Facetable {
     public long getNumber(Facet facet, FacetHandler facetHandler) {
         return 0;
     }
-    
+
     public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         return 0;
     }
-    
+
     public long getNumberFromTripleStore(Facet facet, FacetHandler facetHandler) {
         return 0;
     }
@@ -137,7 +155,7 @@ public abstract class HADatAcThing implements Facetable {
     public void setCount(int count) {
         this.count = count;
     }
-    
+
     public String getQuery() {
         return query;
     }
@@ -153,7 +171,7 @@ public abstract class HADatAcThing implements Facetable {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    
+
     public String getNamedGraph() {
         return namedGraph;
     }
@@ -161,10 +179,10 @@ public abstract class HADatAcThing implements Facetable {
     public void setNamedGraph(String namedGraph) {
         this.namedGraph = namedGraph;
     }
-    
+
     public static List<String> getLabels(String uri) {
         List<String> results = new ArrayList<String>();
-        
+
         if (uri.startsWith("http")) {
             uri = "<" + uri.trim() + ">";
         }
@@ -172,7 +190,7 @@ public abstract class HADatAcThing implements Facetable {
                 "SELECT ?label WHERE { \n" + 
                 "  " + uri + " rdfs:label ?label . \n" + 
                 "}";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -182,19 +200,19 @@ public abstract class HADatAcThing implements Facetable {
                 results.add(soln.get("label").toString().replace("@en", ""));
             }
         }
-        
+
         return results;
     }
-    
+
     public static String getLabel(String uri) {
         List<String> labels = getLabels(uri);
         if (labels.size() > 0) {
             return labels.get(0);
         }
-        
+
         return "";
     }
-    
+
     public static String getShortestLabel(String uri) {
         List<String> labels = getLabels(uri);
         if (labels.size() > 0) {
@@ -204,10 +222,10 @@ public abstract class HADatAcThing implements Facetable {
                     return Integer.compare(o1.length(), o2.length());
                 }
             });
-            
+
             return labels.get(0);
         }
-        
+
         return "";
     }
 
@@ -233,14 +251,110 @@ public abstract class HADatAcThing implements Facetable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return -1;
     }
 
     public void save() { throw new NotImplementedException("Used unimplemented HADatAcThing.save() method"); }
     public void delete() { throw new NotImplementedException("Used unimplemented HADatAcThing.delete() method"); }
 
-    public abstract boolean saveToTripleStore();
-    public abstract void deleteFromTripleStore();
+    @SuppressWarnings("unchecked")
+    public boolean saveToTripleStore() {
+        deleteFromTripleStore();
+        
+        Map<String, Object> row = new HashMap<String, Object>();
+
+        try {            
+            Class<?> currentClass = getClass();
+            while(currentClass != null) {                
+                for (Field field: currentClass.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (field.isAnnotationPresent(Subject.class)) {
+                        String uri = (String)field.get(this);
+                        if (URIUtils.isValidURI(uri)) {
+                            row.put("hasURI", uri);
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    if (field.isAnnotationPresent(PropertyField.class)) {
+                        PropertyField propertyField = field.getAnnotation(PropertyField.class);
+                        String propertyUri = propertyField.uri();
+
+                        if (field.getType().equals(String.class)) {
+                            String value = (String)field.get(this);
+                            if (!value.isEmpty()) {
+                                row.put(propertyUri, value);
+                            }
+                        }
+
+                        if (field.getType().equals(List.class)) {
+                            List<?> list = (List<?>)field.get(this);
+                            if (!list.isEmpty() && list.get(0) instanceof String) {
+                                for (String element : (List<String>)list) {
+                                    if (!element.isEmpty()) {
+                                        row.put(propertyUri, element);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (field.getType().equals(Integer.class)) {
+                            row.put(propertyUri, ((Integer)field.get(this)).toString());
+                        }
+
+                        if (field.getType().equals(Double.class)) {
+                            row.put(propertyUri, ((Double)field.get(this)).toString());
+                        }
+
+                        if (field.getType().equals(Long.class)) {
+                            row.put(propertyUri, ((Long)field.get(this)).toString());
+                        }
+                    }
+                }
+                
+                currentClass = currentClass.getSuperclass();
+            }
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Model model = MetadataFactory.createModel(Arrays.asList(row), getNamedGraph());
+        int numCommitted = MetadataFactory.commitModelToTripleStore(
+                model, CollectionUtil.getCollectionPath(
+                        CollectionUtil.Collection.METADATA_GRAPH));
+
+        return numCommitted >= 0;
+    }
+
+    public void deleteFromTripleStore() {       
+        String query = "";
+        if (getUri() == null || getUri().equals("")) {
+            return;
+        }
+
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " DELETE WHERE { \n";
+        if (getUri().startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += " ?p ?o . \n";
+        query += " } ";
+
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+        processor.execute();
+
+        System.out.println("Deleting <" + getUri() + "> from triple store");
+    }
 
     public abstract boolean saveToSolr();
     public abstract int deleteFromSolr();

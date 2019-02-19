@@ -10,15 +10,10 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -36,6 +31,9 @@ import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
+
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 
 
 public class StudyObject extends HADatAcThing {
@@ -67,11 +65,22 @@ public class StudyObject extends HADatAcThing {
     public static final String OBJECT_ORIGINAL_ID = "OBJECT_ORIGINAL_ID";
     public static final String OBJECT_TIME = "OBJECT_TYME";
  
+    @PropertyField(uri="hasco:originalID")
     String originalId;
+    
+    @PropertyField(uri="hasco:isMemberOf", valueType=PropertyValueType.URI)
     String isMemberOf;
+    
+    @PropertyField(uri="hasco:hasRole", valueType=PropertyValueType.URI)
     String roleUri = "";
+    
+    @PropertyField(uri="hasco:hasObjectScope", valueType=PropertyValueType.URI)
     List<String> scopeUris = new ArrayList<String>();
+    
+    @PropertyField(uri="hasco:hasTimeObjectScope", valueType=PropertyValueType.URI)
     List<String> timeScopeUris = new ArrayList<String>();
+    
+    @PropertyField(uri="hasco:hasSpaceObjectScope", valueType=PropertyValueType.URI)
     List<String> spaceScopeUris = new ArrayList<String>();
 
     public StudyObject() {
@@ -745,110 +754,6 @@ public class StudyObject extends HADatAcThing {
     }
 
     @Override
-    public boolean saveToTripleStore() {
-        if (uri == null || uri.equals("")) {
-            System.out.println("[ERROR] Trying to save OBJ without assigning an URI");
-            return false;
-        }
-        if (isMemberOf == null || isMemberOf.equals("")) {
-            System.out.println("[ERROR] Trying to save OBJ without assigning DAS's URI");
-            return false;
-        }
-        String insert = "";
-
-        String obj_uri = "<" + getUri() + ">";
-
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-
-        if(!typeUri.isEmpty()) {
-            if (typeUri.startsWith("http")) {
-                insert += obj_uri + " a <" + typeUri + "> . ";
-            } else {
-                insert += obj_uri + " a " + typeUri + " . ";
-            }
-        }
-        if(!roleUri.isEmpty()) {
-            if (roleUri.startsWith("http")) {
-                insert += obj_uri + " hasco:hasRole <" + roleUri + "> . ";
-            } else {
-                insert += obj_uri + " hasco:hasRole " + roleUri + " . ";
-            }	
-        }
-        if (!originalId.equals("")) {
-            insert += obj_uri + " hasco:originalID \""  + originalId + "\" .  ";
-        }   
-        if (!label.equals("")) {
-            insert += obj_uri + " rdfs:label  \"" + label + "\" . ";
-        }
-        if (!isMemberOf.equals("")) {
-            if (isMemberOf.startsWith("http")) {
-                insert += obj_uri + " hasco:isMemberOf <" + isMemberOf + "> .  "; 
-            } else {
-                insert += obj_uri + " hasco:isMemberOf " + isMemberOf + " .  "; 
-            } 
-        }
-        if (!comment.equals("")) {
-            insert += obj_uri + " hasco:hasComment \""  + comment + "\" .  ";
-        }
-        if (scopeUris != null && scopeUris.size() > 0) {
-            for (String scope : scopeUris) {
-                if (!scope.equals("")) {
-                    if (scope.startsWith("http")) {
-                        insert += obj_uri + " hasco:hasObjectScope <" + scope + "> .  "; 
-                    } else {
-                        insert += obj_uri + " hasco:hasObjectScope " + scope + " .  "; 
-                    }
-                }
-            } 
-        }
-        if (timeScopeUris != null && timeScopeUris.size() > 0) {
-            for (String scope : timeScopeUris) {
-                if (!scope.equals("")) {
-                    if (scope.startsWith("http")) {
-                        insert += obj_uri + " hasco:hasTimeObjectScope <" + scope + "> .  "; 
-                    } else {
-                        insert += obj_uri + " hasco:hasTimeObjectScope " + scope + " .  "; 
-                    }
-                }
-            } 
-        }
-
-        if (spaceScopeUris != null && spaceScopeUris.size() > 0) {
-            for (String scope : spaceScopeUris) {
-                if (!scope.equals("")) {
-                    if (scope.startsWith("http")) {
-                        insert += obj_uri + " hasco:hasSpaceObjectScope <" + scope + "> .  "; 
-                    } else {
-                        insert += obj_uri + " hasco:hasSpaceObjectScope " + scope + " .  "; 
-                    }
-                }
-            } 
-        }
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-
-        insert += LINE_LAST;
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-
-        return true;
-    }
-
-    @Override
     public int saveToLabKey(String user_name, String password) {
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
@@ -919,30 +824,6 @@ public class StudyObject extends HADatAcThing {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    @Override
-    public void deleteFromTripleStore() {
-        System.out.println("Deleting study object " + getUri() + " from triple store");
-
-        String query = "";
-        if (this.getUri() == null || this.getUri().equals("")) {
-            return;
-        }
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        if (this.getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
-        } else {
-            query += this.getUri();
-        }
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
     }
 
     @Override

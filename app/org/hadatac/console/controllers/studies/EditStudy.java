@@ -125,7 +125,7 @@ public class EditStudy extends Controller {
             if (oldStudy.getUri() != null && !oldStudy.getUri().equals(newURI)) {
                 changedInfos.add(newURI);
             }
-            if (oldStudy.getType() != null && !oldStudy.getType().equals(newStudyType)) {
+            if (oldStudy.getTypeUri() != null && !oldStudy.getTypeUri().equals(newStudyType)) {
                 changedInfos.add(newStudyType);
             }
             if (oldStudy.getId() != null && !oldStudy.getId().equals(newId)) {
@@ -169,7 +169,7 @@ public class EditStudy extends Controller {
 
         // insert current state of the Study
         oldStudy.setUri(newURI);
-        oldStudy.setType(newStudyType);
+        oldStudy.setTypeUri(newStudyType);
         oldStudy.setId(newId);
         oldStudy.setLabel(newLabel);
         oldStudy.setTitle(newTitle);

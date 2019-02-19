@@ -5,16 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
@@ -23,14 +20,10 @@ import org.labkey.remoteapi.CommandException;
 
 public class Sample extends StudyObject {
 
-    public static String INDENT1 = "     ";
-    public static String INSERT_LINE1 = "INSERT DATA {  ";
-    public static String DELETE_LINE1 = "DELETE WHERE {  ";
-    public static String LINE3 = INDENT1 + "a         hasco:Sample;  ";
-    public static String DELETE_LINE3 = " ?p ?o . ";
-    public static String LINE_LAST = "}  ";
+    public static String LINE3 = INDENT1 + "a hasco:Sample;  ";
     public static String PREFIX = "SP-";
 
+    @PropertyField(uri="hasco:isFrom", valueType=PropertyValueType.URI)
     public String isFrom = "";
 
     public Sample(String uri, String isMemberOf) {
@@ -197,69 +190,7 @@ public class Sample extends StudyObject {
             return false;
         }
 
-        deleteFromTripleStore();
-
-        String sp_uri = "";
-        if (this.getUri().startsWith("<")) {
-            sp_uri = this.getUri();
-        } else {
-            sp_uri = "<" + this.getUri() + ">";
-        }
-
-        String insert = "";
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-        
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-        
-        if (typeUri.startsWith("http")) {
-            insert += sp_uri + " a <" + typeUri + "> . ";
-        } else {
-            insert += sp_uri + " a " + typeUri + " . ";
-        }
-        if (!originalId.equals("")) {
-            insert += sp_uri + " hasco:originalID \""  + originalId + "\" .  ";
-        }   
-        if (!label.equals("")) {
-            insert += sp_uri + " rdfs:label  \"" + label + "\" . ";
-        }
-        if (!isMemberOf.equals("")) {
-            if (isMemberOf.startsWith("http")) {
-                insert += sp_uri + " hasco:isMemberOf <" + isMemberOf + "> .  "; 
-            } else {
-                insert += sp_uri + " hasco:isMemberOf " + isMemberOf + " .  "; 
-            } 
-        }
-        if (!comment.equals("")) {
-            insert += sp_uri + " hasco:hasComment \""  + comment + "\" .  ";
-        }   
-        if (!isFrom.equals("")) {
-            if (isFrom.startsWith("http")) {
-                insert += sp_uri + " hasco:isFrom <" + isFrom + "> .  "; 
-            } else {
-                insert += sp_uri + " hasco:isFrom " + isFrom + " .  "; 
-            } 
-        }
-        
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-        
-        insert += LINE_LAST;
-
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-
-        return true;
+        return super.saveToTripleStore();
     }
 
     @Override
@@ -309,26 +240,5 @@ public class Sample extends StudyObject {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    @Override
-    public void deleteFromTripleStore() {
-        String query = "";
-        if (this.getUri() == null || this.getUri().equals("")) {
-            return;
-        }
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        if (this.getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
-        } else {
-            query += this.getUri();
-        }
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
     }
 }

@@ -403,26 +403,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
     }
 
     @Override
-    public void deleteFromTripleStore() {
-        String query = "";
-        if (this.getUri() == null || this.getUri().equals("")) {
-            return;
-        }
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        if (this.getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
-        } else {
-            query += this.getUri();
-        }
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
-    }
-
-    @Override
     public boolean saveToSolr() {
         return false;
     }

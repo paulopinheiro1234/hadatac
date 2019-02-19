@@ -295,59 +295,6 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         return platform;
     }
 
-    @Override
-    public boolean saveToTripleStore() {
-        if (uri == null || uri.equals("")) {
-            System.out.println("[ERROR] Trying to save Platform without assigning an URI");
-            return false;
-        }
-
-        deleteFromTripleStore();
-
-        String insert = "";
-        String plt_uri = "";
-
-        if (this.getUri().startsWith("<")) {
-            plt_uri = this.getUri();
-        } else {
-            plt_uri = "<" + this.getUri() + ">";
-        }
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-        
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-        
-        if (typeUri.startsWith("<")) {
-            insert += plt_uri + " a " + typeUri + " . ";
-        } else {
-            insert += plt_uri + " a <" + typeUri + "> . ";
-        }
-        insert += plt_uri + " rdfs:label  \"" + label + "\" . ";
-        if (comment != null && !comment.equals("")) {
-            insert += plt_uri + " rdfs:comment \"" + comment + "\" .  ";
-        }
-        
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-        
-        insert += LINE_LAST;
-
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-
-        return true;
-    }
-
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public int saveToLabKey(String user_name, String password) {
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
@@ -370,27 +317,6 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
             }
         }
         return totalChanged;
-    }
-
-    @Override
-    public void deleteFromTripleStore() {
-        String query = "";
-        if (this.getUri() == null || this.getUri().equals("")) {
-            return;
-        }
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        if (this.getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
-        } else {
-            query += this.getUri();
-        }
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
     }
 
     @Override

@@ -656,18 +656,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     @Override
     public void deleteFromTripleStore() {
- 
-        String query = "";
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        query += "<" + this.getUri() + ">  ";
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
-	DataAcquisitionSchema.resetCache();
+        super.deleteFromTripleStore();
+        DataAcquisitionSchema.resetCache();
     }
 
     @Override
