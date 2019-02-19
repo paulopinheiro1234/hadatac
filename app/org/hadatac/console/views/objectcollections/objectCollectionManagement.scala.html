@@ -1,7 +1,8 @@
 @(filename : String,
   da_uri   : String,
   study    : org.hadatac.entity.pojo.Study,
-  ocList   : List[org.hadatac.entity.pojo.ObjectCollection])
+  ocList   : List[org.hadatac.entity.pojo.ObjectCollection],
+  vcList   : List[org.hadatac.entity.pojo.VirtualColumn])
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -18,7 +19,7 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
            <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Create Object Collection</a>
-	   <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize Object Graph</a>
+  	       <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize Object Graph</a>
          </div>
       </div>
    </div>
@@ -28,7 +29,7 @@
     <div class="container-fluid">
 
       <h4>Subject Groups</h4>
-   
+      
       <div id="rcorners">
         <table class="table">
             <thead>
@@ -42,14 +43,18 @@
                 <th>Domain Scope</th>
                 <th>Location Scope</th>
                 <th>Time Scope</th>
-		<th># Objects</th>
+		        <th># Objects</th>
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
-	      @if(ocList != null) {
-                 @for(oc <- ocList){
-	            @oc_entry("subject", filename, da_uri, study, oc)
+   	          @if(ocList != null) {
+                 @for(oc <- ocList) {
+                    @for(vc <- vcList) {
+                       @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
+	                      @oc_entry("subject", filename, da_uri, study, oc, vc)
+                       }
+                    }
                  }
               }
             </tbody>
@@ -71,16 +76,20 @@
                 <th>Domain Scope</th>
                 <th>Location Scope</th>
                 <th>Time Scope</th>
-		<th># Objects</th>
+		        <th># Objects</th>
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
-	      @if(ocList != null) {
-                 @for(oc <- ocList){
-	            @oc_entry("sample", filename, da_uri, study, oc)
-                 }
-              }
+	            @if(ocList != null) {
+                   @for(oc <- ocList){
+                      @for(vc <- vcList) {
+                         @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
+	                        @oc_entry("sample", filename, da_uri, study, oc, vc)
+                         }
+                      }
+                   }
+                }
             </tbody>
         </table>
       </div>
@@ -98,16 +107,20 @@
                 <th>Role</th>
                 <th>Description</th>
                 <th>Location Scope</th>
-		<th># Objects</th>
+		        <th># Objects</th>
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
-	      @if(ocList != null) {
-                 @for(oc <- ocList){
-	            @oc_entry("location", filename, da_uri, study, oc)
-                 }
-              }
+	        @if(ocList != null) {
+               @for(oc <- ocList){
+                  @for(vc <- vcList) {
+                     @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
+	                    @oc_entry("location", filename, da_uri, study, oc, vc)
+                     }
+                  }
+               }
+            }
             </tbody>
         </table>
       </div>
@@ -125,16 +138,20 @@
                 <th>Role</th>
                 <th>Description</th>
                 <th>Time Scope</th>
-		<th># Objects</th>
+		        <th># Objects</th>
                 <th>Operations</th>
               </tr>
             </thead>
             <tbody>
-	      @if(ocList != null) {
-                 @for(oc <- ocList){
-	            @oc_entry("time", filename, da_uri, study, oc)
-                 }
-              }
+	           @if(ocList != null) {
+                  @for(oc <- ocList){
+                    @for(vc <- vcList) {
+                       @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
+	                      @oc_entry("time", filename, da_uri, study, oc, vc)
+	                   }
+	                }
+                  }
+               }
             </tbody>
         </table>
       </div>

@@ -23,8 +23,6 @@ public class NameSpaces {
 
     private Map<String, NameSpace> table = new HashMap<String, NameSpace>();
 
-    private Map<String, Integer> loadedOntologies = new HashMap<String, Integer>();
-    
     private String turtleNameSpaceList = "";
     private String sparqlNameSpaceList = "";
 
@@ -61,6 +59,13 @@ public class NameSpaces {
     }
     
     public Map<String, Integer> getLoadedOntologies() {
+        Map<String, Integer> loadedOntologies = new HashMap<String, Integer>();
+        List<NameSpace> list = new ArrayList<NameSpace>(table.values());
+        for (NameSpace ns: list) {
+            if (ns.getNumberOfLoadedTriples() > 0) {
+            	loadedOntologies.put(ns.getAbbreviation(), ns.getNumberOfLoadedTriples());
+            }
+        }
         return loadedOntologies;
     }
 
@@ -181,7 +186,7 @@ public class NameSpaces {
         String json = "";
         boolean first = true;
         List<Map.Entry<String,Integer>> entries = 
-                new ArrayList<Map.Entry<String,Integer>>(loadedOntologies.entrySet());
+                new ArrayList<Map.Entry<String,Integer>>(getLoadedOntologies().entrySet());
         Collections.sort(entries, new Comparator<Map.Entry<String,Integer>>() {
             public int compare(Map.Entry<String,Integer> a, Map.Entry<String,Integer> b) {
                 return Integer.compare(b.getValue(), a.getValue());

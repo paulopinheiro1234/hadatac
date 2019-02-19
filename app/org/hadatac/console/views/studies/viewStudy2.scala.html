@@ -1,0 +1,215 @@
+@(documentMap     : String,
+  study           : org.hadatac.entity.pojo.Study,
+  agent           : org.hadatac.entity.pojo.Agent,
+  institution     : org.hadatac.entity.pojo.Agent,
+  oc              : org.hadatac.entity.pojo.ObjectCollection,
+  objList         : List[org.hadatac.entity.pojo.StudyObject],
+  page            : Integer,
+  total           : Integer)
+  
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.metadataacquisition._
+@import org.hadatac.console.controllers.studies.ViewStudy2
+@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / ViewStudy2.PAGESIZE); var lastpage = (last + 1) 
+@import org.hadatac.console.controllers._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play._
+@import java.net.URLEncoder
+
+@main("Study View") {
+	<head>
+    </head>
+    <body>
+
+    <div class="container-fluid">
+        <h4>Study View</h4>
+
+		<div class="row">
+	        <div class="col-lg-5 left">
+	            <h5>Info</h5>
+			    <ul>        		
+					<li><b>Code</b>: @study.getId()</li>
+					<li><b>Title</b>: @study.getLabel()</li>
+					<!--  <li><b>Full Tile</b>: @study.getTitle()</li> ---->
+					<li><b>Description</b>: @study.getComment()</li>
+					<li><b>Agent(s)</b>: @if(agent != null) { @agent.getLabel() }</li>
+					<li><b>Institution</b>: @if(institution != null) { @institution.getLabel() }</li>
+				</ul>
+			</div>
+
+	        <div class="col-lg-7 right">
+				<h5>SOC Content</h5>
+
+		        @if(oc != null && objList != null) {
+
+					@if(prev >= 0) {
+    					<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn-xs btn-primary" 
+	       				role="button">&lt;&lt;</a>
+	   
+				    	<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn-xs btn-primary" 
+	     				role="button">&lt;</a>
+					} else {
+    					<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn-xs btn-primary disabled" 
+	       				role="button">&lt;&lt;</a>
+	   
+	   					<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn-xs btn-primary disabled" 
+	       				role="button">&lt;</a>
+					}
+
+					@current of @lastpage   
+	   
+					@if(next < last) {
+		    			<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn-xs btn-primary" 
+	    	   			role="button">&gt;</a>
+
+	    				<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn-xs btn-primary" 
+	       				role="button">&gt;&gt;</a>
+	   
+					} else {
+	    				<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn-xs btn-primary disabled" 
+	       				role="button">&gt;</a>
+
+		    			<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy2.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn-xs btn-primary disabled" 
+	    	   			role="button">&gt;&gt;</a>	   
+					}
+
+		        	<table class="table">
+        		    	<thead>
+             				<tr>
+                				<th>Name</th>
+                				<th>Type</th>
+                				<th>Original ID</th>
+		        				@if(objList.size() > 0) {
+		           					@for(scope <- objList.get(0).getScopeUris()) {
+		              					<th>hasScope</th>
+                   					}
+		           					@for(timeScope <- objList.get(0).getTimeScopeUris()) {
+		              					<th>hasTimeScope</th>
+                   					}
+		           					@for(spaceScope <- objList.get(0).getSpaceScopeUris()) {
+		              					<th>hasSpaceScope</th>
+                   					}
+                				}	  
+                				<th>Operations</th>
+              				</tr>
+            			</thead>
+            			<tbody>
+	                 		@for(obj <- objList){
+	                 			@obj_view_entry(study, oc, obj)
+                 			}
+            			</tbody>
+        			</table>
+        		}
+
+			</div>
+		</div>
+
+	    <div class="row">
+        	<div class="col-lg-12">
+				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    			<style>
+    				table.google-visualization-orgchart-table {
+                		border-collapse: separate !important;
+        			}
+    			</style>
+     
+	       		<h5>SOC Structure</h5> (select nodes to browse their objects)
+    	   	    <div id="chart_div" style="width: 100%; height: 250px;">
+    	   	    </div>
+			</div>
+		</div>
+
+		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary" 
+	       role="button">Back to Search Studies</a>  		
+	
+	</div>
+
+	      <script>
+    	    google.charts.load('current', {packages:["orgchart"]});
+    	  	google.charts.setOnLoadCallback(drawChart);
+
+			function getOCParam() {
+    			var url = window.location.href;
+    			var regexS = "[\\?&]oc_uri=([^&#]*)";
+    			var regex = new RegExp(regexS);
+    			var params = regex.exec(url);
+    			return params == null ? null : params[1].replace("%23","#");
+			}
+
+			function removeOCParam() {
+            	var url = window.location.href.split('?')[0]+'?';
+            	var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                	sURLVariables = sPageURL.split('&'),
+                	sParameterName,
+                	i;
+         
+        	    for (i = 0; i < sURLVariables.length; i++) {
+            	    sParameterName = sURLVariables[i].split('=');
+                	if (sParameterName[0] != 'oc_uri') {
+                    	url = url + sParameterName[0] + '=' + sParameterName[1] + '&'
+                	}	
+            	}
+            	return url.substring(0,url.length-1);
+			}
+ 
+ 	     	function drawChart() {
+    	    	var data = new google.visualization.DataTable();
+        		data.addColumn('string', 'Name');
+        		data.addColumn('string', 'Manager');
+        		data.addColumn('string', 'ToolTip');
+
+	        	// For each orgchart box, provide the name, manager, and tooltip to show.
+        		var encodedDataStr = '@documentMap';
+        		var dataStr = '[' + encodedDataStr.replace(/&#x27;/g,"'") + ']';
+	            //alert(dataStr);
+                var arrays = eval(dataStr);
+        		data.addRows(arrays);
+				
+    			// Create the chart.
+    	  	  	var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
+
+	        	// Draw the chart, setting the allowHtml option to true for the tooltips.
+    	    	chart.draw(data, {allowHtml:true});
+    	    	
+    	    	var oc_param = decodeURIComponent(decodeURIComponent(getOCParam()));
+    	    	//alert(oc_param);
+	  			for (var i = 0; i < data.getNumberOfRows(); i++) {
+	  			    if (oc_param == data.wg[i].c[2].v) {
+		  				//alert("selected index is " + i + " for " + data.wg[i].c[2].v);
+		        		chart.setSelection([{'row': i, 'column': null }]);
+		  			}
+	  			}
+
+				// The selection handler.
+				// Loop through all items in the selection and concatenate
+				// a single message from all of them.
+				function selectHandler() {
+  					var selection = chart.getSelection();
+  					var message = '';
+  					for (var i = 0; i < selection.length; i++) {
+    					var item = selection[i];
+    					if (item.row != null) {
+      						var new_oc_uri = data.getValue(item.row, 0);
+      						message += '{row:' + item.row + ', column:none} = ' + new_oc_uri + '\n';
+      						var newUrl = removeOCParam().replace("#","%23") + '&oc_uri=' + new_oc_uri.replace("#","%23");
+      						//alert(message + ' ' + newUrl);
+		  					location.replace(newUrl);				
+    					} 
+  					}
+  					if (message == '') {
+    					message = 'nothing';
+  					}
+  					//alert('You selected ' + message);
+  				}
+
+				// Add our selection handler.
+				google.visualization.events.addListener(chart, 'select', selectHandler);
+
+      		}     
+          </script>
+ 
+   	</body>
+} 

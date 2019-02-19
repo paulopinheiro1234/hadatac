@@ -2,7 +2,8 @@
   filename : String,
   da_uri   : String, 
   study    : org.hadatac.entity.pojo.Study,
-  oc       : org.hadatac.entity.pojo.ObjectCollection)
+  oc       : org.hadatac.entity.pojo.ObjectCollection,
+  vc       : org.hadatac.entity.pojo.VirtualColumn)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
@@ -13,10 +14,11 @@
 @if(oc != null) {
 
   @if(mode.equals("subject") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SubjectGroup")) {
+
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
-     <td>@if(oc.getGroundingLabel() != null) { @oc.getGroundingLabel() }</td>
-     <td>@if(oc.getSOCReference() != null) { @oc.getSOCReference() }</td>
+     <td>@if(vc.getGroundingLabel() != null) { @vc.getGroundingLabel() }</td>
+     <td>@if(vc.getSOCReference() != null) { @vc.getSOCReference() }</td>
      <td>@if(oc.getRoleLabel() != null) { @oc.getRoleLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
      <td>@if(oc.getHasScope() != null) { @oc.getHasScope().getLabel() }</td>
@@ -45,8 +47,8 @@
   @if(mode.equals("sample") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/SampleCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
-     <td>@if(oc.getGroundingLabel() != null) { @oc.getGroundingLabel() }</td>
-     <td>@if(oc.getSOCReference() != null) { @oc.getSOCReference() }</td>
+     <td>@if(vc.getGroundingLabel() != null) { @vc.getGroundingLabel() }</td>
+     <td>@if(vc.getSOCReference() != null) { @vc.getSOCReference() }</td>
      <td>@if(oc.getRoleLabel() != null) { @oc.getRoleLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
      <td>@if(oc.getHasScope() != null) { @oc.getHasScope().getLabel() }</td>
@@ -75,8 +77,8 @@
   @if(mode.equals("location") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/LocationCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
-     <td>@if(oc.getGroundingLabel() != null) { @oc.getGroundingLabel() }</td>
-     <td>@if(oc.getSOCReference() != null) { @oc.getSOCReference() }</td>
+     <td>@if(vc.getGroundingLabel() != null) { @vc.getGroundingLabel() }</td>
+     <td>@if(vc.getSOCReference() != null) { @vc.getSOCReference() }</td>
      <td>@if(oc.getRoleLabel() != null) { @oc.getRoleLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
      <td>@if(oc.getSpaceScopes() != null) { 
@@ -98,8 +100,8 @@
   @if(mode.equals("time") && oc.getTypeUri().equals("http://hadatac.org/ont/hasco/TimeCollection")) {
   <tr>
      <td>@if(oc.getLabel() != null) { @oc.getLabel() }</td>
-     <td>@if(oc.getGroundingLabel() != null) { @oc.getGroundingLabel() }</td>
-     <td>@if(oc.getSOCReference() != null) { @oc.getSOCReference() }</td>
+     <td>@if(vc.getGroundingLabel() != null) { @vc.getGroundingLabel() }</td>
+     <td>@if(vc.getSOCReference() != null) { @vc.getSOCReference() }</td>
      <td>@if(oc.getRoleLabel() != null) { @oc.getRoleLabel() }</td>
      <td>@if(oc.getComment() != null) { @oc.getComment() }</td>
      <td>@if(oc.getTimeScopes() != null) {

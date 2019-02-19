@@ -534,9 +534,14 @@ public class AnnotationWorker {
         SSDGeneratorChain chain = new SSDGeneratorChain();
 
         if (SSDsheet.isValid()) {
-            SSDGenerator gen = new SSDGenerator(SSDsheet);
-            String studyUri = gen.getStudyUri();
-            chain.addGenerator(gen);
+
+            VirtualColumnGenerator vcgen = new VirtualColumnGenerator(SSDsheet, file_name);
+            chain.addGenerator(vcgen);
+            
+            SSDGenerator socgen = new SSDGenerator(SSDsheet, file_name);
+            chain.addGenerator(socgen);
+
+            String studyUri = socgen.getStudyUri();
             if (studyUri == null || studyUri == "") {
                 return null;
             } else {
@@ -551,6 +556,7 @@ public class AnnotationWorker {
             }
 
             chain.setRecordFile(file);
+
         } else {
             //chain.setInvalid();
             AnnotationLog.printException("Cannot locate SSD's sheet ", file.getFileName());

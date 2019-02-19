@@ -4,6 +4,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
@@ -503,7 +504,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 collectionType = ObjectCollection.SUBJECT_COLLECTION;
             }
 
-            ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, scopeUri, "", "", daso.getLabel(), null, null);
+            VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
+            if (newVc == null) {
+                newVc = new VirtualColumn(studyUri, "", daso.getLabel());
+                newVc.setNamedGraph(oasUri);
+                newVc.saveToTripleStore();
+                addObject(newVc);
+            }
+            ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, newVc.getUri(), "", scopeUri, null, null, "0");
             newSoc.setNamedGraph(oasUri);
             newSoc.saveToTripleStore();
             addObject(newSoc);

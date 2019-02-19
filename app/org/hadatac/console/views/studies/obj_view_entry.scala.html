@@ -1,0 +1,39 @@
+@(study : org.hadatac.entity.pojo.Study,
+  oc    : org.hadatac.entity.pojo.ObjectCollection,
+  obj   : org.hadatac.entity.pojo.StudyObject)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+@import org.hadatac.entity.pojo.StudyObject
+
+@if(oc != null) {
+  <tr>
+     <td>@if(obj.getLabel() != null) { @obj.getLabel() }</td>
+     <td>@if(obj.getTypeUri() != null) { @obj.getStudyObjectType().getLabel() }</td>
+     <td>@if(obj.getOriginalId() != null) { @obj.getOriginalId() }</td>
+
+     @if(obj.getScopeUris() != null && obj.getScopeUris().size() > 0) {
+        @for(scope <- obj.getScopeUris()) {
+            <td>@if(scope != null && StudyObject.find(scope) != null) { @StudyObject.find(scope).getLabel() }</td>
+        }
+     }
+
+     @if(obj.getTimeScopeUris() != null && obj.getTimeScopeUris().size() > 0) {
+        @for(timeScope <- obj.getTimeScopeUris()) {
+            <td>@if(timeScope != null && StudyObject.find(timeScope) != null) { @StudyObject.find(timeScope).getLabel() }</td>
+        }
+     }
+
+     @if(obj.getSpaceScopeUris() != null && obj.getSpaceScopeUris().size() > 0) {
+        @for(spaceScope <- obj.getSpaceScopeUris()) {
+            <td>@if(spaceScope != null && StudyObject.find(spaceScope) != null) { @StudyObject.find(spaceScope).getLabel() }</td>
+        }
+     }
+
+     <td>
+        <a href="" class="btn-xs btn-primary" role="button">View</a>
+     </td>
+ </tr>
+}

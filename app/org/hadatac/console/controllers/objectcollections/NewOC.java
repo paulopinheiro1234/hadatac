@@ -98,12 +98,12 @@ public class NewOC extends Controller {
 				newLabel,
 				newComment,
 				newStudyUri,
+				"", // HACK!
+                newHasRoleLabel,
 				newHasScopeUri,
-				newHasGroundingLabel,
-				newHasRoleLabel,
-				newHasSOCReferenceLabel,
 				newSpaceScopeUris,
-				newTimeScopeUris);
+				newTimeScopeUris,
+				"0");
 
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		oc.save();

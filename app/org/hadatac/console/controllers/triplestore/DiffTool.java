@@ -37,7 +37,6 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.metadataacquisition.ViewStudy;
 import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.triplestore.*;
@@ -58,10 +57,6 @@ import play.mvc.Result;
 
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
-
-
-
-
 
 public class DiffTool extends Controller {
 
