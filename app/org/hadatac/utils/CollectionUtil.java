@@ -83,7 +83,6 @@ public class CollectionUtil {
             }
         }
 
-        System.out.println("collection: " + collection);
         return collection;
     }
     
