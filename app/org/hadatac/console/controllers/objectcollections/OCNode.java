@@ -15,7 +15,7 @@ public class OCNode {
     private int type;
     private String memberOf;
     
-    public OCNode(String u, String n, int t, String mOf) {
+    public OCNode(String n, String u , int t, String mOf) {
         name = n;
         uri = u;
         type = t;

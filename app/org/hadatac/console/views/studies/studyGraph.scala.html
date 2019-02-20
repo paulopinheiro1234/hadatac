@@ -6,11 +6,11 @@
 @import org.hadatac.utils._
 @import org.hadatac.utils.NameSpaces
 
-@main("Study Graph") {
+@main("Loaded Ontologies") {
 
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
  
-    <h3>StudyGraph</h3>
+    <h3>Loaded Ontologies</h3>
     
     <div class="container-fluid">
 	
@@ -22,7 +22,7 @@
 
         function drawBasic() {
 
-     	var dataArray = JSON.parse('[["Ontology", "# of triples"],' + '@NameSpaces.getInstance().jsonLoadedOntologies()'.replace(/&quot;/g,'"') + ']');
+	    var dataArray = JSON.parse('[["Ontology", "# of triples"],' + '@NameSpaces.getInstance().jsonLoadedOntologies()'.replace(/&quot;/g,'"') + ']');
 
         var data = google.visualization.arrayToDataTable(dataArray);
 
@@ -43,7 +43,6 @@
       chart.draw(data, options);
     }
      </script> 
-
 
      @mainButton(false)
 	

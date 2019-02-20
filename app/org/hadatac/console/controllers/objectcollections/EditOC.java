@@ -159,17 +159,18 @@ public class EditOC extends Controller {
 		//}
 
 		// insert current state of the OC
-		ObjectCollection newOc = new ObjectCollection(newURI,
+		ObjectCollection newOc = new ObjectCollection(
+		        newURI,
 				newType,
 				newLabel,
 				newComment,
 				newStudyUri,
+				"",  //HACK!
+                newHasRoleLabel,
 				newHasScopeUri,
-				newHasGroundingLabel,
-				newHasRoleLabel,
-				newHasSOCReference,
 				newSpaceScopeUris,
-				newTimeScopeUris);
+				newTimeScopeUris,
+				"0");
 		newOc.setObjectUris(oldOc.getObjectUris());
 
 		// delete previous content and insert new OC content inside of triplestore

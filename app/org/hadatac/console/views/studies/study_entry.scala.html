@@ -16,7 +16,7 @@
   <td>@if(study.getDataAcquisitionUris() != null) { @study.getDataAcquisitionUris().size() }</td>
   <td>@if(study.getObjectCollectionUris() != null) { @study.getObjectCollectionUris().size() }</td>
   <td>
-    <a href="@ConfigFactory.load().getString("hadatac.console.host_deploy")/hadatac/metadataacquisitions/viewStudy?study_uri=@DynamicFunctions.replaceURLWithPrefix(study.getUri())" 
+    <a href="@ConfigFactory.load().getString("hadatac.console.host_deploy")/hadatac/studies/viewStudy2?study_uri=@DynamicFunctions.replaceURLWithPrefix(study.getUri())" 
        class="btn-xs btn-primary" role="button">View</a> 
     @defining("") { filename => @defining("") { da_uri => 
          <a href="@org.hadatac.console.controllers.studies.routes.EditStudy.index(filename, da_uri, URLEncoder.encode(study.getUri(), "UTF-8"))"

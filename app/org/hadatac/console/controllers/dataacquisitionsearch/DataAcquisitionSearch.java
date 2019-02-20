@@ -28,7 +28,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
-import org.hadatac.console.controllers.metadataacquisition.ViewSubject;
 import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
@@ -76,10 +75,11 @@ public class DataAcquisitionSearch extends Controller {
             }
             for (String uri: setObj) {
                 if (uri != null) {
-                    String html = ViewSubject.findBasicHTML(uri);
-                    if (html != null) {
-                        objDetails.putObject(uri, html);
-                    }
+                	// NEEDS TO REPLACE WITH VIEWSTUDYOBJECT
+                    //String html = ViewSubject.findBasicHTML(uri);
+                    //if (html != null) {
+                    //    objDetails.putObject(uri, html);
+                    //}
                 }
             }
         }

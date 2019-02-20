@@ -30,6 +30,7 @@ import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.VirtualColumn;
 import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.console.http.SPARQLUtils;
@@ -55,11 +56,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String LINE_LAST = "}  ";
 
     private String studyUri = "";
-    private String hasScopeUri = "";    
-    private String hasGroundingLabel = "";
-    private String hasSOCReference = "";
+    private String hasVirtualColumnUri = "";
     private String hasRoleLabel = "";
     private String hasLastCounter = "0";
+    private String hasScopeUri = "";    
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -70,36 +70,34 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.label = "";
         this.comment = "";
         this.studyUri = "";
-        this.hasScopeUri = "";
-        this.hasGroundingLabel = "";
         this.hasRoleLabel = "";
-        this.hasSOCReference = "";
+        this.hasVirtualColumnUri = "";
         this.hasLastCounter = "0";
+        this.hasScopeUri = "";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
     }
 
-    public ObjectCollection(String uri,
+    public ObjectCollection(
+            String uri,
             String typeUri,
             String label,
             String comment,
             String studyUri,
-            String hasScopeUri,
-            String hasGroundingLabel,
+            String hasVirtualColumnUri,
             String hasRoleLabel,
-            String hasSOCReference,
+            String hasScopeUri,
             List<String> spaceScopeUris,
-            List<String> timeScopeUris) {
+            List<String> timeScopeUris,
+            String hasLastCounter) {
         this.setUri(uri);
         this.setTypeUri(typeUri);
         this.setLabel(label);
         this.setComment(comment);
         this.setStudyUri(studyUri);
-        this.setHasScopeUri(hasScopeUri);
-        this.setGroundingLabel(hasGroundingLabel);
+        this.setVirtualColumnUri(hasVirtualColumnUri);
         this.setRoleLabel(hasRoleLabel);
-        this.setSOCReference(hasSOCReference);
-        this.hasLastCounter = "0";
+        this.setHasScopeUri(hasScopeUri);
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
     }
@@ -114,9 +112,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setLabel(label);
         this.setComment(comment);
         this.setStudyUri(studyUri);
-        this.setHasScopeUri("");
-        this.setSOCReference("");
+        this.setVirtualColumnUri("");
         this.setRoleLabel("");
+        this.setHasScopeUri("");
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
         this.hasLastCounter = "0";
@@ -290,24 +288,36 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return ObjectCollection.find(hasScopeUri);
     }
 
+    public void setVirtualColumnUri(String vcUri) {
+        this.hasVirtualColumnUri = vcUri;
+    }
+
+    public String getVirtualColumnUri() {
+        return hasVirtualColumnUri;
+    }
+
+    public VirtualColumn getVirtualColumn() {
+        return VirtualColumn.find(hasVirtualColumnUri);
+    }
+
     public void setHasScopeUri(String hasScopeUri) {
         this.hasScopeUri = hasScopeUri;
     }
 
-    public void setSOCReference(String hasSOCReference) {
-        this.hasSOCReference = hasSOCReference;
-    }
-
     public String getSOCReference() {
-        return hasSOCReference;
-    }
-
-    public void setGroundingLabel(String hasGroundingLabel) {
-        this.hasGroundingLabel = hasGroundingLabel;
+        VirtualColumn vc = this.getVirtualColumn();
+        if (vc == null) {
+            return "";
+        }
+        return vc.getSOCReference();
     }
 
     public String getGroundingLabel() {
-        return hasGroundingLabel;
+        VirtualColumn vc = this.getVirtualColumn();
+        if (vc == null) {
+            return "";
+        }
+        return vc.getGroundingLabel();
     }
 
     public void setRoleLabel(String roleLabel) {
@@ -513,14 +523,13 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasSOCReference ?hasRoleLabel ?hasGroundingLabel ?spaceScopeUri ?timeScopeUri ?lastCounter WHERE { \n" + 
+                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasRoleLabel ?hasVirtualColumnUri ?spaceScopeUri ?timeScopeUri ?lastCounter WHERE { \n" + 
                 "    <" + oc_uri + "> a ?ocType . \n" + 
                 "    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" + 
-                "    OPTIONAL { <" + oc_uri + "> hasco:hasSOCReference ?hasSOCReference } . \n" + 
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasReference ?hasVirtualColumnUri } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasRoleLabel ?hasRoleLabel } . \n" + 
-                "    OPTIONAL { <" + oc_uri + "> hasco:hasGroundingLabel ?hasGroundingLabel } . \n" + 
                 "    OPTIONAL { <" + oc_uri + "> hasco:hasLastCounter ?lastCounter } . \n" + 
                 "}";
 
@@ -537,9 +546,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String studyUriStr = "";
         String commentStr = "";
         String hasScopeUriStr = "";
-        String hasGroundingLabelStr = "";
+        String hasVirtualColumnUriStr = "";
         String hasRoleLabelStr = "";
-        String hasSOCReferenceStr = "";
         String lastCounterStr = "0";
         List<String> spaceScopeUrisStr = new ArrayList<String>();
         List<String> timeScopeUrisStr = new ArrayList<String>();
@@ -567,6 +575,14 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 }
 
                 try {
+                    if (soln.getResource("hasVirtualColumnUri") != null && soln.getResource("hasVirtualColumnUri").getURI() != null) {
+                        hasVirtualColumnUriStr = soln.getResource("hasVirtualColumnUri").getURI();
+                    }
+                } catch (Exception e1) {
+                    hasVirtualColumnUriStr = "";
+                }
+
+                try {
                     if (soln.getLiteral("comment") != null && soln.getLiteral("comment").getString() != null) {
                         commentStr = soln.getLiteral("comment").getString();
                     }
@@ -583,27 +599,11 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 }
 
                 try {
-                    if (soln.getLiteral("hasGroundingLabel") != null && soln.getLiteral("hasGroundingLabel").getString() != null) {
-                        hasGroundingLabelStr = soln.getLiteral("hasGroundingLabel").getString();
-                    }
-                } catch (Exception e1) {
-                    hasGroundingLabelStr = "";
-                }
-
-                try {
                     if (soln.getLiteral("hasRoleLabel") != null && soln.getLiteral("hasRoleLabel").getString() != null) {
                         hasRoleLabelStr = soln.getLiteral("hasRoleLabel").getString();
                     }
                 } catch (Exception e1) {
                     hasRoleLabelStr = "";
-                }
-
-                try {
-                    if (soln.getLiteral("hasSOCReference") != null && soln.getLiteral("hasSOCReference").getString() != null) {
-                        hasSOCReferenceStr = soln.getLiteral("hasSOCReference").getString();
-                    }
-                } catch (Exception e1) {
-                    hasSOCReferenceStr = "";
                 }
 
                 try {
@@ -618,7 +618,18 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
                 timeScopeUrisStr = retrieveTimeScope(oc_uri);
 
-                oc = new ObjectCollection(oc_uri, typeStr, labelStr, commentStr, studyUriStr, hasScopeUriStr, hasGroundingLabelStr, hasRoleLabelStr, hasSOCReferenceStr, spaceScopeUrisStr, timeScopeUrisStr);
+                oc = new ObjectCollection(
+                        oc_uri, 
+                        typeStr, 
+                        labelStr, 
+                        commentStr, 
+                        studyUriStr,  
+                        hasVirtualColumnUriStr, 
+                        hasRoleLabelStr, 
+                        hasScopeUriStr, 
+                        spaceScopeUrisStr, 
+                        timeScopeUrisStr,
+                        lastCounterStr);
             }
         }
 
@@ -886,11 +897,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 insert += oc_uri + " hasco:hasScope  " + this.getHasScopeUri() + " . ";
             }
         }
+        /*
         if (this.getGroundingLabel() != null && !this.getGroundingLabel().equals("")) {
             insert += oc_uri + " hasco:hasGroundingLabel  \"" + this.getGroundingLabel() + "\" . ";
-        }
-        if (this.getSOCReference() != null && !this.getSOCReference().equals("")) {
-            insert += oc_uri + " hasco:hasSOCReference  \"" + this.getSOCReference() + "\" . ";
+        }*/
+        if (this.getVirtualColumnUri() != null && !this.getVirtualColumnUri().equals("")) {
+            insert += oc_uri + " hasco:hasReference  <" + this.getVirtualColumnUri() + "> . ";
         }
         if (this.getRoleLabel() != null && !this.getRoleLabel().equals("")) {
             insert += oc_uri + " hasco:hasRoleLabel  \"" + this.getRoleLabel() + "\" . ";

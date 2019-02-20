@@ -503,7 +503,7 @@ public class Study extends HADatAcThing {
                 QuerySolution soln = resultsrw.next();
                 if (soln.contains("oc_uri")) {
                     ocList.add(soln.get("oc_uri").toString());
-                    System.out.println("STUDY: [" + study_uri + "]   OC: [" + soln.get("oc_uri").toString() + "]");
+                    //System.out.println("STUDY: [" + study_uri + "]   OC: [" + soln.get("oc_uri").toString() + "]");
                 }
             }
         } catch (QueryExceptionHTTP e) {

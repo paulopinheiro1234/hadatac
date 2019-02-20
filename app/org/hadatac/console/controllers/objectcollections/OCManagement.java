@@ -6,6 +6,7 @@ import java.net.URLDecoder;
 
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.VirtualColumn;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -29,11 +30,17 @@ public class OCManagement extends Controller {
 		Study std = Study.find(std_uri);
 
 		List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(std_uri);
-		for (ObjectCollection oc : ocList) {
-		    System.out.println("SOC in " + std_uri + " : " + oc.getUri());
-		}
+	    List<VirtualColumn> vcList = VirtualColumn.findByStudyUri(std_uri);
 
-		return ok(objectCollectionManagement.render(filename, da_uri, std, ocList));
+		for (ObjectCollection oc : ocList) {
+		    System.out.println("SOC in " + std_uri + " [" + oc.getUri() + "]  with reference [" + oc.getVirtualColumnUri() + "]");
+		}
+        for (VirtualColumn vc : vcList) {
+            System.out.println("VC in " + std_uri + " [" + vc.getUri() + "]");
+        }
+
+
+		return ok(objectCollectionManagement.render(filename, da_uri, std, ocList, vcList));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
