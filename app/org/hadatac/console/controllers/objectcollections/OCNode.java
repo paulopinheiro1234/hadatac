@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.objectcollections;
 
+import java.util.List;
+
 public class OCNode {
 
     public static final int STUDY = 0;
@@ -9,16 +11,19 @@ public class OCNode {
     public static final int OBJECT = 1;
     public static final int SPACEOBJECT = 2;
     public static final int TIMEOBJECT = 3;
+    public static final int PROPERTY = 4;
     
     private String name;
     private String uri;
     private int type;
-    private String memberOf;
+    private String htmlDoc;
+    private List<String> memberOf;
     
-    public OCNode(String n, String u , int t, String mOf) {
+    public OCNode(String n, String u , int t, String hd, List<String> mOf) {
         name = n;
         uri = u;
         type = t;
+        htmlDoc = hd;
         memberOf = mOf;
     }
     
@@ -34,7 +39,11 @@ public class OCNode {
         return type;
     }	    
         
-    public String getMemberOf() {
+    public String getHtmlDoc() {
+        return htmlDoc;
+    }	    
+        
+    public List<String> getMemberOf() {
         return memberOf;
     }
 }

@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 

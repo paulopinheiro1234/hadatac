@@ -54,7 +54,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
     public VirtualColumn createVirtualColumn(Record record) throws Exception {
   
         // Skip the study row in the SSD sheet
-        System.out.println("VirtualColumnGenerator: row's type: [" + this.getTypeUri(record) + "]   [" + URIUtils.replacePrefix("hasco:Study") + "]");
+        //System.out.println("VirtualColumnGenerator: row's type: [" + this.getTypeUri(record) + "]   [" + URIUtils.replacePrefix("hasco:Study") + "]");
         if (this.getTypeUri(record).equals("hasco:Study")) {
             return null;
         }

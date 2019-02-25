@@ -35,7 +35,6 @@ import org.labkey.remoteapi.CommandException;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
 
-
 public class StudyObject extends HADatAcThing {
 
     public static String LOCATION = "http://semanticscience.org/resource/Location";
@@ -282,6 +281,35 @@ public class StudyObject extends HADatAcThing {
         return retrievedUris;
     }
 
+    public static List<String> retrieveUrisScopedByThisUri(String obj_uri) {
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?scopeUri WHERE { " + 
+                " ?scopeUri hasco:hasObjectScope <" + obj_uri + "> . " + 
+                "}";
+
+        //System.out.println("Study.retrieveScopeUris() queryString: \n" + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("scopeUri") != null && soln.getResource("scopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("scopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
     public static List<String> retrieveTimeScopeUris(String obj_uri) {
         List<String> retrievedUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -449,17 +477,24 @@ public class StudyObject extends HADatAcThing {
     public static String findUriBySocAndOriginalId(String socUri, String original_id) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?objuri WHERE { " + 
-                "	?objuri hasco:originalID \"" + original_id + "\" . " + 
+                "	?objuri hasco:originalID ?id . " + 
                 "	?objuri hasco:isMemberOf <" + socUri + "> . " + 
+      		    "   filter contains(?id,\"" + original_id + "\") " +                   
                 "}";
+
+        //System.out.println("StudyObject: findUriBySocAndOriginalId => SOC=[" + socUri + "]  originalId: [" + original_id + "]");
+        //System.out.println("StudyObject: findUriBySocAndOriginalId => query=[" + queryString + "]");
+        //System.out.println("StudyObject: findUriBySocAndOriginalId => CollectionUtil=[" + CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL) + "]");
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
+        System.out.println("StudyObject: findUriBySocAndOriginalId => resultSize=[" + resultsrw.size() + "]");
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
             if (soln != null) {
-                if (soln.getResource("objuri") != null) {
+                if (soln != null && soln.getResource("objuri") != null) {
+                    System.out.println("StudyObject: findUriBySocAndOriginalId => objuri=[" + soln.getResource("objuri").toString() + "]");
                     return soln.getResource("objuri").toString();
                 }
             }

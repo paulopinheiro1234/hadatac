@@ -797,6 +797,33 @@ public class Measurement extends HADatAcThing implements Runnable {
         return listMeasurement;
     }
 
+    public static List<Measurement> findByObjectUri(String obj_uri) {
+
+    	List<Measurement> listMeasurement = new ArrayList<Measurement>();
+
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+        SolrQuery query = new SolrQuery();
+        query.set("q", "object_uri_str:\"" + obj_uri + "\"");
+        query.set("rows", "10000000");
+        
+        try {
+            QueryResponse response = solr.query(query);
+            solr.close();
+            SolrDocumentList results = response.getResults();
+            Iterator<SolrDocument> i = results.iterator();
+            while (i.hasNext()) {
+                Measurement measurement = convertFromSolr(i.next(), null, new HashMap<>());
+                listMeasurement.add(measurement);
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Measurement.findByDataAcquisitionUri(acquisition_uri) - Exception message: "
+                    + e.getMessage());
+        }
+
+        return listMeasurement;
+    }
+
     public static Map<String, String> generateCachedLabel(List<String> uris) {
         Map<String, String> results = new HashMap<String, String>();
 

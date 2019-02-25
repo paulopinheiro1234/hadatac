@@ -131,7 +131,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("uri").getURI() != null) { 
-                System.out.println("VirtualColumn: findByStudyUri() : " + soln.getResource("uri").getURI());
+                //System.out.println("VirtualColumn: findByStudyUri() : " + soln.getResource("uri").getURI());
                 VirtualColumn vc = VirtualColumn.find(soln.getResource("uri").getURI());
                 vcList.add(vc);
             }

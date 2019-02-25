@@ -279,6 +279,8 @@ POST 	/hadatac/objects/updatecollection	       org.hadatac.console.controllers.o
 GET 	/hadatac/objects/deletecollection	       org.hadatac.console.controllers.objects.ObjectManagement.deleteCollectionObjects(filename : String, da_uri : String, study_uri : String, oc_uri : String, obj_uri_list : java.util.List[String], page : Integer)
 POST 	/hadatac/objects/deletecollection	       org.hadatac.console.controllers.objects.ObjectManagement.deleteCollectionObjects(filename : String, da_uri : String, study_uri : String, oc_uri : String, obj_uri_list : java.util.List[String], page : Integer)
 POST 	/hadatac/objects/new/fileform	               org.hadatac.console.controllers.objects.NewObjectsFromFile.processForm(filename : String, da_uri : String, oc_uri : String, page : Integer)
+GET	    /hadatac/objects/objectView	                   org.hadatac.console.controllers.objects.ObjectView.index(obj_uri: String)
+POST	/hadatac/objects/objectView	                   org.hadatac.console.controllers.objects.ObjectView.postIndex(obj_uri: String)
 
 # data acquisition management
 GET	    /hadatac/dataacquisitions/		       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.index(oper : Int)
