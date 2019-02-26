@@ -44,7 +44,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
 
     private String getSOCReference(Record rec) {
         String ref = rec.getValueByColumnName(mapCol.get("hasSOCReference"));
-        return ref.trim().replace(" ", "").replace("_", "-");
+        return ref.trim().replace(" ", "");
     }
 
     private String getGroundingLabel(Record rec) {

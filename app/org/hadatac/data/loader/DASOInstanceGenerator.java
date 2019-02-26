@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Iterator;
 
-
 public class DASOInstanceGenerator extends BaseGenerator {
 
-	private final boolean DEBUG_MODE = true;
+	private final boolean DEBUG_MODE = false;
 	
 	private final String SIO_OBJECT = "sio:Object";
     private final String SIO_SAMPLE = "sio:Sample";;
