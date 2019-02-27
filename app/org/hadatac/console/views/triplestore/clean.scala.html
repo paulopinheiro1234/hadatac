@@ -80,7 +80,7 @@
          
            <div id="end-process-box" style="display:none;">
                   <h4>Clean complete -- check the results above to see if the clean was successful.</h4>
-                  <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
+                  <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary" role="button">Back to Repository Management</a>
 	       </div>
 
 	     @if((oper=="collections") || (oper=="acquisitions") || (oper=="metadata") || (oper=="usergraph")) {
@@ -93,12 +93,12 @@
 	     
          @if(oper=="doneOk") {
               <h4>Repository operation successfully requested.</h4>
-              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary" role="button">Back to Repository Management</a>
          }
 
          @if(oper=="doneNotOk") {
               <h4>Repository operation failed.</h4>
-              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-warning" role="button">Back to Repository Management</a>
+              <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" class="btn btn-primary" role="button">Back to Repository Management</a>
          }
 
          @if(oper=="init") {

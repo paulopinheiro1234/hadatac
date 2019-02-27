@@ -312,11 +312,12 @@ public class DataFile {
         			selected.add(df);
         		} 
     		} else {
-        		if (df.getFileName().indexOf(currentDir) >= 0) {
-    				selected.add(df);
-        		}
-        	}        	
-        }
+                if (df.getFileName().indexOf(currentDir) >= 0) {
+                    selected.add(df);
+                }
+            }   
+    	}
+    	
     	return selected;
     }
 
@@ -453,7 +454,7 @@ public class DataFile {
         	if (pos >=0) {
         		fName = df.getFileName().substring(0, df.getFileName().indexOf('/'));
         	}
-        	System.out.println("[" + fName + "] " + df.getFileName());
+        	// System.out.println("[" + fName + "] " + df.getFileName());
         	if (!fName.equals("")) {
         		String newFolder = "/" + fName + "/";
         		if (!results.contains(newFolder)) {
