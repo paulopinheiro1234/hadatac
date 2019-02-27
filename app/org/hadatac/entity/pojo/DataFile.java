@@ -273,6 +273,53 @@ public class DataFile {
         }
     }
 
+    public static List<DataFile> findInDir(String dir, String ownerEmail, String status) {
+    	String currentDir = dir.replaceAll("/", "");
+        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED) {
+            SolrQuery query = new SolrQuery();
+            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
+            query.set("rows", "10000000");
+            List<DataFile> all = findByQuery(query);
+            List<DataFile> selected = new ArrayList<DataFile>();
+        	for (DataFile df : all) {
+        		if (currentDir.equals("")) {
+        			if (df.getFileName().indexOf('/') <= -1) {
+            			selected.add(df);
+            		} 
+        		} else {
+            		if (df.getFileName().indexOf(currentDir) >= 0) {
+        				selected.add(df);
+            		}
+            	}        	
+            }
+        	return selected;
+        }
+        else {
+            return new ArrayList<DataFile>();
+        }
+    }
+
+    public static List<DataFile> findInDir(String dir, String status) {
+    	String currentDir = dir.replaceAll("/", "");
+        SolrQuery query = new SolrQuery();
+        query.set("q", "status_str:\"" + status + "\"");
+        query.set("rows", "10000000");
+        List<DataFile> all = findByQuery(query);
+        List<DataFile> selected = new ArrayList<DataFile>();
+    	for (DataFile df : all) {
+    		if (currentDir.equals("")) {
+    			if (df.getFileName().indexOf('/') <= -1) {
+        			selected.add(df);
+        		} 
+    		} else {
+        		if (df.getFileName().indexOf(currentDir) >= 0) {
+    				selected.add(df);
+        		}
+        	}        	
+        }
+    	return selected;
+    }
+
     public static List<DataFile> findAll(String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"");
@@ -392,4 +439,35 @@ public class DataFile {
         }
         return results;
     }
+
+    public static List<String> findAllFolders(String dir) {
+        List<String> results = new ArrayList<String>();
+        if (!dir.equals("/") && !dir.equals("")) {
+        	results.add("/");
+        	return results;
+        }
+        List<DataFile> datafiles = findAll(PROCESSED);
+        for (DataFile df : datafiles) {
+        	String fName = "";
+        	int pos = df.getFileName().indexOf('/');
+        	if (pos >=0) {
+        		fName = df.getFileName().substring(0, df.getFileName().indexOf('/'));
+        	}
+        	System.out.println("[" + fName + "] " + df.getFileName());
+        	if (!fName.equals("")) {
+        		String newFolder = "/" + fName + "/";
+        		if (!results.contains(newFolder)) {
+        			results.add(newFolder);
+        		}
+        	}
+        }
+        return results;
+    }
+
+    public static List<String> findFolders(String dir, String ownerEmail) {
+        List<String> results = new ArrayList<String>();
+
+        return results;
+    }
+
 }

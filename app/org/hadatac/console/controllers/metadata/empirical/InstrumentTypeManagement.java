@@ -26,28 +26,28 @@ public class InstrumentTypeManagement extends Controller {
 	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String filename, String da_uri) {
+	public Result index(String dir, String filename, String da_uri) {
 
 		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(filename, da_uri).url()));
+					org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(dir, filename, da_uri).url()));
 		}
 
 		InstrumentType type = new InstrumentType();
 		String json = type.getHierarchyJson();
 		OtMSparqlQueryResults instrumentTypes = new OtMSparqlQueryResults(json);
 
-		return ok(typeManagement.render("Instrument", filename, da_uri, instrumentTypes));
+		return ok(typeManagement.render("Instrument", dir, filename, da_uri, instrumentTypes));
 
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String filename, String da_uri) {
-		return index(filename, da_uri);
+	public Result postIndex(String dir, String filename, String da_uri) {
+		return index(dir, filename, da_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String filename, String da_uri) {
+	public Result processForm(String dir, String filename, String da_uri) {
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
 
 		Form<ConceptForm> form = formFactory.form(ConceptForm.class).bindFromRequest();
@@ -107,12 +107,12 @@ public class InstrumentTypeManagement extends Controller {
 		//if (nRowsAffected <= 0) {
 		//    return badRequest("Failed to insert new Instrument to LabKey!\n");
 		//	}
-		return index(filename, da_uri);
+		return index(dir, filename, da_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postProcessForm(String filename, String da_uri) {
-		return processForm(filename, da_uri);
+	public Result postProcessForm(String dir, String filename, String da_uri) {
+		return processForm(dir, filename, da_uri);
 
 	}
 

@@ -40,12 +40,12 @@ public class EditDataAcquisition extends Controller {
     private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String filename, String uri, boolean bChangeParam) {
+    public Result index(String dir, String filename, String uri, boolean bChangeParam) {
         if (ConfigProp.getLabKeyLoginRequired() && 
                 (session().get("LabKeyUserName") == null || session().get("LabKeyPassword") == null)
                 && bChangeParam) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.EditDataAcquisition.index(filename, uri, bChangeParam).url()));
+                    routes.EditDataAcquisition.index(dir, filename, uri, bChangeParam).url()));
         }
 
         final SysUser sysUser = AuthApplication.getLocalUser(session());
@@ -83,7 +83,7 @@ public class EditDataAcquisition extends Controller {
                 mapSchemas.put(schema.getUri(), URIUtils.replaceNameSpaceEx(schema.getUri()));
             }
 
-            return ok(editDataAcquisition.render(filename, dataAcquisition, nameList, 
+            return ok(editDataAcquisition.render(dir, filename, dataAcquisition, nameList, 
                     User.getUserURIs(), mapSchemas, sysUser.isDataManager(), bChangeParam));
         }
 
@@ -91,12 +91,12 @@ public class EditDataAcquisition extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String filename, String uri, boolean bChangeParam) {
-        return index(filename, uri, bChangeParam);
+    public Result postIndex(String dir, String filename, String uri, boolean bChangeParam) {
+        return index(dir, filename, uri, bChangeParam);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String filename, String acquisitionUri, boolean bChangeParam) {
+    public Result processForm(String dir, String filename, String acquisitionUri, boolean bChangeParam) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
@@ -168,6 +168,6 @@ public class EditDataAcquisition extends Controller {
             da.save();
         }
 
-        return ok(editDataAcquisitionConfirm.render(filename, da, changedInfos, sysUser.isDataManager()));
+        return ok(editDataAcquisitionConfirm.render(dir, filename, da, changedInfos, sysUser.isDataManager()));
     }
 }

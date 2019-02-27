@@ -36,7 +36,7 @@ public class NewStudy extends Controller {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
                     routes.NewStudy.index().url()));
         }
-        return indexFromFile("");
+        return indexFromFile("/", "");
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -45,10 +45,10 @@ public class NewStudy extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result indexFromFile(String filename) {
+    public Result indexFromFile(String dir, String filename) {
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.NewStudy.indexFromFile(filename).url()));
+                    routes.NewStudy.indexFromFile(dir, filename).url()));
         }
 
         List<Agent> organizations = Agent.findOrganizations();
@@ -62,17 +62,17 @@ public class NewStudy extends Controller {
             file = DataFile.findByName(ownerEmail, filename);
         }
 
-        return ok(newStudy.render(studyType, organizations, persons, file));
+        return ok(newStudy.render(studyType, organizations, persons, dir, file));
 
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndexFromFile(String filename) {
-        return indexFromFile(filename);
+    public Result postIndexFromFile(String dir, String filename) {
+        return indexFromFile(dir, filename);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String filename, String da_uri) {
+    public Result processForm(String dir, String filename, String da_uri) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
@@ -144,6 +144,6 @@ public class NewStudy extends Controller {
             }
         }
         
-        return ok(newStudyConfirm.render(std, filename, da_uri));
+        return ok(newStudyConfirm.render(std, dir, filename, da_uri));
     }
 }

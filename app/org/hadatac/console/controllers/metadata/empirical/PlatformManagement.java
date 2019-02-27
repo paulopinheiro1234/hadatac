@@ -16,15 +16,15 @@ import play.mvc.Controller;
 public class PlatformManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String filename, String da_uri) {
+    public Result index(String dir, String filename, String da_uri) {
     	List<Platform> platforms = Platform.find();
 	System.out.println("Number of platforms: " + platforms.size());
-        return ok(platformManagement.render(filename, da_uri, platforms));
+        return ok(platformManagement.render(dir, filename, da_uri, platforms));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String filename, String da_uri) {
-        return index(filename, da_uri);
+	public Result postIndex(String dir, String filename, String da_uri) {
+        return index(dir, filename, da_uri);
     }
 
 }

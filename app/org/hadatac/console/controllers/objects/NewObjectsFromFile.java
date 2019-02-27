@@ -39,7 +39,7 @@ public class NewObjectsFromFile extends Controller {
     private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String filename, String da_uri, String oc_uri, int page) {
+    public Result processForm(String dir, String filename, String da_uri, String oc_uri, int page) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
@@ -135,7 +135,7 @@ public class NewObjectsFromFile extends Controller {
         }
 
         String message = "Total objects created: " + rowCount;
-        return ok(objectConfirm.render(message, filename, da_uri, study.getUri(), oc_uri, page));
+        return ok(objectConfirm.render(message, dir, filename, da_uri, study.getUri(), oc_uri, page));
     }
 
     static private String formattedCounter (long value) {

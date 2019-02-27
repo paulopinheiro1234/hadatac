@@ -1,4 +1,5 @@
-@(filename      : String,
+@(dir           : String,
+  filename      : String,
   da_uri        : String,
   study         : org.hadatac.entity.pojo.Study,
   oc            : org.hadatac.entity.pojo.ObjectCollection,
@@ -64,7 +65,7 @@
 
    </script>
 
-    <form class="form-horizontal" name="editObjectColleciton" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.EditOC.processForm(filename, da_uri, study.getUri(),oc.getUri())">
+    <form class="form-horizontal" name="editObjectColleciton" method="post" action="@org.hadatac.console.controllers.objectcollections.routes.EditOC.processForm(dir, filename, da_uri, study.getUri(),oc.getUri())">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -145,7 +146,7 @@
 	<div class="form-group">
 	  <label>Updates</label> <br>
 	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Object Collection" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
+	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
 	</div>
 	<script>checkform()</script>
      

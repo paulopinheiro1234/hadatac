@@ -156,7 +156,7 @@ public class CloseDeployment extends Controller {
         	System.out.println("HAS ERRORS");
             return badRequest(closeDeployment.render(deployment_uri, data));
         } else {
-            return ok(deploymentConfirm.render("Close Deployment", data, "", ""));
+            return ok(deploymentConfirm.render("Close Deployment", data, "/", "", ""));
         }
     }
 }

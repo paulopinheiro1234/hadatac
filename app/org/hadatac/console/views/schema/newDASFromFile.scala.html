@@ -1,4 +1,6 @@
-@(file_name : String, labels : String)
+@(dir       : String,
+  file_name : String, 
+  labels    : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -26,7 +28,7 @@
       </div>
       
       <div class="form-group" class="col-sm-6 col-offset-3">
-	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
+	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir)" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
       </div>
       
     </form>

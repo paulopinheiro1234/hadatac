@@ -27,24 +27,24 @@ public class NewPlatform extends Controller {
 	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String filename, String da_uri) {
+	public Result index(String dir, String filename, String da_uri) {
 		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.NewPlatform.index(filename, da_uri).url()));
+					routes.NewPlatform.index(dir, filename, da_uri).url()));
 		}
 
 		PlatformType platformType = new PlatformType();
 
-		return ok(newPlatform.render(filename, da_uri, platformType));
+		return ok(newPlatform.render(dir, filename, da_uri, platformType));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String filename, String da_uri) {
-		return index(filename, da_uri);
+	public Result postIndex(String dir, String filename, String da_uri) {
+		return index(dir, filename, da_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String filename, String da_uri) {
+	public Result processForm(String dir, String filename, String da_uri) {
 		final SysUser sysUser = AuthApplication.getLocalUser(session());
 
 		Form<PlatformForm> form = formFactory.form(PlatformForm.class).bindFromRequest();
@@ -83,6 +83,6 @@ public class NewPlatform extends Controller {
 		System.out.println("Inserting new Platform from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
 		System.out.println("Inserting new Platform from file. Study URI : [" + plt.getUri() + "]");
 		// when a new study is created in the scope of a datafile, the new platform needs to be associated to the datafile's DA 
-		return ok(newPlatformConfirm.render(plt, filename, da_uri));
+		return ok(newPlatformConfirm.render(plt, dir, filename, da_uri));
 	}
 }

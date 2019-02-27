@@ -16,13 +16,13 @@ import play.mvc.Controller;
 public class InstrumentManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String filename, String da_uri) {
+	public Result index(String dir, String filename, String da_uri) {
     	List<Instrument> instruments = Instrument.find();
-        return ok(instrumentManagement.render(filename, da_uri, instruments));
+        return ok(instrumentManagement.render(dir, filename, da_uri, instruments));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String filename, String da_uri) {
-        return index(filename, da_uri);
+    public Result postIndex(String dir, String filename, String da_uri) {
+        return index(dir, filename, da_uri);
     }
 }

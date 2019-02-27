@@ -1,4 +1,5 @@
-@(filename     : String,
+@(dir          : String,
+  filename     : String,
   da           : org.hadatac.entity.pojo.ObjectAccessSpec, 
   permissions  : Map[String, String],
   ownerOptions : List[String],
@@ -72,7 +73,7 @@
        <li><b>Current Permission:</b> @da.getPermissionUri()</li>
 
        <form class="form-horizontal" name="editForm" method="post" 
-	     action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(filename, da.getUri(), bChangeParam)">
+	     action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(dir, filename, da.getUri(), bChangeParam)">
        
        @if(!bChangeParam) {
        	 @if(bAdmin) {
@@ -169,7 +170,7 @@
 
        <br>
        @if(filename != null && !filename.equals("")) {
-            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da.getUri())" 
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, filename,da.getUri())" 
 	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
        } else {
             <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 

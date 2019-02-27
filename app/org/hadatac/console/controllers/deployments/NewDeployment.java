@@ -56,10 +56,10 @@ public class NewDeployment extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String type, String filename, String da_uri ) {
+    public Result index(String type, String dir, String filename, String da_uri ) {
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.NewDeployment.index(type, filename, da_uri).url()));
+                    routes.NewDeployment.index(type, dir, filename, da_uri).url()));
         }
 
         if (type.equalsIgnoreCase("regular")) {
@@ -68,6 +68,7 @@ public class NewDeployment extends Controller {
                     Instrument.findAvailable(),
                     Detector.findAvailable(),
                     type,
+                    dir, 
                     filename, 
                     da_uri));
         }
@@ -77,6 +78,7 @@ public class NewDeployment extends Controller {
                     Instrument.find(),
                     Detector.find(),
                     type,
+                    dir,
                     filename,
                     da_uri));
         }
@@ -85,12 +87,12 @@ public class NewDeployment extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String type, String filename, String da_uri) {
-        return index(type, filename, da_uri);
+    public Result postIndex(String type, String dir, String filename, String da_uri) {
+        return index(type, dir, filename, da_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String filename, String da_uri) {
+    public Result processForm(String dir, String filename, String da_uri) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
         Form<DeploymentForm> form = formFactory.form(DeploymentForm.class).bindFromRequest();
@@ -181,6 +183,6 @@ public class NewDeployment extends Controller {
             }
         }
         
-        return ok(deploymentConfirm.render("New Deployment created.", data, filename, da_uri));
+        return ok(deploymentConfirm.render("New Deployment created.", data, dir, filename, da_uri));
     }
 }

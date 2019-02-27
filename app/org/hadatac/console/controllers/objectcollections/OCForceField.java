@@ -15,13 +15,13 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class OCForceField extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result index(String mode, String filename, String da_uri, String std_uri) {
+	public Result index(String mode, String dir, String filename, String da_uri, String std_uri) {
     	OCForceFieldGraph graph = new OCForceFieldGraph(mode, std_uri);
-        return ok(ocForceField.render(graph.getQueryResult().replace("\n", " "), filename, da_uri, std_uri));
+        return ok(ocForceField.render(graph.getQueryResult().replace("\n", " "), dir, filename, da_uri, std_uri));
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-	public Result postIndex(String mode, String filename, String da_uri, String std_uri) {
-        return index(mode, filename, da_uri, std_uri);
+	public Result postIndex(String mode, String dir, String filename, String da_uri, String std_uri) {
+        return index(mode, dir, filename, da_uri, std_uri);
     }
 }

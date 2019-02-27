@@ -1,4 +1,5 @@
 @(mode        : String,
+  dir         : String,
   fileName    : String,
   da_uri      : String,
   oc_uri      : String,
@@ -61,7 +62,7 @@
 
 	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"
  		   role="button" value="Generate Objects" formmethod="post"
-		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(fileName, da_uri, oc_uri, page)">
+		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(dir, fileName, da_uri, oc_uri, page)">
             </input>
 	    <a href=""  id="reset" name="reset" class="btn btn-primary"
  	       role="button">Reset</a>
@@ -84,10 +85,10 @@
    <br>
    <div>
        @if(da_uri != null && !da_uri.equals("")) {
-            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(fileName,da_uri)" 
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileName,da_uri)" 
 	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
        } else {
-	    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" 
+	    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir)" 
 	       class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
        }
    </div>

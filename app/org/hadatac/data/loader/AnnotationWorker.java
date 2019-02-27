@@ -510,7 +510,7 @@ public class AnnotationWorker {
         row.put("hasURI", sddUri);
         AnnotationLog.println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema", file.getFileName());
         row.put("a", "hasco:DASchema");
-        row.put("rdfs:label", "Schema for " + sddName);
+        row.put("rdfs:label", "SDD-" + sddName);
         row.put("rdfs:comment", "");
         generalGenerator.addRow(row);
         chain.addGenerator(generalGenerator);

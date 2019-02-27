@@ -1,4 +1,5 @@
 @(message   : String, 
+  dir       : String,
   filename  : String,
   da_uri    : String,
   study_uri : String, 
@@ -21,7 +22,7 @@
               <li><b>Collection:</b> @URIUtils.replaceNameSpaceEx(oc_uri)</li>
            </ul>
 
-        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, study_uri, oc_uri, page)" 
+        <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, study_uri, oc_uri, page)" 
            class="btn btn-primary" role="button">Back to Object Management</a>
     </div>
 }

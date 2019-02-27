@@ -1,5 +1,6 @@
 @(message  : String, 
   data     : org.hadatac.console.models.DeploymentForm,
+  dir      : String,
   filename : String,
   da_uri   : String)
 
@@ -18,5 +19,5 @@
 		<li><b>End Date/Time</b>: @data.getEndDateTime()</li>
 	</ul>
 
-   @deploymentButton(false, filename, da_uri)
+   @deploymentButton(false, dir, filename, da_uri)
 }

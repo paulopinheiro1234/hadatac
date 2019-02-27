@@ -27,10 +27,10 @@ public class NewOC extends Controller {
 	private FormFactory formFactory;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String filename, String da_uri, String std_uri) {
+	public Result index(String dir, String filename, String da_uri, String std_uri) {
 		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
 			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					org.hadatac.console.controllers.objectcollections.routes.NewOC.index(filename, da_uri, std_uri).url()));
+					org.hadatac.console.controllers.objectcollections.routes.NewOC.index(dir, filename, da_uri, std_uri).url()));
 		}
 		Study study = Study.find(std_uri);
 		List<ObjectCollectionType> typeList = ObjectCollectionType.find();
@@ -49,16 +49,16 @@ public class NewOC extends Controller {
 			}
 		}
 
-		return ok(newObjectCollection.render(filename, da_uri, study, domainList, locationList, timeList, typeList));
+		return ok(newObjectCollection.render(dir, filename, da_uri, study, domainList, locationList, timeList, typeList));
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String filename, String da_uri, String std_uri) {
-		return index(filename, da_uri, std_uri);
+	public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
+		return index(dir, filename, da_uri, std_uri);
 	}
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String filename, String da_uri, String std_uri) {
+	public Result processForm(String dir, String filename, String da_uri, String std_uri) {
 		Form<ObjectCollectionForm> form = formFactory.form(ObjectCollectionForm.class).bindFromRequest();
 		ObjectCollectionForm data = form.get();
 
@@ -116,7 +116,7 @@ public class NewOC extends Controller {
 		    }
 		}
 		
-		return ok(objectCollectionConfirm.render("New Object Collection has been Generated", filename, da_uri, std_uri, oc));
+		return ok(objectCollectionConfirm.render("New Object Collection has been Generated", dir, filename, da_uri, std_uri, oc));
 	}
 
 }

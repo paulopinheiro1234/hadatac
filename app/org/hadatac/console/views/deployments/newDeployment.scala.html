@@ -2,6 +2,7 @@
   theInstruments : List[org.hadatac.entity.pojo.Instrument],
   theDetectors   : List[org.hadatac.entity.pojo.Detector],
   deploymentType : String,
+  dir            : String,
   filename       : String,
   da_uri         : String)
 
@@ -99,9 +100,9 @@
    <h4>Operations</h4>
     <div class="row">
       <div class="navbar-collapse collapse navbar-secondary">
-        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(filename, da_uri)" 
+        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(dir, filename, da_uri)" 
 	   class="btn btn-primary" role="button">Manage Platforms</a>
-        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(filename, da_uri)" 
+        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(dir, filename, da_uri)" 
 	   class="btn btn-primary" role="button">Manage Instruments</a>
         <a href="" 
 	   class="btn btn-primary disabled" role="button">Manage Detectors</a>
@@ -109,7 +110,7 @@
     </div>
     <br>
 
-    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm(filename, da_uri)">
+    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm(dir, filename, da_uri)">
 	
 	<div class="form-group">
 		<label>URI:</label>
@@ -194,7 +195,7 @@
       </div>
       
       <div class="form-group" class="col-sm-6 col-offset-3">
-           @deploymentButton(false, filename, da_uri) 
+           @deploymentButton(false, dir, filename, da_uri) 
       </div>
 
    </form>

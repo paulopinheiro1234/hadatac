@@ -50,7 +50,7 @@ public class CSVPreview extends Controller{
 		return headerList;
 	}
 
-	public static ArrayList<ArrayList<String>> getCSVPreview(String folder, String fileName, int numRows){
+	public static ArrayList<ArrayList<String>> getCSVPreview(String folder, String dir, String fileName, int numRows){
 		ArrayList<ArrayList<String>> previewList = null;
 		File toPreview = null;
 		if (folder.equals("proc")) {
@@ -83,11 +83,11 @@ public class CSVPreview extends Controller{
 		return previewList;
 	}
 
-	public Result getCSVPreview(String folder, String fileName, String da_uri, String oc_uri, int numRows, int page){
+	public Result getCSVPreview(String folder, String dir, String fileName, String da_uri, String oc_uri, int numRows, int page){
 		if (da_uri != null && !da_uri.equals("")) {
-			return ok(csv_preview.render("selectCol", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows), page));
+			return ok(csv_preview.render("selectCol", dir, fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, dir, fileName, numRows), page));
 		}
-		return ok(csv_preview.render("preview", fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, fileName, numRows), page));
+		return ok(csv_preview.render("preview", dir, fileName, da_uri, oc_uri, getCSVHeaders(folder, fileName), getCSVPreview(folder, dir, fileName, numRows), page));
 	}
 
 	public static ArrayList<String> getColumn(String ownerEmail, String fileName, int selectedCol){

@@ -1,7 +1,9 @@
-@(theDeployments : List[org.hadatac.entity.pojo.Deployment],
-  permissions : Map[String, String], 
-  ownerOptions : List[String], 
-  bAdmin : Boolean)
+@(theStudies     : List[org.hadatac.entity.pojo.Study],
+  theSdds        : List[org.hadatac.entity.pojo.DataAcquisitionSchema],     
+  theDeployments : List[org.hadatac.entity.pojo.Deployment],
+  permissions    : Map[String, String], 
+  ownerOptions   : List[String], 
+  bAdmin         : Boolean)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -60,12 +62,19 @@
 	<h2>New Object Access Specification</h2>
 
 	<form class="form-horizontal" name="newDataAcquisition" method="post"
-		action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.generateOASFileFromForm()">
+		action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.generateOASFileFromForm("/")">
 
 		<div class="form-group">
-			<label>Study ID</label> <input type="text"
+			<label>Study ID</label> <select class="form-control col-sm-6"
+				id="studyId" name="studyId" onchange="checkform()">
+				<option value=""></option> 
+				@for(study <- theStudies) {
+				  <option value="@study.getId()">@study.getId()</option>
+				}
+			</select>
+			<!--  <input type="text"
 				class="form-control col-sm-6" name="studyId" id="studyId"
-				onchange="checkform()">
+				onchange="checkform()">  -->
 		</div>
 
 		<div class="form-group">
@@ -75,9 +84,17 @@
 		</div>
 
 		<div class="form-group">
-			<label>SDD Name</label> <input type="text"
+			<label>SDD Name</label> <select class="form-control col-sm-6"
+				id="sddName" name="sddName" onchange="checkform()">
+				<option value=""></option> 
+				@for(sdd <- theSdds) {
+				  <option value="@sdd.getLabel()">@sdd.getLabel()</option>
+				}
+			</select>
+			
+			<!--  <input type="text"
 				class="form-control col-sm-6" name="sddName" id="sddName"
-				onchange="checkform()">
+				onchange="checkform()">  -->
 		</div>
 
 		<div class="form-group">

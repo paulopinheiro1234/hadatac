@@ -39,7 +39,7 @@ public class PrepareIngestion extends Controller {
     private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result create(String file_name, String da_uri) {
+    public Result create(String dir, String file_name, String da_uri) {
         final String kbPrefix = ConfigProp.getKbPrefix();
         String ownerEmail = "";
         ObjectAccessSpec da = null;
@@ -64,7 +64,7 @@ public class PrepareIngestion extends Controller {
             //System.out.println("Row scope: [" + da.getRowScopeUri() + "]  hasScope: " + da.hasScope());
 
             if (da != null) {
-                return ok(prepareIngestion.render(file_name, da, "DA associated with file has been retrieved"));
+                return ok(prepareIngestion.render(dir, file_name, da, "DA associated with file has been retrieved"));
             } else {
                 String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;
                 return badRequest(message);
@@ -75,7 +75,7 @@ public class PrepareIngestion extends Controller {
         
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.create(file_name,da_uri).url()));
+                    routes.PrepareIngestion.create(dir, file_name,da_uri).url()));
         }
 
         String da_label = "";
@@ -110,26 +110,26 @@ public class PrepareIngestion extends Controller {
         file.setDataAcquisitionUri(da.getUri());
         file.save();
 
-        return ok(prepareIngestion.render(file_name, da, "New data acquisition has been created to support file ingestion"));
+        return ok(prepareIngestion.render(dir, file_name, da, "New data acquisition has been created to support file ingestion"));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreate(String file_name, String da_uri) {
-        return create(file_name, da_uri);
+    public Result postCreate(String dir, String file_name, String da_uri) {
+        return create(dir, file_name, da_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result reconfigure(String file_name, String da_uri) {
+    public Result reconfigure(String dir, String file_name, String da_uri) {
         ObjectAccessSpec dataAcquisition = ObjectAccessSpec.findByUri(da_uri);
         if (null != dataAcquisition) {
             dataAcquisition.setStatus(0);
             dataAcquisition.save();
         }
-        return create(file_name, da_uri);
+        return create(dir, file_name, da_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result refine(String file_name, String da_uri, String message) {
+    public Result refine(String dir, String file_name, String da_uri, String message) {
 
         ObjectAccessSpec da = null;
 
@@ -137,7 +137,7 @@ public class PrepareIngestion extends Controller {
         if (da_uri != null && !da_uri.equals("")) {
             da = ObjectAccessSpec.findByUri(da_uri);
             if (da != null) {
-                return ok(prepareIngestion.render(file_name, da, message));
+                return ok(prepareIngestion.render(dir, file_name, da, message));
             } else {
                 System.out.println("[ERROR] Could not load assigned DA from DA's URI");
             }
@@ -146,27 +146,27 @@ public class PrepareIngestion extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postRefine(String file_name, String da_uri, String message) {
-        return refine(file_name, da_uri, message);
+    public Result postRefine(String dir, String file_name, String da_uri, String message) {
+        return refine(dir, file_name, da_uri, message);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectStudy(String file_name, String da_uri) {
+    public Result selectStudy(String dir, String file_name, String da_uri) {
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.selectStudy(file_name,da_uri).url()));
+                    routes.PrepareIngestion.selectStudy(dir, file_name,da_uri).url()));
         }
 
         List<Study> studies = Study.find();
 
-        return ok(selectStudy.render(file_name, da_uri, studies));
+        return ok(selectStudy.render(dir, file_name, da_uri, studies));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectScope(String file_name, String da_uri, String std_uri) {
+    public Result selectScope(String dir, String file_name, String da_uri, String std_uri) {
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.selectScope(file_name,da_uri, std_uri).url()));
+                    routes.PrepareIngestion.selectScope(dir, file_name,da_uri, std_uri).url()));
         }
 
         String[] fields = null;
@@ -218,30 +218,30 @@ public class PrepareIngestion extends Controller {
         List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(std_uri);
         System.out.println("Collection list size: " + ocList.size());
 
-        return ok(selectScope.render(file_name, da_uri, ocList, Arrays.asList(fields), 
+        return ok(selectScope.render(dir, file_name, da_uri, ocList, Arrays.asList(fields), 
                 rowScope, rowScopeUri, cellScope, cellScopeUri));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectDeployment(String file_name, String da_uri) {
+    public Result selectDeployment(String dir, String file_name, String da_uri) {
 
         State active = new State(State.ACTIVE);
 
         List<Deployment> deployments = Deployment.find(active);
 
-        return ok(selectDeployment.render(file_name, da_uri, deployments));
+        return ok(selectDeployment.render(dir, file_name, da_uri, deployments));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectSchema(String file_name, String da_uri) {
+    public Result selectSchema(String dir, String file_name, String da_uri) {
 
         List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 
-        return ok(selectSchema.render(file_name, da_uri, schemas));
+        return ok(selectSchema.render(dir, file_name, da_uri, schemas));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectStudy(String file_name, String da_uri) {
+    public Result processSelectStudy(String dir, String file_name, String da_uri) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         String message = "";
         AssignOptionForm data = form.get();
@@ -253,13 +253,13 @@ public class PrepareIngestion extends Controller {
             Study std = Study.find(std_uri);
             if (std == null) {
                 message = "ERROR - Could not retrieve study from its URI.";
-                return refine(file_name, da_uri, message);
+                return refine(dir, file_name, da_uri, message);
             }
 
             ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
             if (da == null) {
                 message = "ERROR - Could not retrieve Object Access Specification from its URI.";
-                return refine(file_name, da_uri, message);
+                return refine(dir, file_name, da_uri, message);
             }
 
             da.setStudyUri(std_uri);
@@ -269,15 +269,15 @@ public class PrepareIngestion extends Controller {
                 da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             }
 
-            return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with deployment information"));
+            return ok(prepareIngestion.render(dir, file_name, da, "Updated Object Access Specification with deployment information"));
         }
 
         message = "DA is now associated with study " + std_uri;
-        return refine(file_name, da_uri, message);
+        return refine(dir, file_name, da_uri, message);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectScope(String file_name, String da_uri) {
+    public Result processSelectScope(String dir, String file_name, String da_uri) {
         Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest();
         String message = "";
         SelectScopeForm data = form.get();
@@ -300,7 +300,7 @@ public class PrepareIngestion extends Controller {
         ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
             message = "ERROR - Could not retrieve Object Access Specification from its URI.";
-            return refine(file_name, da_uri, message);
+            return refine(dir, file_name, da_uri, message);
         }
 
         //da.setRowScopeUri(rowScopeUri);
@@ -311,11 +311,11 @@ public class PrepareIngestion extends Controller {
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
         }
 
-        return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with scope information"));
+        return ok(prepareIngestion.render(dir, file_name, da, "Updated Object Access Specification with scope information"));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectDeployment(String file_name, String da_uri) {
+    public Result processSelectDeployment(String dir, String file_name, String da_uri) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         String message = "";
         AssignOptionForm data = form.get();
@@ -327,13 +327,13 @@ public class PrepareIngestion extends Controller {
             Deployment dep = Deployment.find(dep_uri);
             if (dep == null) {
                 message = "ERROR - Could not retrieve Deployment from its URI.";
-                return refine(file_name, da_uri, message);
+                return refine(dir, file_name, da_uri, message);
             }
 
             ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
             if (da == null) {
                 message = "ERROR - Could not retrieve Object Access Specification from its URI.";
-                return refine(file_name, da_uri, message);
+                return refine(dir, file_name, da_uri, message);
             }
 
             da.setDeploymentUri(dep_uri);
@@ -343,15 +343,15 @@ public class PrepareIngestion extends Controller {
                 da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             }
             
-            return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with deployment information"));
+            return ok(prepareIngestion.render(dir, file_name, da, "Updated Object Access Specification with deployment information"));
         }
 
         message = "DA is now associated with deployment " + dep_uri;
-        return refine(file_name, da_uri, message);
+        return refine(dir, file_name, da_uri, message);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectSchema(String file_name, String da_uri) {
+    public Result processSelectSchema(String dir, String file_name, String da_uri) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         String message = "";
         AssignOptionForm data = form.get();
@@ -363,13 +363,13 @@ public class PrepareIngestion extends Controller {
             DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
             if (das == null) {
                 message = "ERROR - Could not retrieve Object Access Specification Schema from its URI.";
-                return refine(file_name, da_uri, message);
+                return refine(dir, file_name, da_uri, message);
             }
 
             ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
             if (da == null) {
                 message = "ERROR - Could not retrieve Object Access Specification from its URI.";
-                return refine(file_name, da_uri, message);
+                return refine(dir, file_name, da_uri, message);
             }
 
             da.setSchemaUri(das_uri);
@@ -379,21 +379,21 @@ public class PrepareIngestion extends Controller {
                 da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             }
             
-            return ok(prepareIngestion.render(file_name, da, "Updated Object Access Specification with data acquisition schema information"));
+            return ok(prepareIngestion.render(dir, file_name, da, "Updated Object Access Specification with data acquisition schema information"));
         }
 
         message = "DA is now associated with data acquisition schema " + das_uri;
-        return refine(file_name, da_uri, message);
+        return refine(dir, file_name, da_uri, message);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result removeAssociation(String file_name, String da_uri, String daComponent) {
+    public Result removeAssociation(String dir, String file_name, String da_uri, String daComponent) {
 
         String message = "";
         ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
             message = "ERROR - Could not retrieve Object Access Specification from its URI.";
-            return refine(file_name, da_uri, message);
+            return refine(dir, file_name, da_uri, message);
         }
 
         switch (daComponent) {
@@ -428,16 +428,16 @@ public class PrepareIngestion extends Controller {
         }
             
         message = "Association with " + daComponent + " removed from the Object Access Specification.";
-        return ok(prepareIngestion.render(file_name, da, message));
+        return ok(prepareIngestion.render(dir, file_name, da, message));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result completeDataAcquisition(String file_name, String da_uri) {
+    public Result completeDataAcquisition(String dir, String file_name, String da_uri) {
         String message = "";
         ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
         if (da == null) {
             message = "ERROR - Could not retrieve Object Access Specification from its URI.";
-            return refine(file_name, da_uri, message);
+            return refine(dir, file_name, da_uri, message);
         }
 
         da.setStatus(9999);
@@ -448,7 +448,7 @@ public class PrepareIngestion extends Controller {
         }
         
         message = "Object Access Specification set as complete";
-        return ok(prepareIngestion.render(file_name, da, message));
+        return ok(prepareIngestion.render(dir, file_name, da, message));
     }
 }
 

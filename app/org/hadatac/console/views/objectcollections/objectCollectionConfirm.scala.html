@@ -1,4 +1,5 @@
-@(message   : String, 
+@(dir       : String,
+  message   : String, 
   filename  : String,
   da_uri    : String,
   study_uri : String, 
@@ -44,7 +45,7 @@
 	      </li>
            </ul>
         }
-        <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, study_uri)" 
+        <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, study_uri)" 
            class="btn btn-primary" role="button">Back to Object Collection Management</a>
     </div>
 }

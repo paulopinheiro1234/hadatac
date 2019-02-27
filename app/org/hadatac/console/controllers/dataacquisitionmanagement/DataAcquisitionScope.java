@@ -27,10 +27,10 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class DataAcquisitionScope extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result create(String file_name, String da_uri) {
+    public Result create(String dir, String file_name, String da_uri) {
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.DataAcquisitionScope.create(file_name, da_uri).url()));
+                    routes.DataAcquisitionScope.create(dir, file_name, da_uri).url()));
         }
 
         ObjectAccessSpec da = null;
@@ -106,16 +106,16 @@ public class DataAcquisitionScope extends Controller {
         List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(da.getStudyUri());
         //System.out.println("Collection list size: " + ocList.size());
 
-        return ok(editScope.render(file_name, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri));
+        return ok(editScope.render(dir, file_name, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreate(String file_name, String da_uri) {
-        return create(file_name, da_uri);
+    public Result postCreate(String dir, String file_name, String da_uri) {
+        return create(dir, file_name, da_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result view(String file_name, String da_uri) {
+    public Result view(String dir, String file_name, String da_uri) {
 
         ObjectAccessSpec da = null;
         DataFile file = null;
@@ -155,12 +155,12 @@ public class DataAcquisitionScope extends Controller {
             System.out.println("  - name : " + str);
         }
 
-        return ok(viewScope.render(file_name, da_uri, cellScopeName, cellScopeUri));
+        return ok(viewScope.render(dir, file_name, da_uri, cellScopeName, cellScopeUri));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postView(String file_name, String da_uri) {
-        return view(file_name, da_uri);
+    public Result postView(String dir, String file_name, String da_uri) {
+        return view(dir, file_name, da_uri);
     }
 
 }

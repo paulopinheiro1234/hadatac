@@ -106,7 +106,7 @@ public class DataFactory {
 
 	public static DataAcquisitionSchema createDataAcquisitionSchema(String dasName) {
 		String dasUri = kbPrefix + "SDD-" + dasName;
-		String dasLabel = "Schema for " + dasName;
+		String dasLabel = "SDD-" + dasName;
 		DataAcquisitionSchema das = DataAcquisitionSchema.create(dasUri);
 		das.setLabel(dasLabel);
 		das.saveToTripleStore();

@@ -24,6 +24,7 @@ import play.data.FormFactory;
 
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
@@ -96,6 +97,8 @@ public class DataAcquisitionManagement extends Controller {
         }
 
         return ok(newDataAcquisition.render(
+        		Study.find(),
+        		DataAcquisitionSchema.findAll(),
                 Deployment.find(new State(State.ACTIVE)),
                 nameList,
                 User.getUserEmails(), 
@@ -139,7 +142,7 @@ public class DataAcquisitionManagement extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result generateOASFileFromForm() {
+    public Result generateOASFileFromForm(String dir) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
@@ -195,6 +198,6 @@ public class DataAcquisitionManagement extends Controller {
         dataFile.setStatus(DataFile.FREEZED);
         dataFile.save();
 
-        return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index());
+        return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir));
     }
 }

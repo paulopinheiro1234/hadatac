@@ -11,7 +11,7 @@ import play.mvc.Result;
 
 public class SchemaFromFile extends Controller {
 
-	public Result create(String file_name) {
+	public Result create(String dir, String file_name) {
 
 		String path = "";
 		String labels = "";
@@ -51,7 +51,7 @@ public class SchemaFromFile extends Controller {
 
 		System.out.println("SchemaFromFile: labels = <" + labels + ">");
 
-		return ok(newDASFromFile.render(file_name, labels));
+		return ok(newDASFromFile.render(dir, file_name, labels));
 	}
 
 }

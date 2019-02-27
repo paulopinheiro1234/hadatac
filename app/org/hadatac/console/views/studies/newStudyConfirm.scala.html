@@ -1,4 +1,5 @@
 @(std      : org.hadatac.entity.pojo.Study,
+  dir      : String,
   filename : String,
   da_uri   : String)
 
@@ -34,7 +35,7 @@
           <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" 
 	     role="button">Back to Study Management</a>
        } else {
-    	  <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" 
+    	  <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, filename,da_uri)" 
 	     class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
        }
 	  

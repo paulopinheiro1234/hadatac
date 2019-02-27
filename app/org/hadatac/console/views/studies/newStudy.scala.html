@@ -1,6 +1,7 @@
 @(studyType     : org.hadatac.entity.pojo.StudyType,
   organizations : List[org.hadatac.entity.pojo.Agent],
   persons       : List[org.hadatac.entity.pojo.Agent],
+  dir           : String,
   file          : org.hadatac.entity.pojo.DataFile) 
 
 @import helper._
@@ -161,12 +162,12 @@
 	  <label>Updates</label> <br>
 	  @if(file == null) {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm("","")"/><br>
+		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, "", "")"/><br>
 	       <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
           } else {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(file.getFileName(),file.getDataAcquisitionUri())"/><br>
-    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file.getFileName(),file.getDataAcquisitionUri())" 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, file.getFileName(),file.getDataAcquisitionUri())"/><br>
+    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getFileName(),file.getDataAcquisitionUri())" 
 		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
           }
 	</div>

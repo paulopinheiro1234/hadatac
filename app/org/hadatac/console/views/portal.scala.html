@@ -39,11 +39,11 @@
         <div class="col-md-3 col-xs-2">
            <h4>Metadata Recording and Data Upload</h4>  
 	   @defining("") { filename => @defining("") { da_uri => 
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" 
+		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/")" 
 		   id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
 		   id="studies" class="btn btn-primary btn-block" role="button">Manage Studies</a>
-		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, filename, da_uri)" 
+		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri)" 
 		   id="deployments" class="btn btn-primary btn-block" role="button">Manage DPLs</a>
 		<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  
 		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage OASs</a>

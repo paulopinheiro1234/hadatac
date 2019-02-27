@@ -1,4 +1,4 @@
-@()
+@(dir : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -37,6 +37,6 @@
     			</tr>
     		</tbody>
     	</table>
-    	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index()" class="btn btn-primary" role="button">Back to Annotator</a>
+    	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir)" class="btn btn-primary" role="button">Back to Annotator</a>
     </div>
 }

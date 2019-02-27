@@ -1,4 +1,5 @@
-@(file_name  : String,
+@(dir        : String,
+  file_name  : String,
   da_uri     : String,
   dasOptions : List[org.hadatac.entity.pojo.DataAcquisitionSchema])
 
@@ -31,7 +32,7 @@
   <div class="container">
     <h2>Select Data Acquisition Schema (DAS) for @URIUtils.replaceNameSpaceEx(da_uri)</h2>
 
-    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectSchema(file_name, da_uri)">
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectSchema(dir, file_name, da_uri)">
 
     <div class="form-group">
       <label>Selected Data Acquisition</label> <br>
@@ -49,7 +50,7 @@
       <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Data Acquisition Schema" disabled="disabled" />
     </div>
     
-    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(file_name, da_uri)" 
+    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file_name, da_uri)" 
        class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
     
     </form>    

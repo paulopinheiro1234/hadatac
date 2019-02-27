@@ -1,4 +1,5 @@
-@(filename     : String,
+@(dir          : String,
+  filename     : String,
   da_uri       : String,
   platformType : org.hadatac.entity.pojo.PlatformType)
 
@@ -121,12 +122,12 @@
 	  <label>Updates</label> <br>
 	  @if(filename == null) {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(filename,da_uri)"/><br>
-	       <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(filename, da_uri)" class="btn btn-primary" role="button">Back to Platform Management</a>
+		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(dir, filename, da_uri)"/><br>
+	       <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(dir, filename, da_uri)" class="btn btn-primary" role="button">Back to Platform Management</a>
           } else {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(filename,da_uri)"/><br>
-    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(filename,da_uri)" 
+		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(dir, filename, da_uri)"/><br>
+    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, filename, da_uri)" 
 		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
           }
 	</div>

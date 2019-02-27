@@ -58,9 +58,10 @@ public class AutoAnnotator extends Controller {
     FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {        
+    public Result index(String dir) {        
         final SysUser user = AuthApplication.getLocalUser(session());
 
+        List<String> folders = null;
         List<DataFile> procFiles = null;
         List<DataFile> unprocFiles = null;
         List<String> studyURIs = new ArrayList<String>();
@@ -69,15 +70,19 @@ public class AutoAnnotator extends Controller {
         String pathUnproc = ConfigProp.getPathUnproc();
 
         if (user.isDataManager()) {
-            procFiles = DataFile.findAll(DataFile.PROCESSED);
-            unprocFiles = DataFile.findAll(DataFile.UNPROCESSED);
-            unprocFiles.addAll(DataFile.findAll(DataFile.FREEZED));
-            DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
-            DataFile.includeUnrecognizedFiles(pathProc, procFiles);
+            folders = DataFile.findAllFolders(dir);
+        	procFiles = DataFile.findInDir(dir, DataFile.PROCESSED);
+            unprocFiles = DataFile.findInDir(dir, DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.findInDir(dir, DataFile.FREEZED));
+            if (dir.equals("/")) {
+            	DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
+            	DataFile.includeUnrecognizedFiles(pathProc, procFiles);
+            }
         } else {
-            procFiles = DataFile.find(user.getEmail(), DataFile.PROCESSED);
-            unprocFiles = DataFile.find(user.getEmail(), DataFile.UNPROCESSED);
-            unprocFiles.addAll(DataFile.find(user.getEmail(), DataFile.FREEZED));
+            folders = DataFile.findFolders(dir, user.getEmail());
+            procFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.PROCESSED);
+            unprocFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.findInDir(dir, user.getEmail(), DataFile.FREEZED));
         }
 
         DataFile.filterNonexistedFiles(pathProc, procFiles);
@@ -100,38 +105,52 @@ public class AutoAnnotator extends Controller {
         if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
             bStarted = true;
         }
+        
+        unprocFiles.sort(new Comparator<DataFile>() {
+            @Override
+            public int compare(DataFile d1, DataFile d2) {
+                return d1.getFileName().compareTo(d2.getFileName());
+            }
+        });
 
-        return ok(autoAnnotator.render(unprocFiles, procFiles, studyURIs, bStarted, user.isDataManager()));
+        procFiles.sort(new Comparator<DataFile>() {
+            @Override
+            public int compare(DataFile d1, DataFile d2) {
+                return d1.getFileName().compareTo(d2.getFileName());
+            }
+        });
+
+        return ok(autoAnnotator.render(dir, folders, unprocFiles, procFiles, studyURIs, bStarted, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    public Result postIndex(String dir) {
+        return index(dir);
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result assignFileOwner(String ownerEmail, String selectedFile) {	
+    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {	
         return ok(assignOption.render(User.getUserEmails(),
-                routes.AutoAnnotator.processOwnerForm(ownerEmail, selectedFile),
+                routes.AutoAnnotator.processOwnerForm(dir, ownerEmail, selectedFile),
                 "Owner", 
                 "Selected File", 
                 selectedFile));
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postAssignFileOwner(String ownerEmail, String selectedFile) {
-        return assignFileOwner(ownerEmail, selectedFile);
+    public Result postAssignFileOwner(String dir, String ownerEmail, String selectedFile) {
+        return assignFileOwner(dir, ownerEmail, selectedFile);
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processOwnerForm(String ownerEmail, String selectedFile) {
+    public Result processOwnerForm(String dir, String ownerEmail, String selectedFile) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         AssignOptionForm data = form.get();
 
         if (form.hasErrors()) {
             System.out.println("HAS ERRORS");
             return badRequest(assignOption.render(User.getUserEmails(),
-                    routes.AutoAnnotator.processOwnerForm(ownerEmail, selectedFile),
+                    routes.AutoAnnotator.processOwnerForm(dir, ownerEmail, selectedFile),
                     "Owner",
                     "Selected File",
                     selectedFile));
@@ -145,30 +164,30 @@ public class AutoAnnotator extends Controller {
             }
             file.setOwnerEmail(data.getOption());
             file.save();
-            return redirect(routes.AutoAnnotator.index());
+            return redirect(routes.AutoAnnotator.index(dir));
         }
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result assignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
+    public Result assignDataAcquisition(String dir, String dataAcquisitionUri, String selectedFile) {
         List<String> dataAcquisitionURIs = new ArrayList<String>();
         ObjectAccessSpec.findAll().forEach((da) -> dataAcquisitionURIs.add(
                 URIUtils.replaceNameSpaceEx(da.getUri())));
 
         return ok(assignOption.render(dataAcquisitionURIs,
-                routes.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri, selectedFile),
+                routes.AutoAnnotator.processDataAcquisitionForm(dir, dataAcquisitionUri, selectedFile),
                 "Object Access Specification",
                 "Selected File",
                 selectedFile));
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postAssignDataAcquisition(String dataAcquisitionUri, String selectedFile) {
-        return assignDataAcquisition(dataAcquisitionUri, selectedFile);
+    public Result postAssignDataAcquisition(String dir, String dataAcquisitionUri, String selectedFile) {
+        return assignDataAcquisition(dir, dataAcquisitionUri, selectedFile);
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processDataAcquisitionForm(String dataAcquisitionUri, String selectedFile) {
+    public Result processDataAcquisitionForm(String dir, String dataAcquisitionUri, String selectedFile) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         AssignOptionForm data = form.get();
 
@@ -179,7 +198,7 @@ public class AutoAnnotator extends Controller {
         if (form.hasErrors()) {
             System.out.println("HAS ERRORS");
             return badRequest(assignOption.render(dataAcquisitionURIs,
-                    routes.AutoAnnotator.processDataAcquisitionForm(dataAcquisitionUri, selectedFile),
+                    routes.AutoAnnotator.processDataAcquisitionForm(dir, dataAcquisitionUri, selectedFile),
                     "Object Access Specification",
                     "Selected File",
                     selectedFile));
@@ -193,12 +212,12 @@ public class AutoAnnotator extends Controller {
             }
             file.setDataAcquisitionUri(URIUtils.replacePrefixEx(data.getOption()));
             file.save();
-            return redirect(routes.AutoAnnotator.index());
+            return redirect(routes.AutoAnnotator.index(dir));
         }
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result toggleAutoAnnotator() {
+    public Result toggleAutoAnnotator(String dir) {
         if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
             ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
             System.out.println("Turning auto-annotation off");
@@ -208,17 +227,17 @@ public class AutoAnnotator extends Controller {
             System.out.println("Turning auto-annotation on");
         }
 
-        return redirect(routes.AutoAnnotator.index());
+        return redirect(routes.AutoAnnotator.index(dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadTemplates() {
-        return ok(download_templates.render());
+    public Result downloadTemplates(String dir) {
+        return ok(download_templates.render(dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postDownloadTemplates() {
-        return postDownloadTemplates();
+    public Result postDownloadTemplates(String dir) {
+        return postDownloadTemplates(dir);
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -251,13 +270,13 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String file_name) {
+    public Result checkAnnotationLog(String dir, String file_name) {
         AnnotationLog log = AnnotationLog.find(file_name);
         if (null == log) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.AutoAnnotator.index().url()));
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.AutoAnnotator.index(dir).url()));
         }
         else {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.AutoAnnotator.index().url()));
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.AutoAnnotator.index(dir).url()));
         }
     }
 
@@ -283,7 +302,7 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result moveDataFile(String fileName) {        
+    public Result moveDataFile(String dir, String fileName) {        
         final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
@@ -331,11 +350,11 @@ public class AutoAnnotator extends Controller {
         new_log.addline(Feedback.println(Feedback.WEB, 
                 String.format("[OK] Moved file %s to unprocessed folder", pureFileName)));
 
-        return redirect(routes.AutoAnnotator.index());
+        return redirect(routes.AutoAnnotator.index(dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result activateDataFile(String fileName) {           
+    public Result activateDataFile(String dir, String fileName) {           
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
@@ -353,11 +372,11 @@ public class AutoAnnotator extends Controller {
         
         AnnotationLog.delete(fileName);
 
-        return redirect(routes.AutoAnnotator.index());
+        return redirect(routes.AutoAnnotator.index(dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFile(String fileName, boolean isProcessed) {
+    public Result deleteDataFile(String dir, String fileName, boolean isProcessed) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
@@ -392,7 +411,7 @@ public class AutoAnnotator extends Controller {
                 dataFile.delete();
                 AnnotationLog.delete(fileName);
                 AnnotationLog.delete(pureFileName);
-                return redirect(routes.AutoAnnotator.index());
+                return redirect(routes.AutoAnnotator.index(dir));
             }
         }
         file.delete();
@@ -400,7 +419,7 @@ public class AutoAnnotator extends Controller {
         AnnotationLog.delete(fileName);
         AnnotationLog.delete(pureFileName);
 
-        return redirect(routes.AutoAnnotator.index());
+        return redirect(routes.AutoAnnotator.index(dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -1,4 +1,5 @@
-@(file_name      : String,
+@(dir            : String,
+  file_name      : String,
   da_uri         : String,
   ocList         : List[org.hadatac.entity.pojo.ObjectCollection],
   labels         : List[String],
@@ -115,7 +116,7 @@
            <li>@URIUtils.replaceNameSpaceEx(da_uri)</li>
        </ul>
     
-    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectScope(file_name, da_uri)">
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectScope(dir, file_name, da_uri)">
 
     <div class="form-group">
       <label>New Scope</label> <br>

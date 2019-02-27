@@ -1,4 +1,5 @@
-@(filename   : String,
+@(dir        : String,
+  filename   : String,
   da_uri     : String,
   study      : org.hadatac.entity.pojo.Study,
   oc         : org.hadatac.entity.pojo.ObjectCollection,
@@ -28,17 +29,17 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"), page)" 
+           <a href="@org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"), page)" 
 	      class="btn btn-primary" role="button">Create Objects From Scratch</a>
 	   @if(objList == null || objList.size() == 0) {
-               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page)" 
+               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page)" 
 		  class="btn btn-primary disabled" role="button">Delete Objects in Collection</a>
 	   } else {
-               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page)" 
+               <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.deleteCollectionObjects(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page)" 
 		  class="btn btn-primary" role="button">Delete Objects in Collection</a>
 	   }
 	   @if(filename != null && !filename.equals("")) {
-               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", filename, da_uri, oc.getUri(), 10, page)"
+               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", dir, filename, da_uri, oc.getUri(), 10, page)"
 		  class="btn btn-primary" role="button">Create Multiple Objects From File</a>
 	   }
          </div>
@@ -50,38 +51,38 @@
    <h4>Objects</h4>
    
 	@if(prev >= 0) {
-    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary" 
+    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary" 
 	       role="button">&lt;&lt;</a>
 	   
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary" 
 	       role="button">&lt;</a>
 	} else {
-    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary disabled" 
+    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary disabled" 
 	       role="button">&lt;&lt;</a>
 	   
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary disabled" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary disabled" 
 	       role="button">&lt;</a>
 	}
 
 	@current of @lastpage   
 	   
 	@if(next < last) {
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary" 
 	       role="button">&gt;</a>
 
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary" 
 	       role="button">&gt;&gt;</a>
 	   
 	} else {
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary disabled" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary disabled" 
 	       role="button">&gt;</a>
 
-	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary disabled" 
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary disabled" 
 	       role="button">&gt;&gt;</a>	   
 	}
 
     <form class="form-horizontal" name="newObjects" method="post" 
-	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page, total)">
+	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page, total)">
     <div class="container-fluid">
         <table class="table">
             <thead>
@@ -113,7 +114,7 @@
         </table>
 
 	<input class="btn btn-success" role="button" type="submit" id="submit" value="Update Objects"/><br>
-	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" 
+	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" 
 	   role="button">Back to Object Collection  Management</a>
 	
     </div>
