@@ -72,17 +72,17 @@ public class AutoAnnotator extends Controller {
         if (user.isDataManager()) {
             folders = DataFile.findAllFolders(dir);
         	procFiles = DataFile.findInDir(dir, DataFile.PROCESSED);
-            unprocFiles = DataFile.findInDir(dir, DataFile.UNPROCESSED);
-            unprocFiles.addAll(DataFile.findInDir(dir, DataFile.FREEZED));
+            unprocFiles = DataFile.findInDir("/", DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.findInDir("/", DataFile.FREEZED));
             if (dir.equals("/")) {
-            	DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
             	DataFile.includeUnrecognizedFiles(pathProc, procFiles);
             }
+        	DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
         } else {
             folders = DataFile.findFolders(dir, user.getEmail());
             procFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.PROCESSED);
-            unprocFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.UNPROCESSED);
-            unprocFiles.addAll(DataFile.findInDir(dir, user.getEmail(), DataFile.FREEZED));
+            unprocFiles = DataFile.findInDir("/", user.getEmail(), DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.findInDir("/", user.getEmail(), DataFile.FREEZED));
         }
 
         DataFile.filterNonexistedFiles(pathProc, procFiles);
