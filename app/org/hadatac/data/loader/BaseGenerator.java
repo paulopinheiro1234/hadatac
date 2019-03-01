@@ -16,6 +16,7 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.metadata.api.MetadataFactory;
@@ -46,15 +47,7 @@ public abstract class BaseGenerator {
         records = file.getRecords();
         fileName = file.getFile().getName();
 
-        String parentDir = file.getFile().getParent();
-        parentDir = parentDir.replace(ConfigProp.getPathUnproc().replace("/", ""), "")
-                .replace(ConfigProp.getPathProc().replace("/", ""), "")
-                .replace("/", "");
-        if (parentDir.trim().isEmpty()) {
-            relativePath = fileName;
-        } else {
-            relativePath = parentDir + "/" + fileName;
-        }
+        setRelativePath(file);
 
         initMapping();
     }
@@ -74,6 +67,29 @@ public abstract class BaseGenerator {
 
     public String getFileName() {
         return fileName;
+    }
+    
+    private void setRelativePath(RecordFile file) {
+        String parentDir = file.getFile().getParent();
+        
+        String pathUnproc = ConfigProp.getPathUnproc();
+        if (pathUnproc.endsWith("/")) {
+            pathUnproc = pathUnproc.substring(0, pathUnproc.length() - 1);
+        }
+        
+        String pathProc = ConfigProp.getPathProc();
+        if (pathProc.endsWith("/")) {
+            pathProc = pathProc.substring(0, pathProc.length() - 1);
+        }
+        
+        parentDir = parentDir.replace(pathUnproc, "").replace(pathProc, "")
+                .replace("/", "").replace(Sandbox.SUFFIX, "");
+        
+        if (parentDir.trim().isEmpty()) {
+            relativePath = fileName;
+        } else {
+            relativePath = parentDir + "/" + fileName;
+        }
     }
 
     public String getRelativePath() {

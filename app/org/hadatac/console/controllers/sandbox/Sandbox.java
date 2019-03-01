@@ -21,6 +21,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Sandbox extends Controller {
     
+    public static final String SUFFIX = "_sandbox";
+    
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
         final SysUser user = AuthApplication.getLocalUser(session());

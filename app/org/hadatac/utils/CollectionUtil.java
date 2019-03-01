@@ -3,6 +3,7 @@ package org.hadatac.utils;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.entity.pojo.OperationMode;
 
 import com.typesafe.config.ConfigFactory;
@@ -77,9 +78,9 @@ public class CollectionUtil {
                     Collection.METADATA_SPARQL.get(), 
                     Collection.METADATA_UPDATE.get(), 
                     Collection.METADATA_GRAPH.get()).contains(collection)) {
-                return collection.replace("store", "store_sandbox");
+                return collection.replace("store", "store" + Sandbox.SUFFIX);
             } else {
-                return collection + "_sandbox";
+                return collection + Sandbox.SUFFIX;
             }
         }
 

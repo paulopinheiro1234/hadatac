@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.hadatac.console.controllers.sandbox.Sandbox;
+
 import com.typesafe.config.ConfigFactory;
 
 public class ConfigProp {
@@ -65,21 +67,21 @@ public class ConfigProp {
 	
 	public static String getPathUnproc() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + "_sandbox";
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + Sandbox.SUFFIX;
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
 	}
 	
 	public static String getPathProc() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + "_sandbox";
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + Sandbox.SUFFIX;
 	    }
 	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
 	}
 	
 	public static String getPathDownload() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + "_sandbox";
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + Sandbox.SUFFIX;
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
 	}
