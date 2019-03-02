@@ -686,7 +686,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectRole.class);
-        // fTreeOC.addUpperFacet(ObjectCollectionType.class);
+        fTreeOC.addUpperFacet(ObjectCollectionType.class);
         fTreeOC.addUpperFacet(StudyObjectType.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
