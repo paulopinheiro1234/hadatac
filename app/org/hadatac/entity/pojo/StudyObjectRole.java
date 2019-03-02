@@ -46,6 +46,9 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
 	public long getNumberFromSolr(Facet facet, FacetHandler facetHandler) {
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
+        
+        // System.out.println("StudyObjectRole getNumberFromSolr: " + strQuery);
+        
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(false);
@@ -77,6 +80,9 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
 	    
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
+        
+        // System.out.println("StudyObjectRole getTargetFacetsFromSolr: " + strQuery);
+        
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);
@@ -116,6 +122,11 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
             role.setCount(pivot_ent.getCount());
             role.setQuery(query);
             role.setField("role_str");
+            
+            // Ignore blank roles
+            if (role.getUri().isEmpty()) {
+                continue;
+            }
 
             if (!results.containsKey(role)) {
                 List<Facetable> children = new ArrayList<Facetable>();

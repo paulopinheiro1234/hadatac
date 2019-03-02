@@ -328,10 +328,6 @@ public abstract class HADatAcThing implements Facetable {
         int numCommitted = MetadataFactory.commitModelToTripleStore(
                 model, CollectionUtil.getCollectionPath(
                         CollectionUtil.Collection.METADATA_GRAPH));
-        
-        //if (numCommitted > 0) {
-        //    System.out.println("Saved <" + getUri() + "> to triple store");
-        //}
 
         return numCommitted >= 0;
     }

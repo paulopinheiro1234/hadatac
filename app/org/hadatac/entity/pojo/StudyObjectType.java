@@ -123,7 +123,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 + "?objectCollection hasco:hasRoleLabel ?role . \n"
                 + "}";
 
-        //System.out.println("StudyObjectType query: \n" + query);
+        // System.out.println("StudyObjectType query: \n" + query);
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
