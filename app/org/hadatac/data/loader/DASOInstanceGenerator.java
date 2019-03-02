@@ -42,7 +42,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private List<ObjectCollection> groundingPath = new ArrayList<ObjectCollection>();  
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
-
+    private Map<String,StudyObject> cacheObject = null;
+    private Map<String,String> cacheSocAndScopeUri = null;
+    private Map<String,String> cacheSocAndOriginalId = null;
+    
     public DASOInstanceGenerator(RecordFile file, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
         super(file);
 
@@ -542,7 +545,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     /* **************************************************************************************
      *                                                                                      *
-     *                GENERATE INSTANCES FOR A GIVEN ROW's IDENTIFIER                        *
+     *                GENERATE INSTANCES FOR A GIVEN ROW's IDENTIFIER                       *
      *                                                                                      *
      ****************************************************************************************/
 
@@ -582,7 +585,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
             // Lookup first study object
             ObjectCollection currentSoc = iter.previous();
-            String currentObjUri = StudyObject.findUriBySocAndOriginalId(currentSoc.getUri(), id); 
+            String currentObjUri = getCachedSocAndOriginalId(currentSoc.getUri(), id); 
             if (DEBUG_MODE) { 
             	System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
             }
@@ -597,7 +600,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
                  *   RETRIEVE/CREATE next object in the path
                  */
 
-                String nextObjUri = StudyObject.findUriBySocAndScopeUri(nextSoc.getUri(), currentObjUri); 
+                String nextObjUri = getCachedSocAndScopeUri(nextSoc.getUri(), currentObjUri); 
                 if (nextObjUri == null || nextObjUri.equals("")) {
                     nextObjUri = createStudyObject(nextSoc, currentObjUri);
                 }
@@ -623,7 +626,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             if (currentObjUri == null || currentObjUri.equals("")) {
             	System.out.println("DASOInstanceGenerator:     Response >>> failed to load object");
             } else {
-            	StudyObject obj = StudyObject.find(currentObjUri);
+            	StudyObject obj = getCachedObject(currentObjUri);
             	if (obj != null) { 
             		List<String> objTimes = StudyObject.retrieveTimeScopeUris(currentObjUri);
             		Map<String,String> referenceEntry = new HashMap<String,String>();
@@ -685,6 +688,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         newObj.setNamedGraph(oasUri);
         newObj.saveToTripleStore();
         addObject(newObj);
+        addObjectToCache(newObj, nextSoc.getUri());
 
         if (DEBUG_MODE) { 
         	System.out.println("DASOInstanceGenerator:          Created Obj with URI=[" + newUri + "]   Type=[" + newTypeUri + "]");
@@ -732,7 +736,78 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
         return resp;
     }
+    
 
+    /*
+     *   METHODS RELATED TO INTERNAL CACHE
+     */
+
+    public void initiateCache() {
+        //System.out.println("INITIATE CACHE BEING CALLED!");
+        cacheObject = mainSoc.getObjectsMap();
+        cacheSocAndScopeUri = new HashMap<String, String>();
+        cacheSocAndOriginalId = new HashMap<String, String>();
+    }
+    
+    private void addObjectToCache(StudyObject newObj, String scopeUri) {
+    	if (newObj == null || cacheObject.containsKey(newObj.getUri())) {
+    		return;
+    	}
+    	cacheObject.put(newObj.getUri(), newObj);
+    	String keySocAndOriginalId = newObj.getIsMemberOf() + ":" + newObj.getOriginalId();
+    	if (!cacheSocAndOriginalId.containsKey(keySocAndOriginalId)) {
+    		cacheSocAndOriginalId.put(keySocAndOriginalId, newObj.getUri());
+    	}
+    	String keySocAndScopeUri = newObj.getIsMemberOf() + ":" + scopeUri;
+    	if (!cacheSocAndScopeUri.containsKey(keySocAndScopeUri)) {
+    		cacheSocAndScopeUri.put(keySocAndScopeUri, scopeUri);
+    	}
+    }
+
+    private StudyObject getCachedObject(String key) {
+    	if (cacheObject.containsKey(key)) {
+    		return cacheObject.get(key); 
+    	} else {
+    		StudyObject obj = StudyObject.find(key);
+    		if (obj != null) {
+    			cacheObject.put(key, obj);
+    		}
+    		return obj;
+    	}
+    }
+    
+    private String getCachedSocAndOriginalId(String soc_uri, String id) {
+    	String key = soc_uri + ":" + id;
+    	if (cacheSocAndOriginalId.containsKey(key)) {
+    		return cacheSocAndOriginalId.get(key); 
+    	} else {
+    		String uri = StudyObject.findUriBySocAndOriginalId(soc_uri, id);
+    		if (uri != null && !uri.equals("")) {
+    			cacheSocAndOriginalId.put(key, uri);
+    		}
+    		return uri;
+    	}
+    }
+    
+    private String getCachedSocAndScopeUri(String soc_uri, String scope_uri) {
+        //System.out.println("cacheSocAndScopeUri: called with socUri=[" + soc_uri + "]  scopeUri=[" + scope_uri + "]");
+        //for (Map.Entry<String, String> entry : cacheSocAndScopeUri.entrySet()) {
+        //    String key = entry.getKey();
+        //    String value = entry.getValue();
+        //    System.out.println("cacheSocAndScopeUri: key=[" + key + "]  value=[" + value + "]");
+        //}
+    	String key = soc_uri + ":" + scope_uri;
+    	if (cacheSocAndScopeUri.containsKey(key)) {
+    		return cacheSocAndScopeUri.get(key); 
+    	} else {
+    		String uri = StudyObject.findUriBySocAndScopeUri(soc_uri, scope_uri);
+    		if (uri != null && !uri.equals("")) {
+    			cacheSocAndScopeUri.put(key, uri);
+    		}
+    		return uri;
+    	}
+    }
+    
     /* **************************************************************************************
      *                                                                                      *
      *  RETRIEVE URI, ORIGINAL ID,  AND TYPE OF GROUNDING OBJECT FROM CURRENT OBJECT URI    *
@@ -763,11 +838,11 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         // Lookup first study object
-        String currentObjUri = StudyObject.findUriBySocAndOriginalId(currentSoc.getUri(), id); 
+        String currentObjUri = getCachedSocAndOriginalId(currentSoc.getUri(), id); 
 
         if (groundingPath == null || groundingPath.size() <= 0) {
-            obj = StudyObject.find(currentObjUri);
-            if (obj == null) {
+        	obj = getCachedObject(currentObjUri);
+        	if (obj == null) {
                 System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve first Study Object for URI=[" + currentObjUri + "]");
                 return null;
             }
@@ -785,7 +860,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             if (DEBUG_MODE) { 
             	System.out.println("            " + nextSoc.getUri() + "  ");
             }
-            String nextObjUri = StudyObject.findUriBySocAndObjectScopeUri(currentSoc.getUri(), currentObjUri); 
+            String nextObjUri = getCachedSocAndScopeUri(currentSoc.getUri(), currentObjUri); 
             if (nextObjUri == null || nextObjUri.equals("")) {
                 //System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
                 currentSoc = nextSoc;
@@ -802,7 +877,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             currentObjUri = nextObjUri;
         }
 
-        obj = StudyObject.find(currentObjUri);
+    	obj = getCachedObject(currentObjUri);
         if (obj == null) {
             System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve Study Object for URI=[" + currentObjUri + "]");
             return null;

@@ -259,6 +259,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         }
         return "";
     }
+
     public List<StudyObject> getObjects() {
         List<StudyObject> resp = new ArrayList<StudyObject>();
         if (objectUris == null || objectUris.size() <=0) {
@@ -268,6 +269,20 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             StudyObject obj = StudyObject.find(uri);
             if (obj != null) {
                 resp.add(obj);
+            }
+        }
+        return resp;
+    }
+
+    public Map<String, StudyObject> getObjectsMap() {
+        Map<String, StudyObject> resp = new HashMap<String, StudyObject>();
+        if (objectUris == null || objectUris.size() <=0) {
+            return resp;
+        }
+        for (String uri : objectUris) {
+            StudyObject obj = StudyObject.find(uri);
+            if (obj != null) {
+                resp.put(uri, obj);
             }
         }
         return resp;

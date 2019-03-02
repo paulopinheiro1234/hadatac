@@ -329,9 +329,9 @@ public abstract class HADatAcThing implements Facetable {
                 model, CollectionUtil.getCollectionPath(
                         CollectionUtil.Collection.METADATA_GRAPH));
         
-        if (numCommitted > 0) {
-            System.out.println("Saved <" + getUri() + "> to triple store");
-        }
+        //if (numCommitted > 0) {
+        //    System.out.println("Saved <" + getUri() + "> to triple store");
+        //}
 
         return numCommitted >= 0;
     }
@@ -357,7 +357,7 @@ public abstract class HADatAcThing implements Facetable {
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
 
-        System.out.println("Deleted <" + getUri() + "> from triple store");
+        //System.out.println("Deleted <" + getUri() + "> from triple store");
     }
 
     public abstract boolean saveToSolr();

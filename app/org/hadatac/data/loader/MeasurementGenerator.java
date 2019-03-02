@@ -54,7 +54,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private int totalCount = 0;
 
     private Map<String, Map<String, String>> possibleValues = null;
-    private Map<String, Map<String, String>> mapIDStudyObjects = null;
+    //private Map<String, Map<String, String>> mapIDStudyObjects = null;
 
     private String dasoUnitUri = "";
 
@@ -68,10 +68,11 @@ public class MeasurementGenerator extends BaseGenerator {
         this.schema = schema;
         this.dataFile = dataFile;
         this.dasoiGen = dasoiGen;
-
+        dasoiGen.initiateCache();
         setStudyUri(da.getStudyUri());
     }
 
+    /*
     private void createVirtualObjectCollections(DataAcquisitionSchema schema) {
         GeneratorChain chain = new GeneratorChain();
         GeneralGenerator generator = new GeneralGenerator(file, "Virtual Object Collections");
@@ -104,7 +105,7 @@ public class MeasurementGenerator extends BaseGenerator {
         }
         chain.addGenerator(generator);
         chain.generate();
-    }
+    }*/
 
     @Override
     public void preprocess() throws Exception {
@@ -178,7 +179,7 @@ public class MeasurementGenerator extends BaseGenerator {
 
         // Store necessary information before hand to avoid frequent SPARQL queries
         possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
-        mapIDStudyObjects = StudyObject.findIdUriMappings(da.getStudyUri());
+        //mapIDStudyObjects = StudyObject.findIdUriMappings(da.getStudyUri());
         dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
 
         //System.out.println("possibleValues: " + possibleValues);
@@ -412,7 +413,7 @@ public class MeasurementGenerator extends BaseGenerator {
                         if (objList.get(reference) == null) {
                             System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
                         } else {
-                            // from obj. list
+                            // from object list
                             measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
                             measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
                             measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
@@ -426,7 +427,7 @@ public class MeasurementGenerator extends BaseGenerator {
                                 measurement.setAbstractTime(objList.get(reference).get(StudyObject.OBJECT_TIME));
                             }
 
-                            // from ground obj.
+                            // from ground object
                             if (groundObj != null) {
                                 measurement.setStudyObjectUri(groundObj.get(StudyObject.STUDY_OBJECT_URI));
                                 measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
@@ -437,19 +438,21 @@ public class MeasurementGenerator extends BaseGenerator {
                     } else {
                         System.out.println("[MeasurementGenerator] [ERROR]: could not find DASA reference for ID=[" + id + "]");
                     }
-                    if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
+                    
+                    /*
+                    //if (dasa.getEntity().equals(URIUtils.replacePrefixEx("sio:Human"))) {
                         //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
-                        if (mapIDStudyObjects.containsKey(id)) {
+                        //if (mapIDStudyObjects.containsKey(id)) {
                             //measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_URI));
                             //measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_TYPE));
                             //measurement.setObjectUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_URI));
                             //measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(StudyObject.SOC_TYPE));
-                        }
+                        //}
                         //measurement.setPID(id);
-                    } else {
-                        if (mapIDStudyObjects.containsKey(id)) {
+                    //} else {
+                        //if (mapIDStudyObjects.containsKey(id)) {
                             // test if object is in the scope of another object
-                            if (!mapIDStudyObjects.get(id).get(StudyObject.OBJECT_SCOPE_URI).isEmpty()) {
+                            //if (!mapIDStudyObjects.get(id).get(StudyObject.OBJECT_SCOPE_URI).isEmpty()) {
                                 //measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_URI));
                                 //measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_TYPE));
                                 //measurement.setObjectUri(mapIDStudyObjects.get(id).get(StudyObject.OBJECT_SCOPE_URI));
@@ -460,9 +463,9 @@ public class MeasurementGenerator extends BaseGenerator {
                                 //}
                                 //measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(StudyObject.SOC_TYPE));
                                 //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-                            } 
+                            //} 
                             // assumes that the object is a subject if object is not in the scope of another object
-                            else {
+                            //else {
                                 // Subject
                                 //measurement.setStudyObjectUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_URI));
                                 //measurement.setStudyObjectTypeUri(mapIDStudyObjects.get(id).get(StudyObject.STUDY_OBJECT_TYPE));
@@ -470,9 +473,11 @@ public class MeasurementGenerator extends BaseGenerator {
                                 //measurement.setPID(mapIDStudyObjects.get(id).get(StudyObject.SUBJECT_ID));
                                 //measurement.setObjectCollectionType(mapIDStudyObjects.get(id).get(StudyObject.SOC_TYPE));
                                 //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SubjectGroup"));
-                            }
-                        }
-                    }
+                            //}
+                        //}
+                    //}
+                     */
+
                 }
             }
 

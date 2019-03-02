@@ -75,8 +75,70 @@
     	</div>
     </div>
     -->
-	
-    <h4>Current Folder: <font color="Green">@dir</font></h4>
+ 	
+ 	<table class="table">
+    <thead>
+         <tr>
+            <th><font color="Green">Unprocessed Data Files</font></th>
+            @if(bAdmin) {
+                <th>Owner Email</th>
+            }
+            <th>Assigned Data Acquisition</th>
+            <th>Time Uploaded</th>
+            <th>Operations</th>
+         </tr>
+    </thead>
+    <tbody>
+        @for(file <- unprocessedFiles) {
+            <tr name="unprocessed">
+                @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                } else {
+                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')) } else { @file.getFileName() }</td>
+                }}
+                @if(bAdmin) {
+                    <td>@file.getOwnerEmail()</td>
+                }
+                <td>@file.getDataAcquisitionUri()</td>
+                <td>@file.getSubmissionTime()</td>
+                <td>
+                @if(file.getStatus().equals("FREEZED")) {
+                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(dir, file.getFileName())" 
+                   class="btn-xs btn-success" role="button">Activate</a>
+                }
+                @if(file.getFileName().startsWith("DA")) {
+                   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getFileName(),file.getDataAcquisitionUri())" 
+                   class="btn-xs btn-success" role="button">Prepare Ingestion</a>
+                }
+                
+                @if(file.getFileName().endsWith(".csv")) {
+                    @defining("") { da_uri => @defining("") { oc_uri => 
+                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+                class="btn-xs btn-primary" role="button">Preview File</a>
+                        }}}
+                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("unproc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                }
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                @if(bAdmin) {
+                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
+                }
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
+                </td>   
+            </tr>
+        }
+    </tbody>
+    </table>
+    @if(unprocessedFiles.isEmpty()) {
+        <p>No unprocessed files</p>
+    }
+    
+ 	<br>
+
+    <h4>Current Processed Data Files Folder: <font color="Green">@dir</font></h4>
     
     <table class="table">
     <thead>
@@ -146,69 +208,6 @@
     @if(processedFiles.isEmpty() && folders.isEmpty()) {
         <p>No records for processed files</p>
     }
-
- 	<br>
- 	
- 	<table class="table">
-    <thead>
-         <tr>
-            <th><font color="Green">Unprocessed Data Files</font></th>
-            @if(bAdmin) {
-                <th>Owner Email</th>
-            }
-            <th>Assigned Data Acquisition</th>
-            <th>Time Uploaded</th>
-            <th>Operations</th>
-         </tr>
-    </thead>
-    <tbody>
-        @for(file <- unprocessedFiles) {
-            <tr name="unprocessed">
-                @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
-                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
-                } else {
-                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')) } else { @file.getFileName() }</td>
-                }}
-                @if(bAdmin) {
-                    <td>@file.getOwnerEmail()</td>
-                }
-                <td>@file.getDataAcquisitionUri()</td>
-                <td>@file.getSubmissionTime()</td>
-                <td>
-                @if(file.getStatus().equals("FREEZED")) {
-                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(dir, file.getFileName())" 
-                   class="btn-xs btn-success" role="button">Activate</a>
-                }
-                @if(file.getFileName().startsWith("DA")) {
-                   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getFileName(),file.getDataAcquisitionUri())" 
-                   class="btn-xs btn-success" role="button">Prepare Ingestion</a>
-                }
-                
-                @if(file.getFileName().endsWith(".csv")) {
-                    @defining("") { da_uri => @defining("") { oc_uri => 
-                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
-                class="btn-xs btn-primary" role="button">Preview File</a>
-                        }}}
-                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("unproc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
-                }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
-                @if(bAdmin) {
-                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
-                }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
-                </td>   
-            </tr>
-        }
-    </tbody>
-    </table>
-    @if(unprocessedFiles.isEmpty()) {
-        <p>No unprocessed files</p>
-    }
-
     <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
 	</div>

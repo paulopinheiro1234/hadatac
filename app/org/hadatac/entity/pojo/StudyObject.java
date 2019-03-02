@@ -489,17 +489,17 @@ public class StudyObject extends HADatAcThing {
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
-        System.out.println("StudyObject: findUriBySocAndOriginalId => resultSize=[" + resultsrw.size() + "]");
+        //System.out.println("StudyObject: findUriBySocAndOriginalId => resultSize=[" + resultsrw.size() + "]");
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
             if (soln != null) {
                 if (soln != null && soln.getResource("objuri") != null) {
-                    System.out.println("StudyObject: findUriBySocAndOriginalId => objuri=[" + soln.getResource("objuri").toString() + "]");
+                    //System.out.println("StudyObject: findUriBySocAndOriginalId => objuri=[" + soln.getResource("objuri").toString() + "]");
                     return soln.getResource("objuri").toString();
                 }
             }
         } else {
-            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for: " + original_id);
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for  SOCURI=[" + socUri + "] and original ID =[" + original_id+ "]");
             return "";
         }
 
@@ -507,11 +507,12 @@ public class StudyObject extends HADatAcThing {
     }
 
     public static String findUriBySocAndScopeUri(String socUri, String scopeUri) {
+    	//System.out.println("StudyObject: findUriBySocAndScopeUri: SOCURI=[" + socUri + "]  SCOPEURI=[" + scopeUri + "]");
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT  ?objuri WHERE { " + 
-	        "      VALUES ?scopeuri { <" + scopeUri + "> } . " + 
-		"      ?objuri hasco:hasObjectScope ?scopeuri .  " + 
-		"      ?objuri hasco:isMemberOf <" + socUri + "> . " +
+                "      VALUES ?scopeuri { <" + scopeUri + "> } . " + 
+                "      ?objuri hasco:hasObjectScope ?scopeuri .  " + 
+                "      ?objuri hasco:isMemberOf <" + socUri + "> . " +
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -525,32 +526,7 @@ public class StudyObject extends HADatAcThing {
                 }
             }
         } else {
-            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for Scope URI: " + scopeUri);
-            return "";
-        }
-
-        return "";
-    }
-
-    public static String findUriBySocAndObjectScopeUri(String socUri, String objUri) {
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT  ?scopeUri WHERE { " + 
-		"      <" + objUri + "> hasco:hasObjectScope ?scopeUri .  " + 
-		"      <" + objUri + "> hasco:isMemberOf <" + socUri + "> . " +
-                "}";
-
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
-        if (resultsrw.size() >= 1) {
-            QuerySolution soln = resultsrw.next();
-            if (soln != null) {
-                if (soln.getResource("scopeUri") != null) {
-                    return soln.getResource("scopeUri").toString();
-                }
-            }
-        } else {
-            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for Scope Object URI: " + objUri);
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for SOCURI=[" + socUri + "] and Scope URI=[" + scopeUri + "]");
             return "";
         }
 
@@ -635,7 +611,7 @@ public class StudyObject extends HADatAcThing {
     }
     
     public static Map<String, Map<String, String>> findIdUriMappings(String studyUri) {
-        System.out.println("findIdUriMappings is called!");
+        //System.out.println("findIdUriMappings is called!");
 
         Map<String, Map<String, String>> mapIdUriMappings = new HashMap<String, Map<String, String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
@@ -659,7 +635,7 @@ public class StudyObject extends HADatAcThing {
                 + " } \n"
                 + " } \n";
 
-        System.out.println("findIdUriMappings() query: \n" + queryString);
+        //System.out.println("findIdUriMappings() query: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -699,7 +675,7 @@ public class StudyObject extends HADatAcThing {
             System.out.println("Error in findIdUriMappings(): " + e.getMessage());
         }
 
-        System.out.println("mapIdUriMappings: " + mapIdUriMappings.keySet().size());
+        //System.out.println("mapIdUriMappings: " + mapIdUriMappings.keySet().size());
         
         return mapIdUriMappings;
     }

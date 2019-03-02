@@ -32,12 +32,12 @@ public class OCManagement extends Controller {
 		List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(std_uri);
 	    List<VirtualColumn> vcList = VirtualColumn.findByStudyUri(std_uri);
 
-		for (ObjectCollection oc : ocList) {
+		/*for (ObjectCollection oc : ocList) {
 		    System.out.println("SOC in " + std_uri + " [" + oc.getUri() + "]  with reference [" + oc.getVirtualColumnUri() + "]");
 		}
         for (VirtualColumn vc : vcList) {
             System.out.println("VC in " + std_uri + " [" + vc.getUri() + "]");
-        }
+        }*/
 
 
 		return ok(objectCollectionManagement.render(dir, filename, da_uri, std, ocList, vcList));
