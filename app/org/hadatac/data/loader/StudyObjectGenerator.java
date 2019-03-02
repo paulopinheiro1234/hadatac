@@ -32,7 +32,7 @@ public class StudyObjectGenerator extends BaseGenerator {
         //this.study_id = study_id; 
         file_name = file.getFile().getName();
         System.out.println("We are in StudyObject Generator!");
-        System.out.println("Study URI: " + study_uri);
+        //System.out.println("Study URI: " + study_uri);
 
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
 
@@ -161,9 +161,9 @@ public class StudyObjectGenerator extends BaseGenerator {
         //System.out.println("StudyObjectGenerator: value of oc_timescope [" + oc_timescope + "]");
         //System.out.println("StudyObjectGenerator: value of mapContent.get(oc_timescope) [" + mapContent.get(oc_timescope) + "]");
         List<String> l = new ArrayList<String>(mapContent.keySet());
-        for (String str : l) {
-        	System.out.println("StudyObjectGenerator: mapContent's key [" + str + "]");
-        }
+        //for (String str : l) {
+        //	System.out.println("StudyObjectGenerator: mapContent's key [" + str + "]");
+        //}
         obj.addTimeScopeUri(getTimeScopeUri(record));
         
         return obj;

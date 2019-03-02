@@ -13,8 +13,11 @@ import org.json.simple.JSONObject;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.Entity;
+import org.hadatac.entity.pojo.HADatAcThing;
+import org.hadatac.entity.pojo.InRelationToInstance;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Unit;
+import org.hadatac.metadata.loader.URIUtils;
 
 public class ObjectForceFieldGraph {
 	
@@ -88,8 +91,19 @@ public class ObjectForceFieldGraph {
         			attrStr += attrStr + "; " + attr.getLabel();
         		}
         	} 
-            attrStr = "[" + attrStr + "]";
-        	nodes.add(new OCNode(m.getValue() + " " + attrStr, m.getUri(), OCNode.PROPERTY,  propertyHtml(m), new ArrayList<>(Arrays.asList(dependedOn.getName()))));
+        	String irtStr = HADatAcThing.getLabel(m.getInRelationToUri());
+        	if (irtStr == null) {
+        		irtStr = "";
+        	}
+        	if (irtStr.length() > 0) {
+        		irtStr = irtStr + " ";
+        	}
+        	attrStr = "[" + irtStr + attrStr + "]";
+        	String valueStr = m.getValue();
+        	if (valueStr.startsWith("http")) {
+        		valueStr = HADatAcThing.getLabel(valueStr);
+        	}
+        	nodes.add(new OCNode(valueStr + " " + attrStr, m.getUri(), OCNode.PROPERTY,  propertyHtml(m), new ArrayList<>(Arrays.asList(dependedOn.getName()))));
     	}
     }
     
@@ -121,12 +135,12 @@ public class ObjectForceFieldGraph {
     	html += "<b>Internal Id</b>: " + id + "<br>"; 
     	html += "<b>Original Id</b>: " + obj.getOriginalId() + "<br>";
     	Entity ent = Entity.find(obj.getTypeUri());
-    	html += "<b>Entity</b>: " + ent.getLabel() + "<br>";
+    	html += "<b>Entity</b>: " + ent.getLabel() + " (" + URIUtils.replaceNameSpace(obj.getTypeUri()) + ") <br>";
     	if (ent.getComment() != null && !ent.getComment().equals("")) {
     		html += "<ul><li><b>Description</b>: " + ent.getComment();
     		html += "</li></ul>";
     	}
-    	html += "<b>URI</b>: " + obj.getUri() + "<br>";
+    	html += "<b>URI</b>: " + URIUtils.replaceNameSpace(obj.getUri()) + "<br>";
     	return html;
     }
     
@@ -140,13 +154,17 @@ public class ObjectForceFieldGraph {
     		Attribute attr = Attribute.find(attrStr);
     		html += attr.getLabel() + " ";
     	}
-    	html += "<br>";
+    	html += " (";
+    	for (String attrUriStr : m.getCharacteristicUris()) {
+    		html += URIUtils.replaceNameSpace(attrUriStr) + " ";
+    	}
+    	html += ") <br>";
     	if (m.getInRelationToUri() != null && !m.getInRelationToUri().equals("")) { 
-    		html += "<b>InRelationTo</b>: " + m.getInRelationToUri() + " <br>";
+    		html += "<b>InRelationTo</b>: " + HADatAcThing.getLabel(m.getInRelationToUri()) + " (" + URIUtils.replaceNameSpace(m.getInRelationToUri()) + ") <br>";
     	}
     	Unit unit = Unit.find(m.getUnitUri());
     	if (unit != null) {
-    		html += "<b>Unit</b>: " + unit.getLabel() + "<br>";
+    		html += "<b>Unit</b>: " + unit.getLabel() + " (" + URIUtils.replaceNameSpace(m.getUnitUri()) + ") <br>";
     	}
     	html += "<b>Source</b>: <br>"; 
     	return html;

@@ -42,9 +42,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private List<ObjectCollection> groundingPath = new ArrayList<ObjectCollection>();  
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
-    private Map<String,StudyObject> cacheObject = null;
-    private Map<String,String> cacheSocAndScopeUri = null;
-    private Map<String,String> cacheSocAndOriginalId = null;
+    private Map<String, StudyObject> cacheObject = null;
+    private Map<String, String> cacheSocAndScopeUri = null;
+    private Map<String, String> cacheSocAndOriginalId = null;
+    private Map<String, String> cacheObjectScopeUri = null;
     
     public DASOInstanceGenerator(RecordFile file, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
         super(file);
@@ -86,6 +87,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         retrieveAvailableSOCs();
         identifyMainDASO();
+        if (mainSoc == null) {
+        	return;
+        }
         identifyGroundingPathForMainSOC();
         identifyTargetDasoURIs();
         identitySOCsForDASOs();
@@ -122,6 +126,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         while (iterAttributes.hasNext()) {
             DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
             String dasoUri = dasa.getObjectUri(); 
+            AnnotationLog.println("DASOInstanceGenerator: DASO Uri: " + dasoUri, fileName);
             DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.find(dasoUri);
             if (dasa.getLabel().equals(mainLabel)) {
                 mainDasoUri = dasoUri;
@@ -742,11 +747,16 @@ public class DASOInstanceGenerator extends BaseGenerator {
      *   METHODS RELATED TO INTERNAL CACHE
      */
 
-    public void initiateCache() {
-        //System.out.println("INITIATE CACHE BEING CALLED!");
-        cacheObject = mainSoc.getObjectsMap();
-        cacheSocAndScopeUri = new HashMap<String, String>();
-        cacheSocAndOriginalId = new HashMap<String, String>();
+    public boolean initiateCache() {
+    	if (mainSoc != null) {
+    		//System.out.println("INITIATE CACHE BEING CALLED!");
+    		cacheObject = mainSoc.getObjectsMap();
+    		cacheSocAndScopeUri = new HashMap<String, String>();
+    		cacheSocAndOriginalId = new HashMap<String, String>();
+    		cacheObjectScopeUri = new HashMap<String, String>();
+    		return true;
+    	}
+    	return false;
     }
     
     private void addObjectToCache(StudyObject newObj, String scopeUri) {
@@ -808,6 +818,21 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	}
     }
     
+    private String getCachedObjectScopeUri(String soc_uri, String obj_uri) {
+        //System.out.println("cacheSocAndScopeUri: called with socUri=[" + soc_uri + "]  objUri=[" + obj_uri + "]");
+    	String key = soc_uri + ":" + obj_uri;
+    	if (cacheObjectScopeUri.containsKey(key)) {
+    		return cacheObjectScopeUri.get(key); 
+    	} else {
+    	    String uri = StudyObject.findObjectScopeUriBySoc(soc_uri, obj_uri);
+    		if (uri != null && !uri.equals("")) {
+    			cacheObjectScopeUri.put(key, uri);
+    		}
+    		return uri;
+    	}
+    }
+ 
+    
     /* **************************************************************************************
      *                                                                                      *
      *  RETRIEVE URI, ORIGINAL ID,  AND TYPE OF GROUNDING OBJECT FROM CURRENT OBJECT URI    *
@@ -858,9 +883,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         for (ObjectCollection nextSoc : groundingPath) {
             if (DEBUG_MODE) { 
-            	System.out.println("            " + nextSoc.getUri() + "  ");
+            	System.out.println("DASOInstanceGenerator:      nextSOC=[" + nextSoc.getUri() + "] Obj URI=[" + currentObjUri + "]");
             }
-            String nextObjUri = getCachedSocAndScopeUri(currentSoc.getUri(), currentObjUri); 
+            String nextObjUri = getCachedObjectScopeUri(nextSoc.getUri(), currentObjUri); 
             if (nextObjUri == null || nextObjUri.equals("")) {
                 //System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
                 currentSoc = nextSoc;
@@ -869,7 +894,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
 
             if (DEBUG_MODE) { 
-            	System.out.println("DASOInstanceGenerator:          Scope Obj URI=[" + currentObjUri + "]  SOC=[" + nextSoc.getUri() + 
+            	System.out.println("DASOInstanceGenerator:          Scope Obj URI=[" + currentObjUri + "]  nextSOC=[" + nextSoc.getUri() + 
             			"]  =>  Obj Uri=[" + nextObjUri + "]");
             }
 

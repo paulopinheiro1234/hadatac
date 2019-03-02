@@ -533,6 +533,37 @@ public class StudyObject extends HADatAcThing {
         return "";
     }
 
+    /*
+     *    this query traverses the grounding path backwards because the isMemberOf is of the scopeUri 
+     *    rather than the isMemberOf of the objUri
+     */
+    public static String findObjectScopeUriBySoc(String socUri, String objUri) {
+    	//System.out.println("StudyObject: findObjectScopeUriBySoc: SOCURI=[" + socUri + "]  OBJURI=[" + objUri + "]");
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?scopeUri WHERE { " + 
+                "      VALUES ?objUri { <" + objUri + "> } . " + 
+                "      ?objUri hasco:hasObjectScope ?scopeUri .  " + 
+                "      ?scopeUri hasco:isMemberOf <" + socUri + "> . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.getResource("scopeUri") != null) {
+                    return soln.getResource("scopeUri").toString();
+                }
+            }
+        } else {
+            System.out.println("[WARNING] StudyObject. Could not find OBJ URI for SOCURI=[" + socUri + "] and Object URI=[" + objUri + "]");
+            return "";
+        }
+
+        return "";
+    }
+
     public static List<StudyObject> findByCollection(ObjectCollection oc) {
         if (oc == null) {
             return null;

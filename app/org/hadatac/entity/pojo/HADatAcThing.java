@@ -181,8 +181,10 @@ public abstract class HADatAcThing implements Facetable {
     }
 
     public static List<String> getLabels(String uri) {
-        List<String> results = new ArrayList<String>();
-
+    	List<String> results = new ArrayList<String>();
+    	if (uri == null || uri.equals("")) {
+    		return results;
+    	}
         if (uri.startsWith("http")) {
             uri = "<" + uri.trim() + ">";
         }

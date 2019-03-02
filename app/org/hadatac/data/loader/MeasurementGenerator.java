@@ -67,9 +67,14 @@ public class MeasurementGenerator extends BaseGenerator {
         this.da = da;
         this.schema = schema;
         this.dataFile = dataFile;
+        String fileName = dataFile.getFileName();
         this.dasoiGen = dasoiGen;
-        dasoiGen.initiateCache();
-        setStudyUri(da.getStudyUri());
+        if (dasoiGen.initiateCache()) {
+        	setStudyUri(da.getStudyUri());
+        } else {
+            AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
+            log.printException("[ERROR] MeasurementGeneration: failed to initialize the data ingestion.", fileName);;
+        }
     }
 
     /*
