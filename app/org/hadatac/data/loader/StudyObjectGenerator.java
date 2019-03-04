@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.HADatAcThing;
+import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
 
 
@@ -20,6 +21,7 @@ public class StudyObjectGenerator extends BaseGenerator {
     String oc_type;
     String oc_scope;
     String oc_timescope;
+    private Map<String, ObjectCollection> socMap = new HashMap<String, ObjectCollection>();
     String role;
     final String kbPrefix = ConfigProp.getKbPrefix();
     private List<String> listCache = new ArrayList<String>();
@@ -79,6 +81,15 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
 
     private String getLabel(Record rec) {
+        String originalID = getOriginalID(rec);
+        if (URIUtils.isValidURI(originalID)) {
+            return URIUtils.getBaseName(originalID);
+        }
+        
+        if (getSoc() != null && getSoc().getRoleLabel() != null && !getSoc().getRoleLabel().equals("")) {
+    		return getSoc().getRoleLabel() + " " + originalID;
+    	}
+        
         String auxstr = uriMap.get(oc_type);
         if (auxstr == null) {
             auxstr = "";
@@ -86,65 +97,71 @@ public class StudyObjectGenerator extends BaseGenerator {
             auxstr = auxstr.replaceAll("-","");
         }
         
-        String originalID = getOriginalID(rec);
-        if (URIUtils.isValidURI(originalID)) {
-            return URIUtils.getBaseName(originalID);
-        }
-        
         return auxstr + " " + originalID + " - " + study_id;
     }
 
     private String getOriginalID(Record rec) {
-	//System.out.println("StudyObjectGenerator: mapCol for originalID = [" + mapCol.get("originalID") + "]");
         String auxstr = rec.getValueByColumnName(mapCol.get("originalID"));
-	//System.out.println("StudyObjectGenerator: getOriginalID(1) = [" + auxstr + "]");
+        //System.out.println("StudyObjectGenerator: getOriginalID(1) = [" + auxstr + "]");
         if (auxstr == null) {
             return "";
         } 
         auxstr = auxstr.replaceAll("\\s+","");
-	//System.out.println("StudyObjectGenerator: getOriginalID(2) = [" + auxstr + "]");
+        //System.out.println("StudyObjectGenerator: getOriginalID(2) = [" + auxstr + "]");
         
         //auxstr = auxstr.replaceAll("(?<=^\\d+)\\.0*$", "");
-	//System.out.println("StudyObjectGenerator: getOriginalID(3) = [" + auxstr + "]");
-
-	return auxstr;
+        //System.out.println("StudyObjectGenerator: getOriginalID(3) = [" + auxstr + "]");
+        return auxstr;
     }
 
-    private String getCohortUri(Record rec) {
+    private String getSocUri() {
         return oc_uri;
     }
 
+    
+    private ObjectCollection getSoc() {
+    	if (oc_uri == null || oc_uri.equals("")) {
+    		return null;
+    	}
+    	if (socMap.containsKey(oc_uri)) {
+    		return socMap.get(oc_uri);
+    	}
+    	ObjectCollection soc = ObjectCollection.find(URIUtils.replacePrefixEx(oc_uri));
+    	socMap.put(oc_uri, soc);
+    	return soc;
+    }
+    
     private String getScopeUri(Record rec) {
         if (oc_scope != null && oc_scope.length() > 0){
-	    if (mapContent.get(oc_scope) != null) {
-		String scopeOCtype = mapContent.get(oc_scope).get(1);
-		return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
-	    } else {
-		System.out.println("StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
-		return "";
-	    }
+        	if (mapContent.get(oc_scope) != null) {
+        		String scopeOCtype = mapContent.get(oc_scope).get(1);
+        		return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+        	} else {
+        		System.out.println("StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
+        		return "";
+        	}
         } else {
-            return "";
+        	return "";
         }
     }
 
     private String getTimeScopeUri(Record rec) {
         if (oc_timescope != null && oc_timescope.length() > 0){
-	    if (mapContent.get(oc_timescope) != null) {
-		String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
-		String returnedValue = rec.getValueByColumnName(mapCol.get("timeScopeID"));
-	        // the value returned by getValueByColumnName may be an URI or an original.
-		if (URIUtils.isValidURI(returnedValue)) {
-		    // if returned value is an URI, this function returns the URI with expanded namespace 
-		    return URIUtils.replacePrefixEx(returnedValue);
-		} else {
-		    // if returned value is not an URI, this function composes an URI according to SDD convention 
-		    return kbPrefix + uriMap.get(timeScopeOCtype) + returnedValue.replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
-		}
-	    } else {
-		System.out.println("StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
-		return "";
-	    }
+        	if (mapContent.get(oc_timescope) != null) {
+        		String timeScopeOCtype = mapContent.get(oc_timescope).get(1);
+        		String returnedValue = rec.getValueByColumnName(mapCol.get("timeScopeID"));
+        		// the value returned by getValueByColumnName may be an URI or an original.
+        		if (URIUtils.isValidURI(returnedValue)) {
+        			// if returned value is an URI, this function returns the URI with expanded namespace 
+        			return URIUtils.replacePrefixEx(returnedValue);
+        		} else {
+        			// if returned value is not an URI, this function composes an URI according to SDD convention 
+        			return kbPrefix + uriMap.get(timeScopeOCtype) + returnedValue.replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+        		}
+        	} else {
+        		System.out.println("StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
+        		return "";
+        	}
         } else {
             return "";
         }
@@ -153,7 +170,7 @@ public class StudyObjectGenerator extends BaseGenerator {
     public StudyObject createStudyObject(Record record) throws Exception {
         StudyObject obj = new StudyObject(getUri(record), getType(record), 
 					  getOriginalID(record), getLabel(record), 
-					  getCohortUri(record), getLabel(record));
+					  getSocUri(), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));
         obj.addScopeUri(getScopeUri(record));
         //System.out.println("StudyObjectGenerator: createStudyObject calling getTimeScopeUri. original ID [" + getOriginalID(record) + "]");

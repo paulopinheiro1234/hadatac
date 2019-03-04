@@ -16,7 +16,7 @@
       
       <div class="row">
 
-        <div class="col-md-8 col-md-offset-1">
+        <div class="col-md-10 col-md-offset-1">
 
 	     <h3>Repository Management</h3>
 
@@ -27,8 +27,25 @@
  
                  <h4>Configuration</h4>
                  <div id="rcorners">  
-		      SOLR Home: <b><font color="blue">@ConfigFactory.load().getString("hadatac.solr.home")</font></b> <br>
-                      Base Ontology: <b><font color="blue">@ConfigFactory.load().getString("hadatac.community.ont_prefix")</font></b> <br>
+					<div class="row">
+  						<div class="col-md-3">
+              				SOLR Home: <b><font color="blue">@ConfigFactory.load().getString("hadatac.solr.home")</font></b> <br>
+                      		Base Ontology: <b><font color="blue">@ConfigFactory.load().getString("hadatac.community.ont_prefix")</font></b> <br>
+                      		Form Template: <b><font color="blue">@ConfigProp.getTemplateFileName()</font></b> <br>  
+                      	</div>
+  						<div class="col-md-3">
+                      		Unprocessed Files Folder: <b><font color="blue">@ConfigProp.getPathUnproc()</font></b> <br>  
+                      		Processed Files Folder: <b><font color="blue">@ConfigProp.getPathProc()</font></b> <br>  
+                      		Download Reports Folder: <b><font color="blue">@ConfigProp.getPathDownload()</font></b> <br>  
+                      		Working Files Folder: <b><font color="blue"></font></b> <br>  
+  						</div>	  						
+  						<div class="col-md-3">
+                      		Unit Facet: <b><font color="blue">@ConfigProp.getFacetedDataUnit()</font></b> <br>  
+                      		Time Facet: <b><font color="blue">@ConfigProp.getFacetedDataTime()</font></b> <br>  
+                      		Space Facet: <b><font color="blue">@ConfigProp.getFacetedDataSpace()</font></b> <br>  
+                      		Platform Facet: <b><font color="blue">@ConfigProp.getFacetedDataPlatform()</font></b> <br>  
+  						</div>
+					</div>		
                  </div>
 
 		 <br>

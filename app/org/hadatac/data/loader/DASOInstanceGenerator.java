@@ -22,6 +22,7 @@ import java.util.Iterator;
 public class DASOInstanceGenerator extends BaseGenerator {
 
 	private final boolean DEBUG_MODE = false;
+	private final int ID_LENGTH = 5;
 	
 	private final String SIO_OBJECT = "sio:Object";
     private final String SIO_SAMPLE = "sio:Sample";;
@@ -126,7 +127,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
         while (iterAttributes.hasNext()) {
             DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
             String dasoUri = dasa.getObjectUri(); 
-            AnnotationLog.println("DASOInstanceGenerator: DASO Uri: " + dasoUri, fileName);
             DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.find(dasoUri);
             if (dasa.getLabel().equals(mainLabel)) {
                 mainDasoUri = dasoUri;
@@ -145,7 +145,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         mainSoc = socFromDaso(mainDaso, socsList);
         if (mainSoc == null) {
-            AnnotationLog.println("DASOInstanceGenerator: [ERROR] FAILED TO LOAD MAIN SOC", fileName);
+            AnnotationLog.println("DASOInstanceGenerator: [ERROR] FAILED TO LOAD MAIN SOC. The virtual column for the file identifier (the row with attribute hasco:originalID) is not one of the firtual columns in the SSD for this study.", fileName);
             return;
         }
         mainSocUri = mainSoc.getUri();
@@ -670,8 +670,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private String createStudyObject(ObjectCollection nextSoc, String currentObjUri) {
         String newOriginalId = String.valueOf(nextSoc.getNextCounter());
+        newOriginalId = addLeftZeros(newOriginalId);
         String newUri = createObjectUri(newOriginalId, nextSoc.getUri(), nextSoc.getTypeUri());
-        String newLabel = createObjectLabel(newOriginalId, nextSoc.getUri(), nextSoc.getTypeUri());
+        String newLabel = createObjectLabel(newOriginalId, nextSoc);
         String newTypeUri = "";
         DataAcquisitionSchemaObject daso = dasoFromSoc(nextSoc, dasos);
         if (daso == null || daso.getEntity() == null || daso.getEntity().equals("")) {
@@ -702,6 +703,17 @@ public class DASOInstanceGenerator extends BaseGenerator {
         return newObj.getUri();
     }
 
+    private String addLeftZeros(String str) {
+    	str = str.trim();
+    	String zeros = "";
+    	if (str.length() < ID_LENGTH) {
+    		while (zeros.length() <= ID_LENGTH - str.length()) {
+    			zeros = "0" + zeros;
+    		}
+    	}
+    	return zeros + str;
+    }
+    
     private String createObjectUri(String originalID, String socUri, String socTypeUri) {
         String labelPrefix = "";
         if (socTypeUri.equals(ObjectCollection.SUBJECT_COLLECTION)) {
@@ -715,14 +727,17 @@ public class DASOInstanceGenerator extends BaseGenerator {
         return uri;
     }
 
-    private String createObjectLabel(String originalID, String socUri, String socTypeUri) {
+    private String createObjectLabel(String originalID, ObjectCollection soc) {
+        if (soc.getRoleLabel() != null && !soc.getRoleLabel().equals("")) {
+        	return soc.getRoleLabel() + " " + originalID;
+        } 
         String labelPrefix = "";
-        if (socTypeUri.equals(ObjectCollection.SUBJECT_COLLECTION)) {
+        if (soc.getTypeUri().equals(ObjectCollection.SUBJECT_COLLECTION)) {
             labelPrefix = "SBJ ";
         } else {
             labelPrefix = "SPL ";
         }
-        return labelPrefix + originalID + " - " + socIdFromUri(socUri);
+        return labelPrefix + originalID + " - " + socIdFromUri(soc.getUri());
 
     }
 

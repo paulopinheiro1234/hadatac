@@ -535,9 +535,38 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return mapPossibleValues;
     }
 
+    public static Map<String, String> findAllUrisByLabel(String schemaUri) {
+    	Map<String, String> resp = new HashMap<String, String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?daso_or_dasa ?label WHERE { "
+                + " ?daso_or_dasa rdfs:label ?label . "
+                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
+                + " }";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        String uriStr = "";
+        String labelStr = "";
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+
+            if (soln.get("daso_or_dasa") != null) {
+                uriStr = soln.get("daso_or_dasa").toString();
+                if (soln.get("label") != null) {
+                	labelStr = soln.get("label").toString();
+                	if (uriStr != null && labelStr != null) {
+                		resp.put(labelStr, uriStr);
+                	}
+                }
+            }
+        }
+        return resp;
+    }
+
     public static String findByLabel(String schemaUri, String label) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?daso_or_dasa WHERE { "
+                + " SELECT ?daso_or_dasa ?label WHERE { "
                 + " ?daso_or_dasa rdfs:label ?label . "
                 + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . "
                 + " FILTER regex(str(?label), \"" + label + "\" ) "

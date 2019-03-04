@@ -1,14 +1,15 @@
-@( indicator : org.hadatac.entity.pojo.Indicator)
+@(indicator : org.hadatac.entity.pojo.Indicator)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
-@import org.hadatac.console.controllers.metadata.DynamicFunctions
+@import org.hadatac.metadata.loader._
 @import java.net._
 @import org.hadatac.utils._
 @import com.typesafe.config.ConfigFactory
 
 <tr>
-  <td>@if(indicator.getUri() != null) { @DynamicFunctions.replaceURLWithPrefix(indicator.getUri()) }</td>
+  <td>@if(indicator.getSuperUri() != null) { @indicator.getSuperUri() }</td>
+  <td>@if(indicator.getUri() != null) { @URIUtils.replaceNameSpace(indicator.getUri()) }</td>
   <td>@if(indicator.getLabel() != null) { @indicator.getLabel() }</td>
   <td>@if(indicator.getComment() != null) { @indicator.getComment() }</td>
   <td>

@@ -112,11 +112,11 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         return getUri().hashCode();
     }
 
-    public static List<Indicator> find() {
+    private static List<Indicator> findImmediateSubclasses(String indicatorUri, boolean justSub) {
         List<Indicator> indicators = new ArrayList<Indicator>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf hasco:Indicator . " + 
+                " ?uri rdfs:subClassOf " + indicatorUri + " . " + 
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -125,11 +125,25 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             Indicator indicator = find(soln.getResource("uri").getURI());
-            indicators.add(indicator);
+            indicator.setSuperUri(indicatorUri);
+            if (!indicatorUri.equals(className) || (indicatorUri.equals(className) && !justSub)) {
+            	indicators.add(indicator);
+            } 
+            if (indicatorUri.equals(className)) {
+            	indicators.addAll(Indicator.findImmediateSubclasses(URIUtils.replaceNameSpace(indicator.getUri()), justSub));
+            }
         }			
 
         java.util.Collections.sort((List<Indicator>) indicators);
         return indicators;		
+    }
+
+    public static List<Indicator> find() {
+    	return Indicator.findImmediateSubclasses(className, false);
+    }
+
+    public static List<Indicator> findSubClasses() {
+    	return Indicator.findImmediateSubclasses(className, true);
     }
 
     public static Indicator find(String uri) {
@@ -345,7 +359,9 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
     @Override
     public int compareTo(Indicator another) {
-        return this.getLabel().compareTo(another.getLabel());
+    	String from = this.getSuperUri() + this.getLabel();
+    	String to = another.getSuperUri() + another.getLabel();
+        return from.compareTo(to);
     }
 
     @Override

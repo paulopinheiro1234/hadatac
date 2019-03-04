@@ -54,6 +54,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private int totalCount = 0;
 
     private Map<String, Map<String, String>> possibleValues = null;
+    private Map<String, String> urisByLabels = null;
     //private Map<String, Map<String, String>> mapIDStudyObjects = null;
 
     private String dasoUnitUri = "";
@@ -71,6 +72,7 @@ public class MeasurementGenerator extends BaseGenerator {
         this.dasoiGen = dasoiGen;
         if (dasoiGen.initiateCache()) {
         	setStudyUri(da.getStudyUri());
+            urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
         } else {
             AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
             log.printException("[ERROR] MeasurementGeneration: failed to initialize the data ingestion.", fileName);;
@@ -184,8 +186,9 @@ public class MeasurementGenerator extends BaseGenerator {
 
         // Store necessary information before hand to avoid frequent SPARQL queries
         possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
+        urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(da.getSchemaUri());
         //mapIDStudyObjects = StudyObject.findIdUriMappings(da.getStudyUri());
-        dasoUnitUri = DataAcquisitionSchema.findByLabel(da.getSchemaUri(), schema.getUnitLabel());
+        dasoUnitUri = urisByLabels.get(schema.getUnitLabel());
 
         //System.out.println("possibleValues: " + possibleValues);
         
