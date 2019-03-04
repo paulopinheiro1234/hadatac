@@ -34,6 +34,8 @@ public abstract class BaseGenerator {
 
     protected List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
     protected List<HADatAcThing> objects = new ArrayList<HADatAcThing>();
+    
+    protected Map<String, Cache> caches = new HashMap<String, Cache>();
 
     protected HashMap<String, String> mapCol = new HashMap<String, String>();
     protected String fileName = "";
@@ -53,6 +55,24 @@ public abstract class BaseGenerator {
     }
 
     public void initMapping() {}
+    
+    public void addCache(Cache cache) {
+        if (!caches.containsKey(cache.getName())) {
+            caches.put(cache.getName(), cache);
+        }
+    }
+    
+    public void clearCacheByName(String name) {
+        if (caches.containsKey(name)) {
+            caches.get(name).clear();
+        }
+    }
+    
+    public void clearAllCaches() {
+        for (String name : caches.keySet()) {
+            caches.get(name).clear();
+        }
+    }
 
     public String getTableName() {
         return null;
@@ -306,6 +326,17 @@ public abstract class BaseGenerator {
 
             if (obj.saveToTripleStore()) {
                 count++;
+            }
+        }
+        
+        for (String name : caches.keySet()) {
+            if (caches.get(name).getNeedCommit()) {
+                for (Object obj : caches.get(name).getMapCache().values()) {
+                    if (obj instanceof HADatAcThing) {
+                        ((HADatAcThing) obj).saveToTripleStore();
+                        count++;
+                    }
+                }
             }
         }
 

@@ -195,6 +195,8 @@ public class MeasurementGenerator extends BaseGenerator {
 
     @Override
     public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
+        System.out.println("rowNumber: " + rowNumber);
+        
         // Comment out row instance generation
         /*
         try{
