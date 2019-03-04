@@ -1,6 +1,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.models.FacetHandler
+@import org.hadatac.utils._
 
 @(	page : Int,
 	rows : Int,
@@ -20,6 +21,7 @@
 	<script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
 	<div id="query" data-documents="@documentJson"/>
 	<div id="facetDiv" data-documents="@handler.toJSON()"/>
+    <div id="preferences" data-results="@ConfigProp.toGuiJson()"/>
 	
 	<div class="container-fluid">
 		<div class="row">
@@ -30,7 +32,7 @@
 			<div class="col-md-2 sidebar">
 			   <center><font size="4"> Selected data values: <b>@resultsSize</b></font> </center> <br></br>
 			</div>
-			<div class="col-md-5 sidebar">
+			<div class="col-md-7 sidebar">
 		        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
 		        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
 		        @if(ownerUri != "Public") {
@@ -101,17 +103,28 @@
 	@facetTree(page, rows, facets, resultsSize, results, documentJson, handler, objDetails)
 	
 	<script>
+	var query_res = document.getElementById('preferences'); 
+	var pref = JSON.parse('{"value":' + query_res.dataset.results + '}');
+	var i = 0;
+
 	$(document).ready(function() {
-		$("#panels").children().each(function () {
+		$("#panels").children().each(function () {  
 			$("#panel_options").append($('<label/>').html(this.id.replace(/_/g, ' ') + '&nbsp;&nbsp;').prepend($('<input/>').attr(
-					{ type: 'checkbox', name: this.id, 'checked': true}).change(function () {
-		        if (this.checked) {
+					{ type: 'checkbox', name: this.id, 'checked': pref.value[i++]}).change(function () {
+		        if (this.checked) { 
 		            $("#" + this.name).show();
 		        } else {
 		        	$("#" + this.name).hide();
 		        }
 		        updatePanelWidths();
 		    })));
+		});
+		i = 0;
+		$("#panels").children().each(function () {
+			if (!pref.value[i++]) {
+				$(this).hide();	
+				updatePanelWidths();				
+			}
 		});
 	});
 	

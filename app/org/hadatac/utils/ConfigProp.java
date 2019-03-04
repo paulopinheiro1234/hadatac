@@ -7,14 +7,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Properties;
 
+import org.hadatac.console.controllers.objectcollections.OCNode;
 import org.hadatac.console.controllers.sandbox.Sandbox;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.typesafe.config.ConfigFactory;
 
 public class ConfigProp {
 	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
+	
+	public static final String GUI_CONFIG_FILE = "gui.config";
 	
 	public static final String LABKEY_CONFIG_FILE = "labkey.config";
 	
@@ -90,6 +96,22 @@ public class ConfigProp {
         return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
     }
 	
+	public static String getFacetedDataUnit() {
+        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_unit");
+    }
+	
+	public static String getFacetedDataTime() {
+        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_time");
+    }
+	
+	public static String getFacetedDataSpace() {
+        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_space");
+    }
+	
+	public static String getFacetedDataPlatform() {
+        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_platform");
+    }
+	
 	public static String getLabKeySite() {
         return getPropertyValue(LABKEY_CONFIG_FILE, "site");
     }
@@ -107,4 +129,32 @@ public class ConfigProp {
         
         return false;
     }
+	
+	@SuppressWarnings("unchecked")
+	public static String toGuiJson() {
+    	
+    	JSONArray gui = new JSONArray();
+	
+    	gui.add(true);
+    	gui.add(true);
+    	gui.add(true);
+    	if (ConfigProp.getFacetedDataUnit().equals("on")) {
+    		gui.add(true);
+    	} else {
+    		gui.add(false);
+    	}
+    	if (ConfigProp.getFacetedDataTime().equals("on")) {
+    		gui.add(true);
+    	} else {
+    		gui.add(false);
+    	}
+    	if (ConfigProp.getFacetedDataPlatform().equals("on")) {
+    		gui.add(true);
+    	} else {
+    		gui.add(false);
+    	}
+    	
+    	return gui.toJSONString();
+    }
+	
 }

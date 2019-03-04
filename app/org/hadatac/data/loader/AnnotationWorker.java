@@ -67,8 +67,8 @@ public class AnnotationWorker {
                 }
             }
             chain = annotateDPLFile(recordFile);
-        } else if (fileName.startsWith("ACQ-")) {
-            chain = annotateACQFile(recordFile, true);
+        //} else if (fileName.startsWith("ACQ-")) {
+        //    chain = annotateACQFile(recordFile, true);
         } else if (fileName.startsWith("OAS-")) {
             checkOASFile(recordFile);
             chain = annotateOASFile(recordFile, true);
@@ -86,7 +86,7 @@ public class AnnotationWorker {
         } else {
             AnnotationLog.printException(
                     "Unsupported file name prefix, only accept prefixes "
-                            + "STD-, DPL-, PID-, MAP-, SDD-, ACQ-, DA-. ", fileName);
+                            + "DA-, DPL-, OAS-, SDD-, SSD-, STD- ", fileName);
             return null;
         }
 

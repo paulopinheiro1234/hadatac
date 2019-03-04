@@ -24,13 +24,29 @@
     <body>
 
     <div class="container-fluid">
-        <h4>Study View</h4>
+        <h4>Study View of @study.getId()</h4>
+
+	    <div class="row">
+        	<div class="col-lg-12">
+				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    			<style>
+    				table.google-visualization-orgchart-table {
+                		border-collapse: separate !important;
+        			}
+    			</style>
+     
+	       		<h5>SOC Structure</h5> (select nodes to browse their objects)
+    	   	    <div id="chart_div" style="width: 100%; height: 250px;">
+    	   	    </div>
+			</div>
+		</div>
 
 		<div class="row">
 	        <div class="col-lg-5 left">
 	            <h5>Info</h5>
 			    <ul>        		
-					<li><b>Code</b>: @study.getId()</li>
+					<!--  <li><b>Code</b>: @study.getId()</li> ---->
 					<li><b>Title</b>: @study.getLabel()</li>
 					<!--  <li><b>Full Tile</b>: @study.getTitle()</li> ---->
 					<li><b>Description</b>: @study.getComment()</li>
@@ -103,22 +119,6 @@
         			</table>
         		}
 
-			</div>
-		</div>
-
-	    <div class="row">
-        	<div class="col-lg-12">
-				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-    			<style>
-    				table.google-visualization-orgchart-table {
-                		border-collapse: separate !important;
-        			}
-    			</style>
-     
-	       		<h5>SOC Structure</h5> (select nodes to browse their objects)
-    	   	    <div id="chart_div" style="width: 100%; height: 250px;">
-    	   	    </div>
 			</div>
 		</div>
 
