@@ -762,9 +762,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
     		*/
     	    
     	    addCache(new Cache<String, StudyObject>("cacheObject", false, mainSoc.getObjectsMap()));
-    		addCache(new Cache<String, String>("cacheSocAndScopeUri", false));
-    		addCache(new Cache<String, String>("cacheSocAndOriginalId", false));
-    		addCache(new Cache<String, String>("cacheObjectScopeUri", false));
+    		addCache(new Cache<String, String>("cacheSocAndScopeUri", false, StudyObject.buildCachedUriBySocAndScopeUri()));
+    		addCache(new Cache<String, String>("cacheSocAndOriginalId", false, StudyObject.buildCachedUriBySocAndOriginalId()));
+    		addCache(new Cache<String, String>("cacheObjectScopeUri", false, StudyObject.buildCachedUriByOriginalId()));
     	    
     		return true;
     	}
@@ -819,12 +819,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
     
     @SuppressWarnings("unchecked")
     private String getCachedSocAndScopeUri(String soc_uri, String scope_uri) {
-        //System.out.println("cacheSocAndScopeUri: called with socUri=[" + soc_uri + "]  scopeUri=[" + scope_uri + "]");
-        //for (Map.Entry<String, String> entry : cacheSocAndScopeUri.entrySet()) {
-        //    String key = entry.getKey();
-        //    String value = entry.getValue();
-        //    System.out.println("cacheSocAndScopeUri: key=[" + key + "]  value=[" + value + "]");
-        //}
     	String key = soc_uri + ":" + scope_uri;
     	if (caches.get("cacheSocAndScopeUri").containsKey(key)) {
     		return (String)caches.get("cacheSocAndScopeUri").get(key); 

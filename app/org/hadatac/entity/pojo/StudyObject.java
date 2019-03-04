@@ -449,6 +449,31 @@ public class StudyObject extends HADatAcThing {
 
         return obj;
     }
+    
+    public static Map<String, String> buildCachedUriByOriginalId() {
+        Map<String, String> cache = new HashMap<String, String>();
+        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT DISTINCT ?objUri ?originalId WHERE { \n" + 
+                " ?objUri hasco:originalID ?originalId . \n" + 
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("objUri") != null && soln.get("originalId") != null) {
+                    cache.put(soln.get("originalId").toString(), soln.get("objUri").toString());
+                }
+            }
+        }
+        
+        System.out.println("buildCachedUriByOriginalId: " + cache.size());
+
+        return cache;
+    }
 
     public static String findUribyOriginalId(String original_id) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -472,6 +497,35 @@ public class StudyObject extends HADatAcThing {
         }
 
         return "";
+    }
+    
+    public static Map<String, String> buildCachedUriBySocAndOriginalId() {
+        Map<String, String> cache = new HashMap<String, String>();
+        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT DISTINCT ?objUri ?id ?socUri WHERE { " + 
+                "   ?objUri hasco:originalID ?id . " + 
+                "   ?objUri hasco:isMemberOf ?socUri . " +                  
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("objUri") != null 
+                        && soln.get("socUri") != null 
+                        && soln.get("id") != null) {
+                    String key = soln.get("socUri").toString() + ":" + soln.get("id").toString();
+                    cache.put(key, soln.get("objUri").toString());
+                }
+            }
+        }
+        
+        System.out.println("buildCachedUriBySocAndOriginalId: " + cache.size());
+
+        return cache;
     }
 
     public static String findUriBySocAndOriginalId(String socUri, String original_id) {
@@ -504,6 +558,35 @@ public class StudyObject extends HADatAcThing {
         }
 
         return "";
+    }
+    
+    public static Map<String, String> buildCachedUriBySocAndScopeUri() {
+        Map<String, String> cache = new HashMap<String, String>();
+        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT DISTINCT ?objUri ?scopeUri ?socUri WHERE { \n" + 
+                " ?objUri hasco:hasObjectScope ?scopeUri . \n" + 
+                " ?objUri hasco:isMemberOf ?socUri . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("objUri") != null 
+                        && soln.get("socUri") != null 
+                        && soln.get("scopeUri") != null) {
+                    String key = soln.get("socUri").toString() + ":" + soln.get("scopeUri").toString();
+                    cache.put(key, soln.get("objUri").toString());
+                }
+            }
+        }
+        
+        System.out.println("buildCachedUriBySocAndScopeUri: " + cache.size());
+
+        return cache;
     }
 
     public static String findUriBySocAndScopeUri(String socUri, String scopeUri) {

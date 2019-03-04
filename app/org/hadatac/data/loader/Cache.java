@@ -98,7 +98,7 @@ public class Cache<K, V> implements Map<K, V> {
     }
 
     @Override
-    public Set<Entry<K, V>> entrySet() {
+    public Set<Map.Entry<K, V>> entrySet() {
         // TODO Auto-generated method stub
         return mapCache.entrySet();
     }
