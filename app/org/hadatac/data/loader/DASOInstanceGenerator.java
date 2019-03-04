@@ -9,6 +9,7 @@ import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.data.loader.Cache;
 
 import java.lang.String;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,10 +44,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private List<ObjectCollection> groundingPath = new ArrayList<ObjectCollection>();  
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
+    
+    /*
     private Map<String, StudyObject> cacheObject = null;
     private Map<String, String> cacheSocAndScopeUri = null;
     private Map<String, String> cacheSocAndOriginalId = null;
     private Map<String, String> cacheObjectScopeUri = null;
+    */
     
     public DASOInstanceGenerator(RecordFile file, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
         super(file);
@@ -765,55 +769,70 @@ public class DASOInstanceGenerator extends BaseGenerator {
     public boolean initiateCache() {
     	if (mainSoc != null) {
     		//System.out.println("INITIATE CACHE BEING CALLED!");
+    	    /*
     		cacheObject = mainSoc.getObjectsMap();
     		cacheSocAndScopeUri = new HashMap<String, String>();
     		cacheSocAndOriginalId = new HashMap<String, String>();
     		cacheObjectScopeUri = new HashMap<String, String>();
+    		*/
+    	    
+    	    addCache(new Cache<String, StudyObject>("cacheObject", false, mainSoc.getObjectsMap()));
+    		addCache(new Cache<String, String>("cacheSocAndScopeUri", false));
+    		addCache(new Cache<String, String>("cacheSocAndOriginalId", false));
+    		addCache(new Cache<String, String>("cacheObjectScopeUri", false));
+    	    
     		return true;
     	}
     	return false;
     }
     
+    @SuppressWarnings("unchecked")
     private void addObjectToCache(StudyObject newObj, String scopeUri) {
-    	if (newObj == null || cacheObject.containsKey(newObj.getUri())) {
+    	if (newObj == null || caches.get("cacheObject").containsKey(newObj.getUri())) {
     		return;
     	}
-    	cacheObject.put(newObj.getUri(), newObj);
+    	
+    	caches.get("cacheObject").put(newObj.getUri(), newObj);
+    	
     	String keySocAndOriginalId = newObj.getIsMemberOf() + ":" + newObj.getOriginalId();
-    	if (!cacheSocAndOriginalId.containsKey(keySocAndOriginalId)) {
-    		cacheSocAndOriginalId.put(keySocAndOriginalId, newObj.getUri());
+    	if (!caches.get("cacheSocAndOriginalId").containsKey(keySocAndOriginalId)) {
+    	    caches.get("cacheSocAndOriginalId").put(keySocAndOriginalId, newObj.getUri());
     	}
+    	
     	String keySocAndScopeUri = newObj.getIsMemberOf() + ":" + scopeUri;
-    	if (!cacheSocAndScopeUri.containsKey(keySocAndScopeUri)) {
-    		cacheSocAndScopeUri.put(keySocAndScopeUri, scopeUri);
+    	if (!caches.get("cacheSocAndScopeUri").containsKey(keySocAndScopeUri)) {
+    	    caches.get("cacheSocAndScopeUri").put(keySocAndScopeUri, scopeUri);
     	}
     }
 
+    @SuppressWarnings("unchecked")
     private StudyObject getCachedObject(String key) {
-    	if (cacheObject.containsKey(key)) {
-    		return cacheObject.get(key); 
+    	if (caches.get("cacheObject").containsKey(key)) {
+    		return (StudyObject)caches.get("cacheObject").get(key); 
     	} else {
     		StudyObject obj = StudyObject.find(key);
     		if (obj != null) {
-    			cacheObject.put(key, obj);
+    		    caches.get("cacheObject").put(key, obj);
     		}
     		return obj;
     	}
     }
     
+    @SuppressWarnings("unchecked")
     private String getCachedSocAndOriginalId(String soc_uri, String id) {
     	String key = soc_uri + ":" + id;
-    	if (cacheSocAndOriginalId.containsKey(key)) {
-    		return cacheSocAndOriginalId.get(key); 
+    	if (caches.get("cacheSocAndOriginalId").containsKey(key)) {
+    		return (String)caches.get("cacheSocAndOriginalId").get(key); 
     	} else {
     		String uri = StudyObject.findUriBySocAndOriginalId(soc_uri, id);
     		if (uri != null && !uri.equals("")) {
-    			cacheSocAndOriginalId.put(key, uri);
+    		    caches.get("cacheSocAndOriginalId").put(key, uri);
     		}
     		return uri;
     	}
     }
     
+    @SuppressWarnings("unchecked")
     private String getCachedSocAndScopeUri(String soc_uri, String scope_uri) {
         //System.out.println("cacheSocAndScopeUri: called with socUri=[" + soc_uri + "]  scopeUri=[" + scope_uri + "]");
         //for (Map.Entry<String, String> entry : cacheSocAndScopeUri.entrySet()) {
@@ -822,26 +841,27 @@ public class DASOInstanceGenerator extends BaseGenerator {
         //    System.out.println("cacheSocAndScopeUri: key=[" + key + "]  value=[" + value + "]");
         //}
     	String key = soc_uri + ":" + scope_uri;
-    	if (cacheSocAndScopeUri.containsKey(key)) {
-    		return cacheSocAndScopeUri.get(key); 
+    	if (caches.get("cacheSocAndScopeUri").containsKey(key)) {
+    		return (String)caches.get("cacheSocAndScopeUri").get(key); 
     	} else {
     		String uri = StudyObject.findUriBySocAndScopeUri(soc_uri, scope_uri);
     		if (uri != null && !uri.equals("")) {
-    			cacheSocAndScopeUri.put(key, uri);
+    		    caches.get("cacheSocAndScopeUri").put(key, uri);
     		}
     		return uri;
     	}
     }
     
+    @SuppressWarnings("unchecked")
     private String getCachedObjectScopeUri(String soc_uri, String obj_uri) {
         //System.out.println("cacheSocAndScopeUri: called with socUri=[" + soc_uri + "]  objUri=[" + obj_uri + "]");
     	String key = soc_uri + ":" + obj_uri;
-    	if (cacheObjectScopeUri.containsKey(key)) {
-    		return cacheObjectScopeUri.get(key); 
+    	if (caches.get("cacheObjectScopeUri").containsKey(key)) {
+    		return (String)caches.get("cacheObjectScopeUri").get(key); 
     	} else {
     	    String uri = StudyObject.findObjectScopeUriBySoc(soc_uri, obj_uri);
     		if (uri != null && !uri.equals("")) {
-    			cacheObjectScopeUri.put(key, uri);
+    		    caches.get("cacheObjectScopeUri").put(key, uri);
     		}
     		return uri;
     	}

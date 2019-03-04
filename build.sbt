@@ -44,7 +44,8 @@ val appDependencies = Seq(
   "com.typesafe.play" %% "play-iteratees" % "2.6.1",
   "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1",
-  "com.google.code.gson" % "gson" % "2.8.2"
+  "com.google.code.gson" % "gson" % "2.8.2",
+  "org.apache.commons" % "commons-jcs" % "2.2.1" pomOnly()
 )
 
 // add resolver for deadbolt and easymail snapshots
