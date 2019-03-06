@@ -471,6 +471,7 @@ public class AutoAnnotator extends Controller {
         if (ResumableUpload.uploadFileByChunking(request(), 
                 ConfigProp.getPathUnproc())) {
             //This Chunk has been Uploaded.
+        	System.out.println("ANNOTATOR resumableRelativePath (uploadDataFileByChunking): " + resumableRelativePath);
             return ok("Uploaded.");
         } else {
             return status(HttpStatus.SC_NOT_FOUND);

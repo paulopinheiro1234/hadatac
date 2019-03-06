@@ -39,6 +39,7 @@ public class OnStart {
 		listFolderPaths.add("processed_csv");
 		listFolderPaths.add("unprocessed_csv");
 		listFolderPaths.add("downloaded_csv");
+		listFolderPaths.add("working_csv");
 		listFolderPaths.add("tmp/ttl");
 		listFolderPaths.add("tmp/cache");
 		listFolderPaths.add("tmp/uploads");

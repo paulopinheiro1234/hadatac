@@ -34,6 +34,7 @@ public class DataFile {
     public static final String UNPROCESSED = "UNPROCESSED";
     public static final String PROCESSED = "PROCESSED";
     public static final String FREEZED = "FREEZED";
+    public static final String WORKING = "WORKING";
 
     // Process status for downloader
     public static final String CREATING = "CREATING";
@@ -201,9 +202,13 @@ public class DataFile {
     }
 
     public static DataFile create(String fileName, String ownerEmail) {
+    	return create(fileName, ownerEmail, DataFile.UNPROCESSED);
+    }
+
+    public static DataFile create(String fileName, String ownerEmail, String status) {
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
-        dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.setStatus(status);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 
         if (fileName.startsWith("DA-")) {
@@ -262,7 +267,7 @@ public class DataFile {
     }
 
     public static List<DataFile> find(String ownerEmail, String status) {
-        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED) {
+        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED || status == WORKING) {
             SolrQuery query = new SolrQuery();
             query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
             query.set("rows", "10000000");
@@ -275,7 +280,7 @@ public class DataFile {
 
     public static List<DataFile> findInDir(String dir, String ownerEmail, String status) {
     	String currentDir = dir.replaceAll("/", "");
-        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED) {
+        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED || status == WORKING) {
             SolrQuery query = new SolrQuery();
             query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
             query.set("rows", "10000000");
@@ -372,7 +377,11 @@ public class DataFile {
     }
 
     public static void includeUnrecognizedFiles(String path, List<DataFile> ownedFiles) {
-        File folder = new File(path);
+    	if (path == null) {
+    		System.out.println("DataFile: [ERROR] parameter path=null when calling includeUnrecognizedFiles()");
+    		return;
+    	}
+    	File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
         }
@@ -390,12 +399,16 @@ public class DataFile {
     }
 
     public static void includeUnrecognizedFiles(String path, String ownerEmail) {      
+    	includeUnrecognizedFiles(path, ownerEmail, DataFile.UNPROCESSED);
+    }
+
+    public static void includeUnrecognizedFiles(String path, String ownerEmail, String status) {      
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
         }
         
-        List<DataFile> unprocFiles = DataFile.findAll(DataFile.UNPROCESSED);
+        List<DataFile> unprocFiles = DataFile.findAll(status);
         unprocFiles.addAll(DataFile.findAll(DataFile.FREEZED));
 
         File[] listOfFiles = folder.listFiles();
@@ -442,12 +455,16 @@ public class DataFile {
     }
 
     public static List<String> findAllFolders(String dir) {
+    	return findAllFolders(dir, PROCESSED);
+    }
+
+    public static List<String> findAllFolders(String dir, String status) {
         List<String> results = new ArrayList<String>();
         if (!dir.equals("/") && !dir.equals("")) {
         	results.add("/");
         	return results;
         }
-        List<DataFile> datafiles = findAll(PROCESSED);
+        List<DataFile> datafiles = findAll(status);
         for (DataFile df : datafiles) {
         	String fName = "";
         	int pos = df.getFileName().indexOf('/');

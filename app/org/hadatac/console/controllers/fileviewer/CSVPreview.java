@@ -21,14 +21,17 @@ public class CSVPreview extends Controller{
 
 	private static String pathProc = ConfigProp.getPathProc();
 	private static String pathUnproc = ConfigProp.getPathUnproc();
+	private static String pathWorking = ConfigProp.getPathWorking();
 
 	public static ArrayList<String> getCSVHeaders(String folder, String fileName) {
 		//System.out.println("filename: " + filename);
 		String fullFileName = "";
 		if (folder.equals("proc")) {
 			fullFileName = pathProc + fileName;
-		} else {
+		} else if (folder.equals("unproc")) {
 			fullFileName = pathUnproc + fileName;
+		} else {
+			fullFileName = pathWorking + fileName;
 		}
 		File toPreview = new File(fullFileName);
 		ArrayList<String> headerList = null;
@@ -55,8 +58,10 @@ public class CSVPreview extends Controller{
 		File toPreview = null;
 		if (folder.equals("proc")) {
 			toPreview = new File(pathProc + fileName);
-		} else {
+		} else if (folder.equals("unproc")) {
 			toPreview = new File(pathUnproc + fileName);
+		} else {
+			toPreview = new File(pathWorking + fileName);
 		}
 		System.out.println("fileName: " + fileName);
 		try{

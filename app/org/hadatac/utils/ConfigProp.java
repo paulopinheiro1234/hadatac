@@ -7,13 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Properties;
 
-import org.hadatac.console.controllers.objectcollections.OCNode;
 import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -72,11 +69,12 @@ public class ConfigProp {
 	}
 	
 	public static String getPathUnproc() {
+	 
 	    if (CollectionUtil.isSandboxMode()) {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + Sandbox.SUFFIX;
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
-	}
+	} 
 	
 	public static String getPathProc() {
 	    if (CollectionUtil.isSandboxMode()) {
@@ -90,6 +88,13 @@ public class ConfigProp {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + Sandbox.SUFFIX;
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
+	}
+	
+	public static String getPathWorking() {
+	    if (CollectionUtil.isSandboxMode()) {
+	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working") + Sandbox.SUFFIX;
+	    }
+		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working");
 	}
 	
 	public static String getDefaultOwnerEmail() {
