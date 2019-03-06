@@ -1,0 +1,177 @@
+@(dir              : String,
+  folders          : List[String], 
+  workingFiles     : List[org.hadatac.entity.pojo.DataFile], 
+  bAdmin           : Boolean)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.fileviewer._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.console.controllers.fileviewer._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Working Files Management") {
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
+    
+    <div class="container-fluid">
+	
+	<a href="" class="btn btn-primary disabled" role="button">Generate Blank Metadata File</a>
+	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
+	<a href="" class="btn btn-primary disabled" role="button">Create Folder</a>
+	<a href="" class="btn btn-primary disabled" role="button">Delete Folder</a>
+    
+	<div id="frame">
+    <div class="resumable-error">
+      Your browser, unfortunately, is not supported by Resumable.js.
+    </div>
+    
+    <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
+      <h4>Working File Uploader</h4>
+      Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
+    </div>
+    
+    <br>
+    <div class="resumable-progress">
+      <table>
+        <tr>
+          <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
+          <td class="progress-text" nowrap="nowrap"></td>
+          <td class="progress-pause" nowrap="nowrap">
+            <a href="#" onclick="r.upload(); return(false);" class="progress-resume-link"><img src="@controllers.routes.Assets.versioned("images/resume.png")" title="Resume upload" /></a>
+            <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="@controllers.routes.Assets.versioned("images/pause.png")" title="Pause upload" /></a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    <ul class="resumable-list"></ul>
+    </div>
+
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadWorking.js")"></script>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
+    
+ 	<table class="table">
+    <thead>
+         <tr>
+            <th><font color="Green">Working Files</font></th>
+            @if(bAdmin) {
+                <th>Owner Email</th>
+            }
+            <th>Time Uploaded</th>
+            <th>View/Edit Operations</th>
+            <th>File Operations</th>
+            <th>Semantic Operations</th>
+            <th>Logs</th>
+         </tr>
+    </thead>
+    <tbody>
+        @for(file <- workingFiles) {
+            <tr name="working">
+                @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                } else {
+                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')) } else { @file.getFileName() }</td>
+                }}
+                @if(bAdmin) {
+                    <td>@file.getOwnerEmail()</td>
+                }
+                <td>@file.getSubmissionTime()</td>
+                <td>
+                @if(file.getFileName().endsWith(".csv")) {
+                    @defining("") { da_uri => @defining("") { oc_uri => 
+                       <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("working", dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+			              class="btn btn-xs btn-primary" role="button">Preview File</a>
+		               <a href="" class="btn btn-xs btn-primary disabled" role="button" id="edit">Edit</a>
+                    }}}
+                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("working", file.getFileName())" class="btn btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="" class="btn btn-xs btn-primary disabled" role="button" id="edit">Edit</a>
+                }
+                </td>
+                <td>
+                <a href="" class="btn btn-xs btn-primary disabled" role="button" id="rename">Rename</a>
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getFileName())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                <a href="" class="btn btn-xs btn-primary disabled" role="button" id="move">Move</a>
+                <a href="" class="btn btn-xs btn-primary disabled" role="button" id="share">Share</a>
+
+				@*
+                @if(bAdmin) {
+                    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" class="btn btn-xs btn-primary" role="button">Assign Owner</a>
+                }
+                *@
+                
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadDataFile(file.getFileName())" class="btn btn-xs btn-primary" role="button">Download</a>
+                </td>   
+                <td>
+                @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
+                    file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
+                    file.getFileName().startsWith("OAS-") || file.getFileName().startsWith("DA-")) {
+                	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="ingest">Ingest</a>
+				}
+                @if(file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-")) {
+                	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="draft">Draft</a>
+                }
+                @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
+                    file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
+                    file.getFileName().startsWith("OAS-")) {
+                	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="verify">Verify</a>
+                }
+                </td>
+                <td>
+	                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.checkAnnotationLog(dir, file.getFileName())" class="btn btn-xs btn-primary" role="button">Logs</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+    </table>
+    @if(workingFiles.isEmpty()) {
+        <p>No working files</p>
+    }
+    
+    <br><br>
+    <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+	</div>
+	
+	<script type="text/javascript">
+    var options = [];
+
+    $('#study-filter a').on('click', function(event) {
+
+       var $target = $( event.currentTarget ),
+           val = $target.attr( 'data-value' ),
+           $inp = $target.find( 'input' ),
+           idx;
+
+       if ( ( idx = options.indexOf( val ) ) > -1 ) {
+          options.splice( idx, 1 );
+          setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+       } else {
+          options.push( val );
+          setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+       }
+
+       $( event.target ).blur();
+
+       if (options.length > 0) {
+    	   $("tbody tr[name='processed']").each(function(index) {
+               if (options.indexOf($(this).attr("data-value")) > -1 
+                       || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
+                   $(this).show();
+               } else {
+                   $(this).hide();
+               }
+           });
+       } else {
+    	   $("tbody tr[name='processed']").each(function(index) {
+        	   $(this).show();
+           });
+       }
+       
+       return false;
+    });
+    </script>
+}

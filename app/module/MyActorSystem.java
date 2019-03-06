@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 
 import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.data.loader.AnnotationWorker;
+import org.hadatac.workingfiles.loader.WorkingFilesWorker;
 
 import akka.actor.ActorSystem;
 import play.libs.Akka;
@@ -47,6 +48,13 @@ public class MyActorSystem {
             }
         };
 
+        Runnable workingfiles = new Runnable() {
+            @Override
+            public void run() {
+                WorkingFilesWorker.process();
+            }
+        };
+
         system.scheduler().schedule(
                 FiniteDuration.create(0, TimeUnit.SECONDS), 
                 FiniteDuration.create(5, TimeUnit.SECONDS), 
@@ -61,5 +69,10 @@ public class MyActorSystem {
                 FiniteDuration.create(0, TimeUnit.SECONDS), 
                 FiniteDuration.create(60, TimeUnit.SECONDS),
                 sandbox, system.dispatcher());
+
+		system.scheduler().schedule(
+                FiniteDuration.create(0, TimeUnit.SECONDS), 
+                FiniteDuration.create(30, TimeUnit.SECONDS),
+                workingfiles, system.dispatcher());
 	}
 }

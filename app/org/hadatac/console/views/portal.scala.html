@@ -41,6 +41,8 @@
 	   @defining("") { filename => @defining("") { da_uri => 
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/")" 
 		   id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
+		<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/")" 
+		   id="workingfile" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
 		   id="studies" class="btn btn-primary btn-block" role="button">Manage Studies</a>
 		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri)" 
@@ -144,6 +146,7 @@
               $('#downloader').attr( 'class', 'btn btn-primary btn-block' );
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block' );
+              $('#workingfiles').attr( 'class', 'btn btn-primary btn-block' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block' );
               $('#sddeditor').attr( 'class', 'btn btn-primary btn-block' );
@@ -161,6 +164,7 @@
               $('#analytes').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#downloader').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#workingfiles').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#sddeditor').attr( 'class', 'btn btn-primary btn-block disabled' );
