@@ -10,14 +10,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.io.FileNotFoundException;
 
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.GeneratorChain;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.data.loader.SpreadsheetRecordFile;
+import org.hadatac.entity.pojo.DataFile;
 
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.BodyParser;
@@ -27,7 +31,23 @@ import play.mvc.Result;
 public class SDDEditor extends Controller {
     
     public Result index() {
-        return ok(sdd_editor.render());
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        List<DataFile> files = null;
+
+        String path = ConfigProp.getPathDownload();
+
+        if (user.isDataManager()) {
+            files = DataFile.findAll(DataFile.DD_UNPROCESSED);
+            files.addAll(DataFile.findAll(DataFile.DD_PROCESSED));
+        } else {
+            files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
+            files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
+        }
+
+        DataFile.filterNonexistedFiles(path, files);
+        
+        return ok(sdd_editor.render(files, user.isDataManager()));
     }
     
     public Result postIndex() {

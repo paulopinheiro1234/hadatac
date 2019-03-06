@@ -68,34 +68,37 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String unitLabel = "";
     private String inRelationToLabel = "";
     private String lodLabel = "";
+    
+    private List<DataAcquisitionSchemaAttribute> attributeObjects = new ArrayList<DataAcquisitionSchemaAttribute>();
+    
     private List<String> attributes = new ArrayList<String>();
     private List<String> objects = new ArrayList<String>();
     private List<String> events = new ArrayList<String>();
     private boolean isRefreshed = false;
 
     private static Map<String, DataAcquisitionSchema> getCache() {
-	if (DASCache == null) {
-	    DASCache = new HashMap<String, DataAcquisitionSchema>(); 
-	}
-	return DASCache;
+        if (DASCache == null) {
+            DASCache = new HashMap<String, DataAcquisitionSchema>(); 
+        }
+        return DASCache;
     }
 
     public static void resetCache() {
-	DataAcquisitionSchemaAttribute.resetCache();
-	//DataAcquisitionSchemaEvent.resetCache();
-	DataAcquisitionSchemaObject.resetCache();
-	DASCache = null;
+        DataAcquisitionSchemaAttribute.resetCache();
+        //DataAcquisitionSchemaEvent.resetCache();
+        DataAcquisitionSchemaObject.resetCache();
+        DASCache = null;
     }
 
     public DataAcquisitionSchema() {
-	DataAcquisitionSchema.getCache();
+        DataAcquisitionSchema.getCache();
     }
 
     public DataAcquisitionSchema(String uri, String label) {
         this.uri = uri;
         this.label = label;
-	isRefreshed = false;
-	DataAcquisitionSchema.getCache();
+        isRefreshed = false;
+        DataAcquisitionSchema.getCache();
     }
 
     public String getUri() {
@@ -220,7 +223,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaAttribute> getAttributes() {
-        return DataAcquisitionSchemaAttribute.findBySchema(this.getUri());
+        if (attributeObjects == null || attributeObjects.isEmpty()) {
+            attributeObjects = DataAcquisitionSchemaAttribute.findBySchema(getUri());
+        }
+        return attributeObjects;
     }
 
     public void setAttributes(List<String> attributes) {
@@ -228,14 +234,14 @@ public class DataAcquisitionSchema extends HADatAcThing {
             System.out.println("[WARNING] No DataAcquisitionSchemaObject for " + uri + " is defined in the knowledge base. ");
         } else {
             this.attributes = attributes;
-	    if (!isRefreshed) {
-		refreshAttributes();
-	    }
+            if (!isRefreshed) {
+                refreshAttributes();
+            }
         }
     }
 
     public void refreshAttributes() {
-	List<DataAcquisitionSchemaAttribute> attributeList = DataAcquisitionSchemaAttribute.findBySchema(this.getUri());
+        List<DataAcquisitionSchemaAttribute> attributeList = DataAcquisitionSchemaAttribute.findBySchema(this.getUri());
         if (attributes == null) {
             System.out.println("[ERROR] No DataAcquisitionSchemaAttribute for " + uri + " is defined in the knowledge base. ");
         } else {
@@ -338,7 +344,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 	    //}
         }
 	}*/
-    
+
     /*public DataAcquisitionSchemaEvent getEvent(String daseUri) {
         for (String dase : events) {
             if (dase.equals(daseUri)) {
@@ -349,7 +355,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 	}*/
 
     public DataAcquisitionSchemaObject getEvent(String daseUri) {
-	return DataAcquisitionSchemaObject.find(daseUri);
+        return DataAcquisitionSchemaObject.find(daseUri);
     }
 
     public List<String> defineTemporaryPositions(List<String> csvHeaders) {
@@ -421,50 +427,50 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return position;
     }
 
-	public static DataAcquisitionSchema find(String schemaUri) {
-	    if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
-		return DataAcquisitionSchema.getCache().get(schemaUri);
-	    }
-	    
-	    System.out.println("Looking for data acquisition schema " + schemaUri);
-	    
-	    if (schemaUri == null || schemaUri.equals("")) {
-		System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
-		return null;
-	    }
-	    
-	    String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+    public static DataAcquisitionSchema find(String schemaUri) {
+        if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
+            return DataAcquisitionSchema.getCache().get(schemaUri);
+        }
+
+        System.out.println("Looking for data acquisition schema " + schemaUri);
+
+        if (schemaUri == null || schemaUri.equals("")) {
+            System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
+            return null;
+        }
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 " ASK { <" + schemaUri + "> a hasco:DASchema . } ";
-	    Query query = QueryFactory.create(queryString);
-	    
-	    QueryExecution qexec = QueryExecutionFactory.sparqlService(
-				   CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-	    boolean uriExist = qexec.execAsk();
-	    qexec.close();
-	    
-	    if (!uriExist) {
-		System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
-		return null;
-	    }
-	    
-	    DataAcquisitionSchema schema = new DataAcquisitionSchema();
-	    schema.setUri(schemaUri);
-	    schema.setLabel(FirstLabel.getLabel(schemaUri));
-	    //schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
-	    schema.setAttributes(DataAcquisitionSchemaAttribute.findUriBySchema(schemaUri));
-	    //schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
-	    schema.setObjects(DataAcquisitionSchemaObject.findUriBySchema(schemaUri));
-	    //schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
-	    //schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
-	    //System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
-	    //        "It has " + schema.getAttributes().size() + " attributes, " + 
-	    //        schema.getObjects().size() + " objects, and " + 
-	    //        schema.getEvents().size() + " events.");
-	   
-	    DataAcquisitionSchema.getCache().put(schemaUri,schema);
-	    return schema;
-	}
-    
+        Query query = QueryFactory.create(queryString);
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+        boolean uriExist = qexec.execAsk();
+        qexec.close();
+
+        if (!uriExist) {
+            System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
+            return null;
+        }
+
+        DataAcquisitionSchema schema = new DataAcquisitionSchema();
+        schema.setUri(schemaUri);
+        schema.setLabel(FirstLabel.getLabel(schemaUri));
+        //schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
+        schema.setAttributes(DataAcquisitionSchemaAttribute.findUriBySchema(schemaUri));
+        //schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));
+        schema.setObjects(DataAcquisitionSchemaObject.findUriBySchema(schemaUri));
+        //schema.setEvents(DataAcquisitionSchemaEvent.findBySchema(schemaUri));
+        //schema.setEvents(DataAcquisitionSchemaEvent.findUriBySchema(schemaUri));
+        //System.out.println("[OK] DataAcquisitionSchema <" + schemaUri + "> exists. " + 
+        //        "It has " + schema.getAttributes().size() + " attributes, " + 
+        //        schema.getObjects().size() + " objects, and " + 
+        //        schema.getEvents().size() + " events.");
+
+        DataAcquisitionSchema.getCache().put(schemaUri,schema);
+        return schema;
+    }
+
     public static List<DataAcquisitionSchema> findAll() {
         List<DataAcquisitionSchema> schemas = new ArrayList<DataAcquisitionSchema>();
 
@@ -536,7 +542,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public static Map<String, String> findAllUrisByLabel(String schemaUri) {
-    	Map<String, String> resp = new HashMap<String, String>();
+        Map<String, String> resp = new HashMap<String, String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?daso_or_dasa ?label WHERE { "
                 + " ?daso_or_dasa rdfs:label ?label . "
@@ -554,10 +560,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
             if (soln.get("daso_or_dasa") != null) {
                 uriStr = soln.get("daso_or_dasa").toString();
                 if (soln.get("label") != null) {
-                	labelStr = soln.get("label").toString();
-                	if (uriStr != null && labelStr != null) {
-                		resp.put(labelStr, uriStr);
-                	}
+                    labelStr = soln.get("label").toString();
+                    if (uriStr != null && labelStr != null) {
+                        resp.put(labelStr, uriStr);
+                    }
                 }
             }
         }

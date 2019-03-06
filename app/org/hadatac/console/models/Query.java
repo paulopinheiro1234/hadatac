@@ -1,7 +1,5 @@
 package org.hadatac.console.models;
 
-import org.hadatac.console.views.formdata.FacetFormData;
-
 public class Query {
     public String subject;
     public String predicate; 

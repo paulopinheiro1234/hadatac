@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.hadatac.console.models.FacetFormData;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
@@ -28,7 +29,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
-import org.hadatac.console.views.formdata.FacetFormData;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;

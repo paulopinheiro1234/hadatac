@@ -39,6 +39,11 @@ public class DataFile {
     public static final String CREATING = "CREATING";
     public static final String CREATED 	= "CREATED";
     public static final String DELETED  = "DELETED";
+    
+    // Process status for SDD generator
+    public static final String DD_UNPROCESSED = "DD_UNPROCESSED";
+    public static final String DD_PROCESSED = "DD_PROCESSED";
+    public static final String DD_FREEZED = "DD_FREEZED";
 
     @Field("file_name")
     private String fileName = "";
@@ -200,7 +205,11 @@ public class DataFile {
         return false;
     }
 
-    public static DataFile create(String fileName, String ownerEmail) {
+    public static DataFile create(String fileName, String ownerEmail) {        
+        return create(fileName, ownerEmail, DataFile.UNPROCESSED);
+    }
+    
+    public static DataFile create(String fileName, String ownerEmail, String status) {
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
         dataFile.setStatus(DataFile.UNPROCESSED);

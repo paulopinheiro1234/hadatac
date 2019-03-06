@@ -1,4 +1,5 @@
-@()
+@(files  : List[org.hadatac.entity.pojo.DataFile], 
+  bAdmin : Boolean)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -36,12 +37,68 @@
 }
 </style>
 
+    <div>
+        <h3>Upload Data Dictionary Files for Automatic Annotation</h3>
+        <form name="fileUploadForm" id='upload_form_dd' method="POST" enctype="multipart/form-data" 
+        action="@org.hadatac.console.controllers.fileviewer.routes.DataDictionaryAnnotator.uploadDataDictionaryFile()">
+            <input type="file" id="dd_file" value="" name="file"/>
+            <input class="btn btn-primary" type="submit" id="upload_dd" value="Upload" disabled/>
+        </form>
+    </div>
+
+    <div class="container-fluid">
+    <table class="table" id="data_dictionary_files">
+    <thead>
+         <tr>
+            <th>Data Dictionary Files</th>
+            @if(bAdmin) {
+                <th>Owner Email</th>
+            }
+            <th>Submission Time</th>
+            <th>Completion Time</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Operations</th>
+         </tr>
+    </thead>
+    <tbody>
+        @for(file <- files){
+            <tr>
+                <td>@file.getFileName()</td>
+                @if(bAdmin) {
+                    <td>@file.getOwnerEmail()</td>
+                }
+                <td>@file.getSubmissionTime()</td>
+                <td>@file.getCompletionTime()</td>
+                <td>@file.getCompletionPercentage().toInt%</td>
+                <td>@file.getStatus()</td>
+                <td>
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.downloadDataFile(file.getFileName())" 
+                   class="btn btn-xs btn-primary" name="download" role="button">Download</a>
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.deleteDataFile(file.getFileName())" 
+                   class="btn btn-xs btn-primary" name="delete" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
+                    @if(bAdmin) {
+                        <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getFileName())" 
+                       class="btn btn-xs btn-primary" name="assign_owner" role="button">Assign Owner</a>
+                    }
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getFileName())" 
+                   class="btn btn-xs btn-primary" name="logs" role="button">Logs</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+    </table>
+    
+    @if(files.isEmpty()) {
+        <p>No records for uploaded files</p>
+    }
+
     <div id="loader" style="display:none;"></div>
     <div id="body">
       <div>
         <h3>SDD Editor</h3>
         <div id="drop">Drop a file here</div>
-        <input type="file" id="file" value=""/>
+        <input type="file" id="sdd_file" value=""/>
         <input class="btn btn-primary" type="button" id="upload" value="Submit" disabled/>
         <a class="btn btn-primary" role="button" id="download" disabled>Download</a>
       </div>
@@ -113,11 +170,19 @@
       }
     });
     
-    $("input:file").change(function () {
+    $("#sdd_file").change(function () {
         var fileName = $(this).val();
         if (fileName.length > 0) {
             $("#upload").removeAttr("disabled");
             $("#download").removeAttr("disabled");
+        }
+    });
+    
+    $("#dd_file").change(function () {
+    	console.log("hello");
+        var fileName = $(this).val();
+        if (fileName.length > 0) {
+            $("#upload_dd").removeAttr("disabled");
         }
     });
     </script>

@@ -810,11 +810,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (caches.get("cacheObject").containsKey(key)) {
     		return (StudyObject)caches.get("cacheObject").get(key); 
     	} else {
+    	    /*
     		StudyObject obj = StudyObject.find(key);
     		if (obj != null) {
     		    caches.get("cacheObject").put(key, obj);
     		}
-    		return obj;
+    		*/
+    		return null;
     	}
     }
     
@@ -824,11 +826,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (caches.get("cacheSocAndOriginalId").containsKey(key)) {
     		return (String)caches.get("cacheSocAndOriginalId").get(key); 
     	} else {
+    	    /*
     		String uri = StudyObject.findUriBySocAndOriginalId(soc_uri, id);
     		if (uri != null && !uri.equals("")) {
     		    caches.get("cacheSocAndOriginalId").put(key, uri);
     		}
-    		return uri;
+    		*/
+    		return null;
     	}
     }
     
@@ -838,11 +842,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (caches.get("cacheSocAndScopeUri").containsKey(key)) {
     		return (String)caches.get("cacheSocAndScopeUri").get(key); 
     	} else {
+    	    /*
     		String uri = StudyObject.findUriBySocAndScopeUri(soc_uri, scope_uri);
     		if (uri != null && !uri.equals("")) {
     		    caches.get("cacheSocAndScopeUri").put(key, uri);
     		}
     		return uri;
+    		*/
+    		return null;
     	}
     }
     
@@ -853,11 +860,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (caches.get("cacheObjectScopeUri").containsKey(key)) {
     		return (String)caches.get("cacheObjectScopeUri").get(key); 
     	} else {
+    	    /*
     	    String uri = StudyObject.findObjectScopeUriBySoc(soc_uri, obj_uri);
     		if (uri != null && !uri.equals("")) {
     		    caches.get("cacheObjectScopeUri").put(key, uri);
     		}
-    		return uri;
+    		*/
+    		return null;
     	}
     }
  

@@ -19,11 +19,10 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
-
+import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
-import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 
 

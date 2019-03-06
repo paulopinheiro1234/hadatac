@@ -172,6 +172,10 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
     }
     
     public static VirtualColumn find(String uri) {
+        if ("".equals(uri.trim())) {
+            return null;
+        }
+        
         System.out.println("VirtualColumn find is called for uri " + uri);
         
         String queryString = "DESCRIBE <" + uri + ">";

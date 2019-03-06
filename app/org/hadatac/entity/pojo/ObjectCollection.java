@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import java.io.ByteArrayOutputStream;
 
 import org.apache.commons.text.WordUtils;
@@ -32,12 +33,11 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
 import org.labkey.remoteapi.CommandException;
-
+import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
 public class ObjectCollection extends HADatAcThing implements Comparable<ObjectCollection> {
@@ -59,7 +59,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     private String hasVirtualColumnUri = "";
     private String hasRoleLabel = "";
     private String hasLastCounter = "0";
-    private String hasScopeUri = "";    
+    private String hasScopeUri = "";
+    private VirtualColumn virtualColumn = null;
+    
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
     private List<String> objectUris = new ArrayList<String>();
@@ -312,7 +314,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     public VirtualColumn getVirtualColumn() {
-        return VirtualColumn.find(hasVirtualColumnUri);
+        if (null == virtualColumn || !virtualColumn.getUri().equals(hasVirtualColumnUri)) {
+            virtualColumn = VirtualColumn.find(hasVirtualColumnUri);
+        }
+        return virtualColumn;
     }
 
     public void setHasScopeUri(String hasScopeUri) {
@@ -320,7 +325,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     public String getSOCReference() {
-        VirtualColumn vc = this.getVirtualColumn();
+        VirtualColumn vc = getVirtualColumn();
         if (vc == null) {
             return "";
         }
@@ -328,7 +333,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     public String getGroundingLabel() {
-        VirtualColumn vc = this.getVirtualColumn();
+        VirtualColumn vc = getVirtualColumn();
         if (vc == null) {
             return "";
         }

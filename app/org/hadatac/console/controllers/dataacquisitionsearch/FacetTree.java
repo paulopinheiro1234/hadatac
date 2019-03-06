@@ -7,7 +7,6 @@ import java.util.Map;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.console.views.dataacquisitionsearch.Facetable;
 
 public class FacetTree {
 	

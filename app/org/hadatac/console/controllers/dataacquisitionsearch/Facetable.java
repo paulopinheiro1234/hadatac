@@ -1,4 +1,4 @@
-package org.hadatac.console.views.dataacquisitionsearch;
+package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import java.util.List;
 import java.util.Map;

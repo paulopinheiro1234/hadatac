@@ -51,16 +51,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     private String alternativeName = "";
 
     private static Map<String, DataAcquisitionSchemaObject> getCache() {
-	if (DASOCache == null) {
-	    DASOCache = new HashMap<String, DataAcquisitionSchemaObject>(); 
-	}
-	return DASOCache;
+        if (DASOCache == null) {
+            DASOCache = new HashMap<String, DataAcquisitionSchemaObject>(); 
+        }
+        return DASOCache;
     }
 
     public static void resetCache() {
-	DASOCache = null;
+        DASOCache = null;
     }
-    
+
     public DataAcquisitionSchemaObject() {}
 
     public DataAcquisitionSchemaObject(String uri, 
@@ -91,7 +91,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         this.setInRelationTo(inRelationTo);
         this.setWasDerivedFrom(wasDerivedFrom);
         this.setRelation(relation);
-	DataAcquisitionSchemaObject.getCache();
+        DataAcquisitionSchemaObject.getCache();
     }
 
     public String getUri() {
@@ -161,28 +161,28 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public String getEntityLabel(Map<String, String> codeMappings) {
         if (entity == null || entityLabel.equals("")) {
-	    String newLabel = URIUtils.replaceNameSpaceEx(entity);
-	    if (newLabel.contains(":")) {
-		if (codeMappings.containsKey(newLabel)){
-		    return codeMappings.get(newLabel);
-		} else {
-		    return newLabel.split("\\:")[1];
-		}
-	    } else {
-		return newLabel;
-	    }
+            String newLabel = URIUtils.replaceNameSpaceEx(entity);
+            if (newLabel.contains(":")) {
+                if (codeMappings.containsKey(newLabel)){
+                    return codeMappings.get(newLabel);
+                } else {
+                    return newLabel.split("\\:")[1];
+                }
+            } else {
+                return newLabel;
+            }
         } else {
-	    return entityLabel;
+            return entityLabel;
         }
     }
-    
+
     public String getEntityLabel() {
         if (entity == null || entityLabel.equals("")) {
-        	return URIUtils.replaceNameSpaceEx(entity);
+            return URIUtils.replaceNameSpaceEx(entity);
         }
         return entityLabel;
     }
-    
+
     public String getRoleLabel() {
         if (role == null || roleLabel.equals("")) {
             return URIUtils.replaceNameSpaceEx(role);
@@ -212,7 +212,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public void setRole(String role) {
         //this.role = role;
-    	this.role = role;
+        this.role = role;
         //System.out.println("New ROLE : " + role);
         if (role == null || role.equals("")) {
             this.roleLabel = "";
@@ -224,19 +224,19 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     public String getInRelationTo() {
         return inRelationTo;
     }
-    
+
     public String getWasDerivedFrom() {
         return wasDerivedFrom;
     }
-    
+
     public void setWasDerivedFrom(String wasDerivedFrom) {
         this.wasDerivedFrom = wasDerivedFrom;
     }
-    
+
     public String getAlternativeName() {
         return alternativeName;
     }
-    
+
     public void setAlternativeName(String alternativeName) {
         this.alternativeName = alternativeName;
     }
@@ -287,10 +287,11 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaObject find(String uri) {
-	if (DataAcquisitionSchemaObject.getCache().get(uri) != null) {
-	    return DataAcquisitionSchemaObject.getCache().get(uri);
-	}
-        //System.out.println("Looking for data acquisition schema objects with uri: " + uri);
+        if (DataAcquisitionSchemaObject.getCache().containsKey(uri)) {
+            return DataAcquisitionSchemaObject.getCache().get(uri);
+        }
+        
+        System.out.println("Looking for data acquisition schema object with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -308,12 +309,13 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "}";
 
         //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
                 CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
             System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find object with uri: " + uri);
+            DataAcquisitionSchemaObject.getCache().put(uri, null);
             return null;
         }
 
@@ -352,7 +354,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
                 try {
                     if (soln.getResource("role") != null && soln.getResource("role").getURI() != null) {
-                    	roleStr = soln.getResource("role").getURI();
+                        roleStr = soln.getResource("role").getURI();
                     } 
                 } catch (Exception e1) {
                     roleStr = "";
@@ -365,23 +367,23 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 } catch (Exception e1) {
                     inRelationToStr = "";
                 }
-                
+
                 try {
                     if (soln.getResource("inRelationToStr") != null) {
-                    	inRelationToLabelStr = soln.getResource("inRelationToStr").toString();
+                        inRelationToLabelStr = soln.getResource("inRelationToStr").toString();
                     }
                 } catch (Exception e1) {
-                	inRelationToLabelStr = "";
+                    inRelationToLabelStr = "";
                 }
-                
+
                 try {
                     if (soln.getLiteral("wasDerivedFrom") != null) {
-                    	wasDerivedFromStr = soln.getLiteral("wasDerivedFrom").toString();
+                        wasDerivedFromStr = soln.getLiteral("wasDerivedFrom").toString();
                     }
                 } catch (Exception e1) {
-                	wasDerivedFromStr = "";
+                    wasDerivedFromStr = "";
                 }
-                
+
                 try {
                     if (soln.getLiteral("alternativeName") != null) {
                         alternativeName = soln.getLiteral("alternativeName").toString();
@@ -413,8 +415,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         } catch (Exception e) {
             System.out.println("[ERROR] DataAcquisitionSchemaObject.find() e.Message: " + e.getMessage());
         }
-        
-	DataAcquisitionSchemaObject.getCache().put(uri, object);
+
+        DataAcquisitionSchemaObject.getCache().put(uri, object);
         return object;
     }
 
@@ -427,7 +429,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   ?uri a hasco:DASchemaObject . \n" + 
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "}";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -440,7 +442,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             QuerySolution soln = resultsrw.next();
             try {
                 if (soln != null && soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
-		    String uriStr = soln.getResource("uri").getURI();
+                    String uriStr = soln.getResource("uri").getURI();
                     if (uriStr != null) {
                         objectUris.add(uriStr);
                     }
@@ -463,8 +465,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
                 "   ?uri rdfs:label ?label . \n" + 
                 "} " +
-	        "ORDER BY ?label";
-        
+                "ORDER BY ?label";
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -492,15 +494,15 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaObject findByLabelInSchema(String schemaUri, String label) {
-	//System.out.println("DataAcquisitionSchemaObject: label = [" + label + "]");
-	List<DataAcquisitionSchemaObject> schemaList = findBySchema(schemaUri);
-	for (DataAcquisitionSchemaObject daso : schemaList) {
-	    //System.out.println("DataAcquisitionSchemaObject: label in daso = [" + daso.getLabel() + "]");
-	    if (daso.getLabel() != null && daso.getLabel().equals(label)) {
-		return daso;
-	    }
-	}
-	return null;
+        //System.out.println("DataAcquisitionSchemaObject: label = [" + label + "]");
+        List<DataAcquisitionSchemaObject> schemaList = findBySchema(schemaUri);
+        for (DataAcquisitionSchemaObject daso : schemaList) {
+            //System.out.println("DataAcquisitionSchemaObject: label in daso = [" + daso.getLabel() + "]");
+            if (daso.getLabel() != null && daso.getLabel().equals(label)) {
+                return daso;
+            }
+        }
+        return null;
     }
 
     public static String findUriFromRole(String newInRelationTo, List<DataAcquisitionSchemaObject> objects) {
@@ -582,11 +584,11 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
-        
+
         insert += this.getUri() + " a hasco:DASchemaObject . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
         if (partOfSchema.startsWith("http")) {
@@ -616,11 +618,11 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 insert += this.getUri() + " sio:relation <" + relationStr + "> .  ";
             }
         }
-        
+
         if (!getNamedGraph().isEmpty()) {
             insert += " } ";
         }
-        
+
         insert += LINE_LAST;
 
         try {

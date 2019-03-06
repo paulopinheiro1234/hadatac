@@ -92,6 +92,13 @@ public class ConfigProp {
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
 	}
 	
+	public static String getPathDataDictionary() {
+        if (CollectionUtil.isSandboxMode()) {
+            return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict") + Sandbox.SUFFIX;
+        }
+        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict");
+    }
+	
 	public static String getDefaultOwnerEmail() {
         return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
     }

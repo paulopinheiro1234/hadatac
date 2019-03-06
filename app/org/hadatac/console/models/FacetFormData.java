@@ -1,6 +1,4 @@
-package org.hadatac.console.views.formdata;
-
-import org.hadatac.console.models.FacetsWithCategories;
+package org.hadatac.console.models;
 
 import play.data.validation.ValidationError;
 

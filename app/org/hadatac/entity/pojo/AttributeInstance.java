@@ -16,7 +16,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.console.views.dataacquisitionsearch.Facetable;
+import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.models.Facet;
 import org.hadatac.utils.CollectionUtil;
 
