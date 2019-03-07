@@ -34,7 +34,6 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.labkey.remoteapi.assay.Run;
 
-import akka.stream.impl.io.InputStreamSinkStage.Data;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.data.Form;
