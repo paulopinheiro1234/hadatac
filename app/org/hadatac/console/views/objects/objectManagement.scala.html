@@ -39,7 +39,7 @@
 		  class="btn btn-primary" role="button">Delete Objects in Collection</a>
 	   }
 	   @if(filename != null && !filename.equals("")) {
-               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", dir, filename, da_uri, oc.getUri(), 10, page)"
+               <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.UNPROC, dir, filename, da_uri, oc.getUri(), 10, page)"
 		  class="btn btn-primary" role="button">Create Multiple Objects From File</a>
 	   }
          </div>

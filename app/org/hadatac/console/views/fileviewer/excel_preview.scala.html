@@ -1,5 +1,4 @@
-@(filePath : String,
-  isProcessed : Boolean)
+@(folder: String, filePath : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -16,7 +15,7 @@
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
     
     <div id="rcorners">
-    <h4 href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(filePath, isProcessed)"> @filePath</h4>
+    <h4 href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(folder, filePath)"> @filePath</h4>
     <div id="grid"></div>
     <div id="footnote"></div>
     <div id="buttons"></div>
@@ -30,7 +29,7 @@
     
     <script type="text/javascript">
     /* set up async GET request */
-    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(filePath, isProcessed)".replace(/&amp;/g, '&');
+    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(folder, filePath)".replace(/&amp;/g, '&');
     var req = new XMLHttpRequest();
     req.open("GET", url, true);
     req.responseType = "arraybuffer";

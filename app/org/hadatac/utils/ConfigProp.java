@@ -69,7 +69,6 @@ public class ConfigProp {
 	}
 	
 	public static String getPathUnproc() {
-	 
 	    if (CollectionUtil.isSandboxMode()) {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + Sandbox.SUFFIX;
 	    }
