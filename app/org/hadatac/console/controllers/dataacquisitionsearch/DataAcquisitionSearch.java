@@ -126,10 +126,11 @@ public class DataAcquisitionSearch extends Controller {
         }
         else {
             ownerUri = UserManagement.getUriByEmail(user.getEmail());
-            if(null == ownerUri){
+            if (null == ownerUri){
                 ownerUri = "Public";
             }
         }
+        System.out.println("OwnerURI: " + ownerUri);
 
         results = Measurement.find(ownerUri, page, rows, facets);
 

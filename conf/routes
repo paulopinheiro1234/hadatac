@@ -15,6 +15,8 @@ GET     /hadatac/sandbox                               org.hadatac.console.contr
 POST    /hadatac/sandbox                               org.hadatac.console.controllers.sandbox.Sandbox.postIndex()
 GET     /hadatac/sandbox/startmode                     org.hadatac.console.controllers.sandbox.Sandbox.startSandboxMode()
 GET     /hadatac/sandbox/exitmode                      org.hadatac.console.controllers.sandbox.Sandbox.exitSandboxMode()
+GET	    /hadatac/knowledgegraph                        org.hadatac.console.controllers.kg.KnowledgeGraphBrowser.index()
+POST    /hadatac/knowledgegraph                        org.hadatac.console.controllers.kg.KnowledgeGraphBrowser.postIndex()
 GET	    /hadatac/acquisitions                          org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15)
 POST	/hadatac/acquisitions                     	   org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postIndex(start: Int ?= 1, rows: Int ?= 15)
 GET	    /hadatac/acquisitions/data                     org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.indexData(start: Int ?= 1, rows: Int ?= 15)

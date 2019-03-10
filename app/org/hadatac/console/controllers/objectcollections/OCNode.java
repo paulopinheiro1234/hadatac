@@ -12,6 +12,7 @@ public class OCNode {
     public static final int SPACEOBJECT = 2;
     public static final int TIMEOBJECT = 3;
     public static final int PROPERTY = 4;
+    public static final int ATTRIBUTE = 5;
     
     private String name;
     private String uri;

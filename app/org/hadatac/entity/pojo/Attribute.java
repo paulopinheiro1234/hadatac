@@ -54,6 +54,37 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 		return attributes;
 	}
 
+	public static List<Attribute> findByStudy(String study_uri) {
+		if (study_uri == null || study_uri.equals("")) {
+			return null;
+		}
+		List<Attribute> attributes = new ArrayList<Attribute>();
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+				" select distinct ?attUri ?attLabel where { " +
+			    "    ?daUri hasco:isDataAcquisitionOf <" + study_uri + "> . " +
+				"    ?daUri hasco:hasSchema ?sddUsi . " +
+				"    ?dasaUri hasco:partOfSchema ?sddUsi . " +
+				"    ?dasaUri hasco:hasAttribute ?attUri . " +
+				"    ?attUri rdfs:label ?attLabel . " +
+				" } ";
+		 
+		System.out.println("Query: " + queryString);
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			Attribute attribute = find(soln.getResource("attUri").getURI());
+			System.out.println("Retrieved attribute: " + attribute);
+			if (attribute != null && !attributes.contains(attribute)) {
+				attributes.add(attribute);
+			}
+		}			
+
+		java.util.Collections.sort((List<Attribute>) attributes);
+		return attributes;
+	}
+
 	public static String findHarmonizedCode(String dasa_uri) {
                 String fullUri = URIUtils.replacePrefix(dasa_uri);
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()

@@ -49,8 +49,8 @@ public class ViewStudy extends Controller {
 		if (oc_uri != null && oc_uri.indexOf("STD-") > -1) {
 			oc_uri = "";
 		}
-		System.out.println("Study URI: [" + study_uri + "]");
-        System.out.println("SOC URI: [" + oc_uri + "]");
+		//System.out.println("Study URI: [" + study_uri + "]");
+        //System.out.println("SOC URI: [" + oc_uri + "]");
 
         try {
             study_uri = URLDecoder.decode(study_uri, "utf-8");
@@ -60,7 +60,9 @@ public class ViewStudy extends Controller {
             oc_uri = "";
         }
 
-    	OCForceFieldGraph graph = new OCForceFieldGraph("full", study_uri);
+        System.out.println("StudyUri: " + study_uri);
+        
+    	OCForceFieldGraph graph = new OCForceFieldGraph(OCForceFieldGraph.NO_TIME_SPACE, study_uri);
         
         if (study_uri == null || study_uri.equals("")) {
             return badRequest("ViewStudy: [ERROR] empty study URI");

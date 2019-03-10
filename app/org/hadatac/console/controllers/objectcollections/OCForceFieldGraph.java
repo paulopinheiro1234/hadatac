@@ -1,7 +1,6 @@
 package org.hadatac.console.controllers.objectcollections;
 
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.ObjectCollection;
 
 import java.util.ArrayList;
@@ -14,7 +13,12 @@ import org.json.simple.JSONObject;
 
 public class OCForceFieldGraph {
 
-    Study study = null;
+	public static String COMPLETE = "COMPLETE";
+	public static String NO_TIME = "NO_TIME";
+	public static String NO_SPACE = "NO_SPACE";
+	public static String NO_TIME_SPACE = "NO_TIME_SPACE";
+
+	Study study = null;
     List<OCNode> objects = new ArrayList<OCNode>();
     List<ObjectCollection> ocList = null;
     
@@ -33,33 +37,28 @@ public class OCForceFieldGraph {
     	ocList = ObjectCollection.findByStudyUri(study.getUri());
     	for (ObjectCollection oc : ocList) {			
     		int type = -1;
-    		if ((mode.equals("full")  || mode.equals("space") || mode.equals("collections")) && (oc.isLocationCollection())) {
-    			type = OCNode.SPACECOLLECTION;
-    			if (oc.getHasScopeUri() == null || oc.getHasScopeUri().equals("")) {
-    				objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type, "",  new ArrayList<>(Arrays.asList(study.getUri()))));
-    				addCollectionNodes(mode,oc);
+    		if ((mode.equals(NO_TIME) || mode.equals(NO_TIME_SPACE)) && oc.isTimeCollection()) {
+    		} else if ((mode.equals("NO_SPACE") || mode.equals(NO_TIME_SPACE)) && oc.isLocationCollection()) {
+    		} else {
+    			if (oc.isLocationCollection()) {
+    				type = OCNode.SPACECOLLECTION;
+    				if (oc.getHasScopeUri() == null || oc.getHasScopeUri().equals("")) {
+    					objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type, "",  new ArrayList<>(Arrays.asList(study.getUri()))));
+    					addCollectionNodes(mode,oc);
+    				}
+    			} else if (oc.isTimeCollection()) {
+    				type = OCNode.TIMECOLLECTION;
+    				if (oc.getHasScopeUri() == null || oc.getHasScopeUri().equals("")) {
+    					objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(study.getUri()))));
+    					addCollectionNodes(mode,oc);
+    				}
+    			} else {
+    				type = OCNode.COLLECTION;
+    				if (oc.getHasScopeUri() == null || oc.getHasScopeUri().equals("")) {
+    					objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(study.getUri()))));
+    					addCollectionNodes(mode,oc);
+    				}
     			}
-    			//if (!mode.equals("collections")) {
-    			//	addObjectNodes(oc);
-    			//}
-    		} else if ((mode.equals("full")  || mode.equals("time") || mode.equals("collections")) && oc.isTimeCollection()) {
-    			type = OCNode.TIMECOLLECTION;
-    			if (oc.getHasScopeUri() == null || oc.getHasScopeUri().equals("")) {
-    				objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(study.getUri()))));
-    				addCollectionNodes(mode,oc);
-    			}
-    			//if (!mode.equals("collections")) {
-    			//	addObjectNodes(oc);
-    			//}
-    		} else if (mode.equals("full") || mode.equals("collections")) {
-    			type = OCNode.COLLECTION;
-    			if (oc.getHasScopeUri() == null || oc.getHasScopeUri().equals("")) {
-    				objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(study.getUri()))));
-    				addCollectionNodes(mode,oc);
-    			}
-    			//if (!mode.equals("collections")) {
-    			//	addObjectNodes(oc);
-    			//}
     		}
     	}
     }
@@ -67,43 +66,32 @@ public class OCForceFieldGraph {
    private void addCollectionNodes(String mode, ObjectCollection objCollection) {
        for (ObjectCollection oc : ocList) {			
     	   int type = -1;
-    	   if ((mode.equals("full")  || mode.equals("space") || mode.equals("collections")) && (oc.isLocationCollection())) {
-    		   type = OCNode.SPACECOLLECTION;
-    		   if (oc.getHasScopeUri().equals(objCollection.getUri())) {
-    			   objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(objCollection.getUri()))));
-    			   addCollectionNodes(mode,oc);
-    		   }
-    	   } else if ((mode.equals("full")  || mode.equals("time") || mode.equals("collections")) && oc.isTimeCollection()) {
-    		   type = OCNode.TIMECOLLECTION;
-    		   if (oc.getHasScopeUri().equals(objCollection.getUri())) {
-    			   objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(objCollection.getUri()))));
-    			   addCollectionNodes(mode,oc);
-    		   }
-    	   } else if (mode.equals("full") || mode.equals("collections")) {
-    		   type = OCNode.COLLECTION;
-    		   if (oc.getHasScopeUri().equals(objCollection.getUri())) {
-    			   objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(objCollection.getUri()))));
-    			   addCollectionNodes(mode,oc);
+    	   if ((mode.equals(NO_TIME) || mode.equals(NO_TIME_SPACE)) && oc.isTimeCollection()) {
+    	   } else if ((mode.equals("NO_SPACE") || mode.equals(NO_TIME_SPACE)) && oc.isLocationCollection()) {
+    	   } else {
+    		   if (oc.isLocationCollection()) {
+    			   type = OCNode.SPACECOLLECTION;
+    			   if (oc.getHasScopeUri().equals(objCollection.getUri())) {
+    				   objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(objCollection.getUri()))));
+    				   addCollectionNodes(mode,oc);
+    			   }
+    		   } else if (oc.isTimeCollection()) {
+    			   type = OCNode.TIMECOLLECTION;
+    			   if (oc.getHasScopeUri().equals(objCollection.getUri())) {
+    				   objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(objCollection.getUri()))));
+    				   addCollectionNodes(mode,oc);
+    			   }
+    		   } else {
+    			   type = OCNode.COLLECTION;
+    			   if (oc.getHasScopeUri().equals(objCollection.getUri())) {
+    				   objects.add(new OCNode(oc.getUri(), oc.getRoleLabel() + " (" + oc.getNumOfObjects() + " objects)", type,  "",  new ArrayList<>(Arrays.asList(objCollection.getUri()))));
+    				   addCollectionNodes(mode,oc);
+    			   }
     		   }
     	   }
        }
    }
-    
-   private void addObjectNodes(ObjectCollection oc){
-	   List<StudyObject> soList = StudyObject.findByCollection(oc);
-	   for (StudyObject so : soList) {
-		   int type = -1;
-		   if (so.isLocation()) {
-			   type = OCNode.SPACEOBJECT;
-		   } else if (so.isTime()) {
-			   type = OCNode.TIMEOBJECT;
-		   } else {
-			   type = OCNode.OBJECT;
-		   }
-		   objects.add(new OCNode(so.getUri(), so.getLabel(), type,  "",  new ArrayList<>(Arrays.asList(oc.getUri()))));
-	   }
-    }	
-    
+ 
     private int findObjectIndex(String uri) {
     	Iterator<OCNode> ag = objects.iterator();
     	if (uri.equals("Public")){
@@ -127,7 +115,6 @@ public class OCForceFieldGraph {
     	while (ag.hasNext()) {
     		OCNode tmpObject = ag.next();
     		JSONObject object = new JSONObject();
-    		System.out.println(tmpObject.getName());
     		object.put("name", tmpObject.getName());
     		object.put("group", tmpObject.getType() + 1);
     		nodes.add(object);
@@ -152,7 +139,6 @@ public class OCForceFieldGraph {
     		}
     	}
     	tree.put("links", links);
-    	System.out.println(tree.toJSONString());
 	
     	return tree.toJSONString();
     }
@@ -167,20 +153,18 @@ public class OCForceFieldGraph {
 
 	private String toTreeJson() {
     	String tree = "";
-    	Iterator<OCNode> ag = objects.iterator();
-		OCNode node = ag.next();
-    	while (node != null && ag.hasNext()) {
+    	int i=1;
+    	for (OCNode node : objects) {
     		if (node.getMemberOf() == null || node.getMemberOf().size() <= 0) {
     			tree += "[ { v:\'" + node.getName() + "\', f:\'" + node.getURI() + "\'},\'" + node.getName() + "\',\'" + node.getName()+ "\']";
     		} else {
     			tree += "[ { v:\'" + node.getName() + "\', f:\'" + node.getURI() + "\'},\'" + node.getMemberOf().get(0) + "\',\'" + node.getName() + "\']";
     		}
-    		node = ag.next();
-    		if (ag.hasNext()) {
+    		if (i++ < objects.size()) {
     			tree += ",";
     		}
     	}
-	
+
     	return tree;
     }
     

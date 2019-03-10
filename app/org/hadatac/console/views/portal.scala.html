@@ -25,6 +25,7 @@
         <div class="col-md-1 col-xs-0"></div>
         <div class="col-md-3 col-xs-2">
            <h4>Data/Metadata Search and Download</h4>
+       @*    <a href="@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index()" id="kg" class="btn btn-primary btn-block" role="button">Browse Knowledge Graph</a>  *@
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
            <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
@@ -42,7 +43,7 @@
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/")" 
 		   id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
 		<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/")" 
-		   id="workingfile" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
+		   id="workingfiles" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
 		   id="studies" class="btn btn-primary btn-block" role="button">Manage Studies</a>
 		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri)" 
@@ -116,23 +117,6 @@
          </div>
          <div class="col-md-2 col-xs-0"></div>
       </div>
-
-      @*
-      <div class="row">
-         <div class="col-md-1 col-xs-0"></div>
-         <div class="col-md-8 col-xs-0">
-             <hr>
-             <h4>Terminology:</h4>
-             <ul>
-               <li>CCSV: contextualized comma separated value</li>
-               <li>CSV: comma separated value</li>
-               <li>KB: knowledge base</li>
-             </ul>
-          </div>
-         <div class="col-md-1 col-xs-0"></div>
-      </div>
-    </div>
-    *@
 
     <script type="text/javascript">
         $( document ).ready(function() {

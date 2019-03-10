@@ -82,10 +82,11 @@ public class MetadataAcquisition extends Controller {
     @SuppressWarnings("unchecked")
 	public static boolean updateStudy() {
 		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment"
+				+ " SELECT DISTINCT ?studyId ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment"
 				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?entityLabel" 
 				+ " ?agentName ?institutionName ?relationLabel ?relationTo ?relationToRole ?relationToRoleLabel WHERE { "
 				+ " ?studyUri a ?subUri . "
+				+ " ?studyUri hasco:hasId ?studyId . "
 				+ " ?subUri rdfs:subClassOf* hasco:Study . "
 				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
 				+ " ?dataAcq hasco:isDataAcquisitionOf ?studyUri ."
@@ -145,7 +146,7 @@ public class MetadataAcquisition extends Controller {
 						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
 						+ "/hadatac/studies/viewStudy?study_uri=" 
 						+ URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
-						+ soln.get("studyLabel").toString() + "</a>");
+						+ soln.get("studyId").toString() + "</a>");
 			}
 			if (soln.contains("studyTitle") && !studyInfo.containsKey("studyTitle_str")) {
 				studyInfo.put("studyTitle_str", soln.get("studyTitle").toString());
