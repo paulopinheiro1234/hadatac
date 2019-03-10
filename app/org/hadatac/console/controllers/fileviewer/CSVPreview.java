@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVParser;
 import java.nio.charset.StandardCharsets;
 
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.FileManager;
 import org.hadatac.console.views.html.fileviewer.*;
 
 import java.io.File;
@@ -25,14 +26,7 @@ public class CSVPreview extends Controller{
 
 	public static ArrayList<String> getCSVHeaders(String folder, String fileName) {
 		//System.out.println("filename: " + filename);
-		String fullFileName = "";
-		if (folder.equals("proc")) {
-			fullFileName = pathProc + fileName;
-		} else if (folder.equals("unproc")) {
-			fullFileName = pathUnproc + fileName;
-		} else {
-			fullFileName = pathWorking + fileName;
-		}
+		String fullFileName = FileManager.getInstance().getPathByLabel(folder) + fileName;
 		File toPreview = new File(fullFileName);
 		ArrayList<String> headerList = null;
 		try{
@@ -55,14 +49,7 @@ public class CSVPreview extends Controller{
 
 	public static ArrayList<ArrayList<String>> getCSVPreview(String folder, String dir, String fileName, int numRows){
 		ArrayList<ArrayList<String>> previewList = null;
-		File toPreview = null;
-		if (folder.equals("proc")) {
-			toPreview = new File(pathProc + fileName);
-		} else if (folder.equals("unproc")) {
-			toPreview = new File(pathUnproc + fileName);
-		} else {
-			toPreview = new File(pathWorking + fileName);
-		}
+		File toPreview = new File(FileManager.getInstance().getPathByLabel(folder) + fileName);
 		System.out.println("fileName: " + fileName);
 		try{
 			CSVParser parser = CSVParser.parse(toPreview, StandardCharsets.UTF_8, CSVFormat.RFC4180.withHeader());

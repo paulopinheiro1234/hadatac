@@ -11,6 +11,7 @@
 @import org.hadatac.console.views.html.fileviewer._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.console.controllers.fileviewer._
+@import org.hadatac.utils._
 @import org.hadatac.metadata.loader._
 @import java.net._
 
@@ -116,18 +117,18 @@
                 
                 @if(file.getFileName().endsWith(".csv")) {
                     @defining("") { da_uri => @defining("") { oc_uri => 
-                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("unproc", dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.UNPROC, dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
                 class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("unproc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.UNPROC, file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
                 @if(bAdmin) {
                     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
                 }
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), false)" class="btn-xs btn-primary" role="button">Download</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(FileManager.UNPROC, file.getFileName())" class="btn-xs btn-primary" role="button">Download</a>
                 </td>   
             </tr>
         }
@@ -181,11 +182,11 @@
                 <td>@file.getCompletionTime()</td>
                 <td>@if(file.getFileName().endsWith(".csv")) {
                         @defining("") { da_uri =>  @defining("") { oc_uri => 
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview("proc", dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.PROC, dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
                    class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index("proc", file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.PROC, file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(dir, file.getFileName())" 
                class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
@@ -199,7 +200,7 @@
                 }
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getFileName())" 
                class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getFileName(), true)" 
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(FileManager.PROC, file.getFileName())" 
                class="btn-xs btn-primary" role="button">Download</a>
                 </td>
             </tr>

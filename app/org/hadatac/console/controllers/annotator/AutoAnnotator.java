@@ -39,6 +39,7 @@ import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.FileManager;
 import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
 
@@ -447,13 +448,10 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadDataFile(String file_name, boolean isProcessed) {
-        String path = ""; 
-        if(isProcessed){
-            path = ConfigProp.getPathProc();
-        } else {
-            path = ConfigProp.getPathUnproc();
-        }
+    public Result downloadDataFile(String folder, String file_name) {
+        String path = FileManager.getInstance().getPathByLabel(folder);
+        
+        /* TO DO : add permission control here */
         
         return ok(new File(path + "/" + file_name));
     }
