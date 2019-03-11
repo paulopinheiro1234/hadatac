@@ -4,25 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
-import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.NameSpaces;
-import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.console.models.Pivot;
 
 public class Alignment {
 
     private Map<String, StudyObject> objects;
+    private Map<String, StudyObject> refObjects;
     private Map<String, Attribute> attributeCache;
     private Map<String, Entity> entityCache;
     private Map<String, Unit> unitCache;
     private Map<String, AlignmentEntityRole> roles;
-    private Map<String, AlignmentAttribute> alignAttrs;
+    private Map<String, Variable> variables;
     private Map<String, List<String>> hCodeBook;
 
     Attribute ID = new Attribute();
@@ -34,37 +25,39 @@ public class Alignment {
         entityCache = new HashMap<String, Entity>();
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
-        alignAttrs = new HashMap<String, AlignmentAttribute>();
-	hCodeBook = new HashMap<String, List<String>>();
+        variables = new HashMap<String, Variable>();
+	    hCodeBook = new HashMap<String, List<String>>();
         ID.setLabel("ID");
     }
 
     public void printAlignment() {
         System.out.println("Alignment Content: ");
-        if (alignAttrs != null && alignAttrs.size() > 0) {
-            for (AlignmentAttribute aa : alignAttrs.values()) {
+        if (variables != null && variables.size() > 0) {
+            for (Variable aa : variables.values()) {
                 System.out.println("Label: " + aa);
             }
         }
     }
 
-    /* objectKey adds a new object identifier into aligment attributes
+    /* objectKey adds a new object identifier into variables
      */
     public String objectKey(AlignmentEntityRole entRole) {
-        AlignmentAttribute aa = new AlignmentAttribute(entRole, ID_IRT);
+        Variable aa = new Variable(entRole, ID_IRT);
         return aa.toString();
     }
 
-    /* returns a key to retrieve alignment attributes. if needed, measuremtnKey adds new alignment attributes 
+    /* returns a key to retrieve variables. if needed, measuremtnKey adds new variables 
      */
     public String measurementKey(Measurement m) {
-        if (alignAttrs == null) {
+        if (variables == null) {
             System.out.println("[ERROR] alignment attribute list not initialized ");
             return null;
         }
 
-        /* Look for existing alignment attributes
+        /* 
+         * Look for existing variables
          */
+        
         //System.out.println("Align-Debug: Measurement Key");
 
         Entity irt = null;
@@ -116,47 +109,49 @@ public class Alignment {
             }
         } 
 
-        //String mRole = inferRole(m);
-	String mRole = m.getRole().replace(" ","");
+	    String mRole = m.getRole().replace(" ","");
 
         String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
 
         //System.out.println("Align-Debug: Measurement: " + mKey);
         //System.out.println("Align-Debug: Vector: " + alignAttrs); 
 
-        if (alignAttrs.containsKey(mKey)) {
-            return alignAttrs.get(mKey).toString();
+        if (variables.containsKey(mKey)) {
+            return variables.get(mKey).toString();
         }
 
-        /* create new alignment attribute
+        /* 
+         * create new variable
          */
-        AlignmentAttribute newAA;
-        Entity entity = Entity.find(m.getEntityUri());
-        if (entity == null) {
-            System.out.println("[ERROR] retrieving entity " + m.getEntityUri());
-            return null;
+
+        Variable newVar;
+
+        Entity entity = entityCache.get(m.getEntityUri());
+        if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
+            entity = Entity.find(m.getEntityUri());
+            if (entity == null) {
+                System.out.println("[ERROR] retrieving entity " + m.getEntityUri());
+                return null;
+            } else {
+                entityCache.put(entity.getUri(),entity);
+            }
         }
+
         //System.out.println("Align-Debug: new alignment attribute"); 
         AlignmentEntityRole newRole = new AlignmentEntityRole(entity,mRole);
 
         System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
-        Attribute attribute = Attribute.find(m.getCharacteristicUris().get(0));
-        if (attribute == null) {
-            System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
-            return null;
-        }
 
-	/*
-        System.out.println("Align-Debug: new alignment attribute DASA URI :[" + m.getDasaUri() + "]"); 
-	if (m.getDasaUri() != null && !m.getDasaUri().equals("")) {
-	    if (!containsCode(m.getDasaUri())) {
-		String code = Attribute.findHarmonizedCode(m.getDasaUri());
-		System.out.println("Align-Debug: new alignment attribute Code for DASA URI :[" + code + "]"); 
-		if (code != null && !code.equals("")) {
-		    addCode(m.getCharacteristicUris().get(0), code);
-		}
-	    }
-	    }*/
+        Attribute attribute = attributeCache.get(m.getCharacteristicUris().get(0));
+        if (attribute == null || !attribute.getUri().equals(m.getCharacteristicUris().get(0))) {
+            attribute = Attribute.find(m.getCharacteristicUris().get(0));
+            if (attribute == null) {
+                System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
+                return null;
+            } else {
+                attributeCache.put(attribute.getUri(),attribute);
+            }
+        }
 
         //System.out.println("Align-Debug: new alignment attribute 2"); 
 
@@ -174,12 +169,12 @@ public class Alignment {
             System.out.println("Adding the following time " + mAbstractTime);
         }
 
-        newAA = new AlignmentAttribute(newRole, newAttrInRel, unit, timeAttr);
+        newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
         //System.out.println("Align-Debug: new alignment attribute 3"); 
 
-        if (!alignAttrs.containsKey(newAA.getKey())) {
-            alignAttrs.put(newAA.getKey(), newAA);
-            return newAA.toString();
+        if (!variables.containsKey(newVar.getKey())) {
+            variables.put(newVar.getKey(), newVar);
+            return newVar.toString();
         }
 
         return null;
@@ -191,6 +186,10 @@ public class Alignment {
 
     public boolean containsObject(String uri) {
         return objects.containsKey(uri);
+    }
+
+    public boolean containsEntity(String uri) {
+        return entityCache.containsKey(uri);
     }
 
     public boolean containsRole(String key) {
@@ -205,7 +204,11 @@ public class Alignment {
      */
 
     public StudyObject getObject(String uri) {
-        return objects.get(uri);
+    	return objects.get(uri);
+    }
+
+    public Entity getEntity(String uri) {
+        return entityCache.get(uri);
     }
 
     public AlignmentEntityRole getRole(String key) {
@@ -231,8 +234,8 @@ public class Alignment {
         return new ArrayList<AlignmentEntityRole>(roles.values());
     }
 
-    public List<AlignmentAttribute> getAlignmentAttributes() {
-        return new ArrayList<AlignmentAttribute>(alignAttrs.values());
+    public List<Variable> getAlignmentAttributes() {
+        return new ArrayList<Variable>(variables.values());
     }
 
     public List<List<String>> getCodes() {
@@ -246,11 +249,15 @@ public class Alignment {
         objects.put(obj.getUri(), obj);
     }
 
+    public void addEntity(Entity ent) {
+        entityCache.put(ent.getUri(), ent);
+    }
+
     public void addRole(AlignmentEntityRole entRole) {
         roles.put(entRole.getKey(), entRole);
         System.out.println("Adding NEW ROLE: " + entRole);
-        AlignmentAttribute newAA = new AlignmentAttribute(entRole,ID_IRT);
-        alignAttrs.put(newAA.getKey(),newAA);
+        Variable newVar = new Variable(entRole,ID_IRT);
+        variables.put(newVar.getKey(),newVar);
     }
 
     public void addCode(String attrUri, List<String> code) {
