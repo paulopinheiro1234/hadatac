@@ -9,18 +9,18 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Object Management") {
+@main("SOC's Object Management") {
 
   <div class="container-fluid">
-    <h3>Management of Study <i><font color="darkBlue"> @study.getId()</font></i>'s Object Collections </h3>
+    <h3>Management of Study <i><font color="darkBlue"> @study.getId()</font></i>'s SOCs </h3>
     
     <h4>Management options</h4>
 
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Create Object Collection</a>
-  	       <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize Object Graph</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Create SOC</a>
+  	       <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize SOC Graph</a>
          </div>
       </div>
    </div>
@@ -35,9 +35,8 @@
         <table class="table">
             <thead>
               <tr>
-                <!--  <th>Study URI</th>  -->
                 <th>Name</th>
-                <th>Grouding</th>
+                <th>Grounding</th>
                 <th>Reference</th>
                 <th>Role</th>
                 <th>Description</th>
@@ -68,9 +67,8 @@
         <table class="table">
             <thead>
               <tr>
-                <!--  <th>Study URI</th>  -->
                 <th>Name</th>
-                <th>Grouding</th>
+                <th>Grounding</th>
                 <th>Reference</th>
                 <th>Role</th>
                 <th>Description</th>
@@ -103,7 +101,7 @@
               <tr>
                 <!--  <th>Study URI</th>  -->
                 <th>Name</th>
-                <th>Grouding</th>
+                <th>Grounding</th>
                 <th>Reference</th>
                 <th>Role</th>
                 <th>Description</th>
@@ -134,7 +132,7 @@
               <tr>
                 <!--  <th>Study URI</th>  -->
                 <th>Name</th>
-                <th>Grouding</th>
+                <th>Grounding</th>
                 <th>Reference</th>
                 <th>Role</th>
                 <th>Description</th>

@@ -15,10 +15,10 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("New Object Collection") {
+@main("New SOC") {
 
   <div class="container">
-    <h4>New Object Collection for Study @study.getLabel()</h4>
+    <h4>New SOC for Study @study.getLabel()</h4>
 
    <script type="text/javascript">
      function checkform() {
@@ -51,7 +51,7 @@
      function labelchange() {
         var label = "@study.getLabel()";
         label = replaceAll(label," ","-");
-	label = replaceAll(label,"<","");
+	    label = replaceAll(label,"<","");
         label = replaceAll(label,">","");
         label = replaceAll(label,"?","");
         label = replaceAll(label,".","");
@@ -140,8 +140,8 @@
            
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Object Collection" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create SOC" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to SOC Management</a>
 	</div>
      
    </form>

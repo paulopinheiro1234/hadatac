@@ -935,6 +935,11 @@ public class StudyObject extends HADatAcThing {
     }
 
     @Override
+    public void deleteFromTripleStore() {
+        super.deleteFromTripleStore();
+    }
+
+    @Override
     public int deleteFromLabKey(String user_name, String password) {
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();

@@ -254,16 +254,16 @@ public class ObjectManagement extends Controller {
         StudyObject oldObj;
         for (int i = 0; i < oldObjList.size(); i++) {
             oldObj = oldObjList.get(i);
-
-            if (ConfigProp.getLabKeyLoginRequired()) {
-                nRowsAffected = oldObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                if (nRowsAffected <= 0) {
-                    message = "Failed to delete object from LabKey";
-                }
+            if (oldObj != null) {
+            	if (ConfigProp.getLabKeyLoginRequired()) {
+            		nRowsAffected = oldObj.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
+            		if (nRowsAffected <= 0) {
+            			message = "Failed to delete object from LabKey";
+            		}
+            	}
+            	oldObj.deleteFromTripleStore();
+            	totDeletes++;
             }
-
-            oldObj.delete();
-            totDeletes++;
         }
         if (totDeletes > 0) {
             message = " " + totDeletes + " object(s) was/were deleted.";

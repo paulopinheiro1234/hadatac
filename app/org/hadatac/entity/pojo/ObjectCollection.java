@@ -1038,6 +1038,19 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     }
 
     @Override
+    public void deleteFromTripleStore() {
+        List<StudyObject> listObj = getObjects();
+        int totObj = listObj.size();
+        if (listObj.size() > 0) {
+        	for (StudyObject so : listObj) {
+        		so.deleteFromTripleStore();
+        	}
+        }
+    	super.deleteFromTripleStore();
+    	System.out.println("ObjectCollection: deleted SOC " + this.getLabel() + " and its " + totObj + " objects.");
+    }
+
+    @Override
     public boolean saveToSolr() {
         return false;
     }

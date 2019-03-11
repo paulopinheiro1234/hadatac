@@ -69,7 +69,7 @@ public class DeleteOC extends Controller {
             }
             
             if (!ConfigProp.getLabKeyLoginRequired() || deletedRows > 0) {
-                oc.delete();
+                oc.deleteFromTripleStore();;
             } else {
                 return badRequest(objectCollectionConfirm.render("Error deleting object collection: zero deleted rows", dir, filename, da_uri, std_uri, oc));
             }

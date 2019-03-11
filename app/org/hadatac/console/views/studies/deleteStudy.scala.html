@@ -2,6 +2,7 @@
 
 @import helper._
 @import org.hadatac.utils._
+@import org.hadatac.metadata.loader._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.studies._
 @import org.hadatac.console.controllers.studies._
@@ -9,17 +10,29 @@
 
 @main("Delete Study") {
 <div class="container">
-<h2>Delete Study</h2>
-
+<h4>Delete Study</h4>
+ 
    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study.getUri())">
- 	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-	<script type="text/javascript">
-	  var msg = "@results";
-       	  var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
-          $('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
-       	  document.getElementById('end-process-box').style.display = 'inline';
-        </script>
-    </form>    
+
+    <ul>
+    	<li><b>URI:</b> @URIUtils.replaceNameSpaceEx(study.getUri())</li>
+      	<li><b>Type:</b> @URIUtils.replaceNameSpaceEx(study.getTypeUri())</li>
+      	<li><b>Short Name:</b> @study.getLabel()</li>
+     	<li><b>Project:</b> @study.getProject()</li>
+     	<li><b>Description:</b> @study.getComment()</li>
+      	<li><b>External Source:</b> @study.getExternalSource()</li>
+      	<li><b>Agent:</b> @if(study.getAgent() != null) { @study.getAgent().getName() }</li>
+      	<li><b>Institution:</b> @if(study.getInstitution() != null) { @study.getInstitution().getName() }</li>
+	 	<li><b>Start Date/Time</b>: @if(study.getStartedAt() != null) { @study.getStartedAt() }</li>
+	 	<li><b>End Date/Time</b>: @if(study.getEndedAt() != null) { @study.getEndedAt() }</li>
+    </ul>
+    
+ 	<p style="color:red;"><b>THIS OPERATION MAY TAKE SEVERAL MINUTES TO COMPLETE</b></p>
+	
+	<div class="form-group" class="col-sm-6 col-offset-3">
+		<input class="btn btn-success" role="button" type="submit" value="Delete" />
+    </div>
+
     @studyButton(false)
 
 </div>

@@ -17,10 +17,10 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("Edit Object Collection") {
+@main("Edit SOC") {
 
   <div class="container">
-    <h4>Edit Object Collection for Study @study.getLabel()</h4>
+    <h4>Edit SOC for Study @study.getLabel()</h4>
 
    <script type="text/javascript">
      function checkform() {
@@ -145,8 +145,8 @@
            
 	<div class="form-group">
 	  <label>Updates</label> <br>
-	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save Object Collection" disabled /><br>
-	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to Object Collection Management</a>
+	  <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Save SOC" disabled /><br>
+	  <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Back to SOC Management</a>
 	</div>
 	<script>checkform()</script>
      

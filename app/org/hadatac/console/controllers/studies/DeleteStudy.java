@@ -37,9 +37,6 @@ public class DeleteStudy extends Controller {
 
         if (!study_uri.equals("")) {
             study = Study.find(study_uri);
-            study.delete();
-
-            result = deleteStudy(study_uri);
             return ok(deleteStudy.render(study, result));
         }
 
@@ -80,6 +77,6 @@ public class DeleteStudy extends Controller {
 
         study.delete();
 
-        return ok(studyConfirm.render("Delete Study", study));
+        return ok(studyConfirm.render("Deleted Study", study));
     }
 }

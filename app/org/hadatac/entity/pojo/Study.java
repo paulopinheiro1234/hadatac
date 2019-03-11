@@ -955,48 +955,28 @@ public class Study extends HADatAcThing {
         return studies;
     }
 
-    public int deleteDataAcquisitions() {
-        SolrClient study_solr = new HttpSolrClient.Builder(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
-        try {
-            UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + studyUri + "\"");
-            study_solr.commit();
-            study_solr.close();
-            return response.getStatus();
-        } catch (SolrServerException e) {
-            System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-        }
-
-        return -1;
-    }
-
-    public int deleteMeasurements() {
-        SolrClient study_solr = new HttpSolrClient.Builder(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
-        try {
-            UpdateResponse response = study_solr.deleteByQuery("study_uri:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
-            study_solr.commit();
-            study_solr.close();
-            return response.getStatus();
-        } catch (SolrServerException e) {
-            System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
-        }
-
-        return -1;
-    }
-
     @Override
     public void save() {
         saveToTripleStore();
         saveToSolr();
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
+            if (endedAt.toString().startsWith("9999")) {
+                endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
+            }
+            solr.addBean(this).getStatus();
+            solr.commit();
+            solr.close();
+            return true;
+        } catch (IOException | SolrServerException e) {
+            System.out.println("[ERROR] Study.saveToSolr() - e.Message: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -1031,6 +1011,32 @@ public class Study extends HADatAcThing {
     }
 
     @Override
+    public void delete() {
+    	
+    	// Delete associated DAs and their measurements
+    	deleteMeasurements();
+    	deleteDataAcquisitions();
+    	
+    	// Delete associated SOCs 
+    	for (String oc_uri : this.objectCollectionUris) {
+    		ObjectCollection oc = ObjectCollection.find(oc_uri);
+    		if (oc != null) {
+    			oc.deleteFromTripleStore();
+    		}
+    	}
+    	
+    	// Delete study itself
+        deleteFromTripleStore();
+        deleteFromSolr();
+    }
+
+
+    @Override
+    public void deleteFromTripleStore() {
+    	super.deleteFromTripleStore();
+    }
+
+    	@Override
     public int deleteFromSolr() {
         SolrClient study_solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
@@ -1067,22 +1073,43 @@ public class Study extends HADatAcThing {
         }
     }
 
-    @Override
-    public boolean saveToSolr() {
+    public int deleteDataAcquisitions() {
+        SolrClient study_solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
         try {
-            SolrClient solr = new HttpSolrClient.Builder(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
-            if (endedAt.toString().startsWith("9999")) {
-                endedAt = DateTime.parse("9999-12-31T23:59:59.999Z");
-            }
-            solr.addBean(this).getStatus();
-            solr.commit();
-            solr.close();
-            return true;
-        } catch (IOException | SolrServerException e) {
-            System.out.println("[ERROR] Study.saveToSolr() - e.Message: " + e.getMessage());
-            return false;
+            UpdateResponse response = study_solr.deleteByQuery("study_uri_str:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri)  + "\"");
+            study_solr.commit();
+            study_solr.close();
+            return response.getStatus();
+        } catch (SolrServerException e) {
+            System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
         }
+
+        return -1;
     }
+
+    public int deleteMeasurements() {
+        SolrClient study_solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+        try {
+            UpdateResponse response = study_solr.deleteByQuery("study_uri_str:\"" + DynamicFunctions.replaceURLWithPrefix(studyUri) + "\"");
+            study_solr.commit();
+            study_solr.close();
+            return response.getStatus();
+        } catch (SolrServerException e) {
+            System.out.println("[ERROR] Study.delete() - SolrServerException message: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERROR] Study.delete() - IOException message: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("[ERROR] Study.delete() - Exception message: " + e.getMessage());
+        }
+
+        return -1;
+    }
+
 }
 
