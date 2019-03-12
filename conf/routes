@@ -403,6 +403,9 @@ GET     /hadatac/working/queryfile                     org.hadatac.console.contr
 # GET	/hadatac/working/file/owner		               org.hadatac.console.controllers.workingfiles.WorkingFiles.assignFileOwner(dir : String, ownerEmail: String, file: String)
 # POST	/hadatac/working/file/owner     	           org.hadatac.console.controllers.workingfiles.WorkingFiles.postAssignFileOwner(dir : String, ownerEmail: String, file: String)
 # POST	/hadatac/working/file/owner/form     	       org.hadatac.console.controllers.workingfiles.WorkingFiles.processOwnerForm(dir : String, ownerEmail: String, file : String)
+GET	    /hadatac/working/newfile	        	       org.hadatac.console.controllers.workingfiles.NewFile.index(dir : String)
+POST	/hadatac/working/newfile     	               org.hadatac.console.controllers.workingfiles.NewFile.postIndex(dir: String)
+POST	/hadatac/working/newfile/form     	           org.hadatac.console.controllers.workingfiles.NewFile.processForm(dir: String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
