@@ -49,6 +49,9 @@ public abstract class HADatAcThing implements Facetable {
     int count = 0;
 
     String namedGraph = "";
+    
+    // delete the object or not when deleting the data file it was generated from
+    boolean deletable = true;
 
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
@@ -178,6 +181,14 @@ public abstract class HADatAcThing implements Facetable {
 
     public void setNamedGraph(String namedGraph) {
         this.namedGraph = namedGraph;
+    }
+    
+    public boolean getDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
     }
 
     public static List<String> getLabels(String uri) {

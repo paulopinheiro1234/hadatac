@@ -8,18 +8,23 @@ import java.util.Set;
 
 public class Cache<K, V> implements Map<K, V> {
     private String name;
+    
+    // specify if the objects in the newCache need to be committed
     private boolean needCommit = false;
     
     private Map<K, V> mapCache = new HashMap<K, V>();
+    private Map<K, V> newCache = new HashMap<K, V>();
+    private Map<K, V> initialCache = new HashMap<K, V>();
     
     public Cache(String name, boolean needCommit) {
         this.name = name;
         this.needCommit = needCommit;
     }
     
-    public Cache(String name, boolean needCommit, Map<K, V> mapCache) {
+    public Cache(String name, boolean needCommit, Map<K, V> initialCache) {
         this(name, needCommit);
-        this.mapCache = mapCache;
+        this.initialCache = initialCache;
+        mapCache.putAll(initialCache);
     }
     
     public String getName() {
@@ -34,8 +39,18 @@ public class Cache<K, V> implements Map<K, V> {
         return mapCache;
     }
     
+    public Map<K, V> getNewCache() {
+        return newCache;
+    }
+    
+    public Map<K, V> getInitialCache() {
+        return initialCache;
+    }
+    
     public void clear() {
         mapCache.clear();
+        newCache.clear();
+        initialCache.clear();
     }
 
     @Override
@@ -70,12 +85,15 @@ public class Cache<K, V> implements Map<K, V> {
     @Override
     public V put(K key, V value) {
         // TODO Auto-generated method stub
+        newCache.put(key, value);
         return mapCache.put(key, value);
     }
 
     @Override
     public V remove(Object key) {
         // TODO Auto-generated method stub
+        initialCache.remove(key);
+        newCache.remove(key);
         return mapCache.remove(key);
     }
 
@@ -83,6 +101,7 @@ public class Cache<K, V> implements Map<K, V> {
     public void putAll(Map<? extends K, ? extends V> m) {
         // TODO Auto-generated method stub
         mapCache.putAll(m);
+        newCache.putAll(m);
     }
 
     @Override
