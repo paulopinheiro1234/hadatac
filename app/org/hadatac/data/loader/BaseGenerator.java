@@ -331,7 +331,10 @@ public abstract class BaseGenerator {
         
         for (String name : caches.keySet()) {
             if (caches.get(name).getNeedCommit()) {
-                for (Object obj : caches.get(name).getMapCache().values()) {
+                System.out.println("cache " + name + " size: Initial " + caches.get(name).getInitialCache().values().size());
+                System.out.println("cache " + name + " size: New " + caches.get(name).getNewCache().values().size());
+                System.out.println("cache " + name + " size: Total " + caches.get(name).getMapCache().values().size());
+                for (Object obj : caches.get(name).getNewCache().values()) {
                     if (obj instanceof HADatAcThing) {
                         ((HADatAcThing) obj).saveToTripleStore();
                         count++;
@@ -413,7 +416,22 @@ public abstract class BaseGenerator {
 
     public boolean deleteObjectsFromTripleStore(List<HADatAcThing> objects) {
         for (HADatAcThing obj : objects) {
-            obj.deleteFromTripleStore();
+            if (obj.getDeletable()) {
+                obj.deleteFromTripleStore();
+            }
+        }
+        
+        for (String name : caches.keySet()) {
+            if (caches.get(name).getNeedCommit()) {
+                for (Object obj : caches.get(name).getNewCache().values()) {
+                    if (obj instanceof HADatAcThing) {
+                        HADatAcThing object = (HADatAcThing)obj;
+                        if (object.getDeletable()) {
+                            object.deleteFromTripleStore();
+                        }
+                    }
+                }
+            }
         }
 
         return true;
