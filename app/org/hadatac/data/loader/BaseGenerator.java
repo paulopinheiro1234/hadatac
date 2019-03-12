@@ -331,9 +331,9 @@ public abstract class BaseGenerator {
         
         for (String name : caches.keySet()) {
             if (caches.get(name).getNeedCommit()) {
-                System.out.println(caches.get(name) + " size: Initial " + caches.get(name).getInitialCache().values().size());
-                System.out.println(caches.get(name) + " size: New " + caches.get(name).getNewCache().values().size());
-                System.out.println(caches.get(name) + " size: Total " + caches.get(name).getMapCache().values().size());
+                System.out.println("cache " + name + " size: Initial " + caches.get(name).getInitialCache().values().size());
+                System.out.println("cache " + name + " size: New " + caches.get(name).getNewCache().values().size());
+                System.out.println("cache " + name + " size: Total " + caches.get(name).getMapCache().values().size());
                 for (Object obj : caches.get(name).getNewCache().values()) {
                     if (obj instanceof HADatAcThing) {
                         ((HADatAcThing) obj).saveToTripleStore();
