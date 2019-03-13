@@ -6,6 +6,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.utils.ConfigProp;
@@ -22,7 +23,7 @@ import java.util.Iterator;
 
 public class DASOInstanceGenerator extends BaseGenerator {
 
-	private final boolean DEBUG_MODE = false;
+	private final boolean DEBUG_MODE = true;
 	private final int ID_LENGTH = 5;
 	
 	private final String SIO_OBJECT = "sio:Object";
@@ -690,7 +691,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 newScopeUris, newTimeScopeUris, newSpaceScopeUris);
         newObj.setNamedGraph(oasUri);
         newObj.setDeletable(false);
-        addObjectToCache(newObj, nextSoc.getUri());
+        addObjectToCache(newObj, nextSoc.getUri(), currentObjUri);
 
         if (DEBUG_MODE) { 
         	System.out.println("DASOInstanceGenerator:          Created Obj with URI=[" + newUri + "]   Type=[" + newTypeUri + "]");
@@ -758,10 +759,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
      *   METHODS RELATED TO INTERNAL CACHE
      */
 
-    public boolean initiateCache() {
+    public boolean initiateCache(String study_uri) {
+    	if (study_uri == null || study_uri.equals("")) {
+    		return false;
+    	}
+    	Study study = Study.find(study_uri);
     	if (mainSoc != null) {
     		System.out.println("INITIATE CACHE BEING CALLED!");
-    		addCache(new Cache<String, StudyObject>("cacheObject", true, mainSoc.getObjectsMap()));
+    		addCache(new Cache<String, StudyObject>("cacheObject", true, study.getObjectsMap()));
     		addCache(new Cache<String, String>("cacheObjectBySocAndScopeUri", false, StudyObject.buildCachedObjectBySocAndScopeUri()));
     		addCache(new Cache<String, String>("cacheObjectBySocAndOriginalId", false, StudyObject.buildCachedObjectBySocAndOriginalId()));
     		addCache(new Cache<String, String>("cacheScopeBySocAndObjectUri", false, StudyObject.buildCachedScopeBySocAndObjectUri()));
@@ -772,7 +777,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     }
     
     @SuppressWarnings("unchecked")
-    private void addObjectToCache(StudyObject newObj, String scopeUri) {
+    private void addObjectToCache(StudyObject newObj, String scopeUri, String scopeObjUri) {
     	if (newObj == null || caches.get("cacheObject").containsKey(newObj.getUri())) {
     		return;
     	}
@@ -786,9 +791,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	    caches.get("cacheObjectBySocAndOriginalId").put(keySocAndOriginalId, newObj.getUri());
     	}
     	
-    	String keySocAndScopeUri = newObj.getIsMemberOf() + ":" + scopeUri;
+    	String keySocAndScopeUri = scopeObjUri + ":" + newObj.getIsMemberOf();
     	if (!caches.get("cacheObjectBySocAndScopeUri").containsKey(keySocAndScopeUri)) {
-    	    caches.get("cacheObjectBySocAndScopeUri").put(keySocAndScopeUri, newObj.getUri());
+    		System.out.println("Adding to SocAndScopeUri: {" + scopeObjUri + "}  {" + newObj.getIsMemberOf() + "}");
+    		caches.get("cacheObjectBySocAndScopeUri").put(keySocAndScopeUri, newObj.getUri());
     	}
     }
 
@@ -797,6 +803,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (caches.get("cacheObject").containsKey(key)) {
     		return (StudyObject)caches.get("cacheObject").get(key); 
     	} else {
+    		System.out.println("Checking cache: NOT FOUND THE FOLLOWING {" + key + "}");
     	    /*
     		StudyObject obj = StudyObject.find(key);
     		if (obj != null) {

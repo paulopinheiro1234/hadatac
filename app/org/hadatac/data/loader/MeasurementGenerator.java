@@ -70,7 +70,7 @@ public class MeasurementGenerator extends BaseGenerator {
         this.dataFile = dataFile;
         String fileName = dataFile.getFileName();
         this.dasoiGen = dasoiGen;
-        if (dasoiGen.initiateCache()) {
+        if (dasoiGen.initiateCache(da.getStudyUri())) {
         	setStudyUri(da.getStudyUri());
             urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
         } else {

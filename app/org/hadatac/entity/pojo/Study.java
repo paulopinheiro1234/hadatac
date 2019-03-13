@@ -487,6 +487,34 @@ public class Study extends HADatAcThing {
         return study;
     }
 
+    public Map<String, StudyObject> getObjectsMap() {
+        Map<String, StudyObject> resp = new HashMap<String, StudyObject>();
+        String queryString = "";
+        queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?objUri " + 
+                " WHERE {  ?objUri hasco:isMemberOf ?socUri . " + 
+                "          ?socUri rdfs:subClassOf hasco:ObjectCollection . " +  
+                "          ?socUri hasco:isMemberOf <" + URIUtils.replaceNameSpaceEx(getUri()) + "> . " +  
+                " }";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        StudyObject obj = null;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("objUri").getURI()!= null) { 
+                obj = StudyObject.find(soln.get("objUri").toString());
+                //System.out.println("StudyObject URI: " + soln.get("objUri").toString());
+                if (obj != null) {
+                	resp.put(obj.getUri(), obj);
+                }
+            }
+        }
+
+        return resp;
+    }
+
     private static List<String> findObjectCollectionUris(String study_uri) {
         //System.out.println("findObjectCollectionUris() is called");
         //System.out.println("study_uri: " + study_uri);
