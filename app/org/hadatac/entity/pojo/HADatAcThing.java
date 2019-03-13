@@ -16,6 +16,7 @@ import org.hadatac.metadata.api.MetadataFactory;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -25,6 +26,7 @@ import org.hadatac.utils.NameSpaces;
 
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.annotations.Subject;
 import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.http.SPARQLUtils;
@@ -277,7 +279,7 @@ public abstract class HADatAcThing implements Facetable {
         
         Map<String, Object> row = new HashMap<String, Object>();
 
-        try {            
+        try {
             Class<?> currentClass = getClass();
             while(currentClass != null) {                
                 for (Field field: currentClass.getDeclaredFields()) {
@@ -343,6 +345,71 @@ public abstract class HADatAcThing implements Facetable {
                         CollectionUtil.Collection.METADATA_GRAPH));
 
         return numCommitted >= 0;
+    }
+    
+    public void fromStatement(Statement statement) {
+        String predicate = statement.getPredicate().getURI();
+        String object = statement.getObject().toString();
+        
+        fromPredicateObject(predicate, object);
+    }
+    
+    public void fromQuerySolution(QuerySolution solnFromDescribe) {
+        // build object from results of DESCRIBE query
+        String predicate = solnFromDescribe.get("predicate").toString();
+        String object = solnFromDescribe.get("object").toString();
+        
+        fromPredicateObject(predicate, object);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void fromPredicateObject(String predicate, String object) {
+        try {
+            Class<?> currentClass = getClass();
+            while(currentClass != null) {                
+                for (Field field: currentClass.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    
+                    if (field.isAnnotationPresent(PropertyField.class)) {
+                        PropertyField propertyField = field.getAnnotation(PropertyField.class);
+                        String propertyUri = URIUtils.replacePrefixEx(propertyField.uri());
+                        
+                        if (predicate.equals(propertyUri)) {
+                            if (field.getType().equals(String.class)) {
+                                field.set(this, object);
+                            }
+
+                            if (field.getType().equals(List.class)) {
+                                List<String> list = (List<String>)field.get(this);
+                                if (!list.contains(object)) {
+                                    list.add(object);
+                                }
+                            }
+
+                            if (field.getType().equals(Integer.class)) {
+                                field.set(this, Integer.parseInt(object));
+                            }
+
+                            if (field.getType().equals(Double.class)) {
+                                field.set(this, Double.parseDouble(object));
+                            }
+
+                            if (field.getType().equals(Long.class)) {
+                                field.set(this, Long.parseLong(object));
+                            }
+                        }
+                    }
+                }
+                
+                currentClass = currentClass.getSuperclass();
+            }
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void deleteFromTripleStore() {       

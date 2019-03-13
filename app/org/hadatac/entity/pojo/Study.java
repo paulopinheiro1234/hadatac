@@ -500,7 +500,7 @@ public class Study extends HADatAcThing {
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         StudyObject obj = null;
-        while (resultsrw.hasNext()) {
+        while (resultsrw.hasNext()){
             QuerySolution soln = resultsrw.next();
             if (soln != null && soln.getResource("objUri").getURI()!= null) { 
                 obj = StudyObject.find(soln.get("objUri").toString());
@@ -512,6 +512,33 @@ public class Study extends HADatAcThing {
         }
 
         return resp;
+    }
+    
+    public Map<String, StudyObject> getObjectsMapInBatch() {
+        Map<String, StudyObject> results = new HashMap<String, StudyObject>();
+        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "DESCRIBE ?objUri WHERE { \n" +
+                "  ?objUri hasco:isMemberOf ?socUri . \n" + 
+                "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +  
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            String uri = soln.get("subject").toString();
+            if (soln != null && uri!= null) {
+                if (!results.containsKey(uri)) {
+                    results.put(uri, new StudyObject());
+                }
+                
+                results.get(uri).fromQuerySolution(soln);
+            }
+        }
+
+        return results;
     }
 
     private static List<String> findObjectCollectionUris(String study_uri) {

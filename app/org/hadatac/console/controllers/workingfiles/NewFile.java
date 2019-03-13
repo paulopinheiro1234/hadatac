@@ -18,7 +18,6 @@ import javax.inject.Inject;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.Environment;
-import play.Play;
 import play.data.*;
 
 import org.hadatac.console.models.FileType;
@@ -29,7 +28,7 @@ import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.ReadResource;
+//import org.hadatac.utils.ReadResource;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
