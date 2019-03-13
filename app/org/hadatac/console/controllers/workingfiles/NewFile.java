@@ -28,7 +28,6 @@ import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-//import org.hadatac.utils.ReadResource;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
