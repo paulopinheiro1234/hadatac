@@ -493,8 +493,7 @@ public class Study extends HADatAcThing {
         queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "SELECT ?objUri " + 
                 " WHERE {  ?objUri hasco:isMemberOf ?socUri . " + 
-                "          ?socUri rdfs:subClassOf hasco:ObjectCollection . " +  
-                "          ?socUri hasco:isMemberOf <" + URIUtils.replaceNameSpaceEx(getUri()) + "> . " +  
+                "          ?socUri hasco:isMemberOf <" + getUri() + "> . " +  
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(

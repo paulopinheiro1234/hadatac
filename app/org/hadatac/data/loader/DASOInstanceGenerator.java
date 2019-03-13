@@ -23,7 +23,7 @@ import java.util.Iterator;
 
 public class DASOInstanceGenerator extends BaseGenerator {
 
-	private final boolean DEBUG_MODE = true;
+	private final boolean DEBUG_MODE = false;
 	private final int ID_LENGTH = 5;
 	
 	private final String SIO_OBJECT = "sio:Object";
@@ -791,9 +791,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	    caches.get("cacheObjectBySocAndOriginalId").put(keySocAndOriginalId, newObj.getUri());
     	}
     	
-    	String keySocAndScopeUri = scopeObjUri + ":" + newObj.getIsMemberOf();
+    	String keySocAndScopeUri =  newObj.getIsMemberOf() + ":" + scopeObjUri;
     	if (!caches.get("cacheObjectBySocAndScopeUri").containsKey(keySocAndScopeUri)) {
-    		System.out.println("Adding to SocAndScopeUri: {" + scopeObjUri + "}  {" + newObj.getIsMemberOf() + "}");
     		caches.get("cacheObjectBySocAndScopeUri").put(keySocAndScopeUri, newObj.getUri());
     	}
     }
@@ -803,7 +802,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (caches.get("cacheObject").containsKey(key)) {
     		return (StudyObject)caches.get("cacheObject").get(key); 
     	} else {
-    		System.out.println("Checking cache: NOT FOUND THE FOLLOWING {" + key + "}");
     	    /*
     		StudyObject obj = StudyObject.find(key);
     		if (obj != null) {
@@ -849,7 +847,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
     
     @SuppressWarnings("unchecked")
     private String getCachedScopeBySocAndObjectUri(String soc_uri, String obj_uri) {
-        //System.out.println("cacheScopeBySocAndObjectUri: called with socUri=[" + soc_uri + "]  objUri=[" + obj_uri + "]");
     	String key = soc_uri + ":" + obj_uri;
     	if (caches.get("cacheScopeBySocAndObjectUri").containsKey(key)) {
     		return (String)caches.get("cacheScopeBySocAndObjectUri").get(key); 
