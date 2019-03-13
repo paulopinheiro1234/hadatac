@@ -499,7 +499,7 @@ public class StudyObject extends HADatAcThing {
         return "";
     }
     
-    public static Map<String, String> buildCachedUriBySocAndOriginalId() {
+    public static Map<String, String> buildCachedObjectBySocAndOriginalId() {
         Map<String, String> cache = new HashMap<String, String>();
         
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -523,7 +523,7 @@ public class StudyObject extends HADatAcThing {
             }
         }
         
-        System.out.println("buildCachedUriBySocAndOriginalId: " + cache.size());
+        System.out.println("buildCachedObjectBySocAndOriginalId: " + cache.size());
 
         return cache;
     }
@@ -560,7 +560,7 @@ public class StudyObject extends HADatAcThing {
         return "";
     }
     
-    public static Map<String, String> buildCachedUriBySocAndScopeUri() {
+    public static Map<String, String> buildCachedObjectBySocAndScopeUri() {
         Map<String, String> cache = new HashMap<String, String>();
         
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -615,13 +615,42 @@ public class StudyObject extends HADatAcThing {
 
         return "";
     }
+    
+    public static Map<String, String> buildCachedScopeBySocAndObjectUri() {
+        Map<String, String> cache = new HashMap<String, String>();
+        
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT DISTINCT ?scopeUri ?socUri ?objUri WHERE { \n" + 
+                "  ?objUri hasco:hasObjectScope ?scopeUri . \n" + 
+                "  ?scopeUri hasco:isMemberOf ?socUri . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("scopeUri") != null 
+                        && soln.get("socUri") != null 
+                        && soln.get("objUri") != null) {
+                    String key = soln.get("socUri").toString() + ":" + soln.get("objUri").toString();
+                    cache.put(key, soln.get("scopeUri").toString());
+                }
+            }
+        }
+        
+        System.out.println("buildCachedScopeBySocAndObjectUri: " + cache.size());
+
+        return cache;
+    }
 
     /*
      *    this query traverses the grounding path backwards because the isMemberOf is of the scopeUri 
      *    rather than the isMemberOf of the objUri
      */
-    public static String findObjectScopeUriBySoc(String socUri, String objUri) {
-    	//System.out.println("StudyObject: findObjectScopeUriBySoc: SOCURI=[" + socUri + "]  OBJURI=[" + objUri + "]");
+    public static String findScopeBySocAndObjectUri(String socUri, String objUri) {
+    	//System.out.println("StudyObject: findScopeBySocAndObjectUri: SOCURI=[" + socUri + "]  OBJURI=[" + objUri + "]");
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT  ?scopeUri WHERE { " + 
                 "      VALUES ?objUri { <" + objUri + "> } . " + 

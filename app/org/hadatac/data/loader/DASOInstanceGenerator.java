@@ -45,13 +45,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
     
-    /*
-    private Map<String, StudyObject> cacheObject = null;
-    private Map<String, String> cacheSocAndScopeUri = null;
-    private Map<String, String> cacheSocAndOriginalId = null;
-    private Map<String, String> cacheObjectScopeUri = null;
-    */
-    
     public DASOInstanceGenerator(RecordFile file, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
         super(file);
 
@@ -594,7 +587,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
             // Lookup first study object
             ObjectCollection currentSoc = iter.previous();
-            String currentObjUri = getCachedSocAndOriginalId(currentSoc.getUri(), id); 
+            String currentObjUri = getCachedObjectBySocAndOriginalId(currentSoc.getUri(), id); 
             if (DEBUG_MODE) { 
             	System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
             }
@@ -769,9 +762,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	if (mainSoc != null) {
     		System.out.println("INITIATE CACHE BEING CALLED!");
     		addCache(new Cache<String, StudyObject>("cacheObject", true, mainSoc.getObjectsMap()));
-    		addCache(new Cache<String, String>("cacheSocAndScopeUri", false, StudyObject.buildCachedUriBySocAndScopeUri()));
-    		addCache(new Cache<String, String>("cacheSocAndOriginalId", false, StudyObject.buildCachedUriBySocAndOriginalId()));
-    		addCache(new Cache<String, String>("cacheObjectScopeUri", false, StudyObject.buildCachedUriByOriginalId()));
+    		addCache(new Cache<String, String>("cacheObjectBySocAndScopeUri", false, StudyObject.buildCachedObjectBySocAndScopeUri()));
+    		addCache(new Cache<String, String>("cacheObjectBySocAndOriginalId", false, StudyObject.buildCachedObjectBySocAndOriginalId()));
+    		addCache(new Cache<String, String>("cacheScopeBySocAndObjectUri", false, StudyObject.buildCachedScopeBySocAndObjectUri()));
     	    
     		return true;
     	}
@@ -784,18 +777,18 @@ public class DASOInstanceGenerator extends BaseGenerator {
     		return;
     	}
     	
-    	if (caches.get("cacheObject").containsKey(newObj.getUri())) {
+    	if (!caches.get("cacheObject").containsKey(newObj.getUri())) {
     	    caches.get("cacheObject").put(newObj.getUri(), newObj);
     	}
     	
     	String keySocAndOriginalId = newObj.getIsMemberOf() + ":" + newObj.getOriginalId();
-    	if (!caches.get("cacheSocAndOriginalId").containsKey(keySocAndOriginalId)) {
-    	    caches.get("cacheSocAndOriginalId").put(keySocAndOriginalId, newObj.getUri());
+    	if (!caches.get("cacheObjectBySocAndOriginalId").containsKey(keySocAndOriginalId)) {
+    	    caches.get("cacheObjectBySocAndOriginalId").put(keySocAndOriginalId, newObj.getUri());
     	}
     	
     	String keySocAndScopeUri = newObj.getIsMemberOf() + ":" + scopeUri;
-    	if (!caches.get("cacheSocAndScopeUri").containsKey(keySocAndScopeUri)) {
-    	    caches.get("cacheSocAndScopeUri").put(keySocAndScopeUri, scopeUri);
+    	if (!caches.get("cacheObjectBySocAndScopeUri").containsKey(keySocAndScopeUri)) {
+    	    caches.get("cacheObjectBySocAndScopeUri").put(keySocAndScopeUri, newObj.getUri());
     	}
     }
 
@@ -815,15 +808,15 @@ public class DASOInstanceGenerator extends BaseGenerator {
     }
     
     @SuppressWarnings("unchecked")
-    private String getCachedSocAndOriginalId(String soc_uri, String id) {
+    private String getCachedObjectBySocAndOriginalId(String soc_uri, String id) {
     	String key = soc_uri + ":" + id;
-    	if (caches.get("cacheSocAndOriginalId").containsKey(key)) {
-    		return (String)caches.get("cacheSocAndOriginalId").get(key); 
+    	if (caches.get("cacheObjectBySocAndOriginalId").containsKey(key)) {
+    		return (String)caches.get("cacheObjectBySocAndOriginalId").get(key); 
     	} else {
     	    /*
     		String uri = StudyObject.findUriBySocAndOriginalId(soc_uri, id);
     		if (uri != null && !uri.equals("")) {
-    		    caches.get("cacheSocAndOriginalId").put(key, uri);
+    		    caches.get("cacheObjectBySocAndOriginalId").put(key, uri);
     		}
     		*/
     		return null;
@@ -833,13 +826,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
     @SuppressWarnings("unchecked")
     private String getCachedSocAndScopeUri(String soc_uri, String scope_uri) {
     	String key = soc_uri + ":" + scope_uri;
-    	if (caches.get("cacheSocAndScopeUri").containsKey(key)) {
-    		return (String)caches.get("cacheSocAndScopeUri").get(key); 
+    	if (caches.get("cacheObjectBySocAndScopeUri").containsKey(key)) {
+    		return (String)caches.get("cacheObjectBySocAndScopeUri").get(key); 
     	} else {
     	    /*
     		String uri = StudyObject.findUriBySocAndScopeUri(soc_uri, scope_uri);
     		if (uri != null && !uri.equals("")) {
-    		    caches.get("cacheSocAndScopeUri").put(key, uri);
+    		    caches.get("cacheObjectBySocAndScopeUri").put(key, uri);
     		}
     		return uri;
     		*/
@@ -848,16 +841,16 @@ public class DASOInstanceGenerator extends BaseGenerator {
     }
     
     @SuppressWarnings("unchecked")
-    private String getCachedObjectScopeUri(String soc_uri, String obj_uri) {
-        //System.out.println("cacheSocAndScopeUri: called with socUri=[" + soc_uri + "]  objUri=[" + obj_uri + "]");
+    private String getCachedScopeBySocAndObjectUri(String soc_uri, String obj_uri) {
+        //System.out.println("cacheScopeBySocAndObjectUri: called with socUri=[" + soc_uri + "]  objUri=[" + obj_uri + "]");
     	String key = soc_uri + ":" + obj_uri;
-    	if (caches.get("cacheObjectScopeUri").containsKey(key)) {
-    		return (String)caches.get("cacheObjectScopeUri").get(key); 
+    	if (caches.get("cacheScopeBySocAndObjectUri").containsKey(key)) {
+    		return (String)caches.get("cacheScopeBySocAndObjectUri").get(key); 
     	} else {
     	    /*
-    	    String uri = StudyObject.findObjectScopeUriBySoc(soc_uri, obj_uri);
+    	    String uri = StudyObject.findScopeBySocAndObjectUri(soc_uri, obj_uri);
     		if (uri != null && !uri.equals("")) {
-    		    caches.get("cacheObjectScopeUri").put(key, uri);
+    		    caches.get("cacheScopeBySocAndObjectUri").put(key, uri);
     		}
     		*/
     		return null;
@@ -895,7 +888,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         // Lookup first study object
-        String currentObjUri = getCachedSocAndOriginalId(currentSoc.getUri(), id); 
+        String currentObjUri = getCachedObjectBySocAndOriginalId(currentSoc.getUri(), id); 
 
         if (groundingPath == null || groundingPath.size() <= 0) {
         	obj = getCachedObject(currentObjUri);
@@ -917,7 +910,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             if (DEBUG_MODE) { 
             	System.out.println("DASOInstanceGenerator:      nextSOC=[" + nextSoc.getUri() + "] Obj URI=[" + currentObjUri + "]");
             }
-            String nextObjUri = getCachedObjectScopeUri(nextSoc.getUri(), currentObjUri); 
+            String nextObjUri = getCachedScopeBySocAndObjectUri(nextSoc.getUri(), currentObjUri); 
             if (nextObjUri == null || nextObjUri.equals("")) {
                 //System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
                 currentSoc = nextSoc;
