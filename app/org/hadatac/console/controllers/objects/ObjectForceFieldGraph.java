@@ -14,17 +14,17 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.HADatAcThing;
-import org.hadatac.entity.pojo.InRelationToInstance;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Unit;
 import org.hadatac.metadata.loader.URIUtils;
 
 public class ObjectForceFieldGraph {
 	
-    List<OCNode> nodes = new ArrayList<OCNode>();
+    List<OCNode> nodes = null;
     List<StudyObject> obj = null;
     
     public ObjectForceFieldGraph(StudyObject obj) {
+    	nodes = new ArrayList<OCNode>();
     	if (obj == null) {
     		return;
     	}
@@ -33,6 +33,10 @@ public class ObjectForceFieldGraph {
     }
         
     private void addObject(StudyObject obj, String toLabel, String fromLabel) {
+    	
+    	if (obj == null) {
+    		return;
+    	}
     	
     	// Verify if object has already been added
     	if (getNodeWithUri(obj.getUri()) != null) {
@@ -51,7 +55,7 @@ public class ObjectForceFieldGraph {
     		toList.add(toLabel);
     	}
 
-    	OCNode objNode = new OCNode(nameNode, obj.getUri(), OCNode.OBJECT, objectHtml(nameNode, obj), toList);
+    	OCNode objNode = new OCNode(nameNode, obj.getUri(), OCNode.OBJECT, objectHtml(obj), toList);
     	nodes.add(objNode);
     	addObjectProperties(obj, objNode);
 
@@ -129,10 +133,12 @@ public class ObjectForceFieldGraph {
     	}
     }
     
-    private String objectHtml(String id, StudyObject obj) {
+    public static String objectHtml(StudyObject obj) {
     	String html = "";
     	html += "<h3>Object Details</h3>";
-    	html += "<b>Internal Id</b>: " + id + "<br>"; 
+    	html += " (see ";
+        html += "<input type=\"button\" value=\"graph in new window\" onclick=\"msg('" + obj.getUri() + "')\">";
+    	html += ")<br>"; 
     	html += "<b>Original Id</b>: " + obj.getOriginalId() + "<br>";
     	Entity ent = Entity.find(obj.getTypeUri());
     	html += "<b>Entity</b>: " + ent.getLabel() + " (" + URIUtils.replaceNameSpace(obj.getTypeUri()) + ") <br>";
@@ -171,7 +177,7 @@ public class ObjectForceFieldGraph {
     }
     
     @SuppressWarnings("unchecked")
-	private String toJson() {
+	public String toJson() {
     	
     	JSONObject dag = new JSONObject();
 	
@@ -211,12 +217,4 @@ public class ObjectForceFieldGraph {
     	return dag.toJSONString();
     }
     
-    public String getQueryResult() {
-    	if (nodes.size() == 0){
-    		return "";
-    	} else{
-    		return toJson();
-    	}	
-    } 
-
 }

@@ -12,7 +12,13 @@ public class OCNode {
     public static final int SPACEOBJECT = 2;
     public static final int TIMEOBJECT = 3;
     public static final int PROPERTY = 4;
-    public static final int ATTRIBUTE = 5;
+    public static final int VARIABLE = 5;
+    public static final int SOC = 6;
+    public static final int ONTOLOGY = 7;
+    public static final int INDICATOR = 8;
+    public static final int DEPLOYMENT = 9;
+    public static final int SDD = 10;
+    public static final int DASPEC = 11;
     
     private String name;
     private String uri;
@@ -47,4 +53,11 @@ public class OCNode {
     public List<String> getMemberOf() {
         return memberOf;
     }
+    
+    public void addMember(String memberName) {
+    	memberOf.add(memberName);
+    }
+    
+    
+    
 }

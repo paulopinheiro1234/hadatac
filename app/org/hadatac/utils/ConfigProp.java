@@ -60,6 +60,10 @@ public class ConfigProp {
 		}
 	}
 	
+	public static String getBasePrefix() {
+		return ConfigFactory.load().getString("hadatac.community.ont_prefix");
+	}
+	
 	public static String getKbPrefix() {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix") + "-kb:";
 	}

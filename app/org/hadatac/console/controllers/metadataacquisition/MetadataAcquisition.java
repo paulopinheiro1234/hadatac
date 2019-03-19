@@ -144,7 +144,7 @@ public class MetadataAcquisition extends Controller {
 			if (soln.contains("studyLabel") && !studyInfo.containsKey("studyLabel_str")) {
 				studyInfo.put("studyLabel_str", "<a href=\""
 						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
-						+ "/hadatac/studies/viewStudy?study_uri=" 
+						+ "/hadatac/studies/view?study_uri=" 
 						+ URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
 						+ soln.get("studyId").toString() + "</a>");
 			}

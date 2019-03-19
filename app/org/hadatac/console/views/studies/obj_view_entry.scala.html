@@ -33,8 +33,15 @@
      }
 
      <td>
-         <a href="@org.hadatac.console.controllers.objects.routes.ObjectView.index(URLEncoder.encode(obj.getUri(), "UTF-8"))"
+         <a href="@org.hadatac.console.controllers.objects.routes.ObjectView.index(URLEncoder.encode(obj.getUri(), "UTF-8"), false)"
             class="btn-xs btn-primary" role="button">View</a>
-     </td>
+         <a onclick="openWindowsFunction()" class="btn-xs btn-primary" role="button">View New Windows</a>
+    </td>
  </tr>
 }
+
+<script>
+function openWindowsFunction() {
+  window.open("@org.hadatac.console.controllers.objects.routes.ObjectView.index(URLEncoder.encode(obj.getUri(), "UTF-8"), false)".replace("&amp;","&"));
+}
+</script>
