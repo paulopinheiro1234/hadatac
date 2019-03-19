@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.objects;
+package org.hadatac.console.controllers.studies;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.objects.*;
+import org.hadatac.console.views.html.studies.*;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Study;
@@ -39,36 +39,18 @@ import org.hadatac.utils.NameSpaces;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class ObjectView extends Controller {
+public class StudyViewGraph extends Controller {
 	
-    public static int PAGESIZE = 7;
-
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String obj_uri, boolean autorefresh) {
+    public Result index(String study_uri, boolean autoRefresh, int maxObjPerSOC) {
 
-        try {
-            obj_uri = URLDecoder.decode(obj_uri, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            obj_uri = "";
-        }
-
-        /* 
-         * In this function it is fine for obj (StudyObject) to be null 
-         */
-        StudyObject obj = StudyObject.find(obj_uri);
-
-        ObjectForceFieldGraph graph = new ObjectForceFieldGraph(obj);        
+        StudyForceFieldGraph graph = new StudyForceFieldGraph(study_uri, maxObjPerSOC);        
         
-        System.out.println("");
-        
-        /* 
-         *  Important to forward the obj_uri even if it is not retrieving any object at the moment
-         */
-        return ok(objectView.render(graph, obj, obj_uri, autorefresh));
+        return ok(studyViewGraph.render(study_uri, graph, autoRefresh, maxObjPerSOC));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String obj_uri, boolean autorefresh) {
-		return index(obj_uri, autorefresh);
+    public Result postIndex(String study_uri, boolean autoRefresh, int maxObjPerSOC) {
+		return index(study_uri, autoRefresh, maxObjPerSOC);
 	}
 }

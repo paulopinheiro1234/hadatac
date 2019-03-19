@@ -42,15 +42,15 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class KnowledgeGraphBrowser extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {
+    public Result index(boolean autoRefresh, boolean includeOntologies, boolean includeIndicators, boolean includeDeployments, boolean includeSDDs, boolean includeDASpecs) {
 
-        KGForceFieldGraph graph = new KGForceFieldGraph();        
+        KGForceFieldGraph graph = new KGForceFieldGraph(includeOntologies, includeIndicators, includeDeployments, includeSDDs, includeDASpecs);        
         
-        return ok(knowledgeGraphBrowser.render(graph));
+        return ok(knowledgeGraphBrowser.render(graph, autoRefresh, includeOntologies, includeIndicators, includeDeployments, includeSDDs, includeDASpecs));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-		return index();
+    public Result postIndex(boolean autoRefresh, boolean includeOntologies, boolean includeIndicators, boolean includeDeployments, boolean includeSDDs, boolean includeDASpecs) {
+		return index(autoRefresh, includeOntologies, includeIndicators, includeDeployments, includeSDDs, includeDASpecs);
 	}
 }

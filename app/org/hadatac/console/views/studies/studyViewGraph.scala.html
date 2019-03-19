@@ -1,7 +1,7 @@
-@(results     : org.hadatac.console.controllers.objects.ObjectForceFieldGraph,
-  obj         : org.hadatac.entity.pojo.StudyObject,
-  obj_uri     : String,
-  autorefresh : Boolean)
+@(study_uri      : String,
+  results        : org.hadatac.console.controllers.studies.StudyForceFieldGraph,
+  autorefresh    : Boolean,
+  maxObjsPerSOC    : Integer)
   
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -11,7 +11,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@maingraph("Object View") {
+@maingraph("Study Graph") {
 	<head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
@@ -22,21 +22,25 @@
     <body>
 
     <div class="container-fluid">
-
-    	<h4>Object's Graph View</h4>
+    	<h4>Study's Graph View</h4>
 		<div class="container">
   			<form>
     			<label class="checkbox-inline">
-      				<input id="autorefresh" type="checkbox" >Auto-Refresh
+      				<input id="autorefresh" type="checkbox" value="" onclick="openWindowsFunction()">Auto-Refresh
     			</label>
+    			<label class="checkbox-inline">
+      				<input type="checkbox" value="">Max Objects Per SOC
+			    </label>
   			</form>
 		</div>
 
 	    <div class="row">
         	<div class="col-lg-12">
+
         	    <div id="query" data-results="@results.toJson()"></div>
- 	            <div id="graph-container">
-    	            <div id="graph"></div>
+ 	            <div id="graph-container" style="height: 800px;visibility: visible;">
+    	            <div id="graph" style="display: block; height: 700px;">
+    	            </div>
         	    </div>
             	<div id="docs-container">
                 	<a id="docs-close" href="#">&times;</a>
@@ -63,7 +67,7 @@ var refreshVar
 $( '#autorefresh' ).prop( "checked", @autorefresh );
 if ($('#autorefresh').is(':checked')) {
 	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,autorefresh)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,autorefresh,maxObjsPerSOC)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
 	}, 30000)};
@@ -71,16 +75,22 @@ if ($('#autorefresh').is(':checked')) {
 
 $('#autorefresh').change(function() {
   if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,true)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,true,maxObjsPerSOC)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
   } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,false)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,false,maxObjsPerSOC)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
   }
 });
 
+function msg(obj_uri){
+    var urlStr = "@org.hadatac.console.controllers.objects.routes.ObjectView.index("zzzzzz", false)";
+    obj_uri = encodeURIComponent(obj_uri);
+    urlStr = urlStr.replace(/&amp;/g, '&').replace("zzzzzz",obj_uri);
+    window.open(urlStr);
+}
     </script> 
    	</body>
 } 

@@ -39,7 +39,7 @@ import org.hadatac.utils.NameSpaces;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class ViewStudy extends Controller {
+public class StudyView extends Controller {
 	
     public static int PAGESIZE = 7;
 
@@ -86,7 +86,7 @@ public class ViewStudy extends Controller {
             total = StudyObject.getNumberStudyObjectsByCollection(oc_uri);
         }
 
-        return ok(viewStudy.render(graph.getTreeQueryResult().replace("\n", " "), study, agent, institution, oc, objects, page, total));
+        return ok(studyView.render(graph.getTreeQueryResult().replace("\n", " "), study, agent, institution, oc, objects, page, total));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

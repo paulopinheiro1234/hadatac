@@ -13,6 +13,10 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -968,6 +972,30 @@ public class StudyObject extends HADatAcThing {
         super.deleteFromTripleStore();
     }
 
+    /*
+    public void deleteFromStudy(String study_uri) {
+        String query = "";
+
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " DELETE WHERE { \n";
+        if (study_uri.startsWith("http")) {
+            query += "<" + this.getUri() + ">";
+        } else {
+            query += this.getUri();
+        }
+        query += " ?p ?o . \n";
+        query += " } ";
+
+        UpdateRequest request = UpdateFactory.create(query);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+        processor.execute();
+
+        //System.out.println("Deleted <" + getUri() + "> from triple store");
+
+    }
+    */
+    
     @Override
     public int deleteFromLabKey(String user_name, String password) {
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);

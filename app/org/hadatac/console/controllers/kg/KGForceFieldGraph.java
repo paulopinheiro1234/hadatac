@@ -12,62 +12,304 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.Attribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Instrument;
+import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.NameSpace;
+import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 
 public class KGForceFieldGraph {
 	
-    List<OCNode> nodes = new ArrayList<OCNode>();
+    List<OCNode> nodes = null;
     List<Study> studies = null;
-    Map<String,OCNode> attributes = new HashMap<String, OCNode>();
+    List<NameSpace> ontologies = null;
+    List<Deployment> deployments = null;
+    List<DataAcquisitionSchema> sdds = null;
+    List<ObjectAccessSpec> daspecs = null;
+    Map<String,OCNode> variables = null;
+    boolean includeOntologies;
+    boolean includeIndicators;
+    boolean includeDeployments;
+    boolean includeSDDs;
+    boolean includeDASpecs;
     
-    public KGForceFieldGraph() {
-    	System.out.println("HERE MAIN 1");
+    public KGForceFieldGraph(boolean includeOntologies, boolean includeIndicators, boolean includeDeployments, boolean includeSDDs, boolean includeDASpecs) {
+        this.includeOntologies = includeOntologies;
+        this.includeIndicators = includeIndicators;
+        this.includeDeployments = includeDeployments;
+        this.includeSDDs = includeDeployments;
+        this.includeDASpecs = includeDASpecs;
+        nodes = new ArrayList<OCNode>();
+        variables = new HashMap<String, OCNode>();
+
+    	// Ontologies need to be added before than studies
+        if (includeOntologies) {
+        	//System.out.println("=========================================== ONTOLOGIES");
+        	ontologies = NameSpaces.getInstance().getOrderedNamespacesAsList();
+        	if (ontologies != null && ontologies.size() > 0) {
+        		for (NameSpace ont: ontologies) { 
+        			addOntology(ont);
+        		}
+        	}
+        }
+        
+        if (includeDeployments) {
+        	//System.out.println("=========================================== DEPLOYMENTS");
+        	State state = new State(State.ACTIVE);
+        	deployments = Deployment.find(state);
+        	if (deployments != null && deployments.size() > 0) {
+        		for (Deployment dpl: deployments) { 
+        			addDeployment(dpl);
+        		}
+        	}
+        }
+        
+        if (includeSDDs) {
+        	//System.out.println("=========================================== SDDs");
+        	sdds = DataAcquisitionSchema.findAll();
+        	if (sdds != null && sdds.size() > 0) {
+        		for (DataAcquisitionSchema sdd: sdds) { 
+        			addSDD(sdd);
+        		}
+        	}
+        }
+        
+        //System.out.println("=========================================== STUDIES");
     	studies = Study.find();
-    	if (studies == null) {
-    		return;
+    	if (studies != null && studies.size() > 0) {
+    		for (Study study: studies) { 
+    			addStudy(study);
+    		}
     	}
-    	for (Study study: studies) { 
-    		//System.out.println("StudiesForceFieldGraph: JSON=[" + toJson() + "]");
-    		addStudy(study, "", "");
+    	
+    	// DASpecs need to be added after studies
+        if (includeDASpecs) {
+        	//System.out.println("=========================================== DASpecs");
+        	daspecs = ObjectAccessSpec.findAll() ;
+        	if (daspecs != null && daspecs.size() > 0) {
+        		for (ObjectAccessSpec daspec: daspecs) { 
+        			addDASpec(daspec);
+        		}
+        	}
+        }
+        
+    	if (includeOntologies) {
+    		setHAScOHierarchy();
     	}
-    	System.out.println("HERE MAIN 2");
+    	    	
+        //System.out.println("=========================================== JSON");
+        //System.out.println("JSON: [" + toJson() + "]");
+    	
     }
         
-    private void addStudy(Study study, String toLabel, String fromLabel) {
+    private void addStudy(Study study) {
     	
+    	if (study == null) {
+    		return;
+    	}
+    	
+    	//System.out.println("addStudy: " + study.getUri());
     	// Verify if study has already been added
     	if (getNodeWithUri(study.getUri()) != null) {
     		return;
     	}
 
-    	System.out.println("HERE ADD STUDY 1");
-
     	// add study itself and its attributes
-    	List<Attribute> attributes = Attribute.findByStudy(study.getUri());
+    	List<DataAcquisitionSchemaAttribute> variables = DataAcquisitionSchemaAttribute.findByStudy(study.getUri());
     	String nameNode = "Study " + study.getId();
-
     	OCNode studyNode = new OCNode(nameNode, study.getUri(), OCNode.STUDY, studyHtml(nameNode, study), new ArrayList<>());
     	nodes.add(studyNode);
-    	int i = 0;
-    	for (Attribute att : attributes) {
-    		addStudyAttribute(att, studyNode);
-        	System.out.println("HERE ADD STUDY 2 [" + i + "]");
+    	for (DataAcquisitionSchemaAttribute variable : variables) {
+    		addStudyVariable(variable, studyNode);
     	}
-    	System.out.println("HERE ADD STUDY 3");
-
+    	if (includeOntologies) {
+    		OCNode domain = getNodeStartsWithName(ConfigProp.getBasePrefix() + " ");
+    		if (domain != null) {
+    			domain.addMember(nameNode);
+    		}
+    	}
     }
     
-    private void addStudyAttribute(Attribute att, OCNode dependedOn) {
-    	System.out.println("HERE ADD ATTRIBUTE 1");
-    	nodes.add(new OCNode(att.getLabel(), att.getUri(), OCNode.ATTRIBUTE, attributeHtml(att), new ArrayList<>(Arrays.asList(dependedOn.getName()))));   	
-    	System.out.println("HERE ADD ATTRIBUTE 2");
+    private void addStudyVariable(DataAcquisitionSchemaAttribute variable, OCNode dependedOn) {
+    	if (variable == null || dependedOn == null || variable.getConcatAttributeLabel() == null || variable.getConcatAttributeLabel().equals("")) {
+    		return;
+    	}
+    	//System.out.println("addStudyVariable: " + variable.getConcatAttributeLabel());
+    	String varLabel = "";
+    	// to add role label
+		varLabel += variable.getConcatAttributeLabel(); 
+		if (variable.getInRelationToUri() != null && !variable.getInRelationToUri().equals("")) {
+			DataAcquisitionSchemaObject irt = DataAcquisitionSchemaObject.find(variable.getInRelationToUri());
+			if (irt == null || irt.getLabel() == null) {
+				varLabel += " null";
+			} else {
+				varLabel += " " + irt.getLabel();
+			}
+		}
+    	nodes.add(new OCNode(varLabel, variable.getUri(), OCNode.VARIABLE, variableHtml(variable), new ArrayList<>(Arrays.asList(dependedOn.getName()))));   	
+    }
+    
+    private void addOntology(NameSpace ont) {
+		//System.out.println("Add ontology " + ont.getAbbreviation());
+    	if (ont == null) {
+    		return; 
+    	}
+    	
+    	// add study itself and its attributes
+    	String nameNode = ont.getAbbreviation();
+    	if (ont.getURL() != null && !ont.getURL().equals("")) {
+    		if (ont.getNumberOfLoadedTriples() == 0) {
+    			return;
+    		} else {
+    			nameNode += " (" + ont.getNumberOfLoadedTriples() + " triples)";
+    		}
+    	}
+    	
+    	OCNode ontNode = new OCNode(nameNode, ont.getURL(), OCNode.ONTOLOGY, ontologyHtml(ont), new ArrayList<>());
+    	nodes.add(ontNode);
+    }
+    
+    private void addDeployment(Deployment dpl) {
+		//System.out.println("Add deployment " + dpl.getLabel());
+    	if (dpl == null) {
+    		return; 
+    	}
+    	
+    	// add study itself and its attributes
+    	String nameNode = dpl.getInstrument().getLabel();
+    	
+    	OCNode ontNode = new OCNode(nameNode, dpl.getUri(), OCNode.DEPLOYMENT, deploymentHtml(dpl), new ArrayList<>());
+    	nodes.add(ontNode);
+    }
+    
+    private void addSDD(DataAcquisitionSchema sdd) {
+		//System.out.println("Add SDD " + sdd.getLabel());
+    	if (sdd == null) {
+    		return; 
+    	}
+    	
+    	// add study itself and its attributes
+    	String nameNode = sdd.getLabel();
+    	
+    	OCNode ontNode = new OCNode(nameNode, sdd.getUri(), OCNode.SDD, sddHtml(sdd), new ArrayList<>());
+    	nodes.add(ontNode);
+    }
+    
+    private void addDASpec(ObjectAccessSpec daspec) {
+		//System.out.println("Add DASpec " + daspec.getLabel());
+    	if (daspec == null) {
+    		return; 
+    	}
+    	
+    	// add study itself and its attributes
+    	String nameNode = daspec.getLabel();
+    	
+    	OCNode daspecNode = new OCNode(nameNode, daspec.getUri(), OCNode.DASPEC, daspecHtml(daspec), new ArrayList<>());
+    	nodes.add(daspecNode);
+    	
+    	if (includeSDDs) {
+        	OCNode targetNode = getNodeWithUri(daspec.getSchemaUri());
+        	if (targetNode != null) {
+        		daspecNode.addMember(targetNode.getName());
+        	}
+    	}
+    	if (includeDeployments) {
+        	OCNode targetNode = getNodeWithUri(daspec.getDeploymentUri());
+        	if (targetNode != null) {
+        		daspecNode.addMember(targetNode.getName());
+        	}
+    	}
+    	OCNode studyNode = getNodeWithUri(daspec.getStudyUri());
+    	if (studyNode != null) {
+    		studyNode.addMember(daspecNode.getName());
+    	}
+    }
+    
+    private String studyHtml(String id, Study study) {
+    	String html = "";
+    	html += "<h3>Study Details</h3>";
+    	html += "<b>Id</b>: " + id;
+    	html += " (see ";
+        html += "<input type=\"button\" value=\"graph in new window\" onclick=\"msg('" + study.getUri() + "')\">";
+    	//html += "<form><input type=\"button\" value=\"" + study.getUri() + "\" onclick=\"msg('" + study.getUri() + "')\"></form>";
+        //html += "<button id=\"callstudy\" class=\"study\" value=\"" + study.getUri() + "\">graph in new window</button>";
+    	html += ")<br>"; 
+    	html += "<b>Title</b>: " + study.getTitle() + "<br>";
+    	html += "<b>Description</b>: " + study.getComment() + "<br>"; 
+    	html += "<b>URI</b>: " + URIUtils.replaceNameSpace(study.getUri()) + "<br>";
+    	return html;
+    }
+    
+    private String variableHtml(DataAcquisitionSchemaAttribute variable) {
+    	String html = "";
+    	html += "<h3>Variable Details</h3>";
+		html += "<b>Entity</b>: " + variable.getEntityLabel() + "<br>"; 
+		html += "<b>Attribute</b>: " + variable.getConcatAttributeLabel() + "<br>"; 
+		if (variable.getInRelationToLabel() != null && !variable.getInRelationToLabel().equals("")) {
+			html += "<b>In relation to</b>: " + variable.getInRelationToLabel() + "<br>"; 
+		}
+		if (variable.getUnitLabel() != null && !variable.getUnitLabel().equals("")) {
+			html += "<b>Unit</b>: " + variable.getUnitLabel() + "<br>"; 
+		}
+    	html += "<b>Source</b>: <br>"; 
+    	return html;
+    }
+    
+    private String ontologyHtml(NameSpace ont) {
+    	String html = "";
+    	html += "<h3>Ontology</h3>";
+		html += "<b>Abbreviation</b>: " + ont.getAbbreviation() + "<br>"; 
+		html += "<b>Name</b>: " + ont.getName() + "<br>";
+		if (ont.getURL() == null || ont.getURL().equals("")) {
+			html += "<b># loaded triples</b>: this ontology is not configured to be loaded in this HADatAc<br>"; 
+		} else {
+			html += "<b>URL</b>: " + ont.getURL() + "<br>"; 
+			html += "<b># loaded triples</b>: " + ont.getNumberOfLoadedTriples() + "<br>"; 
+			html += "<b>Type</b>: " + ont.getType() + "<br>"; 
+		}
+    	return html;
+    }
+    
+    private String deploymentHtml(Deployment dpl) {
+    	String html = "";
+    	html += "<h3>Deployment</h3>";
+		html += "<b>URI</b>: " + dpl.getUri() + "<br>";
+		Platform plt = dpl.getPlatform();
+		Instrument inst = dpl.getInstrument();
+		html += "<b>Platform</b>: " + plt.getLabel() + "<br>";
+		html += "<b>Instrument</b>: " + inst.getLabel() + "<br>";
+    	return html;
+    }
+    
+    private String sddHtml(DataAcquisitionSchema sdd) {
+    	String html = "";
+    	html += "<h3>Semanic Data Dictionary</h3>";
+		html += "<b>URI</b>: " + sdd.getUri() + "<br>";
+		html += "<b>Name</b>: " + sdd.getLabel() + "<br>";
+		html += "<b># of attributes</b>: " + sdd.getTotalDASA() + "<br>";
+		html += "<b># of objects</b>: " + sdd.getTotalDASO() + "<br>";
+    	return html;
+    }
+    
+    private String daspecHtml(ObjectAccessSpec daspec) {
+    	String html = "";
+    	html += "<h3>Data Acquisition Specification</h3>";
+		html += "<b>URI</b>: " + daspec.getUri() + "<br>";
+		html += "<b>Name</b>: " + daspec.getLabel() + "<br>";
+    	return html;
     }
     
     private OCNode getNodeWithUri(String uri) {
-    	if (nodes.size() > 0) {
+    	if (nodes != null && nodes.size() > 0) {
     		for (OCNode nd: nodes) {
-    			if (nd.getURI() != null && nd.getURI().equals(uri)) {
+    			if (nd != null && nd.getURI() != null && nd.getURI().equals(uri)) {
     				return nd;
     			}
     		}
@@ -75,26 +317,73 @@ public class KGForceFieldGraph {
     	return null;
     }
     
-    private String studyHtml(String id, Study study) {
-    	String html = "";
-    	html += "<h3>Study Details</h3>";
-    	html += "<b>Id</b>: " + id + "<br>"; 
-    	html += "<b>Title</b>: " + study.getTitle() + "<br>";
-    	html += "<b>Description</b>: " + study.getComment() + "<br>"; 
-    	html += "<b>URI</b>: " + URIUtils.replaceNameSpace(study.getUri()) + "<br>";
-    	return html;
+    private OCNode getNodeStartsWithName(String name) {
+    	if (nodes != null && nodes.size() > 0) {
+    		for (OCNode nd: nodes) {
+    			if (nd != null && nd.getName() != null && nd.getName().startsWith(name)) {
+    				return nd;
+    			}
+    		}
+    	}
+    	return null;
     }
-    
-    private String attributeHtml(Attribute att) {
-    	String html = "";
-    	html += "<h3>Attribute Details</h3>";
-		html += "<b>Label</b>: " + att.getClassName() + "<br>"; 
-    	html += "<b>Source</b>: <br>"; 
-    	return html;
+
+    private void setHAScOHierarchy() {
+    	OCNode node = getNodeStartsWithName("sio ");
+    	OCNode targetNode = getNodeStartsWithName(ConfigProp.getBasePrefix() + " ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("hasco ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	targetNode = getNodeStartsWithName("hasco ");
+    	node = getNodeStartsWithName("vstoi ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("prov ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("uo ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("rdfs ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("owl ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("rdf ");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("skos");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("foaf");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("xsd");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
+    	node = getNodeStartsWithName("dcterms");
+    	if (node != null && targetNode != null) {
+    		node.addMember(targetNode.getName());
+    	}
     }
+
     
     @SuppressWarnings("unchecked")
-	private String toJson() {
+	public String toJson() {
     	
     	JSONObject dag = new JSONObject();
 	
@@ -107,8 +396,16 @@ public class KGForceFieldGraph {
     		String nodeType = null;
     		if (tmpObject.getType() == OCNode.STUDY) {
     			nodeType = "study";
-    		} else if (tmpObject.getType() == OCNode.ATTRIBUTE) {
-    			nodeType = "attribute";
+    		} else if (tmpObject.getType() == OCNode.VARIABLE) {
+    			nodeType = "variable";
+    		} else if (tmpObject.getType() == OCNode.ONTOLOGY) {
+    			nodeType = "ontology";
+    		} else if (tmpObject.getType() == OCNode.DEPLOYMENT) {
+    			nodeType = "deployment";
+    		} else if (tmpObject.getType() == OCNode.SDD) {
+    			nodeType = "sdd";
+    		} else if (tmpObject.getType() == OCNode.DASPEC) {
+    			nodeType = "daspec";
     		} else {
     			nodeType = "";
     		}
@@ -134,12 +431,4 @@ public class KGForceFieldGraph {
     	return dag.toJSONString();
     }
     
-    public String getQueryResult() {
-    	if (nodes.size() == 0){
-    		return "";
-    	} else{
-    		return toJson();
-    	}	
-    } 
-
 }

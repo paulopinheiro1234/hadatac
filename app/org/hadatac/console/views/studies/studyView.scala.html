@@ -10,8 +10,8 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.metadataacquisition._
-@import org.hadatac.console.controllers.studies.ViewStudy
-@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / ViewStudy.PAGESIZE); var lastpage = (last + 1) 
+@import org.hadatac.console.controllers.studies.StudyView
+@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / StudyView.PAGESIZE); var lastpage = (last + 1) 
 @import org.hadatac.console.controllers._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.java.utils.TemplateUtils._
@@ -61,33 +61,33 @@
 		        @if(oc != null && objList != null) {
 
 					@if(prev >= 0) {
-    					<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn-xs btn-primary" 
+    					<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn-xs btn-primary" 
 	       				role="button">&lt;&lt;</a>
 	   
-				    	<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn-xs btn-primary" 
+				    	<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn-xs btn-primary" 
 	     				role="button">&lt;</a>
 					} else {
-    					<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn-xs btn-primary disabled" 
+    					<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn-xs btn-primary disabled" 
 	       				role="button">&lt;&lt;</a>
 	   
-	   					<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn-xs btn-primary disabled" 
+	   					<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn-xs btn-primary disabled" 
 	       				role="button">&lt;</a>
 					}
 
 					@current of @lastpage   
 	   
 					@if(next < last) {
-		    			<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn-xs btn-primary" 
+		    			<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn-xs btn-primary" 
 	    	   			role="button">&gt;</a>
 
-	    				<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn-xs btn-primary" 
+	    				<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn-xs btn-primary" 
 	       				role="button">&gt;&gt;</a>
 	   
 					} else {
-	    				<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn-xs btn-primary disabled" 
+	    				<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn-xs btn-primary disabled" 
 	       				role="button">&gt;</a>
 
-		    			<a href="@org.hadatac.console.controllers.studies.routes.ViewStudy.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn-xs btn-primary disabled" 
+		    			<a href="@org.hadatac.console.controllers.studies.routes.StudyView.index(URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn-xs btn-primary disabled" 
 	    	   			role="button">&gt;&gt;</a>	   
 					}
 
