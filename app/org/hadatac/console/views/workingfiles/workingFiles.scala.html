@@ -89,8 +89,8 @@
 		               <a href="" class="btn btn-xs btn-primary disabled" role="button" id="edit">Edit</a>
                     }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.WORKING, file.getFileName())" class="btn btn-xs btn-primary" role="button">Preview File</a>
-                    <a href="" class="btn btn-xs btn-primary disabled" role="button" id="edit">Edit</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.WORKING, file.getFileName(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.WORKING, file.getFileName(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                 }
                 </td>
                 <td>

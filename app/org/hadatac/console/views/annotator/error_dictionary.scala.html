@@ -1,0 +1,27 @@
+@(jsonText : String,
+  postAction : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.annotator._
+@import java.net._
+
+@main("Error Dictionary") {
+	<script src="@controllers.routes.Assets.versioned("javascripts/json-table/json-table.js")"></script>
+	<link href="@controllers.routes.Assets.versioned("javascripts/json-table/json-table.css")" rel="stylesheet">
+	
+	<div class="container-fluid">
+   	<div id="dictionary" data-documents="@jsonText"></div>
+	
+	<p id="table"></p>
+
+	<script>
+	   var jsonText = document.getElementById('dictionary').dataset.documents;
+	   var json = decodeURIComponent(jsonText);
+	   $("#table").html(buildTable($.parseJSON(json)));
+	</script>
+	
+    <br><br>
+    <a href="@postAction" class="btn btn-primary" role="button">Back</a>
+	</div>
+}

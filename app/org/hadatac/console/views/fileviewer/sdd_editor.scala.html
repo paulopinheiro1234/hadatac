@@ -98,7 +98,7 @@
       <div>
         <h3>SDD Editor</h3>
         <div id="drop">Drop a file here</div>
-        <input type="file" id="sdd_file" value=""/>
+        <input type="file" id="file" value=""/>
         <input class="btn btn-primary" type="button" id="upload" value="Submit" disabled/>
         <a class="btn btn-primary" role="button" id="download" disabled>Download</a>
       </div>
@@ -170,7 +170,7 @@
       }
     });
     
-    $("#sdd_file").change(function () {
+    $("#file").change(function () {
         var fileName = $(this).val();
         if (fileName.length > 0) {
             $("#upload").removeAttr("disabled");
