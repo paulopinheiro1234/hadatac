@@ -1,0 +1,35 @@
+{
+  "title": "Automatic Annotator Ingestion Error Dictionary",
+  "content": {
+    "STD": {
+      "file type": "STD",
+      "content": [
+        {
+          "id": "STD_00001",
+          "detail": "Study ID is empty",
+          "solution": "Fill in a study ID"
+        },
+        {
+          "id": "STD_00002",
+          "detail": "Study title not given",
+          "solution": "Fill in study title"
+        }
+      ]
+    },
+    "DPL": {
+      "file type": "DPL",
+      "content": [
+        {
+          "id": "DPL_00001",
+          "detail": "InfoSheet not found",
+          "solution": "Add InfoSheet"
+        },
+        {
+          "id": "DPL_00002",
+          "detail": "Unknown headers",
+          "solution": "Check headers"
+        }
+      ]
+    }
+  }
+}

@@ -32,6 +32,7 @@
 	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.setLabKeyCredentials()" class="btn btn-primary" role="button">Set LabKey Credentials for Background Process</a>
 	}
 	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
+	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>
     
 	<div id="frame">
     <div class="resumable-error">
@@ -121,7 +122,7 @@
                 class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.UNPROC, file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.UNPROC, file.getFileName(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
                 @if(bAdmin) {
@@ -186,7 +187,7 @@
                    class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.PROC, file.getFileName())" class="btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.PROC, file.getFileName(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(dir, file.getFileName())" 
                class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>

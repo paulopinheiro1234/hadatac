@@ -1,6 +1,11 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -12,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import org.hadatac.entity.pojo.Credential;
@@ -41,6 +48,8 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.FileManager;
 import org.hadatac.utils.NameSpace;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -50,7 +59,9 @@ import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.Http.MultipartFormData.FilePart;
 
 
 public class AutoAnnotator extends Controller {
@@ -280,6 +291,20 @@ public class AutoAnnotator extends Controller {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.AutoAnnotator.index(dir).url()));
         }
     }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result checkErrorDictionary() {
+        InputStream inputStream = getClass().getClassLoader()
+                .getResourceAsStream("error_dictionary.json");
+        String jsonText = "";
+        try {
+            jsonText = IOUtils.toString(inputStream, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return ok(error_dictionary.render(jsonText, routes.AutoAnnotator.index("/").url()));
+    }
 
     public Result getAnnotationStatus(String fileName) {
         DataFile dataFile = DataFile.findByName(fileName);
@@ -455,6 +480,53 @@ public class AutoAnnotator extends Controller {
         
         return ok(new File(path + "/" + file_name));
     }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result saveDataFile() {        
+        FilePart uploadedfile = request().body().asMultipartFormData().getFile("file");
+        
+        JSONParser parser = new JSONParser();
+        JSONObject params = null;
+        try {
+            String metadata = URLDecoder.decode(uploadedfile.getFilename(), "utf-8");
+            params = (JSONObject)parser.parse(metadata);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        String folder = (String)params.get("folder");
+        String filePath = (String)params.get("filePath");
+        Boolean bSavable = Boolean.parseBoolean((String)params.get("bSavable"));
+        
+        if (uploadedfile != null) {
+            String fileName = uploadedfile.getFilename();
+            String path = FileManager.getInstance().getPathByLabel(folder);
+            File file = new File(path + "/" + filePath);
+            
+            final SysUser user = AuthApplication.getLocalUser(session());
+            if (null == DataFile.findByName(user.getEmail(), filePath)) {
+                return ok("<a style=\"color:#cc3300; font-size: large;\">This file can be modified only by its owner!</a>");
+            }
+            
+            if (!file.exists()) {
+                return ok("<a style=\"color:#cc3300; font-size: large;\">Could not find this file on records!</a>");
+            }
+            
+            InputStream fileInputStream;
+            try {
+                fileInputStream = new FileInputStream((File)uploadedfile.getFile());
+                byte[] byteFile = IOUtils.toByteArray(fileInputStream);
+                FileUtils.writeByteArrayToFile(file, byteFile);
+                fileInputStream.close();
+            } catch (Exception e) {
+                return ok("<a style=\"color:#cc3300; font-size: large;\">Error uploading file. Please try again.</a>");
+            }
+            
+            return ok("<a style=\"color:#008000; font-size: large;\">File successfully saved!</a>");
+        } else {
+            return ok("<a style=\"color:#cc3300; font-size: large;\">Error uploading file. Please try again.</a>");
+        }
+    }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result uploadDataFileByChunking(
@@ -469,7 +541,6 @@ public class AutoAnnotator extends Controller {
         if (ResumableUpload.uploadFileByChunking(request(), 
                 ConfigProp.getPathUnproc())) {
             //This Chunk has been Uploaded.
-        	System.out.println("ANNOTATOR resumableRelativePath (uploadDataFileByChunking): " + resumableRelativePath);
             return ok("Uploaded.");
         } else {
             return status(HttpStatus.SC_NOT_FOUND);

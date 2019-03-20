@@ -172,7 +172,9 @@ var DropSheet = function DropSheet(opts) {
   }
   
   function handleFileUpload(e) {
-	  opts.on.upload();
+	  if (opts.on.upload) {
+		  opts.on.upload();
+	  }
 	  
 	  var wopts = { bookType:'xlsx', bookSST:false, type:'array' };
 	  if (typeof last_sheetidx !== 'undefined') {
@@ -181,15 +183,21 @@ var DropSheet = function DropSheet(opts) {
 	  // console.log('last_wb: ' + JSON.stringify(last_wb));
 	  var wbout = XLSX.write(last_wb, wopts);
 	  // console.log("wbout: " + typeof(wbout));
-	
-	  var req = new XMLHttpRequest();
-	  req.open("POST", opts.upload_url, true);
+	  
 	  var formdata = new FormData();
-	  formdata.append('file', new File([wbout], 'sheetjs.xlsx'));
+	  if (opts.formdata) {
+		  formdata.append('file', new File([wbout], opts.formdata));
+	  } else {
+		  formdata.append('file', new File([wbout], 'sheetjs.xlsx'));
+	  }
 	  //formdata.append('file', 'test.xlsx'); // <-- server expects `file` to hold name
 	  //formdata.append('data', wbout); // <-- `data` holds the base64-encoded data
-	  req.onreadystatechange = opts.reponse_action;
-	  req.send(formdata);
+	
+	  var xhr = new XMLHttpRequest();
+	  xhr.open("POST", opts.upload_url, true);
+	  xhr.onreadystatechange = opts.reponse_action;
+
+	  xhr.send(formdata);
   }
   
   function handleFileDownload(e) {
