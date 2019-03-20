@@ -474,7 +474,7 @@ public class StudyObject extends HADatAcThing {
             }
         }
         
-        System.out.println("buildCachedUriByOriginalId: " + cache.size());
+        //System.out.println("buildCachedUriByOriginalId: " + cache.size());
 
         return cache;
     }
@@ -523,11 +523,12 @@ public class StudyObject extends HADatAcThing {
                         && soln.get("id") != null) {
                     String key = soln.get("socUri").toString() + ":" + soln.get("id").toString();
                     cache.put(key, soln.get("objUri").toString());
+                    //System.out.println("buildCachedObjectBySocAndOriginalId: adding key : [" + key + "]");
                 }
             }
         }
         
-        System.out.println("buildCachedObjectBySocAndOriginalId: " + cache.size());
+        //System.out.println("buildCachedObjectBySocAndOriginalId: " + cache.size());
 
         return cache;
     }
@@ -588,7 +589,7 @@ public class StudyObject extends HADatAcThing {
             }
         }
         
-        System.out.println("buildCachedUriBySocAndScopeUri: " + cache.size());
+        //System.out.println("buildCachedUriBySocAndScopeUri: " + cache.size());
 
         return cache;
     }
@@ -644,7 +645,7 @@ public class StudyObject extends HADatAcThing {
             }
         }
         
-        System.out.println("buildCachedScopeBySocAndObjectUri: " + cache.size());
+        //System.out.println("buildCachedScopeBySocAndObjectUri: " + cache.size());
 
         return cache;
     }

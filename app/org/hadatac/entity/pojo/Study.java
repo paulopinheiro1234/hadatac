@@ -531,13 +531,21 @@ public class Study extends HADatAcThing {
             String uri = soln.get("subject").toString();
             if (soln != null && uri!= null) {
                 if (!results.containsKey(uri)) {
-                    results.put(uri, new StudyObject());
+                	StudyObject tmpObj = new StudyObject();
+                	tmpObj.setUri(uri);
+                    results.put(uri, tmpObj);
                 }
                 
                 results.get(uri).fromQuerySolution(soln);
             }
         }
 
+        /*
+        for (Map.Entry<String, StudyObject> entry : results.entrySet()) {
+             System.out.println("getObjectsMapInBatch(): Key = " + entry.getKey() + ", Value = " + ((StudyObject)entry.getValue()).getUri());
+        }
+        */
+        
         return results;
     }
 

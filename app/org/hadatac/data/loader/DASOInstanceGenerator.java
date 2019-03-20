@@ -71,7 +71,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         if (fileName == null || fileName.equals("")) {
-            System.out.println("DASOInstanceGenerator: NO RECORD FILE PROVIDED");
+            System.out.println("DASOInstanceGenerator: [ERROR] NO RECORD FILE PROVIDED");
             return;
         } 
         this.fileName = fileName;
@@ -558,7 +558,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         if (id == null || id.equals("")) {
-            System.out.println("DASOInstanceGenerator: no identifier provided. See if your SDD contains an identifier," + 
+            System.out.println("DASOInstanceGenerator: [ERROR] no identifier provided. See if your SDD contains an identifier," + 
                     " and if the corresponding label in ths file is a valid identifier.");
             return null;
         }
@@ -849,7 +849,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         if (id == null || id.equals("")) {
-            System.out.println("DASOInstanceGenerator: no identifier provided. See if your SDD contains an identifier," + 
+            System.out.println("DASOInstanceGenerator: [ERROR] no identifier provided. See if your SDD contains an identifier," + 
                     " and if the corresponding label in ths file is a valid identifier.");
             return null;
         }
@@ -867,11 +867,17 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         // Lookup first study object
+        if (DEBUG_MODE) { 
+        	System.out.println("DASOInstanceGenerator: CachedObjectBySocAndOriginalId: soc: [" +currentSoc.getUri() + "]   Id: [" + id + "]");
+        }
         String currentObjUri = getCachedObjectBySocAndOriginalId(currentSoc.getUri(), id); 
+        if (DEBUG_MODE) { 
+        	System.out.println("DASOInstanceGenerator: currentObjUri: [" +currentObjUri + "]");
+        }
 
         if (groundingPath == null || groundingPath.size() <= 0) {
         	obj = getCachedObject(currentObjUri);
-        	if (obj == null) {
+        	if (obj == null || obj.getUri() == null || obj.getUri().equals("")) {
                 System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve first Study Object for URI=[" + currentObjUri + "]");
                 return null;
             }

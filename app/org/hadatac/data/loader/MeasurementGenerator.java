@@ -438,7 +438,9 @@ public class MeasurementGenerator extends BaseGenerator {
                             }
 
                             // from ground object
-                            if (groundObj != null) {
+                            if (groundObj == null || groundObj.get(StudyObject.STUDY_OBJECT_URI) == null || groundObj.get(StudyObject.STUDY_OBJECT_URI).equals("")) {
+                                System.out.println("MeasurementGenerator: [ERROR] Could not retrieve Ground Object for reference [" + reference + "]");
+                            } else {
                                 measurement.setStudyObjectUri(groundObj.get(StudyObject.STUDY_OBJECT_URI));
                                 measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
                                 measurement.setPID(groundObj.get(StudyObject.SUBJECT_ID));
@@ -446,7 +448,7 @@ public class MeasurementGenerator extends BaseGenerator {
                         }
                         //System.out.println("[MeasurementGenerator] For Id=[" + id + "] and reference=[" + reference + "] it was assigned Obj URI=[" + measurement.getObjectUri() + "]");
                     } else {
-                        System.out.println("[MeasurementGenerator] [ERROR]: could not find DASA reference for ID=[" + id + "]");
+                        System.out.println("MeasurementGenerator: [ERROR]: could not find DASA reference for ID=[" + id + "]");
                     }
                     
                     /*

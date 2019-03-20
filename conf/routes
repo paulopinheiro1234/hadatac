@@ -163,6 +163,8 @@ POST	/hadatac/deployments/delete		               org.hadatac.console.controllers
 POST 	/hadatac/deployments/delete/form	           org.hadatac.console.controllers.deployments.DeleteDeployment.processForm(deployment_uri : String)
 GET	    /hadatac/deployments/view		               org.hadatac.console.controllers.deployments.ViewDeployment.index(deployment_uri : String)
 POST	/hadatac/deployments/view	                   org.hadatac.console.controllers.deployments.ViewDeployment.postIndex(deployment_uri : String)
+GET	    /hadatac/deployments/browser		           org.hadatac.console.controllers.deployments.DeploymentBrowser.index(dir : String, filename : String, da_uri : String)
+POST	/hadatac/deployments/browser     	           org.hadatac.console.controllers.deployments.DeploymentBrowser.postIndex(dir : String, filename : String, da_uri : String)
 GET	    /hadatac/deployments/resources		           org.hadatac.console.controllers.deployments.ResourceAvailability.index()
 POST	/hadatac/deployments/resources	               org.hadatac.console.controllers.deployments.ResourceAvailability.postIndex()
 GET	    /hadatac/deployments/urigenerator	           org.hadatac.console.controllers.deployments.URIGenerator.index()
