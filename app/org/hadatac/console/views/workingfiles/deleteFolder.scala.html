@@ -1,0 +1,42 @@
+@(dir   : String,
+  path  : String,
+  empty : Boolean)
+
+@import helper._ 
+@import org.hadatac.utils._ 
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.deployments._
+@import org.hadatac.console.controllers.deployments._ 
+@import org.hadatac.console.controllers._ 
+@import org.hadatac.metadata.loader.URIUtils; 
+
+
+@main("Delete Folder") {
+
+<div class="container">
+	<h4>Delete Folder</h4>
+
+	<form class="form-horizontal" name="newFile" method="post"
+		action="@org.hadatac.console.controllers.workingfiles.routes.Folder.deleteForm(dir,path)">
+
+		<div class="form-group">
+	        @if(empty) {
+			    <label>Folder to be deleted: @dir@path</label>
+			} else {
+			    <label>Folder @dir@path cannot be deleted since it is not empty</label>
+			}
+		</div>
+
+		<div class="form-group" class="col-sm-6 col-offset-3">
+	        @if(empty) {
+			    <input class="btn btn-primary" role="button" id="submitbutton"
+				    type="submit" value="Delete Folder" /> 
+		    }
+            @defining(dir + path) { dest =>
+			    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dest,"..")"
+				    class="btn btn-primary" role="button">Cancel</a>
+			}
+		</div>
+	</form>
+</div>
+}

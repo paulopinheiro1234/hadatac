@@ -55,24 +55,43 @@ public class WorkingFiles extends Controller {
     FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir) {        
+    public Result index(String dir, String dest) {        
         final SysUser user = AuthApplication.getLocalUser(session());
 
+    	String newDir = "";
+        if (dest.equals("..")) {
+        	String[] tokens = dir.split("/");
+        	for (int i=0; i < tokens.length - 1; i++) {
+        		//System.out.println("[" + tokens[i] + "]");
+        		if (tokens[i].equals("")) {
+        			newDir = newDir + "/";
+        		} else {
+        			newDir = newDir + tokens[i] + "/";
+        			dest	 = ".";
+        		}
+        	}
+        } else if (dest.equals(".")) {
+        	newDir = dir;
+        } else {
+        	if (dir.equals("/") && dest.equals("/")) {
+        		newDir = "/";
+        	} else  {
+        		newDir = dir + dest;
+        	}
+        } 
+        
         List<String> folders = null;
         List<DataFile> wkFiles = null;
 
         String pathWorking = ConfigProp.getPathWorking();
 
+        folders = DataFile.findAllFolders(newDir, DataFile.WORKING);
         if (user.isDataManager()) {
-            folders = DataFile.findAllFolders(dir, DataFile.WORKING);
-        	wkFiles = DataFile.findInDir(dir, DataFile.WORKING);
-            if (dir.equals("/")) {
-            	DataFile.includeUnrecognizedFiles(pathWorking, wkFiles);
-            }
-        	DataFile.includeUnrecognizedFiles(pathWorking, wkFiles);
+        	wkFiles = DataFile.findInDir(newDir, DataFile.WORKING);
+        	DataFile.includeUnrecognizedFiles(pathWorking, newDir, wkFiles);
         } else {
-            folders = DataFile.findFolders(dir, user.getEmail());
-            wkFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.WORKING);
+            //folders = DataFile.findFolders(newDir, user.getEmail());
+            wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
         }
 
         DataFile.filterNonexistedFiles(pathWorking, wkFiles);
@@ -84,12 +103,12 @@ public class WorkingFiles extends Controller {
             }
         });
 
-        return ok(workingFiles.render(dir, folders, wkFiles, user.isDataManager()));
+        return ok(workingFiles.render(newDir, folders, wkFiles, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir) {
-        return index(dir);
+    public Result postIndex(String dir, String dest) {
+        return index(dir, dest);
     }
     
     /*
@@ -125,7 +144,7 @@ public class WorkingFiles extends Controller {
             }
             file.setOwnerEmail(data.getOption());
             file.save();
-            return redirect(routes.WorkingFiles.index(dir));
+            return redirect(routes.WorkingFiles.index(dir, "."));
         }
     } 
     */
@@ -144,10 +163,10 @@ public class WorkingFiles extends Controller {
     public Result checkAnnotationLog(String dir, String file_name) {
         AnnotationLog log = AnnotationLog.find(file_name);
         if (null == log) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.WorkingFiles.index(dir).url()));
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.WorkingFiles.index(dir, dir).url()));
         }
         else {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.WorkingFiles.index(dir).url()));
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.WorkingFiles.index(dir, dir).url()));
         }
     }
 
@@ -196,7 +215,7 @@ public class WorkingFiles extends Controller {
         AnnotationLog.delete(fileName);
         AnnotationLog.delete(pureFileName);
 
-        return redirect(routes.WorkingFiles.index(dir));
+        return redirect(routes.WorkingFiles.index(dir, "."));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -217,7 +236,7 @@ public class WorkingFiles extends Controller {
             String resumableRelativePath) {
         if (ResumableUpload.uploadFileByChunking(request(), 
                 ConfigProp.getPathWorking())) {
-        	System.out.println("resumableRelativePath (uploadDataFileByChunking): " + resumableRelativePath);
+        	//System.out.println("resumableRelativePath (uploadDataFileByChunking): " + resumableRelativePath);
             //This Chunk has been Uploaded.
             return ok("Uploaded.");
         } else {

@@ -388,8 +388,8 @@ POST 	/hadatac/annotator/prepare/remove              org.hadatac.console.control
 POST 	/hadatac/annotator/prepare/complete            org.hadatac.console.controllers.annotator.PrepareIngestion.completeDataAcquisition(dir : String, filename: String, da_uri: String)
 
 # working files
-GET	    /hadatac/working	        	               org.hadatac.console.controllers.workingfiles.WorkingFiles.index(dir : String)
-POST	/hadatac/working     	                       org.hadatac.console.controllers.workingfiles.WorkingFiles.postIndex(dir: String)
+GET	    /hadatac/working	        	               org.hadatac.console.controllers.workingfiles.WorkingFiles.index(dir : String, dest: String)
+POST	/hadatac/working     	                       org.hadatac.console.controllers.workingfiles.WorkingFiles.postIndex(dir: String, dest: String)
 GET	    /hadatac/working/template		               org.hadatac.console.controllers.workingfiles.WorkingFiles.downloadTemplates(dir : String)
 POST	/hadatac/working/template     	               org.hadatac.console.controllers.workingfiles.WorkingFiles.postDownloadTemplates(dir : String)
 GET	    /hadatac/working/uploadfile		               org.hadatac.console.controllers.workingfiles.WorkingFiles.uploadDataFileByChunking(resumableChunkNumber : String, resumableChunkSize : String, resumableCurrentChunkSize : String, resumableTotalSize : String, resumableType : String, resumableIdentifier : String, resumableFilename : String, resumableRelativePath : String)
@@ -409,6 +409,12 @@ GET     /hadatac/working/queryfile                     org.hadatac.console.contr
 GET	    /hadatac/working/newfile	        	       org.hadatac.console.controllers.workingfiles.NewFile.index(dir : String)
 POST	/hadatac/working/newfile     	               org.hadatac.console.controllers.workingfiles.NewFile.postIndex(dir: String)
 POST	/hadatac/working/newfile/form     	           org.hadatac.console.controllers.workingfiles.NewFile.processForm(dir: String)
+GET	    /hadatac/working/newfolder	        	       org.hadatac.console.controllers.workingfiles.Folder.index(dir : String)
+POST	/hadatac/working/newfolder     	               org.hadatac.console.controllers.workingfiles.Folder.postIndex(dir: String)
+POST	/hadatac/working/newfolder/form     	       org.hadatac.console.controllers.workingfiles.Folder.processForm(dir: String)
+GET	    /hadatac/working/deletefolder	        	   org.hadatac.console.controllers.workingfiles.Folder.delete(dir : String, path : String)
+POST	/hadatac/working/deletefolder     	           org.hadatac.console.controllers.workingfiles.Folder.postDelete(dir: String, path : String)
+POST	/hadatac/working/deletefolder/form     	       org.hadatac.console.controllers.workingfiles.Folder.deleteForm(dir: String, path : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

@@ -8,6 +8,7 @@
 @import org.hadatac.console.views.html.fileviewer._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.console.controllers.fileviewer._
+@import org.hadatac.entity.pojo._
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader._
 @import java.net._
@@ -20,8 +21,7 @@
 	
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" class="btn btn-primary" role="button">Blank Metadata File</a>
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
-	<a href="" class="btn btn-primary disabled" role="button">Create Folder</a>
-	<a href="" class="btn btn-primary disabled" role="button">Delete Folder</a>
+	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.index(dir)" class="btn btn-primary" role="button">Create Folder</a>
     
 	<div id="frame">
     <div class="resumable-error">
@@ -53,6 +53,8 @@
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadWorking.js")"></script>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
     
+    <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
+    
  	<table class="table">
     <thead>
          <tr>
@@ -68,14 +70,31 @@
          </tr>
     </thead>
     <tbody>
+        @for(folder <- folders) {
+            <tr name="working">
+              <td><a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, folder)">@folder</a></td>
+              @if(bAdmin) {
+                 <th></th>
+              }
+              <td></td>
+              <td></td>
+              <td>
+              @if(folder != "..") {
+              	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.delete(dir,folder)" class="btn btn-xs btn-primary" role="button">Delete</a>
+			  }
+              </td>
+              <td></td>
+              <td></td>
+            </tr>
+        }
         @for(file <- workingFiles) {
             <tr name="working">
                 @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
                 } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
                 } else {
-                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')) } else { @file.getFileName() }</td>
+                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/'))) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
                 }}
                 @if(bAdmin) {
                     <td>@file.getOwnerEmail()</td>

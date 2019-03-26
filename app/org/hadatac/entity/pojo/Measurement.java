@@ -38,7 +38,6 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 

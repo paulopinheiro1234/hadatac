@@ -87,9 +87,9 @@ public class AutoAnnotator extends Controller {
             unprocFiles = DataFile.findInDir("/", DataFile.UNPROCESSED);
             unprocFiles.addAll(DataFile.findInDir("/", DataFile.FREEZED));
             if (dir.equals("/")) {
-            	DataFile.includeUnrecognizedFiles(pathProc, procFiles);
+            	DataFile.includeUnrecognizedFiles(pathProc, dir, procFiles);
             }
-        	DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
+        	DataFile.includeUnrecognizedFiles(pathUnproc, dir, unprocFiles);
         } else {
             folders = DataFile.findFolders(dir, user.getEmail());
             procFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.PROCESSED);
