@@ -16,7 +16,7 @@ import org.apache.http.HttpStatus;
 
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.LabKeyLoginForm;
@@ -142,13 +142,9 @@ public class WorkingFiles extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String file_name) {
-        AnnotationLog log = AnnotationLog.find(file_name);
-        if (null == log) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.WorkingFiles.index(dir).url()));
-        }
-        else {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.WorkingFiles.index(dir).url()));
-        }
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
+                AnnotationLogger.getLogger(file_name).getLog()), 
+                routes.WorkingFiles.index(dir).url()));
     }
 
     public Result getAnnotationStatus(String fileName) {
@@ -166,7 +162,7 @@ public class WorkingFiles extends Controller {
             result.put("Submission Time", dataFile.getSubmissionTime());
             result.put("Completion Time", dataFile.getCompletionTime());
             result.put("Owner Email", dataFile.getOwnerEmail());
-            result.put("Log", AnnotationLog.create(fileName).getLog());
+            result.put("Log", AnnotationLogger.getLogger(fileName).getLog());
         }
 
         return ok(Json.toJson(result));
@@ -193,8 +189,8 @@ public class WorkingFiles extends Controller {
         String pureFileName = Paths.get(fileName).getFileName().toString();
         file.delete();
         dataFile.delete();
-        AnnotationLog.delete(fileName);
-        AnnotationLog.delete(pureFileName);
+        AnnotationLogger.delete(fileName);
+        AnnotationLogger.delete(pureFileName);
 
         return redirect(routes.WorkingFiles.index(dir));
     }

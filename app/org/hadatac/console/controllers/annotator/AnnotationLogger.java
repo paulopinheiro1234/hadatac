@@ -3,7 +3,9 @@ package org.hadatac.console.controllers.annotator;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -18,22 +20,47 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
 
-public class AnnotationLog {
+public class AnnotationLogger {
 	@Field("file_name")
 	private String fileName = "";
 	@Field("log_str")
 	private String log = "";
 	
-	public AnnotationLog() {}
+	private AnnotationLogger() {}
 	
-	public AnnotationLog(String fileName) {
+	private AnnotationLogger(String fileName) {
 		this.fileName = fileName;
 	}
+	
+	public static Map<String, AnnotationLogger> loggers = new HashMap<String, AnnotationLogger>();
+	
+	public static AnnotationLogger getLogger(String name) {
+	    if (loggers.containsKey(name)) {
+	        return loggers.get(name);
+	    } else {
+	        if (loggers.size() == 50) {
+	            loggers.clear();
+	        }
+	        AnnotationLogger logger = create(name);
+	        if (!logger.getLog().isEmpty()) {
+	            loggers.put(name, logger);
+	        }
+	        return logger;
+	    }
+    }
 
 	public String getFileName() {
 		return fileName;
 	}
-	public void setFileName(String file_name) {
+	
+	public void setFileName(String file_name) {		
+		if (!this.fileName.equals(file_name)) {
+		    AnnotationLogger curlogger = AnnotationLogger.find(file_name);
+		    if (null != curlogger) {
+		        setLog(curlogger.getLog());
+		    }
+		}
+		
 		this.fileName = file_name;
 	}
 	
@@ -54,6 +81,8 @@ public class AnnotationLog {
 	}
 	
 	public int save() {
+	    assert(!fileName.isEmpty());
+	    
 	    fileName = fileName.replace("/", "[SLASH]");
 	    
 		try {
@@ -64,37 +93,49 @@ public class AnnotationLog {
 			client.close();
 			return status;
 		} catch (IOException | SolrServerException e) {
-			System.out.println("[ERROR] AnnotationLog.save() - e.Message: " + e.getMessage());
+			System.out.println("[ERROR] AnnotationLogger.save() - e.Message: " + e.getMessage());
 			return -1;
 		}
 	}
 	
 	public int delete() {
-	    return AnnotationLog.delete(getFileName());
+	    return AnnotationLogger.delete(getFileName());
     }
 	
-	public static void printException(Exception exception, String fileName) {
-		AnnotationLog log = AnnotationLog.create(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
-	}
-	
-	public static void printException(String message, String fileName) {
-        AnnotationLog log = AnnotationLog.create(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
+	public void printExceptionById(String id) {
+	    printException(ErrorDictionary.getDetailById(id));
     }
 	
-	public static void printWarning(String message, String fileName) {
-        AnnotationLog log = AnnotationLog.create(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "[WARNING] " + message));
+	public void printExceptionByIdWithArgs(String id, Object... args) {
+        printException(String.format(ErrorDictionary.getDetailById(id), args));
     }
 	
-	public static void println(String message, String fileName) {
-        AnnotationLog log = AnnotationLog.create(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "[LOG] " + message));
+	public void printException(Exception exception) {
+	    addline(Feedback.println(Feedback.WEB, "[ERROR] " + exception.getMessage()));
+    }
+    
+    public void printException(String message) {
+        addline(Feedback.println(Feedback.WEB, "[ERROR] " + message));
+    }
+    
+    public void printWarningById(String id) {
+        printWarning(ErrorDictionary.getDetailById(id));
+    }
+    
+    public void printWarningByIdWithArgs(String id, Object... args) {
+        printWarning(String.format(ErrorDictionary.getDetailById(id), args));
+    }
+    
+    public void printWarning(String message) {
+        addline(Feedback.println(Feedback.WEB, "[WARNING] " + message));
+    }
+    
+    public void println(String message) {
+        addline(Feedback.println(Feedback.WEB, "[LOG] " + message));
     }
 	
-	public static AnnotationLog convertFromSolr(SolrDocument doc) {
-		AnnotationLog annotation_log = new AnnotationLog();
+	public static AnnotationLogger convertFromSolr(SolrDocument doc) {
+	    AnnotationLogger annotation_log = new AnnotationLogger();
 		if (doc.getFieldValue("file_name") != null) {
 			annotation_log.setFileName(doc.getFieldValue("file_name").toString().replace("[SLASH]", "/"));
 		}
@@ -105,7 +146,7 @@ public class AnnotationLog {
 		return annotation_log;
 	}
 	
-	public static AnnotationLog find(String fileName) {
+	public static AnnotationLogger find(String fileName) {
 	    fileName = fileName.replace("/", "[SLASH]");
 	    
 		SolrClient solr = new HttpSolrClient.Builder(
@@ -120,7 +161,7 @@ public class AnnotationLog {
 			SolrDocumentList results = response.getResults();
 			Iterator<SolrDocument> i = results.iterator();
 			if (i.hasNext()) {
-				AnnotationLog log = convertFromSolr(i.next());
+			    AnnotationLogger log = convertFromSolr(i.next());
 				return log;
 			}
 		} catch (Exception e) {
@@ -130,10 +171,10 @@ public class AnnotationLog {
 		return null;
 	}
 	
-	public static AnnotationLog create(String fileName) {
-		AnnotationLog log = AnnotationLog.find(fileName);
+	private static AnnotationLogger create(String fileName) {
+	    AnnotationLogger log = AnnotationLogger.find(fileName);
 		if (null == log) {
-			log = new AnnotationLog();
+			log = new AnnotationLogger();
 	    	log.setFileName(fileName);
 		}
 		
@@ -151,11 +192,11 @@ public class AnnotationLog {
 			solr.close();
 			return response.getStatus();
 		} catch (SolrServerException e) {
-			System.out.println("[ERROR] AnnotationLog.delete(String) - SolrServerException message: " + e.getMessage());
+			System.out.println("[ERROR] AnnotationLogger.delete(String) - SolrServerException message: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println("[ERROR] AnnotationLog.delete(String) - IOException message: " + e.getMessage());
+			System.out.println("[ERROR] AnnotationLogger.delete(String) - IOException message: " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("[ERROR] AnnotationLog.delete(String) - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] AnnotationLogger.delete(String) - Exception message: " + e.getMessage());
 		}
 		
 		return -1;

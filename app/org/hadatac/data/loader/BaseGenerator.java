@@ -1,5 +1,7 @@
 package org.hadatac.data.loader;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.String;
@@ -15,7 +17,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.HADatAcThing;
@@ -43,14 +45,16 @@ public abstract class BaseGenerator {
 
     protected String studyUri = "";
     protected String namedGraphUri = "";
+    
+    protected AnnotationLogger logger = null;
 
     public BaseGenerator(RecordFile file) {
         this.file = file;
         records = file.getRecords();
         fileName = file.getFile().getName();
-
+        logger = AnnotationLogger.getLogger(fileName);
+        
         setRelativePath(file);
-
         initMapping();
     }
 
@@ -198,7 +202,7 @@ public abstract class BaseGenerator {
                 .map(e -> e.getValue() + " " + e.getKey() + "(s)")
                 .collect(Collectors.toList()));
         if (!results.isEmpty()) {
-            AnnotationLog.println(results + " have been created. ", fileName);
+            AnnotationLogger.getLogger(fileName).println(results + " have been created. ");
         }
     }
 
@@ -251,22 +255,22 @@ public abstract class BaseGenerator {
         
         String tableName = getTableName();
         if (null == tableName) {
-            AnnotationLog.printException("No LabKey table name is specified", fileName);
+            logger.printException("No LabKey table name is specified");
             return false;
         }
 
         try {
             checkRows(rows, "hasURI");
         } catch (Exception e) {
-            AnnotationLog.printException(String.format(
+            logger.printException(String.format(
                     "Trying to commit invalid rows to LabKey Table %s: ", tableName)
-                    + e.getMessage(), fileName);
+                    + e.getMessage());
             return false;
         }
 
         Credential cred = Credential.find();
         if (null == cred) {
-            AnnotationLog.printException("No LabKey credentials are provided!", fileName);
+            logger.printException("No LabKey credentials are provided!");
             return false;
         }
 
@@ -274,15 +278,15 @@ public abstract class BaseGenerator {
                 cred.getUserName(), cred.getPassword());
         try {
             int nRows = labkeyDataHandler.insertRows(tableName, rows);
-            AnnotationLog.println(String.format(
-                    "%d row(s) have been inserted into Table %s ", nRows, tableName), fileName);
+            logger.println(String.format(
+                    "%d row(s) have been inserted into Table %s ", nRows, tableName));
         } catch (CommandException e1) {
             try {
                 labkeyDataHandler.deleteRows(tableName, rows);
                 int nRows = labkeyDataHandler.insertRows(tableName, rows);
-                AnnotationLog.println(String.format("%d row(s) have been updated into Table %s ", nRows, tableName), fileName);
+                logger.println(String.format("%d row(s) have been updated into Table %s ", nRows, tableName));
             } catch (CommandException e) {
-                AnnotationLog.printException("CommitRows inside AutoAnnotator: " + e, fileName);
+                logger.printException("CommitRows inside AutoAnnotator: " + e);
                 return false;
             }
         }
@@ -297,7 +301,7 @@ public abstract class BaseGenerator {
                         CollectionUtil.Collection.METADATA_GRAPH));
 
         if (numCommitted > 0) {
-            AnnotationLog.println(String.format("%d triple(s) have been committed to triple store", model.size()), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("%d triple(s) have been committed to triple store", model.size()));
         }
 
         return true;
@@ -315,7 +319,7 @@ public abstract class BaseGenerator {
         }
 
         if (count > 0) {
-            AnnotationLog.println(String.format("%d object(s) have been committed to LabKey", count), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("%d object(s) have been committed to LabKey", count));
         }
     }
 
@@ -344,7 +348,7 @@ public abstract class BaseGenerator {
         }
 
         if (count > 0) {
-            AnnotationLog.println(String.format("%d object(s) have been committed to triple store", count), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("%d object(s) have been committed to triple store", count));
         }
 
         return true;
@@ -359,7 +363,7 @@ public abstract class BaseGenerator {
         }
 
         if (count > 0) {
-            AnnotationLog.println(String.format("%d object(s) have been committed to solr", count), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("%d object(s) have been committed to solr", count));
         }
 
         return true;
@@ -394,11 +398,11 @@ public abstract class BaseGenerator {
         try {
             String tableName = getTableName();
             if (null == tableName) {
-                AnnotationLog.printException("No LabKey table name is specified", fileName);
+                logger.printException("No LabKey table name is specified");
             }
             labkeyDataHandler.deleteRows(tableName, rows);
         } catch (CommandException e) {
-            AnnotationLog.printException("Delete rows from LabKey: " + e, fileName);
+            logger.printException("Delete rows from LabKey: " + e);
             throw new LabKeyException("[ERROR] Delete rows from LabKey: " + e);
         }
     }

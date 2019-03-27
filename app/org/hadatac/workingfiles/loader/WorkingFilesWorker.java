@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.utils.ConfigProp;
 

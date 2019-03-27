@@ -14,8 +14,8 @@ import javax.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.fileviewer.routes;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
@@ -95,7 +95,7 @@ public class DataDictionaryAnnotator extends Controller {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
-        AnnotationLog.delete(file_name);
+        AnnotationLogger.delete(file_name);
         dataFile.setStatus(DataFile.DELETED);
         dataFile.delete();
 
@@ -108,12 +108,9 @@ public class DataDictionaryAnnotator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String file_name) {
-        AnnotationLog log = AnnotationLog.find(file_name);
-        if (null == log) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.SDDEditor.index().url()));
-        } else {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.SDDEditor.index().url()));
-        }
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
+                AnnotationLogger.getLogger(file_name).getLog()), 
+                routes.SDDEditor.index().url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

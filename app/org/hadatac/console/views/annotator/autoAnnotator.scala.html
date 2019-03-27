@@ -94,9 +94,9 @@
     <tbody>
         @for(file <- unprocessedFiles) {
             <tr name="unprocessed">
-                @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                @if(AnnotationLogger.getLogger(file.getFileName()).getLog().contains("[ERROR]")) {
                     <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
-                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                } else { @if(AnnotationLogger.getLogger(file.getFileName()).getLog().contains("[WARNING]")) {
                     <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
                 } else {
                     <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')) } else { @file.getFileName() }</td>
@@ -168,9 +168,9 @@
         }
         @for(file <- processedFiles){
             <tr name="processed" data-value="@file.getStudyUri()">
-                @if(AnnotationLog.create(file.getFileName()).getLog().contains("[ERROR]")) {
+                @if(AnnotationLogger.getLogger(file.getFileName()).getLog().contains("[ERROR]")) {
                     <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
-                } else { @if(AnnotationLog.create(file.getFileName()).getLog().contains("[WARNING]")) {
+                } else { @if(AnnotationLogger.getLogger(file.getFileName()).getLog().contains("[WARNING]")) {
                     <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
                 } else {
                     <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>

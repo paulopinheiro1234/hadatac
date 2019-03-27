@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -34,8 +34,8 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         this.mergedEA = merging.get(0);
         this.mergedAA = merging.get(1);
         this.fileName = file.getFile().getName();
-        AnnotationLog.println("[Merged Attributes] : " + mergedEA.keySet(), fileName);
-        AnnotationLog.println("[Derived Attributes] : " + mergedAA.keySet(), fileName);
+        AnnotationLogger.getLogger(fileName).println("[Merged Attributes] : " + mergedEA.keySet());
+        AnnotationLogger.getLogger(fileName).println("[Derived Attributes] : " + mergedAA.keySet());
 
         initMapping();
 
@@ -287,7 +287,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         }
         
         if (mergedEA.containsKey(getLabel(rec))) {
-	    AnnotationLog.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)), file.getFile().getName());
+	    AnnotationLogger.getLogger(file.getFile().getName()).println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)));
 	    row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
             row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(0));
@@ -323,7 +323,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             }
         } else if (!tmp.contains(getLabel(rec))) {
 	    if (mergedAA.containsKey(getLabel(rec))) {
-		AnnotationLog.println("[Derived Attribute] : " + getLabel(rec) + " ---> " + mergedAA.get(getLabel(rec)), file.getFile().getName());
+		AnnotationLogger.getLogger(file.getFile().getName()).println("[Derived Attribute] : " + getLabel(rec) + " ---> " + mergedAA.get(getLabel(rec)));
 		row.put("hasco:isAttributeOf", getAttributeOf(mergedAA.get(getLabel(rec)).get(2)));
 		row.put("hasco:hasAttribute", getAttribute(rec)); 
 		//row.put("hasco:hasAttribute", URIUtils.replacePrefixEx(mergedAA.get(getLabel(rec)).get(1)));

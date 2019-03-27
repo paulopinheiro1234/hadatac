@@ -10,19 +10,20 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+
 
 public class SSDGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     String SDDName = ""; //used for reference column uri
-    String annotationFileName = "";
 
     public SSDGenerator(RecordFile file, String annotationFileName) {
         super(file);
         String str = file.getFile().getName().replaceAll("SSD-", "");
         this.SDDName = str.substring(0, str.lastIndexOf('.'));
-        this.annotationFileName = annotationFileName;
+
+        logger.setFileName(annotationFileName);
+        
         if (records.get(0) != null) {
             studyUri = URIUtils.convertToWholeURI(getUri(records.get(0)));
         } else {
@@ -133,12 +134,12 @@ public class SSDGenerator extends BaseGenerator {
         }
         
         if (this.studyUri == null || this.studyUri.equals("")) {
-            AnnotationLog.printException("SDDGenerator: no studyUri provided for SOC generator with typeUri [" + this.getTypeUri(record) +"]", annotationFileName);
+            logger.printExceptionByIdWithArgs("SSD_00001", this.getTypeUri(record));
             return null;
         }
             
         if (SOCReference == null || SOCReference.equals("")) {
-            AnnotationLog.printException("SDDGenerator: no SOCReference provided for SOC generator", annotationFileName);
+            logger.printExceptionById("SSD_00002");
             return null;
         }
             

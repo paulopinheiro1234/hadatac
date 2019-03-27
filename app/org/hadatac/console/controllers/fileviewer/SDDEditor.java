@@ -14,7 +14,7 @@ import java.util.List;
 import java.io.FileNotFoundException;
 
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.data.loader.AnnotationWorker;
@@ -75,12 +75,10 @@ public class SDDEditor extends Controller {
                     chain.generate(false);
                 }
                 
-                AnnotationLog log = AnnotationLog.find(newFileName);
-                if (null != log) {
-                    String strLog = log.getLog();
-                    log.delete();
-                    return ok(strLog);
-                }
+                AnnotationLogger logger = AnnotationLogger.getLogger(newFileName);
+                String strLog = logger.getLog();
+                logger.delete();
+                return ok(strLog);
             }
             
             return ok("File uploaded successfully.");

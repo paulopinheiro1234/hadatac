@@ -11,9 +11,10 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.QuerySolution;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.Templates;
+
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
@@ -29,6 +30,8 @@ public class SDD {
     private Map<String, Map<String, String>> codebook = new HashMap<String, Map<String, String>>();
     private Map<String, Map<String, String>> timeline = new HashMap<String, Map<String, String>>();
     private RecordFile sddfile = null;
+    
+    private AnnotationLogger logger = null;
 
     private static List<String> metaAttributes;
 
@@ -64,6 +67,7 @@ public class SDD {
         this.sddfile = file;
         getMetaAttributes();
         readCatalog(file);
+        logger = AnnotationLogger.getLogger(file.getFileName());
     }
 
     public String getName() {
@@ -356,11 +360,9 @@ public class SDD {
         }
 
         if (file.getHeaders().size() > 0) {
-            AnnotationLog.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.",
-                    sddfile.getFileName());
+            logger.println("The Dictionary Mapping has " + file.getHeaders().size() + " columns.");
         } else {
-            AnnotationLog.printException("The Dictionary Mapping has is EMPTY.",
-                    sddfile.getFileName());
+            logger.printExceptionById("SDD_00007");
         }
 
         //Boolean uriResolvable = true;
@@ -509,10 +511,7 @@ public class SDD {
                     if (attributeOfCell.length() > 0) {
                         sa2so.put(record.getValueByColumnIndex(0), attributeOfCell);
                     } else {
-                        AnnotationLog.printException(
-                                "Attribute " + record.getValueByColumnIndex(0)
-                                + " is not attributeOf any object. Please fix the content.",
-                                sddfile.getFileName());
+                        logger.printExceptionByIdWithArgs("SDD_00008", record.getValueByColumnIndex(0));
                     }
                 }
 
@@ -562,10 +561,7 @@ public class SDD {
                             }
                         }
                     } else {
-                        AnnotationLog.printException(
-                                "The Entity Cell \"" + entityCell + "\" in the [Entity] column is either not "
-                                        + "valid uri or it can not be resolved by replaceNameSpaceEx().",
-                                        sddfile.getFile().getName());
+                        logger.printExceptionByIdWithArgs("SDD_00009", entityCell);
                         return false;
                     }
                 }
@@ -573,17 +569,12 @@ public class SDD {
                 if (checkCellValue(record.getValueByColumnName("attributeOf"))) {
                     mapAttrObj.put(record.getValueByColumnIndex(0), record.getValueByColumnName("attributeOf"));
                 } else {
-                    AnnotationLog.printException("\"" + record.getValueByColumnName("attributeOf") + 
-                            "\" at column [attributeOf] , row [" + rowNumber + "] contains illegal content.",
-                            sddfile.getFile().getName());
+                    logger.printExceptionByIdWithArgs("SDD_00010", record.getValueByColumnName("attributeOf"), rowNumber);
                     return false;
                 }
 
             } else {
-                AnnotationLog.printException("The Dictionary Mapping contains illegal content in \""
-                        + record.getValueByColumnName("Column")
-                        + "\" in the [Column] column. Check if it contains characters such as \",\" and blank space.",
-                        sddfile.getFile().getName());
+                logger.printExceptionByIdWithArgs("SDD_00011", record.getValueByColumnName("Column"));
                 return false;
             }
 
@@ -592,32 +583,31 @@ public class SDD {
         }
 
         /*if (checkUriResolveResults.size() > 0) {
-            AnnotationLog.printException("The Dictionary Mapping has unresolvable uris in the following cells: "
-                    + String.join(", ", checkUriResolveResults) + " .", sddfile.getFileName());
+            logger.printException("The Dictionary Mapping has unresolvable uris in the following cells: "
+                    + String.join(", ", checkUriResolveResults) + " .");
             return false;
 	    }*/
 
         if (checkUriNamespaceResults.size() > 0) {
-            AnnotationLog.printException("The Dictionary Mapping has unregistered namespace in the following cells: "
-                    + String.join(", ", checkUriNamespaceResults) + " .", sddfile.getFileName());
+            logger.printException("The Dictionary Mapping has unregistered namespace in the following cells: "
+                    + String.join(", ", checkUriNamespaceResults) + " .");
             return false;
         }
 
         if (checkUriLabelResults.size() > 0) {
-            AnnotationLog.printWarning("The Dictionary Mapping has the following cells with missing labels: "
-                    + String.join(", ", checkUriLabelResults) + " .", sddfile.getFileName());
+            logger.printWarning("The Dictionary Mapping has the following cells with missing labels: "
+                    + String.join(", ", checkUriLabelResults) + " .");
         }
 
         if (checkStudyIndicatorPathResults.size() > 0) {
-            AnnotationLog.printWarning(
+            logger.printWarning(
                     "The Attributes: [" + String.join(", ", checkStudyIndicatorPathResults)
-                    + "] are subclasses of neither hasco:StudyIndicator nor hasco:SampleIndicator .",
-                    sddfile.getFileName());
+                    + "] are subclasses of neither hasco:StudyIndicator nor hasco:SampleIndicator .");
         }
 
         if (checkCellValResults.size() > 0) {
-            AnnotationLog.printException("The Dictionary Mapping has incorrect content in :"
-                    + String.join(", ", checkCellValResults) + "in \"attributeOf\" column.", sddfile.getFileName());
+            logger.printException("The Dictionary Mapping has incorrect content in :"
+                    + String.join(", ", checkCellValResults) + "in \"attributeOf\" column.");
             return false;
         }
 
@@ -625,20 +615,16 @@ public class SDD {
         //    AnnotationLog.println("The Dictionary Mapping has resolvable uris.", sddfile.getFileName());
         //}
         if (namespaceRegistered == true) {
-            AnnotationLog.println("The Dictionary Mapping's namespaces are all registered.", sddfile.getFileName());
+            logger.println("The Dictionary Mapping's namespaces are all registered.");
         }
         if (hasLabel == true) {
-            AnnotationLog.println("The Dictionary Mapping's terms have labels.", sddfile.getFileName());
+            logger.println("The Dictionary Mapping's terms have labels.");
         }
         if (isIndicator == true) {
-            AnnotationLog.println(
-                    "The Dictionary Mapping's attributes are all subclasses of hasco:StudyIndicator or hasco:SampleIndicator.",
-                    sddfile.getFileName());
+            logger.println("The Dictionary Mapping's attributes are all subclasses of hasco:StudyIndicator or hasco:SampleIndicator.");
         }
 
-        AnnotationLog.println(
-                "The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.",
-                sddfile.getFileName());
+        logger.println("The Dictionary Mapping has correct content under \"Column\" and \"attributeOf\" columns.");
         //System.out.println("[SDD] mapAttrObj: " + mapAttrObj);
 
         return true;

@@ -16,7 +16,7 @@ import java.util.Map;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
@@ -33,7 +33,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
-
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -53,6 +52,7 @@ public class AnnotationWorker {
     public static GeneratorChain getGeneratorChain(
             String fileName, DataFile dataFile, RecordFile recordFile) {
         GeneratorChain chain = null;
+        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
 
         if (fileName.startsWith("DA-")) {
             chain = annotateDAFile(dataFile, recordFile);
@@ -62,7 +62,7 @@ public class AnnotationWorker {
             if (fileName.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(recordFile.getFile(), "InfoSheet");
                 if (!recordFile.isValid()) {
-                    AnnotationLog.printException("Missing InfoSheet. ", fileName);
+                    logger.printExceptionById("DPL_00001");
                     return null;
                 }
             }
@@ -76,7 +76,7 @@ public class AnnotationWorker {
             if (fileName.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(recordFile.getFile(), "InfoSheet");
                 if (!recordFile.isValid()) {
-                    AnnotationLog.printException("The Info sheet is missing in this SDD file. ", fileName);
+                    AnnotationLogger.getLogger(fileName).printExceptionById("SDD_00001");
                     return null;
                 }
             }
@@ -84,9 +84,7 @@ public class AnnotationWorker {
         } else if (fileName.startsWith("SSD-")) {
             chain = annotateSSDFile(recordFile);
         } else {
-            AnnotationLog.printException(
-                    "Unsupported file name prefix, only accept prefixes "
-                            + "DA-, DPL-, OAS-, SDD-, SSD-, STD- ", fileName);
+            AnnotationLogger.getLogger(fileName).printExceptionById("GBL_00001");
             return null;
         }
 
@@ -120,14 +118,11 @@ public class AnnotationWorker {
             String filePath = pathUnproc + "/" + fileName;
 
             if (procFiles.contains(dataFile)) {
-                AnnotationLog.printException(String.format(
-                        "Already processed a file with the same name %s . "
-                                + "Please delete the old file before moving forward ", fileName), 
-                        fileName);
+                AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("GBL_00002", fileName);
                 return;
             }
 
-            AnnotationLog.println(String.format("Processing file: %s", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("Processing file: %s", fileName));
 
             RecordFile recordFile = null;
             File file = new File(filePath);
@@ -136,9 +131,7 @@ public class AnnotationWorker {
             } else if (fileName.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(file);
             } else {
-                AnnotationLog.printException(
-                        String.format("Unknown file format: %s", fileName), 
-                        fileName);
+                AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("GBL_00003", fileName);
                 return;
             }
 
@@ -181,11 +174,11 @@ public class AnnotationWorker {
                 f.renameTo(new File(destFolder + "/" + fileName));
                 f.delete();
 
-                AnnotationLog log = AnnotationLog.find(fileName);
-                if (null != log) {                    
-                    AnnotationLog newLog = new AnnotationLog(dataFile.getFileName());
-                    newLog.setLog(log.getLog());
-                    log.delete();
+                AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
+                if (null != logger) {
+                    AnnotationLogger newLog = AnnotationLogger.getLogger(dataFile.getFileName());
+                    newLog.setLog(logger.getLog());
+                    logger.delete();
                     newLog.save();
                 }
             } else {
@@ -205,8 +198,8 @@ public class AnnotationWorker {
         String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
         String fileName = recordFile.getFileName();
 
-        AnnotationLog.println("Study ID found: " + studyName, fileName);
-        AnnotationLog.println("Study URI found: " + studyUri, fileName);
+        AnnotationLogger.getLogger(fileName).println("Study ID found: " + studyName);
+        AnnotationLogger.getLogger(fileName).println("Study URI found: " + studyUri);
 
         List<ObjectCollection> ocList = ObjectCollection.findByStudyUri(studyUri);
         Map<String, String> refList = new HashMap<String, String>();
@@ -224,7 +217,7 @@ public class AnnotationWorker {
         System.out.println("das_uri " + das_uri);
         DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
         if (das == null) {
-            AnnotationLog.printException("The SDD of study " + record.getValueByColumnName("Study ID") + " can not be found. Check if it is already ingested.", fileName);
+            AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("OAS_00001", record.getValueByColumnName("Study ID"));
         } else {
             Map<String, String> dasoPL = new HashMap<String, String>();
             List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
@@ -238,7 +231,7 @@ public class AnnotationWorker {
                     }
                 }
             }
-            AnnotationLog.println("PATH COMPUTATION: The number of DASOs to be computed: " + loo2.toString(), fileName);
+            AnnotationLogger.getLogger(fileName).println("PATH COMPUTATION: The number of DASOs to be computed: " + loo2.toString());
 
             for (DataAcquisitionSchemaObject daso : loo) {
                 if (null == daso) {
@@ -246,7 +239,7 @@ public class AnnotationWorker {
                 }
 
                 if (daso.getEntityLabel() == null || daso.getEntityLabel().length() == 0) {
-                    AnnotationLog.printException("The Entity Label of DASO : " + daso.getLabel() + " can not be found. Check SDD.", fileName);
+                    AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("OAS_00002", daso.getLabel());
                 } else if (!refList.containsKey(daso.getLabel())) {
 
                     List<String> answer = new ArrayList<String>();
@@ -280,7 +273,7 @@ public class AnnotationWorker {
                                                 if (soln.getResource("x") != null) {
                                                     if (tarList.contains(soln.getResource("x").toString())) {                           
                                                         answer.add(das.getObject(soln.getResource("x").toString()).getEntityLabel());
-                                                        AnnotationLog.println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
+                                                        AnnotationLogger.getLogger(fileName).println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"");
                                                         dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                         found = true;
                                                         break;
@@ -298,7 +291,7 @@ public class AnnotationWorker {
                                                             if (soln.getLiteral("o") != null) {
                                                                 if (refList.containsKey(soln.getLiteral("o").toString())) {
                                                                     answer.add(refList.get(soln.getLiteral("o").toString()));
-                                                                    AnnotationLog.println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
+                                                                    AnnotationLogger.getLogger(fileName).println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"");
                                                                     dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                                     found = true;
                                                                     break;
@@ -311,7 +304,7 @@ public class AnnotationWorker {
                                                 if (soln.getLiteral("x") != null) {
                                                     if (refList.containsKey(soln.getLiteral("x").toString())) {
                                                         answer.add(refList.get(soln.getLiteral("x").toString()));
-                                                        AnnotationLog.println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"", fileName);
+                                                        AnnotationLogger.getLogger(fileName).println("PATH: DASO: " + daso.getLabel() + ": \"" + answer.get(1) + " " + answer.get(0) + "\"");
                                                         dasoPL.put(daso.getUri(), answer.get(1) + " " + answer.get(0));
                                                         found = true;
                                                         break;
@@ -324,17 +317,17 @@ public class AnnotationWorker {
                                         }
                                     }
                                 } catch (Exception e) {
-                                    AnnotationLog.printException(e.getMessage(), fileName);
+                                    AnnotationLogger.getLogger(fileName).printException(e.getMessage());
                                 }
                             }
                         }
 
                     }
                     if (found == false) {
-                        AnnotationLog.println("PATH: DASO: " + daso.getLabel() + " Path connections can not be found ! check the SDD definition. ", fileName);
+                        AnnotationLogger.getLogger(fileName).println("PATH: DASO: " + daso.getLabel() + " Path connections can not be found ! check the SDD definition. ");
                     }
                 } else {
-                    AnnotationLog.println("PATH: Skipped :" + daso.getLabel(), fileName);
+                    AnnotationLogger.getLogger(fileName).println("PATH: Skipped :" + daso.getLabel());
                 }
             }
             //insert the triples
@@ -437,7 +430,7 @@ public class AnnotationWorker {
         String fileName = file.getFileName();
         String sddName = sdd.getName();
         if (sddName == "") {
-            AnnotationLog.printException("This SDD has no Study_ID filled.", fileName);
+            AnnotationLogger.getLogger(fileName).printExceptionById("SDD_00003");
         }
         Map<String, String> mapCatalog = sdd.getCatalog();
 
@@ -474,23 +467,23 @@ public class AnnotationWorker {
         if (null != codeMappingFile) {
             codeMappingRecordFile = new CSVRecordFile(codeMappingFile);
             if (!sdd.readCodeMapping(codeMappingRecordFile)) {
-                AnnotationLog.printWarning(String.format("The CodeMapping of this SDD is empty. ", fileName), fileName);
+                AnnotationLogger.getLogger(fileName).printWarning(String.format("The CodeMapping of this SDD is empty. ", fileName));
             } else {
-                AnnotationLog.println(String.format("Codemappings: " + sdd.getCodeMapping().get("U"), fileName), fileName);
+                AnnotationLogger.getLogger(fileName).println(String.format("Codemappings: " + sdd.getCodeMapping().get("U"), fileName));
             }
         } else {
-            AnnotationLog.printWarning(String.format("Failed to download the CodeMapping of this SDD.", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).printWarning(String.format("Failed to download the CodeMapping of this SDD.", fileName));
         }
 
         if (!sdd.readDataDictionary(dictionaryRecordFile)) {
-            AnnotationLog.printException("Read Data Dictionary failed, please refer to the error msg above.", file.getFileName());
+            AnnotationLogger.getLogger(file.getFileName()).printExceptionById("SDD_00004");
             return null;
         }
         if (codeBookRecordFile == null || !sdd.readCodebook(codeBookRecordFile)) {
-            AnnotationLog.printWarning(String.format("The Codebook of this SDD is either invalid or empty. ", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).printWarningById("SDD_00005");
         }
         if (timelineRecordFile == null || !sdd.readTimeline(timelineRecordFile)) {
-            AnnotationLog.println("The TimeLine of this SDD is empty.", file.getFileName());
+            AnnotationLogger.getLogger(file.getFileName()).printWarningById("SDD_00006");
         }
 
         GeneratorChain chain = new GeneratorChain();
@@ -508,7 +501,7 @@ public class AnnotationWorker {
         String sddUri = ConfigProp.getKbPrefix() + "DAS-" + sddName;
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", sddUri);
-        AnnotationLog.println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema", file.getFileName());
+        AnnotationLogger.getLogger(file.getFileName()).println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema");
         row.put("a", "hasco:DASchema");
         row.put("rdfs:label", "SDD-" + sddName);
         row.put("rdfs:comment", "");
@@ -548,9 +541,9 @@ public class AnnotationWorker {
                 chain.setStudyUri(studyUri);
                 Study study = Study.find(studyUri);
                 if (study != null) {
-                    AnnotationLog.println("SSD ingestion: The study uri :" + studyUri + " is in the TS.", file_name);
+                    AnnotationLogger.getLogger(file_name).println("SSD ingestion: The study uri :" + studyUri + " is in the TS.");
                 } else {
-                    AnnotationLog.printException("SSD ingestion: Could not find the study uri : " + studyUri + " in the TS, check the study uri in the SSD sheet.", file_name);
+                    AnnotationLogger.getLogger(file_name).printException("SSD ingestion: Could not find the study uri : " + studyUri + " in the TS, check the study uri in the SSD sheet.");
                     return null;
                 }
             }
@@ -559,7 +552,7 @@ public class AnnotationWorker {
 
         } else {
             //chain.setInvalid();
-            AnnotationLog.printException("Cannot locate SSD's sheet ", file.getFileName());
+            AnnotationLogger.getLogger(file.getFileName()).printException("Cannot locate SSD's sheet ");
         }
 
         String study_uri = chain.getStudyUri();
@@ -589,43 +582,43 @@ public class AnnotationWorker {
             oas = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
             if (oas != null) {
                 if (!oas.isComplete()) {
-                    AnnotationLog.printWarning(String.format("Specification of associated Object Access Specification is incomplete: %s", fileName), fileName);
+                    AnnotationLogger.getLogger(fileName).printWarning(String.format("Specification of associated Object Access Specification is incomplete: %s", fileName));
                     chain.setInvalid();
                 } else {
-                    AnnotationLog.println(String.format("Specification of associated Object Access Specification is complete: %s", fileName), fileName);
+                    AnnotationLogger.getLogger(fileName).println(String.format("Specification of associated Object Access Specification is complete: %s", fileName));
                 }
                 oas_uri = oas.getUri();
                 deployment_uri = oas.getDeploymentUri();
                 schema_uri = oas.getSchemaUri();
             } else {
-                AnnotationLog.printWarning(String.format("Cannot find associated Object Access Specification: %s", fileName), fileName);
+                AnnotationLogger.getLogger(fileName).printWarning(String.format("Cannot find associated Object Access Specification: %s", fileName));
                 chain.setInvalid();
             }
         }
 
         if (oas_uri == null) {
-            AnnotationLog.printException(String.format("Cannot find target data acquisition: %s", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).printException(String.format("Cannot find target data acquisition: %s", fileName));
             chain.setInvalid();
         } else {
-            AnnotationLog.println(String.format("Found target data acquisition: %s", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("Found target data acquisition: %s", fileName));
         }
         if (schema_uri == null) {
-            AnnotationLog.printException(String.format("Cannot load schema specified for data acquisition: %s", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).printException(String.format("Cannot load schema specified for data acquisition: %s", fileName));
             chain.setInvalid();
         } else {
-            AnnotationLog.println(String.format("Schema %s specified for data acquisition: %s", schema_uri, fileName), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("Schema %s specified for data acquisition: %s", schema_uri, fileName));
         }
         if (deployment_uri == null) {
-            AnnotationLog.printException(String.format("Cannot load deployment specified for data acquisition: %s", fileName), fileName);
+            AnnotationLogger.getLogger(fileName).printException(String.format("Cannot load deployment specified for data acquisition: %s", fileName));
             chain.setInvalid();
         } else {
             try {
                 deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                AnnotationLog.printException(String.format("URL decoding error for deployment uri %s", deployment_uri), fileName);
+                AnnotationLogger.getLogger(fileName).printException(String.format("URL decoding error for deployment uri %s", deployment_uri));
                 chain.setInvalid();
             }
-            AnnotationLog.println(String.format("Deployment %s specified for data acquisition %s", deployment_uri, fileName), fileName);
+            AnnotationLogger.getLogger(fileName).println(String.format("Deployment %s specified for data acquisition %s", deployment_uri, fileName));
         }
 
         if (oas != null) {
@@ -635,7 +628,7 @@ public class AnnotationWorker {
 
             DataAcquisitionSchema schema = DataAcquisitionSchema.find(oas.getSchemaUri());
             if (schema == null) {
-                AnnotationLog.printException(String.format("Schema %s cannot be found", oas.getSchemaUri()), fileName);
+                AnnotationLogger.getLogger(fileName).printException(String.format("Schema %s cannot be found", oas.getSchemaUri()));
                 chain.setInvalid();
             }
 

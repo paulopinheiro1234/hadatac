@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
@@ -86,7 +86,7 @@ public class Downloader extends Controller {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
-        AnnotationLog.delete(file_name);
+        AnnotationLogger.delete(file_name);
         dataFile.setStatus(DataFile.DELETED);
         dataFile.delete();
 
@@ -139,13 +139,9 @@ public class Downloader extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String file_name) {
-        AnnotationLog log = AnnotationLog.find(file_name);
-        if (null == log) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.Downloader.index().url()));
-        }
-        else {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.Downloader.index().url()));
-        }
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
+                AnnotationLogger.getLogger(file_name).getLog()), 
+                routes.Downloader.index().url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -172,9 +168,9 @@ public class Downloader extends Controller {
         String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
 
-        AnnotationLog log = new AnnotationLog(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
-        log.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
+        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
+        logger.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
+        logger.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
 
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
@@ -196,8 +192,8 @@ public class Downloader extends Controller {
         String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
 
-        AnnotationLog log = new AnnotationLog(fileName);
-        log.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
+        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
+        logger.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
 
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);

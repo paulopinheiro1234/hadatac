@@ -15,7 +15,8 @@ import org.apache.commons.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
+import org.hadatac.console.controllers.annotator.ErrorDictionary;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -68,14 +69,15 @@ public class MeasurementGenerator extends BaseGenerator {
         this.da = da;
         this.schema = schema;
         this.dataFile = dataFile;
-        String fileName = dataFile.getFileName();
         this.dasoiGen = dasoiGen;
+        
+        logger.setFileName(dataFile.getFileName());
+        
         if (dasoiGen.initiateCache(da.getStudyUri())) {
         	setStudyUri(da.getStudyUri());
             urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
         } else {
-            AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
-            log.printException("[ERROR] MeasurementGeneration: failed to initialize the data ingestion.", fileName);;
+            logger.printExceptionById("DA_00001");
         }
     }
 
@@ -118,7 +120,7 @@ public class MeasurementGenerator extends BaseGenerator {
     public void preprocess() throws Exception {
         System.out.println("[Parser] indexMeasurements()...");
 
-        AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
+        AnnotationLogger logger = AnnotationLogger.getLogger(dataFile.getFileName());
 
         // createVirtualObjectCollections(schema);
 
@@ -142,7 +144,7 @@ public class MeasurementGenerator extends BaseGenerator {
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
         if (!unknownHeaders.isEmpty()) {
-            log.addline(Feedback.println(Feedback.WEB, 
+            logger.addline(Feedback.println(Feedback.WEB, 
                     "[WARNING] Failed to match the following " 
                             + unknownHeaders.size() + " headers: " + unknownHeaders));
         }
@@ -644,21 +646,21 @@ public class MeasurementGenerator extends BaseGenerator {
         da.addNumberDataPoints(totalCount);
         da.saveToSolr();
 
-        AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
-        log.addline(Feedback.println(Feedback.WEB, String.format(
+        AnnotationLogger logger = AnnotationLogger.getLogger(dataFile.getFileName());
+        logger.addline(Feedback.println(Feedback.WEB, String.format(
                 "[OK] %d object(s) have been committed to solr", count)));
 
         return true;
     }
 
     private void commitToSolr(SolrClient solr, int batch_size) throws Exception {
-        AnnotationLog log = AnnotationLog.create(dataFile.getFileName());
+        AnnotationLogger logger = AnnotationLogger.getLogger(dataFile.getFileName());
 
         try {
             System.out.println("solr.commit()...");
             solr.commit();
             System.out.println(String.format("[OK] Committed %s measurements!", batch_size));
-            log.addline(Feedback.println(Feedback.WEB, String.format("[OK] Committed %s measurements!", batch_size)));
+            logger.addline(Feedback.println(Feedback.WEB, String.format("[OK] Committed %s measurements!", batch_size)));
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
             try {

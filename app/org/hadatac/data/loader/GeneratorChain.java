@@ -3,7 +3,7 @@ package org.hadatac.data.loader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 
 public class GeneratorChain {
 
@@ -68,7 +68,9 @@ public class GeneratorChain {
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
-                AnnotationLog.printException(generator.getErrorMsg(e), generator.getFileName());
+                
+                AnnotationLogger logger = AnnotationLogger.getLogger(generator.getFileName());
+                logger.printException(generator.getErrorMsg(e));
                 return false;
             }
         }
@@ -103,7 +105,9 @@ public class GeneratorChain {
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
-                AnnotationLog.printException(generator.getErrorMsg(e), generator.getFileName());
+                
+                AnnotationLogger logger = AnnotationLogger.getLogger(generator.getFileName());
+                logger.printException(generator.getErrorMsg(e));
                 return false;
             }
         }
@@ -136,7 +140,9 @@ public class GeneratorChain {
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
-                AnnotationLog.printException(e, generator.getFileName());
+                
+                AnnotationLogger logger = AnnotationLogger.getLogger(generator.getFileName());
+                logger.printException(e);
             }
         }
     }

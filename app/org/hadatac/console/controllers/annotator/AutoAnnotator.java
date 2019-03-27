@@ -24,7 +24,6 @@ import org.apache.http.HttpStatus;
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.routes;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.LabKeyLoginForm;
@@ -283,13 +282,9 @@ public class AutoAnnotator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String file_name) {
-        AnnotationLog log = AnnotationLog.find(file_name);
-        if (null == log) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), routes.AutoAnnotator.index(dir).url()));
-        }
-        else {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, log.getLog()), routes.AutoAnnotator.index(dir).url()));
-        }
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
+                AnnotationLogger.getLogger(file_name).getLog()), 
+                routes.AutoAnnotator.index(dir).url()));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -321,7 +316,7 @@ public class AutoAnnotator extends Controller {
             result.put("Submission Time", dataFile.getSubmissionTime());
             result.put("Completion Time", dataFile.getCompletionTime());
             result.put("Owner Email", dataFile.getOwnerEmail());
-            result.put("Log", AnnotationLog.create(fileName).getLog());
+            result.put("Log", AnnotationLogger.getLogger(fileName).getLog());
         }
 
         return ok(Json.toJson(result));
@@ -367,12 +362,12 @@ public class AutoAnnotator extends Controller {
         file.renameTo(new File(destFolder + "/" + pureFileName));
         file.delete();
 
-        AnnotationLog log = AnnotationLog.find(fileName);
-        if (null != log) {
-            log.delete();
+        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
+        if (null != logger) {
+            logger.delete();
         }
 
-        AnnotationLog new_log = new AnnotationLog(pureFileName);
+        AnnotationLogger new_log = AnnotationLogger.getLogger(pureFileName);
         new_log.addline(Feedback.println(Feedback.WEB, 
                 String.format("[OK] Moved file %s to unprocessed folder", pureFileName)));
 
@@ -396,7 +391,7 @@ public class AutoAnnotator extends Controller {
         dataFile.setStatus(DataFile.UNPROCESSED);
         dataFile.save();
         
-        AnnotationLog.delete(fileName);
+        AnnotationLogger.delete(fileName);
 
         return redirect(routes.AutoAnnotator.index(dir));
     }
@@ -435,15 +430,15 @@ public class AutoAnnotator extends Controller {
                 System.out.print("Can not delete triples ingested by " + fileName + " ..");
                 file.delete();
                 dataFile.delete();
-                AnnotationLog.delete(fileName);
-                AnnotationLog.delete(pureFileName);
+                AnnotationLogger.delete(fileName);
+                AnnotationLogger.delete(pureFileName);
                 return redirect(routes.AutoAnnotator.index(dir));
             }
         }
         file.delete();
         dataFile.delete();
-        AnnotationLog.delete(fileName);
-        AnnotationLog.delete(pureFileName);
+        AnnotationLogger.delete(fileName);
+        AnnotationLogger.delete(pureFileName);
 
         return redirect(routes.AutoAnnotator.index(dir));
     }
@@ -458,8 +453,8 @@ public class AutoAnnotator extends Controller {
         } else if (file.getName().endsWith(".xlsx")) {
             recordFile = new SpreadsheetRecordFile(file);
         } else {
-            AnnotationLog log = new AnnotationLog(file.getName());
-            log.addline(Feedback.println(Feedback.WEB, String.format(
+            AnnotationLogger logger = AnnotationLogger.getLogger(file.getName());
+            logger.addline(Feedback.println(Feedback.WEB, String.format(
                     "[ERROR] Unknown file format: %s", file.getName())));
             return;
         }

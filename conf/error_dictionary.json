@@ -21,13 +21,153 @@
       "content": [
         {
           "id": "DPL_00001",
-          "detail": "InfoSheet not found",
-          "solution": "Add InfoSheet"
+          "detail": "Missing InfoSheet. ",
+          "solution": ""
         },
         {
           "id": "DPL_00002",
           "detail": "Unknown headers",
           "solution": "Check headers"
+        }
+      ]
+    },
+    "SSD": {
+      "file type": "SSD",
+      "content": [
+        {
+          "id": "SSD_00001",
+          "detail": "SSDGenerator: no studyUri provided for SOC generator with typeUri [%s]",
+          "solution": ""
+        },
+        {
+          "id": "SSD_00002",
+          "detail": "SSDGenerator: no SOCReference provided for SOC generator",
+          "solution": ""
+        },
+        {
+          "id": "SSD_00003",
+          "detail": "VirtualColumnGenerator: no studyUri provided for generator with typeUri [%s]",
+          "solution": ""
+        },
+        {
+          "id": "SSD_00004",
+          "detail": "VirtualColumnGenerator: no SOCReference provided for generator",
+          "solution": ""
+        }
+      ]
+    },
+    "SDD": {
+      "file type": "SDD",
+      "content": [
+        {
+          "id": "SDD_00001",
+          "detail": "The Info sheet is missing in this SDD file. ",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00002",
+          "detail": "SSDGenerator: no SOCReference provided for SOC generator",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00003",
+          "detail": "This SDD has no Study_ID filled.",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00004",
+          "detail": "Read Data Dictionary failed, please refer to the error msg above.",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00005",
+          "detail": "The Codebook of this SDD is either invalid or empty. ",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00006",
+          "detail": "The TimeLine of this SDD is empty. ",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00007",
+          "detail": "The Dictionary Mapping has is EMPTY.",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00008",
+          "detail": "Attribute %s is not attributeOf any object. Please fix the content.",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00009",
+          "detail": "The Entity Cell \"%s\" in the [Entity] column is either not valid uri or it can not be resolved by replaceNameSpaceEx().",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00010",
+          "detail": "\"%s\" at column [attributeOf] , row [%s] contains illegal content.",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00011",
+          "detail": "The Dictionary Mapping contains illegal content in \"%s\" in the [Column] column. Check if it contains characters such as \",\" and blank space.",
+          "solution": ""
+        }
+      ]
+    },
+    "OAS": {
+      "file type": "OAS",
+      "content": [
+        {
+          "id": "OAS_00001",
+          "detail": "The SDD of study %s can not be found. Check if it is already ingested.",
+          "solution": ""
+        },
+        {
+          "id": "OAS_00002",
+          "detail": "The Entity Label of DASO : %s can not be found. Check SDD.",
+          "solution": ""
+        },
+        {
+          "id": "OAS_00003",
+          "detail": "The Entity Label of DASO : %s can not be found. Check SDD.",
+          "solution": ""
+        }
+      ]
+    },
+    "DA": {
+      "file type": "DA",
+      "content": [
+        {
+          "id": "DA_00001",
+          "detail": "MeasurementGeneration: failed to initialize the data ingestion.",
+          "solution": ""
+        },
+        {
+          "id": "DA_00002",
+          "detail": "SSDGenerator: no SOCReference provided for SOC generator",
+          "solution": ""
+        }
+      ]
+    },
+    "GLOBAL": {
+      "file type": "GLOBAL",
+      "content": [
+        {
+          "id": "GBL_00001",
+          "detail": "Unsupported file name prefix, only accept prefixes DA-, DPL-, OAS-, SDD-, SSD-, STD- ",
+          "solution": ""
+        },
+        {
+          "id": "GBL_00002",
+          "detail": "Already processed a file with the same name %s . Please delete the old file before moving forward. ",
+          "solution": ""
+        },
+        {
+          "id": "GBL_00003",
+          "detail": "Unknown file format: %s",
+          "solution": ""
         }
       ]
     }

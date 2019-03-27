@@ -1,27 +1,19 @@
 package org.hadatac.data.loader;
 
 import java.lang.String;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.HADatAcThing;
-import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
-import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.console.controllers.annotator.AnnotationLog;
+
 
 public class VirtualColumnGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
-    String annotationFileName = "";
 
     public VirtualColumnGenerator(RecordFile file, String annotationFileName) {
         super(file);
-        String str = file.getFile().getName().replaceAll("SSD-", "");
-        this.annotationFileName = annotationFileName;
+        logger.setFileName(annotationFileName);
     }
 
     @Override
@@ -61,13 +53,13 @@ public class VirtualColumnGenerator extends BaseGenerator {
         
         this.studyUri = getStudyUri(record);
         if (this.studyUri == null || this.studyUri.equals("")) {
-            AnnotationLog.printException("VirtualColumnGenerator: no studyUri provided for generator with typeUri [" + this.getTypeUri(record) +"]", annotationFileName);
+            logger.printExceptionByIdWithArgs("SSD_00003", this.getTypeUri(record));
             return null;
         }
             
         String SOCReference = getSOCReference(record);
         if (SOCReference == null || SOCReference.equals("")) {
-            AnnotationLog.printException("VirtualColumnGenerator: no SOCReference provided for generator", annotationFileName);
+            logger.printException("SSD_00004");
             return null;
         }
             
