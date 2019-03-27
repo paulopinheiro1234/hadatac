@@ -53,6 +53,11 @@
           "id": "SSD_00004",
           "detail": "VirtualColumnGenerator: no SOCReference provided for generator",
           "solution": ""
+        },
+        {
+          "id": "SSD_00005",
+          "detail": "SSD ingestion: Could not find the study uri <%s> in the TS, check the study uri in the SSD sheet.",
+          "solution": ""
         }
       ]
     },
@@ -113,6 +118,26 @@
           "id": "SDD_00011",
           "detail": "The Dictionary Mapping contains illegal content in \"%s\" in the [Column] column. Check if it contains characters such as \",\" and blank space.",
           "solution": ""
+        },
+        {
+          "id": "SDD_00012",
+          "detail": "The Dictionary Mapping has unregistered namespace in the following cells: %s .",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00013",
+          "detail": "The Dictionary Mapping has the following cells with missing labels: %s .",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00014",
+          "detail": "The Attributes: [%s] are subclasses of neither hasco:StudyIndicator nor hasco:SampleIndicator . ",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00015",
+          "detail": "The Dictionary Mapping has incorrect content in : %s in \"attributeOf\" column . ",
+          "solution": ""
         }
       ]
     },
@@ -147,6 +172,31 @@
         {
           "id": "DA_00002",
           "detail": "SSDGenerator: no SOCReference provided for SOC generator",
+          "solution": ""
+        },
+        {
+          "id": "DA_00003",
+          "detail": "Specification of associated Object Access Specification is incomplete: <%s>",
+          "solution": ""
+        },
+        {
+          "id": "DA_00004",
+          "detail": "Cannot find associated Object Access Specification: <%s>",
+          "solution": ""
+        },
+        {
+          "id": "DA_00005",
+          "detail": "Cannot load schema specified for data acquisition: <%s>",
+          "solution": ""
+        },
+        {
+          "id": "DA_00006",
+          "detail": "Cannot load deployment specified for data acquisition: <%s>",
+          "solution": ""
+        },
+        {
+          "id": "DA_00007",
+          "detail": "Schema <%s> cannot be found",
           "solution": ""
         }
       ]

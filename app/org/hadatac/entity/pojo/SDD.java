@@ -589,25 +589,20 @@ public class SDD {
 	    }*/
 
         if (checkUriNamespaceResults.size() > 0) {
-            logger.printException("The Dictionary Mapping has unregistered namespace in the following cells: "
-                    + String.join(", ", checkUriNamespaceResults) + " .");
+            logger.printExceptionByIdWithArgs("SDD_00012", String.join(", ", checkUriNamespaceResults));
             return false;
         }
 
         if (checkUriLabelResults.size() > 0) {
-            logger.printWarning("The Dictionary Mapping has the following cells with missing labels: "
-                    + String.join(", ", checkUriLabelResults) + " .");
+            logger.printWarningByIdWithArgs("SDD_00013", String.join(", ", checkUriLabelResults));
         }
 
         if (checkStudyIndicatorPathResults.size() > 0) {
-            logger.printWarning(
-                    "The Attributes: [" + String.join(", ", checkStudyIndicatorPathResults)
-                    + "] are subclasses of neither hasco:StudyIndicator nor hasco:SampleIndicator .");
+            logger.printWarningByIdWithArgs("SDD_00014", String.join(", ", checkStudyIndicatorPathResults));
         }
 
         if (checkCellValResults.size() > 0) {
-            logger.printException("The Dictionary Mapping has incorrect content in :"
-                    + String.join(", ", checkCellValResults) + "in \"attributeOf\" column.");
+            logger.printExceptionByIdWithArgs("SDD_00015", String.join(", ", checkCellValResults));
             return false;
         }
 

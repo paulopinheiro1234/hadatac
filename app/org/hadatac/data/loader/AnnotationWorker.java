@@ -543,7 +543,7 @@ public class AnnotationWorker {
                 if (study != null) {
                     AnnotationLogger.getLogger(file_name).println("SSD ingestion: The study uri :" + studyUri + " is in the TS.");
                 } else {
-                    AnnotationLogger.getLogger(file_name).printException("SSD ingestion: Could not find the study uri : " + studyUri + " in the TS, check the study uri in the SSD sheet.");
+                    AnnotationLogger.getLogger(file_name).printExceptionByIdWithArgs("SSD_00005", studyUri);
                     return null;
                 }
             }
@@ -579,46 +579,40 @@ public class AnnotationWorker {
         String schema_uri = null;
 
         if (dataFile != null) {
-            oas = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
+            oas_uri = URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri());
+            oas = ObjectAccessSpec.findByUri(oas_uri);
             if (oas != null) {
                 if (!oas.isComplete()) {
-                    AnnotationLogger.getLogger(fileName).printWarning(String.format("Specification of associated Object Access Specification is incomplete: %s", fileName));
+                    AnnotationLogger.getLogger(fileName).printWarningByIdWithArgs("DA_00003", oas_uri);
                     chain.setInvalid();
                 } else {
-                    AnnotationLogger.getLogger(fileName).println(String.format("Specification of associated Object Access Specification is complete: %s", fileName));
+                    AnnotationLogger.getLogger(fileName).println(String.format("Specification of associated Object Access Specification is complete: <%s>", oas_uri));
                 }
-                oas_uri = oas.getUri();
                 deployment_uri = oas.getDeploymentUri();
                 schema_uri = oas.getSchemaUri();
             } else {
-                AnnotationLogger.getLogger(fileName).printWarning(String.format("Cannot find associated Object Access Specification: %s", fileName));
+                AnnotationLogger.getLogger(fileName).printWarningByIdWithArgs("DA_00004", oas_uri);
                 chain.setInvalid();
             }
         }
 
-        if (oas_uri == null) {
-            AnnotationLogger.getLogger(fileName).printException(String.format("Cannot find target data acquisition: %s", fileName));
+        if (schema_uri == null || schema_uri.isEmpty()) {
+            AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("DA_00005", oas_uri);
             chain.setInvalid();
         } else {
-            AnnotationLogger.getLogger(fileName).println(String.format("Found target data acquisition: %s", fileName));
+            AnnotationLogger.getLogger(fileName).println(String.format("Schema <%s> specified for data acquisition: <%s>", schema_uri, oas_uri));
         }
-        if (schema_uri == null) {
-            AnnotationLogger.getLogger(fileName).printException(String.format("Cannot load schema specified for data acquisition: %s", fileName));
-            chain.setInvalid();
-        } else {
-            AnnotationLogger.getLogger(fileName).println(String.format("Schema %s specified for data acquisition: %s", schema_uri, fileName));
-        }
-        if (deployment_uri == null) {
-            AnnotationLogger.getLogger(fileName).printException(String.format("Cannot load deployment specified for data acquisition: %s", fileName));
+        if (deployment_uri == null || deployment_uri.isEmpty()) {
+            AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("DA_00006", oas_uri);
             chain.setInvalid();
         } else {
             try {
                 deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                AnnotationLogger.getLogger(fileName).printException(String.format("URL decoding error for deployment uri %s", deployment_uri));
+                AnnotationLogger.getLogger(fileName).printException(String.format("URL decoding error for deployment uri <%s>", deployment_uri));
                 chain.setInvalid();
             }
-            AnnotationLogger.getLogger(fileName).println(String.format("Deployment %s specified for data acquisition %s", deployment_uri, fileName));
+            AnnotationLogger.getLogger(fileName).println(String.format("Deployment <%s> specified for data acquisition <%s>", deployment_uri, oas_uri));
         }
 
         if (oas != null) {
@@ -628,7 +622,7 @@ public class AnnotationWorker {
 
             DataAcquisitionSchema schema = DataAcquisitionSchema.find(oas.getSchemaUri());
             if (schema == null) {
-                AnnotationLogger.getLogger(fileName).printException(String.format("Schema %s cannot be found", oas.getSchemaUri()));
+                AnnotationLogger.getLogger(fileName).printExceptionByIdWithArgs("DA_00007", oas.getSchemaUri());
                 chain.setInvalid();
             }
 

@@ -165,7 +165,8 @@ public class AnnotationLogger {
 				return log;
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] AnnotationLog.find(String) - Exception message: " + e.getMessage());
+		    e.printStackTrace();
+			System.out.println("[ERROR] AnnotationLogger.find(String) - Exception message: " + e.getMessage());
 		}
 	
 		return null;
