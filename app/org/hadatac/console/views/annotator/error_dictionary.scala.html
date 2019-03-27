@@ -17,7 +17,7 @@
 
 	<script>
 	   var jsonText = document.getElementById('dictionary').dataset.documents;
-	   var json = decodeURIComponent(jsonText);
+	   var json = jsonText.replace(/&quot;/g, '\\"');
 	   $("#table").html(buildTable($.parseJSON(json)));
 	</script>
 	

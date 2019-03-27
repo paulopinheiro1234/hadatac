@@ -7,62 +7,6 @@ var json_visible = !0,
     tree_visible = !0,
     tree_pnl_size = 0,
     xxa_pnl_size = 0;
-jQuery(function (a) {
-    function e() {
-        json_visible ? (a("#all_panels").split().position(a("#all_panels").width() - xxa_pnl_size - 2), table_visible && tree_visible ? a("#xxa").split().position(xxa_pnl_size - tree_pnl_size - 2) : !table_visible && tree_visible ? a("#xxa").split().position(0) : table_visible && !tree_visible ? a("#xxa").split().position(xxa_pnl_size) : table_visible || tree_visible || a("#all_panels").split().position(a("#all_panels").width())) : (a("#all_panels").split().position(0), table_visible && tree_visible ? a("#xxa").split().position(xxa_pnl_size -
-            tree_pnl_size - 2) : !table_visible && tree_visible ? a("#xxa").split().position(0) : table_visible && !tree_visible && a("#xxa").split().position(a("#all_panels").width() - 2))
-    }
-    a("#all_panels").split({
-        orientation: "vertical",
-        limit: 0,
-        position: "33%"
-    });
-    a("#xxa").split({
-        orientation: "vertical",
-        limit: 0,
-        position: "50%"
-    });
-    tree_pnl_size = a("#tree_pnl").width();
-    json_pnl_size = a("#json_pnl").width();
-    xxa_pnl_size = a("#xxa").width();
-    a("#all_panels").split().settings.onDrag = function () {
-        json_visible ? (json_pnl_size = a("#json_pnl").width(),
-            xxa_pnl_size = a("#xxa").width(), table_visible && tree_visible ? a("#xxa").split().position(xxa_pnl_size - tree_pnl_size - 2) : table_visible && !tree_visible ? a("#xxa").split().position(xxa_pnl_size - 2) : !table_visible && tree_visible && a("#xxa").split().position(0)) : a("#all_panels").split().position(0)
-    };
-    a("#xxa").split().settings.onDrag = function () {
-        !table_visible && tree_visible ? a("#xxa").split().position(0) : tree_pnl_size = a("#tree_pnl").width()
-    };
-    a("#jsonViewMenu").click(function () {
-        if (table_visible || tree_visible) a("#jsonLi").toggleClass("active "),
-            json_visible = !json_visible, e()
-    });
-    a("#tableViewMenu").click(function () {
-        if (json_visible || tree_visible) a("#tableLi").toggleClass("active "), table_visible = !table_visible, e()
-    });
-    a("#treeViewMenu").click(function () {
-        if (json_visible || table_visible) a("#treeLi").toggleClass("active "), tree_visible = !tree_visible, e()
-    });
-    a("#load_json_btn").click(function () {
-        processJson()
-    });
-    a("#aboutLnk").click(function () {
-        a("#leaveMsg").val("");
-        a("#msgConfirmation").hide();
-        a("#msgForm").show();
-        a("#aboutModal").modal("show")
-    });
-    a("#sendMsgBtn").click(function () {
-        a("#msgForm").hide();
-        a("#msgConfirmation").show();
-        sendMsg()
-    });
-    a("#load_url_btn").click(function () {
-        a("#inputURLModal").modal("show")
-    });
-    a("#exec_loadBtn").click(function () {
-        loadfromURL(a("#urlInput").val())
-    })
-});
 
 function sendMsg() {
     $.ajax({
