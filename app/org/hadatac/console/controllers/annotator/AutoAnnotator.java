@@ -69,9 +69,31 @@ public class AutoAnnotator extends Controller {
     FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir) {        
+    public Result index(String dir, String dest) {        
         final SysUser user = AuthApplication.getLocalUser(session());
 
+    	String newDir = "";
+        if (dest.equals("..")) {
+        	String[] tokens = dir.split("/");
+        	for (int i=0; i < tokens.length - 1; i++) {
+        		//System.out.println("[" + tokens[i] + "]");
+        		if (tokens[i].equals("")) {
+        			newDir = newDir + "/";
+        		} else {
+        			newDir = newDir + tokens[i] + "/";
+        			dest	 = ".";
+        		}
+        	}
+        } else if (dest.equals(".")) {
+        	newDir = dir;
+        } else {
+        	if (dir.equals("/") && dest.equals("/")) {
+        		newDir = "/";
+        	} else  {
+        		newDir = dir + dest;
+        	}
+        } 
+        
         List<String> folders = null;
         List<DataFile> procFiles = null;
         List<DataFile> unprocFiles = null;
@@ -81,17 +103,17 @@ public class AutoAnnotator extends Controller {
         String pathUnproc = ConfigProp.getPathUnproc();
 
         if (user.isDataManager()) {
-            folders = DataFile.findAllFolders(dir);
-        	procFiles = DataFile.findInDir(dir, DataFile.PROCESSED);
+            folders = DataFile.findAllFolders(newDir);
+        	procFiles = DataFile.findInDir(newDir, DataFile.PROCESSED);
             unprocFiles = DataFile.findInDir("/", DataFile.UNPROCESSED);
             unprocFiles.addAll(DataFile.findInDir("/", DataFile.FREEZED));
             if (dir.equals("/")) {
-            	DataFile.includeUnrecognizedFiles(pathProc, procFiles);
+            	DataFile.includeUnrecognizedFiles(pathProc, newDir, procFiles);
             }
-        	DataFile.includeUnrecognizedFiles(pathUnproc, unprocFiles);
+        	DataFile.includeUnrecognizedFiles(pathUnproc, newDir, unprocFiles);
         } else {
-            folders = DataFile.findFolders(dir, user.getEmail());
-            procFiles = DataFile.findInDir(dir, user.getEmail(), DataFile.PROCESSED);
+            folders = DataFile.findFolders(newDir, user.getEmail());
+            procFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.PROCESSED);
             unprocFiles = DataFile.findInDir("/", user.getEmail(), DataFile.UNPROCESSED);
             unprocFiles.addAll(DataFile.findInDir("/", user.getEmail(), DataFile.FREEZED));
         }
@@ -131,12 +153,12 @@ public class AutoAnnotator extends Controller {
             }
         });
 
-        return ok(autoAnnotator.render(dir, folders, unprocFiles, procFiles, studyURIs, bStarted, user.isDataManager()));
+        return ok(autoAnnotator.render(newDir, folders, unprocFiles, procFiles, studyURIs, bStarted, user.isDataManager()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir) {
-        return index(dir);
+    public Result postIndex(String dir, String dest) {
+        return index(dir, dest);
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
@@ -175,7 +197,7 @@ public class AutoAnnotator extends Controller {
             }
             file.setOwnerEmail(data.getOption());
             file.save();
-            return redirect(routes.AutoAnnotator.index(dir));
+            return redirect(routes.AutoAnnotator.index(dir, "."));
         }
     }
 
@@ -223,7 +245,7 @@ public class AutoAnnotator extends Controller {
             }
             file.setDataAcquisitionUri(URIUtils.replacePrefixEx(data.getOption()));
             file.save();
-            return redirect(routes.AutoAnnotator.index(dir));
+            return redirect(routes.AutoAnnotator.index(dir, "."));
         }
     }
 
@@ -238,7 +260,7 @@ public class AutoAnnotator extends Controller {
             System.out.println("Turning auto-annotation on");
         }
 
-        return redirect(routes.AutoAnnotator.index(dir));
+        return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -284,7 +306,7 @@ public class AutoAnnotator extends Controller {
     public Result checkAnnotationLog(String dir, String file_name) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 AnnotationLogger.getLogger(file_name).getLog()), 
-                routes.AutoAnnotator.index(dir).url()));
+                routes.AutoAnnotator.index(dir, ".").url()));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -298,7 +320,7 @@ public class AutoAnnotator extends Controller {
             e.printStackTrace();
         }
         
-        return ok(error_dictionary.render(jsonText, routes.AutoAnnotator.index("/").url()));
+        return ok(error_dictionary.render(jsonText, routes.AutoAnnotator.index("/", ".").url()));
     }
 
     public Result getAnnotationStatus(String fileName) {
@@ -371,7 +393,7 @@ public class AutoAnnotator extends Controller {
         new_log.addline(Feedback.println(Feedback.WEB, 
                 String.format("[OK] Moved file %s to unprocessed folder", pureFileName)));
 
-        return redirect(routes.AutoAnnotator.index(dir));
+        return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -393,7 +415,7 @@ public class AutoAnnotator extends Controller {
         
         AnnotationLogger.delete(fileName);
 
-        return redirect(routes.AutoAnnotator.index(dir));
+        return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -430,9 +452,10 @@ public class AutoAnnotator extends Controller {
                 System.out.print("Can not delete triples ingested by " + fileName + " ..");
                 file.delete();
                 dataFile.delete();
+                
                 AnnotationLogger.delete(fileName);
                 AnnotationLogger.delete(pureFileName);
-                return redirect(routes.AutoAnnotator.index(dir));
+                return redirect(routes.AutoAnnotator.index(dir, "."));
             }
         }
         file.delete();
@@ -440,7 +463,7 @@ public class AutoAnnotator extends Controller {
         AnnotationLogger.delete(fileName);
         AnnotationLogger.delete(pureFileName);
 
-        return redirect(routes.AutoAnnotator.index(dir));
+        return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

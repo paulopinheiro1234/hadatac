@@ -8,14 +8,13 @@ public class FileType {
 
     public String name;
     public String longName;
-    public String path;
     public String suffix;
 
-    public static FileType DPL = new FileType("DPL", "Deployment Specification", "public/example/data/templates/DPL-Template.xlsx", ".xlsx");
-    public static FileType STD = new FileType("STD", "Study Specification", "public/example/data/templates/STD.csv", ".csv");
-    public static FileType SSD = new FileType("SSD", "Semantic Study Design", "public/example/data/templates/SSD-Template.xlsx", ".xlsx");
-    public static FileType SDD = new FileType("SDD", "Semantic Data Dictionary", "public/example/data/templates/SDD-Template.xlsx", ".xlsx");
-    public static FileType OAS = new FileType("OAS", "Object Access Specification", "public/example/data/templates/OAS-Template.xlsx", ".xlsx");
+    public static FileType DPL = new FileType("DPL", "Deployment Specification", ".xlsx");
+    public static FileType STD = new FileType("STD", "Study Specification", ".xlsx");
+    public static FileType SSD = new FileType("SSD", "Semantic Study Design", ".xlsx");
+    public static FileType SDD = new FileType("SDD", "Semantic Data Dictionary", ".xlsx");
+    public static FileType OAS = new FileType("OAS", "Object Access Specification", ".csv");
 
     public static List<FileType> FILETYPES = new ArrayList<FileType>(Arrays.asList(DPL, STD, SSD, SDD, OAS));
 
@@ -28,43 +27,34 @@ public class FileType {
     	return null;
     }
     
-    public FileType(String name, String longName, String path, String suffix) {
+    public FileType(String name, String longName, String suffix) {
     	this.name = name;
     	this.longName = longName;
-    	this.path = path;
     	this.suffix = suffix;
     }
     
     public String getName() {
-	return name;
+    	return name;
     }
 
     public void setName(String name) {
-	this.name = name;
+    	this.name = name;
     }
     
     public String getLongName() {
-	return longName;
+    	return longName;
     }
 
     public void setLongName(String longName) {
-	this.longName = longName;
+    	this.longName = longName;
     }
     
-    public String getPath() {
-	return path;
-    }
-
-    public void setPath(String path) {
-	this.path = path;
-    }
-        
     public String getSuffix() {
-	return suffix;
+    	return suffix;
     }
 
     public void setSuffix(String suffix) {
-	this.suffix = suffix;
+    	this.suffix = suffix;
     }
         
 }

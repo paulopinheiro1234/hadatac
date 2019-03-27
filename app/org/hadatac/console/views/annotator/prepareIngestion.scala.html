@@ -278,7 +278,7 @@
   }  @*  END OF PREPARATION PART OF THIS FORM *@
 
     <br>
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir)" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
+    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
     @if(da != null && da.isComplete()) {
         <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.reconfigure(dir, filename, da.getUri())" class="btn btn-primary" role="button">Reconfigure Data Ingestion</a>
     }

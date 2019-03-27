@@ -198,6 +198,6 @@ public class DataAcquisitionManagement extends Controller {
         dataFile.setStatus(DataFile.FREEZED);
         dataFile.save();
 
-        return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir));
+        return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, "."));
     }
 }

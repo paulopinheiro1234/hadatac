@@ -1,5 +1,6 @@
-@(fileTypes   : List[org.hadatac.console.models.FileType],
-  dir         : String)
+@(fileTypes     : List[org.hadatac.console.models.FileType],
+  templateTypes : List[String],
+  dir           : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -20,6 +21,10 @@
               cansubmit = false;
           }
 	
+	      if (document.getElementById('newTemplate').value.length == 0) {
+              cansubmit = false;
+          }
+	
 	      if (document.getElementById('newName').value.length == 0) {
 	          cansubmit = false;
 	      }
@@ -36,7 +41,7 @@
 	<h3>New Metadata File</h3>
 
 	<form class="form-horizontal" name="newFile" method="post"
-		action="@org.hadatac.console.controllers.workingfiles.routes.NewFile.processForm(dir))">
+		action="@org.hadatac.console.controllers.workingfiles.routes.NewFile.processForm(dir)">
 
 		<div class="form-group">
 			<label>File Type</label> <select class="form-control col-sm-6"
@@ -45,6 +50,17 @@
 				  <option value="@ft.getName()">@ft.getName() - @ft.getLongName()</option>
 				}
 			</select>
+
+		</div>
+
+		<div class="form-group">
+			<label>Template</label> <select class="form-control col-sm-6"
+				id="newTemplate" name="newTemplate" onchange="checkform()">
+				@for(tp <- templateTypes) {
+				  <option value="@tp">@tp</option>
+				}
+			</select> (select "GENERIC" if your project is not using specialized forms)
+
 		</div>
 
 		<div class="form-group">
@@ -57,7 +73,7 @@
 			<input class="btn btn-primary" role="button" id="submitbutton"
 				type="submit" value="Create New Metadata File"
 				disabled="disabled" /> 
-			<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir)"
+			<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")"
 				class="btn btn-primary" role="button">Cancel</a>
 		</div>
 	</form>

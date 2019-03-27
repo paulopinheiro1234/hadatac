@@ -12,6 +12,8 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -20,12 +22,14 @@ import play.mvc.Result;
 import play.Environment;
 import play.data.*;
 
+import org.hadatac.console.models.FileTemplate;
 import org.hadatac.console.models.FileType;
 import org.hadatac.console.models.NewFileForm;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.views.html.workingfiles.*;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
@@ -46,7 +50,7 @@ public class NewFile extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir) {
  
-        return ok(newFile.render(FileType.FILETYPES, dir));
+        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir));
 
     }
 
@@ -62,21 +66,30 @@ public class NewFile extends Controller {
 
         // store new values
         String newType = data.getNewType();
+        String newTemplate = data.getNewTamplate();
         String newName = data.getNewName();
 
         FileType ft = FileType.find(newType);
-        
-        System.out.println("Creating new metadata file. type: [" + newType + "]  name: [" + newName + "]");
-        System.out.println("Creating new metadata file. path: [" + ft.getPath() + "]  suffix: [" + ft.getSuffix() + "]");
+        FileTemplate tp = FileTemplate.find(newType, newTemplate);
+        		
+        //System.out.println("Creating new metadata file. type: [" + newType + "]  template: [" + newTemplate + "]   name: [" + newName + "]");
+        //System.out.println("Creating new metadata file. path: [" + tp.getPath() + "]  suffix: [" + ft.getSuffix() + "]");
         
         Environment env = Environment.simple();
         //ReadResource resource = new ReadResource(controller.);
         
-        System.out.println( env.getFile("public/example/data/templates/STD.csv").getAbsolutePath());
+        //System.out.println( env.getFile("public/example/data/templates/STD.csv").getAbsolutePath());
         try  {
-            final File templateFile = env.getFile(ft.getPath());
+            final File templateFile = env.getFile(tp.getPath());
             final InputStream inputStream = new DataInputStream(new FileInputStream(templateFile));
-            File newFile = new File(ConfigProp.getPathWorking() + newType + "-" + newName + ft.getSuffix());
+            String partialPath = dir + newType + "-" + newName + ft.getSuffix();
+            //System.out.println("Creating new metadata file. partial path: [" + partialPath + "]");
+            String fullPath = ConfigProp.getPathWorking() + partialPath;
+            //System.out.println("Creating new metadata file. full path: [" + fullPath + "]");
+            partialPath = partialPath.replace("//", "/");           
+            fullPath = fullPath.replace("//", "/");           
+            File newFile = new File(fullPath);
+            //System.out.println("Creating new metadata file. full path: [" + fullPath + "]   dir: [" + dir + "]  email : [" + AuthApplication.getLocalUser(session()).getEmail() + "]");
             OutputStream outStream = new FileOutputStream(newFile);
             byte[] buffer = new byte[8 * 1024];
             int bytesRead;
@@ -85,48 +98,15 @@ public class NewFile extends Controller {
             }
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outStream);  
+            DataFile file = new DataFile(partialPath);
+            file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+            file.setStatus(DataFile.WORKING);
+            file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            file.save();
         } catch(IOException e) {
 
         }
-
-        /*
-        try {
-			String ftPath = "";
-        	URL url = new URL(ftPath);
-        	String destPath = ConfigProp.getPathWorking() + newType + "-" + newName + ft.getSuffix();
-        	System.out.println("Creating new metadata file. Destination path: [" + destPath + "]");
-        	ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
-        	FileOutputStream fileOutputStream = new FileOutputStream(destPath);
-        	FileChannel fileChannel = fileOutputStream.getChannel();
-        } catch (MalformedURLException e1) {
-        	e1.printStackTrace();
-        } catch (IOException e2) {
-        	e2.printStackTrace();
-        }
-        */
-                
-        /*
-
-        @controllers.routes.Assets.versioned("example/data/templates/STD.csv")
         
-        // when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
-        if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
-            ObjectAccessSpec da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
-            if (da != null) {
-                da.setStudyUri(std.getUri());
-                
-                System.out.println("Inserting new Study from file. Found DA");
-                if (!ConfigProp.getLabKeyLoginRequired() || da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
-                    da.save();
-                } else {
-                    System.out.println("[WARNING] Could not update DA from associated DataFile when creating a new study");
-                }
-            } else {
-                System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
-            }
-        }
-        */
-        
-        return redirect(routes.WorkingFiles.index(dir));
+        return redirect(routes.WorkingFiles.index(dir, "."));
     }
 }

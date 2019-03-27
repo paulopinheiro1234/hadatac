@@ -1132,52 +1132,57 @@ public class Measurement extends HADatAcThing implements Runnable {
                 				}
                 	        }
                 		}
-                    }
+                	}
 		    
                 	//System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
 		    
-                    // assign values to results
-                    String key = alignment.measurementKey(m);
-                    //System.out.println("Align-Debug: computed measurement key [" + key + "]");
-                    if (key != null) {
-                    	String finalValue = "";
+                	// assign values to results
+                	String key = alignment.measurementKey(m);
+                	//System.out.println("Align-Debug: computed measurement key [" + key + "]");
+                	if (key != null) {
+                		String finalValue = "";
 			
-                    	if (categoricalOption.equals(WITH_VALUES)){
-                    		finalValue = m.getValue();
-                    	} else {
-                    		//System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
-                    		if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
-                    			if (!alignment.containsCode(m.getValueClass())) {
-                    				String code = Attribute.findHarmonizedCode(m.getValueClass());
-                    				//System.out.println("Align-Debug: new alignment attribute Code for URI-value :[" + code + "]"); 
-                    				if (code != null && !code.equals("")) {
-                    					List<String> newEntry = new ArrayList<String>();
-                    					newEntry.add(code);
-                    					newEntry.add(m.getValue());
-                    					alignment.addCode(m.getValueClass(), newEntry);
-                    				}	
-                    			}
-                    		}
+                		if (categoricalOption.equals(WITH_VALUES)){
+                			finalValue = m.getValue();
+                		} else {
+                			//System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
+                			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
+                				if (!alignment.containsCode(m.getValueClass())) {
+                					String code = Attribute.findHarmonizedCode(m.getValueClass());
+                					//System.out.println("Align-Debug: new alignment attribute Code for URI-value :[" + code + "]"); 
+                					if (code != null && !code.equals("")) {
+                						List<String> newEntry = new ArrayList<String>();
+                						newEntry.add(code);
+                						newEntry.add(m.getValue());
+                						alignment.addCode(m.getValueClass(), newEntry);
+                					}	
+                				}
+                			}
 			    
-                    		if (alignment.containsCode(m.getValueClass())) {
-                    			// get code for qualitative variables
-                    			List<String> entry = alignment.getCode(m.getValueClass()); 
-                    			finalValue = entry.get(0);
-                    		} else {
-                    			// get actual value for quantitative variables
-                    			finalValue = m.getValueClass();
-                    		}
-                    	}
+                			if (alignment.containsCode(m.getValueClass())) {
+                				// get code for qualitative variables
+                				List<String> entry = alignment.getCode(m.getValueClass()); 
+                				finalValue = entry.get(0);
+                			} else {
+                				// get actual value for quantitative variables
+                				finalValue = m.getValueClass();
+                			}
+                		}
 
-                        results.get(referenceObj.getUri()).put(key, finalValue);
-                    	//System.out.println("Align-Debug: final value [" + finalValue + "]");
-                    } else {
-                        System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
-                                "attribute could be created for this measurement): " + 
-                                //m.getEntityUri() + " " + m.getCharacteristicUri());
-                                m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
-                    }
+                		if (referenceObj != null) {
+                			results.get(referenceObj.getUri()).put(key, finalValue);
+                			//System.out.println("Align-Debug: final value [" + finalValue + "]");
+                		}
+                			
+                	} else {
+                			
+                		System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
+                				"attribute could be created for this measurement): " + 
+                				//m.getEntityUri() + " " + m.getCharacteristicUri());
+                				m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
+                	}
                 }
+                
 
                 // compute and show progress 
                 double ratio = (double)i / total * 100;
@@ -1288,11 +1293,20 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
 	    
 	    FileUtils.writeStringToFile(codeBookFile, "code, value, class\n", "utf-8", true);
-	    // Wrte code book
+	    // Write code book
 	    for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
-		List<String> list = entry.getValue();
-		System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
-		FileUtils.writeStringToFile(codeBookFile, list.get(0) + ",\"" + list.get(1) + "\", " + entry.getKey() + "\n", "utf-8", true);
+	    	List<String> list = entry.getValue();
+	    	//System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
+	    	String pretty = list.get(1).replace("@en","");
+	    	if (!pretty.equals("")) {
+	    		String c0 = pretty.substring(0,1).toUpperCase();
+	    		if (pretty.length() == 1) {
+	    			pretty = c0;
+	    		} else {
+	    			pretty = c0 + pretty.substring(1);
+	    		}
+	    	}
+	    	FileUtils.writeStringToFile(codeBookFile, list.get(0) + ",\"" + pretty + "\", " + entry.getKey() + "\n", "utf-8", true);
 	    }
 
 	    dataFile.setCompletionPercentage(100);

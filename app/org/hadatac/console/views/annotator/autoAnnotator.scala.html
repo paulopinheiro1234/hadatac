@@ -159,7 +159,7 @@
     <tbody>
         @for(folder <- folders) {
             <tr name="processed">
-              <td><a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(folder)">@folder</a></td>
+              <td><a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, folder)">@folder</a></td>
               <td></td>
               <td></td>
               <td></td>

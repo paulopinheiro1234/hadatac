@@ -16,6 +16,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.Platform;
@@ -153,7 +154,35 @@ public class KGForceFieldGraph {
 				varLabel += " " + irt.getLabel();
 			}
 		}
-    	nodes.add(new OCNode(varLabel, variable.getUri(), OCNode.VARIABLE, variableHtml(variable), new ArrayList<>(Arrays.asList(dependedOn.getName()))));   	
+		List<String> listNS = new ArrayList<String>();
+		if (variable.getEntityNamespace() != null) {
+			int pos = variable.getEntityNamespace().indexOf(':');
+			if (pos > 0) {
+				listNS.add(variable.getEntityNamespace().substring(0, pos));
+			}
+		}
+    	if (variable.getAttributeNamespace() != null && variable.getAttributeNamespace().size() > 0) {
+    		for (String attStr : variable.getAttributeNamespace()) {
+    			if (attStr != null) {
+    				int pos = attStr.indexOf(':');
+    				if (pos > 0) {
+    					String attNS = attStr.substring(0, pos);
+    					if (!listNS.contains(attNS)) {
+    						listNS.add(attNS);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	if (includeOntologies) {
+    	for (String ns : listNS) {
+			OCNode tmpNode = this.getNodeStartsWithName(ns);
+			if (tmpNode != null) {
+				tmpNode.addMember(varLabel);
+			}
+		}
+    	}
+		nodes.add(new OCNode(varLabel, variable.getUri(), OCNode.VARIABLE, variableHtml(variable), new ArrayList<String>(Arrays.asList(dependedOn.getName()))));   	
     }
     
     private void addOntology(NameSpace ont) {
@@ -210,6 +239,7 @@ public class KGForceFieldGraph {
     	
     	// add study itself and its attributes
     	String nameNode = daspec.getLabel();
+    	nameNode += " (" + daspec.getNumberDataPoints() + " data values)";
     	
     	OCNode daspecNode = new OCNode(nameNode, daspec.getUri(), OCNode.DASPEC, daspecHtml(daspec), new ArrayList<>());
     	nodes.add(daspecNode);

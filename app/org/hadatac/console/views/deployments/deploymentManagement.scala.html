@@ -18,6 +18,7 @@
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
            @defining("") { filename => @defining("") { da_uri => 
+ 	          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri)" class="btn-sm btn-primary disabled" role="button">Deployment Browser</a>
               @if(oper.getCurrent() == State.ACTIVE) { 
                  <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, filename, da_uri)" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
               } else {

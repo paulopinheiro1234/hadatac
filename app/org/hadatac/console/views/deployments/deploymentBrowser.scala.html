@@ -1,0 +1,51 @@
+@(dir         : String,
+  filename    : String,
+  da_uri      : String,
+  documentMap : String)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.metadataacquisition._
+@import org.hadatac.console.controllers.studies.StudyView
+@import org.hadatac.console.controllers._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play._
+@import java.net.URLEncoder
+
+@main("Deployment Browser") {
+	<head>
+     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("d3-geomap/css/d3.geomap.css")"/>
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("d3-geomap/vendor/d3.geomap.dependencies.min.js")"></script>
+		<script type="text/javascript" src="@controllers.routes.Assets.versioned("d3-geomap/js/d3.geomap.min.js")"></script>
+	</head>
+    <body>
+
+    <div class="container-fluid">
+        <h4>Deployment Browser</h4>
+    
+    	<div class="row">
+        	<div class="col-lg-12">
+		        <div id="map"></div>
+			</div>
+		</div>
+
+		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary" 
+	       role="button">Back to Search Studies</a>  		
+	</div>
+
+  <script>
+
+    // For each orgchart box, provide the name, manager, and tooltip to show.
+    var encodedDataStr = '@documentMap';
+    var dataStr = '[' + encodedDataStr.replace(/&#x27;/g,"'") + ']';
+	//alert(dataStr);
+    var arrays = eval(dataStr);
+    //data.addRows(arrays);				
+
+    var map = d3.geomap()
+       .geofile('@controllers.routes.Assets.versioned("d3-geomap/topojson/world/countries.json")')
+       .draw(d3.select('#map'));
+  </script>
+}
+

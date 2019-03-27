@@ -1,0 +1,55 @@
+@(dir : String)
+
+@import helper._ 
+@import org.hadatac.utils._ 
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.deployments._
+@import org.hadatac.console.controllers.deployments._ 
+@import org.hadatac.console.controllers._ 
+@import org.hadatac.metadata.loader.URIUtils; 
+
+
+@main("New Folder") {
+
+<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	      
+	      if (document.getElementById('newName').value.length == 0) {
+	          cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
+
+<div class="container">
+	<h3>New Folder</h3>
+
+	<form class="form-horizontal" name="newFile" method="post"
+		action="@org.hadatac.console.controllers.workingfiles.routes.Folder.processForm(dir)">
+
+		<div class="form-group">
+			<label>Parent folder: @dir</label> 
+		</div>
+
+		<div class="form-group">
+			<label>Folder Name</label> <input type="text"
+				class="form-control col-sm-6" name="newName" id="newName"
+				onchange="checkform()">
+		</div>
+
+		<div class="form-group" class="col-sm-6 col-offset-3">
+			<input class="btn btn-primary" role="button" id="submitbutton"
+				type="submit" value="Create New Folder"
+				disabled="disabled" /> 
+			<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")"
+				class="btn btn-primary" role="button">Cancel</a>
+		</div>
+	</form>
+</div>
+}

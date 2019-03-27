@@ -1,6 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 
 
 public class DataFile {
@@ -283,54 +285,11 @@ public class DataFile {
         }
     }
 
-    public static List<DataFile> findInDir(String dir, String ownerEmail, String status) {
-    	String currentDir = dir.replaceAll("/", "");
-        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED || status == WORKING) {
-            SolrQuery query = new SolrQuery();
-            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
-            query.set("rows", "10000000");
-            List<DataFile> all = findByQuery(query);
-            List<DataFile> selected = new ArrayList<DataFile>();
-        	for (DataFile df : all) {
-        		if (currentDir.equals("")) {
-        			if (df.getFileName().indexOf('/') <= -1) {
-            			selected.add(df);
-            		} 
-        		} else {
-            		if (df.getFileName().indexOf(currentDir) >= 0) {
-        				selected.add(df);
-            		}
-            	}        	
-            }
-        	return selected;
-        }
-        else {
-            return new ArrayList<DataFile>();
-        }
+    public static String fileNameFromPath (String path) {
+    	String[] tokens = path.split("/");
+    	return tokens[tokens.length - 1];
     }
-
-    public static List<DataFile> findInDir(String dir, String status) {
-    	String currentDir = dir.replaceAll("/", "");
-        SolrQuery query = new SolrQuery();
-        query.set("q", "status_str:\"" + status + "\"");
-        query.set("rows", "10000000");
-        List<DataFile> all = findByQuery(query);
-        List<DataFile> selected = new ArrayList<DataFile>();
-    	for (DataFile df : all) {
-    		if (currentDir.equals("")) {
-    			if (df.getFileName().indexOf('/') <= -1) {
-        			selected.add(df);
-        		} 
-    		} else {
-                if (df.getFileName().indexOf(currentDir) >= 0) {
-                    selected.add(df);
-                }
-            }   
-    	}
-    	
-    	return selected;
-    }
-
+    
     public static List<DataFile> findAll(String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"");
@@ -381,12 +340,22 @@ public class DataFile {
         return false;
     }
 
-    public static void includeUnrecognizedFiles(String path, List<DataFile> ownedFiles) {
+    public static void includeUnrecognizedFiles(String path, String dir, List<DataFile> ownedFiles) {
     	if (path == null) {
     		System.out.println("DataFile: [ERROR] parameter path=null when calling includeUnrecognizedFiles()");
     		return;
     	}
-    	File folder = new File(path);
+    	if (dir == null) {
+    		System.out.println("DataFile: [ERROR] parameter dir=null when calling includeUnrecognizedFiles()");
+    		return;
+    	}
+    	//System.out.println("Path inside includeUnrecognized: " + path);
+    	if (path.endsWith("/") && dir.startsWith("/")) {
+    		path = path.substring(0, path.length() - 1);
+    	}
+    	String fullPath = path + dir;
+    	//System.out.println("FullPath inside includeUnrecognized: " + fullPath);
+    	File folder = new File(fullPath);
         if (!folder.exists()) {
             folder.mkdirs();
         }
@@ -459,31 +428,119 @@ public class DataFile {
         return results;
     }
 
+    public static List<DataFile> findInDir(String dir, String ownerEmail, String status) {
+    	String currentDir = dir.replaceAll("/", "");
+        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED || status == WORKING) {
+            SolrQuery query = new SolrQuery();
+            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
+            query.set("rows", "10000000");
+            List<DataFile> all = findByQuery(query);
+            List<DataFile> selected = new ArrayList<DataFile>();
+        	for (DataFile df : all) {
+        		if (currentDir.equals("")) {
+        			if (df.getFileName().indexOf('/') <= -1) {
+            			selected.add(df);
+            		} 
+        		} else {
+            		if (df.getFileName().indexOf(currentDir) >= 0) {
+        				selected.add(df);
+            		}
+            	}        	
+            }
+        	return selected;
+        }
+        else {
+            return new ArrayList<DataFile>();
+        }
+    }
+
+
+    public static List<DataFile> findInDir(String dir, String status) {
+		System.out.println("DataFile: =====> dir: [" + dir + "]   status: [" + status + "]");
+    	String currentDir = dir;
+    	currentDir = currentDir.replaceAll("/", "");
+    	if (status != WORKING && dir != null && !dir.equals("/") && dir.startsWith("/")) {
+    		dir = dir.substring(1, dir.length());
+    	}
+		System.out.println("DataFile: dir: [" + dir + "]   currentDir: [" + currentDir + "]");
+    	SolrQuery query = new SolrQuery();
+        query.set("q", "status_str:\"" + status + "\"");
+        query.set("rows", "10000000");
+        List<DataFile> all = findByQuery(query);
+        List<DataFile> selected = new ArrayList<DataFile>();
+    	for (DataFile df : all) {
+    		if (currentDir.equals("")) {
+    			if (df.getFileName().indexOf('/') <= -1) {
+        			selected.add(df);
+        		} 
+    		} else {
+    			System.out.println("DataFile: filename: [" + df.getFileName() + "]");
+    			// starts with the current dir
+                if (df.getFileName().indexOf(dir) >= 0) {
+                	// check if there is no folder in the reminder of the filename after subtracting current dir
+                	String subtractedStr = df.getFileName().replace(dir,"");
+        			System.out.println("DataFile: dir: [" + dir + "]   filename: [" + subtractedStr + "]");
+                	if (subtractedStr.indexOf("/") <= -1) {
+                		selected.add(df);
+            			System.out.println("DataFile: added");
+                	}
+                }
+            }   
+    	}
+    	
+    	return selected;
+    }
+
     public static List<String> findAllFolders(String dir) {
     	return findAllFolders(dir, PROCESSED);
     }
 
     public static List<String> findAllFolders(String dir, String status) {
         List<String> results = new ArrayList<String>();
-        if (!dir.equals("/") && !dir.equals("")) {
-        	results.add("/");
-        	return results;
-        }
-        List<DataFile> datafiles = findAll(status);
-        for (DataFile df : datafiles) {
-        	String fName = "";
-        	int pos = df.getFileName().indexOf('/');
-        	if (pos >=0) {
-        		fName = df.getFileName().substring(0, df.getFileName().indexOf('/'));
+    	if (!dir.equals("/") && !dir.equals("")) {
+    		results.add("..");
+        	if (!status.equals(WORKING)) {
+        		return results;
         	}
-        	// System.out.println("[" + fName + "] " + df.getFileName());
-        	if (!fName.equals("")) {
-        		String newFolder = "/" + fName + "/";
-        		if (!results.contains(newFolder)) {
-        			results.add(newFolder);
-        		}
-        	}
-        }
+    	}
+    	
+    	if (status.equals(WORKING)) {
+    		String fullDir = ConfigProp.getPathWorking().substring(0, ConfigProp.getPathWorking().length() - 1) + dir;
+    		File file = new File(fullDir);
+    		//System.out.println("findAllFolders: [" + fullDir + "]");
+    		String[] directories = file.list(new FilenameFilter() {
+    			@Override
+    			public boolean accept(File current, String name) {
+    				return new File(current, name).isDirectory();
+    			}
+    		});
+    		if (directories != null && directories.length > 0) {
+    			for (int i=0; i < directories.length; i++) {
+    				results.add(directories[i] + "/");
+    			}
+    		}
+    		//System.out.println("findAllFolders: to string: " + results);
+    	
+    	} else {
+    	
+    		//System.out.println("findAllFolders: dir : [" + dir + "]");
+    		List<DataFile> datafiles = findAll(status);
+    		for (DataFile df : datafiles) {
+    			String fName = "";
+    			int pos = df.getFileName().indexOf('/');
+    			if (pos >=0) {
+    				fName = df.getFileName().substring(0, df.getFileName().indexOf('/'));
+    			}
+    			System.out.println("[" + fName + "] " + df.getFileName());
+    			if (!fName.equals("")) {
+    				String newFolder = fName + "/";
+    				if (!results.contains(newFolder)) {
+    					results.add(newFolder);
+    				}
+    			}
+    		}
+    	}
+    	
         return results;
     }
 
