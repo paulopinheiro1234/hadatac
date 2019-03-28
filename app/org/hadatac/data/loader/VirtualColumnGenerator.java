@@ -3,6 +3,7 @@ package org.hadatac.data.loader;
 import java.lang.String;
 
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.VirtualColumn;
 
@@ -13,7 +14,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
 
     public VirtualColumnGenerator(RecordFile file, String annotationFileName) {
         super(file);
-        logger.setFileName(annotationFileName);
+        logger = AnnotationLogger.getLogger(annotationFileName);
     }
 
     @Override

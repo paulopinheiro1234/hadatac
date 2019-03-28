@@ -53,15 +53,8 @@ public class AnnotationLogger {
 		return fileName;
 	}
 	
-	public void setFileName(String file_name) {		
-		if (!this.fileName.equals(file_name)) {
-		    AnnotationLogger curlogger = AnnotationLogger.find(file_name);
-		    if (null != curlogger) {
-		        setLog(curlogger.getLog());
-		    }
-		}
-		
-		this.fileName = file_name;
+	public void setFileName(String file_name) {
+	    this.fileName = file_name;
 	}
 	
 	public String getLog() {

@@ -71,7 +71,7 @@ public class MeasurementGenerator extends BaseGenerator {
         this.dataFile = dataFile;
         this.dasoiGen = dasoiGen;
         
-        logger.setFileName(dataFile.getFileName());
+        logger = AnnotationLogger.getLogger(dataFile.getFileName());
         
         if (dasoiGen.initiateCache(da.getStudyUri())) {
         	setStudyUri(da.getStudyUri());

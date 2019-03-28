@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
@@ -22,7 +23,7 @@ public class SSDGenerator extends BaseGenerator {
         String str = file.getFile().getName().replaceAll("SSD-", "");
         this.SDDName = str.substring(0, str.lastIndexOf('.'));
 
-        logger.setFileName(annotationFileName);
+        logger = AnnotationLogger.getLogger(annotationFileName);
         
         if (records.get(0) != null) {
             studyUri = URIUtils.convertToWholeURI(getUri(records.get(0)));
