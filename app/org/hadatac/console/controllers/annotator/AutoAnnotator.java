@@ -51,6 +51,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.labkey.remoteapi.CommandException;
 
+import akka.stream.impl.io.InputStreamSinkStage.Data;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.twirl.api.Html;
@@ -188,7 +189,7 @@ public class AutoAnnotator extends Controller {
                     "Selected File",
                     selectedFile));
         } else {
-            DataFile file = DataFile.findByName(ownerEmail, selectedFile);
+            DataFile file = DataFile.findByNameAndEmail(ownerEmail, selectedFile);
             if (file == null) {
                 file = new DataFile(selectedFile);
                 file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
@@ -236,7 +237,7 @@ public class AutoAnnotator extends Controller {
                     "Selected File",
                     selectedFile));
         } else {
-            DataFile file = DataFile.findByName(dataAcquisitionUri, selectedFile);
+            DataFile file = DataFile.findByName(selectedFile);
             if (file == null) {
                 file = new DataFile(selectedFile);
                 file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
@@ -305,7 +306,7 @@ public class AutoAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String file_name) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                AnnotationLogger.getLogger(file_name).getLog()), 
+                DataFile.findByName(file_name).getLogger().getLog()), 
                 routes.AutoAnnotator.index(dir, ".").url()));
     }
     
@@ -338,7 +339,7 @@ public class AutoAnnotator extends Controller {
             result.put("Submission Time", dataFile.getSubmissionTime());
             result.put("Completion Time", dataFile.getCompletionTime());
             result.put("Owner Email", dataFile.getOwnerEmail());
-            result.put("Log", AnnotationLogger.getLogger(fileName).getLog());
+            result.put("Log", dataFile.getLog());
         }
 
         return ok(Json.toJson(result));
@@ -350,9 +351,9 @@ public class AutoAnnotator extends Controller {
         
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(null, fileName);
+            dataFile = DataFile.findByName(fileName);
         } else {
-            dataFile = DataFile.findByName(user.getEmail(), fileName);
+            dataFile = DataFile.findByNameAndEmail(user.getEmail(), fileName);
         }
 
         if (null == dataFile) {
@@ -375,7 +376,6 @@ public class AutoAnnotator extends Controller {
         dataFile.setFileName(pureFileName);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
         dataFile.setCompletionTime("");
-        dataFile.save();
 
         File destFolder = new File(pathUnproc);
         if (!destFolder.exists()){
@@ -384,14 +384,9 @@ public class AutoAnnotator extends Controller {
         file.renameTo(new File(destFolder + "/" + pureFileName));
         file.delete();
 
-        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
-        if (null != logger) {
-            logger.delete();
-        }
-
-        AnnotationLogger new_log = AnnotationLogger.getLogger(pureFileName);
-        new_log.addline(Feedback.println(Feedback.WEB, 
+        dataFile.getLogger().addLine(Feedback.println(Feedback.WEB,
                 String.format("[OK] Moved file %s to unprocessed folder", pureFileName)));
+        dataFile.save();
 
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
@@ -401,19 +396,18 @@ public class AutoAnnotator extends Controller {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(null, fileName);
+            dataFile = DataFile.findByName(fileName);
         }
         else {
-            dataFile = DataFile.findByName(user.getEmail(), fileName);
+            dataFile = DataFile.findByNameAndEmail(user.getEmail(), fileName);
         }
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
         dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.getLogger().resetLog();
         dataFile.save();
-        
-        AnnotationLogger.delete(fileName);
 
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
@@ -424,9 +418,9 @@ public class AutoAnnotator extends Controller {
         
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(null, fileName);
+            dataFile = DataFile.findByName(fileName);
         } else {
-            dataFile = DataFile.findByName(user.getEmail(), fileName);
+            dataFile = DataFile.findByNameAndEmail(user.getEmail(), fileName);
         }
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -453,15 +447,11 @@ public class AutoAnnotator extends Controller {
                 file.delete();
                 dataFile.delete();
                 
-                AnnotationLogger.delete(fileName);
-                AnnotationLogger.delete(pureFileName);
                 return redirect(routes.AutoAnnotator.index(dir, "."));
             }
         }
         file.delete();
         dataFile.delete();
-        AnnotationLogger.delete(fileName);
-        AnnotationLogger.delete(pureFileName);
 
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
@@ -476,14 +466,13 @@ public class AutoAnnotator extends Controller {
         } else if (file.getName().endsWith(".xlsx")) {
             recordFile = new SpreadsheetRecordFile(file);
         } else {
-            AnnotationLogger logger = AnnotationLogger.getLogger(file.getName());
-            logger.addline(Feedback.println(Feedback.WEB, String.format(
+            dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, String.format(
                     "[ERROR] Unknown file format: %s", file.getName())));
             return;
         }
-
-        String fileName = file.getName();
-        GeneratorChain chain = AnnotationWorker.getGeneratorChain(fileName, dataFile, recordFile);
+        
+        dataFile.setRecordFile(recordFile);
+        GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
         
         if (chain != null) {
             chain.delete();
@@ -522,7 +511,7 @@ public class AutoAnnotator extends Controller {
             File file = new File(path + "/" + filePath);
             
             final SysUser user = AuthApplication.getLocalUser(session());
-            if (null == DataFile.findByName(user.getEmail(), filePath)) {
+            if (null == DataFile.findByNameAndEmail(user.getEmail(), filePath)) {
                 return ok("<a style=\"color:#cc3300; font-size: large;\">This file can be modified only by its owner!</a>");
             }
             
@@ -588,7 +577,7 @@ public class AutoAnnotator extends Controller {
         }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
-            DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail());
+            DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail(), DataFile.UNPROCESSED);
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

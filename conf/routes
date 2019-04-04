@@ -400,6 +400,8 @@ GET	    /hadatac/working/deletefile		               org.hadatac.console.controll
 POST	/hadatac/working/deletefile    	               org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFile(dir : String, file_name : String)
 GET	    /hadatac/working/downloadfile		           org.hadatac.console.controllers.workingfiles.WorkingFiles.downloadDataFile(file_name : String)
 POST	/hadatac/working/downloadfile    	           org.hadatac.console.controllers.workingfiles.WorkingFiles.downloadDataFile(file_name : String)
+GET     /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_name : String)
+POST    /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_name : String)
 GET	    /hadatac/working/log                           org.hadatac.console.controllers.workingfiles.WorkingFiles.checkAnnotationLog(dir : String, file_name : String)
 POST	/hadatac/working/log                           org.hadatac.console.controllers.workingfiles.WorkingFiles.checkAnnotationLog(dir : String, file_name : String)
 GET     /hadatac/working/queryfile                     org.hadatac.console.controllers.workingfiles.WorkingFiles.getAnnotationStatus(filename: String)

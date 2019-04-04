@@ -13,6 +13,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -27,8 +28,8 @@ public class SSDSampleMapper extends BaseGenerator {
     String study_id;
     String file_name;
 
-    public SSDSampleMapper(RecordFile file) {
-        super(file);
+    public SSDSampleMapper(DataFile dataFile) {
+        super(dataFile);
         mapIdUriCache = getMapIdUri();
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");

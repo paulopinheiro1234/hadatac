@@ -6,6 +6,7 @@ import java.util.Map;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 
 
@@ -14,8 +15,8 @@ public class TimeInstantGenerator extends BaseGenerator {
     String study_id;
     String file_name;
     final String kbPrefix = ConfigProp.getKbPrefix();
-    public TimeInstantGenerator(RecordFile file) {
-        super(file);
+    public TimeInstantGenerator(DataFile dataFile) {
+        super(dataFile);
         file_name = file.getFile().getName();
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
         

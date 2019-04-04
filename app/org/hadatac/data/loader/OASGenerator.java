@@ -30,12 +30,12 @@ public class OASGenerator extends BaseGenerator {
     final String kbPrefix = ConfigProp.getKbPrefix();
     String startTime = "";
 
-    public OASGenerator(RecordFile file) {
-        super(file);
+    public OASGenerator(DataFile dataFile) {
+        super(dataFile);
     }
 
-    public OASGenerator(RecordFile file, String startTime) {
-        super(file);
+    public OASGenerator(DataFile dataFile, String startTime) {
+        super(dataFile);
         this.startTime = startTime;
     }
 

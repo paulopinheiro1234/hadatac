@@ -735,20 +735,19 @@ public class StudyObject extends HADatAcThing {
         if (oc == null) {
             return null;
         }
+        
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri ?label WHERE { " + 
                 "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
                 "   OPTIONAL { ?uri rdfs:label ?label } . " +
                 " } ";
-        Query query = QueryFactory.create(queryString);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        ResultSet results = qexec.execSelect();
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ResultSetFormatter.outputAsJSON(outputStream, results);
-        qexec.close();
+        
+        ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
 
         try {
             return outputStream.toString("UTF-8");

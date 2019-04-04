@@ -26,7 +26,7 @@ import org.hadatac.utils.NameSpaces;
 
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.annotations.PropertyField;
-import org.hadatac.annotations.PropertyValueType;
+import org.hadatac.annotations.ReversedPropertyField;
 import org.hadatac.annotations.Subject;
 import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.http.SPARQLUtils;
@@ -276,8 +276,9 @@ public abstract class HADatAcThing implements Facetable {
     @SuppressWarnings("unchecked")
     public boolean saveToTripleStore() {
         deleteFromTripleStore();
-        
+
         Map<String, Object> row = new HashMap<String, Object>();
+        List<Map<String, Object>> reversed_rows = new ArrayList<Map<String, Object>>();
 
         try {
             Class<?> currentClass = getClass();
@@ -290,6 +291,20 @@ public abstract class HADatAcThing implements Facetable {
                             row.put("hasURI", uri);
                         } else {
                             return false;
+                        }
+                    }
+                    
+                    if (field.isAnnotationPresent(ReversedPropertyField.class)) {
+                        ReversedPropertyField reversedPropertyField = field.getAnnotation(ReversedPropertyField.class);
+                        String propertyUri = reversedPropertyField.uri();
+                        
+                        if (field.getType().equals(String.class)) {
+                            String value = (String)field.get(this);
+                            if (!value.isEmpty()) {
+                                Map<String, Object> rvs_row = new HashMap<String, Object>();
+                                rvs_row.put(propertyUri, value);
+                                reversed_rows.add(rvs_row);
+                            }
                         }
                     }
 
@@ -338,8 +353,27 @@ public abstract class HADatAcThing implements Facetable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+        if (!row.containsKey("hasURI")) {
+            return false;
+        }
+        
+        String objUri = (String)row.get("hasURI");
+        for (Map<String, Object> rvs_row : reversed_rows) {
+            for (String key : rvs_row.keySet()) {
+                String value = (String)row.get(key);
+                if (URIUtils.isValidURI(value)) {
+                    rvs_row.put("hasURI", value);
+                    rvs_row.remove(key);
+                    rvs_row.put(key, objUri);
+                } else {
+                    continue;
+                }
+            }
+        }
+        reversed_rows.add(row);
 
-        Model model = MetadataFactory.createModel(Arrays.asList(row), getNamedGraph());
+        Model model = MetadataFactory.createModel(reversed_rows, getNamedGraph());
         int numCommitted = MetadataFactory.commitModelToTripleStore(
                 model, CollectionUtil.getCollectionPath(
                         CollectionUtil.Collection.METADATA_GRAPH));

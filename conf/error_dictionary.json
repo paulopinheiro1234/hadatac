@@ -138,6 +138,16 @@
           "id": "SDD_00015",
           "detail": "The Dictionary Mapping has incorrect content in : %s in \"attributeOf\" column . ",
           "solution": ""
+        },
+        {
+          "id": "SDD_00016",
+          "detail": "The CodeMapping of this SDD is empty . ",
+          "solution": ""
+        },
+        {
+          "id": "SDD_00017",
+          "detail": "Failed to download the CodeMapping of this SDD . ",
+          "solution": ""
         }
       ]
     },

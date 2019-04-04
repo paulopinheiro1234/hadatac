@@ -63,15 +63,13 @@ public class MeasurementGenerator extends BaseGenerator {
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
     private DASOInstanceGenerator dasoiGen = null; 
 
-    public MeasurementGenerator(RecordFile file, ObjectAccessSpec da, 
-            DataAcquisitionSchema schema, DataFile dataFile, DASOInstanceGenerator dasoiGen) {
-        super(file);
+    public MeasurementGenerator(DataFile dataFile, ObjectAccessSpec da, 
+            DataAcquisitionSchema schema, DASOInstanceGenerator dasoiGen) {
+        super(dataFile);
         this.da = da;
         this.schema = schema;
         this.dataFile = dataFile;
         this.dasoiGen = dasoiGen;
-        
-        logger = AnnotationLogger.getLogger(dataFile.getFileName());
         
         if (dasoiGen.initiateCache(da.getStudyUri())) {
         	setStudyUri(da.getStudyUri());
@@ -120,8 +118,6 @@ public class MeasurementGenerator extends BaseGenerator {
     public void preprocess() throws Exception {
         System.out.println("[Parser] indexMeasurements()...");
 
-        AnnotationLogger logger = AnnotationLogger.getLogger(dataFile.getFileName());
-
         // createVirtualObjectCollections(schema);
 
         /*
@@ -144,7 +140,7 @@ public class MeasurementGenerator extends BaseGenerator {
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
         if (!unknownHeaders.isEmpty()) {
-            logger.addline(Feedback.println(Feedback.WEB, 
+            logger.addLine(Feedback.println(Feedback.WEB, 
                     "[WARNING] Failed to match the following " 
                             + unknownHeaders.size() + " headers: " + unknownHeaders));
         }
@@ -648,21 +644,18 @@ public class MeasurementGenerator extends BaseGenerator {
         da.addNumberDataPoints(totalCount);
         da.saveToSolr();
 
-        AnnotationLogger logger = AnnotationLogger.getLogger(dataFile.getFileName());
-        logger.addline(Feedback.println(Feedback.WEB, String.format(
+        logger.addLine(Feedback.println(Feedback.WEB, String.format(
                 "[OK] %d object(s) have been committed to solr", count)));
 
         return true;
     }
 
     private void commitToSolr(SolrClient solr, int batch_size) throws Exception {
-        AnnotationLogger logger = AnnotationLogger.getLogger(dataFile.getFileName());
-
         try {
             System.out.println("solr.commit()...");
             solr.commit();
             System.out.println(String.format("[OK] Committed %s measurements!", batch_size));
-            logger.addline(Feedback.println(Feedback.WEB, String.format("[OK] Committed %s measurements!", batch_size)));
+            logger.addLine(Feedback.println(Feedback.WEB, String.format("[OK] Committed %s measurements!", batch_size)));
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
             try {

@@ -63,11 +63,11 @@ public class SDD {
         return metaAttributes;
     }
 
-    public SDD(RecordFile file) {
-        this.sddfile = file;
+    public SDD(DataFile dataFile) {
+        this.sddfile = dataFile.getRecordFile();
         getMetaAttributes();
-        readCatalog(file);
-        logger = AnnotationLogger.getLogger(file.getFileName());
+        readCatalog(dataFile.getRecordFile());
+        logger = dataFile.getLogger();
     }
 
     public String getName() {
@@ -118,6 +118,8 @@ public class SDD {
     }
 
     public File downloadFile(String fileURL, String fileName) {
+        System.out.println("fileURL: " + fileURL);
+        
         if (fileURL == null || fileURL.length() == 0) {
             return null;
         } else {

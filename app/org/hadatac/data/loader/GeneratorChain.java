@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
+import org.hadatac.entity.pojo.DataFile;
 
 public class GeneratorChain {
 
     private List<BaseGenerator> chain = new ArrayList<BaseGenerator>();
-    private RecordFile file = null;
+    private DataFile dataFile = null;
     private boolean bValid = true;
     
     private String studyUri = "";
@@ -30,12 +31,12 @@ public class GeneratorChain {
         this.namedGraphUri = namedGraphUri;
     }
 
-    public RecordFile getRecordFile() {
-        return file;
+    public DataFile getDataFile() {
+        return dataFile;
     }
 
-    public void setRecordFile(RecordFile file) {
-        this.file = file;
+    public void setDataFile(DataFile dataFile) {
+        this.dataFile = dataFile;
     }
 
     public boolean isValid() {
@@ -69,8 +70,7 @@ public class GeneratorChain {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
                 
-                AnnotationLogger logger = AnnotationLogger.getLogger(generator.getFileName());
-                logger.printException(generator.getErrorMsg(e));
+                generator.getLogger().printException(generator.getErrorMsg(e));
                 return false;
             }
         }
@@ -106,8 +106,7 @@ public class GeneratorChain {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
                 
-                AnnotationLogger logger = AnnotationLogger.getLogger(generator.getFileName());
-                logger.printException(generator.getErrorMsg(e));
+                generator.getLogger().printException(generator.getErrorMsg(e));
                 return false;
             }
         }
@@ -141,8 +140,7 @@ public class GeneratorChain {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();
                 
-                AnnotationLogger logger = AnnotationLogger.getLogger(generator.getFileName());
-                logger.printException(e);
+                generator.getLogger().printException(e);
             }
         }
     }

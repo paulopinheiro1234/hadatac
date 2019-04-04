@@ -194,9 +194,7 @@ public class DataAcquisitionManagement extends Controller {
             e.printStackTrace();
         }
 
-        dataFile = DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail());
-        dataFile.setStatus(DataFile.FREEZED);
-        dataFile.save();
+        dataFile = DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail(), DataFile.FREEZED);
 
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, "."));
     }

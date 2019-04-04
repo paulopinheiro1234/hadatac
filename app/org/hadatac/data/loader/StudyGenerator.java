@@ -4,6 +4,7 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
@@ -13,8 +14,8 @@ public class StudyGenerator extends BaseGenerator {
     final String kbPrefix = ConfigProp.getKbPrefix();
     String file_name;
 
-    public StudyGenerator(RecordFile file) {
-        super(file);
+    public StudyGenerator(DataFile dataFile) {
+        super(dataFile);
         this.file_name = file.getFile().getName();
     }
 

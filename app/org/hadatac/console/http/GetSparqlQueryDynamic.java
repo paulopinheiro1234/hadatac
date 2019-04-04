@@ -15,6 +15,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.ResultSetRewindable;
 
 
 public class GetSparqlQueryDynamic {
@@ -81,14 +82,11 @@ public class GetSparqlQueryDynamic {
                     + "  OPTIONAL { ?id prov:wasAttributedTo ?attrTo } . \n"
                     + "  OPTIONAL { ?id prov:wasAssociatedWith ?assocWith } . \n"
                     + "} \n";
-            Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(collection, query);
-            ResultSet results = qexec.execSelect();
 
+            ResultSetRewindable resultsrw = SPARQLUtils.select(collection, queryString);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ResultSetFormatter.outputAsJSON(outputStream, results);
-
-            qexec.close();
+            ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
+            
             return outputStream.toString("UTF-8");
         } catch (Exception e) {
             e.printStackTrace();

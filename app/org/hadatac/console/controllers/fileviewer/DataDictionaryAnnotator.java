@@ -58,8 +58,8 @@ public class DataDictionaryAnnotator extends Controller {
         String path = ConfigProp.getPathDownload();
 
         if (user.isDataManager()) {
-            files = DataFile.findAll(DataFile.DD_UNPROCESSED);
-            files.addAll(DataFile.findAll(DataFile.DD_PROCESSED));
+            files = DataFile.findByStatus(DataFile.DD_UNPROCESSED);
+            files.addAll(DataFile.findByStatus(DataFile.DD_PROCESSED));
         } else {
             files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
             files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
@@ -86,16 +86,15 @@ public class DataDictionaryAnnotator extends Controller {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(null, file_name);
+            dataFile = DataFile.findByName(file_name);
         }
         else {
-            dataFile = DataFile.findByName(user.getEmail(), file_name);
+            dataFile = DataFile.findByNameAndEmail(user.getEmail(), file_name);
         }
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
-        AnnotationLogger.delete(file_name);
         dataFile.setStatus(DataFile.DELETED);
         dataFile.delete();
 
@@ -109,7 +108,7 @@ public class DataDictionaryAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String file_name) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                AnnotationLogger.getLogger(file_name).getLog()), 
+                DataFile.findByName(file_name).getLog()), 
                 routes.SDDEditor.index().url()));
     }
 

@@ -57,13 +57,10 @@ public class Hierarchy {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
-			Query query = QueryFactory.create(queryString);
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(CollectionUtil.
-					getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-			ResultSet results = qexec.execSelect();
-			ResultSetFormatter.outputAsJSON(outputStream, results);
-			qexec.close();
-			System.out.println(outputStream.toString("UTF-8"));
+			ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.
+					getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+			ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
+			
 			return outputStream.toString("UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();

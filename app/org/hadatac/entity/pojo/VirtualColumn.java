@@ -20,10 +20,13 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.ReversedPropertyField;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+
 
 public class VirtualColumn extends HADatAcClass implements Comparable<VirtualColumn> {
 
@@ -37,8 +40,13 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String LINE_LAST = "}  ";
 
+    @ReversedPropertyField(uri="hasco:hasVirtualColumn")
     private String studyUri = "";
+    
+    @PropertyField(uri="hasco:hasGroundingLabel")
     private String hasGroundingLabel = "";
+    
+    @PropertyField(uri="hasco:hasSOCReference")
     private String hasSOCReference = "";
 
     public VirtualColumn(
@@ -155,6 +163,8 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
                 + " ?uri rdfs:subClassOf* <" + uri + "> . \n"
                 + " } \n";
 
+        System.out.println("queryString: " + queryString);
+        
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -282,28 +292,10 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
 
         return true;
     }
-
+    
     @Override
     public void deleteFromTripleStore() {
-        String query = "";
-
-        String oc_uri = "";
-        if (this.getUri().startsWith("<")) {
-            oc_uri = this.getUri();
-        } else {
-            oc_uri = "<" + this.getUri() + ">";
-        }
-
-        query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += DELETE_LINE1;
-        query += " " + oc_uri + "  ";
-        query += DELETE_LINE3;
-        query += LINE_LAST;
-
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
+        super.deleteFromTripleStore();
     }
 
     @Override

@@ -3,12 +3,14 @@ package org.hadatac.data.loader;
 import java.lang.String;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.DataFile;
+
 public class GeneralGenerator extends BaseGenerator {
 
     private String tableName;
 
-    public GeneralGenerator(RecordFile file, String tableName) {
-        super(file);
+    public GeneralGenerator(DataFile dataFile, String tableName) {
+        super(dataFile);
         this.tableName = tableName;
     }
 

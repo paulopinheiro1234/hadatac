@@ -12,9 +12,9 @@ public class DPL {
 	private RecordFile dplfile = null;
 	private Map<String, String> mapCatalog = new HashMap<String, String>();
 	
-	public DPL(RecordFile file) {
-		this.dplfile = file;
-		readCatalog(file);
+	public DPL(DataFile dataFile) {
+		this.dplfile = dataFile.getRecordFile();
+		readCatalog(dataFile.getRecordFile());
 	}
 	
 	public String getFileName() {

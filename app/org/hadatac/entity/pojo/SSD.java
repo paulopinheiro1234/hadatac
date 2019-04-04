@@ -19,10 +19,10 @@ public class SSD {
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
     private RecordFile ssdfile = null;
 
-    public SSD(RecordFile file) {
-        this.ssdfile = file;
-        readCatalog(file);
-        readContent(file);
+    public SSD(DataFile dataFile) {
+        this.ssdfile = dataFile.getRecordFile();
+        readCatalog(dataFile.getRecordFile());
+        readContent(dataFile.getRecordFile());
     }
 
     public String getNameFromFileName() {

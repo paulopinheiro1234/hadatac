@@ -8,6 +8,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -150,14 +151,11 @@ public class DeploymentQueries {
     	try {
     		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     					querySelector(concept, uri);
-    		Query query = QueryFactory.create(queryString);
-    			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-    		ResultSet results = qexec.execSelect();
     		
-    		ResultSetFormatter.outputAsJSON(outputStream, results);
-    		qexec.close();
+    		ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+    		        CollectionUtil.Collection.METADATA_SPARQL), queryString);
+    		
+    		ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
     		
     		return outputStream.toString("UTF-8");
     	} catch (Exception e) {

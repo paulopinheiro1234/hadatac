@@ -1,7 +1,5 @@
 package org.hadatac.data.loader;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.String;
@@ -20,6 +18,7 @@ import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.entity.pojo.Credential;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.metadata.api.MetadataFactory;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -48,11 +47,11 @@ public abstract class BaseGenerator {
     
     protected AnnotationLogger logger = null;
 
-    public BaseGenerator(RecordFile file) {
-        this.file = file;
+    public BaseGenerator(DataFile dataFile) {
+        file = dataFile.getRecordFile();
         records = file.getRecords();
         fileName = file.getFile().getName();
-        logger = AnnotationLogger.getLogger(fileName);
+        logger = dataFile.getLogger();
         
         setRelativePath(file);
         initMapping();
@@ -76,6 +75,10 @@ public abstract class BaseGenerator {
         for (String name : caches.keySet()) {
             caches.get(name).clear();
         }
+    }
+    
+    public AnnotationLogger getLogger() {
+        return logger;
     }
 
     public String getTableName() {
@@ -202,7 +205,7 @@ public abstract class BaseGenerator {
                 .map(e -> e.getValue() + " " + e.getKey() + "(s)")
                 .collect(Collectors.toList()));
         if (!results.isEmpty()) {
-            AnnotationLogger.getLogger(fileName).println(results + " have been created. ");
+            logger.println(results + " have been created. ");
         }
     }
 
@@ -301,7 +304,7 @@ public abstract class BaseGenerator {
                         CollectionUtil.Collection.METADATA_GRAPH));
 
         if (numCommitted > 0) {
-            AnnotationLogger.getLogger(fileName).println(String.format("%d triple(s) have been committed to triple store", model.size()));
+            logger.println(String.format("%d triple(s) have been committed to triple store", model.size()));
         }
 
         return true;
@@ -319,7 +322,7 @@ public abstract class BaseGenerator {
         }
 
         if (count > 0) {
-            AnnotationLogger.getLogger(fileName).println(String.format("%d object(s) have been committed to LabKey", count));
+            logger.println(String.format("%d object(s) have been committed to LabKey", count));
         }
     }
 
@@ -348,7 +351,7 @@ public abstract class BaseGenerator {
         }
 
         if (count > 0) {
-            AnnotationLogger.getLogger(fileName).println(String.format("%d object(s) have been committed to triple store", count));
+            logger.println(String.format("%d object(s) have been committed to triple store", count));
         }
 
         return true;
@@ -363,7 +366,7 @@ public abstract class BaseGenerator {
         }
 
         if (count > 0) {
-            AnnotationLogger.getLogger(fileName).println(String.format("%d object(s) have been committed to solr", count));
+            logger.println(String.format("%d object(s) have been committed to solr", count));
         }
 
         return true;

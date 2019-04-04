@@ -12,6 +12,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.ResultSetRewindable;
 
 public class GetSparqlQuery {
     public String collection;
@@ -314,13 +315,8 @@ public class GetSparqlQuery {
     	try {
     		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
     				querySelector(tab);
-    		Query query = QueryFactory.create(queryString);
-    			
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(collection, query);
-    		ResultSet results = qexec.execSelect();
-    		
-    		ResultSetFormatter.outputAsJSON(outputStream, results);
-    		qexec.close();
+    		ResultSetRewindable resultsrw = SPARQLUtils.select(collection, queryString);
+    		ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
     		
     		return outputStream.toString("UTF-8");
     	} catch (Exception e) {

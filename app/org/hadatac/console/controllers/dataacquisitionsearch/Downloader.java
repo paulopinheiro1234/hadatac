@@ -49,8 +49,8 @@ public class Downloader extends Controller {
         String path = ConfigProp.getPathDownload();
 
         if (user.isDataManager()) {
-            files = DataFile.findAll(DataFile.CREATED);
-            files.addAll(DataFile.findAll(DataFile.CREATING));
+            files = DataFile.findByStatus(DataFile.CREATED);
+            files.addAll(DataFile.findByStatus(DataFile.CREATING));
         } else {
             files = DataFile.find(user.getEmail(), DataFile.CREATED);
             files.addAll(DataFile.find(user.getEmail(), DataFile.CREATING));
@@ -77,16 +77,15 @@ public class Downloader extends Controller {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(null, file_name);
+            dataFile = DataFile.findByName(file_name);
         }
         else {
-            dataFile = DataFile.findByName(user.getEmail(), file_name);
+            dataFile = DataFile.findByNameAndEmail(user.getEmail(), file_name);
         }
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
 
-        AnnotationLogger.delete(file_name);
         dataFile.setStatus(DataFile.DELETED);
         dataFile.delete();
 
@@ -124,7 +123,7 @@ public class Downloader extends Controller {
                     "Selected File",
                     selectedFile));
         } else {
-            DataFile file = DataFile.findByName(ownerEmail, selectedFile);
+            DataFile file = DataFile.findByNameAndEmail(ownerEmail, selectedFile);
             if (file == null) {
                 file = new DataFile(selectedFile);
                 file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
@@ -140,7 +139,7 @@ public class Downloader extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String file_name) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                AnnotationLogger.getLogger(file_name).getLog()), 
+                DataFile.findByName(file_name).getLog()), 
                 routes.Downloader.index().url()));
     }
 
@@ -168,14 +167,12 @@ public class Downloader extends Controller {
         String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
 
-        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
-        logger.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
-        logger.addline(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
-
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
         dataFile.setStatus(DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+        dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
+        dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
         dataFile.save();
 
         Measurement.outputAsCSV(measurements, selectedFields, file);
@@ -192,13 +189,11 @@ public class Downloader extends Controller {
         String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
 
-        AnnotationLogger logger = AnnotationLogger.getLogger(fileName);
-        logger.addline(Feedback.println(Feedback.WEB, "Facets: " + facets));
-
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
         dataFile.setStatus(DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+        dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
         System.out.println("Created download " + fileName);
 

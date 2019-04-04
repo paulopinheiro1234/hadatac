@@ -28,12 +28,12 @@ public class DataAcquisitionGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
-	public DataAcquisitionGenerator(RecordFile file) {
-		super(file);
+	public DataAcquisitionGenerator(DataFile dataFile) {
+		super(dataFile);
 	}
 
-	public DataAcquisitionGenerator(RecordFile file, String startTime) {
-		super(file);
+	public DataAcquisitionGenerator(DataFile dataFile, String startTime) {
+		super(dataFile);
 		this.startTime = startTime;
 	}
 

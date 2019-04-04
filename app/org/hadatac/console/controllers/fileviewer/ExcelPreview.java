@@ -16,7 +16,7 @@ public class ExcelPreview extends Controller {
     public Result index(String folder, String fileName, boolean bSavable) {
         if (bSavable) {
             final SysUser user = AuthApplication.getLocalUser(session());
-            if (null == DataFile.findByName(user.getEmail(), fileName)) {
+            if (null == DataFile.findByNameAndEmail(user.getEmail(), fileName)) {
                 return ok(excel_preview.render(folder, fileName, false));
             }
         }

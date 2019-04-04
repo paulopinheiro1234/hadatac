@@ -59,7 +59,7 @@ public class NewStudy extends Controller {
 
         if (filename != null && !filename.equals("")) {
             ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
-            file = DataFile.findByName(ownerEmail, filename);
+            file = DataFile.findByNameAndEmail(ownerEmail, filename);
         }
 
         return ok(newStudy.render(studyType, organizations, persons, dir, file));

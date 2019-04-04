@@ -4,11 +4,13 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.DataFile;
+
 
 public class DPLGenerator extends BaseGenerator {
     
-	public DPLGenerator(RecordFile file) {
-		super(file);
+	public DPLGenerator(DataFile dataFile) {
+		super(dataFile);
 	}
 
 	@Override

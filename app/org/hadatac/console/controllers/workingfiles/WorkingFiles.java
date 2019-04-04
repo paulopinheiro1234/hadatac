@@ -12,11 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpStatus;
 
 import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
+import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.LabKeyLoginForm;
@@ -24,6 +26,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.workingfiles.*;
+import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.GeneratorChain;
 import org.hadatac.data.loader.RecordFile;
@@ -40,6 +43,7 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
 
+import akka.stream.impl.io.InputStreamSinkStage.Data;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.twirl.api.Html;
@@ -48,6 +52,7 @@ import play.data.FormFactory;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+
 
 public class WorkingFiles extends Controller {
 
@@ -135,7 +140,7 @@ public class WorkingFiles extends Controller {
                     "Selected File",
                     selectedFile));
         } else {
-            DataFile file = DataFile.findByName(ownerEmail, selectedFile);
+            DataFile file = DataFile.findByNameAndEmail(ownerEmail, selectedFile);
             if (file == null) {
                 file = new DataFile(selectedFile);
                 file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
@@ -162,7 +167,7 @@ public class WorkingFiles extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String file_name) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                AnnotationLogger.getLogger(file_name).getLog()), 
+                DataFile.findByNameAndStatus(DataFile.WORKING, file_name).getLog()), 
                 routes.WorkingFiles.index(dir, dir).url()));
     }
 
@@ -181,7 +186,7 @@ public class WorkingFiles extends Controller {
             result.put("Submission Time", dataFile.getSubmissionTime());
             result.put("Completion Time", dataFile.getCompletionTime());
             result.put("Owner Email", dataFile.getOwnerEmail());
-            result.put("Log", AnnotationLogger.getLogger(fileName).getLog());
+            result.put("Log", dataFile.getLog());
         }
 
         return ok(Json.toJson(result));
@@ -193,9 +198,9 @@ public class WorkingFiles extends Controller {
         
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(null, fileName);
+            dataFile = DataFile.findByName(fileName);
         } else {
-            dataFile = DataFile.findByName(user.getEmail(), fileName);
+            dataFile = DataFile.findByNameAndEmail(user.getEmail(), fileName);
         }
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -208,8 +213,6 @@ public class WorkingFiles extends Controller {
         String pureFileName = Paths.get(fileName).getFileName().toString();
         file.delete();
         dataFile.delete();
-        AnnotationLogger.delete(fileName);
-        AnnotationLogger.delete(pureFileName);
 
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
@@ -218,6 +221,33 @@ public class WorkingFiles extends Controller {
     public Result downloadDataFile(String file_name) {
         String path = ConfigProp.getPathWorking();
         return ok(new File(path + "/" + file_name));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result verifyDataFile(String fileName) {
+        String path = ConfigProp.getPathWorking();
+        File file = new File(path + "/" + fileName);
+        
+        RecordFile recordFile = null;
+        if (fileName.endsWith(".csv")) {
+            recordFile = new CSVRecordFile(file);
+        } else if (fileName.endsWith(".xlsx")) {
+            recordFile = new SpreadsheetRecordFile(file);
+        }
+        
+        DataFile dataFile = DataFile.findByNameAndStatus(DataFile.WORKING, fileName);
+        dataFile.setRecordFile(recordFile);
+        dataFile.getLogger().resetLog();
+        
+        GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
+        if (null != chain) {
+            chain.generate(false);
+        }
+        
+        String strLog = dataFile.getLog();
+        
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
+                routes.WorkingFiles.index("/", ".").url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -232,7 +262,6 @@ public class WorkingFiles extends Controller {
             String resumableRelativePath) {
         if (ResumableUpload.uploadFileByChunking(request(), 
                 ConfigProp.getPathWorking())) {
-        	//System.out.println("resumableRelativePath (uploadDataFileByChunking): " + resumableRelativePath);
             //This Chunk has been Uploaded.
             return ok("Uploaded.");
         } else {

@@ -4,6 +4,7 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
 
@@ -11,8 +12,8 @@ public class AgentGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	private int counter = 1; //starting index number
 	
-	public AgentGenerator(RecordFile file) {
-		super(file);
+	public AgentGenerator(DataFile dataFile) {
+		super(dataFile);
 	}
 	
 	@Override

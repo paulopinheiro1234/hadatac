@@ -2,6 +2,9 @@ package org.hadatac.console.controllers.fileviewer;
 
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+
+import akka.stream.impl.io.InputStreamSinkStage.Data;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -38,8 +41,8 @@ public class SDDEditor extends Controller {
         String path = ConfigProp.getPathDownload();
 
         if (user.isDataManager()) {
-            files = DataFile.findAll(DataFile.DD_UNPROCESSED);
-            files.addAll(DataFile.findAll(DataFile.DD_PROCESSED));
+            files = DataFile.findByStatus(DataFile.DD_UNPROCESSED);
+            files.addAll(DataFile.findByStatus(DataFile.DD_PROCESSED));
         } else {
             files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
             files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
@@ -66,18 +69,22 @@ public class SDDEditor extends Controller {
                 
                 // Ingest the uploaded SDD file
                 RecordFile recordFile = new SpreadsheetRecordFile(file, newFileName, "InfoSheet");
-                if (!recordFile.isValid()) {
-                    return ok(Feedback.println(Feedback.WEB, "[ERROR] The Info sheet is missing in this SDD file. "));
-                }
                 
-                GeneratorChain chain = AnnotationWorker.annotateSDDFile(recordFile);
+                DataFile dataFile = DataFile.create(
+                        newFileName, 
+                        AuthApplication.getLocalUser(session()).getEmail(), 
+                        DataFile.WORKING);
+                
+                dataFile.setRecordFile(recordFile);
+                
+                GeneratorChain chain = AnnotationWorker.annotateSDDFile(dataFile);
                 if (null != chain) {
                     chain.generate(false);
                 }
                 
-                AnnotationLogger logger = AnnotationLogger.getLogger(newFileName);
-                String strLog = logger.getLog();
-                logger.delete();
+                String strLog = dataFile.getLog();
+                dataFile.delete();
+                
                 return ok(strLog);
             }
             

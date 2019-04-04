@@ -8,6 +8,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.utils.CollectionUtil;
     
 public class GenericSparqlQuery {
@@ -18,14 +19,11 @@ public class GenericSparqlQuery {
     //Postconditions: None
     public static String execute(String str_query, boolean isUpdate) {
     	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	try {
-    		Query query = QueryFactory.create(str_query);
-    		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-    				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-    		ResultSet results = qexec.execSelect();
+    	try {    		
+    		ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+    		        CollectionUtil.Collection.METADATA_SPARQL), str_query);
     		
-    		ResultSetFormatter.outputAsJSON(outputStream, results);
-    		qexec.close();
+    		ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
     		
     		return outputStream.toString("UTF-8");
     	} catch (Exception e) {

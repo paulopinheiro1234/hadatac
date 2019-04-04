@@ -52,7 +52,7 @@ public class PrepareIngestion extends Controller {
         }
 
         ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
-        file = DataFile.findByName(ownerEmail, file_name);
+        file = DataFile.findByNameAndEmail(ownerEmail, file_name);
         if (file == null) {
             return badRequest("[ERROR] Could not update file records with new DA information");
         }

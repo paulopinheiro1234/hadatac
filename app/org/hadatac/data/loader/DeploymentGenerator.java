@@ -10,6 +10,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.RDFNode;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
@@ -20,12 +21,12 @@ public class DeploymentGenerator extends BaseGenerator {
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 
-	public DeploymentGenerator(RecordFile file) {
-		super(file);
+	public DeploymentGenerator(DataFile dataFile) {
+		super(dataFile);
 	}
 
-	public DeploymentGenerator(RecordFile file, String startTime) {
-		super(file);
+	public DeploymentGenerator(DataFile dataFile, String startTime) {
+		super(dataFile);
 		this.startTime = startTime;
 	}
 

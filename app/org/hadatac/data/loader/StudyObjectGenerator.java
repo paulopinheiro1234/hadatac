@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.StudyObject;
@@ -28,9 +29,9 @@ public class StudyObjectGenerator extends BaseGenerator {
     private Map<String, String> uriMap = new HashMap<String, String>();
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
 
-    public StudyObjectGenerator(RecordFile file, List<String> listContent, 
+    public StudyObjectGenerator(DataFile dataFile, List<String> listContent, 
             Map<String, List<String>> mapContent, String study_uri) {
-        super(file);
+        super(dataFile);
         //this.study_id = study_id; 
         file_name = file.getFile().getName();
         System.out.println("We are in StudyObject Generator!");

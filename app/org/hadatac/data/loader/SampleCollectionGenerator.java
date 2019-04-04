@@ -4,6 +4,7 @@ import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Templates;
@@ -13,8 +14,8 @@ public class SampleCollectionGenerator extends BaseGenerator {
 
 	final String kbPrefix = ConfigProp.getKbPrefix();
 
-	public SampleCollectionGenerator(RecordFile file) {
-		super(file);
+	public SampleCollectionGenerator(DataFile dataFile) {
+		super(dataFile);
 	}
 
 	@Override

@@ -15,14 +15,16 @@ public class WorkingFilesWorker {
 
     public static void scan() {
         DataFile.includeUnrecognizedFiles(
-                ConfigProp.getPathWorking(), 
-                ConfigProp.getDefaultOwnerEmail());
+                ConfigProp.getPathWorking(),
+                DataFile.findByStatus(DataFile.WORKING),
+                ConfigProp.getDefaultOwnerEmail(),
+                DataFile.WORKING);
     }
 
     public static void process() {
 
         String pathWorking = ConfigProp.getPathWorking();
-        List<DataFile> workingFiles = DataFile.findAll(DataFile.WORKING);
+        List<DataFile> workingFiles = DataFile.findByStatus(DataFile.WORKING);
         DataFile.filterNonexistedFiles(pathWorking, workingFiles);
 
         workingFiles.sort(new Comparator<DataFile>() {

@@ -2,6 +2,7 @@ package org.hadatac.data.loader;
 
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.DASVirtualObject;
+import org.hadatac.entity.pojo.DataFile;
 
 import java.lang.String;
 import java.util.ArrayList;
@@ -21,8 +22,8 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 	List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
         //List<String> timeList = new ArrayList<String>();
 
-	public DASchemaObjectGenerator(RecordFile file, String SDDName, Map<String, String> codeMap) {
-		super(file);
+	public DASchemaObjectGenerator(DataFile dataFile, String SDDName, Map<String, String> codeMap) {
+		super(dataFile);
 		this.codeMap = codeMap;
 		this.SDDName = SDDName;
 		

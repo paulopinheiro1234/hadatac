@@ -21,7 +21,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 public class SpreadsheetRecordFile implements RecordFile {
 
-    private File file;
+    private File file = null;
     private String fileName = "";
     private String sheetName = "";
     private int numberOfSheets = 1;
@@ -32,7 +32,7 @@ public class SpreadsheetRecordFile implements RecordFile {
         this.file = file;
         init();
     }
-
+    
     public SpreadsheetRecordFile(File file, String sheetName) {
         this.file = file;
         this.sheetName = sheetName;
@@ -41,12 +41,12 @@ public class SpreadsheetRecordFile implements RecordFile {
     
     public SpreadsheetRecordFile(File file, String fileName, String sheetName) {
         this.file = file;
-        this.fileName = fileName;
         this.sheetName = sheetName;
+        this.fileName = fileName;
         init();
     }
     
-    private void init() {
+    private void init() {        
         if (fileName.isEmpty()) {
             fileName = file.getName();
         }

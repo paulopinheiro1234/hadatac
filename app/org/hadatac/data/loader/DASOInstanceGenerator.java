@@ -3,6 +3,7 @@ package org.hadatac.data.loader;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.entity.pojo.StudyObject;
@@ -46,8 +47,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
     
-    public DASOInstanceGenerator(RecordFile file, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
-        super(file);
+    public DASOInstanceGenerator(DataFile dataFile, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
+        super(dataFile);
 
         this.studyUri = studyUri;
         this.oasUri = oasUri;
@@ -71,51 +72,52 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         if (fileName == null || fileName.equals("")) {
-            System.out.println("DASOInstanceGenerator: [ERROR] NO RECORD FILE PROVIDED");
+            logger.printException("DASOInstanceGenerator: [ERROR] NO RECORD FILE PROVIDED");
             return;
         } 
         this.fileName = fileName;
 
         if (mainLabel.equals("")) {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: NO IDENTIFIER");
+            logger.printException("DASOInstanceGenerator: NO IDENTIFIER");
             return;
         } else {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Study URI: " + studyUri);
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Label of main DASO: " + mainLabel);
+            logger.println("DASOInstanceGenerator: Study URI: " + studyUri);
+            logger.println("DASOInstanceGenerator: Label of main DASO: " + mainLabel);
         }
 
-        retrieveAvailableSOCs();
-        identifyMainDASO();
-        if (mainSoc == null) {
-        	return;
+        if (retrieveAvailableSOCs() 
+                && identifyMainDASO()
+                && identifyGroundingPathForMainSOC()
+                && identifyTargetDasoURIs()
+                && identitySOCsForDASOs()
+                && retrieveAdditionalSOCs()
+                && printRequiredSOCs()
+                && computePathsForTargetSOCs()
+                && computeLabelsForTargetSOCs()) {
+            return;
         }
-        identifyGroundingPathForMainSOC();
-        identifyTargetDasoURIs();
-        identitySOCsForDASOs();
-        retrieveAdditionalSOCs();
-        printRequiredSOCs();
-        computePathsForTargetSOCs();
-        computeLabelsForTargetSOCs();
     }
 
-    private void retrieveAvailableSOCs() {
+    private boolean retrieveAvailableSOCs() {
         /* 
          *  (1/9) INITIALLY AVAILABLE SOCs
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (1/9) ======== INITIALLY AVAILABLE SOCs ========");
+        logger.println("DASOInstanceGenerator: (1/9) ======== INITIALLY AVAILABLE SOCs ========");
         socsList = ObjectCollection.findByStudyUri(studyUri);
         if (socsList == null) {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: no SOC is available");
+            logger.println("DASOInstanceGenerator: no SOC is available");
             socsList = new ArrayList<ObjectCollection>();  
         } else {
             for (ObjectCollection soc : socsList) {
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference());
+                logger.println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference());
             }
         }
+        
+        return true;
     }
 
-    private void identifyMainDASO() {
+    private boolean identifyMainDASO() {
         /* 
          *  (2/9) IDENTIFY MAIN DASO and DASOS REQUIRED FROM DASAs. THESE DASOS ARE LISTED IN STEP (4)
          */
@@ -130,8 +132,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 mainDasoUri = dasoUri;
                 mainDaso = tmpDaso;
                 if (mainDaso == null) {
-                    AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] FAILED TO LOAD MAIN DASO");
-                    return;
+                    logger.printException("DASOInstanceGenerator: [ERROR] FAILED TO LOAD MAIN DASO");
+                    return false;
                 }
             } 
             if (dasoUri != null && !dasoUri.equals("") && !dasos.containsKey(dasoUri)) {
@@ -143,33 +145,35 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         mainSoc = socFromDaso(mainDaso, socsList);
         if (mainSoc == null) {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] FAILED TO LOAD MAIN SOC. The virtual column for the file identifier (the row with attribute hasco:originalID) is not one of the firtual columns in the SSD for this study.");
-            return;
+            logger.printException("DASOInstanceGenerator: FAILED TO LOAD MAIN SOC. The virtual column for the file identifier (the row with attribute hasco:originalID) is not one of the firtual columns in the SSD for this study.");
+            return false;
         }
         mainSocUri = mainSoc.getUri();
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (2/9) ============= MAIN DASO ================");
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Main DASO: " + mainDasoUri);
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Main SOC: " + mainSocUri);
+        logger.println("DASOInstanceGenerator: (2/9) ============= MAIN DASO ================");
+        logger.println("DASOInstanceGenerator: Main DASO: " + mainDasoUri);
+        logger.println("DASOInstanceGenerator: Main SOC: " + mainSocUri);
+        
+        return true;
     }
 
-    private void identifyGroundingPathForMainSOC() {
+    private boolean identifyGroundingPathForMainSOC() {
         /* 
          *  (3/8) IDENTIFY GROUNDING PATH FOR MAIN SOC
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (3/9) =========== GROUNDING PATH FOR  MAIN SOC ============");
+        logger.println("DASOInstanceGenerator: (3/9) =========== GROUNDING PATH FOR  MAIN SOC ============");
         if (mainSoc.getHasScopeUri() == null || mainSoc.getHasScopeUri().equals("")) {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Main SOC is already grounded. No grouding path required");
+            logger.println("DASOInstanceGenerator: Main SOC is already grounded. No grouding path required");
             groundingSoc = mainSoc;
         } else {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Main SOC is not grounded. Computing grouding path");
+            logger.println("DASOInstanceGenerator: Main SOC is not grounded. Computing grouding path");
             ObjectCollection currentSoc = mainSoc;
             while (currentSoc.getHasScopeUri() != null && !currentSoc.getHasScopeUri().equals("") && !containsUri(currentSoc.getHasScopeUri(), groundingPath)) {
 
                 ObjectCollection nextSoc = ObjectCollection.find(currentSoc.getHasScopeUri());
                 if (nextSoc == null) {
-                    AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] Could not find SOC with following URI : " + currentSoc.getHasScopeUri());
-                    return;
+                    logger.printException("DASOInstanceGenerator: Could not find SOC with following URI : " + currentSoc.getHasScopeUri());
+                    return false;
                 } else {
                     if (!containsUri(nextSoc.getUri(), groundingPath)) {
                         groundingPath.add(nextSoc);
@@ -178,49 +182,54 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 }
             }
             for (ObjectCollection soc : groundingPath) {
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: SOC in grouding path: " + soc.getUri());
+                logger.println("DASOInstanceGenerator: SOC in grouding path: " + soc.getUri());
             }
         }
+        
+        return true;
     }
 
-    private void identifyTargetDasoURIs() {
+    private boolean identifyTargetDasoURIs() {
         /* 
          *  (4/9) IDENTIFY URIs of TARGET DASOs
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (4/9) =============== TRAVERSE DASOS ================");
+        logger.println("DASOInstanceGenerator: (4/9) =============== TRAVERSE DASOS ================");
 
         for (Map.Entry<String, DataAcquisitionSchemaObject> entry : dasos.entrySet()) {
             String key = entry.getKey();
             DataAcquisitionSchemaObject daso = entry.getValue();
             processTargetDaso(daso);
         }
+        
+        return true;
     }
 
-    private void identitySOCsForDASOs() {
+    private boolean identitySOCsForDASOs() {
         /* 
          *  (5/9) IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (5/9) ===== IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs ======");
+        logger.println("DASOInstanceGenerator: (5/9) ===== IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs ======");
 
         this.requiredSocs.clear();
         for (Map.Entry<String, DataAcquisitionSchemaObject> entry : dasos.entrySet()) {
             String key = entry.getKey();
             DataAcquisitionSchemaObject daso = entry.getValue();
             if (!findCreateAssociatedSOC(daso)) {
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [WARNING] Cannot create SOC for the following daso: " + daso.getUri());
-                //return;
+                logger.printWarning("DASOInstanceGenerator: Cannot create SOC for the following daso: " + daso.getUri());
             }
         }
+        
+        return true;
     }
 
-    private void retrieveAdditionalSOCs() {
+    private boolean retrieveAdditionalSOCs() {
         /* 
          *  (6/9) RETRIEVING ADDITIONAL SOCs required for traversing existing SOCs
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (6/9) ======== RETRIEVING ADDITINAL  SOCs ========");
+        logger.println("DASOInstanceGenerator: (6/9) ======== RETRIEVING ADDITINAL  SOCs ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
@@ -237,89 +246,95 @@ public class DASOInstanceGenerator extends BaseGenerator {
                     }
                 }
                 if (nextSoc == null) {
-                    AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] Could not find SOC with following URI : " + currentSoc.getHasScopeUri());
-                    return;
+                    logger.printException("DASOInstanceGenerator: Could not find SOC with following URI : " + currentSoc.getHasScopeUri());
+                    return false;
                 } else {
                     if (!requiredSocs.containsKey(nextSoc.getUri())) {
                         requiredSocs.put(nextSoc.getUri(), nextSoc);
-                        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Loading SOC: " + nextSoc.getUri() + " to required SOCs");
+                        logger.println("DASOInstanceGenerator: Loading SOC: " + nextSoc.getUri() + " to required SOCs");
                     }
                     currentSoc = nextSoc;
                 }
             }   
         }
+        
+        return true;
     }
 
-    private void printRequiredSOCs() {
+    private boolean printRequiredSOCs() {
         /* 
          *  (7/9) LIST OF REQUIRED SOCs
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (7/9) ======== REQUIRED SOCs ========");
+        logger.println("DASOInstanceGenerator: (7/9) ======== REQUIRED SOCs ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference() + 
+            logger.println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Reference : " + soc.getSOCReference() + 
                     "    with hasScope: " + soc.getHasScopeUri());
         }
+        
+        return true;
     }
 
-    private void computePathsForTargetSOCs() {
+    private boolean computePathsForTargetSOCs() {
         /* 
          *  (8/9) COMPUTE PATH for each TARGET SOC
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (8/9) ======== BUILD SOC PATHS ========");
+        logger.println("DASOInstanceGenerator: (8/9) ======== BUILD SOC PATHS ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
             List<ObjectCollection> socs = new ArrayList<ObjectCollection>();
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: START: " + soc.getUri());
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: PATH ---->> ");
+            logger.println("DASOInstanceGenerator: START: " + soc.getUri());
+            logger.println("DASOInstanceGenerator: PATH ---->> ");
             if (soc.getHasScope() == null) {
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator:       " + soc.getUri());
+                logger.println("DASOInstanceGenerator:       " + soc.getUri());
                 socs.add(soc);
                 socPaths.put(key,socs);
             } else {
                 String toUri = soc.getHasScope().getUri();
                 ObjectCollection nextTarget = soc;
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator:       " + nextTarget.getUri());
+                logger.println("DASOInstanceGenerator:       " + nextTarget.getUri());
                 socs.add(nextTarget);
                 while (!nextTarget.getUri().equals(mainSocUri)) {
                     String nextTargetUri = nextTarget.getHasScopeUri();
                     nextTarget =  requiredSocs.get(nextTargetUri);
                     if (nextTarget == null) {
-                        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] Could not complete path for " + toUri);
-                        return;
+                        logger.printException("DASOInstanceGenerator: Could not complete path for " + toUri);
+                        return false;
                     }
-                    AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator:       " + nextTarget.getUri());
+                    logger.println("DASOInstanceGenerator:       " + nextTarget.getUri());
                     socs.add(nextTarget);
                 }
                 socPaths.put(key,socs);
             } 
         }
+        
+        return true;
     }
 
-    private void computeLabelsForTargetSOCs() {
+    private boolean computeLabelsForTargetSOCs() {
         /* 
          *  (9/9) COMPUTE LABEL for each TARGET SOC
          */
 
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: (9/9) ======== COMPUTE SOC LABELS ========");
+        logger.println("DASOInstanceGenerator: (9/9) ======== COMPUTE SOC LABELS ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
             String fullLabel = "";
             boolean process = true;
 
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: START: " + soc.getUri());
+            logger.println("DASOInstanceGenerator: START: " + soc.getUri());
             String label = soc.getGroundingLabel();
             if (label == null) {
                 label = "";
             }
             if (soc.getHasScope() == null || !label.equals("")) {
                 fullLabel = label;
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Computed label [" + fullLabel + "]");
+                logger.println("DASOInstanceGenerator: Computed label [" + fullLabel + "]");
                 socLabels.put(soc.getSOCReference(), fullLabel);
                 if (soc.getRoleLabel() == null || soc.getRoleLabel().equals("")) {
                     soc.saveRoleLabel(fullLabel);
@@ -341,8 +356,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
                     String nextTargetUri = nextTarget.getHasScopeUri();
                     nextTarget =  requiredSocs.get(nextTargetUri);
                     if (nextTarget == null) {
-                        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] Could not complete path for " + toUri);
-                        return;
+                        logger.printException("DASOInstanceGenerator: Could not complete path for " + toUri);
+                        return false;
                     }
                     label = nextTarget.getGroundingLabel();
                     if (label == null) {
@@ -354,13 +369,15 @@ public class DASOInstanceGenerator extends BaseGenerator {
                         fullLabel = label + " " + fullLabel;
                     }
                 }
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Computed label [" + fullLabel + "]");       
+                logger.println("DASOInstanceGenerator: Computed label [" + fullLabel + "]");       
                 if (soc.getRoleLabel() == null || soc.getRoleLabel().equals("")) {
                     soc.saveRoleLabel(fullLabel);
                 }
                 socLabels.put(soc.getSOCReference(), fullLabel);
             }
         }
+        
+        return true;
     }
 
     /* **************************************************************************************
@@ -385,14 +402,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean processTargetDaso(DataAcquisitionSchemaObject daso) { 
         String toUri = targetUri(daso);
-        AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: DASO: " + daso.getUri() + "   From : " + daso.getLabel() + "  To: " + toUri);
+        logger.println("DASOInstanceGenerator: DASO: " + daso.getUri() + "   From : " + daso.getLabel() + "  To: " + toUri);
 
         //  LOAD each TARGET DASO into DASOs, if TARGET DASO is not loaded yet
         if (toUri != null && !toUri.equals("") && !dasos.containsKey(toUri)) {
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Loading " + toUri);
+            logger.println("DASOInstanceGenerator: Loading " + toUri);
             DataAcquisitionSchemaObject newDaso = DataAcquisitionSchemaObject.find(toUri);
             if (newDaso == null) {
-                AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: [ERROR] Could not find DASO with following URI : " + toUri);
+                logger.println("DASOInstanceGenerator: [ERROR] Could not find DASO with following URI : " + toUri);
                 return false;
             }
             dasos.put(toUri, newDaso);
@@ -481,7 +498,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             if (soc.getSOCReference().equals(daso.getLabel())) {
                 associatedSOC = ObjectCollection.find(soc.getUri());
                 if (associatedSOC != null) {
-                    AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "  Associated SOC : " + associatedSOC + "    with hasScope: " + associatedSOC.getHasScopeUri());
+                    logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "  Associated SOC : " + associatedSOC + "    with hasScope: " + associatedSOC.getHasScopeUri());
                     if (!requiredSocs.containsKey(associatedSOC.getUri())) {
                         requiredSocs.put(associatedSOC.getUri(), associatedSOC);
                     }
@@ -499,7 +516,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 if (scopeObj != null && scopeObj.getUri() != null) {
                     scopeUri = scopeObj.getUri();
                 } else {
-                    AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator:       [WARNING] SOC association ignored for " + daso.getUri());
+                    logger.println("DASOInstanceGenerator:       [WARNING] SOC association ignored for " + daso.getUri());
                     return false;
                 }
             }
@@ -527,7 +544,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 requiredSocs.put(newSoc.getUri(), newSoc);
                 socsList.add(newSoc);
             }
-            AnnotationLogger.getLogger(fileName).println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
+            logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
         }
 
         return true;

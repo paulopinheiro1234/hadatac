@@ -1,5 +1,6 @@
 package org.hadatac.data.loader;
 
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 
@@ -20,9 +21,9 @@ public class PVGenerator extends BaseGenerator {
 	Map<String, String> mapAttrObj;
 	Map<String, String> codeMappings;
 
-	public PVGenerator(RecordFile file, String SDDName,  
+	public PVGenerator(DataFile dataFile, String SDDName,  
 			Map<String, String> mapAttrObj, Map<String, String> codeMappings) {
-		super(file);
+		super(dataFile);
 		this.SDDName = SDDName;
 		this.mapAttrObj = mapAttrObj;
 		this.codeMappings = codeMappings;

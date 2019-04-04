@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -24,13 +25,15 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.http.SolrUtils;
+import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 
 
-public class DataFile {
+public class DataFile implements Cloneable {
 
     // Process status for auto-annotator
     public static final String UNPROCESSED = "UNPROCESSED";
@@ -68,9 +71,25 @@ public class DataFile {
     private String completionTime = "";
     @Field("last_processed_time_str")
     private String lastProcessTime = "";
+    @Field("log_str")
+    private String log = "";
+    
+    private AnnotationLogger logger = null;
+    private RecordFile recordFile = null;
+    private File file = null;
 
     public DataFile(String fileName) {
         this.fileName = fileName;
+        logger = new AnnotationLogger(this);
+    }
+    
+    public DataFile(RecordFile recordFile) {
+        this(recordFile.getFileName());
+        this.file = recordFile.getFile();
+    }
+    
+    public Object clone()throws CloneNotSupportedException {
+        return (DataFile)super.clone();  
     }
 
     @Override
@@ -84,6 +103,25 @@ public class DataFile {
             return fileName.equals(((DataFile) o).fileName);
         }
         return false;
+    }
+    
+    public AnnotationLogger getLogger() {
+        return logger;
+    }
+    public void setLogger(AnnotationLogger logger) {
+        this.logger = logger;
+    }
+    
+    public RecordFile getRecordFile() {
+        return recordFile;
+    }
+    public void setRecordFile(RecordFile recordFile) {
+        this.recordFile = recordFile;
+        this.file = recordFile.getFile();
+    }
+    
+    public File getFile() {
+        return file;
     }
 
     public String getOwnerEmail() {
@@ -155,9 +193,18 @@ public class DataFile {
     public void setLastProcessTime(String lastProcessTime) {
         this.lastProcessTime = lastProcessTime;
     }
+    
+    public String getLog() {
+        return getLogger().getLog();
+    }
+    public void setLog(String log) {
+        getLogger().setLog(log);
+        this.log = log;
+    }
 
     public int save() {
         fileName = fileName.replace("/", "[SLASH]");
+        log = getLogger().getLog();
         
         try {
             SolrClient client = new HttpSolrClient.Builder(
@@ -208,10 +255,6 @@ public class DataFile {
         return false;
     }
 
-    public static DataFile create(String fileName, String ownerEmail) {        
-        return create(fileName, ownerEmail, DataFile.UNPROCESSED);
-    }
-
     public static DataFile create(String fileName, String ownerEmail, String status) {
         DataFile dataFile = new DataFile(fileName);
         dataFile.setOwnerEmail(ownerEmail);
@@ -240,6 +283,7 @@ public class DataFile {
         object.setSubmissionTime(SolrUtils.getFieldValue(doc, "submission_time_str").toString());
         object.setCompletionTime(SolrUtils.getFieldValue(doc, "completion_time_str").toString());
         object.setLastProcessTime(SolrUtils.getFieldValue(doc, "last_processed_time_str").toString());
+        object.setLogger(new AnnotationLogger(object, SolrUtils.getFieldValue(doc, "log_str").toString()));
 
         return object;
     }
@@ -267,7 +311,7 @@ public class DataFile {
             });
         } catch (Exception e) {
             list.clear();
-            System.out.println("[ERROR] DataFile.find(SolrQuery) - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] DataFile.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
         }
 
         return list;
@@ -285,19 +329,28 @@ public class DataFile {
         }
     }
 
-    public static String fileNameFromPath (String path) {
+    public static String fileNameFromPath(String path) {
     	String[] tokens = path.split("/");
     	return tokens[tokens.length - 1];
     }
     
-    public static List<DataFile> findAll(String status) {
+    public static List<DataFile> findByStatus(String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"");
         query.set("rows", "10000000");
         return findByQuery(query);
     }
+    
+    public static List<DataFile> findByMultiStatus(List<String> status) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", String.join(" OR ", status.stream()
+                .map(s -> "status_str:\"" + s + "\"")
+                .collect(Collectors.toList())));
+        query.set("rows", "10000000");
+        return findByQuery(query);
+    }
 
-    public static DataFile findByName(String ownerEmail, String fileName) {
+    public static DataFile findByNameAndEmail(String ownerEmail, String fileName) {
         fileName = fileName.replace("/", "[SLASH]");
         
         SolrQuery query = new SolrQuery();
@@ -316,9 +369,24 @@ public class DataFile {
 
         return null;
     }
+    
+    public static DataFile findByNameAndStatus(String status, String fileName) {
+        fileName = fileName.replace("/", "[SLASH]");
+        
+        SolrQuery query = new SolrQuery();
+        query.set("q", "status_str:\"" + status + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+        query.set("rows", "10000000");
+
+        List<DataFile> results = findByQuery(query);
+        if (!results.isEmpty()) {
+            return results.get(0);
+        }
+
+        return null;
+    }
 
     public static DataFile findByName(String fileName) {
-        return findByName(null, fileName);
+        return findByNameAndEmail(null, fileName);
     }
 
     public static boolean hasValidExtension(String fileName) {
@@ -372,24 +440,18 @@ public class DataFile {
         }
     }
 
-    public static void includeUnrecognizedFiles(String path, String ownerEmail) {      
-    	includeUnrecognizedFiles(path, ownerEmail, DataFile.UNPROCESSED);
-    }
-
-    public static void includeUnrecognizedFiles(String path, String ownerEmail, String status) {      
+    public static void includeUnrecognizedFiles(String path, List<DataFile> dataFiles, 
+            String ownerEmail, String defaultStatus) {      
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        
-        List<DataFile> unprocFiles = DataFile.findAll(status);
-        unprocFiles.addAll(DataFile.findAll(DataFile.FREEZED));
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile() && hasValidExtension(listOfFiles[i].getName())) {
-                if (!search(listOfFiles[i].getName(), unprocFiles)) {
-                    DataFile.create(listOfFiles[i].getName(), ownerEmail);
+                if (!search(listOfFiles[i].getName(), dataFiles)) {
+                    DataFile.create(listOfFiles[i].getName(), ownerEmail, defaultStatus);
                 }
             }
         }
@@ -524,7 +586,7 @@ public class DataFile {
     	} else {
     	
     		//System.out.println("findAllFolders: dir : [" + dir + "]");
-    		List<DataFile> datafiles = findAll(status);
+    		List<DataFile> datafiles = findByStatus(status);
     		for (DataFile df : datafiles) {
     			String fName = "";
     			int pos = df.getFileName().indexOf('/');

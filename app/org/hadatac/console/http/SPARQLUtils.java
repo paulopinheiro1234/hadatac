@@ -12,9 +12,9 @@ import org.apache.jena.query.ResultSetRewindable;
 
 public class SPARQLUtils {
     
-    public static ResultSetRewindable select(
-            String sparqlService, 
-            String queryString) {
+    public static ResultSetRewindable select(String sparqlService, String queryString) {
+        // System.out.println("\nqueryString: " + queryString + "\n");
+        
         try {
             Query query = QueryFactory.create(queryString);
             QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
