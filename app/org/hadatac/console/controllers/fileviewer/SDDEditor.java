@@ -3,8 +3,6 @@ package org.hadatac.console.controllers.fileviewer;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
-import akka.stream.impl.io.InputStreamSinkStage.Data;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
