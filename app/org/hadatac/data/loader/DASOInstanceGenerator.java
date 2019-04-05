@@ -9,7 +9,6 @@ import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.data.loader.Cache;
 
@@ -21,6 +20,7 @@ import java.util.ListIterator;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Iterator;
+
 
 public class DASOInstanceGenerator extends BaseGenerator {
 
@@ -85,17 +85,36 @@ public class DASOInstanceGenerator extends BaseGenerator {
             logger.println("DASOInstanceGenerator: Label of main DASO: " + mainLabel);
         }
 
-        if (retrieveAvailableSOCs() 
-                && identifyMainDASO()
-                && identifyGroundingPathForMainSOC()
-                && identifyTargetDasoURIs()
-                && identitySOCsForDASOs()
-                && retrieveAdditionalSOCs()
-                && printRequiredSOCs()
-                && computePathsForTargetSOCs()
-                && computeLabelsForTargetSOCs()) {
+        ////////////////////////////////////////////
+        // Strictly follow the given order of steps
+        if (!retrieveAvailableSOCs()) {
             return;
         }
+        if (!identifyMainDASO()) {
+            return;
+        }
+        if (!identifyGroundingPathForMainSOC()) {
+            return;
+        }
+        if (!identifyTargetDasoURIs()) {
+            return;
+        }
+        if (!identitySOCsForDASOs()) {
+            return;
+        }
+        if (!retrieveAdditionalSOCs()) {
+            return;
+        }
+        if (!printRequiredSOCs()) {
+            return;
+        }
+        if (!computePathsForTargetSOCs()) {
+            return;
+        }
+        if (!computeLabelsForTargetSOCs()) {
+            return;
+        }
+        ////////////////////////////////////////////
     }
 
     private boolean retrieveAvailableSOCs() {
