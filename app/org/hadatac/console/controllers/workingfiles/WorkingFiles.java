@@ -166,7 +166,7 @@ public class WorkingFiles extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String file_name) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                DataFile.findByNameAndStatus(DataFile.WORKING, file_name).getLog()), 
+                DataFile.findByNameAndStatus(file_name, DataFile.WORKING).getLog()), 
                 routes.WorkingFiles.index(dir, dir).url()));
     }
 
@@ -223,6 +223,43 @@ public class WorkingFiles extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result ingestDataFile(String fileName) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
+        } else {
+            dataFile = DataFile.findByNameAndOwnerEmailAndStatus(
+                    fileName, user.getEmail(), DataFile.WORKING);
+        }
+
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+        
+        if (dataFile.existsInFileSystem(ConfigProp.getPathUnproc())) {
+            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
+        }
+        
+        String path = ConfigProp.getPathWorking();
+        File file = new File(path + "/" + fileName);
+        File destFolder = new File(ConfigProp.getPathUnproc());
+        if (!destFolder.exists()){
+            destFolder.mkdirs();
+        }
+        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getPureFileName()));
+        file.delete();
+        
+        dataFile.getLogger().resetLog();
+        dataFile.setStatus(DataFile.UNPROCESSED);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        dataFile.save();
+        
+        return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", "."));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result verifyDataFile(String fileName) {
         String path = ConfigProp.getPathWorking();
         File file = new File(path + "/" + fileName);
@@ -234,7 +271,7 @@ public class WorkingFiles extends Controller {
             recordFile = new SpreadsheetRecordFile(file);
         }
         
-        DataFile dataFile = DataFile.findByNameAndStatus(DataFile.WORKING, fileName);
+        DataFile dataFile = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
         dataFile.setRecordFile(recordFile);
         dataFile.getLogger().resetLog();
         

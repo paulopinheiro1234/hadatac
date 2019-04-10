@@ -238,6 +238,10 @@ public class DataFile implements Cloneable {
 
         return -1;
     }
+    
+    public String getPureFileName() {
+        return Paths.get(fileName).getFileName().toString();
+    }
 
     public boolean existsInFileSystem(String path) {
         File folder = new File(path);
@@ -247,7 +251,7 @@ public class DataFile implements Cloneable {
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() && getFileName().equals(listOfFiles[i].getName())) {
+            if (listOfFiles[i].isFile() && getPureFileName().equals(listOfFiles[i].getName())) {
                 return true;
             }
         }
@@ -356,8 +360,7 @@ public class DataFile implements Cloneable {
         SolrQuery query = new SolrQuery();
         if (null == ownerEmail) {
             query.set("q", "file_name:\"" + fileName + "\"");
-        }
-        else {
+        } else {
             query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "file_name:\"" + fileName + "\"");
         }
         query.set("rows", "10000000");
@@ -370,11 +373,26 @@ public class DataFile implements Cloneable {
         return null;
     }
     
-    public static DataFile findByNameAndStatus(String status, String fileName) {
+    public static DataFile findByNameAndStatus(String fileName, String status) {
         fileName = fileName.replace("/", "[SLASH]");
         
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+        query.set("rows", "10000000");
+
+        List<DataFile> results = findByQuery(query);
+        if (!results.isEmpty()) {
+            return results.get(0);
+        }
+
+        return null;
+    }
+    
+    public static DataFile findByNameAndOwnerEmailAndStatus(String fileName, String ownerEmail, String status) {
+        fileName = fileName.replace("/", "[SLASH]");
+        
+        SolrQuery query = new SolrQuery();
+        query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "file_name:\"" + fileName + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);

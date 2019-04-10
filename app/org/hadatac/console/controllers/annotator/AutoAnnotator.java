@@ -389,6 +389,43 @@ public class AutoAnnotator extends Controller {
 
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result moveDataFileToWorking(String fileName) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findByNameAndStatus(fileName, DataFile.UNPROCESSED);
+        } else {
+            dataFile = DataFile.findByNameAndOwnerEmailAndStatus(
+                    fileName, user.getEmail(), DataFile.UNPROCESSED);
+        }
+
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+        
+        if (dataFile.existsInFileSystem(ConfigProp.getPathWorking())) {
+            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
+        }
+        
+        String path = ConfigProp.getPathUnproc();
+        File file = new File(path + "/" + fileName);
+        File destFolder = new File(ConfigProp.getPathWorking());
+        if (!destFolder.exists()){
+            destFolder.mkdirs();
+        }
+        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getPureFileName()));
+        file.delete();
+        
+        dataFile.getLogger().resetLog();
+        dataFile.setStatus(DataFile.WORKING);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        dataFile.save();
+        
+        return redirect(routes.AutoAnnotator.index("/", "."));
+    }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result activateDataFile(String dir, String fileName) {           

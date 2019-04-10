@@ -51,7 +51,7 @@ public class MyActorSystem {
         Runnable workingfiles = new Runnable() {
             @Override
             public void run() {
-                WorkingFilesWorker.process();
+                WorkingFilesWorker.scan();
             }
         };
 
