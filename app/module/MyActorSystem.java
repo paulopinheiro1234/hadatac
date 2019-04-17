@@ -54,11 +54,6 @@ public class MyActorSystem {
                 WorkingFilesWorker.scan();
             }
         };
-
-        system.scheduler().schedule(
-                FiniteDuration.create(0, TimeUnit.SECONDS), 
-                FiniteDuration.create(5, TimeUnit.SECONDS), 
-                scanning, system.dispatcher());
         
 		system.scheduler().schedule(
 		        FiniteDuration.create(0, TimeUnit.SECONDS), 
@@ -70,9 +65,16 @@ public class MyActorSystem {
                 FiniteDuration.create(60, TimeUnit.SECONDS),
                 sandbox, system.dispatcher());
 
+		/*
+		system.scheduler().schedule(
+                FiniteDuration.create(0, TimeUnit.SECONDS), 
+                FiniteDuration.create(5, TimeUnit.SECONDS), 
+                scanning, system.dispatcher());
+		
 		system.scheduler().schedule(
                 FiniteDuration.create(0, TimeUnit.SECONDS), 
                 FiniteDuration.create(30, TimeUnit.SECONDS),
                 workingfiles, system.dispatcher());
+        */
 	}
 }

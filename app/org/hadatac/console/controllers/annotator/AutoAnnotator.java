@@ -71,28 +71,8 @@ public class AutoAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String dest) {        
         final SysUser user = AuthApplication.getLocalUser(session());
-
-    	String newDir = "";
-        if (dest.equals("..")) {
-        	String[] tokens = dir.split("/");
-        	for (int i=0; i < tokens.length - 1; i++) {
-        		//System.out.println("[" + tokens[i] + "]");
-        		if (tokens[i].equals("")) {
-        			newDir = newDir + "/";
-        		} else {
-        			newDir = newDir + tokens[i] + "/";
-        			dest	 = ".";
-        		}
-        	}
-        } else if (dest.equals(".")) {
-        	newDir = dir;
-        } else {
-        	if (dir.equals("/") && dest.equals("/")) {
-        		newDir = "/";
-        	} else  {
-        		newDir = dir + dest;
-        	}
-        } 
+        
+    	String newDir = Paths.get(dir, dest).normalize().toString();
         
         List<String> folders = null;
         List<DataFile> procFiles = null;
@@ -107,10 +87,10 @@ public class AutoAnnotator extends Controller {
         	procFiles = DataFile.findInDir(newDir, DataFile.PROCESSED);
             unprocFiles = DataFile.findInDir("/", DataFile.UNPROCESSED);
             unprocFiles.addAll(DataFile.findInDir("/", DataFile.FREEZED));
-            if (dir.equals("/")) {
-            	DataFile.includeUnrecognizedFiles(pathProc, newDir, procFiles);
-            }
-        	DataFile.includeUnrecognizedFiles(pathUnproc, newDir, unprocFiles);
+            DataFile.includeUnrecognizedFiles(Paths.get(pathProc, newDir).toString(), procFiles,
+                    user.getEmail(), DataFile.PROCESSED);
+        	DataFile.includeUnrecognizedFiles(Paths.get(pathUnproc, newDir).toString(), unprocFiles,
+        	        user.getEmail(), DataFile.UNPROCESSED);
         } else {
             folders = DataFile.findFolders(newDir, user.getEmail());
             procFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.PROCESSED);

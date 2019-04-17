@@ -62,27 +62,7 @@ public class WorkingFiles extends Controller {
     public Result index(String dir, String dest) {        
         final SysUser user = AuthApplication.getLocalUser(session());
 
-    	String newDir = "";
-        if (dest.equals("..")) {
-        	String[] tokens = dir.split("/");
-        	for (int i=0; i < tokens.length - 1; i++) {
-        		//System.out.println("[" + tokens[i] + "]");
-        		if (tokens[i].equals("")) {
-        			newDir = newDir + "/";
-        		} else {
-        			newDir = newDir + tokens[i] + "/";
-        			dest	 = ".";
-        		}
-        	}
-        } else if (dest.equals(".")) {
-        	newDir = dir;
-        } else {
-        	if (dir.equals("/") && dest.equals("/")) {
-        		newDir = "/";
-        	} else  {
-        		newDir = dir + dest;
-        	}
-        } 
+        String newDir = Paths.get(dir, dest).normalize().toString();
         
         List<String> folders = null;
         List<DataFile> wkFiles = null;
@@ -92,9 +72,9 @@ public class WorkingFiles extends Controller {
         folders = DataFile.findAllFolders(newDir, DataFile.WORKING);
         if (user.isDataManager()) {
         	wkFiles = DataFile.findInDir(newDir, DataFile.WORKING);
-        	DataFile.includeUnrecognizedFiles(pathWorking, newDir, wkFiles);
+        	DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), wkFiles,
+        	        user.getEmail(), DataFile.WORKING);
         } else {
-            //folders = DataFile.findFolders(newDir, user.getEmail());
             wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
         }
 

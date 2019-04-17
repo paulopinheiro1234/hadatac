@@ -13,9 +13,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.jena.sparql.function.library.print;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -51,7 +53,9 @@ public class DataFile implements Cloneable {
     public static final String DD_PROCESSED = "DD_PROCESSED";
     public static final String DD_FREEZED = "DD_FREEZED";
 
-    @Field("file_name")
+    @Field("id")
+    private String id;
+    @Field("file_name_str")
     private String fileName = "";
     @Field("owner_email_str")
     private String ownerEmail = "";
@@ -79,6 +83,7 @@ public class DataFile implements Cloneable {
     private File file = null;
 
     public DataFile(String fileName) {
+        this.id = UUID.randomUUID().toString();
         this.fileName = fileName;
         logger = new AnnotationLogger(this);
     }
@@ -103,6 +108,13 @@ public class DataFile implements Cloneable {
             return fileName.equals(((DataFile) o).fileName);
         }
         return false;
+    }
+    
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
     }
     
     public AnnotationLogger getLogger() {
@@ -276,8 +288,9 @@ public class DataFile implements Cloneable {
     }
 
     public static DataFile convertFromSolr(SolrDocument doc) {
-        DataFile object = new DataFile(doc.getFieldValue("file_name").toString().replace("[SLASH]", "/"));
+        DataFile object = new DataFile(SolrUtils.getFieldValue(doc, "file_name_str").toString().replace("[SLASH]", "/"));
 
+        object.setId(SolrUtils.getFieldValue(doc, "id").toString());
         object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
         object.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str").toString());
         object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(SolrUtils.getFieldValue(doc, "acquisition_uri_str").toString()));
@@ -359,9 +372,9 @@ public class DataFile implements Cloneable {
         
         SolrQuery query = new SolrQuery();
         if (null == ownerEmail) {
-            query.set("q", "file_name:\"" + fileName + "\"");
+            query.set("q", "file_name_str:\"" + fileName + "\"");
         } else {
-            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
         }
         query.set("rows", "10000000");
 
@@ -377,7 +390,7 @@ public class DataFile implements Cloneable {
         fileName = fileName.replace("/", "[SLASH]");
         
         SolrQuery query = new SolrQuery();
-        query.set("q", "status_str:\"" + status + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+        query.set("q", "status_str:\"" + status + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);
@@ -392,7 +405,7 @@ public class DataFile implements Cloneable {
         fileName = fileName.replace("/", "[SLASH]");
         
         SolrQuery query = new SolrQuery();
-        query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "file_name:\"" + fileName + "\"");
+        query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);
@@ -426,51 +439,29 @@ public class DataFile implements Cloneable {
         return false;
     }
 
-    public static void includeUnrecognizedFiles(String path, String dir, List<DataFile> ownedFiles) {
-    	if (path == null) {
-    		System.out.println("DataFile: [ERROR] parameter path=null when calling includeUnrecognizedFiles()");
-    		return;
-    	}
-    	if (dir == null) {
-    		System.out.println("DataFile: [ERROR] parameter dir=null when calling includeUnrecognizedFiles()");
-    		return;
-    	}
-    	//System.out.println("Path inside includeUnrecognized: " + path);
-    	if (path.endsWith("/") && dir.startsWith("/")) {
-    		path = path.substring(0, path.length() - 1);
-    	}
-    	String fullPath = path + dir;
-    	//System.out.println("FullPath inside includeUnrecognized: " + fullPath);
-    	File folder = new File(fullPath);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
-        File[] listOfFiles = folder.listFiles();
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() && hasValidExtension(listOfFiles[i].getName())) {
-                if (!search(listOfFiles[i].getName(), ownedFiles)) {
-                    DataFile newFile = new DataFile(listOfFiles[i].getName());
-                    newFile.save();
-                    ownedFiles.add(newFile);
-                }
-            }
-        }
-    }
-
     public static void includeUnrecognizedFiles(String path, List<DataFile> dataFiles, 
-            String ownerEmail, String defaultStatus) {      
+            String ownerEmail, String defaultStatus) {
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
         }
 
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        
         File[] listOfFiles = folder.listFiles();
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() && hasValidExtension(listOfFiles[i].getName())) {
-                if (!search(listOfFiles[i].getName(), dataFiles)) {
-                    DataFile.create(listOfFiles[i].getName(), ownerEmail, defaultStatus);
-                }
+        for (int i = 0; i < listOfFiles.length; i++) {            
+            if (listOfFiles[i].isFile() 
+                    && hasValidExtension(listOfFiles[i].getName())
+                    && !listOfFiles[i].getName().startsWith(".") 
+                    && !search(listOfFiles[i].getName(), dataFiles)) {
+                DataFile df = DataFile.create(listOfFiles[i].getName(), 
+                        ownerEmail, defaultStatus);
+                dataFiles.add(df);
+            } else if (listOfFiles[i].isDirectory()) {
+                includeUnrecognizedFiles(Paths.get(path, listOfFiles[i].getName()).toString(), 
+                        dataFiles, ownerEmail, defaultStatus);
             }
         }
     }
@@ -480,7 +471,7 @@ public class DataFile implements Cloneable {
         while (iterFile.hasNext()) {
             DataFile file = iterFile.next();
             try {
-                Path p = Paths.get(path + "/" + file.getFileName());
+                Path p = Paths.get(path, file.getFileName());
                 if (!Files.exists(p) || Files.isHidden(p)) {
                     iterFile.remove();
                 }
