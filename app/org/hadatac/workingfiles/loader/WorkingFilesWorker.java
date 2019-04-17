@@ -10,7 +10,7 @@ public class WorkingFilesWorker {
 
     public static void scan() {
         DataFile.includeUnrecognizedFiles(
-                ConfigProp.getPathWorking(),
+                ConfigProp.getPathWorking(), "",
                 DataFile.findByStatus(DataFile.WORKING),
                 ConfigProp.getDefaultOwnerEmail(),
                 DataFile.WORKING);

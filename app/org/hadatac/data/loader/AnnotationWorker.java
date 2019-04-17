@@ -47,7 +47,7 @@ public class AnnotationWorker {
 
     public static void scan() {
         DataFile.includeUnrecognizedFiles(
-                ConfigProp.getPathUnproc(),
+                ConfigProp.getPathUnproc(), "",
                 DataFile.findByMultiStatus(Arrays.asList(DataFile.UNPROCESSED, DataFile.FREEZED)),
                 ConfigProp.getDefaultOwnerEmail(),
                 DataFile.UNPROCESSED);

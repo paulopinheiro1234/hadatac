@@ -1,7 +1,6 @@
 package org.hadatac.entity.pojo;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +16,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.jena.sparql.function.library.print;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -32,7 +30,6 @@ import org.hadatac.console.http.SolrUtils;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
 
 
 public class DataFile implements Cloneable {
@@ -57,6 +54,8 @@ public class DataFile implements Cloneable {
     private String id;
     @Field("file_name_str")
     private String fileName = "";
+    @Field("dir_str")
+    private String dir = "";
     @Field("owner_email_str")
     private String ownerEmail = "";
     @Field("study_uri_str")
@@ -170,6 +169,13 @@ public class DataFile implements Cloneable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+    
+    public String getDir() {
+        return dir;
+    }
+    public void setDir(String dir) {
+        this.dir = dir;
+    }
 
     public String getStatus() {
         return status;
@@ -215,7 +221,6 @@ public class DataFile implements Cloneable {
     }
 
     public int save() {
-        fileName = fileName.replace("/", "[SLASH]");
         log = getLogger().getLog();
         
         try {
@@ -236,7 +241,7 @@ public class DataFile implements Cloneable {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
-            UpdateResponse response = solr.deleteById(this.getFileName().replace("/", "[SLASH]"));
+            UpdateResponse response = solr.deleteById(this.getFileName());
             solr.commit();
             solr.close();
             return response.getStatus();
@@ -271,8 +276,9 @@ public class DataFile implements Cloneable {
         return false;
     }
 
-    public static DataFile create(String fileName, String ownerEmail, String status) {
+    public static DataFile create(String fileName, String dir, String ownerEmail, String status) {
         DataFile dataFile = new DataFile(fileName);
+        dataFile.setDir(dir);
         dataFile.setOwnerEmail(ownerEmail);
         dataFile.setStatus(status);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -288,9 +294,10 @@ public class DataFile implements Cloneable {
     }
 
     public static DataFile convertFromSolr(SolrDocument doc) {
-        DataFile object = new DataFile(SolrUtils.getFieldValue(doc, "file_name_str").toString().replace("[SLASH]", "/"));
+        DataFile object = new DataFile(SolrUtils.getFieldValue(doc, "file_name_str").toString());
 
         object.setId(SolrUtils.getFieldValue(doc, "id").toString());
+        object.setDir(SolrUtils.getFieldValue(doc, "dir_str").toString());
         object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
         object.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str").toString());
         object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(SolrUtils.getFieldValue(doc, "acquisition_uri_str").toString()));
@@ -367,9 +374,7 @@ public class DataFile implements Cloneable {
         return findByQuery(query);
     }
 
-    public static DataFile findByNameAndEmail(String ownerEmail, String fileName) {
-        fileName = fileName.replace("/", "[SLASH]");
-        
+    public static DataFile findByNameAndEmail(String ownerEmail, String fileName) {        
         SolrQuery query = new SolrQuery();
         if (null == ownerEmail) {
             query.set("q", "file_name_str:\"" + fileName + "\"");
@@ -387,8 +392,6 @@ public class DataFile implements Cloneable {
     }
     
     public static DataFile findByNameAndStatus(String fileName, String status) {
-        fileName = fileName.replace("/", "[SLASH]");
-        
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
         query.set("rows", "10000000");
@@ -401,9 +404,7 @@ public class DataFile implements Cloneable {
         return null;
     }
     
-    public static DataFile findByNameAndOwnerEmailAndStatus(String fileName, String ownerEmail, String status) {
-        fileName = fileName.replace("/", "[SLASH]");
-        
+    public static DataFile findByNameAndOwnerEmailAndStatus(String fileName, String ownerEmail, String status) {        
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
         query.set("rows", "10000000");
@@ -430,38 +431,30 @@ public class DataFile implements Cloneable {
         return false;
     }
 
-    public static boolean search(String fileName, List<DataFile> pool) {
+    public static boolean search(String fileName, String dir, List<DataFile> pool) {
         for (DataFile file : pool) {
-            if (file.getFileName().equals(fileName)) {
+            if (file.getFileName().equals(fileName) && file.getDir().equals(dir)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static void includeUnrecognizedFiles(String path, List<DataFile> dataFiles, 
-            String ownerEmail, String defaultStatus) {
-        File folder = new File(path);
+    public static void includeUnrecognizedFiles(String curPath, String basePath, 
+            List<DataFile> dataFiles, String ownerEmail, String defaultStatus) {
+        File folder = new File(curPath);
         if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
-        if (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
+            return;
         }
         
         File[] listOfFiles = folder.listFiles();
-        for (int i = 0; i < listOfFiles.length; i++) {            
+        for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile() 
                     && hasValidExtension(listOfFiles[i].getName())
                     && !listOfFiles[i].getName().startsWith(".") 
-                    && !search(listOfFiles[i].getName(), dataFiles)) {
-                DataFile df = DataFile.create(listOfFiles[i].getName(), 
-                        ownerEmail, defaultStatus);
+                    && !search(listOfFiles[i].getName(), basePath, dataFiles)) {
+                DataFile df = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
                 dataFiles.add(df);
-            } else if (listOfFiles[i].isDirectory()) {
-                includeUnrecognizedFiles(Paths.get(path, listOfFiles[i].getName()).toString(), 
-                        dataFiles, ownerEmail, defaultStatus);
             }
         }
     }
@@ -471,7 +464,7 @@ public class DataFile implements Cloneable {
         while (iterFile.hasNext()) {
             DataFile file = iterFile.next();
             try {
-                Path p = Paths.get(path, file.getFileName());
+                Path p = Paths.get(path, file.getDir(), file.getFileName());
                 if (!Files.exists(p) || Files.isHidden(p)) {
                     iterFile.remove();
                 }
@@ -486,7 +479,7 @@ public class DataFile implements Cloneable {
 
         File folder = new File(path);
         if (!folder.exists()) {
-            folder.mkdirs();
+            return results;
         }
 
         File[] listOfFiles = folder.listFiles();
@@ -496,129 +489,49 @@ public class DataFile implements Cloneable {
                 results.add(listOfFiles[i]);
             }
         }
+        
         return results;
     }
 
     public static List<DataFile> findInDir(String dir, String ownerEmail, String status) {
-    	String currentDir = dir.replaceAll("/", "");
-        if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED || status == WORKING) {
-            SolrQuery query = new SolrQuery();
-            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
-            query.set("rows", "10000000");
-            List<DataFile> all = findByQuery(query);
-            List<DataFile> selected = new ArrayList<DataFile>();
-        	for (DataFile df : all) {
-        		if (currentDir.equals("")) {
-        			if (df.getFileName().indexOf('/') <= -1) {
-            			selected.add(df);
-            		} 
-        		} else {
-            		if (df.getFileName().indexOf(currentDir) >= 0) {
-        				selected.add(df);
-            		}
-            	}        	
-            }
-        	return selected;
+        if (dir.startsWith("/")) {
+            dir = dir.substring(1, dir.length());
         }
-        else {
-            return new ArrayList<DataFile>();
-        }
+        
+        SolrQuery query = new SolrQuery();
+        query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
+        query.set("rows", "10000000");
+        
+        return findByQuery(query);
     }
-
 
     public static List<DataFile> findInDir(String dir, String status) {
-		System.out.println("DataFile: =====> dir: [" + dir + "]   status: [" + status + "]");
-    	String currentDir = dir;
-    	currentDir = currentDir.replaceAll("/", "");
-    	if (status != WORKING && dir != null && !dir.equals("/") && dir.startsWith("/")) {
-    		dir = dir.substring(1, dir.length());
-    	}
-		System.out.println("DataFile: dir: [" + dir + "]   currentDir: [" + currentDir + "]");
-    	SolrQuery query = new SolrQuery();
-        query.set("q", "status_str:\"" + status + "\"");
+        if (dir.startsWith("/")) {
+            dir = dir.substring(1, dir.length());
+        }
+        
+        SolrQuery query = new SolrQuery();
+        query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "status_str:\"" + status + "\"");
         query.set("rows", "10000000");
-        List<DataFile> all = findByQuery(query);
-        List<DataFile> selected = new ArrayList<DataFile>();
-    	for (DataFile df : all) {
-    		if (currentDir.equals("")) {
-    			if (df.getFileName().indexOf('/') <= -1) {
-        			selected.add(df);
-        		} 
-    		} else {
-    			System.out.println("DataFile: filename: [" + df.getFileName() + "]");
-    			// starts with the current dir
-                if (df.getFileName().indexOf(dir) >= 0) {
-                	// check if there is no folder in the reminder of the filename after subtracting current dir
-                	String subtractedStr = df.getFileName().replace(dir,"");
-        			System.out.println("DataFile: dir: [" + dir + "]   filename: [" + subtractedStr + "]");
-                	if (subtractedStr.indexOf("/") <= -1) {
-                		selected.add(df);
-            			System.out.println("DataFile: added");
-                	}
-                }
-            }   
-    	}
-    	
-    	return selected;
+        
+        return findByQuery(query);
     }
 
-    public static List<String> findAllFolders(String dir) {
-    	return findAllFolders(dir, PROCESSED);
-    }
-
-    public static List<String> findAllFolders(String dir, String status) {
-        List<String> results = new ArrayList<String>();
-    	if (!dir.equals("/") && !dir.equals("")) {
-    		results.add("..");
-        	if (!status.equals(WORKING)) {
-        		return results;
-        	}
-    	}
-    	
-    	if (status.equals(WORKING)) {
-    		String fullDir = ConfigProp.getPathWorking().substring(0, ConfigProp.getPathWorking().length() - 1) + dir;
-    		File file = new File(fullDir);
-    		//System.out.println("findAllFolders: [" + fullDir + "]");
-    		String[] directories = file.list(new FilenameFilter() {
-    			@Override
-    			public boolean accept(File current, String name) {
-    				return new File(current, name).isDirectory();
-    			}
-    		});
-    		if (directories != null && directories.length > 0) {
-    			for (int i=0; i < directories.length; i++) {
-    				results.add(directories[i] + "/");
-    			}
-    		}
-    		//System.out.println("findAllFolders: to string: " + results);
-    	
-    	} else {
-    	
-    		//System.out.println("findAllFolders: dir : [" + dir + "]");
-    		List<DataFile> datafiles = findByStatus(status);
-    		for (DataFile df : datafiles) {
-    			String fName = "";
-    			int pos = df.getFileName().indexOf('/');
-    			if (pos >=0) {
-    				fName = df.getFileName().substring(0, df.getFileName().indexOf('/'));
-    			}
-    			System.out.println("[" + fName + "] " + df.getFileName());
-    			if (!fName.equals("")) {
-    				String newFolder = fName + "/";
-    				if (!results.contains(newFolder)) {
-    					results.add(newFolder);
-    				}
-    			}
-    		}
-    	}
-    	
-        return results;
-    }
-
-    public static List<String> findFolders(String dir, String ownerEmail) {
+    public static List<String> findFolders(String dir) {
         List<String> results = new ArrayList<String>();
 
+        File folder = new File(dir);
+        if (!folder.exists()) {
+            return results;
+        }
+
+        File[] listOfFiles = folder.listFiles();
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isDirectory()) {
+                results.add(listOfFiles[i].getName() + "/");
+            }
+        }
+        
         return results;
     }
-
 }

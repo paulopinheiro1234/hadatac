@@ -64,16 +64,25 @@ public class WorkingFiles extends Controller {
 
         String newDir = Paths.get(dir, dest).normalize().toString();
         
-        List<String> folders = null;
         List<DataFile> wkFiles = null;
 
         String pathWorking = ConfigProp.getPathWorking();
-
-        folders = DataFile.findAllFolders(newDir, DataFile.WORKING);
+        
+        List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString());
+        if (!"/".equals(newDir)) {
+            folders.add(0, "..");
+        }
+        
         if (user.isDataManager()) {
         	wkFiles = DataFile.findInDir(newDir, DataFile.WORKING);
-        	DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), wkFiles,
-        	        user.getEmail(), DataFile.WORKING);
+        	
+        	String basePath = newDir;
+            if (basePath.startsWith("/")) {
+                basePath = basePath.substring(1, basePath.length());
+            }
+            
+        	DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), 
+        	        basePath, wkFiles, user.getEmail(), DataFile.WORKING);
         } else {
             wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
         }
@@ -308,7 +317,7 @@ public class WorkingFiles extends Controller {
         }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathWorking())) {
-            DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
+            DataFile.create(filename, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

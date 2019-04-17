@@ -153,7 +153,8 @@ public class DataDictionaryAnnotator extends Controller {
             }
             
             String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
-            DataFile.create(fileName, ownerEmail, DataFile.DD_UNPROCESSED);
+            DataFile.create(fileName, "", ownerEmail, DataFile.DD_UNPROCESSED);
+            
             return redirect(routes.DataDictionaryAnnotator.index());
         } else {
             System.out.println("uploadedfile is null");

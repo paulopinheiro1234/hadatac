@@ -69,7 +69,7 @@ public class SDDEditor extends Controller {
                 RecordFile recordFile = new SpreadsheetRecordFile(file, newFileName, "InfoSheet");
                 
                 DataFile dataFile = DataFile.create(
-                        newFileName, 
+                        newFileName, "", 
                         AuthApplication.getLocalUser(session()).getEmail(), 
                         DataFile.WORKING);
                 
