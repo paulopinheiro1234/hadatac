@@ -62,39 +62,28 @@ public class WorkingFiles extends Controller {
     public Result index(String dir, String dest) {        
         final SysUser user = AuthApplication.getLocalUser(session());
 
-    	String newDir = "";
-        if (dest.equals("..")) {
-        	String[] tokens = dir.split("/");
-        	for (int i=0; i < tokens.length - 1; i++) {
-        		//System.out.println("[" + tokens[i] + "]");
-        		if (tokens[i].equals("")) {
-        			newDir = newDir + "/";
-        		} else {
-        			newDir = newDir + tokens[i] + "/";
-        			dest	 = ".";
-        		}
-        	}
-        } else if (dest.equals(".")) {
-        	newDir = dir;
-        } else {
-        	if (dir.equals("/") && dest.equals("/")) {
-        		newDir = "/";
-        	} else  {
-        		newDir = dir + dest;
-        	}
-        } 
+        String newDir = Paths.get(dir, dest).normalize().toString();
         
-        List<String> folders = null;
         List<DataFile> wkFiles = null;
 
         String pathWorking = ConfigProp.getPathWorking();
-
-        folders = DataFile.findAllFolders(newDir, DataFile.WORKING);
+        
+        List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString());
+        if (!"/".equals(newDir)) {
+            folders.add(0, "..");
+        }
+        
         if (user.isDataManager()) {
         	wkFiles = DataFile.findInDir(newDir, DataFile.WORKING);
-        	DataFile.includeUnrecognizedFiles(pathWorking, newDir, wkFiles);
+        	
+        	String basePath = newDir;
+            if (basePath.startsWith("/")) {
+                basePath = basePath.substring(1, basePath.length());
+            }
+            
+        	DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), 
+        	        basePath, wkFiles, user.getEmail(), DataFile.WORKING);
         } else {
-            //folders = DataFile.findFolders(newDir, user.getEmail());
             wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
         }
 
@@ -328,7 +317,7 @@ public class WorkingFiles extends Controller {
         }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathWorking())) {
-            DataFile.create(filename, AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
+            DataFile.create(filename, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

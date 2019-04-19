@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema version="1.5">
   <fields>
-    <field name="file_name" type="string" stored="true" indexed="true" docValues="true" />
+    <field name="id" type="string" stored="true" indexed="true" docValues="true" />
     <dynamicField name="*_str" type="string" indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_str_multi" type="string" indexed="true" stored="true" docValues="true" multiValued="true" />
     <dynamicField name="*_date" type="date" indexed="true" stored="true" docValues="true"/>
@@ -18,7 +18,7 @@
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true" />
   </fields>
 
-  <uniqueKey>file_name</uniqueKey>
+  <uniqueKey>id</uniqueKey>
 
   <types>
     <fieldType name="string" class="solr.StrField" />
