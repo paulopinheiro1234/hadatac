@@ -524,7 +524,7 @@ public class AutoAnnotator extends Controller {
         } else {
         	totFiles = dfs.size();
         }
-        List<String> folders = DataFile.findAllFolders(dir, DataFile.PROCESSED);
+        List<String> folders = DataFile.findFolders(dir);
         boolean noSubFolders = (folders.size() == 0 || (folders.size() == 1 && folders.get(0) != null && folders.get(0).equals("..")));
         String statusMsg;
         if (noSubFolders) {
