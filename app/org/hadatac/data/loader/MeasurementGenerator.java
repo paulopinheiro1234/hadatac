@@ -57,6 +57,8 @@ public class MeasurementGenerator extends BaseGenerator {
     private Map<String, Map<String, String>> possibleValues = null;
     private Map<String, String> urisByLabels = null;
     //private Map<String, Map<String, String>> mapIDStudyObjects = null;
+    private StudyObject cellScopeObject = null;
+    private ObjectCollection cellScopeSOC = null;
 
     private String dasoUnitUri = "";
 
@@ -69,50 +71,27 @@ public class MeasurementGenerator extends BaseGenerator {
         this.da = da;
         this.schema = schema;
         this.dataFile = dataFile;
-        this.dasoiGen = dasoiGen;
-        
-        if (dasoiGen.initiateCache(da.getStudyUri())) {
-        	setStudyUri(da.getStudyUri());
-            urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
+    	this.dasoiGen = dasoiGen;
+
+    	boolean cont = true;
+        if (da.hasCellScope()) {
+        	System.out.println("Measurement Generator: hasCellScope is TRUE");
+        	cellScopeObject = StudyObject.find(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+        	cellScopeSOC = ObjectCollection.find(cellScopeObject.getIsMemberOf());
         } else {
-            logger.printExceptionById("DA_00001");
+        	System.out.println("Measurement Generator: hasCellScope is FALSE");
+        	if (!dasoiGen.initiateCache(da.getStudyUri())) {
+        		logger.printExceptionById("DA_00001");
+        		cont = false;
+        	}
         }
+        if (cont) {
+        	System.out.println("Measurement Generator: setting STUDY URI");
+    		setStudyUri(da.getStudyUri());
+    		urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
+        }
+    
     }
-
-    /*
-    private void createVirtualObjectCollections(DataAcquisitionSchema schema) {
-        GeneratorChain chain = new GeneratorChain();
-        GeneralGenerator generator = new GeneralGenerator(file, "Virtual Object Collections");
-
-        List<String> socRefs = ObjectCollection.findAll().stream()
-                .map(x -> x.getSOCReference()).collect(Collectors.toList());
-        for (DataAcquisitionSchemaObject daso : schema.getObjects()) {
-
-            // TO DO: for the following if clause, use the correct criteria for 
-            // adding new SOC
-            if (!socRefs.contains(daso.getAlternativeName())
-                    && !daso.getWasDerivedFrom().isEmpty()) {
-                Map<String, Object> row = new HashMap<String, Object>();
-                row.put("hasURI", ConfigProp.getKbPrefix() + "SOC-" 
-                        + URIUtils.getBaseName(getStudyUri()).replace("STD-", "") + "-" 
-                        + daso.getAlternativeName().replace("??", "").toUpperCase());
-                row.put("hasco:isMemberOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
-
-                String label = WordUtils.capitalize(daso.getAlternativeName().replace("??", ""));
-                row.put("hasco:hasGroundingLabel", label);
-                row.put("hasco:hasRoleLabel", label);
-                row.put("rdfs:comment", label);
-                row.put("rdfs:label", label);
-                row.put("hasco:hasSOCReference", daso.getAlternativeName());
-
-                // TO DO: add type and hasScope property for SOC
-
-                generator.addRow(row);
-            }
-        }
-        chain.addGenerator(generator);
-        chain.generate();
-    }*/
 
     @Override
     public void preprocess() throws Exception {
@@ -398,9 +377,14 @@ public class MeasurementGenerator extends BaseGenerator {
 
                 // Objects defined by Cell Scope
                 if (da.getCellScopeName().get(0).equals("*")) {
-                    measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-                    measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-                    measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
+                    measurement.setStudyObjectUri(cellScopeObject.getUri());
+                    measurement.setStudyObjectTypeUri(cellScopeObject.getTypeUri());
+                    measurement.setObjectUri(cellScopeObject.getUri());
+                    measurement.setObjectCollectionType(cellScopeSOC.getTypeUri());
+                    measurement.setRole(cellScopeSOC.getRoleLabel());
+                    if (cellScopeObject.getOriginalId() != null) {
+                    	measurement.setPID(cellScopeObject.getOriginalId());
+                    }
                     //System.out.println("Measurement: ObjectURI (before replace): <" + da.getCellScopeUri().get(0).trim() + ">");
                     //System.out.println("Measurement: ObjectURI (after replace): <" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + ">");
                 } else {
