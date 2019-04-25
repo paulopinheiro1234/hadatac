@@ -17,7 +17,7 @@ public class NewFileForm {
     	this.newType = newType;
     }
     
-    public String getNewTamplate() {
+    public String getNewTemplate() {
     	return newTemplate;
     }
     

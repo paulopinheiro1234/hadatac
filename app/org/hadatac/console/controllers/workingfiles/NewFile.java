@@ -67,7 +67,7 @@ public class NewFile extends Controller {
 
         // store new values
         String newType = data.getNewType();
-        String newTemplate = data.getNewTamplate();
+        String newTemplate = data.getNewTemplate();
         String newName = data.getNewName();
 
         FileType ft = FileType.find(newType);
@@ -102,7 +102,7 @@ public class NewFile extends Controller {
             }
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outStream);
-        } catch(IOException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
         
