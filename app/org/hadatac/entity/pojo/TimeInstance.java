@@ -76,6 +76,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
+    	System.out.println("TimeInstance: INSIDE getTargetFacets");
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 

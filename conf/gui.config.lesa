@@ -1,0 +1,7 @@
+# Configure the GUI default values
+faceted_data_unit=off
+faceted_data_time=on
+faceted_data_space=off
+faceted_data_platform=on
+
+

@@ -654,13 +654,16 @@ public class AnnotationWorker {
                 chain.setInvalid();
             }
 
-            // Need to be fixed here by getting codeMap and codebook from sparql query
-            DASOInstanceGenerator dasoInstanceGen = new DASOInstanceGenerator(
-                    dataFile, oas.getStudyUri(), oas.getUri(), 
-                    schema, dataFile.getFileName());
-
-            chain.addGenerator(dasoInstanceGen);
-            chain.addGenerator(new MeasurementGenerator(dataFile, oas, schema, dasoInstanceGen));
+            if (!oas.hasCellScope()) {
+            	// Need to be fixed here by getting codeMap and codebook from sparql query
+            	DASOInstanceGenerator dasoInstanceGen = new DASOInstanceGenerator(
+            			dataFile, oas.getStudyUri(), oas.getUri(), 
+            			schema, dataFile.getFileName());
+            	chain.addGenerator(dasoInstanceGen);	
+            	chain.addGenerator(new MeasurementGenerator(dataFile, oas, schema, dasoInstanceGen));
+            } else {
+                chain.addGenerator(new MeasurementGenerator(dataFile, oas, schema, null));
+            }
             chain.setNamedGraphUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         }
 

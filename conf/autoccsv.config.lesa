@@ -1,0 +1,13 @@
+# Configure the path of csv files
+path_proc=processed_csv/
+path_unproc=unprocessed_csv/
+path_download=downloaded_csv/
+path_data_dict=data_dictionary/
+path_working=working_csv/
+auto=on
+
+# Configure the template file for CSV header mappings
+template_file_name=template.conf.generic
+
+# Configure the default owner email for the unrecorded files
+default_owner_email=user@server.com

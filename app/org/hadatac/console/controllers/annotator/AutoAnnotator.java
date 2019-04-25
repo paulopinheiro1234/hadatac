@@ -532,6 +532,40 @@ public class AutoAnnotator extends Controller {
         return ok(new File(dataFile.getAbsolutePath()));
     }
     
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result deleteFolder(String dir) {	
+        List<DataFile> dfs = DataFile.findInDir(dir,DataFile.PROCESSED);
+        int totFiles;
+        if (dfs == null) {
+        	totFiles = 0;
+        } else {
+        	totFiles = dfs.size();
+        }
+        List<String> folders = DataFile.findFolders(dir);
+        boolean noSubFolders = (folders.size() == 0 || (folders.size() == 1 && folders.get(0) != null && folders.get(0).equals("..")));
+        String statusMsg;
+        if (noSubFolders) {
+        	statusMsg = "Folder can be deleted because it has no sub-folders.";
+        } else {
+        	statusMsg = "Folder cannot be deleted becuase it has sub-folders.";
+        }
+    	return ok(deleteFolder.render(dir, !noSubFolders, totFiles, statusMsg));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postDeleteFolder(String dir) {
+        return deleteFolder(dir);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processDeleteFolder(String dir) {	
+        List<DataFile> dfs = DataFile.findInDir(dir,DataFile.PROCESSED);
+        for (DataFile df : dfs) {
+        	df.delete();
+        }
+        return redirect(routes.AutoAnnotator.index(dir, ".."));
+    }
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result saveDataFile() {        
         FilePart uploadedfile = request().body().asMultipartFormData().getFile("file");

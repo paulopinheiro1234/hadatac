@@ -1,0 +1,77 @@
+#####################################################################################
+#
+# HADataC settings
+#
+#####################################################################################
+
+hadatac {
+
+	console {
+	    
+	    # the application's base host URL
+		host="http://localhost:9000"
+		
+		# the url that the application is deployed
+		host_deploy="http://localhost:9000"
+		
+		# the base url that the application uses to send email
+		base_url="127.0.0.1:9000"
+		
+		# the kb's base host URL -- usually, the application's base host URL without any port information
+		kb="http://localhost"
+	}
+
+    # SOLR connection string
+    #   - Current values are for locally installed SOLR instance
+    #   - IMPORTANT NOTES FOR THE URL VALUESs BELOW:
+    #     * DO NOT INCLUDE ENDING SLASHES
+    #     * SOLR CONNECTION STRINGS OFTEN END WITH "/solr"
+    #     * USE ABSOLUTE URLs INCLUDING THE PROTOCAL PART, e.g., "HTTP://" OR "HTTPS://" 
+    solr {
+    
+        # HOME: the path in the file system where the SOLR instances are located
+        home=/Users/paulo/hadatac/solr
+
+        # URL for data collections
+        data="http://127.0.0.1:8983/solr"
+        
+        # URL for metadata (RDF triplestore RDF) collection
+        # For blazegraph in the local
+        triplestore="http://127.0.0.1:8080/blazegraph/namespace"
+        # For blazegraph in the vm
+        # triplestore="http://127.0.0.1:8080/bigdata/namespace"
+	    
+        # URL for user management collection
+        users="http://127.0.0.1:8983/solr"
+
+        # URL for user permission management collection
+        # For blazegraph in the local
+        permissions="http://127.0.0.1:8080/blazegraph/namespace"
+        # For blazegraph in the vm
+        # permissions="http://127.0.0.1:8080/bigdata/namespace"
+    }
+
+    # activity flags are used to verify if HADatAc knowledge base contains 
+    # concepts essential for supported scientific activities 
+    activities {
+
+        # use true for empirical activities involving the use of sensors
+        empirical=true
+        
+        # use true for computational activities involving computational simulations
+        computational=false
+    }
+
+    # properties about community using current HADatAc installation
+    #  - these properties are used to project customization of HADaAc installations
+    community {
+       fullname="LESA"
+       
+       shortname="LESA"
+       
+       description=""
+	   
+       ont_prefix="lesa"
+    }
+
+}

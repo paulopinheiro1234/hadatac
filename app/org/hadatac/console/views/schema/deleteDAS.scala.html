@@ -6,22 +6,25 @@
 @import org.hadatac.console.views.html.schema._
 @import org.hadatac.console.controllers.schema._
 
-@main("Delete Data Acquisition Schema") {
+@main("Delete Semantic Data Dictionary") {
 <div class="container">
-   <h3>Delete Data Acquisition Schema</h3>
+   <h4>Delete Semantic Data Dictionary</h4>
 
-   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.schema.routes.DeleteDAS.processForm(das_uri)">
+    <div class="container-fluid">
+      <div class="row">
+	    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.schema.routes.DeleteDAS.processForm(das_uri)">
 
-     <div class="form-group">
-       <label>URI : </label> @das.getUri() <br>         
-       <label>Name : </label> @das.getLabel()         
-     </div>
+           <div class="form-group">
+              <label>URI : </label> @das.getUri() <br>         
+              <label>Name : </label> @das.getLabel()         
+           </div>
      
-	 <input class="btn btn-danger" role="button" type="submit" value="Delete" />
-    </form>
-    
-    <br>
-    <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to DA Schema Management</a>
+	       <input class="btn btn-danger" role="button" type="submit" value="Confirm Deletion" /> OR         
+	       <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Go back to SDD Management</a>
+	       
+        </form>
+      </div>
+    </div>
 
 </div>
 

@@ -262,6 +262,7 @@ public class DataFile implements Cloneable {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
+            
             UpdateResponse response = solr.deleteById(getId());
             solr.commit();
             solr.close();
