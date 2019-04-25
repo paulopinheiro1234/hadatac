@@ -103,7 +103,7 @@ public class NewFile extends Controller {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outStream);
         } catch(IOException e) {
-
+            e.printStackTrace();
         }
         
         return redirect(routes.WorkingFiles.index(dir, "."));

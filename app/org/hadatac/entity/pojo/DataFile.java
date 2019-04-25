@@ -26,6 +26,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
+import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
@@ -579,7 +580,7 @@ public class DataFile implements Cloneable {
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isDirectory()) {
+            if (listOfFiles[i].isDirectory() && !listOfFiles[i].getName().equals(Sandbox.SUFFIX)) {
                 results.add(listOfFiles[i].getName() + "/");
             }
         }
