@@ -12,6 +12,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -82,14 +83,17 @@ public class NewFile extends Controller {
         try  {
             final File templateFile = env.getFile(tp.getPath());
             final InputStream inputStream = new DataInputStream(new FileInputStream(templateFile));
-            String partialPath = dir + newType + "-" + newName + ft.getSuffix();
-            //System.out.println("Creating new metadata file. partial path: [" + partialPath + "]");
-            String fullPath = ConfigProp.getPathWorking() + partialPath;
-            //System.out.println("Creating new metadata file. full path: [" + fullPath + "]");
-            partialPath = partialPath.replace("//", "/");           
-            fullPath = fullPath.replace("//", "/");           
-            File newFile = new File(fullPath);
-            //System.out.println("Creating new metadata file. full path: [" + fullPath + "]   dir: [" + dir + "]  email : [" + AuthApplication.getLocalUser(session()).getEmail() + "]");
+            
+            String fileName = newType + "-" + newName + ft.getSuffix();
+            
+            DataFile dataFile = new DataFile(fileName);
+            dataFile.setDir(dir);
+            dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+            dataFile.setStatus(DataFile.WORKING);
+            dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.save();
+            
+            File newFile = new File(dataFile.getAbsolutePath());
             OutputStream outStream = new FileOutputStream(newFile);
             byte[] buffer = new byte[8 * 1024];
             int bytesRead;
@@ -97,12 +101,7 @@ public class NewFile extends Controller {
                 outStream.write(buffer, 0, bytesRead);
             }
             IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outStream);  
-            DataFile file = new DataFile(partialPath);
-            file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-            file.setStatus(DataFile.WORKING);
-            file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            file.save();
+            IOUtils.closeQuietly(outStream);
         } catch(IOException e) {
 
         }

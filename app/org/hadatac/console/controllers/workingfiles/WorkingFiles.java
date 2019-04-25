@@ -153,18 +153,18 @@ public class WorkingFiles extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String dir, String file_name) {
+    public Result checkAnnotationLog(String dir, String fileId) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                DataFile.findByNameAndStatus(file_name, DataFile.WORKING).getLog()), 
+                DataFile.findById(fileId).getLog()), 
                 routes.WorkingFiles.index(dir, dir).url()));
     }
 
-    public Result getAnnotationStatus(String fileName) {
-        DataFile dataFile = DataFile.findByName(fileName);
+    public Result getAnnotationStatus(String fileId) {
+        DataFile dataFile = DataFile.findById(fileId);
         Map<String, Object> result = new HashMap<String, Object>();
 
         if (dataFile == null) {
-            result.put("File Name", fileName);
+            result.put("File Id", fileId);
             result.put("Status", "Unknown");
             result.put("Error", "The file with the specified name cannot be retrieved. "
                     + "Please provide a valid file name.");
@@ -181,24 +181,21 @@ public class WorkingFiles extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFile(String dir, String fileName) {
+    public Result deleteDataFile(String dir, String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(fileName);
+            dataFile = DataFile.findById(fileId);
         } else {
-            dataFile = DataFile.findByNameAndEmail(user.getEmail(), fileName);
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         }
+        
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
-
-        String path = ConfigProp.getPathWorking();
-
-        File file = new File(path + "/" + fileName);
-
-        String pureFileName = Paths.get(fileName).getFileName().toString();
+        
+        File file = new File(dataFile.getAbsolutePath());
         file.delete();
         dataFile.delete();
 
@@ -206,21 +203,26 @@ public class WorkingFiles extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadDataFile(String file_name) {
-        String path = ConfigProp.getPathWorking();
-        return ok(new File(path + "/" + file_name));
+    public Result downloadDataFile(String fileId) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to download this file!");
+        }
+        
+        return ok(new File(dataFile.getAbsolutePath()));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result ingestDataFile(String fileName) {
+    public Result ingestDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
+            dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
         } else {
-            dataFile = DataFile.findByNameAndOwnerEmailAndStatus(
-                    fileName, user.getEmail(), DataFile.WORKING);
+            dataFile = DataFile.findByIdAndOwnerEmailAndStatus(
+                    fileId, user.getEmail(), DataFile.WORKING);
         }
 
         if (null == dataFile) {
@@ -231,8 +233,7 @@ public class WorkingFiles extends Controller {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
         
-        String path = ConfigProp.getPathWorking();
-        File file = new File(path + "/" + fileName);
+        File file = new File(dataFile.getAbsolutePath());
         File destFolder = new File(ConfigProp.getPathUnproc());
         if (!destFolder.exists()){
             destFolder.mkdirs();
@@ -241,6 +242,7 @@ public class WorkingFiles extends Controller {
         file.delete();
         
         dataFile.getLogger().resetLog();
+        dataFile.setDir("");
         dataFile.setStatus(DataFile.UNPROCESSED);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
         dataFile.save();
@@ -249,18 +251,17 @@ public class WorkingFiles extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result verifyDataFile(String fileName) {
-        String path = ConfigProp.getPathWorking();
-        File file = new File(path + "/" + fileName);
+    public Result verifyDataFile(String fileId) {
+        DataFile dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
+        File file = new File(dataFile.getAbsolutePath());
         
         RecordFile recordFile = null;
-        if (fileName.endsWith(".csv")) {
+        if (dataFile.getFileName().endsWith(".csv")) {
             recordFile = new CSVRecordFile(file);
-        } else if (fileName.endsWith(".xlsx")) {
+        } else if (dataFile.getFileName().endsWith(".xlsx")) {
             recordFile = new SpreadsheetRecordFile(file);
         }
         
-        DataFile dataFile = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
         dataFile.setRecordFile(recordFile);
         dataFile.getLogger().resetLog();
         
@@ -310,14 +311,14 @@ public class WorkingFiles extends Controller {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">Could not get file path!</a>");
         }
 
-        String filename = path.getFileName().toString();
-        DataFile file = DataFile.findByName(filename);
+        String fileName = path.getFileName().toString();
+        DataFile file = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
         if (file != null && file.existsInFileSystem(ConfigProp.getPathWorking())) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathWorking())) {
-            DataFile.create(filename, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
+            DataFile.create(fileName, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

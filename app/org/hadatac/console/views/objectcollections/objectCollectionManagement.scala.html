@@ -1,5 +1,5 @@
 @(dir      : String,
-  filename : String,
+  fileId   : String,
   da_uri   : String,
   study    : org.hadatac.entity.pojo.Study,
   ocList   : List[org.hadatac.entity.pojo.ObjectCollection],
@@ -19,8 +19,8 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Create SOC</a>
-  	       <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", dir, filename, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize SOC Graph</a>
+           <a href="@org.hadatac.console.controllers.objectcollections.routes.NewOC.index(dir, fileId, da_uri, study.getUri())" class="btn btn-primary" role="button">Create SOC</a>
+  	       <a href="@org.hadatac.console.controllers.objectcollections.routes.OCForceField.index("full", dir, fileId, da_uri, study.getUri())" class="btn btn-primary" role="button">Visualize SOC Graph</a>
          </div>
       </div>
    </div>
@@ -52,7 +52,7 @@
                  @for(oc <- ocList) {
                     @for(vc <- vcList) {
                        @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
-	                      @oc_entry("subject", dir, filename, da_uri, study, oc, vc)
+	                      @oc_entry("subject", dir, fileId, da_uri, study, oc, vc)
                        }
                     }
                  }
@@ -84,7 +84,7 @@
                    @for(oc <- ocList){
                       @for(vc <- vcList) {
                          @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
-	                        @oc_entry("sample", dir, filename, da_uri, study, oc, vc)
+	                        @oc_entry("sample", dir, fileId, da_uri, study, oc, vc)
                          }
                       }
                    }
@@ -115,7 +115,7 @@
                @for(oc <- ocList){
                   @for(vc <- vcList) {
                      @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
-	                    @oc_entry("location", dir, filename, da_uri, study, oc, vc)
+	                    @oc_entry("location", dir, fileId, da_uri, study, oc, vc)
                      }
                   }
                }
@@ -146,7 +146,7 @@
                   @for(oc <- ocList){
                     @for(vc <- vcList) {
                        @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
-	                      @oc_entry("time", dir, filename, da_uri, study, oc, vc)
+	                      @oc_entry("time", dir, fileId, da_uri, study, oc, vc)
 	                   }
 	                }
                   }
@@ -155,10 +155,10 @@
         </table>
       </div>
       <br>
-        @if(filename == null || filename.equals("") || da_uri == null || da_uri.equals("")) {
+        @if(fileId == null || fileId.equals("") || da_uri == null || da_uri.equals("")) {
               <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
 	} else {
-              <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, filename, da_uri)" 
+              <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)" 
 		 class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
 	}
 	

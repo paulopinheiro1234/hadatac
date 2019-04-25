@@ -13,20 +13,19 @@ import play.mvc.Result;
 public class ExcelPreview extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String folder, String fileName, boolean bSavable) {
-        if (bSavable) {
-            final SysUser user = AuthApplication.getLocalUser(session());
-            if (null == DataFile.findByNameAndEmail(user.getEmail(), fileName)) {
-                return ok(excel_preview.render(folder, fileName, false));
-            }
+    public Result index(String fileId, boolean bSavable) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        if (null == dataFile) {
+            return ok(excel_preview.render(dataFile, false));
         }
         
-        return ok(excel_preview.render(folder, fileName, bSavable));
+        return ok(excel_preview.render(dataFile, bSavable));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String folder, String fileName, boolean bSavable) {
-        return index(folder, fileName, bSavable);
+    public Result postIndex(String fileId, boolean bSavable) {
+        return index(fileId, bSavable);
     }
 }
 

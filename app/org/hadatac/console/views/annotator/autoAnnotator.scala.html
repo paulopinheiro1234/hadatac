@@ -108,29 +108,29 @@
                 <td>@file.getSubmissionTime()</td>
                 <td>
                 @if(file.getStatus().equals("FREEZED")) {
-                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(dir, file.getFileName())" 
+                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(dir, file.getId())" 
                    class="btn-xs btn-success" role="button">Activate</a>
                 }
                 @if(file.getFileName().startsWith("DA")) {
-                   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getFileName(),file.getDataAcquisitionUri())" 
+                   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getId(), file.getDataAcquisitionUri())" 
                    class="btn-xs btn-success" role="button">Prepare Ingestion</a>
                 }
                 
                 @if(file.getFileName().endsWith(".csv")) {
                     @defining("") { da_uri => @defining("") { oc_uri => 
-                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.UNPROC, dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.UNPROC, dir, file.getId(), da_uri, oc_uri, 10, 1)" 
                 class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.UNPROC, file.getFileName(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getFileName(), false)" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFileToWorking(file.getFileName())" class="btn-xs btn-primary" role="button" id="move-to-working" onclick="return confirm('Are you sure to move it to working list?')">Move to Working</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getId())" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFileToWorking(file.getId())" class="btn-xs btn-primary" role="button" id="move-to-working" onclick="return confirm('Are you sure to move it to working list?')">Move to Working</a>
                 @if(bAdmin) {
-                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" class="btn-xs btn-primary" role="button">Assign Owner</a>
+                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn-xs btn-primary" role="button">Assign Owner</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getFileName())" class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(FileManager.UNPROC, file.getFileName())" class="btn-xs btn-primary" role="button">Download</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getId())" class="btn-xs btn-primary" role="button">Logs</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getId())" class="btn-xs btn-primary" role="button">Download</a>
                 </td>   
             </tr>
         }
@@ -184,25 +184,27 @@
                 <td>@file.getCompletionTime()</td>
                 <td>@if(file.getFileName().endsWith(".csv")) {
                         @defining("") { da_uri =>  @defining("") { oc_uri => 
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.PROC, dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.PROC, dir, file.getId(), da_uri, oc_uri, 10, 1)" 
                    class="btn-xs btn-primary" role="button">Preview File</a>
                         }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.PROC, file.getFileName(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(dir, file.getFileName())" 
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(dir, file.getId())" 
                class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getFileName(), true)" 
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getId())" 
                class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(dir, file.getDataAcquisitionUri(), file.getFileName())" 
+                @if(file.getFileName().startsWith("DA-")) {
+                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(dir, file.getDataAcquisitionUri(), file.getId())" 
                class="btn-xs btn-primary" role="button">Assign Acquisition</a>
+                }
                 @if(bAdmin) {
-                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" 
+                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" 
                    class="btn-xs btn-primary" role="button">Assign Owner</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getFileName())" 
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getId())" 
                class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(FileManager.PROC, file.getFileName())" 
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getId())" 
                class="btn-xs btn-primary" role="button">Download</a>
                 </td>
             </tr>

@@ -1,5 +1,5 @@
 @(dir          : String,
-  filename     : String,
+  fileId       : String,
   da_uri       : String,
   platformList : List[org.hadatac.entity.pojo.Platform])
 
@@ -16,9 +16,9 @@
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.index(dir, filename, da_uri)"
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.index(dir, fileId, da_uri)"
 	      class="btn btn-primary" role="button">Create Platform</a>
-           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(dir, filename, da_uri)" 
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(dir, fileId, da_uri)" 
 	      class="btn btn-primary" role="button">Manage Platform Types</a>
          </div>
       </div>

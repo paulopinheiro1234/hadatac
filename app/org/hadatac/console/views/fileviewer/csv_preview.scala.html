@@ -1,6 +1,6 @@
 @(mode        : String,
   dir         : String,
-  fileName    : String,
+  fileId      : String,
   da_uri      : String,
   oc_uri      : String,
   headers     : List[String],
@@ -13,6 +13,7 @@
 @import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
+@import org.hadatac.entity.pojo.DataFile;
 @import java.net._
 
 @main("CSV Preview"){
@@ -44,7 +45,7 @@
 	      selectedColumn = colNumber;
               document.getElementById('colSelector').disabled = false;
 	      $('#position').val(colNumber);
-	      //link = 'org.hadatac.console.controllers.fileviewer.routes.CSVPreview.selectColumn(ownerEmail,fileName,' + selectedColumn + ')'
+	      //link = 'org.hadatac.console.controllers.fileviewer.routes.CSVPreview.selectColumn(ownerEmail,fileId,' + selectedColumn + ')'
 	      //btn.setAttribute('href', link);
 	  }
 
@@ -53,7 +54,7 @@
 }
 
    <div>
-     <h3>File: @fileName</h3>
+     <h3>File: @DataFile.findById(fileId).getFileName()</h3>
      @if(mode.equals("selectCol")) {
        <form>
        <div id="rcorners">
@@ -62,7 +63,7 @@
 
 	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"
  		   role="button" value="Generate Objects" formmethod="post"
-		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(dir, fileName, da_uri, oc_uri, page)">
+		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(dir, fileId, da_uri, oc_uri, page)">
             </input>
 	    <a href=""  id="reset" name="reset" class="btn btn-primary"
  	       role="button">Reset</a>
@@ -85,7 +86,7 @@
    <br>
    <div>
        @if(da_uri != null && !da_uri.equals("")) {
-            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileName,da_uri)" 
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)" 
 	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
        } else {
 	    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" 

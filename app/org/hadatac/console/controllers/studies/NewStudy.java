@@ -45,10 +45,10 @@ public class NewStudy extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result indexFromFile(String dir, String filename) {
+    public Result indexFromFile(String dir, String fileId) {
         if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
             return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.NewStudy.indexFromFile(dir, filename).url()));
+                    routes.NewStudy.indexFromFile(dir, fileId).url()));
         }
 
         List<Agent> organizations = Agent.findOrganizations();
@@ -57,9 +57,9 @@ public class NewStudy extends Controller {
         DataFile file = null;
         String ownerEmail = null;
 
-        if (filename != null && !filename.equals("")) {
+        if (fileId != null && !fileId.equals("")) {
             ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
-            file = DataFile.findByNameAndEmail(ownerEmail, filename);
+            file = DataFile.findByIdAndEmail(fileId, ownerEmail);
         }
 
         return ok(newStudy.render(studyType, organizations, persons, dir, file));

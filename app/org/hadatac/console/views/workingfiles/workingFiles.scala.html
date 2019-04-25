@@ -103,33 +103,33 @@
                 <td>
                 @if(file.getFileName().endsWith(".csv")) {
                     @defining("") { da_uri => @defining("") { oc_uri => 
-                       <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.WORKING, dir, file.getFileName(), da_uri, oc_uri, 10, 1)" 
+                       <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.WORKING, dir, file.getId(), da_uri, oc_uri, 10, 1)" 
 			              class="btn btn-xs btn-primary" role="button">Preview File</a>
 		               <a href="" class="btn btn-xs btn-primary disabled" role="button" id="edit">Edit</a>
                     }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.WORKING, file.getFileName(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(FileManager.WORKING, file.getFileName(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                 }
                 </td>
                 <td>
                 <a href="" class="btn btn-xs btn-primary disabled" role="button" id="rename">Rename</a>
-                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getFileName())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
                 <a href="" class="btn btn-xs btn-primary disabled" role="button" id="share">Share</a>
 
 				@*
                 @if(bAdmin) {
-                    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.assignFileOwner(dir, file.getOwnerEmail(), file.getFileName())" class="btn btn-xs btn-primary" role="button">Assign Owner</a>
+                    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn btn-xs btn-primary" role="button">Assign Owner</a>
                 }
                 *@
                 
-                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadDataFile(file.getFileName())" class="btn btn-xs btn-primary" role="button">Download</a>
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadDataFile(file.getId())" class="btn btn-xs btn-primary" role="button">Download</a>
                 </td>   
                 <td>
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
                     file.getFileName().startsWith("OAS-") || file.getFileName().startsWith("DA-")) {
-                	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.ingestDataFile(file.getFileName())" class="btn btn-xs btn-primary" role="button" id="ingest" onclick="return confirm('Are you sure to submit it to auto-annotator?')">Ingest</a>
+                	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.ingestDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="ingest" onclick="return confirm('Are you sure to submit it to auto-annotator?')">Ingest</a>
 				}
                 @if(file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-")) {
                 	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="draft">Draft</a>
@@ -137,17 +137,17 @@
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
                     file.getFileName().startsWith("OAS-")) {
-                	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.verifyDataFile(file.getFileName())" class="btn btn-xs btn-primary" role="button" id="verify">Verify</a>
+                	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.verifyDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="verify">Verify</a>
                 }
                 </td>
                 <td>
-	                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.checkAnnotationLog(dir, file.getFileName())" class="btn btn-xs btn-primary" role="button">Logs</a>
+	                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.checkAnnotationLog(dir, file.getId())" class="btn btn-xs btn-primary" role="button">Logs</a>
                 </td>
             </tr>
         }
     </tbody>
     </table>
-    @if(workingFiles.isEmpty()) {
+    @if(workingFiles.isEmpty() && (folders.size() == 0 && dir == "/" || folders.size() == 1 && dir != "/")) {
         <p>No working files</p>
     }
     

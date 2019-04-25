@@ -1,5 +1,5 @@
 @(dir          : String,
-  file_name    : String,
+  fileId       : String,
   da_uri       : String,
   studyOptions : List[org.hadatac.entity.pojo.Study])
 
@@ -31,7 +31,7 @@
   <div class="container">
     <h2>Select Study for @da_uri</h2>
 
-    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectStudy(dir, file_name, da_uri)">
+    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectStudy(dir, fileId, da_uri)">
 
     <div class="form-group">
       <label>Selected Data Acquisition</label> <br>
@@ -48,7 +48,7 @@
     <div class="form-group" class="col-sm-6 col-offset-3">
       <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Study" disabled="disabled" />
     </div>
-    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file_name, da_uri)" 
+    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)" 
        class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
     
     </form>    

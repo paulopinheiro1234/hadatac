@@ -82,15 +82,15 @@ public class DataDictionaryAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFile(String file_name) {
+    public Result deleteDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(file_name);
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         }
-        else {
-            dataFile = DataFile.findByNameAndEmail(user.getEmail(), file_name);
-        }
+        
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
@@ -98,25 +98,24 @@ public class DataDictionaryAnnotator extends Controller {
         dataFile.setStatus(DataFile.DELETED);
         dataFile.delete();
 
-        String path = ConfigProp.getPathDownload();
-        File file = new File(path + "/" + file_name);
+        File file = new File(dataFile.getAbsolutePath());
         file.delete();
 
         return redirect(routes.SDDEditor.index());
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String file_name) {
+    public Result checkAnnotationLog(String fileId) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                DataFile.findByName(file_name).getLog()), 
+                DataFile.findById(fileId).getLog()), 
                 routes.SDDEditor.index().url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkCompletion(String file_name) {
+    public Result checkCompletion(String fileId) {
         Map<String, Object> result = new HashMap<String, Object>();
 
-        DataFile dataFile = DataFile.findByName(file_name);
+        DataFile dataFile = DataFile.findById(fileId);
         if (dataFile != null) {
             result.put("CompletionPercentage", dataFile.getCompletionPercentage());
             result.put("Status", dataFile.getStatus());

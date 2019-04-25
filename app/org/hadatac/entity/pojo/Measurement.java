@@ -1011,7 +1011,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSV(List<Measurement> measurements, 
-            List<String> fieldNames, File file) {
+            List<String> fieldNames, File file, String fileId) {
         try {
             // Create headers
             FileUtils.writeStringToFile(file, String.join(",", fieldNames) + "\n", "utf-8", true);
@@ -1029,7 +1029,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 if (((int)ratio) != prev_ratio) {
                     prev_ratio = (int)ratio;
 
-                    dataFile = DataFile.findByName(file.getName());
+                    dataFile = DataFile.findById(fileId);
                     if (dataFile != null) {
                         if (dataFile.getStatus() == DataFile.DELETED) {
                             dataFile.delete();
@@ -1044,7 +1044,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 i++;
             }
 
-            dataFile = DataFile.findByName(file.getName());
+            dataFile = DataFile.findById(fileId);
             if (dataFile != null) {
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
@@ -1060,7 +1060,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file, String categoricalOption) {        
+    public static void outputAsCSVByAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {        
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
@@ -1191,7 +1191,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     prev_ratio = current_ratio;
                     System.out.println("Progress: " + current_ratio + "%");
 
-                    dataFile = DataFile.findByName(file.getName());
+                    dataFile = DataFile.findById(fileId);
                     if (dataFile != null) {
                         if (dataFile.getStatus() == DataFile.DELETED) {
                             dataFile.delete();
@@ -1255,7 +1255,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             System.out.println("Finished writing!");
 
-            dataFile = DataFile.findByName(file.getName());
+            dataFile = DataFile.findById(fileId);
             if (dataFile != null) {
 
             	// Write harmonized code book

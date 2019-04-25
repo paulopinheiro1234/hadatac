@@ -1,5 +1,4 @@
-@(folder : String,
-  filePath : String,
+@(dataFile : org.hadatac.entity.pojo.DataFile,
   bSavable : Boolean)
 
 @import helper._
@@ -17,11 +16,11 @@
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
     
     <div id="rcorners">
-    <h4>@filePath</h4>
+    <h4>@dataFile.getFileName()</h4>
     @if(bSavable) {
         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
     }
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(folder, filePath)" class="btn btn-primary" role="button">Download</a>
+    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
     <div><a id="error_msg"></a></div>
     <div id="grid"></div>
     <div id="footnote"></div>
@@ -36,7 +35,7 @@
     
     <script type="text/javascript">
     /* set up async GET request */
-    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(folder, filePath)".replace(/&amp;/g, '&');
+    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
     var _upload = document.getElementById('upload');    
     var _onreponse = function() {
     	$("#error_msg").html(decodeURIComponent(this.responseText));
@@ -61,7 +60,7 @@
         drop: _target,
         upload: _upload,
         upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",
-        formdata: JSON.stringify({ "folder": "@folder", "filePath": "@filePath", "bSavable": "@bSavable" }),
+        formdata: JSON.stringify({"fileId": "@dataFile.getId()"}),
         reponse_action: _onreponse,
         on: {
             workstart: _workstart,

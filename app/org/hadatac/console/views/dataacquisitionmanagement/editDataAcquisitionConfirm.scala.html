@@ -1,5 +1,5 @@
 @(dir         : String,
-  filename    : String,
+  fileId      : String,
   da          : org.hadatac.entity.pojo.ObjectAccessSpec,
   changedInfo : List[String],
   bAdmin      : Boolean)
@@ -50,11 +50,11 @@
        </ul>
 
        <br>
-       @if(filename == null || filename.equals("")) {
+       @if(fileId == null || fileId.equals("")) {
           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 
 	     class="btn btn-primary" role="button">Back to Object Access Specification Management</a>
        } else {
-    	  <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, filename,da.getUri())" 
+    	  <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da.getUri())" 
 	     class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
        }
     </div>

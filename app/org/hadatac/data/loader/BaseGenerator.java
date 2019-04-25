@@ -32,6 +32,7 @@ public abstract class BaseGenerator {
 
     protected List<Record> records = null;
     protected RecordFile file;
+    protected DataFile dataFile;
 
     protected List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
     protected List<HADatAcThing> objects = new ArrayList<HADatAcThing>();
@@ -48,12 +49,12 @@ public abstract class BaseGenerator {
     protected AnnotationLogger logger = null;
 
     public BaseGenerator(DataFile dataFile) {
+        this.dataFile = dataFile;
         file = dataFile.getRecordFile();
         records = file.getRecords();
         fileName = file.getFile().getName();
         logger = dataFile.getLogger();
         
-        setRelativePath(file);
         initMapping();
     }
 
@@ -92,35 +93,12 @@ public abstract class BaseGenerator {
         return "Errors in " + getClass().getSimpleName() + ": " + e.getMessage() + " " + errors.toString();
     }
 
-    public String getFileName() {
-        return fileName;
+    public DataFile getDataFile() {
+        return dataFile;
     }
     
-    private void setRelativePath(RecordFile file) {
-        String parentDir = file.getFile().getParent();
-        
-        String pathUnproc = ConfigProp.getPathUnproc();
-        if (pathUnproc.endsWith("/")) {
-            pathUnproc = pathUnproc.substring(0, pathUnproc.length() - 1);
-        }
-        
-        String pathProc = ConfigProp.getPathProc();
-        if (pathProc.endsWith("/")) {
-            pathProc = pathProc.substring(0, pathProc.length() - 1);
-        }
-        
-        parentDir = parentDir.replace(pathUnproc, "").replace(pathProc, "")
-                .replace("/", "").replace(Sandbox.SUFFIX, "");
-        
-        if (parentDir.trim().isEmpty()) {
-            relativePath = fileName;
-        } else {
-            relativePath = parentDir + "/" + fileName;
-        }
-    }
-
-    public String getRelativePath() {
-        return relativePath;
+    public String getFileName() {
+        return fileName;
     }
 
     public RecordFile getRecordFile() {

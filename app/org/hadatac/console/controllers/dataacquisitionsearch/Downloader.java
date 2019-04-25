@@ -67,21 +67,26 @@ public class Downloader extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadDataFile(String file_name) {
-        String path = ConfigProp.getPathDownload();
-        return ok(new File(path + "/" + file_name));
+    public Result downloadDataFile(String fileId) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to download this file!");
+        }
+        
+        return ok(new File(dataFile.getAbsolutePath()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFile(String file_name) {
+    public Result deleteDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = null;
         if (user.isDataManager()) {
-            dataFile = DataFile.findByName(file_name);
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         }
-        else {
-            dataFile = DataFile.findByNameAndEmail(user.getEmail(), file_name);
-        }
+        
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
@@ -89,65 +94,61 @@ public class Downloader extends Controller {
         dataFile.setStatus(DataFile.DELETED);
         dataFile.delete();
 
-        String path = ConfigProp.getPathDownload();
-        File file = new File(path + "/" + file_name);
+        File file = new File(dataFile.getAbsolutePath());
         file.delete();
 
         return redirect(routes.Downloader.index());
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result assignFileOwner(String ownerEmail, String selectedFile) {	
+    public Result assignFileOwner(String ownerEmail, String fileId) {	
         return ok(assignOption.render(User.getUserEmails(),
-                routes.Downloader.processOwnerForm(ownerEmail, selectedFile),
+                routes.Downloader.processOwnerForm(ownerEmail, fileId),
                 "Owner", 
                 "Selected File", 
-                selectedFile));
+                fileId));
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postAssignFileOwner(String ownerEmail, String selectedFile) {
-        return assignFileOwner(ownerEmail, selectedFile);
+    public Result postAssignFileOwner(String ownerEmail, String fileId) {
+        return assignFileOwner(ownerEmail, fileId);
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processOwnerForm(String ownerEmail, String selectedFile) {
+    public Result processOwnerForm(String ownerEmail, String fileId) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         AssignOptionForm data = form.get();
 
         if (form.hasErrors()) {
             System.out.println("HAS ERRORS");
             return badRequest(assignOption.render(User.getUserEmails(),
-                    routes.Downloader.processOwnerForm(ownerEmail, selectedFile),
+                    routes.Downloader.processOwnerForm(ownerEmail, fileId),
                     "Owner",
                     "Selected File",
-                    selectedFile));
+                    fileId));
         } else {
-            DataFile file = DataFile.findByNameAndEmail(ownerEmail, selectedFile);
-            if (file == null) {
-                file = new DataFile(selectedFile);
-                file.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
-                file.setStatus(DataFile.CREATING);
-                file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            DataFile file = DataFile.findByIdAndEmail(fileId, ownerEmail);
+            if (file != null) {
+                file.setOwnerEmail(data.getOption());
+                file.save();
             }
-            file.setOwnerEmail(data.getOption());
-            file.save();
+            
             return redirect(routes.Downloader.index());
         }
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String file_name) {
+    public Result checkAnnotationLog(String fileId) {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                DataFile.findByName(file_name).getLog()), 
+                DataFile.findById(fileId).getLog()), 
                 routes.Downloader.index().url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkCompletion(String file_name) {
+    public Result checkCompletion(String fileId) {
         Map<String, Object> result = new HashMap<String, Object>();
 
-        DataFile dataFile = DataFile.findByName(file_name);
+        DataFile dataFile = DataFile.findById(fileId);
         if (dataFile != null) {
             result.put("CompletionPercentage", dataFile.getCompletionPercentage());
             result.put("Status", dataFile.getStatus());
@@ -175,7 +176,7 @@ public class Downloader extends Controller {
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
         dataFile.save();
 
-        Measurement.outputAsCSV(measurements, selectedFields, file);
+        Measurement.outputAsCSV(measurements, selectedFields, file, dataFile.getId());
         System.out.println("Generated CSV files ...");
 
         return 0;
@@ -197,7 +198,7 @@ public class Downloader extends Controller {
         dataFile.save();
         System.out.println("Created download " + fileName);
 
-        Measurement.outputAsCSVByAlignment(measurements, file, categoricalOption);
+        Measurement.outputAsCSVByAlignment(measurements, file, dataFile.getId(), categoricalOption);
         System.out.println("Generated CSV files ...");
 
         return 0;

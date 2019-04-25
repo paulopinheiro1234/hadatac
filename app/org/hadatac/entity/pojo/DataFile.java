@@ -30,6 +30,7 @@ import org.hadatac.console.http.SolrUtils;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 
 
 public class DataFile implements Cloneable {
@@ -116,6 +117,22 @@ public class DataFile implements Cloneable {
         this.id = id;
     }
     
+    public String getAbsolutePath() {
+        if (getStatus().equals(UNPROCESSED)) {
+            return Paths.get(ConfigProp.getPathUnproc(), getDir(), getFileName()).toString();
+        } else if (getStatus().equals(PROCESSED)) {
+            return Paths.get(ConfigProp.getPathProc(), getDir(), getFileName()).toString();
+        } else if (getStatus().equals(WORKING)) {
+            return Paths.get(ConfigProp.getPathWorking(), getDir(), getFileName()).toString();
+        } else if (Arrays.asList(CREATED, CREATING, DELETED).contains(getStatus())) {
+            return Paths.get(ConfigProp.getPathDownload(), getDir(), getFileName()).toString();
+        } else if (Arrays.asList(DD_UNPROCESSED, DD_PROCESSED, DD_FREEZED).contains(getStatus())) {
+            return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getFileName()).toString();
+        }
+        
+        return "";
+    }
+    
     public AnnotationLogger getLogger() {
         return logger;
     }
@@ -174,6 +191,10 @@ public class DataFile implements Cloneable {
         return dir;
     }
     public void setDir(String dir) {
+        dir = Paths.get(dir).toString();
+        if (dir.startsWith("/")) {
+            dir = dir.substring(1, dir.length());
+        }
         this.dir = dir;
     }
 
@@ -241,7 +262,7 @@ public class DataFile implements Cloneable {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
-            UpdateResponse response = solr.deleteById(this.getFileName());
+            UpdateResponse response = solr.deleteById(getId());
             solr.commit();
             solr.close();
             return response.getStatus();
@@ -258,6 +279,15 @@ public class DataFile implements Cloneable {
     
     public String getPureFileName() {
         return Paths.get(fileName).getFileName().toString();
+    }
+    
+    public void resetForUnprocessed() {
+        setStatus(DataFile.UNPROCESSED);
+        getLogger().resetLog();
+        setDir("");
+        setFileName(getPureFileName());
+        setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        setCompletionTime("");
     }
 
     public boolean existsInFileSystem(String path) {
@@ -373,14 +403,27 @@ public class DataFile implements Cloneable {
         query.set("rows", "10000000");
         return findByQuery(query);
     }
-
-    public static DataFile findByNameAndEmail(String ownerEmail, String fileName) {        
+    
+    public static DataFile findByIdAndEmail(String id, String ownerEmail) {        
         SolrQuery query = new SolrQuery();
         if (null == ownerEmail) {
-            query.set("q", "file_name_str:\"" + fileName + "\"");
+            query.set("q", "id:\"" + id + "\"");
         } else {
-            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
+            query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "id:\"" + id + "\"");
         }
+        query.set("rows", "10000000");
+
+        List<DataFile> results = findByQuery(query);
+        if (!results.isEmpty()) {
+            return results.get(0);
+        }
+
+        return null;
+    }
+    
+    public static DataFile findByIdAndStatus(String id, String status) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "status_str:\"" + status + "\"" + " AND " + "id:\"" + id + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);
@@ -404,9 +447,9 @@ public class DataFile implements Cloneable {
         return null;
     }
     
-    public static DataFile findByNameAndOwnerEmailAndStatus(String fileName, String ownerEmail, String status) {        
+    public static DataFile findByIdAndOwnerEmailAndStatus(String id, String ownerEmail, String status) {        
         SolrQuery query = new SolrQuery();
-        query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
+        query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "id:\"" + id + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);
@@ -417,8 +460,8 @@ public class DataFile implements Cloneable {
         return null;
     }
 
-    public static DataFile findByName(String fileName) {
-        return findByNameAndEmail(null, fileName);
+    public static DataFile findById(String id) {
+        return findByIdAndEmail(id, null);
     }
 
     public static boolean hasValidExtension(String fileName) {
@@ -517,6 +560,14 @@ public class DataFile implements Cloneable {
         return findByQuery(query);
     }
 
+    public static boolean isEmptyDir(File dir) {
+        if (!dir.exists()) {
+            return true;
+        }
+        
+        return dir.listFiles().length == 0;
+    }
+    
     public static List<String> findFolders(String dir) {
         List<String> results = new ArrayList<String>();
 

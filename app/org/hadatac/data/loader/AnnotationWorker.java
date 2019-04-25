@@ -4,6 +4,7 @@ import java.lang.String;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -108,7 +109,6 @@ public class AnnotationWorker {
             dataFile.save();
 
             String fileName = dataFile.getFileName();
-            String filePath = pathUnproc + "/" + fileName;
 
             if (procFiles.contains(dataFile)) {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00002", fileName);
@@ -118,7 +118,7 @@ public class AnnotationWorker {
             dataFile.getLogger().println(String.format("Processing file: %s", fileName));
 
             RecordFile recordFile = null;
-            File file = new File(filePath);
+            File file = new File(dataFile.getAbsolutePath());
             if (fileName.endsWith(".csv")) {
                 recordFile = new CSVRecordFile(file);
             } else if (fileName.endsWith(".xlsx")) {
@@ -144,11 +144,11 @@ public class AnnotationWorker {
                 if (study.isEmpty()) {
                     new_path = pathProc;
                 } else {
-                    new_path = pathProc + "/" + study;
+                    new_path = Paths.get(pathProc, study).toString();
                 }
 
                 File destFolder = new File(new_path);
-                if (!destFolder.exists()){
+                if (!destFolder.exists()) {
                     destFolder.mkdirs();
                 }
 
@@ -157,17 +157,15 @@ public class AnnotationWorker {
                 dataFile.setStatus(DataFile.PROCESSED);
                 dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
                 if (study.isEmpty()) {
-                    dataFile.setFileName(dataFile.getFileName());
                     dataFile.setStudyUri("");
                 } else {
-                    dataFile.setFileName(study + "/" + dataFile.getFileName());
+                    dataFile.setDir(study);
                     dataFile.setStudyUri(chain.getStudyUri());
                 }
                 dataFile.save();
 
-                File f = new File(pathUnproc + "/" + fileName);
-                f.renameTo(new File(destFolder + "/" + fileName));
-                f.delete();
+                file.renameTo(new File(destFolder + "/" + fileName));
+                file.delete();
             } else {
                 // Freeze file
                 System.out.println("Freezed file " + dataFile.getFileName());
@@ -367,7 +365,7 @@ public class AnnotationWorker {
                 
                 try {
                     DataFile dataFileForSheet = (DataFile)dataFile.clone();
-                    dataFile.setRecordFile(sheet);
+                    dataFileForSheet.setRecordFile(sheet);
                     chain.addGenerator(new DPLGenerator(dataFileForSheet));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();

@@ -12,6 +12,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Paths;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -47,14 +48,11 @@ public class Folder extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir) {
-    	
     	return ok(newFolder.render(dir));
-
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processForm(String dir) {
-    	
         Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
         NewFileForm data = form.get();
 
@@ -64,17 +62,12 @@ public class Folder extends Controller {
 
         // store new values
         String newName = data.getNewName();
-        String fullPath = ConfigProp.getPathWorking() + dir + newName;
-        fullPath = fullPath.replace("//", "/");
 
-        //System.out.println("Creating new folder.  dir: [" + dir + "]");
-        //System.out.println("Creating new folder.  newName: [" + newName + "]");
-        //System.out.println("Creating new folder.  newName: [" + ConfigProp.getPathWorking() + "]");
-        //System.out.println("Creating new folder.  name: [" + ConfigProp.getPathWorking() + dir + newName + "]");
-        //System.out.println("Creating new folder.  name: [" + fullPath + "]");
-
-        new File(fullPath).mkdirs();        
-
+        File folder = new File(Paths.get(ConfigProp.getPathWorking(), dir, newName).toString());
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
 
@@ -84,17 +77,13 @@ public class Folder extends Controller {
     		return redirect(routes.WorkingFiles.index(dir, "."));
     	}
     	
-        String fullPath = ConfigProp.getPathWorking() + dir + path;
-    	fullPath = fullPath.replace("//","/");
-    	//System.out.println("Deleting folder.  name: [" + fullPath + "]");
-
+        String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
     	File folder = new File(fullPath);
 
         File[] listOfFiles = folder.listFiles();
-        Boolean folderEmpty = listOfFiles == null || listOfFiles.length <= 0;
+        Boolean folderEmpty = listOfFiles == null || listOfFiles.length == 0;
 
         return ok(deleteFolder.render(dir, path, folderEmpty));
-
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -108,11 +97,9 @@ public class Folder extends Controller {
     		return redirect(routes.WorkingFiles.index(dir, "."));
     	}
 
-        String fullPath = ConfigProp.getPathWorking() + dir + path;
-    	fullPath = fullPath.replace("//","/");
-    	//System.out.println("Deleting folder.  name: [" + fullPath + "]");
-
+    	String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
         File deleteFolder = new File(fullPath);
+        
         try {
         	FileUtils.deleteDirectory(deleteFolder);
         } catch (Exception e) {
@@ -121,5 +108,4 @@ public class Folder extends Controller {
 
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
-
 }

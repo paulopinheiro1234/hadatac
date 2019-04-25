@@ -155,7 +155,7 @@ public class DataAcquisitionManagement extends Controller {
         String pathUnproc = ConfigProp.getPathUnproc();
 
         String filename = "OAS-" + data.getDaName() + ".csv";
-        DataFile dataFile = DataFile.findByName(filename);
+        DataFile dataFile = DataFile.findByNameAndStatus(filename, DataFile.UNPROCESSED);
         if (dataFile != null && dataFile.existsInFileSystem(pathUnproc)) {
             return badRequest(
                     "<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");

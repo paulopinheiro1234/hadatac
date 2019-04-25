@@ -167,7 +167,7 @@
           } else {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
 		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, file.getFileName(),file.getDataAcquisitionUri())"/><br>
-    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getFileName(),file.getDataAcquisitionUri())" 
+    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getId(), file.getDataAcquisitionUri())" 
 		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
           }
 	</div>
