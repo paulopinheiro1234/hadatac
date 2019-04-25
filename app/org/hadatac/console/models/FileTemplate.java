@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import controllers.Assets.Asset;
+import controllers.routes;
+
 public class FileTemplate {
 
     public static String GENERIC = "GENERIC";
@@ -15,20 +18,20 @@ public class FileTemplate {
     public String template;
     public String path;
 
-    public static FileTemplate DPL_GEN = new FileTemplate("DPL", "GENERIC", "public/example/data/templates/generic/DPL.xlsx");
-    public static FileTemplate STD_GEN = new FileTemplate("STD", "GENERIC", "public/example/data/templates/generic/STD.xlsx");
-    public static FileTemplate SSD_GEN = new FileTemplate("SSD", "GENERIC", "public/example/data/templates/generic/SSD.xlsx");
-    public static FileTemplate SDD_GEN = new FileTemplate("SDD", "GENERIC", "public/example/data/templates/generic/SDD.xlsx");
-    public static FileTemplate OAS_GEN = new FileTemplate("OAS", "GENERIC", "public/example/data/templates/generic/OAS.csv");
-    public static FileTemplate DPL_CHEAR = new FileTemplate("DPL", "CHEAR", "public/example/data/templates/chear/DPL.xlsx");
-    public static FileTemplate STD_CHEAR = new FileTemplate("STD", "CHEAR", "public/example/data/templates/chear/STD.xlsx");
-    public static FileTemplate SSD_CHEAR = new FileTemplate("SSD", "CHEAR", "public/example/data/templates/chear/SSD.xlsx");
-    public static FileTemplate SDD_CHEAR = new FileTemplate("SDD", "CHEAR", "public/example/data/templates/chear/SDD.xlsx");
-    public static FileTemplate OAS_CHEAR = new FileTemplate("OAS", "CHEAR", "public/example/data/templates/chear/OAS.csv");
-
-    public static List<FileTemplate> FILETEMPLATES = 
-    		new ArrayList<FileTemplate>(Arrays.asList(DPL_GEN, STD_GEN, SSD_GEN, SDD_GEN, OAS_GEN, 
-    					DPL_CHEAR, STD_CHEAR, SSD_CHEAR, SDD_CHEAR, OAS_CHEAR));
+    public static FileTemplate DPL_GEN = new FileTemplate("DPL", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/DPL.xlsx")).toString());
+    public static FileTemplate STD_GEN = new FileTemplate("STD", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/STD.xlsx")).toString());
+    public static FileTemplate SSD_GEN = new FileTemplate("SSD", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/SSD.xlsx")).toString());
+    public static FileTemplate SDD_GEN = new FileTemplate("SDD", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/SDD.xlsx")).toString());
+    public static FileTemplate OAS_GEN = new FileTemplate("OAS", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/OAS.csv")).toString());
+    public static FileTemplate DPL_CHEAR = new FileTemplate("DPL", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/DPL.xlsx")).toString());
+    public static FileTemplate STD_CHEAR = new FileTemplate("STD", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/STD.xlsx")).toString());
+    public static FileTemplate SSD_CHEAR = new FileTemplate("SSD", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/SSD.xlsx")).toString());
+    public static FileTemplate SDD_CHEAR = new FileTemplate("SDD", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/SDD.xlsx")).toString());
+    public static FileTemplate OAS_CHEAR = new FileTemplate("OAS", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/OAS.csv")).toString());
+    
+    public static List<FileTemplate> FILETEMPLATES = Arrays.asList(
+            DPL_GEN, STD_GEN, SSD_GEN, SDD_GEN, OAS_GEN, 
+            DPL_CHEAR, STD_CHEAR, SSD_CHEAR, SDD_CHEAR, OAS_CHEAR);
 
     public FileTemplate(String name, String template, String path) {
     	this.name = name;

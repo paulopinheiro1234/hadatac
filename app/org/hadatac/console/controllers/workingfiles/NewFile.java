@@ -34,12 +34,12 @@ import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import controllers.Assets;
+
 
 public class NewFile extends Controller {
 
@@ -47,15 +47,13 @@ public class NewFile extends Controller {
     private FormFactory formFactory;
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result index(String dir) {
+        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir) {
         return index(dir);
-    }
-
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir) {
- 
-        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir));
-
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -72,38 +70,24 @@ public class NewFile extends Controller {
         String newTemplate = data.getNewTemplate();
         String newName = data.getNewName();
 
-        FileType ft = FileType.find(newType);
-        FileTemplate tp = FileTemplate.find(newType, newTemplate);
-        		
-        //System.out.println("Creating new metadata file. type: [" + newType + "]  template: [" + newTemplate + "]   name: [" + newName + "]");
-        //System.out.println("Creating new metadata file. path: [" + tp.getPath() + "]  suffix: [" + ft.getSuffix() + "]");
+        FileType fileType = FileType.find(newType);
+        FileTemplate fileTemplate = FileTemplate.find(newType, newTemplate);
         
-        Environment env = Environment.simple();
-        //ReadResource resource = new ReadResource(controller.);
-        
-        //System.out.println( env.getFile("public/example/data/templates/STD.csv").getAbsolutePath());
         try  {
-            final File templateFile = env.getFile(tp.getPath());
-            
-            final InputStream inputStream = new FileInputStream(templateFile);
-            
-            String fileName = newType + "-" + newName + ft.getSuffix();
+            String fileName = newType + "-" + newName + fileType.getSuffix();
             
             DataFile dataFile = new DataFile(fileName);
             dataFile.setDir(dir);
             dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
             dataFile.setStatus(DataFile.WORKING);
             dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            dataFile.save();
+            
+            String url = ConfigFactory.load().getString("hadatac.console.host") + fileTemplate.getPath();
             
             File newFile = new File(dataFile.getAbsolutePath());
-            System.out.println("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
-            final Logger log = LoggerFactory.getLogger(this.getClass());
-            log.error("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
+            FileUtils.copyURLToFile(new URL(url), newFile);
             
-            byte[] byteFile = IOUtils.toByteArray(inputStream);
-            FileUtils.writeByteArrayToFile(newFile, byteFile);
-            inputStream.close();
+            dataFile.save();
         } catch(Exception e) {
             e.printStackTrace();
         }
