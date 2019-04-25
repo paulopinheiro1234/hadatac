@@ -26,6 +26,7 @@ import play.data.*;
 import org.hadatac.console.models.FileTemplate;
 import org.hadatac.console.models.FileType;
 import org.hadatac.console.models.NewFileForm;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.workingfiles.routes;
@@ -57,7 +58,6 @@ public class NewFile extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processForm(String dir) {
-    	
         Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
         NewFileForm data = form.get();
 
@@ -82,7 +82,7 @@ public class NewFile extends Controller {
         //System.out.println( env.getFile("public/example/data/templates/STD.csv").getAbsolutePath());
         try  {
             final File templateFile = env.getFile(tp.getPath());
-            final InputStream inputStream = new DataInputStream(new FileInputStream(templateFile));
+            final InputStream inputStream = new FileInputStream(templateFile);
             
             String fileName = newType + "-" + newName + ft.getSuffix();
             
@@ -93,15 +93,10 @@ public class NewFile extends Controller {
             dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             dataFile.save();
             
-            File newFile = new File(dataFile.getAbsolutePath());
-            OutputStream outStream = new FileOutputStream(newFile);
-            byte[] buffer = new byte[8 * 1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outStream.write(buffer, 0, bytesRead);
-            }
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outStream);
+            File newFile = new File(dataFile.getAbsolutePath());            
+            byte[] byteFile = IOUtils.toByteArray(inputStream);
+            FileUtils.writeByteArrayToFile(newFile, byteFile);
+            inputStream.close();
         } catch(Exception e) {
             e.printStackTrace();
         }
