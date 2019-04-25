@@ -34,6 +34,8 @@ import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -82,6 +84,7 @@ public class NewFile extends Controller {
         //System.out.println( env.getFile("public/example/data/templates/STD.csv").getAbsolutePath());
         try  {
             final File templateFile = env.getFile(tp.getPath());
+            
             final InputStream inputStream = new FileInputStream(templateFile);
             
             String fileName = newType + "-" + newName + ft.getSuffix();
@@ -93,7 +96,11 @@ public class NewFile extends Controller {
             dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             dataFile.save();
             
-            File newFile = new File(dataFile.getAbsolutePath());            
+            File newFile = new File(dataFile.getAbsolutePath());
+            System.out.println("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
+            final Logger log = LoggerFactory.getLogger(this.getClass());
+            log.error("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
+            
             byte[] byteFile = IOUtils.toByteArray(inputStream);
             FileUtils.writeByteArrayToFile(newFile, byteFile);
             inputStream.close();
