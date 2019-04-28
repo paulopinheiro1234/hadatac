@@ -558,8 +558,8 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processDeleteFolder(String dir) {	
-        List<DataFile> dfs = DataFile.findInDir(dir,DataFile.PROCESSED);
+    public Result processDeleteFolder(String dir) {
+        List<DataFile> dfs = DataFile.findInDir(dir, DataFile.PROCESSED);
         for (DataFile df : dfs) {
         	df.delete();
         }

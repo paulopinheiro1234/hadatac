@@ -1,10 +1,7 @@
-package org.hadatac.console.controllers.dataacquisitionsearch;
+package org.hadatac.console.models;
 
 import java.util.List;
 import java.util.Map;
-
-import org.hadatac.console.models.Facet;
-import org.hadatac.console.models.FacetHandler;
 
 public interface Facetable {
     

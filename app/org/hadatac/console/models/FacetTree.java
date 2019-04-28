@@ -1,12 +1,8 @@
-package org.hadatac.console.controllers.dataacquisitionsearch;
+package org.hadatac.console.models;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.hadatac.console.models.Facet;
-import org.hadatac.console.models.FacetHandler;
-import org.hadatac.console.models.Pivot;
 
 public class FacetTree {
 	
@@ -34,9 +30,9 @@ public class FacetTree {
 		}
 	}
 	
-        public void retrieveFacetData(int level, Facet facet, 
-			FacetHandler facetHandler, 
-			Pivot curPivot) {
+	public void retrieveFacetData(int level, Facet facet, 
+	        FacetHandler facetHandler, 
+	        Pivot curPivot) {
 		System.out.println("\n\n\nlevel " + level);
 		System.out.println("facetName: " + facet.getFacetName());
 		
