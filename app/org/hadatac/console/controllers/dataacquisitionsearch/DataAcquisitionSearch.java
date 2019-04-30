@@ -116,7 +116,7 @@ public class DataAcquisitionSearch extends Controller {
         System.out.println("\n\n\n\n\nfacets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();
-        facetHandler.loadFacets(facets);
+        facetHandler.loadFacetsFromString(facets);
 
         AcquisitionQueryResult results = null;
         String ownerUri;

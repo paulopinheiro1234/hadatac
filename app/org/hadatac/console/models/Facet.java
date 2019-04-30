@@ -3,7 +3,6 @@ package org.hadatac.console.models;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -132,24 +131,6 @@ public class Facet {
 		}
 	}
 	
-	public void tailor(Facet facet) {
-		if (facet == null) {
-			return;
-		}
-		
-		for (String field : getFieldValues().keySet()) {
-			if (facet.getFieldValues().containsKey(field)) {
-				Iterator<String> iter = getFieldValues().get(field).iterator();
-				while (iter.hasNext()) {
-					String value = iter.next();
-				    if (!facet.getFieldValues().get(field).contains(value)) {
-				    	iter.remove();
-				    }
-				}
-			}
-		}
-	}
-	
 	public List<String> getFacetValuesByField(String field) {
 		if (mapFieldValues.containsKey(field)) {
 			return mapFieldValues.get(field);
@@ -209,26 +190,12 @@ public class Facet {
 		return values;
 	}
 	
-	public void toSparqlConstraints(Map<String, List<String>> constraints) {
-        for (String field : getFieldValues().keySet()) {
-            if (!field.isEmpty()) {
-                if (!constraints.containsKey(field)) {
-                    constraints.put(field, new ArrayList<String>());
-                }
-                
-                for (String value : getFieldValues().get(field)) {
-                    if (!constraints.get(field).contains(value)) {
-                        constraints.get(field).add(value);
-                    }
-                }
-            }
-        }
-        
-        for (Facet f : getChildrenAsList()) {
-            f.toSparqlConstraints(constraints);
-        }
-    }
-	
+	/**
+     * To transform the constraints hold by this facet object 
+     * into an executable Solr query for getting data point 
+     * statistics.
+     * @return String An executable Solr query
+     */
 	public String toSolrQuery() {
 		List<String> fieldQueries = new ArrayList<>();
 		for (String field : getFieldValues().keySet()) {
@@ -261,23 +228,12 @@ public class Facet {
 		return wrapWithParentheses(query);
 	}
 	
-	public String currentLevelToSolrQuery() {
-		List<String> fieldQueries = new ArrayList<>();
-		for (String field : getFieldValues().keySet()) {
-			if (!getIgnoredFields().contains(field)) {
-			    fieldQueries.add(field + ":(" + String.join(", ", getFieldValues().get(field).stream().map(
-                        p -> "\"" + p + "\"").collect(Collectors.toList())) + ")");
-			}
-		}
-		
-		String facetsQuery = String.join(" AND ", fieldQueries.stream()
-				.filter(s -> !s.equals(""))
-				.map(s -> wrapWithParentheses(s))
-				.collect(Collectors.toList()));
-		
-		return wrapWithParentheses(facetsQuery);
-	}
-	
+	/**
+     * To transform the constraints hold by a dictionary of 
+     * field values into an executable Solr query for getting 
+     * data point statistics.
+     * @return String An executable Solr query
+     */
 	private String fieldValuesToSolrQuery(Map<String, List<String>> fieldValues) {
 		List<String> fieldQueries = new ArrayList<>();
 		
@@ -296,6 +252,12 @@ public class Facet {
 		return wrapWithParentheses(facetsQuery);
 	}
 	
+	/**
+     * To transform the constraints hold by the leaf node children
+     * of this facet object into an executable Solr query for getting 
+     * data point statistics.
+     * @return String An executable Solr query
+     */
 	public String bottommostFacetsToSolrQuery() {
 		List<String> fieldQueries = new ArrayList<>();
 		
@@ -324,6 +286,12 @@ public class Facet {
 		return str;
 	}
 	
+	/**
+     * To specify a list of facet field names that are not valid
+     * field names in the Solr schema and need to be ignored when
+     * constructing Solr queries
+     * @return List<String> A list of fields to be ignored
+     */
 	private List<String> getIgnoredFields() {
 		return Arrays.asList("indicator_uri_str", "entity_role_uri_str", 
 				"platform_uri_str", "instrument_uri_str", "dase_type_uri_str");

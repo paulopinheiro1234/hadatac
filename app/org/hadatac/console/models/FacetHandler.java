@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 
 public class FacetHandler {
 	
-	public Map<String, Facet> facetsAll;
+	public Map<String, Facet> facetCatalog = new HashMap<String, Facet>();
 	
 	public static final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
 	public static final String STUDY_FACET = "facetsS";
@@ -26,19 +26,18 @@ public class FacetHandler {
 	public static final String TIME_FACET = "facetsT";
 	public static final String PLATFORM_INSTRUMENT_FACET = "facetsPI";
 
-	public FacetHandler() { 
-		facetsAll = new HashMap<String, Facet>();
-		facetsAll.put(ENTITY_CHARACTERISTIC_FACET, new Facet());
-		facetsAll.put(STUDY_FACET, new Facet());
-		facetsAll.put(OBJECT_COLLECTION_FACET, new Facet());
-		facetsAll.put(UNIT_FACET, new Facet());
-		facetsAll.put(TIME_FACET, new Facet());
-		facetsAll.put(PLATFORM_INSTRUMENT_FACET, new Facet());
+	public FacetHandler() {
+	    facetCatalog.put(ENTITY_CHARACTERISTIC_FACET, new Facet());
+	    facetCatalog.put(STUDY_FACET, new Facet());
+		facetCatalog.put(OBJECT_COLLECTION_FACET, new Facet());
+		facetCatalog.put(UNIT_FACET, new Facet());
+		facetCatalog.put(TIME_FACET, new Facet());
+		facetCatalog.put(PLATFORM_INSTRUMENT_FACET, new Facet());
 	}
 	
 	public Facet getFacetByName(String facetName) {
-		if (facetsAll.containsKey(facetName)) {
-			return facetsAll.get(facetName);
+		if (facetCatalog.containsKey(facetName)) {
+			return facetCatalog.get(facetName);
 		}
 		
 		return null;
@@ -47,9 +46,9 @@ public class FacetHandler {
 	@SuppressWarnings("unchecked")
 	public List<String> getValuesByFacetField(String facetName, String fieldName) {
 		List<String> results = new ArrayList<String>();
-		if (facetsAll.containsKey(facetName)) {
-			if (((Map<String, List<String>>)facetsAll.get(facetName)).containsKey(fieldName)) {
-				for (String value : ((Map<String, List<String>>)facetsAll.get(facetName)).get(fieldName)) {
+		if (facetCatalog.containsKey(facetName)) {
+			if (((Map<String, List<String>>)facetCatalog.get(facetName)).containsKey(fieldName)) {
+				for (String value : ((Map<String, List<String>>)facetCatalog.get(facetName)).get(fieldName)) {
 					if (!results.contains(value)) {
 						results.add(value);
 					}
@@ -61,10 +60,14 @@ public class FacetHandler {
 	}
 	
 	public String values(String facetName) {
-		List<String> results = facetsAll.get(facetName).values();
+		List<String> results = facetCatalog.get(facetName).values();
 		return (new Gson()).toJson(results);
 	}
 
+	/**
+     * To serialize this object into a JSON string
+     * @return String A JSON string
+     */
 	public String toJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -76,7 +79,13 @@ public class FacetHandler {
 		return "";
 	}
 	
-	public void loadFacets(String str) {
+	/**
+     * To construct the facet catalog given a JSON string from
+     * the front end
+     * @param str A JSON string
+     * @return Nothing
+     */
+	public void loadFacetsFromString(String str) {
 		if (str == null || str.equals("")) {
 			// Default facets
 			str = "{\"facetsEC\":[],\"facetsS\":[],\"facetsOC\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
@@ -85,22 +94,22 @@ public class FacetHandler {
 		try {
 			JSONObject obj = (JSONObject)(new JSONParser().parse(str));
 			Facet facet = Facet.loadFacet(obj.get(ENTITY_CHARACTERISTIC_FACET), ENTITY_CHARACTERISTIC_FACET);
-			facetsAll.put(ENTITY_CHARACTERISTIC_FACET, facet);
+			facetCatalog.put(ENTITY_CHARACTERISTIC_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(STUDY_FACET), STUDY_FACET);
-			facetsAll.put(STUDY_FACET, facet);
+			facetCatalog.put(STUDY_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(OBJECT_COLLECTION_FACET), OBJECT_COLLECTION_FACET);
-			facetsAll.put(OBJECT_COLLECTION_FACET, facet);
+			facetCatalog.put(OBJECT_COLLECTION_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(UNIT_FACET), UNIT_FACET);
-			facetsAll.put(UNIT_FACET, facet);
+			facetCatalog.put(UNIT_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(TIME_FACET), TIME_FACET);
-			facetsAll.put(TIME_FACET, facet);
+			facetCatalog.put(TIME_FACET, facet);
 			
 			facet = Facet.loadFacet(obj.get(PLATFORM_INSTRUMENT_FACET), PLATFORM_INSTRUMENT_FACET);
-			facetsAll.put(PLATFORM_INSTRUMENT_FACET, facet);
+			facetCatalog.put(PLATFORM_INSTRUMENT_FACET, facet);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -108,40 +117,18 @@ public class FacetHandler {
 		return;
 	}
 	
-	public Map<String, List<String>> getTempSparqlConstraints(Facet facet) {
-        System.out.println("getTempSparqlConstraints() facet.getFacetName(): " + facet.getFacetName());
-        
-        Map<String, List<String>> constraints = new HashMap<String, List<String>>();
-        Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Facet> entry = (Map.Entry<String, Facet>)iter.next();
-            if (!entry.getKey().equals(facet.getFacetName())) {
-                entry.getValue().toSparqlConstraints(constraints);
-            }
-        }
-        
-        facet.toSparqlConstraints(constraints);
-        
-        return constraints;
-    }
-	
-	public String getTempSolrQuery(Facet facet, String field, List<String> values) {
-		for (String val : values) {
-			facet.putFacet(field, val);
-		}
-		String query = toSolrQuery();
-		for (String val : values) {
-			facet.removeFacet(field, val);
-		}
-		
-		return query;
-	}
-	
+	/**
+     * To transform the constraints hold by a given facet object
+     * into an executable Solr query for getting its corresponding
+     * data point statistics.
+     * @param facet The facet to be transformed
+     * @return String An executable Solr query
+     */
 	public String getTempSolrQuery(Facet facet) {
 		System.out.println("getTempSolrQuery() facet.getFacetName(): " + facet.getFacetName());
 		
 		List<String> facetQueries = new ArrayList<String>();
-		Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();
+		Iterator<Map.Entry<String, Facet>> iter = facetCatalog.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<String, Facet> entry = (Map.Entry<String, Facet>)iter.next();
 			if (!entry.getKey().equals(facet.getFacetName())) {
@@ -165,34 +152,18 @@ public class FacetHandler {
 		return query;
 	}
 
+	/**
+	   * To transform the constraints specified by user selections
+	   * for all facets into an executable Solr query for getting
+	   * data point statistics.
+	   * @return String Executable Solr queries
+	   */
 	public String toSolrQuery() {
 		List<String> facetQueries = new ArrayList<String>();
-		Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();
+		Iterator<Map.Entry<String, Facet>> iter = facetCatalog.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<String, Facet> entry = (Map.Entry<String, Facet>)iter.next();
 			facetQueries.add(entry.getValue().toSolrQuery());
-		}
-		
-		String query = "";
-		query = String.join(" AND ", facetQueries.stream()
-				.filter(s -> !s.equals(""))
-				.collect(Collectors.toList()));
-		
-		if (query.isEmpty()) {
-			query = "*:*";
-		} else {
-			query = "(" + query + ")"; 
-		}
-		
-		return query;
-	}
-	
-	public String bottommostFacetsToSolrQuery() {
-		List<String> facetQueries = new ArrayList<String>();
-		Iterator<Map.Entry<String, Facet>> iter = facetsAll.entrySet().iterator();
-		while (iter.hasNext()) {
-			Map.Entry<String, Facet> entry = (Map.Entry<String, Facet>)iter.next();
-			facetQueries.add(entry.getValue().bottommostFacetsToSolrQuery());
 		}
 		
 		String query = "";

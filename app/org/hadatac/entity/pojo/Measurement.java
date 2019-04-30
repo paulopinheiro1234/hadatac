@@ -594,10 +594,10 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
         FacetHandler facetHandler = new FacetHandler();
-        facetHandler.loadFacets(facets);
+        facetHandler.loadFacetsFromString(facets);
 
         FacetHandler retFacetHandler = new FacetHandler();
-        retFacetHandler.loadFacets(facets);
+        retFacetHandler.loadFacetsFromString(facets);
 
         // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
         // System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
