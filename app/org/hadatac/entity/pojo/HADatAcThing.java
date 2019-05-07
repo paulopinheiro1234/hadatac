@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.api.MetadataFactory;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QuerySolution;
@@ -28,7 +29,6 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.ReversedPropertyField;
 import org.hadatac.annotations.Subject;
-import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.http.SPARQLUtils;
 
 

@@ -25,47 +25,47 @@ public class Pivot {
     public String getField() {
         return field;
     }
-    
+
     public void setField(String field) {
         this.field = field;
     }
-    
+
     public String getValue() {
         return value;
     }
-    
+
     public void setValue(String value) {
         this.value = value;
     }
-    
+
     public String getTooltip() {
         return tooltip;
     }
-    
+
     public void setTooltip(String tooltip) {
         this.tooltip = tooltip;
     }
-    
+
     public int getCount() {
         return count;
     }
-    
+
     public void setCount(int count) {
         this.count = count;
     }
-    
+
     public String getQuery() {
         return query;
     }
-    
+
     public void setQuery(String query) {
         this.query = query;
-	//System.out.println("Pivot: query set: [" + query + "]");
+        //System.out.println("Pivot: query set: [" + query + "]");
     }
-    
+
     public void addChild(Pivot child) {
         children
-.add(child);
+        .add(child);
     }
 
     public int recomputeStats() {
@@ -137,7 +137,7 @@ public class Pivot {
 
         return pivot;
     }
-    
+
     @Override
     public String toString() {
         return Json.toJson(this).toString();

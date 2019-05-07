@@ -33,10 +33,10 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
 import org.labkey.remoteapi.CommandException;
-import org.hadatac.console.controllers.dataacquisitionsearch.Facetable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 
