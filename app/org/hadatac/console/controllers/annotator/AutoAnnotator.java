@@ -561,7 +561,38 @@ public class AutoAnnotator extends Controller {
     public Result processDeleteFolder(String dir) {	
         List<DataFile> dfs = DataFile.findInDir(dir,DataFile.PROCESSED);
         for (DataFile df : dfs) {
-        	df.delete();
+            File file = new File(df.getAbsolutePath());
+            System.out.println(df.getAbsolutePath() + "  " + df.getPureFileName());
+            
+            if (df.getPureFileName().startsWith("DA-")) {
+                Measurement.deleteFromSolr(df.getDatasetUri());
+                NameSpace.deleteTriplesByNamedGraph(URIUtils.replacePrefixEx(df.getDataAcquisitionUri()));
+            } else {
+                try {
+                    deleteAddedTriples(file, df);
+                } catch (Exception e) {
+                    System.out.print("Can not delete triples ingested by " + df.getFileName() + " ..");
+                    file.delete();
+                    df.delete();
+                    
+                    return redirect(routes.AutoAnnotator.index(dir, "."));
+                }
+            }
+            file.delete();
+            df.delete();
+        }
+        DataFile folder = new DataFile(dir);
+        File folderFile = new File(folder.getAbsolutePath());
+		System.out.println(folder.getFileName());
+		System.out.println(folderFile.getAbsolutePath() + "  " + folderFile.getName());
+        if (folderFile.exists()) {
+        	try { 
+        		folderFile.delete();
+        		folder.delete();
+            } catch (Exception e) {
+                System.out.print("Can not delete folder " + dir + " itself");
+                return redirect(routes.AutoAnnotator.index(dir, "."));
+            }
         }
         return redirect(routes.AutoAnnotator.index(dir, ".."));
     }
