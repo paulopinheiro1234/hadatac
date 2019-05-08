@@ -15,10 +15,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -47,10 +43,17 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     public static String PREFIX = "PLT-";
 
     private String location;
-    private String firstCoordinate;
-    private String secondCoordinate;
-    private String thirdCoordinate;
+    private Float firstCoordinate;
+    private String firstCoordinateUnit;
+    private String firstCoordinateCharacteristic;
+    private Float secondCoordinate;
+    private String secondCoordinateUnit;
+    private String secondCoordinateCharacteristic;
+    private Float thirdCoordinate;
+    private String thirdCoordinateUnit;
+    private String thirdCoordinateCharacteristic;
     private String elevation;
+    private String partOf;
     private String serialNumber;
 
     public Platform(String uri,
@@ -68,6 +71,10 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         this.typeUri = "";
         this.label = "";
         this.comment = "";
+        this.location = "";
+        this.elevation = "";
+        this.partOf = "";
+        this.serialNumber = "";
     }
 
     public String getLocation() {
@@ -82,27 +89,71 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     public void setElevation(String elevation) {
         this.elevation = elevation;
     }
-    public String getFirstCoordinate() {
+    public Float getFirstCoordinate() {
         return firstCoordinate;
     }
-    public void setFirstCoordinate(String firstCoordinate) {
+    public void setFirstCoordinate(Float firstCoordinate) {
         this.firstCoordinate = firstCoordinate;
     }
+    public String getFirstCoordinateUnit() {
+        return firstCoordinateUnit;
+    }
+    public void setFirstCoordinateUnit(String firstCoordinateUnit) {
+        this.firstCoordinateUnit = firstCoordinateUnit;
+    }
+    public String getFirstCoordinateCharacteristic() {
+        return firstCoordinateCharacteristic;
+    }
+    public void setFirstCoordinateCharacteristic(String firstCoordinateCharacteristic) {
+        this.firstCoordinateCharacteristic = firstCoordinateCharacteristic;
+    }
 
-    public String getSecondCoordinate() {
+    public Float getSecondCoordinate() {
         return secondCoordinate;
     }
 
-    public void setSecondCoordinate(String secondCoordinate) {
+    public void setSecondCoordinate(Float secondCoordinate) {
         this.secondCoordinate = secondCoordinate;
     }
 
-    public String getThirdCoordinate() {
+    public String getSecondCoordinateUnit() {
+        return secondCoordinateUnit;
+    }
+
+    public void setSecondCoordinateUnit(String secondCoordinateUnit) {
+        this.secondCoordinateUnit = secondCoordinateUnit;
+    }
+
+    public String getSecondCoordinateCharacteristic() {
+        return secondCoordinateCharacteristic;
+    }
+
+    public void setSecondCoordinateCharacteristic(String secondCoordinateCharacteristic) {
+        this.secondCoordinateCharacteristic = secondCoordinateCharacteristic;
+    }
+
+    public Float getThirdCoordinate() {
         return thirdCoordinate;
     }
 
-    public void setThirdCoordinate(String thirdCoordinate) {
+    public void setThirdCoordinate(Float thirdCoordinate) {
         this.thirdCoordinate = thirdCoordinate;
+    }
+
+    public String getThirdCoordinateUnit() {
+        return thirdCoordinateUnit;
+    }
+
+    public void setThirdCoordinateUnit(String thirdCoordinateUnit) {
+        this.thirdCoordinateUnit = thirdCoordinateUnit;
+    }
+
+    public String getThirdCoordinateCharacteristic() {
+        return thirdCoordinateCharacteristic;
+    }
+
+    public void setThirdCoordinateCharacteristic(String thirdCoordinateCharacteristic) {
+        this.thirdCoordinateCharacteristic = thirdCoordinateCharacteristic;
     }
 
     public String getSerialNumber() {
@@ -110,6 +161,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     }
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
+    }
+
+    public String getPartOf() {
+        return partOf;
+    }
+    public void setPartOf(String partOf) {
+        this.partOf = partOf;
     }
 
     @Override
@@ -215,11 +273,25 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
                 platform.setSerialNumber(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinate")) {
-                platform.setFirstCoordinate(object.asLiteral().getString());
+                platform.setFirstCoordinate(object.asLiteral().getFloat());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinateUnit")) {
+                platform.setFirstCoordinateUnit(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinateCharacteristic")) {
+                platform.setFirstCoordinateCharacteristic(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinate")) {
-                platform.setSecondCoordinate(object.asLiteral().getString());
+                platform.setSecondCoordinate(object.asLiteral().getFloat());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinateUnit")) {
+                platform.setSecondCoordinateUnit(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinateCharacteristic")) {
+                platform.setSecondCoordinateCharacteristic(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinate")) {
-                platform.setThirdCoordinate(object.asLiteral().getString());
+                platform.setThirdCoordinate(object.asLiteral().getFloat());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinateUnit")) {
+            	platform.setThirdCoordinateUnit(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinateCharacteristic")) {
+            	platform.setThirdCoordinateCharacteristic(object.asResource().getURI());
+            } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/partOf")) {
+            	platform.setPartOf(object.asResource().getURI());
             }
         }
 
@@ -276,13 +348,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 platform.setComment(soln.getLiteral("comment").getString());
             }
             if(soln.getLiteral("lat") != null) {
-                platform.setFirstCoordinate(soln.getLiteral("lat").getString());
+                platform.setFirstCoordinate(soln.getLiteral("lat").getFloat());
             }
             if(soln.getLiteral("lon") != null) {
-                platform.setSecondCoordinate(soln.getLiteral("long").getString());
+                platform.setSecondCoordinate(soln.getLiteral("long").getFloat());
             }
             if(soln.getLiteral("ele") != null) {
-                platform.setThirdCoordinate(soln.getLiteral("ele").getString());
+                platform.setThirdCoordinate(soln.getLiteral("ele").getFloat());
                 platform.setLocation("(" + platform.getFirstCoordinate() + ", " 
                         + platform.getSecondCoordinate() + ", "
                         + platform.getThirdCoordinate() + ")");

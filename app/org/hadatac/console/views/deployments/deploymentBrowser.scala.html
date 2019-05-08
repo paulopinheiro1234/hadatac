@@ -1,7 +1,7 @@
 @(dir         : String,
   filename    : String,
   da_uri      : String,
-  documentMap : String)
+  coordinates : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -15,37 +15,62 @@
 
 @main("Deployment Browser") {
 	<head>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("d3-geomap/css/d3.geomap.css")"/>
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("d3-geomap/vendor/d3.geomap.dependencies.min.js")"></script>
-		<script type="text/javascript" src="@controllers.routes.Assets.versioned("d3-geomap/js/d3.geomap.min.js")"></script>
+        <style>svg{width:100%;height:500px;margin:0px auto;}</style>
 	</head>
     <body>
 
-    <div class="container-fluid">
-        <h4>Deployment Browser</h4>
+	<h4>Deployment Browser</h4>
     
-    	<div class="row">
-        	<div class="col-lg-12">
-		        <div id="map"></div>
-			</div>
-		</div>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
 
-		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary" 
-	       role="button">Back to Search Studies</a>  		
-	</div>
+	<!-- 
+    <script src="https://unpkg.com/d3@@4"></script>
+    <script src="https://unpkg.com/topojson-client@@3"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>  
+    -->
+    <svg></svg>
+	<script>
 
-  <script>
+        // For each orgchart box, provide the name, manager, and tooltip to show.
+        var encodedDataStr = '@coordinates';
+        var dataStr = encodedDataStr.replace(/&#x27;/g,"'");
+	    //alert(dataStr);
+        var arrays = eval(dataStr);
+        //data.addRows(arrays);				
 
-    // For each orgchart box, provide the name, manager, and tooltip to show.
-    var encodedDataStr = '@documentMap';
-    var dataStr = '[' + encodedDataStr.replace(/&#x27;/g,"'") + ']';
-	//alert(dataStr);
-    var arrays = eval(dataStr);
-    //data.addRows(arrays);				
+		// set projection
+		var projection = d3.geo.mercator();
 
-    var map = d3.geomap()
-       .geofile('@controllers.routes.Assets.versioned("d3-geomap/topojson/world/countries.json")')
-       .draw(d3.select('#map'));
-  </script>
+		// create path variable
+		var path = d3.geo.path()
+    		.projection(projection);
+
+	    // points
+    	aa = [-73.0, 42.0];
+		bb = [-122.389809, 37.72728];
+
+		var svg = d3.select("svg");
+
+        d3.json("@controllers.routes.Assets.versioned("lib/110m.json")", function(error, world) {
+           	if (error) throw error;
+           	svg.selectAll("path")
+                .data(topojson.feature(world,world.objects.countries).features)
+                .enter().append("path")
+                .style("fill", "steelblue")
+                .attr("d", path);
+                
+        	// add circles to svg
+    		svg.selectAll("circle")
+				.data([[-73.0, 42.0],[-122.389809, 37.72728]]).enter()
+				.append("circle")
+				.attr("cx", function (d) { return projection(d)[0]; })
+				.attr("cy", function (d) { return projection(d)[1]; })
+				.attr("r", "8px")
+				.attr("fill", "red")
+           
+        });
+    </script>
 }
 
