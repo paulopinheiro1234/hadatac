@@ -57,6 +57,7 @@
       DropSheet({
         data: data,
         file: _file,
+        filetype: "@dataFile.getFileExtention()",
         drop: _target,
         upload: _upload,
         upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",

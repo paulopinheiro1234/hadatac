@@ -10,6 +10,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+
 public class ExcelPreview extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -26,6 +27,19 @@ public class ExcelPreview extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String fileId, boolean bSavable) {
         return index(fileId, bSavable);
+    }
+    
+    public Result fromSharedLink(String sharedId) {
+        DataFile dataFile = DataFile.findBySharedId(sharedId);
+        if (null == dataFile) {
+            return badRequest("Invalid link!");
+        }
+        
+        return ok(excel_preview.render(dataFile, false));
+    }
+    
+    public Result postFromSharedLink(String sharedId) {
+        return fromSharedLink(sharedId);
     }
 }
 

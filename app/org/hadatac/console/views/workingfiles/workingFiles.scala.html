@@ -101,21 +101,15 @@
                 }
                 <td>@file.getSubmissionTime()</td>
                 <td>
-                @if(file.getFileName().endsWith(".csv")) {
-                    @defining("") { da_uri => @defining("") { oc_uri => 
-                       <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.WORKING, dir, file.getId(), da_uri, oc_uri, 10, 1)" 
-			              class="btn btn-xs btn-primary" role="button">Preview File</a>
-		               <a href="" class="btn btn-xs btn-primary disabled" role="button" id="edit">Edit</a>
-                    }}}
-                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls") || file.getFileName().endsWith(".csv")) {
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                 }
                 </td>
                 <td>
-                <a href="" class="btn btn-xs btn-primary disabled" role="button" id="rename">Rename</a>
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.renameDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="rename">Rename</a>
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
-                <a href="" class="btn btn-xs btn-primary disabled" role="button" id="share">Share</a>
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.getLinkForSharing(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="share">Share</a>
 
 				@*
                 @if(bAdmin) {
