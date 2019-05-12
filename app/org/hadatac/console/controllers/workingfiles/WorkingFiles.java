@@ -155,7 +155,7 @@ public class WorkingFiles extends Controller {
             return badRequest(renameFile.render(dir, dataFile));
         } else {
             String newFileName = Paths.get(data.getNewName()).getFileName().toString();
-            String newFilePath = Paths.get(Paths.get(dataFile.getAbsolutePath()).getParent().getFileName().toString(), newFileName).toString();
+            String newFilePath = Paths.get(Paths.get(dataFile.getAbsolutePath()).getParent().toString(), newFileName).toString();
             
             File originalFile = new File(dataFile.getAbsolutePath());
             File newFile = new File(newFilePath);
@@ -163,9 +163,7 @@ public class WorkingFiles extends Controller {
                 return badRequest("A file with the new name already exists in the current folder!");
             } else {
                 try {
-                    newFile.createNewFile();
-                    Files.copy(originalFile, newFile);
-                    
+                    originalFile.renameTo(newFile);
                     originalFile.delete();
                     
                     dataFile.setFileName(newFileName);
