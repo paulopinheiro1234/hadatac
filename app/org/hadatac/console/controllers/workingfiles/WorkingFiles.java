@@ -161,11 +161,14 @@ public class WorkingFiles extends Controller {
             if (newFile.exists()) {
                 return badRequest("A file with the new name already exists in the current folder!");
             } else {
-                originalFile.renameTo(newFile);
-                originalFile.delete();
-                
-                dataFile.setFileName(newFileName);
-                dataFile.save();
+                if (originalFile.renameTo(newFile)) {
+                    originalFile.delete();
+                    
+                    dataFile.setFileName(newFileName);
+                    dataFile.save();
+                } else {
+                    return badRequest("Failed to rename the target file!");
+                }
             }
             
             return redirect(routes.WorkingFiles.index(dir, "."));
