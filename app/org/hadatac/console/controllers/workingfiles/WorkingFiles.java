@@ -45,6 +45,7 @@ import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
 
+import com.google.common.io.Files;
 import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -161,12 +162,16 @@ public class WorkingFiles extends Controller {
             if (newFile.exists()) {
                 return badRequest("A file with the new name already exists in the current folder!");
             } else {
-                if (originalFile.renameTo(newFile)) {
-                    originalFile.delete();
+                try {
+                    Files.copy(originalFile, newFile);
                     
-                    dataFile.setFileName(newFileName);
-                    dataFile.save();
-                } else {
+                    if (newFile.exists()) {
+                        originalFile.delete();
+                        
+                        dataFile.setFileName(newFileName);
+                        dataFile.save();
+                    }
+                } catch (Exception e) {
                     return badRequest("Failed to rename the target file!");
                 }
             }
