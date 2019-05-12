@@ -133,7 +133,7 @@ public class WorkingFiles extends Controller {
     } 
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processRenameDataFileForm(String dir, String fileId) {
+    public Result processRenameDataFileForm(String dir, String fileId) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
@@ -172,8 +172,8 @@ public class WorkingFiles extends Controller {
                         dataFile.save();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    return badRequest("Failed to rename the target file!");
+                    throw e;
+                    // return badRequest("Failed to rename the target file!");
                 }
             }
             
