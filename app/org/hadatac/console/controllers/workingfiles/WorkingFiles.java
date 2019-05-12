@@ -163,17 +163,15 @@ public class WorkingFiles extends Controller {
                 return badRequest("A file with the new name already exists in the current folder!");
             } else {
                 try {
+                    newFile.createNewFile();
                     Files.copy(originalFile, newFile);
                     
-                    if (newFile.exists()) {
-                        originalFile.delete();
-                        
-                        dataFile.setFileName(newFileName);
-                        dataFile.save();
-                    }
+                    originalFile.delete();
+                    
+                    dataFile.setFileName(newFileName);
+                    dataFile.save();
                 } catch (Exception e) {
-                    throw e;
-                    // return badRequest("Failed to rename the target file!");
+                    return badRequest("Failed to rename the target file!");
                 }
             }
             
