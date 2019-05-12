@@ -172,6 +172,7 @@ public class WorkingFiles extends Controller {
                         dataFile.save();
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return badRequest("Failed to rename the target file!");
                 }
             }
