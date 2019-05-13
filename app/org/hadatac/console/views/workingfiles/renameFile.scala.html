@@ -1,0 +1,52 @@
+@(dir : String,
+  dataFile : org.hadatac.entity.pojo.DataFile)
+
+@import helper._ 
+@import org.hadatac.utils._ 
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.deployments._
+@import org.hadatac.console.controllers.deployments._ 
+@import org.hadatac.console.controllers._ 
+@import org.hadatac.metadata.loader.URIUtils; 
+
+
+@main("Rename File") {
+
+<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	      
+	      if (document.getElementById('newName').value.length == 0) {
+	          cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	</script>
+
+	<div class="container">
+		<h3>Rename File</h3>
+	
+		<form class="form-horizontal" name="newFile" method="post" 
+		action="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.processRenameDataFileForm(dir, dataFile.getId())">
+	
+			<div class="form-group">
+				<label>In folder: @dir</label> 
+			</div>
+	
+			<div class="form-group">
+				<label>File Name</label>
+				<input type="text" class="form-control col-sm-6" name="newName" id="newName" value="@dataFile.getFileName()" onchange="checkform()">
+			</div>
+	
+			<div class="form-group" class="col-sm-6 col-offset-3">
+				<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" /> 
+				<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
+			</div>
+		</form>
+	</div>
+}

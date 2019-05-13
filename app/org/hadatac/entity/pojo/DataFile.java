@@ -60,6 +60,8 @@ public class DataFile implements Cloneable {
 
     @Field("id")
     private String id;
+    @Field("shared_id_str")
+    private String sharedId = "";
     @Field("file_name_str")
     private String fileName = "";
     @Field("dir_str")
@@ -124,6 +126,13 @@ public class DataFile implements Cloneable {
         this.id = id;
     }
     
+    public String getSharedId() {
+        return sharedId;
+    }
+    public void setSharedId(String sharedId) {
+        this.sharedId = sharedId;
+    }
+    
     public String getAbsolutePath() {
         if (getStatus().equals(UNPROCESSED)) {
             return Paths.get(ConfigProp.getPathUnproc(), getDir(), getFileName()).toString();
@@ -166,6 +175,10 @@ public class DataFile implements Cloneable {
     
     public File getFile() {
         return file;
+    }
+    
+    public String getFileExtention() {
+        return FilenameUtils.getExtension(fileName);
     }
 
     public String getOwnerEmail() {
@@ -357,6 +370,7 @@ public class DataFile implements Cloneable {
         DataFile object = new DataFile(SolrUtils.getFieldValue(doc, "file_name_str").toString());
 
         object.setId(SolrUtils.getFieldValue(doc, "id").toString());
+        object.setSharedId(SolrUtils.getFieldValue(doc, "shared_id_str").toString());
         object.setDir(SolrUtils.getFieldValue(doc, "dir_str").toString());
         object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
         object.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str").toString());
@@ -480,6 +494,19 @@ public class DataFile implements Cloneable {
     public static DataFile findByIdAndOwnerEmailAndStatus(String id, String ownerEmail, String status) {        
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "id:\"" + id + "\"");
+        query.set("rows", "10000000");
+
+        List<DataFile> results = findByQuery(query);
+        if (!results.isEmpty()) {
+            return results.get(0);
+        }
+
+        return null;
+    }
+    
+    public static DataFile findBySharedId(String id) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "shared_id_str:\"" + id + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);

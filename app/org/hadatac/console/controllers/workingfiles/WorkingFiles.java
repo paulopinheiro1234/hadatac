@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.LabKeyLoginForm;
+import org.hadatac.console.models.NewFileForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.annotator.*;
@@ -42,6 +44,9 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
+
+import com.google.common.io.Files;
+import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -102,6 +107,103 @@ public class WorkingFiles extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String dest) {
         return index(dir, dest);
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result renameDataFile(String dir, String fileId) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+        
+        return ok(renameFile.render(dir, dataFile));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postRenameDataFile(String dir, String fileId) {
+        return renameDataFile(dir, fileId);
+    } 
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processRenameDataFileForm(String dir, String fileId) throws Exception {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+        
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+        NewFileForm data = form.get();
+
+        if (form.hasErrors()) {
+            System.out.println("HAS ERRORS");
+            return badRequest(renameFile.render(dir, dataFile));
+        } else {
+            String newFileName = Paths.get(data.getNewName()).getFileName().toString();
+            String newFilePath = Paths.get(Paths.get(dataFile.getAbsolutePath()).getParent().toString(), newFileName).toString();
+            
+            File originalFile = new File(dataFile.getAbsolutePath());
+            File newFile = new File(newFilePath);
+            if (newFile.exists()) {
+                return badRequest("A file with the new name already exists in the current folder!");
+            } else {
+                try {
+                    originalFile.renameTo(newFile);
+                    originalFile.delete();
+                    
+                    dataFile.setFileName(newFileName);
+                    dataFile.save();
+                } catch (Exception e) {
+                    return badRequest("Failed to rename the target file!");
+                }
+            }
+            
+            return redirect(routes.WorkingFiles.index(dir, "."));
+        }
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result getLinkForSharing(String dir, String fileId) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to share this file!");
+        }
+        
+        String sharedId = dataFile.getSharedId();
+        if (sharedId.isEmpty()) {
+            sharedId = UUID.randomUUID().toString();
+            dataFile.setSharedId(sharedId);
+            dataFile.save();
+        }
+        
+        String sharedlink = ConfigFactory.load().getString("hadatac.console.host_deploy") + 
+                org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.fromSharedLink(sharedId).toString();
+        
+        return ok("<a style=\"color:#0000FF; font-size: large;\">Please copy this link for sharing: <br/><u>" + sharedlink 
+                + "</u><br/>With this link, one can preview the shared file!&#128521;</a>").as("text/html");
     }
     
     /*
