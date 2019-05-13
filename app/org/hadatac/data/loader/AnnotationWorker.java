@@ -41,10 +41,9 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
-
 public class AnnotationWorker {
 
-    public AnnotationWorker() {}
+	public AnnotationWorker() {}
 
     public static void scan() {
         DataFile.includeUnrecognizedFiles(
@@ -105,11 +104,13 @@ public class AnnotationWorker {
         });
 
         for (DataFile dataFile : unprocFiles) {
+        	//System.out.println("Processing file: " + dataFile.getFileName());
             dataFile.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             dataFile.save();
 
             String fileName = dataFile.getFileName();
 
+            // file is rejected if it already exists in the folder of processed files
             if (procFiles.contains(dataFile)) {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00002", fileName);
                 return;
@@ -117,12 +118,17 @@ public class AnnotationWorker {
 
             dataFile.getLogger().println(String.format("Processing file: %s", fileName));
 
+            // file is rejected if it has an invalid extension
             RecordFile recordFile = null;
             File file = new File(dataFile.getAbsolutePath());
             if (fileName.endsWith(".csv")) {
                 recordFile = new CSVRecordFile(file);
             } else if (fileName.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(file);
+            } else if (dataFile.isMediaFile()) {
+            	System.out.println("Process Media File: " + dataFile.getFileName());
+                processMediaFile(dataFile);
+                return;
             } else {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00003", fileName);
                 return;
@@ -175,6 +181,32 @@ public class AnnotationWorker {
         }
     }
 
+    /* 
+     * Move any file that isMediaFile() into a media folder in processed files.
+     * At the moment, no other kind of processing is performed by this code. 
+     */
+    public static void processMediaFile(DataFile dataFile) {
+    	//Move the file to the folder for processed files
+        String new_path = ConfigProp.getPathMedia();
+ 
+        String fileName = dataFile.getFileName();
+        File file = new File(dataFile.getAbsolutePath());
+
+        File destFolder = new File(new_path);
+        if (!destFolder.exists()) {
+            destFolder.mkdirs();
+        }
+
+        dataFile.setStatus(DataFile.PROCESSED);
+        dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        dataFile.setDir(ConfigProp.MEDIA_FOLDER);
+        dataFile.setStudyUri("");
+        dataFile.save();
+
+        file.renameTo(new File(destFolder + "/" + fileName));
+        file.delete();
+    }
+    
     public static void checkOASFile(DataFile dataFile) {
         System.out.println("OAS HERE!");
         final String kbPrefix = ConfigProp.getKbPrefix();

@@ -321,6 +321,14 @@ public class AutoAnnotator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String fileId) {
+    	if (fileId == null) {
+    		fileId = "";
+    	}
+    	if (DataFile.findById(fileId) == null || 
+    		DataFile.findById(fileId).getLogger() == null) {
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), 
+                    routes.AutoAnnotator.index(dir, ".").url()));
+    	}
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLogger().getLog()), 
                 routes.AutoAnnotator.index(dir, ".").url()));
@@ -530,6 +538,12 @@ public class AutoAnnotator extends Controller {
         }
         
         return ok(new File(dataFile.getAbsolutePath()));
+    }
+    
+    // access to media files does no require ownership verification
+    public Result downloadMediaFile(String mediaFileName) {
+        //System.out.println("MediaFile: " + Paths.get(ConfigProp.getPathProc(), "media", mediaFileName.replace("file://", "")).toString()); 
+        return ok(new File(Paths.get(ConfigProp.getPathProc(), "media", mediaFileName.replace("file://", "")).toString())); 
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))

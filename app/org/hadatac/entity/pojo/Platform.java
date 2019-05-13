@@ -21,6 +21,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -32,7 +33,6 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.labkey.remoteapi.CommandException;
-
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
@@ -55,6 +55,9 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     private String elevation;
     private String partOf;
     private String serialNumber;
+    private String image;
+    private String layout;
+    private String referenceLayout;
 
     public Platform(String uri,
             String typeUri,
@@ -98,12 +101,28 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     public String getFirstCoordinateUnit() {
         return firstCoordinateUnit;
     }
+    public String getFirstCoordinateUnitLabel() {
+        if (firstCoordinateUnit == null || firstCoordinateUnit.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(firstCoordinateUnit);
+    }
+
     public void setFirstCoordinateUnit(String firstCoordinateUnit) {
         this.firstCoordinateUnit = firstCoordinateUnit;
     }
+
     public String getFirstCoordinateCharacteristic() {
         return firstCoordinateCharacteristic;
     }
+
+    public String getFirstCoordinateCharacteristicLabel() {
+        if (firstCoordinateCharacteristic == null || firstCoordinateCharacteristic.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(firstCoordinateCharacteristic);
+    }
+
     public void setFirstCoordinateCharacteristic(String firstCoordinateCharacteristic) {
         this.firstCoordinateCharacteristic = firstCoordinateCharacteristic;
     }
@@ -120,12 +139,26 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         return secondCoordinateUnit;
     }
 
+    public String getSecondCoordinateUnitLabel() {
+        if (secondCoordinateUnit == null || secondCoordinateUnit.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(secondCoordinateUnit);
+    }
+
     public void setSecondCoordinateUnit(String secondCoordinateUnit) {
         this.secondCoordinateUnit = secondCoordinateUnit;
     }
 
     public String getSecondCoordinateCharacteristic() {
         return secondCoordinateCharacteristic;
+    }
+
+    public String getSecondCoordinateCharacteristicLabel() {
+        if (secondCoordinateCharacteristic == null || secondCoordinateCharacteristic.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(secondCoordinateCharacteristic);
     }
 
     public void setSecondCoordinateCharacteristic(String secondCoordinateCharacteristic) {
@@ -144,12 +177,26 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         return thirdCoordinateUnit;
     }
 
+    public String getThirdCoordinateUnitLabel() {
+        if (thirdCoordinateUnit == null || thirdCoordinateUnit.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(thirdCoordinateUnit);
+    }
+
     public void setThirdCoordinateUnit(String thirdCoordinateUnit) {
         this.thirdCoordinateUnit = thirdCoordinateUnit;
     }
 
     public String getThirdCoordinateCharacteristic() {
         return thirdCoordinateCharacteristic;
+    }
+
+    public String getThirdCoordinateCharacteristicLabel() {
+        if (thirdCoordinateCharacteristic == null || thirdCoordinateCharacteristic.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(thirdCoordinateCharacteristic);
     }
 
     public void setThirdCoordinateCharacteristic(String thirdCoordinateCharacteristic) {
@@ -166,8 +213,71 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     public String getPartOf() {
         return partOf;
     }
+
+    public List<Platform> getImmediateSubPlatforms() {
+        List<Platform> subPlatforms = new ArrayList<Platform>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?uri hasco:partOf <" + uri + "> . " + 
+                "} ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            Platform platform = find(soln.getResource("uri").getURI());
+            subPlatforms.add(platform);
+        }			
+
+        if (subPlatforms.size() > 1) {
+        	java.util.Collections.sort((List<Platform>) subPlatforms);
+        }
+        
+        return subPlatforms;
+    }
+    
+    public String getPartOfLabel() {
+        if (partOf == null || partOf.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(partOf);
+    }
+
     public void setPartOf(String partOf) {
         this.partOf = partOf;
+    }
+    
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+    
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
+    }
+    
+    public String getReferenceLayout() {
+        return referenceLayout;
+    }
+
+    public void setReferenceLayout(String referenceLayout) {
+        this.referenceLayout = referenceLayout;
+    }
+    
+    public String getTypeLabel() {
+    	PlatformType pltType = PlatformType.find(getTypeUri());
+    	if (pltType == null || pltType.getLabel() == null) {
+    		return "";
+    	}
+    	return pltType.getLabel();
     }
 
     @Override
@@ -292,6 +402,12 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
             	platform.setThirdCoordinateCharacteristic(object.asResource().getURI());
             } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/partOf")) {
             	platform.setPartOf(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasImage")) {
+                platform.setImage(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayout")) {
+                platform.setLayout(object.asLiteral().getString());
+            } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasReferenceLayout")) {
+                platform.setReferenceLayout(object.asResource().getURI());
             }
         }
 

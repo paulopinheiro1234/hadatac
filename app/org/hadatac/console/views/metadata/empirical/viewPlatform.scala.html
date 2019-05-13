@@ -1,0 +1,93 @@
+@(dir      : String,
+  fileId   : String,
+  da_uri   : String,
+  platform : org.hadatac.entity.pojo.Platform)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.entity.pojo.DataFile
+@import java.net._
+
+@main("View Platform") {
+
+<div>
+  <h3>Platform - @platform.getLabel()</h3>
+  <p><b>URI</b>: @platform.getUri()</p>
+  <p><b>Model</b>: @platform.getTypeLabel() (@platform.getTypeUri())</p>
+  <p><b>Serial Number</b>: @platform.getSerialNumber()</p>
+  @if(platform.getPartOf() != null && !platform.getPartOf().equals("")) {
+    <p><b>Part Of</b>: @platform.getPartOfLabel() 
+        (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getPartOf()</a>)</p>
+  }
+
+  @defining(platform.getImmediateSubPlatforms()) { subPlatforms => 	
+  
+    @if(subPlatforms != null && subPlatforms.size() > 0 ) {
+       <p><b>SubPlatforms:</b></p>
+       <ul>  
+       @for(sub <- subPlatforms) {
+ 		  <li>@sub.getLabel()
+          (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(sub.getUri(),"UTF-8"))">@sub.getUri()</a>)
+          </li>
+       }
+       </ul>
+    }
+  }
+  
+  <p><b>Location:</b></p>
+
+  <ul>
+	  @if(platform.getReferenceLayout() != null && !platform.getReferenceLayout().isEmpty()) {
+    	<p><b>Reference Layout</b>: @platform.getReferenceLayout() 
+        	(<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getReferenceLayout()</a>)</p>
+  	  }
+  	  <table class="table">
+   		<thead>
+        	<tr>
+             	<th>Coordinate</th>
+                <th>Value</th>
+                <th>Type</th>
+                <th>Unit</th>
+            </tr>
+         </thead>
+         <tbody>
+			<tr>
+ 				<td>First</td>
+ 				<td>@platform.getFirstCoordinate()</td>
+ 				<td>@platform.getFirstCoordinateCharacteristicLabel()</td>
+ 				<td>@platform.getFirstCoordinateUnitLabel()</td>
+			</tr>
+			<tr>
+ 				<td>Second</td>
+ 				<td>@platform.getSecondCoordinate()</td>
+ 				<td>@platform.getSecondCoordinateCharacteristicLabel()</td>
+ 				<td>@platform.getSecondCoordinateUnitLabel()</td>
+			</tr>
+			<tr>
+ 				<td>Third</td>
+ 				<td>@platform.getThirdCoordinate()</td>
+ 				<td>@platform.getThirdCoordinateCharacteristicLabel()</td>
+ 				<td>@platform.getThirdCoordinateUnitLabel()</td>
+			</tr>
+         </tbody>
+      </table>
+  </ul>
+  <p><b>Layout:</b> @platform.getLayout()</p>
+  @if(platform.getLayout() != null && !platform.getLayout().isEmpty()) {
+  	   @if(platform.getLayout().startsWith("file:///media/")) {
+		  <ul>
+    	     <img src="@DataFile.getMediaUrl(platform.getLayout())" alt="@platform.getLayout()" width="300">  
+    	  </ul>
+	   }
+  }
+  <p><b>Image</b>: @platform.getImage()</p>
+  @if(platform.getImage() != null && !platform.getImage().isEmpty()) {
+  	   @if(platform.getImage().startsWith("file:///media/")) {
+		  <ul>
+    	     <img src="@DataFile.getMediaUrl(platform.getImage())" alt="@platform.getImage()" width="300">  
+    	  </ul>
+	   }
+  }
+</div>
+
+}

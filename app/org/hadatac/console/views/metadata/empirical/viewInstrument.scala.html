@@ -1,0 +1,21 @@
+@(dir        : String,
+  fileId     : String,
+  da_uri     : String,
+  instrument : org.hadatac.entity.pojo.Instrument)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.entity.pojo.DataFile
+@import java.net._
+
+@main("View Instrument") {
+
+<div>
+  <h3>Instrument - @instrument.getLabel()</h3>
+  <p><b>URI</b>: @instrument.getUri()</p>
+  <p><b>Model</b>: @instrument.getTypeLabel() (@instrument.getTypeUri())</p>
+  <p><b>Serial Number</b>: @instrument.getSerialNumber()</p>
+  <p><b>Image</b>: @instrument.getImage()</p>
+</div>
+
+}

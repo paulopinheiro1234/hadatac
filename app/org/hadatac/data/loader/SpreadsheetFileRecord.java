@@ -72,8 +72,12 @@ public class SpreadsheetFileRecord implements Record {
                 strCellValue = dateFormat.format(cell.getDateCellValue());
             } else {
                 Double value = cell.getNumericCellValue();
-                Long longValue = value.longValue();
-                strCellValue = longValue.toString();
+                if (value % 1 == 0) { 
+                	Long longValue = value.longValue();
+                	strCellValue = longValue.toString();
+                } else {
+                	strCellValue = value.toString(); 
+                }
             }
             break;
         case Cell.CELL_TYPE_BOOLEAN:

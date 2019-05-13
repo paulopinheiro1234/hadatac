@@ -288,7 +288,7 @@ public class Deployment extends HADatAcThing {
     }
 
     public static Deployment find(String deployment_uri) {
-        System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
+        //System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
 
         Deployment deployment = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList();

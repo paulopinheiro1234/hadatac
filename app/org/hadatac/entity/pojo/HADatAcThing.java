@@ -1,6 +1,9 @@
 package org.hadatac.entity.pojo;
 
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -118,7 +121,16 @@ public abstract class HADatAcThing implements Facetable {
             this.uri = "";
             return;
         }
-        this.uri = URIUtils.replacePrefixEx(uri);
+        URI tmpUri = null;
+		try {
+			tmpUri = new URI(uri);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		if (tmpUri != null) {
+			String strUri = tmpUri.toASCIIString().trim();
+			this.uri = URIUtils.replacePrefixEx(strUri);
+		}
     }
 
     public String getTypeUri() {

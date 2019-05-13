@@ -1,30 +1,32 @@
-@(dir              : String,
-  fileId           : String,
-  da_uri           : String,
-  platformTypeList : List[org.hadatac.entity.pojo.PlatformType])
+@(dir                : String,
+  fileId             : String,
+  da_uri             : String,
+  instrumentTypeList : List[org.hadatac.entity.pojo.InstrumentType])
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Platform Type Management") {
+@main("Instrument Type Management") {
 
-    <h3>Platform Type Management</h3>
+    <h3>Instrument Type Management</h3>
     
     <h4>Management options</h4>
 
+	@*
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.index(dir, fileId, da_uri)"
-	      class="btn btn-primary" role="button">Create Platform Type</a>
+           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.NewInstrument.index(dir, fileId, da_uri)"
+	      class="btn btn-primary" role="button">Create Instrument Type</a>
          </div>
       </div>
    </div>
+   *@
 
    <hr>
 
-   <h4>Platforms</h4>
+   <h4>Instrument Types</h4>
    
     <div class="container-fluid">
         <table class="table">
@@ -37,8 +39,8 @@
               </tr>
             </thead>
             <tbody>
-              @for(platformType <- platformTypeList){
-	             @pltType_entry(dir, fileId, da_uri, platformType)
+              @for(instrumentType <- instrumentTypeList){
+	             @instType_entry(instrumentType)
               }
             </tbody>
         </table>

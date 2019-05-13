@@ -65,7 +65,7 @@ public class DeploymentBrowser extends Controller {
     				}
     			}
     			if (plt != null) {
-    				String geoCoord = "[" + plt.getFirstCoordinate() + "," + plt.getSecondCoordinate() + "]";
+    				String geoCoord = plt.getFirstCoordinate() + "," + plt.getSecondCoordinate();
     				if (!geoCoordinates.contains(geoCoord)) {
     					geoCoordinates.add(geoCoord);
     				}

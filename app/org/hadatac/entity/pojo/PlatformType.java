@@ -56,6 +56,14 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
         return map;
     }
 
+    public String getSuperClassLabel() {
+    	PlatformType superType = PlatformType.find(this.getSuperUri());
+    	if (superType == null || superType.getLabel() == null) {
+    		return "";
+    	}
+    	return superType.getLabel();
+    }
+
     public static PlatformType find(String uri) {
         PlatformType platformType = null;
         Model model;

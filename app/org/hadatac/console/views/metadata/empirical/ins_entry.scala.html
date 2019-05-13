@@ -1,4 +1,7 @@
-@(instrument : org.hadatac.entity.pojo.Instrument)
+@(dir        : String,
+  fileId     : String,
+  da_uri     : String,
+  instrument : org.hadatac.entity.pojo.Instrument)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
@@ -7,11 +10,11 @@
 
 <tr>
   <td>@if(instrument.getLabel() != null) { @instrument.getLabel() }</td>
-  <td>@if(instrument.getTypeUri() != null) { @instrument.getTypeUri() }</td>
+  <td>@if(instrument.getTypeLabel() != null) { @instrument.getTypeLabel() }</td>
   <td>@if(instrument.getComment() != null) { @instrument.getComment() }</td>
   <td>
-    <a href=""
-       class="btn-xs btn-primary disabled" role="button">View</a> 
+    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.viewInstrument(dir, fileId, da_uri, URLEncoder.encode(instrument.getUri(),"UTF-8"))" 
+       class="btn-xs btn-primary" role="button">View</a>
     <a href=""
        class="btn-xs btn-primary disabled" role="button">Edit</a>
     <a href=""

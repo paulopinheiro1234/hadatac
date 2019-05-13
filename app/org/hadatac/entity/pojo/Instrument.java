@@ -23,10 +23,10 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-
 public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 
 	private String serialNumber;
+	private String image;
 	
 	public String getSerialNumber() {
 		return serialNumber;
@@ -35,6 +35,22 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		this.serialNumber = serialNumber;
 	}
 	
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+    
+    public String getTypeLabel() {
+    	InstrumentType insType = InstrumentType.find(getTypeUri());
+    	if (insType == null || insType.getLabel() == null) {
+    		return "";
+    	}
+    	return insType.getLabel();
+    }
+
 	@Override
 	public boolean equals(Object o) {
 		if((o instanceof Instrument) && (((Instrument)o).getUri().equals(this.getUri()))) {
@@ -155,7 +171,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
-		    Instrument instrument = find(soln.getResource("uri").getURI());
+		    Instrument instrument = find(soln.getResource("uri").getURI().trim());
 			instruments.add(instrument);
 		}			
 		
@@ -164,7 +180,6 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 	}
 	
 	public static List<Instrument> findDeployed() {
-	    //System.out.println("Inside Lits<Instrument> findAvailable()");
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		    " SELECT ?uri WHERE { " +
@@ -181,7 +196,7 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		
 		while (resultsrw.hasNext()) {
 		    QuerySolution soln = resultsrw.next();
-		    Instrument instrument = find(soln.getResource("uri").getURI());
+		    Instrument instrument = find(soln.getResource("uri").getURI().trim());
 		    instruments.add(instrument);
 		}			
 
@@ -208,11 +223,13 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    statement = stmtIterator.next();
 		    object = statement.getObject();
 		    if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-			instrument.setLabel(object.asLiteral().getString());
+		    	instrument.setLabel(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+                instrument.setTypeUri(object.asResource().getURI());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
-			instrument.setSerialNumber(object.asLiteral().getString());
+		    	instrument.setSerialNumber(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
-			instrument.setComment(object.asLiteral().getString());
+		    	instrument.setComment(object.asLiteral().getString());
 		    }
 		}
 		

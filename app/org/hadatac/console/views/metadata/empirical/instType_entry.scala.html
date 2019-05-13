@@ -1,0 +1,16 @@
+@(instrumentType : org.hadatac.entity.pojo.InstrumentType)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+  <td>@if(instrumentType.getLabel() != null)   { @instrumentType.getLabel() }</td>
+  <td>@if(instrumentType.getSuperLabel() != null)   { @instrumentType.getSuperLabel() }</td>
+  <td>@if(instrumentType.getComment() != null) { @instrumentType.getComment() }</td>
+  <td>
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">View</a> 
+  </td>
+</tr>

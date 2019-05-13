@@ -31,6 +31,15 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
 		super(className);
 	}
 
+    public String getSuperLabel() {
+    	InstrumentType superInsType = InstrumentType.find(getSuperUri());
+    	if (superInsType == null || superInsType.getLabel() == null) {
+    		return "";
+    	}
+    	return superInsType.getLabel();
+    }
+
+
 	public static List<InstrumentType> find() {
 		List<InstrumentType> instrumentTypes = new ArrayList<InstrumentType>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +

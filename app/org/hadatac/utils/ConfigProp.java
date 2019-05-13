@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.hadatac.console.controllers.sandbox.Sandbox;
@@ -15,11 +16,14 @@ import org.json.simple.JSONArray;
 import com.typesafe.config.ConfigFactory;
 
 public class ConfigProp {
+
 	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
 	
 	public static final String GUI_CONFIG_FILE = "gui.config";
 	
 	public static final String LABKEY_CONFIG_FILE = "labkey.config";
+	
+	public static final String MEDIA_FOLDER = "media";
 	
 	private static Properties getProperties(String confFileName) {
 		Properties prop = new Properties();
@@ -84,6 +88,10 @@ public class ConfigProp {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + Sandbox.SUFFIX;
 	    }
 	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
+	}
+	
+	public static String getPathMedia() {
+	    return Paths.get(getPathProc(), "/" + MEDIA_FOLDER + "/").toString();
 	}
 	
 	public static String getPathDownload() {

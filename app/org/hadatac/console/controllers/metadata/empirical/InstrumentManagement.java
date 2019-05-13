@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.metadata.empirical;
 import java.util.List;
 
 import org.hadatac.entity.pojo.Instrument;
+import org.hadatac.entity.pojo.Platform;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -25,4 +26,20 @@ public class InstrumentManagement extends Controller {
     public Result postIndex(String dir, String filename, String da_uri) {
         return index(dir, filename, da_uri);
     }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result viewInstrument(String dir, String filename, String da_uri, String instrument_uri) {
+    	try {
+    	    instrument_uri = java.net.URLDecoder.decode(instrument_uri,"UTF8");
+    	} catch (Exception e) {
+    	}    	
+    	Instrument instrument = Instrument.find(instrument_uri);
+        return ok(viewInstrument.render(dir, filename, da_uri, instrument));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public Result postViewInstrument(String dir, String filename, String da_uri, String instrument_uri) {
+        return viewInstrument(dir, filename, da_uri, instrument_uri);
+    }
+
 }

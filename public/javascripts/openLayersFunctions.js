@@ -6,7 +6,7 @@
 //<div style="width:95%; height:500px" id="map"></div>
 
 
-function createMap(locations){
+function createMap(locations, imgurl){
 
     var map;
 
@@ -35,6 +35,7 @@ function createMap(locations){
     }
 
     if (bbox){
+    	alert(bbox);
         if (bbox.length == 4){
             center_lat = bbox[0] + ((bbox[1] - bbox[0]) / 2);
             center_lon = bbox[2] + ((bbox[3] - bbox[2]) / 2);
@@ -57,11 +58,6 @@ function createMap(locations){
             osm // to Spherical Mercator
         );
 
-    //Create the markers layer
-    //This is used to add the icons which mark the locations on the map
-    var markers = new OpenLayers.Layer.Markers( "Markers" );
-    map.addLayer(markers);
-
     //Can optionally mark the center of the map
     //markers.addMarker(new OpenLayers.Marker(centerlonlat));
 
@@ -71,18 +67,121 @@ function createMap(locations){
     var instance_lat;
     var instance_lonlat;
 
+    //var features = [];
+
     //Add the markers to the map
     if (locations){
-        for (i = 0; i < locations.length - 1; i = i + 2){
+
+        //Create the markers layer
+        //This is used to add the icons which mark the locations on the map
+        var markers = new OpenLayers.Layer.Markers( "Markers" );
+        map.addLayer(markers);
+        //var markers = new OpenLayers.Layer.Vector( "Markers" );
+    	
+    	for (i = 0; i < locations.length - 1; i = i + 2){
             instance_lon = parseFloat(locations[i+1]);
             instance_lat = parseFloat(locations[i]);
-            instance_lonlat = new OpenLayers.LonLat(instance_lon, instance_lat).transform(
-                    epsg, osm
+            instance_lonlat = new OpenLayers.LonLat(instance_lon, instance_lat).transform(epsg, osm);
+
+            //Make the feature a plain OpenLayers marker
+            var marker = new OpenLayers.Marker(instance_lonlat);
+            
+            /*
+            var marker = new OpenLayers.Feature.Vector(
+            	new OpenLayers.Geometry.Point(instance_lon, instance_lat).transform(epsg, osm),
+            	{description:'This is the value of<br>the description attribute'} ,
+            //	{externalGraphic: imgurl, graphicHeight: 25, graphicWidth: 21, graphicXOffset:-12, graphicYOffset:-25  }
+            	{
+                    fillColor       : '#008040',
+                    fillOpacity     : 0.8,                    
+                    strokeColor     : "#ee9900",
+                    strokeOpacity   : 1,
+                    strokeWidth     : 1,
+                    pointRadius     : 8,
+                    externalGraphic : imgurl, 
+                    graphicHeight   : 25, 
+                    graphicWidth    : 21, 
+                    graphicXOffset  :-12, 
+                    graphicYOffset  :-25
+                }
             );
-            markers.addMarker(new OpenLayers.Marker(instance_lonlat));
+
+            features.push(marker);
+            */
+            
+            markers.addMarker(marker);
+            markers.events.register('click', marker, function(evt) {
+            	alert("HERE");
+            });      
         }
+
+    	/*
+        // Feature's popup support 
+        var markers = new OpenLayers.Layer.Vector("Points",{
+            eventListeners:{
+                'featureselected': function(evt) {
+                	var feature = evt.feature;
+                	var popup = new OpenLayers.Popup.FramedCloud("popup",
+                			OpenLayers.LonLat.fromString(feature.geometry.toShortString()),
+                			//instance_lonlat,
+                			null,
+                			'<div>Hello World! Put your html here</div>',
+                			null,
+                			false);
+                	map.addPopup(popup);
+                },
+                'featureunselected': function(evt) {
+                	var feature = evt.feature;
+                	map.removePopup(feature.popup);
+                	feature.popup.destroy();
+                	feature.popup = null;
+                }
+            }
+        });
+        */        	
+  	
+
+        /*
+        markers.addFeatures(features);
+
+        var selector = new OpenLayers.Control.SelectFeature(markers, {
+        	hover: true
+        });
+        */
+    	
+        //map.addLayer(markers);
+        //map.addControl(selector);
     }
 
+    /*
+    selectControl.events.register(
+    		'featurehighlighted', 
+    		null, 
+    		function (evt) {
+    		    // Needed only for interaction, not for the display.
+    		    var onPopupClose = function (evt) {
+    		        // 'this' is the popup.
+    		        var feature = this.feature;
+    		        if (feature.layer) {
+    		            selectControl.unselect(feature);
+    		        }  
+    		        this.destroy();
+    		    }
+
+    		    feature = evt.feature;
+    		    popup = new OpenLayers.Popup.FramedCloud("featurePopup",
+    		            feature.geometry.getBounds().getCenterLonLat(),
+    		            new OpenLayers.Size(100,100),
+    		            "test",
+    		            null, 
+    		            true, 
+    		            onPopupClose);
+    		    feature.popup = popup;
+    		    popup.feature = feature;
+    		    map.addPopup(popup, true);
+    		}
+    ); */
+    
     //Set the center of the map so it looks right on loading
     map.setCenter(centerlonlat, zoom);
 
@@ -96,8 +195,8 @@ function generate_bbox(locations){
     var lon;
     var lat;
     var minlon = 100000000.0;
-    var minlat = -100000000.0;
-    var maxlon = 100000000.0;
+    var minlat = 100000000.0;
+    var maxlon = -100000000.0;
     var maxlat = -100000000.0;
 
     if (locations.length <= 2){

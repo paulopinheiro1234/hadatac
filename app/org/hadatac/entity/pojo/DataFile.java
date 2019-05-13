@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import play.mvc.Controller;
+import play.mvc.Result;
+import play.data.*;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -32,6 +36,8 @@ import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
+
+import com.typesafe.config.ConfigFactory;
 
 
 public class DataFile implements Cloneable {
@@ -134,6 +140,15 @@ public class DataFile implements Cloneable {
         return "";
     }
     
+    public static String getMediaUrl(String filename) {
+    	if (filename == null || !filename.startsWith("file:///media/")) {
+    		return "";
+    	}
+    	return ConfigFactory.load().getString("hadatac.console.host") + 
+    			org.hadatac.console.controllers.routes.Portal.index().url() + 
+    			filename.replace("file:///", "");
+    }
+    
     public AnnotationLogger getLogger() {
         return logger;
     }
@@ -202,6 +217,18 @@ public class DataFile implements Cloneable {
     public String getStatus() {
         return status;
     }
+    
+    public boolean isMediaFile() {
+    	System.out.println("isMediaFile: [" + fileName + "]   status: [" + status +"]");
+    	if (fileName == null || fileName.isEmpty()) {
+    		return false;
+    	}
+    	return  (fileName.endsWith(".png") || fileName.endsWith(".PNG") ||
+        		 fileName.endsWith(".jpg") || fileName.endsWith(".JPG") ||
+        		 fileName.endsWith(".jpeg") || fileName.endsWith(".JPEG") ||
+        		 fileName.endsWith(".pdf") || fileName.endsWith(".PDF"));
+    }
+    
     public void setStatus(String status) {
         this.status = status;
     }
@@ -260,6 +287,7 @@ public class DataFile implements Cloneable {
     }
 
     public int delete() {
+    	
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
