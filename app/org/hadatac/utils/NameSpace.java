@@ -127,20 +127,21 @@ public class NameSpace {
         }
     }
 	
-	public void loadTriples(String address, boolean fromRemote) {
-	    System.out.println("Loading triples from " + address);
-	    
+	public void loadTriples(String address, boolean fromRemote) { 
         try {
             Repository repo = new SPARQLRepository(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             repo.initialize();
             RepositoryConnection con = repo.getConnection();
             ValueFactory factory = repo.getValueFactory();
+            
+            System.out.println("Loading triples from " + address);
             if (fromRemote) {
                 con.add(new URL(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
             } else {
                 con.add(new File(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
             }
+            System.out.println("Loaded triples from " + address + " \n");
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: address " + address);
             System.out.println("NotFoundException: " + e.getMessage());

@@ -44,6 +44,8 @@ import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
 import org.labkey.remoteapi.CommandException;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.google.common.io.Files;
 import com.typesafe.config.ConfigFactory;
@@ -62,6 +64,8 @@ public class WorkingFiles extends Controller {
 
     @Inject
     FormFactory formFactory;
+    
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String dest) {        
@@ -73,7 +77,7 @@ public class WorkingFiles extends Controller {
 
         String pathWorking = ConfigProp.getPathWorking();
         
-        List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString());
+        List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString(), false);
         if (!"/".equals(newDir)) {
             folders.add(0, "..");
         }
@@ -168,6 +172,8 @@ public class WorkingFiles extends Controller {
                     
                     dataFile.setFileName(newFileName);
                     dataFile.save();
+                    
+                    logger.info("newFilePath: " + newFilePath);
                 } catch (Exception e) {
                     return badRequest("Failed to rename the target file!");
                 }

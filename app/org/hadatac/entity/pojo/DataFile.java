@@ -625,7 +625,7 @@ public class DataFile implements Cloneable {
         return dir.listFiles().length == 0;
     }
     
-    public static List<String> findFolders(String dir) {
+    public static List<String> findFolders(String dir, boolean ignoreEmptyFolders) {
         List<String> results = new ArrayList<String>();
 
         File folder = new File(dir);
@@ -636,7 +636,13 @@ public class DataFile implements Cloneable {
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isDirectory() && !listOfFiles[i].getName().equals(Sandbox.SUFFIX)) {
-                results.add(listOfFiles[i].getName() + "/");
+                if (ignoreEmptyFolders) {
+                    if (!isEmptyDir(listOfFiles[i])) {
+                        results.add(listOfFiles[i].getName() + "/");
+                    }
+                } else {
+                    results.add(listOfFiles[i].getName() + "/");
+                }
             }
         }
         

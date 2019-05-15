@@ -81,7 +81,7 @@ public class AutoAnnotator extends Controller {
         String pathProc = ConfigProp.getPathProc();
         String pathUnproc = ConfigProp.getPathUnproc();
         
-        List<String> folders = DataFile.findFolders(Paths.get(pathProc, newDir).toString());
+        List<String> folders = DataFile.findFolders(Paths.get(pathProc, newDir).toString(), true);
         if (!"/".equals(newDir)) {
             folders.add(0, "..");
         }
@@ -555,7 +555,8 @@ public class AutoAnnotator extends Controller {
         } else {
         	totFiles = dfs.size();
         }
-        List<String> folders = DataFile.findFolders(dir);
+        
+        List<String> folders = DataFile.findFolders(dir, false);
         boolean noSubFolders = (folders.size() == 0 || (folders.size() == 1 && folders.get(0) != null && folders.get(0).equals("..")));
         String statusMsg;
         if (noSubFolders) {
@@ -563,6 +564,7 @@ public class AutoAnnotator extends Controller {
         } else {
         	statusMsg = "Folder cannot be deleted becuase it has sub-folders.";
         }
+        
     	return ok(deleteFolder.render(dir, !noSubFolders, totFiles, statusMsg));
     }
 
