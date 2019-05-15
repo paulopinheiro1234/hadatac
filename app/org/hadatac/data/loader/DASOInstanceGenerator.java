@@ -468,19 +468,24 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private ObjectCollection socFromTargetDaso(DataAcquisitionSchemaObject daso, List<ObjectCollection> list) {
         String targetObjUri = targetUri(daso);
+    	System.out.println("debug target uri: " + targetObjUri);
         if (targetObjUri.equals("")) {
+        	System.out.println("debug 1");
             return null;
         }
         DataAcquisitionSchemaObject targetObj = DataAcquisitionSchemaObject.find(targetObjUri);
         if (targetObj == null || targetObj.getLabel() == null || targetObj.getLabel().equals("")) {
+        	System.out.println("debug 2");
             return null;
         }
         for (ObjectCollection soc : list) {
-            //AnnotationLog.println("socFromTargetDaso : " + targetObj.getLabel() + "    soc's getSOCReference " + soc.getSOCReference(), fileName); 
+        	logger.println("socFromTargetDaso : " + targetObj.getLabel() + "    soc's getSOCReference " + soc.getSOCReference()); 
             if (soc.getSOCReference().equals(targetObj.getLabel())) {
+            	System.out.println("debug 3");
                 return soc;
             }
         }
+    	System.out.println("debug 4");
         return null;
     }
 
@@ -535,8 +540,12 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 if (scopeObj != null && scopeObj.getUri() != null) {
                     scopeUri = scopeObj.getUri();
                 } else {
-                    logger.println("DASOInstanceGenerator:       [WARNING] SOC association ignored for " + daso.getUri());
-                    return false;
+                	String tmpUri = targetUri(daso);
+                	if (tmpUri == null || tmpUri.isEmpty()) {
+                		logger.println("DASOInstanceGenerator:       [WARNING] SOC association ignored for " + daso.getUri());
+                		return false;
+                	} 
+                	scopeUri = tmpUri.replace("DASO", "SOC");
                 }
             }
             String newLabel = daso.getLabel().replace("??","");

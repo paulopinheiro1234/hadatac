@@ -15,6 +15,7 @@ public class Alignment {
     private Map<String, AlignmentEntityRole> roles;
     private Map<String, Variable> variables;
     private Map<String, List<String>> hCodeBook;
+    private Map<String, String> studyId;  // key=socUri;  value=studyId
 
     Attribute ID = new Attribute();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
@@ -27,6 +28,7 @@ public class Alignment {
         roles = new HashMap<String, AlignmentEntityRole>();
         variables = new HashMap<String, Variable>();
 	    hCodeBook = new HashMap<String, List<String>>();
+	    studyId = new HashMap<String,String>();
         ID.setLabel("ID");
     }
 
@@ -220,7 +222,11 @@ public class Alignment {
     }
 
     public Map<String, List<String>> getCodeBook() {
-	return hCodeBook;
+    	return hCodeBook;
+    }
+    
+    public String getStudyId(String uri) {
+        return studyId.get(uri);
     }
 
     /* GET LIST METHODS
@@ -247,6 +253,15 @@ public class Alignment {
 
     public void addObject(StudyObject obj) {
         objects.put(obj.getUri(), obj);
+        if (!studyId.containsKey(obj.getIsMemberOf())) {
+        	ObjectCollection soc = ObjectCollection.find(obj.getIsMemberOf());
+        	if (soc != null) {
+        		Study std = soc.getStudy();
+        		if (std != null && std.getId() != null) {
+        			studyId.put(obj.getIsMemberOf(), std.getId());
+        		}
+        	}
+        }
     }
 
     public void addEntity(Entity ent) {

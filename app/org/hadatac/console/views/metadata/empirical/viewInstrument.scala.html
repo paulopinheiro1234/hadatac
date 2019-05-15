@@ -16,6 +16,13 @@
   <p><b>Model</b>: @instrument.getTypeLabel() (@instrument.getTypeUri())</p>
   <p><b>Serial Number</b>: @instrument.getSerialNumber()</p>
   <p><b>Image</b>: @instrument.getImage()</p>
+  @if(instrument.getImage() != null && !instrument.getImage().isEmpty()) {
+  	   @if(instrument.getImage().startsWith("file:///media/")) {
+		  <ul>
+    	     <img src="@DataFile.getMediaUrl(instrument.getImage())" alt="@instrument.getImage()" width="300">  
+    	  </ul>
+	   }
+  }
 </div>
 
 }

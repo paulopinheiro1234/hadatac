@@ -70,8 +70,9 @@ public class Downloader extends Controller {
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        
         if (null == dataFile) {
-            return badRequest("You do NOT have the permission to download this file!");
+            return badRequest("You do NOT have the permission to download this file! fileId: " + fileId + "   user.email: " + user.getEmail());
         }
         
         return ok(new File(dataFile.getAbsolutePath()));
@@ -139,7 +140,11 @@ public class Downloader extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String fileId) {
-        return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
+    	if (DataFile.findById(fileId) == null) {
+        	return ok(annotation_log.render(Feedback.print(Feedback.WEB,""), 
+                    routes.Downloader.index().url()));
+    	}
+    	return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLog()), 
                 routes.Downloader.index().url()));
     }

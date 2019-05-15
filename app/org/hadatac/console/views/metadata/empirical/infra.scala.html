@@ -1,0 +1,54 @@
+@(dir          : String,
+  fileId       : String,
+  da_uri       : String)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play
+@import com.typesafe.config.ConfigFactory
+
+@main("HADataC: Human-Aware Data Acquisition Framework") {
+
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-1 col-xs-0"></div>
+          <div class="col-md-9 col-xs-2">
+             <h4><font color="darkBlue">Instrument Infrastructure Management</font></h4>
+          </div>
+        </div>
+	   @defining("") { filename => @defining("") { da_uri => 
+        <div class="row">
+          <div class="col-md-1 col-xs-0"></div>
+          <div class="col-md-3 col-xs-2">
+             <h4>Platform Management</h4>
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(dir, filename, da_uri)" id="platbrowser" class="btn btn-primary btn-block" role="button">Browse Platforms</a>  
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(dir, filename, da_uri)" id="platmodelbrowser" class="btn btn-primary btn-block" role="button">Browse Platform Models</a>
+          </div>
+          <div class="col-md-3 col-xs-2">
+             <h4>Instrument Management</h4>  
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(dir, filename, da_uri)" id="insbrowser" class="btn btn-primary btn-block" role="button">Browse Instruments</a>  
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(dir, filename, da_uri)" id="insmodelbrowser" class="btn btn-primary btn-block" role="button">Browse Instrument Models</a>
+          </div>
+          <div class="col-md-3 col-xs-2">
+             <h4>Detector Management</h4>  
+             <a href="" id="detbrowser" class="btn btn-primary btn-block" role="button">Browse Detectors</a>  
+             <a href="" id="detmodelbrowser" class="btn btn-primary btn-block" role="button">Browse Detector Models</a>
+          </div>
+          <div class="col-md-1 col-xs-0"></div>
+        </div>
+      }}
+
+      <div class="row">
+        <div class="col-md-1 col-xs-0"></div>
+        <div class="col-md-1 col-xs-1">
+	       <br><br><br>@mainButton(false)
+	    </div>
+	  </div>
+
+    </div>
+
+}

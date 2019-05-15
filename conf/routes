@@ -89,6 +89,8 @@ GET	    /hadatac/metadata/agent			               org.hadatac.console.controllers
 POST	/hadatac/metadata/agent			               org.hadatac.console.controllers.metadata.concepts.Agent.postIndex()
 
 # Metadata empirical
+GET	    /hadatac/infra	    	                       org.hadatac.console.controllers.metadata.empirical.Infra.index(dir : String, filename : String, da_uri : String)
+POST	/hadatac/infra               		           org.hadatac.console.controllers.metadata.empirical.Infra.postIndex(dir : String, filename : String, da_uri : String)
 GET	    /hadatac/metadata/platform	    	           org.hadatac.console.controllers.metadata.empirical.Platform.index()
 POST	/hadatac/metadata/platform   		           org.hadatac.console.controllers.metadata.empirical.Platform.postIndex()
 GET	    /hadatac/metadata/platform/new		           org.hadatac.console.controllers.metadata.empirical.NewPlatform.index(dir : String, filename : String, da_uri : String)

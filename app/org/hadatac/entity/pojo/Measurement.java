@@ -31,6 +31,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
+import org.hadatac.console.models.CodeBookEntry;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetTree;
@@ -1215,14 +1216,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
             });
             //System.out.println("aligned attributes size: " + aaList.size());
-            boolean first = true;
+            FileUtils.writeStringToFile(file, "\"STUDY-ID\"", "utf-8", true);
             for (Variable aa : aaList) {
-                if (first) {
-                    FileUtils.writeStringToFile(file, "\"" + aa + "\"", "utf-8", true);
-                    first = false;
-                } else {
-                    FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
-                }
+            	FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
             }
             FileUtils.writeStringToFile(file, "\n", "utf-8", true);
 
@@ -1240,14 +1236,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             for (StudyObject obj : objects) {
                 if (results.containsKey(obj.getUri())) {
                     Map<String, String> row = results.get(obj.getUri());
-                    first = true;
+                    FileUtils.writeStringToFile(file, "\"" + alignment.getStudyId(obj.getIsMemberOf()) + "\"", "utf-8", true);
                     for (Variable aa : aaList) {
-                        if (first) {
-                            FileUtils.writeStringToFile(file, "\"" + row.get(aa.toString()) + "\"", "utf-8", true);
-                            first = false;
-                        } else {
-                            FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
-                        }
+                    	FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
                     }
                     FileUtils.writeStringToFile(file, "\n", "utf-8", true);
                 }
@@ -1294,6 +1285,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    
 	    FileUtils.writeStringToFile(codeBookFile, "code, value, class\n", "utf-8", true);
 	    // Write code book
+	    List<CodeBookEntry> codeBook = new ArrayList<CodeBookEntry>();
 	    for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
 	    	List<String> list = entry.getValue();
 	    	//System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
@@ -1306,10 +1298,27 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    			pretty = c0 + pretty.substring(1);
 	    		}
 	    	}
-	    	FileUtils.writeStringToFile(codeBookFile, list.get(0) + ",\"" + pretty + "\", " + entry.getKey() + "\n", "utf-8", true);
+	    	CodeBookEntry cbe = new CodeBookEntry(list.get(0), pretty, entry.getKey());
+	    	codeBook.add(cbe);
 	    }
-
-	    dataFile.setCompletionPercentage(100);
+        codeBook.sort(new Comparator<CodeBookEntry>() {
+            @Override
+            public int compare(CodeBookEntry cbe1, CodeBookEntry cbe2) {
+            	int v1 = Integer.parseInt(cbe1.getCode());
+            	int v2 = Integer.parseInt(cbe2.getCode());
+                if(v1 > v2) {
+                    return 1;
+                }else if(v1 < v2) {
+                   return -1;
+                }
+                return 0;            
+            }
+        });
+	    for (CodeBookEntry cbe : codeBook) {
+	    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
+	    }
+	    	
+    	dataFile.setCompletionPercentage(100);
 	    dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 	    dataFile.setStatus(DataFile.CREATED);
 	    dataFile.save();
