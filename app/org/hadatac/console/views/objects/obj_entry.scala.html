@@ -20,7 +20,7 @@
      </td>
      <td>
 	<input type="text" class="form-control" name="newOriginalId[]" id="newOrigonalId@if(obj.getUri() != null) {-@obj.getUri() }" 
-	       value="@if(obj.getOriginalId() != null) { @obj.getOriginalId() }" onchange="checkform()">
+	       value="@if(obj.getOriginalId() != null) { @obj.getOriginalIdLabel() }" onchange="checkform()">
      </td>
 
      @if(obj.getScopeUris() != null && obj.getScopeUris().size() > 0) {

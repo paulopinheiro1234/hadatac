@@ -19,6 +19,8 @@ public class Alignment {
 
     Attribute ID = new Attribute();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
+    Attribute GROUPID = new Attribute();
+    AttributeInRelationTo GROUPID_IRT = new AttributeInRelationTo(GROUPID, null);
 
     public Alignment() {
         objects = new HashMap<String, StudyObject>();
@@ -30,6 +32,7 @@ public class Alignment {
 	    hCodeBook = new HashMap<String, List<String>>();
 	    studyId = new HashMap<String,String>();
         ID.setLabel("ID");
+        GROUPID.setLabel("GROUPID");
     }
 
     public void printAlignment() {
@@ -45,6 +48,13 @@ public class Alignment {
      */
     public String objectKey(AlignmentEntityRole entRole) {
         Variable aa = new Variable(entRole, ID_IRT);
+        return aa.toString();
+    }
+
+    /* groupKey adds a new group identifier into variables
+     */
+    public String groupKey(AlignmentEntityRole entRole) {
+        Variable aa = new Variable(entRole, GROUPID_IRT);
         return aa.toString();
     }
 
@@ -273,6 +283,8 @@ public class Alignment {
         System.out.println("Adding NEW ROLE: " + entRole);
         Variable newVar = new Variable(entRole,ID_IRT);
         variables.put(newVar.getKey(),newVar);
+        Variable newGroupVar = new Variable(entRole,GROUPID_IRT);
+        variables.put(newVar.getKey() + "GROUP",newGroupVar);
     }
 
     public void addCode(String attrUri, List<String> code) {

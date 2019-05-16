@@ -15,6 +15,7 @@ public class ObjectCollectionForm {
     public String newHasSOCReference;
     public List<String> spaceUri;
     public List<String> timeUri;
+    public List<String> groupUri;
 
     // STUDY information is not passed through the form since it cannot change
     //public String newStudyUri;
@@ -98,6 +99,18 @@ public class ObjectCollectionForm {
     
     public void addTimeUri(String timeUri) {
 	this.timeUri.add(timeUri);
+    }
+    
+    public List<String> getGroupUri() {
+	return groupUri;
+    }
+    
+    public void setGroupUri(List<String> groupUri) {
+	this.groupUri = groupUri;
+    }
+    
+    public void addGroupUri(String groupUri) {
+	this.groupUri.add(groupUri);
     }
     
 }

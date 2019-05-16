@@ -468,24 +468,19 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private ObjectCollection socFromTargetDaso(DataAcquisitionSchemaObject daso, List<ObjectCollection> list) {
         String targetObjUri = targetUri(daso);
-    	System.out.println("debug target uri: " + targetObjUri);
         if (targetObjUri.equals("")) {
-        	System.out.println("debug 1");
             return null;
         }
         DataAcquisitionSchemaObject targetObj = DataAcquisitionSchemaObject.find(targetObjUri);
         if (targetObj == null || targetObj.getLabel() == null || targetObj.getLabel().equals("")) {
-        	System.out.println("debug 2");
             return null;
         }
         for (ObjectCollection soc : list) {
-        	logger.println("socFromTargetDaso : " + targetObj.getLabel() + "    soc's getSOCReference " + soc.getSOCReference()); 
+        	//logger.println("socFromTargetDaso : " + targetObj.getLabel() + "    soc's getSOCReference " + soc.getSOCReference()); 
             if (soc.getSOCReference().equals(targetObj.getLabel())) {
-            	System.out.println("debug 3");
                 return soc;
             }
         }
-    	System.out.println("debug 4");
         return null;
     }
 
@@ -563,7 +558,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
-            ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, newVc.getUri(), "", scopeUri, null, null, "0");
+            ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
+            		newVc.getUri(), "", scopeUri, null, null, null, "0");
             newSoc.setNamedGraph(oasUri);
             newSoc.saveToTripleStore();
             // addObject(newSoc);
@@ -684,6 +680,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             		referenceEntry.put(StudyObject.SOC_LABEL, socLabels.get(currentSoc.getSOCReference()));
             		referenceEntry.put(StudyObject.OBJECT_SCOPE_URI, id);
             		referenceEntry.put(StudyObject.OBJECT_ORIGINAL_ID, obj.getOriginalId());
+            		referenceEntry.put(StudyObject.SOC_URI, currentSoc.getUri());
             		if (objTimes != null && objTimes.size() > 0) {
             			referenceEntry.put(StudyObject.OBJECT_TIME, objTimes.get(0));
             		}

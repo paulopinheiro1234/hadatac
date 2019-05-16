@@ -89,7 +89,7 @@
               <tr>
                 <th>Name</th>
                 <th>Type</th>
-                <th>Original ID</th>
+                <th>Original ID (or URI)</th>
 		        @if(objList.size() > 0) {
 		           @for(scope <- objList.get(0).getScopeUris()) {
 		              <th>hasScope</th>
@@ -106,7 +106,10 @@
             </thead>
             <tbody>
 	        @if(objList != null) {
+	             @objList.size() 
+	             @objList.toString()
                  @for(obj <- objList){
+                     @obj.getUri()
 	                 @obj_entry(study, oc, obj)
                  }
             } 

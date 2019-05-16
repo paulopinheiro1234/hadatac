@@ -65,6 +65,7 @@ public class StudyObject extends HADatAcThing {
     public static final String SOC_TYPE = "SOC_TYPE";
     //         soc's label
     public static final String SOC_LABEL = "SOC_LABEL";
+    public static final String SOC_URI = "SOC_URI";
     public static final String OBJECT_ORIGINAL_ID = "OBJECT_ORIGINAL_ID";
     public static final String OBJECT_TIME = "OBJECT_TYME";
  
@@ -166,6 +167,13 @@ public class StudyObject extends HADatAcThing {
         return originalId;
     }
 
+    public String getOriginalIdLabel() {
+    	if (originalId != null && !originalId.isEmpty()) {
+    		return originalId;
+    	}
+    	return uri;
+    }
+
     public void setOriginalId(String originalId) {
         this.originalId = originalId;
     }
@@ -214,6 +222,30 @@ public class StudyObject extends HADatAcThing {
         this.spaceScopeUris.add(spaceScopeUri);
     }
 
+    public String getGroupId() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "SELECT ?id WHERE { \n" + 
+        		 " ?grpUri hasco:ofSOC ?soc . \n" + 
+        		 " ?grpUri hasco:hasGroupId ?id . \n" + 
+        		 " <" + uri + "> hasco:isMemberOf ?soc . " + 
+        		 " <" + uri + "> hasco:isGroupMember ?grpUri . " + 
+        		 "}";
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return soln.getLiteral("id").getString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    	
+    }
+    
     public static int getNumberStudyObjects() {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -711,12 +743,20 @@ public class StudyObject extends HADatAcThing {
         }
         List<StudyObject> objects = new ArrayList<StudyObject>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?uri ?id WHERE { " + 
+        		"SELECT ?uri WHERE { " + 
                 "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
-                "   ?uri hasco:originalID  ?id . " +
-                " } ORDER BY ASC (?id)" + 
+                " } " + 
                 " LIMIT " + pageSize + 
                 " OFFSET " + offset;
+
+        /* 
+        "SELECT ?uri ?id WHERE { " + 
+        "   ?uri hasco:isMemberOf  <" + oc.getUri() + "> . " +
+        "   ?uri hasco:originalID  ?id . " +
+        " } ORDER BY ASC (?id)" + 
+        " LIMIT " + pageSize + 
+        " OFFSET " + offset;
+        */
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -762,7 +802,7 @@ public class StudyObject extends HADatAcThing {
 
         Map<String, Map<String, String>> mapIdUriMappings = new HashMap<String, Map<String, String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id ?socType WHERE { \n"
+                + " SELECT ?studyObject ?studyObjectType ?id ?obj ?subj_id ?soc ?socType WHERE { \n"
                 + " { \n"
                 + "     ?studyObject hasco:originalID ?id . \n"
                 + "     ?studyObject rdf:type ?studyObjectType . \n"
@@ -815,6 +855,11 @@ public class StudyObject extends HADatAcThing {
                     details.put(SOC_TYPE, soln.get("socType").toString());
                 } else {
                     details.put(SOC_TYPE, "");
+                }
+                if (soln.get("soc") != null) {
+                    details.put(SOC_URI, soln.get("soc").toString());
+                } else {
+                    details.put(SOC_URI, "");
                 }
                 mapIdUriMappings.put(soln.get("id").toString(), details);
             }

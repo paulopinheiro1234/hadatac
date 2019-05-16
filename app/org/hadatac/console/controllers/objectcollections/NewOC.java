@@ -91,6 +91,7 @@ public class NewOC extends Controller {
 		String newHasSOCReferenceLabel = data.getNewHasSOCReference();
 		List<String> newSpaceScopeUris = data.getSpaceUri();
 		List<String> newTimeScopeUris = data.getTimeUri();
+		List<String> newGroupUris = data.getGroupUri();
 
 		// insert current state of the OC
 		ObjectCollection oc = new ObjectCollection(newURI,
@@ -103,6 +104,7 @@ public class NewOC extends Controller {
 				newHasScopeUri,
 				newSpaceScopeUris,
 				newTimeScopeUris,
+				newGroupUris,
 				"0");
 
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted

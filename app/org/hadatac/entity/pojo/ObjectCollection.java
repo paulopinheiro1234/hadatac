@@ -64,6 +64,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     
     private List<String> spaceScopeUris = null;
     private List<String> timeScopeUris = null;
+    private List<String> groupUris = null;
     private List<String> objectUris = new ArrayList<String>();
 
     public ObjectCollection() {
@@ -78,6 +79,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.hasScopeUri = "";
         this.spaceScopeUris = new ArrayList<String>();
         this.timeScopeUris = new ArrayList<String>();
+        this.groupUris = new ArrayList<String>();
     }
 
     public ObjectCollection(
@@ -91,6 +93,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String hasScopeUri,
             List<String> spaceScopeUris,
             List<String> timeScopeUris,
+            List<String> groupUris,
             String hasLastCounter) {
         this.setUri(uri);
         this.setTypeUri(typeUri);
@@ -102,6 +105,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setHasScopeUri(hasScopeUri);
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
+        this.setGroupUris(groupUris);
     }
 
     public ObjectCollection(String uri,
@@ -119,6 +123,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setHasScopeUri("");
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
+        this.setGroupUris(groupUris);
         this.hasLastCounter = "0";
 
     }
@@ -392,6 +397,28 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.timeScopeUris = timeScopeUris;
     }
 
+    public List<String> getGroupUris() {
+        return groupUris;
+    }
+
+    public List<SOCGroup> getGroups() {
+        if (groupUris == null || groupUris.equals("")) {
+            return null;
+        }
+        List<SOCGroup> groups = new ArrayList<SOCGroup>();
+        for (String grpUri : groupUris) {
+            SOCGroup grp = SOCGroup.find(grpUri);
+            if (grp != null) {
+                groups.add(grp);
+            }
+        }
+        return groups;
+    }
+
+    public void setGroupUris(List<String> groupUris) {
+        this.groupUris = groupUris;
+    }
+
     public long getNumOfObjects() {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT (COUNT(?obj) AS ?count) WHERE { \n" 
@@ -539,6 +566,35 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    private static List<String> retrieveGroup(String oc_uri) {
+        List<String> groupUris = new ArrayList<String>();
+        String groupUri = "";
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT  ?groupUri WHERE { " + 
+                " <" + oc_uri + "> hasco:hasGroup ?groupUri . " + 
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("groupUri") != null && soln.getResource("groupUri").getURI() != null) {
+                        groupUri = soln.getResource("groupUri").getURI();
+                        if (groupUri != null && !groupUri.equals("")) {
+                            groupUris.add(groupUri);
+                        }
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+
+        return groupUris;
+    }
+
     public static ObjectCollection find(String oc_uri) {
         ObjectCollection oc = null;
 
@@ -571,6 +627,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String lastCounterStr = "0";
         List<String> spaceScopeUrisStr = new ArrayList<String>();
         List<String> timeScopeUrisStr = new ArrayList<String>();
+        List<String> groupUrisStr = new ArrayList<String>();
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -638,6 +695,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
                 timeScopeUrisStr = retrieveTimeScope(oc_uri);
 
+                groupUrisStr = retrieveGroup(oc_uri);
+
                 oc = new ObjectCollection(
                         oc_uri, 
                         typeStr, 
@@ -649,6 +708,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                         hasScopeUriStr, 
                         spaceScopeUrisStr, 
                         timeScopeUrisStr,
+                        groupUrisStr,
                         lastCounterStr);
             }
         }
@@ -944,6 +1004,18 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                     } else {
                         insert += oc_uri + " hasco:hasTimeScope  " + timeScope + " . ";
                         System.out.println(oc_uri + " hasco:hasTimeScope  " + timeScope + " . ");
+                    }
+                }
+            }
+        }
+        if (this.getGroupUris() != null && this.getGroupUris().size() > 0) {
+            for (String group : this.getGroupUris()) {
+                if (group.length() > 0){
+                    if (group.startsWith("http")) {
+                        insert += oc_uri + " hasco:hasGroup  <" + group + "> . ";
+                    } else {
+                        insert += oc_uri + " hasco:hasGroup  " + group + " . ";
+                        System.out.println(oc_uri + " hasco:hasGroup  " + group + " . ");
                     }
                 }
             }

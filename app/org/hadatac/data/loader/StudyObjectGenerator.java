@@ -69,11 +69,14 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
 
     private String getUri(Record rec) {
-        String originalID = getOriginalID(rec);
+        String originalID = rec.getValueByColumnName(mapCol.get("originalID"));
+        System.out.println("StudyObjectGenerator: " + originalID);
         if (URIUtils.isValidURI(originalID)) {
+            System.out.println("StudyObjectGenerator: VALID URI");
             return URIUtils.replaceNameSpaceEx(originalID);
         }
-        
+
+        System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
         return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
     }
 
@@ -82,7 +85,7 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
 
     private String getLabel(Record rec) {
-        String originalID = getOriginalID(rec);
+        String originalID = rec.getValueByColumnName(mapCol.get("originalID"));
         if (URIUtils.isValidURI(originalID)) {
             return URIUtils.getBaseName(originalID);
         }
@@ -107,6 +110,9 @@ public class StudyObjectGenerator extends BaseGenerator {
         if (auxstr == null) {
             return "";
         } 
+        if (URIUtils.isValidURI(auxstr)) {
+            return "";
+        }
         auxstr = auxstr.replaceAll("\\s+","");
         //System.out.println("StudyObjectGenerator: getOriginalID(2) = [" + auxstr + "]");
         

@@ -121,16 +121,7 @@ public abstract class HADatAcThing implements Facetable {
             this.uri = "";
             return;
         }
-        URI tmpUri = null;
-		try {
-			tmpUri = new URI(uri);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		if (tmpUri != null) {
-			String strUri = tmpUri.toASCIIString().trim();
-			this.uri = URIUtils.replacePrefixEx(strUri);
-		}
+		this.uri = URIUtils.replacePrefixEx(uri);
     }
 
     public String getTypeUri() {

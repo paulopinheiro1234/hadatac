@@ -44,6 +44,7 @@ public class SSDGenerator extends BaseGenerator {
         //mapCol.put("groundingLabel", "groundingLabel");
         mapCol.put("spaceScopeUris", "hasSpaceScope");
         mapCol.put("timeScopeUris", "hasTimeScope");
+        mapCol.put("groupUris", "hasGroup");
     }
 
     private String getUri(Record rec) {
@@ -111,10 +112,17 @@ public class SSDGenerator extends BaseGenerator {
                 .stream()
                 .map(s -> URIUtils.replacePrefixEx(s))
                 .collect(Collectors.toList());
-        System.out.println("getTimeScopeUris:");
-        for (String str : ans) {
-            System.out.println("value: [" + str + "]");
+        return ans;
+    }
+
+    private List<String> getGroupUris(Record rec) {
+        if (mapCol.get("groupUris") == null || rec.getValueByColumnName(mapCol.get("groupUris")) == null) {
+            return new ArrayList<String>();
         }
+        List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("groupUris")).split(","))
+                .stream()
+                .map(s -> URIUtils.replacePrefixEx(s))
+                .collect(Collectors.toList());
         return ans;
     }
 
@@ -153,6 +161,7 @@ public class SSDGenerator extends BaseGenerator {
                 URIUtils.replacePrefixEx(getHasScopeUri(record)),
                 getSpaceScopeUris(record),
                 getTimeScopeUris(record),
+                getGroupUris(record),
                 "0");
         
         return oc;

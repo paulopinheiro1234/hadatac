@@ -100,6 +100,7 @@ public class EditOC extends Controller {
 		String newHasSOCReference = data.getNewHasSOCReference();
 		List<String> newSpaceScopeUris = data.getSpaceUri();
 		List<String> newTimeScopeUris = data.getTimeUri();
+		List<String> newGroupUris = data.getGroupUri();
 
 		// Verify Study and ObjectCollection information is valid
 		String newURI = null;
@@ -170,6 +171,7 @@ public class EditOC extends Controller {
 				newHasScopeUri,
 				newSpaceScopeUris,
 				newTimeScopeUris,
+				newGroupUris,
 				"0");
 		newOc.setObjectUris(oldOc.getObjectUris());
 

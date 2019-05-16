@@ -52,7 +52,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
             "hasco:hasLOD",
             "hasco:hasCalibration",
             "hasco:hasElevation",
-            "hasco:hasLocation");
+            "hasco:hasLocation",
+            "hasco:isGroupMember");
 
     private static Map<String, DataAcquisitionSchema> DASCache;
 
@@ -68,6 +69,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String unitLabel = "";
     private String inRelationToLabel = "";
     private String lodLabel = "";
+    private String groupLabel = "";
     
     private List<DataAcquisitionSchemaAttribute> attributeObjects = new ArrayList<DataAcquisitionSchemaAttribute>();
     
@@ -169,6 +171,14 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.lodLabel = lodLabel;
     }
 
+    public String getGroupLabel() {
+        return groupLabel;
+    }
+
+    public void setGroupLabel(String groupLabel) {
+        this.groupLabel = groupLabel;
+    }
+
     public String getElevationLabel() {
         return elevationLabel;
     }
@@ -267,6 +277,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("chear:LevelOfDetection"))) {
                     setLODLabel(dasa.getLabel());
                     System.out.println("[OK] DataAcquisitionSchema LODLabel: " + dasa.getLabel());
+                }
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:isGroupMember"))) {
+                    setGroupLabel(dasa.getLabel());
+                    System.out.println("[OK] DataAcquisitionSchema GroupLabel: " + dasa.getLabel());
                 }
                 if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:originalID")) 
                         || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:Identifier")) 
