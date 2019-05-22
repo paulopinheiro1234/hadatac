@@ -184,6 +184,88 @@ public class WorkingFiles extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result moveDataFile(String dir, String fileId) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+        
+        DataFile dirFile = new DataFile(dir);
+        dirFile.setStatus(DataFile.WORKING);
+        
+        return ok(moveFile.render(dir, dataFile, dirFile));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postMoveDataFile(String dir, String fileId) {
+        return moveDataFile(dir, fileId);
+    } 
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processMoveDataFileForm(String dir, String fileId) throws Exception {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+        
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+        NewFileForm data = form.get();
+
+        if (form.hasErrors()) {
+            System.out.println("HAS ERRORS");
+            DataFile dirFile = new DataFile(dir);
+            return badRequest(moveFile.render(dir, dataFile, dirFile));
+        } else {
+            String destination = data.getNewDest();
+        	
+            DataFile root = new DataFile("/");
+            root.setStatus(DataFile.WORKING);
+        	String fileName = dataFile.getFileName();
+        	String oldFilePath = dataFile.getAbsolutePath();
+            String newFilePath = Paths.get(root.getAbsolutePath(), destination, fileName).toString();
+            System.out.println("fileName " + fileName);
+            System.out.println("oldFilePath " + oldFilePath);
+            System.out.println("newFilePath " + newFilePath);
+
+            File originalFile = new File(oldFilePath);
+            File newFile = new File(newFilePath);
+            if (newFile.exists()) {
+                return badRequest("A file with the same name already exists in the destination folder!");
+            } else {
+                try {
+                    originalFile.renameTo(newFile);
+                    originalFile.delete();
+                    
+                    dataFile.setFileName(fileName);
+                    dataFile.save();
+                    
+                    logger.info("newFilePath: " + newFilePath);
+                } catch (Exception e) {
+                    return badRequest("Failed to move the file!");
+                }
+            }
+            
+            return redirect(routes.WorkingFiles.index(dir, "."));
+        }
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result getLinkForSharing(String dir, String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         

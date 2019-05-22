@@ -8,19 +8,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.HashMap;
 
-import org.apache.commons.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.hadatac.console.controllers.annotator.AnnotationLogger;
-import org.hadatac.console.controllers.annotator.ErrorDictionary;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.SOCGroup;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.entity.pojo.StudyObjectMatching;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
@@ -29,9 +26,7 @@ import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-
 
 public class MeasurementGenerator extends BaseGenerator {
 
@@ -53,6 +48,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private int posInRelation = -1;
     private int posLOD = -1;
     private int posGroup = -1;
+    private int posMatching = -1;
 
     private int totalCount = 0;
 
@@ -62,6 +58,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private Map<String,SOCGroup> groupBySocAndId = null;
     private StudyObject cellScopeObject = null;
     private ObjectCollection cellScopeSOC = null;
+    private Map<String,ObjectCollection> matchingSOCs = null;
 
     private String dasoUnitUri = "";
 
@@ -87,6 +84,7 @@ public class MeasurementGenerator extends BaseGenerator {
         		logger.printExceptionById("DA_00001");
         		cont = false;
         	}
+        	matchingSOCs = dasoiGen.getMatchingSOCs();
         }
         if (cont) {
         	System.out.println("Measurement Generator: setting STUDY URI");
@@ -99,25 +97,6 @@ public class MeasurementGenerator extends BaseGenerator {
     @Override
     public void preprocess() throws Exception {
         System.out.println("[Parser] indexMeasurements()...");
-
-        // createVirtualObjectCollections(schema);
-
-        /*
-        if(!AnnotationWorker.templateLibrary.containsKey(da.getSchemaUri())){
-            System.out.println("[Parser] [WARN] no DASVirtualObject templates for this DataAcquisition. Is this correct?");
-            System.out.println("[Parser] Could not retrieve template list for " + da.getSchemaUri());
-            System.out.println("[Parser] templateLibrary contains keys ");
-            for(String k : AnnotationWorker.templateLibrary.keySet()){
-                System.out.println("\t" + k);
-            }
-        } else {
-            templateList = AnnotationWorker.templateLibrary.get(da.getSchemaUri());
-            System.out.println("[Parser] Found the right template list for " + da.getSchemaUri());
-            for(DASVirtualObject item : templateList){
-                System.out.println(item);
-            }
-        }
-         */
 
         // ASSIGN values for tempPositionInt
         List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
@@ -167,6 +146,10 @@ public class MeasurementGenerator extends BaseGenerator {
             posGroup = schema.tempPositionOfLabel(schema.getGroupLabel());
             System.out.println("posGroup: " + posGroup);
         }
+        if (!schema.getMatchingLabel().equals("")) {
+            posMatching = schema.tempPositionOfLabel(schema.getMatchingLabel());
+            System.out.println("posMatching: " + posMatching);
+        }
 
         // Store necessary information before hand to avoid frequent SPARQL queries
         possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
@@ -185,34 +168,15 @@ public class MeasurementGenerator extends BaseGenerator {
     public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
         System.out.println("rowNumber: " + rowNumber);
         
-        // Comment out row instance generation
-        /*
-        try{
-            // complete DASOInstances for the row FIRST
-            // so we can refer to these URI's when setting the entity and/or object
-            rowInstances.clear();
-            rowInstances = dasoiGen.generateRowInstances(record);
-        } catch(Exception e){
-            System.out.println("[Parser] [ERROR]:");
-            e.printStackTrace(System.out);
-        }
-        // rowInstances keys *should* match what is in DASchemaAttribute table's "attributeOf" field!
-        for(Map.Entry instance : rowInstances.entrySet()) {
-            System.out.println("[Parser] Made an instance for " + instance.getKey() + " :\n\t" + instance.getValue());
-        }
-         */
-
         Map<String, Map<String,String>> objList = null;
         Map<String,String> groundObj = null;
+        String socUri = "";
+        String objUri = "";
+        boolean doMatching = false;
+        boolean doGroup = false;
         if (da.hasCellScope()) {
-            // Objects defined by Cell Scope
-            //if (da.getCellScopeName().get(0).equals("*")) {
-            //	measurement.setStudyObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-            //measurement.setObjectUri(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-            //measurement.setObjectCollectionType(URIUtils.replacePrefixEx("hasco:SampleCollection"));
-            //} else {
-            // TO DO: implement rest of cell scope
-            //}
+            socUri = cellScopeSOC.getUri();
+            objUri = cellScopeObject.getUri();
         } else {
             // Objects defined by Row Scope
             String id = "";
@@ -223,6 +187,8 @@ public class MeasurementGenerator extends BaseGenerator {
             }
             objList = dasoiGen.generateRowInstances(id);
             groundObj = dasoiGen.retrieveGroundObject(id);
+            
+            // socUri and objUri for row scope is defined later under measurement processing
         }
 
         Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
@@ -260,7 +226,10 @@ public class MeasurementGenerator extends BaseGenerator {
                 continue;
             }
             if (dasa.getLabel().equals(schema.getGroupLabel())) {
-                continue;
+            	doGroup = true;
+            }
+            if (dasa.getLabel().equals(schema.getMatchingLabel())) {
+            	doMatching = true;
             }
 
             Measurement measurement = new Measurement();
@@ -271,12 +240,13 @@ public class MeasurementGenerator extends BaseGenerator {
              *                   *
              *===================*/
 
+            String originalValue = "";
             if (dasa.getTempPositionInt() < 0 || dasa.getTempPositionInt() >= record.size()) {
                 continue;
             } else if (record.getValueByColumnIndex(dasa.getTempPositionInt()).isEmpty()) { 
                 continue;
             } else {
-                String originalValue = record.getValueByColumnIndex(dasa.getTempPositionInt());
+                originalValue = record.getValueByColumnIndex(dasa.getTempPositionInt());
                 String dasa_uri_temp = dasa.getUri();
                 measurement.setOriginalValue(originalValue);
                 if (possibleValues.containsKey(dasa_uri_temp)) {
@@ -329,12 +299,12 @@ public class MeasurementGenerator extends BaseGenerator {
                     try {
                         measurement.setTimestamp(timeValue);
                     } catch (Exception e) {
-                        System.out.println("Setting current time!");
+                        //System.out.println("Setting current time!");
                         measurement.setTimestamp(new Date(0).toInstant().toString());
                     }
                 }
             } else if (!schema.getNamedTimeLabel().equals("")) {
-                // full-row named time
+            	// full-row named time
                 String timeValue = record.getValueByColumnIndex(posNamedTime);
                 if (timeValue != null) {
                     measurement.setAbstractTime(timeValue);
@@ -382,11 +352,9 @@ public class MeasurementGenerator extends BaseGenerator {
             measurement.setSID("");
             measurement.setRole("");
             measurement.setEntityUri("");
-            String socUri = "";
-            String objUri = "";
 
+            String reference = null;
             if (da.hasCellScope()) {
-                System.out.println("da.hasCellScope() ===============");
 
                 // Objects defined by Cell Scope
                 if (da.getCellScopeName().get(0).equals("*")) {
@@ -398,8 +366,6 @@ public class MeasurementGenerator extends BaseGenerator {
                     if (cellScopeObject.getOriginalId() != null) {
                     	measurement.setPID(cellScopeObject.getOriginalId());
                     }
-                    socUri = cellScopeSOC.getUri();
-                    objUri = cellScopeObject.getUri();
                     //System.out.println("Measurement: ObjectURI (before replace): <" + da.getCellScopeUri().get(0).trim() + ">");
                     //System.out.println("Measurement: ObjectURI (after replace): <" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + ">");
                 } else {
@@ -414,20 +380,17 @@ public class MeasurementGenerator extends BaseGenerator {
                     id = record.getValueByColumnIndex(posId);
                 }
 
-                if (!"".equals(id)) {
-                    String reference = dasa.getObjectViewLabel();
+                if (!id.equals("")) {
+                    reference = dasa.getObjectViewLabel();
                     if (reference != null && !reference.equals("")) {
                         if (objList.get(reference) == null) {
                             System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
                         } else {
                             // from object list
-                            measurement.setObjectUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_URI));
                             objUri = objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
+                            measurement.setObjectUri(objUri);
                             measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
                             measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
-                            if (objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE) != null && !objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE).equals("")) {
-                                measurement.setEntityUri(objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE));
-                            }
                             if (objList.get(reference).get(StudyObject.SOC_TYPE).equals(ObjectCollection.SAMPLE_COLLECTION)) {
                                 measurement.setSID(objList.get(reference).get(StudyObject.OBJECT_ORIGINAL_ID));
                             }
@@ -436,6 +399,24 @@ public class MeasurementGenerator extends BaseGenerator {
                             }
                             if (objList.get(reference).get(StudyObject.SOC_URI) != null && !objList.get(reference).get(StudyObject.SOC_URI).equals("")) {
                                 socUri = objList.get(reference).get(StudyObject.SOC_URI);
+                            }
+                            if (objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE) != null && !objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE).equals("")) {
+                                String entityUri = objList.get(reference).get(StudyObject.STUDY_OBJECT_TYPE);
+                                measurement.setEntityUri(entityUri);
+                                if (entityUri.equals(URIUtils.replacePrefix(StudyObjectMatching.className)) && !doMatching) {
+                                    String scopeObjectUri = objList.get(reference).get(StudyObject.SCOPE_OBJECT_URI);
+                                	StudyObjectMatching matching = StudyObjectMatching.findByMemberUri(scopeObjectUri);
+                                	if (matching != null) {
+                                		measurement.setObjectUri(matching.getUri());
+                                	} else {
+                                		measurement.setObjectUri(objUri);
+                                	}
+                                	//measurement.setObjectCollectionType();
+                                	//measurement.setRole();
+                                	measurement.setStudyObjectUri(objList.get(reference).get(StudyObject.SCOPE_OBJECT_URI));
+                                	measurement.setStudyObjectTypeUri(groundObj.get(StudyObject.STUDY_OBJECT_TYPE));
+                                	//measurement.setPID();
+                                }
                             }
 
                             // from ground object
@@ -461,14 +442,9 @@ public class MeasurementGenerator extends BaseGenerator {
              *                                     *
              *=====================================*/
             
-            System.out.println("MeasurementGenerator: set group. GroupLabel=[" + schema.getGroupLabel() + "]");
-            System.out.println("MeasurementGenerator: set group. posGroup=[" + posGroup + "]");
-            System.out.println("MeasurementGenerator: set group. socUri=[" + socUri + "]");
-            System.out.println("MeasurementGenerator: set group. objUri=[" + objUri + "]");
-            if (!schema.getGroupLabel().equals("") && posGroup >= 0 && !socUri.equals("") && !objUri.equals("")) {
+            if (doGroup && !schema.getGroupLabel().equals("") && posGroup >= 0 && !socUri.equals("") && !objUri.equals("")) {
                 // group value exists
                 String groupValue = record.getValueByColumnIndex(posGroup);
-                System.out.println("MeasurementGenerator: set group. groupValue=[" + groupValue + "]");
                 if (groupValue != null) {
 
                 	// verify if SOC has a group with id=groupValue. If not, create new group inside SOC
@@ -478,7 +454,6 @@ public class MeasurementGenerator extends BaseGenerator {
                 		grp = groupBySocAndId.get(key);
                 	} else {
                 		grp = SOCGroup.findBySOCUriAndId(socUri, groupValue);
-                		System.out.println("MeasurementGenerator: set group. findGroup=[" + grp + "]");
                 		if (grp == null) {
                 			grp = new SOCGroup(socUri, groupValue);
                 			grp.saveToTripleStore();
@@ -488,9 +463,36 @@ public class MeasurementGenerator extends BaseGenerator {
                 	// add object URI to group
                 	grp.addMemberUri(objUri);
                 	grp.saveMemberToTripleStore(objUri);
-
                 
                 }
+                doGroup = false;
+            }
+
+        	/*=====================================*
+             *                                     *
+             *   SET MATCHING                      *
+             *                                     *
+             *=====================================*/
+            
+            if (doMatching && !schema.getMatchingLabel().equals("") && posMatching >= 0) {
+                String scopeObjectUri = objList.get(reference).get(StudyObject.SCOPE_OBJECT_URI);
+                String scopeObjectSOCUri = objList.get(reference).get(StudyObject.SCOPE_OBJECT_SOC_URI);
+            	String matchingValue = record.getValueByColumnIndex(posMatching);
+                if (matchingSOCs.containsKey(scopeObjectSOCUri) && matchingValue != null && !matchingValue.isEmpty()) {
+                	ObjectCollection matchingSOC = matchingSOCs.get(scopeObjectSOCUri);
+                	StudyObjectMatching matching = StudyObjectMatching.find(matchingSOC.getUri(), matchingValue);
+                	if (matching == null) {
+                		matching = new StudyObjectMatching(matchingSOC.getUri(), matchingValue);
+                		matching.addMemberUri(scopeObjectUri);
+                		matching.saveToTripleStore();
+                	} else {
+                		matching.addMemberUri(scopeObjectUri);
+                		matching.saveLastMemberTripleStore();
+                	}
+                    measurement.setObjectUri(matching.getUri());
+                    measurement.setObjectCollectionType(matchingSOC.getTypeUri());
+                }
+                doMatching = false;
             }
 
             /*=====================================*

@@ -106,10 +106,7 @@
             </thead>
             <tbody>
 	        @if(objList != null) {
-	             @objList.size() 
-	             @objList.toString()
                  @for(obj <- objList){
-                     @obj.getUri()
 	                 @obj_entry(study, oc, obj)
                  }
             } 

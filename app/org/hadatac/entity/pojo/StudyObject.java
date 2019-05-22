@@ -58,7 +58,8 @@ public class StudyObject extends HADatAcThing {
     //    1 -> originalID of object in the object’s scope (if any)
     public static final String SUBJECT_ID = "SUBJECT_ID";
     //    2 -> URI of object in the object’s scope (if any)
-    public static final String OBJECT_SCOPE_URI = "OBJECT_SCOPE_URI";
+    public static final String SCOPE_OBJECT_URI = "SCOPE_OBJECT_URI";
+    public static final String SCOPE_OBJECT_SOC_URI = "SCOPE_OBJECT_SOC_URI";
     //    3 -> studyObjectType
     public static final String STUDY_OBJECT_TYPE = "STUDY_OBJECT_TYPE";
     //    4 -> soc's type
@@ -67,7 +68,7 @@ public class StudyObject extends HADatAcThing {
     public static final String SOC_LABEL = "SOC_LABEL";
     public static final String SOC_URI = "SOC_URI";
     public static final String OBJECT_ORIGINAL_ID = "OBJECT_ORIGINAL_ID";
-    public static final String OBJECT_TIME = "OBJECT_TYME";
+    public static final String OBJECT_TIME = "OBJECT_TIME";
  
     @PropertyField(uri="hasco:originalID")
     String originalId;
@@ -367,6 +368,36 @@ public class StudyObject extends HADatAcThing {
                 try {
                     if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
                         retrievedUris.add(soln.getResource("timeScopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveTimeScopeTypeUris(String obj_uri) {
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT DISTINCT ?timeScopeUri ?timeScopeTypeUri WHERE { " + 
+                " <" + obj_uri + "> hasco:hasTimeObjectScope ?timeScopeUri . " + 
+                " ?timeScopeUri a ?timeScopeTypeUri . " +
+                "}";
+
+        //System.out.println("Study.retrieveTimeScopeUris() queryString: \n" + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("timeScopeTypeUri") != null && soln.getResource("timeScopeTypeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("timeScopeTypeUri").getURI());
                     }
                 } catch (Exception e1) {
                 }
@@ -842,9 +873,9 @@ public class StudyObject extends HADatAcThing {
                     details.put(SUBJECT_ID, "");
                 }
                 if (soln.get("obj") != null) {
-                    details.put(OBJECT_SCOPE_URI, soln.get("obj").toString());
+                    details.put(SCOPE_OBJECT_URI, soln.get("obj").toString());
                 } else {
-                    details.put(OBJECT_SCOPE_URI, "");
+                    details.put(SCOPE_OBJECT_URI, "");
                 }
                 if (soln.get("studyObjectType") != null) {
                     details.put(STUDY_OBJECT_TYPE, soln.get("studyObjectType").toString());

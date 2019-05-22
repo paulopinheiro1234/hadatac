@@ -20,6 +20,8 @@ import play.mvc.Result;
 import play.data.*;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -31,12 +33,16 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.sandbox.Sandbox;
+import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
+import org.hadatac.console.models.TreeNode;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.NameSpaces;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.typesafe.config.ConfigFactory;
 
 
@@ -648,4 +654,46 @@ public class DataFile implements Cloneable {
         
         return results;
     }
+
+    @JsonIgnore
+    public static TreeNode getHierarchy(String current, String path) {
+    	if (current == null) {
+    		return null;
+    	}
+    	DataFile dirFile = null;
+    	if (path.equals("")) {
+    		path = current;
+    	} else if (path.equals("/")) {
+    		path = path + current;
+    	} else {
+    		path = path + "/" + current;
+    	}
+        TreeNode node = new TreeNode(path);
+		dirFile = new DataFile(path);
+		dirFile.setStatus(DataFile.WORKING);
+        File fileAux = new File(dirFile.getAbsolutePath());
+        if (fileAux.isDirectory() && fileAux.listFiles() != null) {
+        	File[] children = fileAux.listFiles();
+        	for (File child : children) {
+        		DataFile childDataFile = new DataFile(child.getName());
+        		childDataFile.setStatus(DataFile.WORKING);
+        		if (child.isDirectory()) {
+        			node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path));
+        		}
+        	}
+        }
+        return node;
+    }
+
+    public static String getFolderLabel(String folderPath) {
+    	if (folderPath == null) {
+    		return "";
+    	}
+    	if (folderPath.equals("/")) {
+    		return folderPath;
+    	}
+    	String[] pieces = folderPath.split("/");
+    	return pieces[pieces.length -1];
+    }
+
 }

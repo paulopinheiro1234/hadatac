@@ -5,6 +5,7 @@ public class NewFileForm {
     public String newType;
     public String newTemplate;
     public String newName;
+    public String newDest;
     
     public NewFileForm () {
     }
@@ -31,6 +32,14 @@ public class NewFileForm {
     
     public void setNewName(String newName) {
     	this.newName = newName;
+    }
+    
+    public String getNewDest() {
+    	return newDest;
+    }
+    
+    public void setNewDest(String newDest) {
+    	this.newDest = newDest;
     }
     
 }

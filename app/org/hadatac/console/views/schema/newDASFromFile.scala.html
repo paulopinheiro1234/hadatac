@@ -9,10 +9,10 @@
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.console.controllers._
 
-@main("New Data Acquisition Schema from File") {
+@main("New SDD from File") {
 
   <div class="container">
-    <h2>New Data Acquisition Schema From File</h2>
+    <h2>New SDD From File</h2>
 
     <form class="form-horizontal" name="newDAS" method="post">
 	
@@ -24,11 +24,11 @@
       <div class="form-group" class="col-sm-6 col-offset-3">
         <input class="btn btn-success" role="button" type="submit" value="Create labels and positions" formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFile(labels)"/>
         <input class="btn btn-success" role="button" type="submit" value="Create just labels" formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFileLabels(labels)"/> 
-        <p> The created data Acquisition Schema will be saved in LabKey</p>
+        <p> The created SDD will be saved in LabKey</p>
       </div>
       
       <div class="form-group" class="col-sm-6 col-offset-3">
-	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Manage CSV Annotation</a>
+	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Data File Management</a>
       </div>
       
     </form>

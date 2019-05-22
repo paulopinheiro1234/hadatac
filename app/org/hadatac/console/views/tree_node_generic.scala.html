@@ -6,19 +6,20 @@
 @import java.net._
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader.URIUtils
+@import org.hadatac.entity.pojo.DataFile
 
 @if(node == null) {
    EMPTY
 } else {
    @if(!selected.equals("") && node.getName().equals(selected)) {
-      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@URIUtils.replaceNameSpaceEx(node.getName())" onchange="typechange()" checked>@FirstLabel.getLabel(node.getName())</a>
+      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" onchange="typechange()" checked>&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
    } else {
-      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@URIUtils.replaceNameSpaceEx(node.getName())" onchange="typechange()" >@FirstLabel.getLabel(node.getName())</a>
+      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" onchange="typechange()" >&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
    }
    @if(node.getChildren().size() > 0) {
       <ul>
 	     @for(child <- node.getChildren()) { 
-            @tree_node(child, optionName, selected)
+            @tree_node_generic(child, optionName, selected)
          }
       </ul>
    }

@@ -7,6 +7,7 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.entity.pojo.StudyObject;
+import org.hadatac.entity.pojo.StudyObjectMatching;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
@@ -46,6 +47,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private List<ObjectCollection> groundingPath = new ArrayList<ObjectCollection>();  
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
+    private Map<String, ObjectCollection> socMatchingSOCs = new ConcurrentHashMap<String, ObjectCollection>();
     
     public DASOInstanceGenerator(DataFile dataFile, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
         super(dataFile);
@@ -56,10 +58,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
         socPaths.clear();
         socLabels.clear();
 
-        /* **************************************************************************************
-         *                                                                                      *
-         *                MAPPING OF IDNTIFIER AND ASSOCIATED OBJECTS                           *
-         *                                                                                      *
+        /* ***************************************************************************************
+         *                                                                                       *
+         *                MAPPING OF IDENTIFIER AND ASSOCIATED OBJECTS                           *
+         *                                                                                       *
          ****************************************************************************************/
 
         mainLabel = "";
@@ -114,15 +116,18 @@ public class DASOInstanceGenerator extends BaseGenerator {
         if (!computeLabelsForTargetSOCs()) {
             return;
         }
+        if (!mapSOCsAndMatchings()) {
+            return;
+        }
         ////////////////////////////////////////////
     }
 
     private boolean retrieveAvailableSOCs() {
         /* 
-         *  (1/9) INITIALLY AVAILABLE SOCs
+         *  (1/10) INITIALLY AVAILABLE SOCs
          */
 
-        logger.println("DASOInstanceGenerator: (1/9) ======== INITIALLY AVAILABLE SOCs ========");
+        logger.println("DASOInstanceGenerator: (1/10) ======== INITIALLY AVAILABLE SOCs ========");
         socsList = ObjectCollection.findByStudyUri(studyUri);
         if (socsList == null) {
             logger.println("DASOInstanceGenerator: no SOC is available");
@@ -138,7 +143,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean identifyMainDASO() {
         /* 
-         *  (2/9) IDENTIFY MAIN DASO and DASOS REQUIRED FROM DASAs. THESE DASOS ARE LISTED IN STEP (4)
+         *  (2/10) IDENTIFY MAIN DASO and DASOS REQUIRED FROM DASAs. THESE DASOS ARE LISTED IN STEP (4)
          */
 
         mainDasoUri = "";
@@ -168,7 +173,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             return false;
         }
         mainSocUri = mainSoc.getUri();
-        logger.println("DASOInstanceGenerator: (2/9) ============= MAIN DASO ================");
+        logger.println("DASOInstanceGenerator: (2/10) ============= MAIN DASO ================");
         logger.println("DASOInstanceGenerator: Main DASO: " + mainDasoUri);
         logger.println("DASOInstanceGenerator: Main SOC: " + mainSocUri);
         
@@ -177,10 +182,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean identifyGroundingPathForMainSOC() {
         /* 
-         *  (3/8) IDENTIFY GROUNDING PATH FOR MAIN SOC
+         *  (3/10) IDENTIFY GROUNDING PATH FOR MAIN SOC
          */
 
-        logger.println("DASOInstanceGenerator: (3/9) =========== GROUNDING PATH FOR  MAIN SOC ============");
+        logger.println("DASOInstanceGenerator: (3/10) =========== GROUNDING PATH FOR  MAIN SOC ============");
         if (mainSoc.getHasScopeUri() == null || mainSoc.getHasScopeUri().equals("")) {
             logger.println("DASOInstanceGenerator: Main SOC is already grounded. No grouding path required");
             groundingSoc = mainSoc;
@@ -210,10 +215,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean identifyTargetDasoURIs() {
         /* 
-         *  (4/9) IDENTIFY URIs of TARGET DASOs
+         *  (4/10) IDENTIFY URIs of TARGET DASOs
          */
 
-        logger.println("DASOInstanceGenerator: (4/9) =============== TRAVERSE DASOS ================");
+        logger.println("DASOInstanceGenerator: (4/10) =============== TRAVERSE DASOS ================");
 
         for (Map.Entry<String, DataAcquisitionSchemaObject> entry : dasos.entrySet()) {
             String key = entry.getKey();
@@ -226,10 +231,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean identitySOCsForDASOs() {
         /* 
-         *  (5/9) IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs
+         *  (5/10) IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs
          */
 
-        logger.println("DASOInstanceGenerator: (5/9) ===== IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs ======");
+        logger.println("DASOInstanceGenerator: (5/10) ===== IDENTIFY SOCs ASSOCIATED WITH IDENTIFIED DASOs ======");
 
         this.requiredSocs.clear();
         for (Map.Entry<String, DataAcquisitionSchemaObject> entry : dasos.entrySet()) {
@@ -245,10 +250,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean retrieveAdditionalSOCs() {
         /* 
-         *  (6/9) RETRIEVING ADDITIONAL SOCs required for traversing existing SOCs
+         *  (6/10) RETRIEVING ADDITIONAL SOCs required for traversing existing SOCs
          */
 
-        logger.println("DASOInstanceGenerator: (6/9) ======== RETRIEVING ADDITINAL  SOCs ========");
+        logger.println("DASOInstanceGenerator: (6/10) ======== RETRIEVING ADDITINAL  SOCs ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
@@ -282,10 +287,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean printRequiredSOCs() {
         /* 
-         *  (7/9) LIST OF REQUIRED SOCs
+         *  (7/10) LIST OF REQUIRED SOCs
          */
 
-        logger.println("DASOInstanceGenerator: (7/9) ======== REQUIRED SOCs ========");
+        logger.println("DASOInstanceGenerator: (7/10) ======== REQUIRED SOCs ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
@@ -298,10 +303,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean computePathsForTargetSOCs() {
         /* 
-         *  (8/9) COMPUTE PATH for each TARGET SOC
+         *  (8/10) COMPUTE PATH for each TARGET SOC
          */
 
-        logger.println("DASOInstanceGenerator: (8/9) ======== BUILD SOC PATHS ========");
+        logger.println("DASOInstanceGenerator: (8/10) ======== BUILD SOC PATHS ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
@@ -336,10 +341,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     private boolean computeLabelsForTargetSOCs() {
         /* 
-         *  (9/9) COMPUTE LABEL for each TARGET SOC
+         *  (9/10) COMPUTE LABEL for each TARGET SOC
          */
 
-        logger.println("DASOInstanceGenerator: (9/9) ======== COMPUTE SOC LABELS ========");
+        logger.println("DASOInstanceGenerator: (9/10) ======== COMPUTE SOC LABELS ========");
         for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
@@ -393,6 +398,30 @@ public class DASOInstanceGenerator extends BaseGenerator {
                     soc.saveRoleLabel(fullLabel);
                 }
                 socLabels.put(soc.getSOCReference(), fullLabel);
+            }
+        }
+        
+        return true;
+    }
+
+    private boolean mapSOCsAndMatchings() {
+        /* 
+         *  (10/10) Map SOCs and Matchings 
+         */
+
+        logger.println("DASOInstanceGenerator: (10/10) ======== MAP SOCs and MATCHINGS ========");
+        for (Map.Entry<String, ObjectCollection> entry : requiredSocs.entrySet()) {
+            String key = entry.getKey();
+            ObjectCollection soc = entry.getValue();
+            if (!socMatchingSOCs.containsKey(soc.getUri())) {
+            	List<ObjectCollection> matchingSOCs = ObjectCollection.findMatchingScopeCollections(soc.getUri());
+            	if (matchingSOCs.size() > 1) {
+            		logger.printWarning("DASOInstanceGenerator: SOC: " + soc.getUri() + "   has more than one matching SOC");
+            	}
+            	if (matchingSOCs.size() >- 0) {
+            		socMatchingSOCs.put(soc.getUri(), matchingSOCs.get(0));
+            		logger.println("DASOInstanceGenerator: SOC: " + soc.getUri() + "   Has matching SOC: " + matchingSOCs.get(0).getUri());
+            	}
             }
         }
         
@@ -545,7 +574,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
             String newLabel = daso.getLabel().replace("??","");
             String collectionType = null;
-            if (isSample(daso)) {
+            if (daso.getEntity().equals(URIUtils.replacePrefixEx("hasco:StudyObjectMatching"))) {
+            	collectionType = ObjectCollection.MATCHING_COLLECTION;
+            } else if (isSample(daso)) {
                 collectionType = ObjectCollection.SAMPLE_COLLECTION;
             } else {
                 collectionType = ObjectCollection.SUBJECT_COLLECTION;
@@ -633,7 +664,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
             if (DEBUG_MODE) { 
             	System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
             }
-            
+
+            ObjectCollection previousSoc = null;
+            String previousObjUri = null;
             while (currentObjUri != null && !currentObjUri.equals("") && iter.hasPrevious()) {
                 ObjectCollection nextSoc = iter.previous();
                 if (DEBUG_MODE) { 
@@ -663,6 +696,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 			"]  =>  Obj Uri=[" + nextObjUri + "]");
                 }
 
+                previousSoc = currentSoc;
+                previousObjUri = currentObjUri;
                 currentSoc = nextSoc;
                 currentObjUri = nextObjUri;
             }
@@ -672,17 +707,24 @@ public class DASOInstanceGenerator extends BaseGenerator {
             } else {
             	StudyObject obj = getCachedObject(currentObjUri);
             	if (obj != null) { 
-            		List<String> objTimes = StudyObject.retrieveTimeScopeUris(currentObjUri);
+            		// TO-DO we will need to have a mechanism to decide whether to use instances or classes to represent abstract time
+            		List<String> objTypeTimes = StudyObject.retrieveTimeScopeTypeUris(currentObjUri);
             		Map<String,String> referenceEntry = new HashMap<String,String>();
             		referenceEntry.put(StudyObject.STUDY_OBJECT_URI, currentObjUri);
             		referenceEntry.put(StudyObject.STUDY_OBJECT_TYPE, obj.getTypeUri());
             		referenceEntry.put(StudyObject.SOC_TYPE, currentSoc.getTypeUri());
             		referenceEntry.put(StudyObject.SOC_LABEL, socLabels.get(currentSoc.getSOCReference()));
-            		referenceEntry.put(StudyObject.OBJECT_SCOPE_URI, id);
+            		referenceEntry.put(StudyObject.SUBJECT_ID, id);
+            		if (previousObjUri != null && !previousObjUri.isEmpty()) {
+            			referenceEntry.put(StudyObject.SCOPE_OBJECT_URI, previousObjUri);
+            		}
+            		if (previousSoc != null && previousSoc.getUri() != null && !previousSoc.getUri().isEmpty()) {
+            			referenceEntry.put(StudyObject.SCOPE_OBJECT_SOC_URI, previousSoc.getUri());
+            		}
             		referenceEntry.put(StudyObject.OBJECT_ORIGINAL_ID, obj.getOriginalId());
             		referenceEntry.put(StudyObject.SOC_URI, currentSoc.getUri());
-            		if (objTimes != null && objTimes.size() > 0) {
-            			referenceEntry.put(StudyObject.OBJECT_TIME, objTimes.get(0));
+            		if (objTypeTimes != null && objTypeTimes.size() > 0) {
+            			referenceEntry.put(StudyObject.OBJECT_TIME, objTypeTimes.get(0));
             		}
 
             		objMapList.put(currentSoc.getSOCReference(),referenceEntry);
@@ -716,7 +758,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
         String newTypeUri = "";
         DataAcquisitionSchemaObject daso = dasoFromSoc(nextSoc, dasos);
         if (daso == null || daso.getEntity() == null || daso.getEntity().equals("")) {
-            if (nextSoc.getTypeUri().equals(ObjectCollection.SUBJECT_COLLECTION)) {
+            if (nextSoc.getTypeUri().equals(ObjectCollection.MATCHING_COLLECTION)) {
+                newTypeUri = URIUtils.replacePrefixEx(StudyObjectMatching.className);
+            } else if (nextSoc.getTypeUri().equals(ObjectCollection.SUBJECT_COLLECTION)) {
                 newTypeUri = URIUtils.replacePrefixEx(SIO_OBJECT);
             } else {
                 newTypeUri = URIUtils.replacePrefixEx(SIO_SAMPLE);
@@ -878,6 +922,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	}
     }
  
+    public Map<String,ObjectCollection> getMatchingSOCs() {
+    	return socMatchingSOCs;
+    }
     
     /* **************************************************************************************
      *                                                                                      *

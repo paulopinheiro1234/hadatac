@@ -73,7 +73,7 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 		    return null;
 		} else {
 		    if (codeMap.containsKey(entity)) {
-			System.out.println("[DASOGenerator] code matched: " + entity); 
+			//System.out.println("[DASOGenerator] code matched: " + entity); 
 			return codeMap.get(entity);
 		    } else {
 			return entity;
@@ -142,32 +142,32 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 	    int rowNumber = 0;
 	    List<String> column_name = new ArrayList<String>();
 	    for (Record record : records) {
-		System.out.println("[DASOGenerator] Processing [" + getLabel(record) + "]");
-		//if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
-		if (getEntity(record)  == null || getEntity(record).equals("")) {
-		    System.out.println("[DASOGenerator]     getEntity(record) = [" + getEntity(record) + "]");
-		    if (column_name.contains(getLabel(record))){
-			rows.add(createRelationRow(record, ++rowNumber));
-		    }
-		} else {
-		    System.out.println("[DASOGenerator]     creating a row....");
-		    rows.add(createRow(record, ++rowNumber));
-		    column_name.add(getLabel(record));
-		}
+	    	//System.out.println("[DASOGenerator] Processing [" + getLabel(record) + "]");
+	    	//if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
+	    	if (getEntity(record)  == null || getEntity(record).equals("")) {
+	    		//System.out.println("[DASOGenerator]     getEntity(record) = [" + getEntity(record) + "]");
+	    		if (column_name.contains(getLabel(record))){
+	    			rows.add(createRelationRow(record, ++rowNumber));
+	    		}
+	    	} else {
+	    		//System.out.println("[DASOGenerator]     creating a row....");
+	    		rows.add(createRow(record, ++rowNumber));
+	    		column_name.add(getLabel(record));
+	    	}
 	    }
 	    
 	    System.out.println("[DASOGenerator] Added " + rowNumber + " rows!");
 	}
     
-        public List<String> createUris() throws Exception {
+	public List<String> createUris() throws Exception {
 	    List<String> result = new ArrayList<String>();
 	    for (Record record : records) {
-		//if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
-		if (getEntity(record)  == null || getEntity(record).equals("")) {
-		    continue;
-		} else {
-		    result.add(kbPrefix + "DASO-" + SDDName + "-" + getLabel(record).trim().replace(" ","").replace("_","-").replace("??", ""));
-		}
+	    	//if (getEntity(record)  == null || getEntity(record).equals("")  || timeList.contains(getLabel(record))){
+	    	if (getEntity(record)  == null || getEntity(record).equals("")) {
+	    		continue;
+	    	} else {
+	    		result.add(kbPrefix + "DASO-" + SDDName + "-" + getLabel(record).trim().replace(" ","").replace("_","-").replace("??", ""));
+	    	}
 	    }
 	    return result;
 	}
@@ -183,7 +183,7 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
 		row.put("hasco:hasEntity", getEntity(rec));
 		row.put("hasco:hasRole", getRole(rec));
-		System.out.println("[DASOGenerator] [createRow] getRelation: [" + getRelation(rec) + "]    inRelationTo: [" + getInRelationTo(rec) + "]    inRelationToString: [" + getInRelationToString(rec) + "]");
+		//System.out.println("[DASOGenerator] [createRow] getRelation: [" + getRelation(rec) + "]    inRelationTo: [" + getInRelationTo(rec) + "]    inRelationToString: [" + getInRelationToString(rec) + "]");
 		if (getRelation(rec).length() > 0) {
 			if (getInRelationTo(rec).length() > 0) {
 				row.put(getRelation(rec), getInRelationTo(rec));

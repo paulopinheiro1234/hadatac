@@ -126,7 +126,7 @@ public class AnnotationWorker {
             } else if (fileName.endsWith(".xlsx")) {
                 recordFile = new SpreadsheetRecordFile(file);
             } else if (dataFile.isMediaFile()) {
-            	System.out.println("Process Media File: " + dataFile.getFileName());
+            	System.out.println("Processing Media File " + dataFile.getFileName());
                 processMediaFile(dataFile);
                 return;
             } else {
@@ -208,7 +208,6 @@ public class AnnotationWorker {
     }
     
     public static void checkOASFile(DataFile dataFile) {
-        System.out.println("OAS HERE!");
         final String kbPrefix = ConfigProp.getKbPrefix();
         Record record = dataFile.getRecordFile().getRecords().get(0);
         String studyName = record.getValueByColumnName("Study ID");
@@ -226,12 +225,10 @@ public class AnnotationWorker {
             if (oc.getGroundingLabel().length() > 0) {
                 refList.put(oc.getSOCReference(), oc.getGroundingLabel());
                 tarList.add(kbPrefix + "DASO-" + studyName + "-" + oc.getSOCReference().trim().replace(" ","").replace("_","-").replace("??", ""));
-                System.out.println("========================= " + oc.getGroundingLabel());
             }
         }
 
         String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
-        System.out.println("das_uri " + das_uri);
         DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
         if (das == null) {
             dataFile.getLogger().printExceptionByIdWithArgs("OAS_00001", record.getValueByColumnName("Study ID"));
@@ -240,7 +237,6 @@ public class AnnotationWorker {
             List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
             List<String> loo2 = new ArrayList<String>();
             for (DataAcquisitionSchemaAttribute attr : das.getAttributes()) {
-                System.out.println(" +++++++ " + attr.getLabel() + " --- " + attr.getObjectViewLabel());
                 if (attr.getObjectViewLabel().length() > 0) {
                     if (!loo2.contains(attr.getObjectViewLabel())) {
                         loo2.add(attr.getObjectViewLabel());
@@ -456,7 +452,7 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSDDFile(DataFile dataFile) {
-        System.out.println("Processing data acquisition schema file ...");
+        System.out.println("Processing SDD file ...");
         
         RecordFile recordFile = new SpreadsheetRecordFile(dataFile.getFile(), "InfoSheet");
         if (!recordFile.isValid()) {
@@ -570,8 +566,8 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSSDFile(DataFile dataFile) {
-        String Pilot_Num = dataFile.getRecordFile().getFileName().replaceAll("SSD-", "");
-        System.out.println("Processing SSD file of " + Pilot_Num + "...");
+        String studyId = dataFile.getRecordFile().getFileName().replaceAll("SSD-", "");
+        System.out.println("Processing SSD file of " + studyId + "...");
 
         SSD ssd = new SSD(dataFile);
         Map<String, String> mapCatalog = ssd.getCatalog();
@@ -629,7 +625,7 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateDAFile(DataFile dataFile) {
-        System.out.println("annotateDAFile: [" + dataFile.getFileName() + "]");
+        System.out.println("Processing DA file " + dataFile.getFileName());
 
         GeneratorChain chain = new GeneratorChain();
 

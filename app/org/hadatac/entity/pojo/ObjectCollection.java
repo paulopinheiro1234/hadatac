@@ -46,6 +46,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String SAMPLE_COLLECTION = "http://hadatac.org/ont/hasco/SampleCollection";
     public static String LOCATION_COLLECTION = "http://hadatac.org/ont/hasco/LocationCollection";
     public static String TIME_COLLECTION = "http://hadatac.org/ont/hasco/TimeCollection";
+    public static String MATCHING_COLLECTION = "http://hadatac.org/ont/hasco/MatchingCollection";
 
     public static String INDENT1 = "   ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -595,6 +596,36 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return groupUris;
     }
 
+    public static List<ObjectCollection> findMatchingScopeCollections(String oc_uri) {
+
+    	List<ObjectCollection> matchingSOCs = new ArrayList<ObjectCollection>(); 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?matchingUri WHERE { \n" + 
+                "  ?matchingUri hasco:hasScope <" + oc_uri + "> . \n" + 
+                "  ?matchingUri a <" + ObjectCollection.MATCHING_COLLECTION + "> . \n" + 
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("matchingUri") != null && soln.getResource("matchingUri").getURI() != null) {
+                        String matchingUri = soln.getResource("matchingUri").getURI();
+                        if (matchingUri != null && !matchingUri.equals("")) {
+                            matchingSOCs.add(ObjectCollection.find(matchingUri));
+                        }
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+
+        return matchingSOCs;
+    }
+
     public static ObjectCollection find(String oc_uri) {
         ObjectCollection oc = null;
 
@@ -1003,7 +1034,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                         insert += oc_uri + " hasco:hasTimeScope  <" + timeScope + "> . ";
                     } else {
                         insert += oc_uri + " hasco:hasTimeScope  " + timeScope + " . ";
-                        System.out.println(oc_uri + " hasco:hasTimeScope  " + timeScope + " . ");
+                        //System.out.println(oc_uri + " hasco:hasTimeScope  " + timeScope + " . ");
                     }
                 }
             }
@@ -1015,7 +1046,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                         insert += oc_uri + " hasco:hasGroup  <" + group + "> . ";
                     } else {
                         insert += oc_uri + " hasco:hasGroup  " + group + " . ";
-                        System.out.println(oc_uri + " hasco:hasGroup  " + group + " . ");
+                        //System.out.println(oc_uri + " hasco:hasGroup  " + group + " . ");
                     }
                 }
             }
@@ -1157,7 +1188,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             //System.out.println("    - oc.domain " + oc.getHasScopeUri());
             //System.out.println("    - oc.time " + oc.getTimeScopes());
             if (path.get(path.size() - 1).isConnected(oc)) {
-                System.out.println(oc.getUri() + " is connected to " + path.get(path.size() - 1).getUri());
+                //System.out.println(oc.getUri() + " is connected to " + path.get(path.size() - 1).getUri());
                 if (oc.getGroundingLabel() != null && !oc.getGroundingLabel().equals("")) {
                     String finalLabel = oc.getGroundingLabel();
                     for (int i = path.size() - 1; i >= 0; i--) {

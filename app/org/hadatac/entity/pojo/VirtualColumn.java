@@ -163,7 +163,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
                 + " ?uri rdfs:subClassOf* <" + uri + "> . \n"
                 + " } \n";
 
-        System.out.println("queryString: " + queryString);
+        //System.out.println("queryString: " + queryString);
         
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -186,7 +186,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
             return null;
         }
         
-        System.out.println("VirtualColumn find is called for uri " + uri);
+        //System.out.println("VirtualColumn find is called for uri " + uri);
         
         String queryString = "DESCRIBE <" + uri + ">";
         Query query = QueryFactory.create(queryString);
