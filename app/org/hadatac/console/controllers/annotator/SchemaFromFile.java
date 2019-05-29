@@ -53,6 +53,6 @@ public class SchemaFromFile extends Controller {
 
 		return ok(newDASFromFile.render(dir, file_name, labels));
 	}
-
+	
 }
 

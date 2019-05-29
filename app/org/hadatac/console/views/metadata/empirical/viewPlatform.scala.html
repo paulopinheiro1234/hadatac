@@ -15,6 +15,9 @@
   <p><b>URI</b>: @platform.getUri()</p>
   <p><b>Model</b>: @platform.getTypeLabel() (@platform.getTypeUri())</p>
   <p><b>Serial Number</b>: @platform.getSerialNumber()</p>
+  @if(platform.getURL() != null && !platform.getURL().isEmpty()) {
+	  <p><b>URL</b>: <a href="@platform.getURL()">@platform.getURL()</a></p>
+  }
   @if(platform.getPartOf() != null && !platform.getPartOf().equals("")) {
     <p><b>Part Of</b>: @platform.getPartOfLabel() 
         (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getPartOf()</a>)</p>
@@ -79,6 +82,34 @@
     	     <img src="@DataFile.getMediaUrl(platform.getLayout())" alt="@platform.getLayout()" width="300">  
     	  </ul>
 	   }
+	  <ul>
+  	  <table class="table">
+   		<thead>
+        	<tr>
+             	<th>Dimension</th>
+                <th>Value</th>
+                <th>Unit</th>
+            </tr>
+         </thead>
+         <tbody>
+			<tr>
+ 				<td>Width</td>
+ 				<td>@platform.getWidth()</td>
+ 				<td>@platform.getWidthUnitLabel()</td>
+			</tr>
+			<tr>
+ 				<td>Depth</td>
+ 				<td>@platform.getDepth()</td>
+ 				<td>@platform.getDepthUnitLabel()</td>
+			</tr>
+			<tr>
+ 				<td>Height</td>
+ 				<td>@platform.getHeight()</td>
+ 				<td>@platform.getHeightUnitLabel()</td>
+			</tr>
+         </tbody>
+      </table>
+      </ul>
   }
   <p><b>Image</b>: @platform.getImage()</p>
   @if(platform.getImage() != null && !platform.getImage().isEmpty()) {

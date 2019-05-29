@@ -58,6 +58,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     private String image;
     private String layout;
     private String referenceLayout;
+    private String url;
+    private Float width;
+    private String widthUnit;
+    private Float depth;
+    private String depthUnit;
+    private Float height;
+    private String heightUnit;
 
     public Platform(String uri,
             String typeUri,
@@ -201,6 +208,80 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
     public void setThirdCoordinateCharacteristic(String thirdCoordinateCharacteristic) {
         this.thirdCoordinateCharacteristic = thirdCoordinateCharacteristic;
+    }
+
+    public Float getWidth() {
+        return width;
+    }
+    public void setWidth(Float width) {
+        this.width = width;
+    }
+
+    public String getWidthUnit() {
+        return widthUnit;
+    }
+    public String getWidthUnitLabel() {
+        if (widthUnit == null || widthUnit.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(widthUnit);
+    }
+
+    public void setWidthUnit(String widthUnit) {
+        this.widthUnit = widthUnit;
+    }
+
+    public Float getDepth() {
+        return depth;
+    }
+
+    public void setDepth(Float depth) {
+        this.depth = depth;
+    }
+
+    public String getDepthUnit() {
+        return depthUnit;
+    }
+
+    public String getDepthUnitLabel() {
+        if (depthUnit == null || depthUnit.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(depthUnit);
+    }
+
+    public void setDepthUnit(String depthUnit) {
+        this.depthUnit = depthUnit;
+    }
+
+    public Float getHeight() {
+        return height;
+    }
+
+    public void setHeight(Float height) {
+        this.height = height;
+    }
+
+    public String getHeightUnit() {
+        return heightUnit;
+    }
+
+    public String getHeightUnitLabel() {
+        if (heightUnit == null || heightUnit.isEmpty()) {
+        	return "";
+        }
+        return FirstLabel.getPrettyLabel(heightUnit);
+    }
+
+    public void setHeightUnit(String heightUnit) {
+        this.heightUnit = heightUnit;
+    }
+
+    public String getURL() {
+        return url;
+    }
+    public void setURL(String url) {
+        this.url = url;
     }
 
     public String getSerialNumber() {
@@ -408,6 +489,20 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 platform.setLayout(object.asLiteral().getString());
             } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasReferenceLayout")) {
                 platform.setReferenceLayout(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutWidth")) {
+                platform.setWidth(object.asLiteral().getFloat());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutWidthUnit")) {
+                platform.setWidthUnit(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutDepth")) {
+                platform.setDepth(object.asLiteral().getFloat());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutDepthUnit")) {
+                platform.setDepthUnit(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutHeight")) {
+                platform.setHeight(object.asLiteral().getFloat());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutHeightUnit")) {
+                platform.setHeightUnit(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasURL")) {
+                platform.setURL(object.asLiteral().getString());
             }
         }
 

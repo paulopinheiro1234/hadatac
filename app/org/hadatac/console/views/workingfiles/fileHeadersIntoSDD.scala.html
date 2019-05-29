@@ -1,0 +1,137 @@
+@(dir      : String,
+  sdd_name : String,
+  dirFile  : org.hadatac.entity.pojo.DataFile)
+
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.schema._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo._
+
+@main("Add File Headers into SDD") {
+
+<script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	      
+	      if (document.getElementById('targetFile').value.length == 0) {
+	          cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton1').disabled = false;
+	          document.getElementById('submitbutton2').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton1').disabled = 'disabled';
+	          document.getElementById('submitbutton2').disabled = 'disabled';
+	      }
+	   }
+	</script>
+   <style>
+      ul.tree li {
+        list-style-type: none;
+        position: relative;
+      }
+
+      ul.tree li ul {
+        display: none;
+      }
+
+      ul.tree li.open > ul {
+        display: block;
+      }
+
+      ul.tree li a {
+        color: black;
+        text-decoration: none;
+      }
+
+      ul.tree li a:before {
+        height: 1em;
+        padding:0 .1em;
+        font-size: .8em;
+        display: block;
+        position: absolute;
+        left: -1.3em;
+        top: .2em;
+      }
+
+      ul.tree li > a:not(:last-child):before {
+        content: '+';
+      }
+
+      ul.tree li.open > a:not(:last-child):before {
+        content: '-';
+      }
+   </style>
+  <div class="container">
+
+    <form class="form-horizontal" name="newDAS" method="post">
+	
+      <div class="form-group">
+         <h3>Add File Headers into SDD</h3>
+	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>	
+	     <p>This option extract column headers from CSV files and add them into a give Semantic Data Dictionary.</p>
+	  </div>
+	  
+      <div class="form-group">
+		<label>SDD:</label> This is the Semantic Data Dictionary where the column headers are going to be inserted.
+ 		<input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@sdd_name >
+      </div>
+      
+      <div class="form-group">
+		<label>Selected File:</label> The data file where the column headers are going to be extracted need to be loaded inside of working files. 
+		Use the drop box in working files to include the data file into working files. If the data file is already on working files, use the option
+		below to expand the directories and select the file.
+	      <ul class="tree">
+            @if(dirFile != null) {
+		   		@tree_node_generic(DataFile.getHierarchy("/","",false),"targetFile", "", false)
+			}
+          </ul>
+		
+      </div>
+      
+      @defining("") { labels => 
+      	  <div class="form-group" class="col-sm-6 col-offset-3">
+        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Create labels and positions" disabled="disabled" 
+        	         formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFile(labels)"/>
+        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton2" value="Create just labels" disabled="disabled" 
+        	         formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFileLabels(labels)"/> 
+      	  </div>
+      }
+      
+      <div class="form-group" class="col-sm-6 col-offset-3">
+	     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Back to Working Files</a>
+      </div>
+      
+    </form>
+  </div>
+ 	<script>
+       function typechange() {
+          var newType = $("input[name=newStudyType]:checked").val();
+ 	  $('#currentType').val(newType);
+          checkform();
+       };
+
+       var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
+       for(var i = 0; i < tree.length; i++){
+          tree[i].addEventListener('click', function(e) {
+          var parent = e.target.parentElement;
+          var classList = parent.classList;
+          if(classList.contains("open")) {
+            classList.remove('open');
+            var opensubs = parent.querySelectorAll(':scope .open');
+            for(var i = 0; i < opensubs.length; i++){
+                opensubs[i].classList.remove('open');
+            }
+          } else {
+            classList.add('open');
+          }
+         });
+       }
+       </script>
+ 
+  
+  }

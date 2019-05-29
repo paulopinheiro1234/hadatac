@@ -96,6 +96,8 @@ public class NewDAS extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processFormFromFile(String attributes) {
+    	
+    	/*
         System.out.println("Inside processFormFromFile()");
 
         Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
@@ -108,7 +110,11 @@ public class NewDAS extends Controller {
 
         String label = data.getLabel().replace("DA-","").replace(".csv","").replace(".","").replace("+","-");
         DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
+		*/
+    	
+        DataAcquisitionSchema das = new DataAcquisitionSchema();
 
+        /*
         System.out.println("File Processing: [" + attributes + "]");
         if (attributes == null || attributes.equals("")) {
             return ok(editDAS.render(das));	
@@ -137,13 +143,17 @@ public class NewDAS extends Controller {
                 return badRequest("Failed to insert DA Schema to LabKey!\n");
             }
         }
-
+		*/
+       
         return ok(editDAS.render(das));
+       
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processFormFromFileLabels(String attributes) {
-        System.out.println("Inside processFormFromFileLabels()");
+
+    	/*
+    	System.out.println("Inside processFormFromFileLabels()");
         Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
@@ -154,7 +164,11 @@ public class NewDAS extends Controller {
 
         String label = data.getLabel().replace("DA-","").replace(".csv","").replace(".","").replace("+","-");
         DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
+        */
 
+    	DataAcquisitionSchema das = new DataAcquisitionSchema();
+    	
+    	/*
         System.out.println("File Processing: [" + attributes + "]");
         if (attributes == null || attributes.equals("")) {
             return ok(editDAS.render(das));	
@@ -183,7 +197,8 @@ public class NewDAS extends Controller {
                 return badRequest("Failed to insert DA Schema to LabKey!\n");
             }
         }
-
+		*/
+    	
         return ok(editDAS.render(das));
     }
 }

@@ -1,4 +1,7 @@
-@(node : org.hadatac.console.models.TreeNode, optionName : String, selected : String)
+@(node       : org.hadatac.console.models.TreeNode, 
+  optionName : String, 
+  selected   : String,
+  isDir      : Boolean)
 
 @import play.Play
 @import org.hadatac.console.controllers.metadata._
@@ -11,15 +14,32 @@
 @if(node == null) {
    EMPTY
 } else {
-   @if(!selected.equals("") && node.getName().equals(selected)) {
-      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" onchange="typechange()" checked>&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
+   @if(isDir) {
+	   @if(!selected.equals("") && node.getName().equals(selected)) {
+    	  <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" 
+    	         onchange="typechange()" checked>&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
+   	   } else {
+      	  <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" 
+      	  		 onchange="typechange()" >&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
+   	   }
    } else {
-      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" onchange="typechange()" >&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
+	   @if(node.getName().startsWith("+")) {
+	   	  <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" disabled>&nbsp;&nbsp; 
+	   	         @DataFile.getFolderLabel(node.getName())</a>
+	   } else {
+		   @if(!selected.equals("") && node.getName().equals(selected)) {
+   		 	  <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" 
+    		         onchange="typechange()" checked>&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
+   	   	   } else {
+      	 	  <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" 
+      	  	    	 onchange="typechange()" >&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
+      	   }
+   	   }
    }
    @if(node.getChildren().size() > 0) {
       <ul>
 	     @for(child <- node.getChildren()) { 
-            @tree_node_generic(child, optionName, selected)
+            @tree_node_generic(child, optionName, selected, isDir)
          }
       </ul>
    }

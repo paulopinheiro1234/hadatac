@@ -109,10 +109,15 @@ function createMap(locations, imgurl){
             features.push(marker);
             */
             
+            marker.events.register('click', marker, function(evt) {
+            	alert("HERE 0");
+            });      
             markers.addMarker(marker);
+            /*
             markers.events.register('click', marker, function(evt) {
             	alert("HERE");
-            });      
+            });
+            */      
         }
 
     	/*

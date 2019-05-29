@@ -80,7 +80,7 @@
 				<label>Destination folder:</label>  (Use selector below to set destination folder)
                    <ul class="tree">
                     @if(dirFile != null) {
-		   			    @tree_node_generic(DataFile.getHierarchy("/",""),"newDest", "")
+		   			    @tree_node_generic(DataFile.getHierarchy("/","",true),"newDest", "", true)
 					}
                    </ul>
 			</div>
@@ -99,7 +99,7 @@
 	<script>
        function typechange() {
           var newType = $("input[name=newStudyType]:checked").val();
- 	  $('#currentType').val(newType);
+ 	      $('#currentType').val(newType);
           checkform();
        };
 

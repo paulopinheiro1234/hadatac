@@ -1,0 +1,188 @@
+@(dir            : String,
+  filename       : String,
+  da_uri         : String,
+  coordinates    : String,
+  platformNames  : String,
+  platformUris   : String,
+  platform       : org.hadatac.entity.pojo.Platform,
+  dimensions     : String)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.metadataacquisition._
+@import org.hadatac.console.controllers.studies.StudyView
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play._
+@import java.net.URLEncoder
+
+@main("Deployment Browser") {
+	<head>
+        <style>
+        
+			body { font: 12px Arial;}
+
+			path { 
+    				stroke: steelblue;
+    				stroke-width: 2;
+    				fill: none;
+			}
+
+			div.tooltip {	
+    			position: absolute;			
+    			text-align: center;			
+    			width: 150px;					
+    			height: 16px;					
+    			padding: 2px;				
+    			font: 12px sans-serif;		
+    			background: lightsteelblue;	
+    			border: 0px;		
+    			border-radius: 8px;			
+    			pointer-events: none;			
+			}
+			.tooltip.in {
+				opacity: 1;
+	  			filter: alpha(opacity=100);
+			}
+			.tooltip.top .tooltip-arrow {
+  				border-top-color: white;
+			}
+			.tooltip-inner {
+  				border: 2px solid white;
+			}
+		</style>	
+	</head>
+    <body>
+
+	<div class="row">
+   		<div class="col-md-1">
+   		</div>
+   		<div class="col-md-11">
+        	<h3>Deployment Browser</h3>
+        </div>
+	</div>
+
+    <!--   <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css"> -->
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/ol.css")">
+    <!--  <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script> -->
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/ol.js")"></script>
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions3.js")"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    
+    <!--  
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+	-->
+	
+    <!--  
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css">
+    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    -->
+    
+    <!--      
+    <script type="text/javascript" charset="utf-8" src="http://dev.openlayers.org/OpenLayers.light.debug.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://unpkg.com/d3@@4"></script>
+    <script src="https://unpkg.com/topojson-client@@3"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>  
+    <svg></svg>
+    -->
+
+	<div class="row">
+   		<div class="col-md-1">
+   		</div>
+   		<div class="col-md-11">
+            <h4>Platform Locations</h4>
+       		<div class="row text-center">
+			<svg width="1150" height="500">
+  				<defs>
+    				<pattern id="Img" width="1100" height="500" patternUnits="userSpaceOnUse">
+				    </pattern>
+  				</defs>
+				<rect x="0" y="0" width="1150" height="500" fill="url(#Img)" />
+			</svg>
+            <div id="tooltip" display="none" style="position: absolute; display: none;"></div> 
+<!--     			<svg id="mySvg" width="1150" height="500">
+      				<defs id="mdef">
+        				<pattern id="bgimage" x="50" y="0" height="500" width="1150" patternUnits="objectBoundingBox">
+				        </pattern>
+  					</defs>
+  				</svg>
+            </div> -->
+            <script type="text/javascript">
+		        var coordinates = '@coordinates';
+        		var coordinatesStr = coordinates.replace(/&#x27;/g,"'");
+	    		var coords = eval(coordinatesStr);
+		        var dimensions = '@dimensions';
+        		var dimensionsStr = dimensions.replace(/&#x27;/g,"'");
+	    		var dims = eval(dimensionsStr);
+		        var pltNames = '@platformNames';
+        		var namesStr = pltNames.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
+	    		var names = eval(namesStr);
+		        var pltUris = '@platformUris';
+        		var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'").replace(/#/g,"%23");
+	    		var uris = eval(uriStr);
+
+				var svg = d3.select("svg");
+    			var imgPattern = d3.select("pattern");
+        
+			    // create an svg element
+			    
+			    var widthPixels = 900;
+			    var widthOffset = 50;
+			    var heightPixels = 450;
+			    
+			    var widthLayout = dims[0];
+			    var heightLayout = dims[1];
+			    
+			    var widthScale = widthPixels / widthLayout;
+			    var heightScale = heightPixels / heightLayout;
+
+    			imgPattern.append("image")
+    				.attr("x", "50")
+    				.attr("y", "0")
+    				.attr("width", "900")
+    				.attr("height", "450")
+        			.attr("xlink:href", function(d) {
+          				return "@DataFile.getMediaUrl(platform.getLayout())";
+        			});
+
+				/*  
+    			svg.selectAll("rect").data([0])
+      				.enter().append("rect")
+        				.attr("x", "50")
+      					.attr("y", "0")
+        				.attr("width", "1100")
+        				.attr("height", "500")
+        				.style("fill", "url(#bgimage)");
+        		*/   
+        	   
+    			svg.selectAll("circle").data(names)
+      				.enter().append("circle")
+        				.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
+      					.attr("cy", function(d,i) { return coords[i * 2 + 1] * heightScale; })
+      					.attr("r", 4)
+      					.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
+      					.attr("onmouseout", onmouseout="hideTooltip();")
+      					.attr("title", function(d,i) { return names[i]; })
+        				.style("fill", "red")
+        		   
+				function showTooltip(evt, text) {
+  						let tooltip = document.getElementById("tooltip");
+  						tooltip.innerHTML = text;
+  						tooltip.style.display = "block";
+  						tooltip.style.left = evt.pageX + 10 + 'px';
+  						tooltip.style.top = evt.pageY + 10 + 'px';
+				}
+
+				function hideTooltip() {
+  						var tooltip = document.getElementById("tooltip");
+  						tooltip.style.display = "none";
+				}
+
+    		</script>
+    </div>
+
+}

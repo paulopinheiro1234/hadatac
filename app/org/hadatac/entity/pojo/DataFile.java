@@ -656,7 +656,7 @@ public class DataFile implements Cloneable {
     }
 
     @JsonIgnore
-    public static TreeNode getHierarchy(String current, String path) {
+    public static TreeNode getHierarchy(String current, String path, boolean justDir) {
     	if (current == null) {
     		return null;
     	}
@@ -668,26 +668,38 @@ public class DataFile implements Cloneable {
     	} else {
     		path = path + "/" + current;
     	}
-        TreeNode node = new TreeNode(path);
 		dirFile = new DataFile(path);
 		dirFile.setStatus(DataFile.WORKING);
         File fileAux = new File(dirFile.getAbsolutePath());
+        TreeNode node = null;
+        if (fileAux.isDirectory() && !justDir) {
+        	node = new TreeNode("+" + path);
+        } else {
+        	node = new TreeNode(path);
+        }
         if (fileAux.isDirectory() && fileAux.listFiles() != null) {
         	File[] children = fileAux.listFiles();
         	for (File child : children) {
         		DataFile childDataFile = new DataFile(child.getName());
         		childDataFile.setStatus(DataFile.WORKING);
-        		if (child.isDirectory()) {
-        			node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path));
+        		if (justDir) {
+        			if (child.isDirectory()) {
+        				node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path, justDir));
+        			}
+        		} else {
+        			node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path, justDir));
         		}
         	}
         }
         return node;
     }
-
+    
     public static String getFolderLabel(String folderPath) {
     	if (folderPath == null) {
     		return "";
+    	}
+    	if (folderPath.startsWith("+")) {
+    		folderPath = folderPath.substring(1);
     	}
     	if (folderPath.equals("/")) {
     		return folderPath;

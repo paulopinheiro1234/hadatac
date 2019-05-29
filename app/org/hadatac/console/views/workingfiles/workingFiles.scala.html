@@ -22,6 +22,12 @@
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" class="btn btn-primary" role="button">Blank Metadata File</a>
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.index(dir)" class="btn btn-primary" role="button">Create Folder</a>
+	<a href="" class="btn btn-primary" role="button" disabled>Delete Current Folder</a>
+	<a href="" class="btn btn-primary" role="button" disabled>Select All</a>
+	<a href="" class="btn btn-primary" role="button" disabled>Unselect All</a>
+	<a href="" class="btn btn-primary" role="button" disabled>Move Selection</a>
+	<a href="" class="btn btn-primary" role="button" disabled>Delete Selection</a>
+	<a href="" class="btn btn-primary" role="button" disabled>Download Selection</a>
     
 	<div id="frame">
     <div class="resumable-error">
@@ -90,11 +96,11 @@
         @for(file <- workingFiles) {
             <tr name="working">
                 @if(file.getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
+                    <td bgcolor="#FF9999" name="file_name"><input type="checkbox">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
                 } else { @if(file.getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
+                    <td bgcolor="#FFFF99" name="file_name"><input type="checkbox">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
                 } else {
-                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/'))) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
+                    <td name="file_name"><input type="checkbox">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/'))) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
                 }}
                 @if(bAdmin) {
                     <td>@file.getOwnerEmail()</td>
@@ -129,6 +135,11 @@
                 @if(file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-")) {
                 	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="draft">Draft</a>
                 }
+                @if(file.getFileName().startsWith("SDD-")) {
+                    @defining("") { fileId => 
+                	    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="headers">Add Headers</a>
+					}
+				}
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
                     file.getFileName().startsWith("OAS-")) {

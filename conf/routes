@@ -165,8 +165,8 @@ POST	/hadatac/deployments/delete		               org.hadatac.console.controllers
 POST 	/hadatac/deployments/delete/form	           org.hadatac.console.controllers.deployments.DeleteDeployment.processForm(deployment_uri : String)
 GET	    /hadatac/deployments/view		               org.hadatac.console.controllers.deployments.ViewDeployment.index(deployment_uri : String)
 POST	/hadatac/deployments/view	                   org.hadatac.console.controllers.deployments.ViewDeployment.postIndex(deployment_uri : String)
-GET	    /hadatac/deployments/browser		           org.hadatac.console.controllers.deployments.DeploymentBrowser.index(dir : String, filename : String, da_uri : String)
-POST	/hadatac/deployments/browser     	           org.hadatac.console.controllers.deployments.DeploymentBrowser.postIndex(dir : String, filename : String, da_uri : String)
+GET	    /hadatac/deployments/browser		           org.hadatac.console.controllers.deployments.DeploymentBrowser.index(dir : String, filename : String, da_uri : String, plat_uri : String)
+POST	/hadatac/deployments/browser     	           org.hadatac.console.controllers.deployments.DeploymentBrowser.postIndex(dir : String, filename : String, da_uri : String, plat_uri : String)
 GET	    /hadatac/deployments/resources		           org.hadatac.console.controllers.deployments.ResourceAvailability.index()
 POST	/hadatac/deployments/resources	               org.hadatac.console.controllers.deployments.ResourceAvailability.postIndex()
 GET	    /hadatac/deployments/urigenerator	           org.hadatac.console.controllers.deployments.URIGenerator.index()
@@ -438,6 +438,9 @@ POST	/hadatac/working/newfolder/form     	       org.hadatac.console.controllers
 GET	    /hadatac/working/deletefolder	        	   org.hadatac.console.controllers.workingfiles.Folder.delete(dir : String, path : String)
 POST	/hadatac/working/deletefolder     	           org.hadatac.console.controllers.workingfiles.Folder.postDelete(dir: String, path : String)
 POST	/hadatac/working/deletefolder/form     	       org.hadatac.console.controllers.workingfiles.Folder.deleteForm(dir: String, path : String)
+GET	    /hadatac/working/headers	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeaders(dir : String, sdd_uri : String)
+POST	/hadatac/working/headers     	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.postCreateHeaders(dir: String, sdd_uri : String)
+POST	/hadatac/working/headers/form     	           org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeadersForm(dir: String, sdd_uri : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

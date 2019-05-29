@@ -331,17 +331,15 @@ public class Deployment extends HADatAcThing {
         List<Deployment> deployments = new ArrayList<Deployment>();
         String queryString = "";
         if (state.getCurrent() == State.ACTIVE) { 
-            queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-                    "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
-                    "SELECT ?uri WHERE { " + 
+            queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+            		"SELECT ?uri WHERE { " + 
                     "   ?uri a vstoi:Deployment . " + 
                     "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
                     "} " + 
                     "ORDER BY DESC(?datetime) ";
         } else {
             if (state.getCurrent() == State.CLOSED) {
-                queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-                        "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+                queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                         "SELECT ?uri WHERE { " + 
                         "   ?uri a vstoi:Deployment . " + 
                         "   ?uri prov:startedAtTime ?startdatetime .  " + 
@@ -350,8 +348,7 @@ public class Deployment extends HADatAcThing {
                         "ORDER BY DESC(?datetime) ";
             } else {
                 if (state.getCurrent() == State.ALL) {
-                    queryString = "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
-                            "PREFIX vstoi: <http://hadatac.org/ont/vstoi#>  " +
+                    queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                             "SELECT ?uri WHERE { " + 
                             "   ?uri a vstoi:Deployment . " + 
                             "} " +
@@ -399,6 +396,67 @@ public class Deployment extends HADatAcThing {
         }
 
         return null;
+    }
+
+    public static List<Deployment> findByPlatformAndStatus(String plat_uri, State state) {
+    	if (plat_uri == null) {
+    		return null;
+    	}
+        List<Deployment> deployments = new ArrayList<Deployment>();
+    	String p_uri = plat_uri;
+    	if (plat_uri.startsWith("http")) {
+    		p_uri = "<" + plat_uri + ">"; 
+    	}
+        String queryString = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+            queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+            		"SELECT ?uri WHERE { " + 
+                    "   ?uri a vstoi:Deployment . " + 
+                    "   ?uri vstoi:hasPlatform ?plt . " + 
+                    "   ?plt hasco:hasReferenceLayout " + p_uri + "  . " + 
+                    "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+                    "} " + 
+                    "ORDER BY DESC(?datetime) ";
+        } else {
+            if (state.getCurrent() == State.CLOSED) {
+                queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                        "SELECT ?uri WHERE { " + 
+                        "   ?uri a vstoi:Deployment . " + 
+                        "   ?uri vstoi:hasPlatform ?plt . " + 
+                        "   ?plt hasco:hasReferenceLayout " + p_uri + "  . " + 
+                        "   ?uri prov:startedAtTime ?startdatetime .  " + 
+                        "   ?uri prov:endedAtTime ?enddatetime .  " + 
+                        "} " +
+                        "ORDER BY DESC(?datetime) ";
+            } else {
+                if (state.getCurrent() == State.ALL) {
+                    queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                            "SELECT ?uri WHERE { " + 
+                            "   ?uri a vstoi:Deployment . " + 
+                            "   ?uri vstoi:hasPlatform ?plt . " + 
+                            "   ?plt hasco:hasReferenceLayout " + p_uri + "  . " + 
+                            "} " +
+                            "ORDER BY DESC(?datetime) ";
+                } else {
+                    System.out.println("Deployment.java: no valid state specified.");
+                    return null;
+                }
+            }
+        }
+                
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        Deployment dep = null;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI()!= null) { 
+                dep = Deployment.find(soln.getResource("uri").getURI()); 
+            }
+            deployments.add(dep);
+        }
+
+        return deployments;
     }
 
     @Override
