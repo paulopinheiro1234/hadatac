@@ -68,14 +68,14 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
                 "    ?attUri rdfs:label ?attLabel . " +
                 " } ";
 
-        System.out.println("Query: " + queryString);
+        //System.out.println("Query: " + queryString);
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             Attribute attribute = find(soln.getResource("attUri").getURI());
-            System.out.println("Retrieved attribute: " + attribute);
+            //System.out.println("Retrieved attribute: " + attribute);
             if (attribute != null && !attributes.contains(attribute)) {
                 attributes.add(attribute);
             }

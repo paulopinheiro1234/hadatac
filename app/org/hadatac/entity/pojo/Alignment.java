@@ -152,7 +152,7 @@ public class Alignment {
         //System.out.println("Align-Debug: new alignment attribute"); 
         AlignmentEntityRole newRole = new AlignmentEntityRole(entity,mRole);
 
-        System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
+        //System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
 
         Attribute attribute = attributeCache.get(m.getCharacteristicUris().get(0));
         if (attribute == null || !attribute.getUri().equals(m.getCharacteristicUris().get(0))) {
@@ -280,7 +280,7 @@ public class Alignment {
 
     public void addRole(AlignmentEntityRole entRole) {
         roles.put(entRole.getKey(), entRole);
-        System.out.println("Adding NEW ROLE: " + entRole);
+        //System.out.println("Adding NEW ROLE: " + entRole);
         Variable newVar = new Variable(entRole,ID_IRT);
         variables.put(newVar.getKey(),newVar);
         Variable newGroupVar = new Variable(entRole,GROUPID_IRT);

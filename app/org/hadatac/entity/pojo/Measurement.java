@@ -1118,7 +1118,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                 	            }
                 	        }
                 	        if (referenceObjEntity != null) {
-                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
+                	        	//AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
+                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
                 				if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
                 					alignment.addRole(referenceEntRole);
                 				}
@@ -1127,11 +1128,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                 					results.put(referenceObj.getUri(), new HashMap<String, String>());
                 					if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
                 						if (referenceObj.getOriginalId() != null) { 
-                							System.out.println("Align-Debug: adding PID to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
+                							//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
                 							results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
                 						}
                 						if (referenceObj.getOriginalId() != null) { 
-                							System.out.println("Align-Debug: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole)); 
+                							//System.out.println("Align-Debug: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole)); 
                 							results.get(referenceObj.getUri()).put(alignment.groupKey(referenceEntRole), referenceObj.getGroupId());
                 						}
                 					} 
@@ -1155,7 +1156,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
                 				if (!alignment.containsCode(m.getValueClass())) {
                 					String code = Attribute.findHarmonizedCode(m.getValueClass());
-                					//System.out.println("Align-Debug: new alignment attribute Code for URI-value :[" + code + "]"); 
+                					//System.out.println("Align-Debug: new alignment attribute Code [" + code + "] for URI-value [" + m.getValueClass() + "]"); 
                 					if (code != null && !code.equals("")) {
                 						List<String> newEntry = new ArrayList<String>();
                 						newEntry.add(code);
