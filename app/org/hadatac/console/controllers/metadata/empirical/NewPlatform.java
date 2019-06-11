@@ -84,6 +84,6 @@ public class NewPlatform extends Controller {
 		System.out.println("Inserting new Platform from file. da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
 		System.out.println("Inserting new Platform from file. Study URI : [" + plt.getUri() + "]");
 		// when a new study is created in the scope of a datafile, the new platform needs to be associated to the datafile's DA 
-		return ok(newPlatformConfirm.render(plt, dir, fileId, da_uri));
+		return ok(newPlatformConfirm.render(plt, dir, fileId, da_uri, 0));
 	}
 }

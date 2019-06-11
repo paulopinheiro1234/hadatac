@@ -85,7 +85,15 @@
      </div>
 
    </form>    
-   @defining("/") { dir => @defining("") { filename => @defining("") { da_uri => @deploymentButton(false, dir, filename, da_uri) }}}
+   @defining("/") { dir => 
+       @defining("") { filename => 
+           @defining("") { da_uri => 
+               @defining(0) { page => 
+                   @deploymentButton(false, dir, filename, da_uri, page) 
+               }
+           }
+       }
+   }
 </div>
 
 }

@@ -42,29 +42,17 @@ import org.labkey.remoteapi.CommandException;
 public class Deployment extends HADatAcThing {
 
     public static String INDENT1 = "     ";
-
     public static String INSERT_LINE1 = "INSERT DATA {  ";
-
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
-
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
-
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
-
     public static String LINE3_LEGACY = INDENT1 + "a         vstoi:Deployment;  ";
-
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
-
     public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasco:hasInstrument    ";
-
     public static String DETECTOR_PREDICATE =     INDENT1 + "hasco:hasDetector      ";
-
     public static String START_TIME_PREDICATE =   INDENT1 + "prov:startedAtTime		  ";
-
     public static String END_TIME_PREDICATE =     INDENT1 + "prov:endedAtTime		  ";
-
     public static String TIME_XMLS =   "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
-
     public static String LINE_LAST = "}  ";
 
     private String uri;
@@ -77,6 +65,18 @@ public class Deployment extends HADatAcThing {
     private Instrument instrument;
     private Platform platform;
     private List<Detector> detectors;
+    private static Map<String, Deployment> DPLCache;
+
+    private static Map<String, Deployment> getCache() {
+        if (DPLCache == null) {
+            DPLCache = new HashMap<String, Deployment>(); 
+        }
+        return DPLCache;
+    }
+
+    public static void resetCache() {
+        DPLCache = null;
+    }
 
     public Deployment() {
         startedAt = null;
@@ -85,6 +85,7 @@ public class Deployment extends HADatAcThing {
         platform = null;
         legacy = false;
         detectors = new ArrayList<Detector>();
+        Deployment.getCache();
     }
 
     public boolean isLegacy() {
@@ -288,6 +289,10 @@ public class Deployment extends HADatAcThing {
     }
 
     public static Deployment find(String deployment_uri) {
+        if (Deployment.getCache().get(deployment_uri) != null) {
+            return Deployment.getCache().get(deployment_uri);
+        }
+
         //System.out.println("Current URI for FIND DEPLOYMENT: " + deployment_uri);
 
         Deployment deployment = null;
@@ -324,6 +329,7 @@ public class Deployment extends HADatAcThing {
             }
         }
 
+        Deployment.getCache().put(deployment_uri, deployment);
         return deployment;
     }
 
@@ -375,6 +381,103 @@ public class Deployment extends HADatAcThing {
         return deployments;
     }
 
+    public static List<Deployment> findWithPages(State state, int pageSize, int offset) {
+        List<Deployment> deployments = new ArrayList<Deployment>();
+        String queryString = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+            queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+            		"SELECT ?uri WHERE { " + 
+                    "   ?uri a vstoi:Deployment . " + 
+                    "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+                    "} " + 
+                    " ORDER BY DESC(?datetime) " +
+            		" LIMIT " + pageSize + 
+            		" OFFSET " + offset;
+        } else {
+            if (state.getCurrent() == State.CLOSED) {
+                queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                        "SELECT ?uri WHERE { " + 
+                        "   ?uri a vstoi:Deployment . " + 
+                        "   ?uri prov:startedAtTime ?startdatetime .  " + 
+                        "   ?uri prov:endedAtTime ?enddatetime .  " + 
+                        "} " +
+                        " ORDER BY DESC(?datetime) " +
+                        " LIMIT " + pageSize + 
+                        " OFFSET " + offset;
+            } else {
+                if (state.getCurrent() == State.ALL) {
+                    queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                            "SELECT ?uri WHERE { " + 
+                            "   ?uri a vstoi:Deployment . " + 
+                            "} " +
+                            " ORDER BY DESC(?datetime) " +
+                            " LIMIT " + pageSize + 
+                            " OFFSET " + offset;
+                } else {
+                    System.out.println("Deployment.java: no valid state specified.");
+                    return null;
+                }
+            }
+        }
+        
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        Deployment dep = null;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI()!= null) { 
+                dep = Deployment.find(soln.getResource("uri").getURI()); 
+            }
+            deployments.add(dep);
+        }
+
+        return deployments;
+    }
+
+    public static int getNumberDeployments(State state) {
+        String query = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+            query = NameSpaces.getInstance().printSparqlNameSpaceList() +
+            		"SELECT (count(?uri) as ?tot) WHERE { " + 
+                    "   ?uri a vstoi:Deployment . " + 
+                    "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+                    "} "; 
+        } else {
+            if (state.getCurrent() == State.CLOSED) {
+                query = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                        "SELECT (count(?uri) as ?tot) WHERE { " + 
+                        "   ?uri a vstoi:Deployment . " + 
+                        "   ?uri prov:startedAtTime ?startdatetime .  " + 
+                        "   ?uri prov:endedAtTime ?enddatetime .  " + 
+                        "} ";
+            } else {
+                if (state.getCurrent() == State.ALL) {
+                    query = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                            "SELECT (count(?uri) as ?tot) WHERE { " + 
+                            "   ?uri a vstoi:Deployment . " + 
+                            "} ";
+                } else {
+                    System.out.println("Deployment.java: no valid state specified.");
+                    return 0;
+                }
+            }
+        }
+                
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public static Deployment find(Model model, ObjectAccessSpec dataAcquisition) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
                 + "SELECT ?dp WHERE {\n"
@@ -398,7 +501,92 @@ public class Deployment extends HADatAcThing {
         return null;
     }
 
+    public static List<Deployment> findWithGeoReference() {
+        List<Deployment> deployments = new ArrayList<Deployment>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?platModel rdfs:subClassOf* vstoi:Platform . " + 
+                " ?plat a ?platModel ." +
+                " ?plat hasco:hasFirstCoordinate ?lat . " +
+                " ?plat hasco:hasSecondCoordinate ?lon . " +
+                " ?plat hasco:hasFirstCoordinateCharacteristic <" + Platform.LAT + "> . " +
+                " ?plat hasco:hasSecondCoordinateCharacteristic <" + Platform.LONG + "> . " +
+                " ?uri vstoi:hasPlatform ?plat . " +
+                "} ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            Deployment deployment = find(soln.getResource("uri").getURI());
+            deployments.add(deployment);
+        }			
+
+        return deployments;
+    }
+
+
+    
     public static List<Deployment> findByPlatformAndStatus(String plat_uri, State state) {
+    	if (plat_uri == null) {
+    		return null;
+    	}
+        List<Deployment> deployments = new ArrayList<Deployment>();
+    	String p_uri = plat_uri;
+    	if (plat_uri.startsWith("http")) {
+    		p_uri = "<" + plat_uri + ">"; 
+    	}
+        String queryString = "";
+        if (state.getCurrent() == State.ACTIVE) { 
+            queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+            		"SELECT ?uri WHERE { " + 
+                    "   ?uri a vstoi:Deployment . " + 
+                    "   ?uri vstoi:hasPlatform " + p_uri + " . " + 
+                    "   FILTER NOT EXISTS { ?uri prov:endedAtTime ?enddatetime . } " + 
+                    "} " + 
+                    "ORDER BY DESC(?datetime) ";
+        } else {
+            if (state.getCurrent() == State.CLOSED) {
+                queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                        "SELECT ?uri WHERE { " + 
+                        "   ?uri a vstoi:Deployment . " + 
+                        "   ?uri vstoi:hasPlatform " + p_uri + " . " + 
+                        "   ?uri prov:startedAtTime ?startdatetime .  " + 
+                        "   ?uri prov:endedAtTime ?enddatetime .  " + 
+                        "} " +
+                        "ORDER BY DESC(?datetime) ";
+            } else {
+                if (state.getCurrent() == State.ALL) {
+                    queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                            "SELECT ?uri WHERE { " + 
+                            "   ?uri a vstoi:Deployment . " + 
+                            "   ?uri vstoi:hasPlatform " + p_uri + " . " + 
+                            "} " +
+                            "ORDER BY DESC(?datetime) ";
+                } else {
+                    System.out.println("Deployment.java: no valid state specified.");
+                    return null;
+                }
+            }
+        }
+                
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        Deployment dep = null;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI()!= null) { 
+                dep = Deployment.find(soln.getResource("uri").getURI()); 
+            }
+            deployments.add(dep);
+        }
+
+        return deployments;
+    }
+
+    public static List<Deployment> findByReferenceLayoutAndStatus(String plat_uri, State state) {
     	if (plat_uri == null) {
     		return null;
     	}

@@ -1,7 +1,8 @@
 @(indent   : Boolean,
   dir      : String, 
-  fileId : String,
-  da_uri   : String)
+  fileId   : String,
+  da_uri   : String, 
+  page     : Integer)
 
 @import org.hadatac.utils._
 
@@ -9,11 +10,11 @@
     @if(indent) {
         <div class="row">
             <div class="col-md-12 col-md-offset-1">
-               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, fileId, da_uri)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+               <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, fileId, da_uri, page)" class="btn btn-primary" role="button">Back to Deployment Management</a>
             </div>
         </div>
     } else {
-        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, fileId, da_uri)" class="btn btn-primary" role="button">Back to Deployment Management</a>
+        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, fileId, da_uri, page)" class="btn btn-primary" role="button">Back to Deployment Management</a>
     }
 } else {
     @if(indent) {

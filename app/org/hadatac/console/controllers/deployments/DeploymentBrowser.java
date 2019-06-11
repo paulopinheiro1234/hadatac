@@ -25,34 +25,50 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeploymentBrowser extends Controller {
 	
-	private static String LAT = "http://semanticscience.org/resource/Latitude";
-	private static String LONG = "http://semanticscience.org/resource/Longitude";
-	
+
+	public static String GEODEPLOYMENT = "GEODEPLOYMENT";
 	private static State allState = new State(State.ALL);
-	private static State activeState = new State(State.ACTIVE);
 	
 	private String geoCoordList = "[]";
 	private String platformNameList = "[]";
 	private String platformUriList = "[]";
 	private String dimensionsList = "[]";
-	private int totDeployments = -1;
+	//private int totDeployments = -1;
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String plat_uri) {
+    public Result index(String dir, String filename, String da_uri, String plat_uri, String previous_plt_uri) {
 
-		totDeployments = -1;
+		// Looking for georeferenced platforms 
 		if (plat_uri == null || plat_uri.isEmpty()) {
 			geoDeployments();
 	    	return ok(deploymentBrowser.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList));
 		}
 		Platform platform = Platform.find(plat_uri);
+		if (platform == null) {
+	    	return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]"));
+		}
+		System.out.println("Platform URI: " + platform.getUri());
+		System.out.println("Platform Layout: " + platform.getLayout());
+		if (platform.getLayout() == null || platform.getLayout().isEmpty()) {
+			List<Deployment> dpls = Deployment.findByPlatformAndStatus(plat_uri, allState);
+			System.out.println("# Deployments: " + dpls.size());
+			if (dpls.size() <= 0) {
+		    	return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]"));
+			}
+			System.out.println("Deployment URI: " + dpls.get(0).getUri());
+			ViewDeployment viewDpl = new ViewDeployment();
+			if (previous_plt_uri == null || previous_plt_uri.isEmpty()) {
+				previous_plt_uri = GEODEPLOYMENT;
+			}
+ 			return viewDpl.index(dpls.get(0).getUri(), previous_plt_uri);
+		}
 		platDeployments(platform);
-		return ok(deploymentBrowserWithPlatform.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList, platform, dimensionsList));
+		return ok(deploymentBrowserWithPlatform.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList, platform, dimensionsList, plat_uri));
     }
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String plat_uri) {
-    	return index(dir, filename, da_uri, plat_uri);
+    public Result postIndex(String dir, String filename, String da_uri, String plat_uri, String previous_plt_uri) {
+    	return index(dir, filename, da_uri, plat_uri, previous_plt_uri);
     }
 
 	private void geoDeployments() {
@@ -69,7 +85,7 @@ public class DeploymentBrowser extends Controller {
 				if (plt.getSecondCoordinateCharacteristic() == null) {
 					plt.setSecondCoordinateCharacteristic("");
 				}
-				while (plt != null && !plt.getFirstCoordinateCharacteristic().equals(LAT) && !plt.getSecondCoordinateCharacteristic().equals(LONG)) {
+				while (plt != null && !plt.getFirstCoordinateCharacteristic().equals(Platform.LAT) && !plt.getSecondCoordinateCharacteristic().equals(Platform.LONG)) {
 					//System.out.println(plt.getLabel() + " (" + plt.getUri() + "): " + plt.getPartOf() + " " + plt.getFirstCoordinate() + " " + plt.getFirstCoordinateCharacteristic() +  
 					//		" " + plt.getSecondCoordinate() + " " + plt.getSecondCoordinateCharacteristic());
 					if (plt.getPartOf() == null) {
@@ -88,7 +104,7 @@ public class DeploymentBrowser extends Controller {
 					}
 				}
 				if (plt != null) {
-					totDeployments++;
+					//totDeployments++;
 					if (!platforms.contains(plt)) {
 						platforms.add(plt);
 					}
@@ -99,7 +115,7 @@ public class DeploymentBrowser extends Controller {
 	}
 	
 	private void platDeployments(Platform platform) {
-		List<Deployment> deployments = Deployment.findByPlatformAndStatus(platform.getUri(), allState);
+		List<Deployment> deployments = Deployment.findByReferenceLayoutAndStatus(platform.getUri(), allState);
 		List<Platform> platforms = new ArrayList<Platform>();
 		dimensionsList = "[";
 		if (platform.getWidth() == null) {

@@ -67,6 +67,21 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 		this.isInstrumentAttachment = isInstrumentAttachment;
 	}
 	
+    public String getTypeLabel() {
+    	DetectorType detType = DetectorType.find(getTypeUri());
+    	if (detType == null || detType.getLabel() == null) {
+    		return "";
+    	}
+    	return detType.getLabel();
+    }
+
+    public String getTypeURL() {
+    	DetectorType detType = DetectorType.find(getTypeUri());
+    	if (detType == null || detType.getLabel() == null) {
+    		return "";
+    	}
+    	return detType.getURL();
+    }
 	public static List<Detector> find() {
 		List<Detector> detectors = new ArrayList<Detector>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +

@@ -123,7 +123,10 @@
 	  @if(fileId == null) {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
 		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(dir, fileId, da_uri)"/><br>
-	       <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(dir, fileId, da_uri)" class="btn btn-primary" role="button">Back to Platform Management</a>
+	          @defining(0) { offset =>  
+       	          <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, offset)" 
+       	          class="btn btn-primary" role="button">Back to Platform Management</a>
+       	      }
           } else {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
 		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(dir, fileId, da_uri)"/><br>

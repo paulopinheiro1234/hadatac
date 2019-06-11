@@ -1,7 +1,8 @@
 @(plt      : org.hadatac.entity.pojo.Platform,
   dir      : String,
   filename : String,
-  da_uri   : String)
+  da_uri   : String, 
+  page     : Integer)
 
 @import helper._
 @import org.hadatac.utils._
@@ -25,7 +26,7 @@
        </ul>
        
        <br>
-          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, filename, da_uri)" class="btn btn-primary" 
+          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, filename, da_uri, page)" class="btn btn-primary" 
 	     role="button">Back to Deployment Management</a>
     </div>
     

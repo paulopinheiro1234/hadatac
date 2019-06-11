@@ -26,17 +26,19 @@
         <div class="col-md-3 col-xs-2">
            <h4>Data/Metadata Search and Download</h4>
            <a href="@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(false, false, false, false, false, false)" 
-              id="kg" class="btn btn-primary btn-block" role="button">Browse Knowledge Graph</a>  
+              id="kg" class="btn btn-primary btn-block" role="button">Knowledge Graph Browsing</a>  
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" 
-              id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Search Studies</a>
+              id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Study Search</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()" 
-              id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Search Data Acquisitions</a>
+              id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Data Acquisition Search</a>
            <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()" 
-              id="data" class="btn btn-primary btn-block disabled" role="button">Search Data</a>
+              id="data" class="btn btn-primary btn-block disabled" role="button">Data Faceted Search</a>
+           <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index("/", "", "", "", "")" 
+              id="spatial" class="btn btn-primary btn-block disabled" role="button">Data Spatial Search</a>
            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" 
-              id="variables" class="btn btn-primary btn-block disabled" role="button">Search Variables</a>
+              id="variables" class="btn btn-primary btn-block disabled" role="button">Variable Search</a>
        @*  <a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()" 
-              id="analytes" class="btn btn-primary btn-block disabled" role="button">Search Analytes</a>  *@
+              id="analytes" class="btn btn-primary btn-block disabled" role="button">Analyte Search</a>  *@
            <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()"  
               id="downloader" class="btn btn-primary btn-block disabled" role="button">Data Download</a>
            <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block" role="button">Browse Ontologies and Metadata</a>
@@ -55,8 +57,10 @@
 		   id="studies" class="btn btn-primary btn-block" role="button">Manage Studies [STD/SSD]</a>
 		<a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.index("/", filename, da_uri)" 
 		   id="infra" class="btn btn-primary btn-block" role="button">Manage Instrument Infrastructure [DPL]</a>
-		<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri)" 
-		   id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments [DPL]</a>
+    	@defining(0) { page =>  
+		   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri, page)" 
+		      id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments [DPL]</a>
+		}
 		<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  
 		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Acquisition Specs [OAS]</a>
 		<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" 
@@ -135,6 +139,7 @@
               $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#subjectviewdemo').attr( 'class', 'btn btn-primary btn-block');
               $('#data').attr( 'class', 'btn btn-primary btn-block' );
+              $('#spatial').attr( 'class', 'btn btn-primary btn-block' );
               $('#variables').attr( 'class', 'btn btn-primary btn-block' );
               $('#analytes').attr( 'class', 'btn btn-primary btn-block' );
               $('#downloader').attr( 'class', 'btn btn-primary btn-block' );
@@ -155,6 +160,7 @@
               $('#subjectviewdemo').attr( 'class', 'btn btn-primary btn-block disabled');
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#data').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#spatial').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#variables').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#analytes').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#downloader').attr( 'class', 'btn btn-primary btn-block disabled' );

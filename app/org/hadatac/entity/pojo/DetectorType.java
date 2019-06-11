@@ -23,13 +23,13 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
-public class InstrumentType extends HADatAcClass implements Comparable<InstrumentType> {
+public class DetectorType extends HADatAcClass implements Comparable<DetectorType> {
 
-	static String className = "vstoi:Instrument";
+	static String className = "vstoi:Detector";
 	
 	private String url;
 
-	public InstrumentType () {
+	public DetectorType () {
 		super(className);
 	}
 
@@ -42,7 +42,7 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
     }
     
     public String getSuperLabel() {
-    	InstrumentType superInsType = InstrumentType.find(getSuperUri());
+    	DetectorType superInsType = DetectorType.find(getSuperUri());
     	if (superInsType == null || superInsType.getLabel() == null) {
     		return "";
     	}
@@ -50,8 +50,8 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
     }
 
 
-	public static List<InstrumentType> find() {
-		List<InstrumentType> instrumentTypes = new ArrayList<InstrumentType>();
+	public static List<DetectorType> find() {
+		List<DetectorType> detectorTypes = new ArrayList<DetectorType>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				" SELECT ?uri WHERE { " +
 				" ?uri rdfs:subClassOf* " + className + " . " + 
@@ -62,25 +62,25 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
 
 		while (resultsrw.hasNext()) {
 			QuerySolution soln = resultsrw.next();
-			InstrumentType instrumentType = find(soln.getResource("uri").getURI());
-			instrumentTypes.add(instrumentType);
+			DetectorType detectorType = find(soln.getResource("uri").getURI());
+			detectorTypes.add(detectorType);
 		}			
 
-		java.util.Collections.sort((List<InstrumentType>) instrumentTypes);
-		return instrumentTypes;
+		java.util.Collections.sort((List<DetectorType>) detectorTypes);
+		return detectorTypes;
 
 	}
 
 	public static Map<String,String> getMap() {
-		List<InstrumentType> list = find();
+		List<DetectorType> list = find();
 		Map<String,String> map = new HashMap<String,String>();
-		for (InstrumentType typ: list) 
+		for (DetectorType typ: list) 
 			map.put(typ.getUri(),typ.getLabel());
 		return map;
 	}
 
-	public static InstrumentType find(String uri) {
-		InstrumentType instrumentType = null;
+	public static DetectorType find(String uri) {
+		DetectorType detectorType = null;
 		Model model;
 		Statement statement;
 		RDFNode object;
@@ -91,29 +91,29 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
 		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 		model = qexec.execDescribe();
 
-		instrumentType = new InstrumentType();
+		detectorType = new DetectorType();
 		StmtIterator stmtIterator = model.listStatements();
 
 		while (stmtIterator.hasNext()) {
 			statement = stmtIterator.next();
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-				instrumentType.setLabel(object.asLiteral().getString());
+				detectorType.setLabel(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasWebDocumentation")) {
-				instrumentType.setURL(object.asLiteral().getString());
+				detectorType.setURL(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
-				instrumentType.setSuperUri(object.asResource().getURI());
+				detectorType.setSuperUri(object.asResource().getURI());
 			}
 		}
 		
-		instrumentType.setUri(uri);
-		instrumentType.setLocalName(uri.substring(uri.indexOf('#') + 1));
+		detectorType.setUri(uri);
+		detectorType.setLocalName(uri.substring(uri.indexOf('#') + 1));
 
-		return instrumentType;
+		return detectorType;
 	}
 
 	@Override
-	public int compareTo(InstrumentType another) {
+	public int compareTo(DetectorType another) {
 		if (this.getLabel() != null && another.getLabel() != null) {
 			return this.getLabel().compareTo(another.getLabel());
 		}

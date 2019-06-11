@@ -102,6 +102,14 @@
   </div>
   </div>
 
-  @defining("/") { dir => @defining("") { filename => @defining("") { da_uri => @deploymentButton(true, dir, filename, da_uri) }}}
+  @defining("/") { dir => 
+     @defining("") { filename => 
+        @defining("") { da_uri => 
+           @defining(0) { page => 
+              @deploymentButton(true, dir, filename, da_uri, page) 
+           }
+     	}
+     }
+  }
 
 }

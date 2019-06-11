@@ -15,6 +15,9 @@ import play.mvc.Controller;
 
 public class PlatformManagement extends Controller {
 
+	final static int PAGESIZE = 20;
+	
+	/*
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri) {
     	List<Platform> platforms = Platform.find();
@@ -25,6 +28,20 @@ public class PlatformManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result postIndex(String dir, String filename, String da_uri) {
         return index(dir, filename, da_uri);
+    }
+	*/
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result indexWithPages(String dir, String filename, String da_uri, int offset) {
+    	List<Platform> platforms = Platform.findWithPages(PAGESIZE, offset * PAGESIZE);
+    	int total = Platform.getNumberPlatforms();
+    	//System.out.println("Number of platforms: " + platforms.size());
+        return ok(platformManagement.render(dir, filename, da_uri, offset, PAGESIZE, total, platforms));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	public Result postIndexWithPages(String dir, String filename, String da_uri, int offset) {
+        return indexWithPages(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

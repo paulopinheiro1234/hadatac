@@ -25,18 +25,20 @@
           <div class="col-md-1 col-xs-0"></div>
           <div class="col-md-3 col-xs-2">
              <h4>Platform Management</h4>
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.index(dir, filename, da_uri)" id="platbrowser" class="btn btn-primary btn-block" role="button">Browse Platforms</a>  
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(dir, filename, da_uri)" id="platmodelbrowser" class="btn btn-primary btn-block" role="button">Browse Platform Models</a>
+             @defining(0) { offset =>  
+                 <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, filename, da_uri, offset)" id="platbrowser" class="btn btn-primary btn-block" role="button">List Platforms</a>  
+             }
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(dir, filename, da_uri)" id="platmodelbrowser" class="btn btn-primary btn-block" role="button">List Platform Models</a>
           </div>
           <div class="col-md-3 col-xs-2">
              <h4>Instrument Management</h4>  
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(dir, filename, da_uri)" id="insbrowser" class="btn btn-primary btn-block" role="button">Browse Instruments</a>  
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(dir, filename, da_uri)" id="insmodelbrowser" class="btn btn-primary btn-block" role="button">Browse Instrument Models</a>
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(dir, filename, da_uri)" id="insbrowser" class="btn btn-primary btn-block" role="button">List Instruments</a>  
+             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(dir, filename, da_uri)" id="insmodelbrowser" class="btn btn-primary btn-block" role="button">List Instrument Models</a>
           </div>
           <div class="col-md-3 col-xs-2">
              <h4>Detector Management</h4>  
-             <a href="" id="detbrowser" class="btn btn-primary btn-block" role="button">Browse Detectors</a>  
-             <a href="" id="detmodelbrowser" class="btn btn-primary btn-block" role="button">Browse Detector Models</a>
+             <a href="" id="detbrowser" class="btn btn-primary btn-block" role="button">List Detectors</a>  
+             <a href="" id="detmodelbrowser" class="btn btn-primary btn-block" role="button">List Detector Models</a>
           </div>
           <div class="col-md-1 col-xs-0"></div>
         </div>

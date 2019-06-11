@@ -28,7 +28,7 @@ public class ViewDeployment extends Controller {
 	
 	// for /metadata HTTP GET requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String deployment_uri) {
+    public Result index(String deployment_uri, String prev_plat_uri) {
 
     	//DeploymentForm dep = new DeploymentForm();
     	Deployment deployment = null;
@@ -48,7 +48,15 @@ public class ViewDeployment extends Controller {
         	deployment = Deployment.find(deployment_uri);
         	dataCollections = ObjectAccessSpec.find(deployment, false);    		
     	}
-    	return ok(viewDeployment.render(deployment, dataCollections));
+
+    	String urlReturn = null;
+    	if (prev_plat_uri == null || prev_plat_uri.isEmpty()) {
+    		urlReturn = "";
+    	} else {
+    		urlReturn = prev_plat_uri;
+    	}
+    	
+    	return ok(viewDeployment.render(deployment, dataCollections, urlReturn));
     
         
     }// /index()
@@ -56,28 +64,8 @@ public class ViewDeployment extends Controller {
 
     // for /metadata HTTP POST requests
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String deployment_uri) {
-
-    	//DeploymentForm dep = new DeploymentForm();
-    	Deployment deployment = null;
-    	List<ObjectAccessSpec> dataCollections = null;
-    	
-    	try {
-    		if (deployment_uri != null) {
-			    deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
-    		} else {
-    			deployment_uri = "";
-    		}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-
-    	if (!deployment_uri.equals("")) {
-        	deployment = Deployment.find(deployment_uri);
-        	dataCollections = ObjectAccessSpec.find(deployment, false);    		
-    	}
-    	return ok(viewDeployment.render(deployment, dataCollections));
-        
+    public Result postIndex(String deployment_uri, String prev_plat_uri) {
+    	return index(deployment_uri, prev_plat_uri);
     }// /postIndex()
 
 }

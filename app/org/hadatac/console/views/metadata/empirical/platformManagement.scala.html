@@ -1,11 +1,15 @@
 @(dir          : String,
   fileId       : String,
   da_uri       : String,
+  page         : Integer,
+  pagesize     : Integer,
+  total        : Integer,
   platformList : List[org.hadatac.entity.pojo.Platform])
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
+@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / pagesize); var lastpage = (last + 1)
 
 @main("Platform Management") {
 
@@ -26,6 +30,37 @@
 
    <h4>Platforms</h4>
    
+	@if(prev >= 0) {
+    	<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, 0)" class="btn btn-primary" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, prev)" class="btn btn-primary" 
+	       role="button">&lt;</a>
+	} else {
+    	<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, 0)" class="btn btn-primary disabled" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, prev)" class="btn btn-primary disabled" 
+	       role="button">&lt;</a>
+	}
+
+	@current of @lastpage   
+	   
+	@if(next < last) {
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, next)" class="btn btn-primary" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, last)" class="btn btn-primary" 
+	       role="button">&gt;&gt;</a>
+	   
+	} else {
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, next)" class="btn btn-primary disabled" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, last)" class="btn btn-primary disabled" 
+	       role="button">&gt;&gt;</a>	   
+	}
+
     <div class="container-fluid">
         <table class="table">
             <thead>

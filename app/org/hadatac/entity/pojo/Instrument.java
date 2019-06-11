@@ -51,6 +51,39 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
     	return insType.getLabel();
     }
 
+    public String getTypeURL() {
+    	InstrumentType insType = InstrumentType.find(getTypeUri());
+    	if (insType == null || insType.getLabel() == null) {
+    		return "";
+    	}
+    	return insType.getURL();
+    }
+
+    public List<Detector> getAttachments() {
+    	List<Detector> dets = new ArrayList<Detector>();
+    	if (uri == null || uri.isEmpty()) {
+    		return dets;
+    	}
+    	String iUri = uri;
+    	if (uri.startsWith("http")) {
+    		iUri = "<" + uri + ">";
+    	}
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+			    "SELECT ?detUri WHERE { " +
+			    "   ?detUri vstoi:isInstrumentAttachment " + iUri + " . " + 
+			    "} ";
+			
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+				CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+				
+		while (resultsrw.hasNext()) {
+			QuerySolution soln = resultsrw.next();
+			Detector det = Detector.find(soln.getResource("detUri").getURI());
+			dets.add(det);
+		}			
+    	return dets;
+    }
+    
 	@Override
 	public boolean equals(Object o) {
 		if((o instanceof Instrument) && (((Instrument)o).getUri().equals(this.getUri()))) {

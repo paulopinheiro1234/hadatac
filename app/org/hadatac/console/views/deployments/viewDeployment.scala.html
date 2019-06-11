@@ -1,5 +1,6 @@
 @(deployment      : org.hadatac.entity.pojo.Deployment,
-  dataCollections : List[org.hadatac.entity.pojo.ObjectAccessSpec])
+  dataCollections : List[org.hadatac.entity.pojo.ObjectAccessSpec],
+  urlReturn       : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -11,10 +12,16 @@
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
 
     <div class="row">
-        <div class="col-md-6">
-            <h1>View Deployment</h1>
-            
-            <h2>Basic Info</h2>
+        <div class="col-md-1"></div>
+        <div class="col-md-5">
+           <h2>View Deployment</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-5">            
+            <h3>Basic Info</h3>
                 <ul>
                     <li><b>URI</b>: @deployment.getUri()</li>
                     <li><b>Platform</b>: @deployment.getPlatform().getLabel()</li>
@@ -26,39 +33,65 @@
                     @if(deployment.getInstrument() != null) {
                        <li><b>Instrument</b>: @deployment.getInstrument().getLabel()</li>
                        <ul>
+                         <li><b>Model</b>: @deployment.getInstrument().getTypeLabel()</li>
+						 @if(deployment.getInstrument.getTypeURL() != null && !deployment.getInstrument.getTypeURL().isEmpty()) {
+                             <li><b>On the Web</b>: <a href="@deployment.getInstrument().getTypeURL()">@deployment.getInstrument().getTypeURL()</a></li>
+						 }
                          <li><b>Serial Number</b>: @deployment.getInstrument().getSerialNumber()</li>
                       </ul>
                     }
                     <li><b>Start Date/Time</b>: @deployment.getStartedAt()</li>
                     <li><b>End Date/Time</b>: @deployment.getEndedAt()</li>
                 </ul>
-
-            <h2>Sensing Info</h2>
+	    </div>
+        <div class="col-md-5">
+            <div class="row">
+            <h3>Sensing Info</h3>
                 <ul>
                    @for(detector <- deployment.getDetectors()) {
                       <li><b>Detector</b>: @detector.getLabel()</li>
                       <ul>
+                         <li><b>Model</b>: @deployment.getInstrument().getTypeLabel()</li>
+						 @if(deployment.getInstrument.getTypeURL() != null && !deployment.getInstrument.getTypeURL().isEmpty()) {
+                             <li><b>On the Web</b>: <a href="@deployment.getInstrument().getTypeURL()">@deployment.getInstrument().getTypeURL()</a></li>
+						 }
+                         <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
+                         <li><b>Characteristic</b>: </li>
+                      </ul>   
+                   }
+                   @for(detector <- deployment.getInstrument().getAttachments()) {
+                      <li><b>Detector</b>: @detector.getLabel() (permanently attached to instrument)</li>
+                      <ul>
+                         <li><b>Model</b>: @detector.getTypeLabel()</li>
+						 @if(detector.getTypeURL() != null && !detector.getTypeURL().isEmpty()) {
+                             <li><b>On the Web</b>: <a href="@detector.getTypeURL()">@detector.getTypeURL()</a></li>
+						 }
                          <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
                          <li><b>Characteristic</b>: </li>
                       </ul>   
                    }
                 </ul>
-        </div>
+        	</div>
+		</div>
+	</div>
 
-        <div class="col-md-6">
-            <div class="row text-center">
-                <div style="width:95%; height:500px" id="map"></div>
-                @if(deployment.getPlatform().getFirstCoordinate() != null && deployment.getPlatform().getSecondCoordinate() != null) {
+	@if(deployment.getPlatform().hasGeoReference()) {
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-4">
+	            <h3>Geo-Location</h3>
+                <div class="row text-center">
+                    <div style="width:95%; height:500px" id="map"></div>
                     <script type="text/javascript">locations=["@deployment.getPlatform().getFirstCoordinate()","@deployment.getPlatform().getSecondCoordinate()"];createMap(locations);</script>
-                }
+                </div>
             </div>
         </div>
-
-    </div>
+	}
 
     <div class="row">
-        <div class="col-md-12">
-            <h2>Deployment's Data Acquisitions</h2>
+        <div class="col-md-1"></div>
+        <div class="col-md-11">
+            <h3>Deployment's Data Acquisitions</h3>
                <div class="container-fluid">
                  <table class="table">
                     <thead>
@@ -84,6 +117,29 @@
         </div>
     </div>
 
-      @defining("/") { dir => @defining("") { filename => @defining("") { da_uri => @deploymentButton(true, dir, filename, da_uri) }}}
+      @defining("/") { dir => 
+         @defining("") { filename => 
+            @defining("") { da_uri => 
+			   @if(urlReturn == null || urlReturn.isEmpty()) {
+                  @defining(0) { page => 
+                     @deploymentButton(true, dir, filename, da_uri, page) 
+                  }
+               } else {
+                  <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-11">
+                       @if(urlReturn.equals(DeploymentBrowser.GEODEPLOYMENT)) {
+     	                   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "", "")" 
+     	                   class="btn-sm btn-primary" role="button">Back</a>
+                       } else {
+     	                   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, urlReturn,"")" 
+    	                   class="btn-sm btn-primary" role="button">Back</a>
+                       }
+	                </div>
+	              </div>
+               }
+            }
+         }
+      }
 
 }

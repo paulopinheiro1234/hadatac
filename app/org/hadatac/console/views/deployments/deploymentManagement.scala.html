@@ -1,10 +1,13 @@
 @(oper     : org.hadatac.utils.State,
   dir      : String,
-  filename : String,
+  fileId   : String,
   da_uri   : String,
+  total    : Integer,
+  pagesize : Integer,
+  page     : Integer,
   results  : List[org.hadatac.entity.pojo.Deployment])
 
-@import helper._
+@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / pagesize); var lastpage = (last + 1)
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
@@ -12,27 +15,22 @@
 
     <h2>Deployment Management</h2>
     
-    <h3>Management options</h3>
-
     <div class="container-fluid">
       <div class="row">
          <div class="navbar-collapse collapse navbar-secondary">
-           @defining("") { filename => @defining("") { da_uri => 
-              @defining("") { plat_uri =>  
-     	          <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, plat_uri)" class="btn-sm btn-primary disabled" role="button">Deployment Browser</a>
-     	      }
+           @defining("") { fileId => @defining("") { da_uri => 
               @if(oper.getCurrent() == State.ACTIVE) { 
-                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, filename, da_uri)" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
+                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, fileId, da_uri, page)" class="btn-sm btn-warning disabled" role="button">Active Deployments</a>
               } else {
-                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, filename, da_uri)" class="btn-sm btn-primary" role="button">Active Deployments</a>
+                 <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, dir, fileId, da_uri, page)" class="btn-sm btn-primary" role="button">Active Deployments</a>
               }
               @if(oper.getCurrent() == State.CLOSED) {
-       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED, dir, filename, da_uri)" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
+       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED, dir, fileId, da_uri, page)" class="btn-sm btn-warning disabled" role="button">Closed Deployments</a>
        	      } else {
-       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED, dir, filename, da_uri)" class="btn-sm btn-primary" role="button">Closed Deployments</a>
+       	         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.CLOSED, dir, fileId, da_uri, page)" class="btn-sm btn-primary" role="button">Closed Deployments</a>
        	      }
-              <a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("regular", dir, filename, da_uri)" class="btn-sm btn-primary" role="button">Create Regular Deployment</a>
-              <a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", dir, filename, da_uri)" class="btn-sm btn-primary" role="button">Create Legacy Deployment</a>
+              <a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("regular", dir, fileId, da_uri, page)" class="btn-sm btn-primary" role="button">Create Regular Deployment</a>
+              <a href="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", dir, fileId, da_uri, page)" class="btn-sm btn-primary" role="button">Create Legacy Deployment</a>
        	      <a href="@org.hadatac.console.controllers.deployments.routes.ResourceAvailability.index()" class="btn-sm btn-primary" role="button">Instrument/Detector Availability</a>
        	      <a href="@org.hadatac.console.controllers.deployments.routes.URIGenerator.index()" class="btn-sm btn-primary" role="button">Register URI Generator</a>
            }}
@@ -54,6 +52,39 @@
       }
    }
    
+   <ul>
+ 	@if(current > 1) {
+    	<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, 0)" class="btn btn-primary" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, prev)" class="btn btn-primary" 
+	       role="button">&lt;</a>
+	} else {
+    	<a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, 0)" class="btn btn-primary disabled" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, prev)" class="btn btn-primary disabled" 
+	       role="button">&lt;</a>
+	}
+
+	@current of @lastpage   
+	   
+	@if(current <= last) {
+	    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, next)" class="btn btn-primary" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, last)" class="btn btn-primary" 
+	       role="button">&gt;&gt;</a>
+	   
+	} else {
+	    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, next)" class="btn btn-primary disabled" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(oper.getCurrent(), dir, fileId, da_uri, last)" class="btn btn-primary disabled" 
+	       role="button">&gt;&gt;</a>	   
+	}
+    </ul>
+    
     <div class="container-fluid">
         <table class="table">
             <thead>

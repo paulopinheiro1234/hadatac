@@ -15,7 +15,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Deployment Browser") {
+@main("Deployment Browser - Georeferenced Platforms") {
 	<head>
         <style>
         
@@ -78,7 +78,7 @@
    		<div class="col-md-1">
    		</div>
    		<div class="col-md-11">
-        	<h3>Deployment Browser</h3>
+        	<h3>Deployment Browser - Georeferenced Platforms</h3>
         </div>
 	</div>
 
@@ -121,13 +121,16 @@
 		        var coordinates = '@coordinates';
         		var coordinatesStr = coordinates.replace(/&#x27;/g,"'");
 	    		var coords = eval(coordinatesStr);
-		        var pltNames = '@platformNames';
-        		var namesStr = pltNames.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
-	    		var names = eval(namesStr);
-		        var pltUris = '@platformUris';
-        		var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
-	    		var uris = eval(uriStr);
-                createMap("@dir", "@filename", "@da_uri", "@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "XXXX")",coords,names,uris);
+	    		if (coords.length === 0) {
+	    		} else {
+		           var pltNames = '@platformNames';
+        		   var namesStr = pltNames.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
+	    		   var names = eval(namesStr);
+		           var pltUris = '@platformUris';
+        		   var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
+	    		   var uris = eval(uriStr);
+                   createMap("@dir", "@filename", "@da_uri", "@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "XXXX", "")",coords,names,uris);
+				}
                 </script>
             </div>
         </div>

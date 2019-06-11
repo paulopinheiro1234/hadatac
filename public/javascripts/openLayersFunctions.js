@@ -35,7 +35,7 @@ function createMap(locations, imgurl){
     }
 
     if (bbox){
-    	alert(bbox);
+    	//alert(bbox);
         if (bbox.length == 4){
             center_lat = bbox[0] + ((bbox[1] - bbox[0]) / 2);
             center_lon = bbox[2] + ((bbox[3] - bbox[2]) / 2);
@@ -110,7 +110,6 @@ function createMap(locations, imgurl){
             */
             
             marker.events.register('click', marker, function(evt) {
-            	alert("HERE 0");
             });      
             markers.addMarker(marker);
             /*

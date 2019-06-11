@@ -10,10 +10,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -36,7 +33,10 @@ import org.labkey.remoteapi.CommandException;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
-    public static String INSERT_LINE1 = "INSERT DATA {  ";
+	public static String LAT = "http://semanticscience.org/resource/Latitude";
+	public static String LONG = "http://semanticscience.org/resource/Longitude";
+	
+	public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
     public static String DELETE_LINE3 = " ?p ?o . ";
     public static String LINE_LAST = "}  ";
@@ -361,6 +361,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     	return pltType.getLabel();
     }
 
+    public boolean hasGeoReference() {
+    	return getFirstCoordinate() != null && getSecondCoordinate() != null &&
+    		   getFirstCoordinateCharacteristic() != null && getSecondCoordinate() != null &&
+    		   getFirstCoordinateCharacteristic().equals(LAT) &&
+    		   getSecondCoordinateCharacteristic().equals(LONG);
+    }
+    
     @Override
     public boolean equals(Object o) {
         if((o instanceof Platform) && (((Platform)o).getUri().equals(this.getUri()))) {
@@ -511,12 +518,82 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         return platform;
     }
 
+    public static int getNumberPlatforms() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " select (count(?uri) as ?tot) where { " + 
+                " ?platModel rdfs:subClassOf* vstoi:Platform . " + 
+                " ?uri a ?platModel ." + 
+                "}";
+
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public static List<Platform> findWithPages(int pageSize, int offset) {
+        List<Platform> platforms = new ArrayList<Platform>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        		"SELECT ?uri WHERE { " + 
+                " ?platModel rdfs:subClassOf* vstoi:Platform . " + 
+                " ?uri a ?platModel . } " + 
+                " LIMIT " + pageSize + 
+                " OFFSET " + offset;
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI() != null) {
+                Platform platform = Platform.find(soln.getResource("uri").getURI());
+                platforms.add(platform);
+            }
+        }
+        return platforms;
+    }
+
     public static List<Platform> find() {
         List<Platform> platforms = new ArrayList<Platform>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
                 " ?platModel rdfs:subClassOf* vstoi:Platform . " + 
                 " ?uri a ?platModel ." + 
+                "} ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            Platform platform = find(soln.getResource("uri").getURI());
+            platforms.add(platform);
+        }			
+
+        java.util.Collections.sort((List<Platform>) platforms);
+
+        return platforms;
+    }
+
+    public static List<Platform> findWithGeoReferenceAndDeployment() {
+        List<Platform> platforms = new ArrayList<Platform>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?platModel rdfs:subClassOf* vstoi:Platform . " + 
+                " ?uri a ?platModel ." +
+                " ?uri hasco:hasFirstCoordinate ?lat . " +
+                " ?uri hasco:hasSecondCoordinate ?lon . " +
+                " ?uri hasco:hasFirstCoordinateCharacteristic <" + LAT + "> . " +
+                " ?uri hasco:hasSecondCoordinateCharacteristic <" + LONG + "> . " +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
