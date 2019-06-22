@@ -13,8 +13,10 @@ import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.FieldOfView;
 import org.hadatac.entity.pojo.ObjectAccessSpec;
 import org.hadatac.utils.State;
 import org.hadatac.utils.CollectionUtil;
@@ -518,7 +520,7 @@ public class RestApi extends Controller {
 	    "}";
         //System.out.println("[deploymentsQuery] sparql query\n" + sparqlQueryString);
 	
-	ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
 		  CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
@@ -549,7 +551,142 @@ public class RestApi extends Controller {
         System.out.println("[deploymentsQuery] parsed " + anode.size() + " results into array");
         return anode;
     }// /deploymentsQuery
-    
+
+    private ArrayNode platformsQuery(){
+    	List<Platform> plats = Platform.find();
+        if (plats.size() == 0) {
+            System.out.println("[platformsQuery] No platforms found in blazegraph!");
+            return null;
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode anode = mapper.createArrayNode();
+
+        for (Platform plat : plats) {
+            ObjectNode temp = mapper.createObjectNode();
+            if (plat.getUri() != null) {
+            	temp.put("uri", plat.getUri());
+            }
+            if (plat.getLabel() != null && !plat.getLabel().isEmpty()) {
+            	temp.put("label", plat.getLabel());
+            }
+            if (plat.getFirstCoordinate() != null) {
+            	temp.put("coord1", plat.getFirstCoordinate().toString());
+            }
+            if (plat.getFirstCoordinateUnitLabel() != null && !plat.getFirstCoordinateUnitLabel().isEmpty()) {
+            	temp.put("coord1Unit", plat.getFirstCoordinateUnitLabel());
+            }
+            if (plat.getFirstCoordinateCharacteristicLabel() != null && !plat.getFirstCoordinateCharacteristicLabel().isEmpty()) {
+            	temp.put("coord1Char", plat.getFirstCoordinateCharacteristicLabel());
+            }
+            if (plat.getSecondCoordinate() != null) {
+            	temp.put("coord2", plat.getSecondCoordinate().toString());
+            }
+            if (plat.getSecondCoordinateUnitLabel() != null && !plat.getSecondCoordinateUnitLabel().isEmpty()) {
+            	temp.put("coord2Unit", plat.getSecondCoordinateUnitLabel());
+            }
+            if (plat.getSecondCoordinateCharacteristicLabel() != null && !plat.getSecondCoordinateCharacteristicLabel().isEmpty()) {
+            	temp.put("coord2Char", plat.getSecondCoordinateCharacteristicLabel());
+            }
+            if (plat.getThirdCoordinate() != null) {
+            	temp.put("coord3", plat.getThirdCoordinate().toString());
+            }
+            if (plat.getThirdCoordinateUnitLabel() != null && !plat.getThirdCoordinateUnitLabel().isEmpty()) {
+            	temp.put("coord3Unit", plat.getThirdCoordinateUnitLabel());
+            }
+            if (plat.getThirdCoordinateCharacteristicLabel() != null && !plat.getThirdCoordinateCharacteristicLabel().isEmpty()) {
+            	temp.put("coord3Char", plat.getThirdCoordinateCharacteristicLabel());
+            }
+            if (plat.getPartOf() != null && !plat.getPartOf().isEmpty()) {
+            	temp.put("partOf", plat.getPartOf());
+            }
+            if (plat.getReferenceLayout() != null && !plat.getReferenceLayout().isEmpty()) {
+            	temp.put("refLayout" , plat.getReferenceLayout());
+            }
+            if (plat.getLayout() != null && !plat.getLayout().isEmpty()) {
+            	temp.put("layout", plat.getLayout());
+            }
+            if (plat.getWidth() != null) {
+            	temp.put("layoutWidth", plat.getWidth());
+            }
+            if (plat.getWidthUnit() != null && !plat.getWidthUnit().isEmpty()) {
+            	temp.put("layoutWidthUnit", plat.getWidthUnitLabel());
+            }
+            if (plat.getDepth() != null) {
+            	temp.put("layoutDepth" , plat.getDepth());
+            }
+            if (plat.getDepthUnit() != null && !plat.getDepthUnit().isEmpty()) {
+            	temp.put("layoutDepthUnit", plat.getDepthUnitLabel());
+            }
+            if (plat.getHeight() != null) {
+            	temp.put("layoutHeight", plat.getHeight());
+            }
+            if (plat.getHeightUnit() != null && !plat.getHeightUnit().isEmpty()) {
+            	temp.put("layoutHeightUnit", plat.getHeightUnitLabel());
+            }
+            anode.add(temp);
+        }
+        System.out.println("[platformsQuery] parsed " + anode.size() + " results into array");
+        return anode;
+    }// /platformsQuery
+
+    private ArrayNode fieldsOfViewQuery(){
+    	List<FieldOfView> fovs = FieldOfView.find();
+        if (fovs.size() == 0) {
+            System.out.println("[fieldsofviewQuery] No fields of view found in blazegraph!");
+            return null;
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode anode = mapper.createArrayNode();
+
+        for (FieldOfView fov : fovs) {
+            ObjectNode temp = mapper.createObjectNode();
+            if (fov.getUri() != null) {
+            	temp.put("uri", fov.getUri());
+            }
+            if (fov.getLabel() != null && !fov.getLabel().isEmpty()) {
+            	temp.put("label", fov.getLabel());
+            }
+            if (fov.getIsFOVOf() != null && !fov.getIsFOVOf().isEmpty()) {
+            	temp.put("platform_uri", fov.getIsFOVOf());
+            }
+            if (fov.getGeometry() != null && !fov.getGeometry().isEmpty()) {
+            	temp.put("geometry" , fov.getGeometry());
+            }
+            if (fov.getFirstParameter() != null) {
+            	temp.put("param1", fov.getFirstParameter().toString());
+            }
+            if (fov.getFirstParameterUnitLabel() != null && !fov.getFirstParameterUnitLabel().isEmpty()) {
+            	temp.put("param1Unit", fov.getFirstParameterUnitLabel());
+            }
+            if (fov.getFirstParameterCharacteristicLabel() != null && !fov.getFirstParameterCharacteristicLabel().isEmpty()) {
+            	temp.put("param1Char", fov.getFirstParameterCharacteristicLabel());
+            }
+            if (fov.getSecondParameter() != null) {
+            	temp.put("param2", fov.getSecondParameter().toString());
+            }
+            if (fov.getSecondParameterUnitLabel() != null && !fov.getSecondParameterUnitLabel().isEmpty()) {
+            	temp.put("param2Unit", fov.getSecondParameterUnitLabel());
+            }
+            if (fov.getSecondParameterCharacteristicLabel() != null && !fov.getSecondParameterCharacteristicLabel().isEmpty()) {
+            	temp.put("param2Char", fov.getSecondParameterCharacteristicLabel());
+            }
+            if (fov.getThirdParameter() != null) {
+            	temp.put("param3", fov.getThirdParameter().toString());
+            }
+            if (fov.getThirdParameterUnitLabel() != null && !fov.getThirdParameterUnitLabel().isEmpty()) {
+            	temp.put("param3Unit", fov.getThirdParameterUnitLabel());
+            }
+            if (fov.getThirdParameterCharacteristicLabel() != null && !fov.getThirdParameterCharacteristicLabel().isEmpty()) {
+            	temp.put("param3Char", fov.getThirdParameterCharacteristicLabel());
+            }
+            anode.add(temp);
+        }
+        System.out.println("[platformsQuery] parsed " + anode.size() + " results into array");
+        return anode;
+    }// /platformsQuery
+
     private ArrayNode ocQuery(String ocUri){
         if(ocUri == null){
             return null; 
@@ -695,6 +832,40 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getAllDeployments
+
+    // ************
+    // Platforms
+    // ************
+    public Result getAllPlatforms(){
+        ObjectMapper mapper = new ObjectMapper();
+        // 1. Query Blazegraph for platforms
+        ArrayNode anode = platformsQuery();
+        // 2. Construct response
+        if (anode == null){
+            return notFound(ApiUtil.createResponse("Encountered Blazegraph error!", false));
+        } else{
+            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+            System.out.println("[getAllPlatforms] Done");
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getAllPlatforms
+
+    // **************
+    // Fields of View
+    // **************
+    public Result getAllFieldsOfView(){
+        ObjectMapper mapper = new ObjectMapper();
+        // 1. Query Blazegraph for fields of view
+        ArrayNode anode = fieldsOfViewQuery();
+        // 2. Construct response
+        if (anode == null){
+            return notFound(ApiUtil.createResponse("Encountered Blazegraph error!", false));
+        } else{
+            JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
+            System.out.println("[getAllFieldsOfView] Done");
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }// /getAllFieldsOfView
 
     // ***********
     // Indicators!

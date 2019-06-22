@@ -1,4 +1,5 @@
 hadatac=http://hadatac.org/ont/hadatac#,,
+dcterms=http://purl.org/dc/terms/,,
 rdf=http://www.w3.org/1999/02/22-rdf-syntax-ns#,text/turtle,http://www.w3.org/1999/02/22-rdf-syntax-ns#
 rdfs=http://www.w3.org/2000/01/rdf-schema#,text/turtle,http://www.w3.org/2000/01/rdf-schema#
 xsd=http://www.w3.org/2001/XMLSchema#,,
@@ -7,7 +8,7 @@ vstoi=http://hadatac.org/ont/vstoi#,text/turtle,http://hadatac.org/ont/vstoi#
 prov=http://www.w3.org/ns/prov#,text/turtle,http://hadatac.org/ont/prov/
 foaf=http://xmlns.com/foaf/0.1/,,
 hasco=http://hadatac.org/ont/hasco/,text/turtle,http://hadatac.org/ont/hasco/
-lesa=http://hadatac.org/ont/seva#,text/turtle,http://hadatac.org/ont/lesa/
+lesa=http://hadatac.org/ont/lesa#,text/turtle,http://hadatac.org/ont/lesa/
 lesa-kb=http://hadatac.org/kb/lesa#,,
 sio=http://semanticscience.org/resource/,application/rdf+xml,http://hadatac.org/ont/sio/
 uo=http://purl.obolibrary.org/obo/UO_,application/rdf+xml,http://purl.obolibrary.org/obo/uo.owl

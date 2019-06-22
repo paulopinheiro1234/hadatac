@@ -517,6 +517,8 @@ GET     /hadatac/api/variables/all                     org.hadatac.console.contr
 GET     /hadatac/api/variables/:variableuri            org.hadatac.console.controllers.restapi.RestApi.getVariable(variableuri: String)
 GET     /hadatac/api/units/all                         org.hadatac.console.controllers.restapi.RestApi.getAllUnits()
 GET     /hadatac/api/deployments/all                   org.hadatac.console.controllers.restapi.RestApi.getAllDeployments()
+GET     /hadatac/api/platforms/all                     org.hadatac.console.controllers.restapi.RestApi.getAllPlatforms()
+GET     /hadatac/api/fieldsofview/all                  org.hadatac.console.controllers.restapi.RestApi.getAllFieldsOfView()
 GET     /hadatac/api/objectcollections/size/:ocuri     org.hadatac.console.controllers.restapi.RestApi.getOCSize(ocuri: String)
 GET     /hadatac/api/objectcollections/:ocuri/all      org.hadatac.console.controllers.restapi.RestApi.getObjectCollection(ocuri: String)
 GET     /hadatac/api/objectcollections/:ocuri/:offset  org.hadatac.console.controllers.restapi.RestApi.getObjectsInCollection(ocuri: String, offset: Integer)
