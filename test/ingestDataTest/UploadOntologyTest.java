@@ -9,6 +9,7 @@ import com.typesafe.config.ConfigFactory;
 
 public class UploadOntologyTest extends StepTest{
 	private static UploadOntologyTest test = new UploadOntologyTest();
+	private int CHEARTRIPLE = 5339;
 	
 	private UploadOntologyTest() {}
 	
@@ -35,6 +36,8 @@ public class UploadOntologyTest extends StepTest{
 
 	@Override
 	public void test() {
+		
+		
 		NameSpaces.getInstance();
         MetadataContext metadata = new 
                 MetadataContext("user", 
@@ -42,7 +45,7 @@ public class UploadOntologyTest extends StepTest{
                         ConfigFactory.load().getString("hadatac.solr.triplestore"), 
                         false);
         metadata.loadOntologies(0, "confirmedCache");
-        assertTrue(metadata.totalTriples() == 5339);
+        assertTrue(metadata.totalTriples() == CHEARTRIPLE);
 		System.out.println("[Step 3] Upload Ontology Test Pass.");
 	}
 
