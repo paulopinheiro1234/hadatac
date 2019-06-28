@@ -1,4 +1,5 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
+  dd_dataFile: org.hadatac.entity.pojo.DataFile,
   bSavable : Boolean)
 
 @import helper._
@@ -13,6 +14,7 @@
     <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
 
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
 
     <div id="rcorners">
@@ -23,55 +25,27 @@
     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
 
 
-
-    <button class="main-nav" id="show">Show Options</button>
-    <button class="Close" id="hide">Hide Options</button>
-
-
-
-
-
-     <div class="mobile-nav">
-        <p id="effect">These are ontologies displayed below:</p>
-
-          <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
-             <option value="Choose from Below">Choose from Below</option>
-          </select>
-          <div id="editRowsAdd">
-
-            <div class="dropdown">
-                <button class="insertrowbtn">Insert Row Above</button>
-                <div class="dropdown-child">
-                  <input  type="text" id="textInput1" value=" " />
-                </div>
+    <button class="btn btn-primary">Back</button>
+      <button class="btn btn-primary" style=margin-left:5px>Consider SSD</button>
+        Description of Column Variable:
+        <input type="text" id="varDescription" value=" "/>
+     
+      <button class="main-nav" id="show">Show Options</button>
+      <button class="Close" id="hide">Hide Options</button>
+      
+        <div class="mobile-nav">
+          <p id="effect" style="text-align:center">These are ontologies displayed below:</p>
+            <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
+                <option value="Choose from Below">Choose from Below</option>
+            </select>
+            <div id="editRowsAdd">
+              <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
+              <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
+              <button class="removerowbtn" onclick="removeRow()">Remove Row</button> 
             </div>
-
-            <script>
-            document.getElementById('textInput1').onkeypress=function(e){
-             if(e.keyCode==13){
-                  rowEnteredAdd();
-             }
-            }
-            </script>
-          </div>
-
-
-          <div id=editRowsRemove>
-          <div class="dropdown">
-             <button class="removerowbtn">Remove Row</button>
-             <div class="dropdown-child">
-                <input  type="text" id="textInput2" value=" " />
-             </div>
-          </div>
-          <script>
-             document.getElementById('textInput2').onkeypress=function(e){
-                if(e.keyCode==13){
-                    rowEnteredRemove();
-                }
-             }
-          </script>
-          </div>
-
+            
+        </div>
+        
 
     <div><a id="error_msg"></a></div>
     <div id="grid"></div>
@@ -84,10 +58,12 @@
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
 
     <script type="text/javascript">
     /* set up async GET request */
     var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
+   
     var _upload = document.getElementById('upload');
     var _onreponse = function() {
     	$("#error_msg").html(decodeURIComponent(this.responseText));
@@ -132,4 +108,17 @@
     }
     req.send();
     </script>
+    <script>
+      if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
+        alert("Please upload a valid Data Dictionary")
+      }
+      else{
+        var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+        getURL(url);
+      }      
+    </script>
+
+  
+  
+
 }

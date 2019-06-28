@@ -1,0 +1,93 @@
+
+/* #heading { 
+    left:1000px;
+    top:200px;
+}  */
+.main-nav {
+    float:right;
+    background:cornflowerblue;
+    color:white;
+    font-family:Arial;
+    font-size: 12pt;
+    
+}
+#effect{
+    top:200px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size:14pt;
+}
+#hide{
+    display:none;
+}
+#show{
+    display:block;
+}
+
+.mobile-nav { 
+    position:absolute;
+    display: none;
+    top: 200px;
+    left:1000px;
+    
+}
+
+.Close {
+    color:white;
+    background-color: royalblue;
+    float:right;
+    margin-left:5px;
+    font-family:Arial;
+    font-size: 12pt;
+}
+.menuoptions{
+    max-width: 100%;
+    font-size: 15pt;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#menulist{
+    margin-left:60px;
+}
+
+.insertrowbtn{
+    background-color: cornflowerblue;
+    font-family:Arial;
+    color:white;
+    font-size: 10pt;
+    margin-top: 7px;
+    text-align: center;
+    padding:3px;
+
+}
+.removerowbtn{
+    background-color: cornflowerblue;
+    font-family:Arial;
+    color:white;
+    font-size: 10pt;
+    margin-top: 7px;
+    text-align: center;
+    padding:3px;
+
+}
+
+#varDescription{
+    width:30%;
+    font-size: 11pt;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left:5pt;
+    color:black;
+    border-block-color: black;
+}
+
+/* .submitButton{
+    
+    color:white;
+    background-color: rgb(113, 164, 196);
+    margin-top:10px;
+    font-family:Arial;
+    font-size: 12pt;
+} */
+
+/* #Submission{
+    top:800px;
+    float:left
+} */
