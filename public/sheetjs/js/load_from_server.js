@@ -306,3 +306,16 @@ function DDExceltoJSON(dd_url,varnameElement){
 
 }
 
+function showOntologyList(){
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+var closebtns = document.getElementsByClassName("remove");
+  var i;
+  
+  for (i = 0; i < closebtns.length; i++) {
+    closebtns[i].addEventListener("click", function() {
+      this.parentElement.style.display = 'none';
+    });
+}
+
