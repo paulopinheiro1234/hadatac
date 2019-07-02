@@ -21,14 +21,6 @@ public class LoadOASTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		System.out.print("Step8: Post-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadOAS());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step8: Not yet implemented");
 		

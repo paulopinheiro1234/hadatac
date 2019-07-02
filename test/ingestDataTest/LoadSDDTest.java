@@ -21,14 +21,6 @@ public class LoadSDDTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		System.out.print("Step7: Post-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadSDD());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step7: Not yet implemented");
 		

@@ -21,14 +21,6 @@ public class LoadDATest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		System.out.print("Step9: Post-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadDA());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step9: Not yet implemented");
 		

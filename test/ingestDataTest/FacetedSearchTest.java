@@ -21,14 +21,6 @@ public class FacetedSearchTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		System.out.print("Step10: Post-step Verification......");
-		assertTrue("Failed.", Verify.verifyFacetedSearch());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step10: Not yet implemented");
 		

@@ -22,11 +22,6 @@ public class EmptyTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		return;
-	}
-
-	@Override
 	public void test() {
 		return;
 		

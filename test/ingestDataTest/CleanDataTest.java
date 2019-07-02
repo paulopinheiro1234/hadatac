@@ -74,12 +74,6 @@ public class CleanDataTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		return;
-		
-	}
-
-	@Override
 	public int step() {
 		return 2;
 	}

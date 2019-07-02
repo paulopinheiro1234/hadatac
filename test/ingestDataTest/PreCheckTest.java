@@ -59,13 +59,7 @@ public class PreCheckTest extends StepTest{
 		System.out.println("[Step 1] Blazegraph Check Pass.");
 		
 	}
-	
-	
-	@Override
-	public void verifyPost() {
-		
-		
-	}
+
 
 	@Override
 	public int step() {

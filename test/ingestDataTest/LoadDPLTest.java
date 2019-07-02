@@ -21,14 +21,6 @@ public class LoadDPLTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		System.out.print("Step4: Post-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadDPL());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step4: Not yet implemented");
 		

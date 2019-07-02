@@ -13,7 +13,6 @@ public abstract class StepTest {
 	public final static String FILEPATH = "test/ingestDataTest/step.txt";
 	public abstract int step();
 	public abstract void verifyPre();
-	public abstract void verifyPost();
 	public abstract void test();
 	public abstract void preMsg();
 	
@@ -47,7 +46,6 @@ public abstract class StepTest {
 		checkStep();
 		verifyPre();
 		test();
-		verifyPost();
 		recordStep();
 	}
 }

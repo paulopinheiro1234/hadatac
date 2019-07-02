@@ -21,14 +21,6 @@ public class DownloadTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-		System.out.print("Step11: Post-step Verification......");
-		assertTrue("Failed.", Verify.verifyDownload());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step11: Not yet implemented");
 		

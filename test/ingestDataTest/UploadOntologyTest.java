@@ -35,12 +35,6 @@ public class UploadOntologyTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPost() {
-
-		return;
-	}
-
-	@Override
 	public void test() {
 		//clean cache
 		//equivalent to org.hadatac.console.controllers.triplestore.LoadOnt.erasecache()
