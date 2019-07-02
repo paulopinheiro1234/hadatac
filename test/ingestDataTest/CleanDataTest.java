@@ -32,7 +32,7 @@ public class CleanDataTest extends StepTest{
 	
 	@Override
 	public void preMsg() {
-		System.out.println("[Step2] Executing cleanDataTest:");
+		System.out.println("[Step 2] Executing cleanDataTest:");
 		
 	}
 	

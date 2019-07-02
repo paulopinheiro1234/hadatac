@@ -19,8 +19,8 @@ import ingestDataTest.LoadOASTest;
 import ingestDataTest.LoadSDDTest;
 import ingestDataTest.LoadSSDTest;
 import ingestDataTest.LoadSTDTest;
+import ingestDataTest.PreCheckTest;
 import ingestDataTest.StepTest;
-import ingestDataTest.SupportOntologyTest;
 import ingestDataTest.UploadOntologyTest;
 
 public class IngestDataTest {
@@ -29,7 +29,7 @@ public class IngestDataTest {
 	public void loadTest()
 	{
 		tests.add(0, EmptyTest.getTest());
-		tests.add(1, SupportOntologyTest.getTest());
+		tests.add(1, PreCheckTest.getTest());
 		tests.add(2, CleanDataTest.getTest());
 		tests.add(3, UploadOntologyTest.getTest());
 		tests.add(4, LoadDPLTest.getTest());
