@@ -19,7 +19,7 @@ import com.typesafe.config.ConfigFactory;
 
 public class UploadOntologyTest extends StepTest{
 	private static UploadOntologyTest test = new UploadOntologyTest();
-	private int CHEARTRIPLE = 5339;
+	private int TOTALTRIPLE = 305821;
 	
 	private UploadOntologyTest() {}
 	
@@ -55,12 +55,24 @@ public class UploadOntologyTest extends StepTest{
 		assertTrue("Clean Cache failed.", folder.listFiles().length == 0);
 		System.out.println("[Step 3] Clean Cache Pass.");
 		
-		//move copy-chear into cache file
+		//move all ontologies into cache file
 		try {
 			Files.copy(java.nio.file.Paths.get("test/src/copy-chear"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-chear"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-cogat"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-cogat"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-doid"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-doid"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-hasco"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-hasco"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-owl"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-owl"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-pato"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-pato"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-prov"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-prov"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-rdf"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-rdf"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-rdfs"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-rdfs"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-sio"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-sio"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-uo"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-uo"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/copy-vstoi"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-vstoi"), StandardCopyOption.REPLACE_EXISTING);
 		}catch(IOException e) {
-			fail("Fail to copy \"copy-chear\" from src to cache file");
+			fail("Fail to copy ontologies from test/src to tmp/cache");
 		}
+		
 		
 		//upload ontology from cache
 		//equivalent to org.hadatac.console.controllers.triplestore.LoadOnt.playLoadOntologies("conformedCache")
@@ -74,8 +86,8 @@ public class UploadOntologyTest extends StepTest{
         
         //check result after upload ontology from cache
         long tripleNum = metadata.totalTriples();
-        assertTrue(String.format("Triples after loading \"chear\" Ontology should be %d, but was %d", CHEARTRIPLE, tripleNum), tripleNum == CHEARTRIPLE);
-		System.out.println("[Step 3] Upload Ontology Test Pass.");
+        assertTrue(String.format("Triples after loading all ontologies should be %d, but was %d", TOTALTRIPLE, tripleNum), tripleNum == TOTALTRIPLE);
+		System.out.println("[Step 3] Upload Ontology Test Pass. " + tripleNum);
 	}
 
 	@Override

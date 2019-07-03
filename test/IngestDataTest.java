@@ -46,7 +46,7 @@ public class IngestDataTest {
 	public void test() throws IOException
 	{
 		loadTest();
-		int step = 0;
+		int step;
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(StepTest.FILEPATH));
 			step = Integer.parseInt(reader.readLine());
@@ -55,6 +55,9 @@ public class IngestDataTest {
 			fail(e.getMessage());
 		}
 
+		//UI not implemented yet
+		//due to unavailability of System.in stream under sbt mode
+		
 		/*System.out.println("You have currently arrived Test Step: " + step);
 		System.out.println("0: Reinitialize the step.");
 		System.out.println("1: SupportOntologyTest.");
@@ -76,6 +79,7 @@ public class IngestDataTest {
 		{
 			System.out.print("Choose a test option:");
 			System.out.println("\nUI implementation not completed. Choose \"all\" automatically.");
+			/*String cmd = scan.nextLine();*/
 			String cmd = "all";
 			if(cmd.equals("q"))
 			{
@@ -116,5 +120,7 @@ public class IngestDataTest {
 		{
 			test.execute();
 		}
+		
+		System.out.println("Congratulation: IngestDataTest Pass.");
 	}
 }
