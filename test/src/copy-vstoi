@@ -1,0 +1,1639 @@
+@prefix : <http://hadatac.org/ont/vstoi#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xsp: <http://www.owl-ontologies.com/2005/08/07/xsp.owl#> .
+@prefix daml: <http://www.daml.org/2001/03/daml+oil#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vstoi: <http://hadatac.org/ont/vstoi#> .
+@prefix protege: <http://protege.stanford.edu/plugins/owl/protege#> .
+@base <http://hadatac.org/ont/vstoi> .
+
+<http://hadatac.org/ont/vstoi> rdf:type owl:Ontology ;
+                               
+                               owl:versionIRI <http://hadatac.org/ont/vstoi/0.4> .
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://hadatac.org/ont/vstoi#hasDeployment
+
+vstoi:hasDeployment rdf:type owl:ObjectProperty ;
+                    
+                    owl:deprecated "" ;
+                    
+                    rdfs:range vstoi:Deployment ;
+                    
+                    rdfs:domain vstoi:Platform .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasDetector
+
+vstoi:hasDetector rdf:type owl:ObjectProperty ;
+                  
+                  rdfs:domain vstoi:Deployment ;
+                  
+                  rdfs:range vstoi:Detector .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasInstrument
+
+vstoi:hasInstrument rdf:type owl:FunctionalProperty ,
+                             owl:ObjectProperty ;
+                    
+                    rdfs:domain vstoi:Deployment ;
+                    
+                    rdfs:range vstoi:Instrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasInstrumentOperatingMode
+
+vstoi:hasInstrumentOperatingMode rdf:type owl:ObjectProperty ;
+                                 
+                                 rdfs:domain vstoi:Instrument ;
+                                 
+                                 rdfs:range vstoi:InstrumentOperatingMode .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasPlatform
+
+vstoi:hasPlatform rdf:type owl:FunctionalProperty ,
+                           owl:ObjectProperty ;
+                  
+                  rdfs:domain vstoi:Deployment ;
+                  
+                  rdfs:range vstoi:Platform .
+
+
+
+###  http://hadatac.org/ont/vstoi#isFromInstrument
+
+vstoi:isFromInstrument rdf:type owl:ObjectProperty ;
+                       
+                       owl:deprecated "" ;
+                       
+                       rdfs:domain vstoi:Dataset ;
+                       
+                       rdfs:range vstoi:Instrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#isFromInstrumentOperatingMode
+
+vstoi:isFromInstrumentOperatingMode rdf:type owl:ObjectProperty ;
+                                    
+                                    owl:deprecated "" ;
+                                    
+                                    rdfs:domain vstoi:Dataset ;
+                                    
+                                    rdfs:range vstoi:InstrumentOperatingMode .
+
+
+
+###  http://hadatac.org/ont/vstoi#isInstrumentAttachment
+
+vstoi:isInstrumentAttachment rdf:type owl:FunctionalProperty ,
+                                      owl:ObjectProperty ;
+                             
+                             rdfs:comment "Some detectors are permanently attached to an intrument. This property documents the intrument model that a detector is permanently attached." ;
+                             
+                             rdfs:domain vstoi:Detector ;
+                             
+                             rdfs:range vstoi:Instrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#perspectiveOf
+
+vstoi:perspectiveOf rdf:type owl:ObjectProperty ;
+                    
+                    rdfs:range vstoi:Detector ;
+                    
+                    rdfs:domain vstoi:SensingPerspective .
+
+
+
+
+
+#################################################################
+#
+#    Data properties
+#
+#################################################################
+
+
+###  http://hadatac.org/ont/vstoi#hasAccuracyPercentage
+
+vstoi:hasAccuracyPercentage rdf:type owl:DatatypeProperty ;
+                            
+                            rdfs:domain vstoi:SensingPerspective ;
+                            
+                            rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasAccuracyR2
+
+vstoi:hasAccuracyR2 rdf:type owl:DatatypeProperty ;
+                    
+                    rdfs:domain vstoi:SensingPerspective ;
+                    
+                    rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasDeploymentId
+
+vstoi:hasDeploymentId rdf:type owl:DatatypeProperty ,
+                               owl:FunctionalProperty ;
+                      
+                      rdfs:domain vstoi:Deployment ;
+                      
+                      rdfs:range xsd:int .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasDeploymentName
+
+vstoi:hasDeploymentName rdf:type owl:DatatypeProperty ,
+                                 owl:FunctionalProperty ;
+                        
+                        rdfs:domain vstoi:Deployment ;
+                        
+                        rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasDeploymentSynonym
+
+vstoi:hasDeploymentSynonym rdf:type owl:DatatypeProperty ;
+                           
+                           rdfs:domain vstoi:Deployment ;
+                           
+                           rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasDescription
+
+vstoi:hasDescription rdf:type owl:DatatypeProperty ,
+                              owl:FunctionalProperty ;
+                     
+                     rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasDimensions
+
+vstoi:hasDimensions rdf:type owl:DatatypeProperty ,
+                             owl:FunctionalProperty ;
+                    
+                    rdfs:domain vstoi:Detector ;
+                    
+                    rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasErrors
+
+vstoi:hasErrors rdf:type owl:DatatypeProperty ;
+                
+                rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasFocalLength
+
+vstoi:hasFocalLength rdf:type owl:DatatypeProperty ;
+                     
+                     rdfs:domain vstoi:OpticalInstrument ;
+                     
+                     rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasHighRangeValue
+
+vstoi:hasHighRangeValue rdf:type owl:DatatypeProperty ;
+                        
+                        rdfs:domain vstoi:SensingPerspective ;
+                        
+                        rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasIdentifier
+
+vstoi:hasIdentifier rdf:type owl:DatatypeProperty ,
+                             owl:FunctionalProperty ;
+                    
+                    rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasLowRangeValue
+
+vstoi:hasLowRangeValue rdf:type owl:DatatypeProperty ;
+                       
+                       rdfs:domain vstoi:SensingPerspective ;
+                       
+                       rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasMaker
+
+vstoi:hasMaker rdf:type owl:DatatypeProperty ;
+               
+               owl:deprecated "" ;
+               
+               rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasMaxResponseTimeValue
+
+vstoi:hasMaxResponseTimeValue rdf:type owl:DatatypeProperty ;
+                              
+                              rdfs:domain vstoi:Detector ;
+                              
+                              rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasName
+
+vstoi:hasName rdf:type owl:DatatypeProperty ,
+                       owl:FunctionalProperty ;
+              
+              owl:deprecated "" ;
+              
+              rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasOutputResolution
+
+vstoi:hasOutputResolution rdf:type owl:DatatypeProperty ;
+                          
+                          rdfs:domain vstoi:SensingPerspective ;
+                          
+                          rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasPixelScale
+
+vstoi:hasPixelScale rdf:type owl:DatatypeProperty ,
+                             owl:FunctionalProperty ;
+                    
+                    rdfs:domain vstoi:Detector ;
+                    
+                    rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasQuantumEfficiency
+
+vstoi:hasQuantumEfficiency rdf:type owl:DatatypeProperty ,
+                                    owl:FunctionalProperty ;
+                           
+                           rdfs:domain vstoi:Detector ;
+                           
+                           rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasSerialNumber
+
+vstoi:hasSerialNumber rdf:type owl:DatatypeProperty ;
+                      
+                      rdfs:range xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasWebDocumentation
+
+vstoi:hasWebDocumentation rdf:type owl:DatatypeProperty ;
+                          
+                          rdfs:range xsd:anyURI .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasX
+
+vstoi:hasX rdf:type owl:DatatypeProperty ;
+           
+           owl:deprecated "" ;
+           
+           rdfs:domain vstoi:Platform ;
+           
+           rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasY
+
+vstoi:hasY rdf:type owl:DatatypeProperty ;
+           
+           owl:deprecated "" ;
+           
+           rdfs:domain vstoi:Platform ;
+           
+           rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#hasZ
+
+vstoi:hasZ rdf:type owl:DatatypeProperty ;
+           
+           owl:deprecated "" ;
+           
+           rdfs:domain vstoi:Platform ;
+           
+           rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#maxDetachableDetectors
+
+vstoi:maxDetachableDetectors rdf:type owl:DatatypeProperty ;
+                             
+                             rdfs:domain vstoi:Instrument ;
+                             
+                             rdfs:range xsd:integer .
+
+
+
+###  http://hadatac.org/ont/vstoi#maxLoggedMeasurements
+
+vstoi:maxLoggedMeasurements rdf:type owl:DatatypeProperty ;
+                            
+                            rdfs:domain vstoi:Instrument ;
+                            
+                            rdfs:range xsd:double .
+
+
+
+###  http://hadatac.org/ont/vstoi#maxOperatingTemperature
+
+vstoi:maxOperatingTemperature rdf:type owl:DatatypeProperty ;
+                              
+                              rdfs:domain vstoi:Instrument ;
+                              
+                              rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#minOperatingTemperature
+
+vstoi:minOperatingTemperature rdf:type owl:DatatypeProperty ;
+                              
+                              rdfs:domain vstoi:Instrument ;
+                              
+                              rdfs:range xsd:float .
+
+
+
+###  http://hadatac.org/ont/vstoi#numAttachedDetectors
+
+vstoi:numAttachedDetectors rdf:type owl:DatatypeProperty ;
+                           
+                           rdfs:domain vstoi:Instrument ;
+                           
+                           rdfs:range xsd:integer .
+
+
+
+###  http://hadatac.org/ont/vstoi#reference
+
+vstoi:reference rdf:type owl:DatatypeProperty ;
+                
+                rdfs:range xsd:string ;
+                
+                rdfs:domain [ rdf:type owl:Class ;
+                              owl:unionOf ( vstoi:Instrument
+                                            vstoi:Observatory
+                                          )
+                            ] .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://hadatac.org/ont/vstoi#AcceleratorMassSpectrometer
+
+vstoi:AcceleratorMassSpectrometer rdf:type owl:Class ;
+                                  
+                                  rdfs:label "Accelerator Mass Spectrometer"^^xsd:string ;
+                                  
+                                  rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#AerosolLidar
+
+vstoi:AerosolLidar rdf:type owl:Class ;
+                   
+                   rdfs:label "Aerosol Lidar"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#AirglowImager
+
+vstoi:AirglowImager rdf:type owl:Class ;
+                    
+                    rdfs:label "Airglow Imager"^^xsd:string ;
+                    
+                    rdfs:subClassOf vstoi:Imager .
+
+
+
+###  http://hadatac.org/ont/vstoi#AllSkyImager
+
+vstoi:AllSkyImager rdf:type owl:Class ;
+                   
+                   rdfs:label "All Sky Imager"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:Imager .
+
+
+
+###  http://hadatac.org/ont/vstoi#BiStaticRadar
+
+vstoi:BiStaticRadar rdf:type owl:Class ;
+                    
+                    rdfs:label "Bi Static Radar"^^xsd:string ;
+                    
+                    rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#BirefringentFilter
+
+vstoi:BirefringentFilter rdf:type owl:Class ;
+                         
+                         rdfs:label "Birefringent Filter Instrument"^^xsd:string ;
+                         
+                         rdfs:subClassOf vstoi:FilterInstrument ;
+                         
+                         owl:disjointWith vstoi:InterferenceFilter ,
+                                          vstoi:LyotFilter .
+
+
+
+###  http://hadatac.org/ont/vstoi#CCD
+
+vstoi:CCD rdf:type owl:Class ;
+          
+          rdfs:label "CCD Imaging Detector"^^xsd:string ;
+          
+          rdfs:subClassOf vstoi:ImagingDetector ;
+          
+          owl:disjointWith vstoi:Film ,
+                           vstoi:Thermometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#CalciumLidar
+
+vstoi:CalciumLidar rdf:type owl:Class ;
+                   
+                   rdfs:label "Calcium Lidar"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#CoherentIonosphericRadar
+
+vstoi:CoherentIonosphericRadar rdf:type owl:Class ;
+                               
+                               rdfs:label "Coherent Ionospheric Radar"^^xsd:string ;
+                               
+                               rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Dataset
+
+vstoi:Dataset rdf:type owl:Class ;
+              
+              rdfs:label "Dataset"^^xsd:string ;
+              
+              owl:disjointWith vstoi:Detector ,
+                               vstoi:Instrument ,
+                               vstoi:Observatory ;
+              
+              rdfs:comment "A collection of observations of the physical quantity of interest.  They usually have a location, observatory, instrument, and parameter (or set of parameters) associated with them.  They also have a format along with an epoch over which they were taken."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Deployment
+
+vstoi:Deployment rdf:type owl:Class ;
+                 
+                 rdfs:label "Deployment"^^xsd:string ;
+                 
+                 rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                   owl:onProperty vstoi:hasDeploymentId ;
+                                   owl:cardinality "1"^^xsd:nonNegativeInteger
+                                 ] ;
+                 
+                 rdfs:comment "A platform is deployed during a certain duration of time and over a certain spacial domain. The platform has instruments on it within the scope of this deployment. For example, a boat will carry certain instruments during a deployment, and those instruments will be removed once the deployment is completed. A stationary deployment can last a much longer time, even decades, with the same instrument."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Detector
+
+vstoi:Detector rdf:type owl:Class ;
+               
+               rdfs:label "Detector"^^xsd:string ;
+               
+               owl:disjointWith vstoi:Instrument ,
+                                vstoi:Observatory ;
+               
+               rdfs:comment "A device which detects measurements, such as temperature or wind velocity"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#DifferentialAbsorptionLidar
+
+vstoi:DifferentialAbsorptionLidar rdf:type owl:Class ;
+                                  
+                                  rdfs:label "Differential Absorption Lidar"^^xsd:string ;
+                                  
+                                  rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#DopplerLidar
+
+vstoi:DopplerLidar rdf:type owl:Class ;
+                   
+                   rdfs:label "Doppler Lidar"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#DopplerRadar
+
+vstoi:DopplerRadar rdf:type owl:Class ;
+                   
+                   rdfs:label "Doppler Radar"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#FabryPerot
+
+vstoi:FabryPerot rdf:type owl:Class ;
+                 
+                 rdfs:label "Febry Perot Interferometer"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:Interferometer ;
+                 
+                 rdfs:comment "A multiple-beam interferometer, usually consisting of two flat plates, with high reflective ability. The plates are set parallel to one another by spacers so that light waves may bounce back and forth between them several times. The requirements for constructive interference of reflected light waves of a given wavelength can be fulfilled only at particular angles, relative to the normal to the plates. Therefore, Fabry-Perot interferometers can be used as spectrometers with high resolution. Used as a laser resonator, the Fabry-Perot reinforces only light of specific frequencies traveling perpendicular to the mirror surfaces, and its successive reflections and amplifications form the oscillating mode."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Film
+
+vstoi:Film rdf:type owl:Class ;
+           
+           rdfs:label "Film"^^xsd:string ;
+           
+           rdfs:subClassOf vstoi:ImagingDetector ;
+           
+           owl:disjointWith vstoi:Thermometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#FilterInstrument
+
+vstoi:FilterInstrument rdf:type owl:Class ;
+                       
+                       rdfs:label "Filter Instrument"^^xsd:string ;
+                       
+                       rdfs:subClassOf vstoi:PhysicalInstrument ;
+                       
+                       owl:disjointWith vstoi:OpticalInstrument ,
+                                        vstoi:Telescope .
+
+
+
+###  http://hadatac.org/ont/vstoi#FourierTransformIonCyclotronMassSpectrometer
+
+vstoi:FourierTransformIonCyclotronMassSpectrometer rdf:type owl:Class ;
+                                                   
+                                                   rdfs:label "Fourier Transform Ion Cyclotron Mass Spectrometer"^^xsd:string ;
+                                                   
+                                                   rdfs:subClassOf vstoi:IonCyclotronMassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#GlowDischargeMassSpectrometer
+
+vstoi:GlowDischargeMassSpectrometer rdf:type owl:Class ;
+                                    
+                                    rdfs:label "Glow Discharge Mass Spectrometer"^^xsd:string ;
+                                    
+                                    rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#GroundBasedIndices
+
+vstoi:GroundBasedIndices rdf:type owl:Class ;
+                         
+                         rdfs:label "Ground Based Indices"^^xsd:string ;
+                         
+                         rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#GroundBasedInstrument
+
+vstoi:GroundBasedInstrument rdf:type owl:Class ;
+                            
+                            rdfs:label "Ground Based Instrument"^^xsd:string ;
+                            
+                            rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#GroundBasedRadar
+
+vstoi:GroundBasedRadar rdf:type owl:Class ;
+                       
+                       rdfs:label "Ground Based Radar"^^xsd:string ;
+                       
+                       rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#HFRadar
+
+vstoi:HFRadar rdf:type owl:Class ;
+              
+              rdfs:label "HF Radar"^^xsd:string ;
+              
+              rdfs:subClassOf vstoi:CoherentIonosphericRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Heliograph
+
+vstoi:Heliograph rdf:type owl:Class ;
+                 
+                 rdfs:label "Heliograph Optical Instrument"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:OpticalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#Imager
+
+vstoi:Imager rdf:type owl:Class ;
+             
+             rdfs:label "Imager"^^xsd:string ;
+             
+             rdfs:subClassOf vstoi:OpticalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#ImagingDetector
+
+vstoi:ImagingDetector rdf:type owl:Class ;
+                      
+                      rdfs:label "Imaging Detector"^^xsd:string ;
+                      
+                      rdfs:subClassOf vstoi:Detector .
+
+
+
+###  http://hadatac.org/ont/vstoi#IncoherentScatterRadar
+
+vstoi:IncoherentScatterRadar rdf:type owl:Class ;
+                             
+                             rdfs:label "Incoherent Scatter Radar"^^xsd:string ;
+                             
+                             rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#InductivelyCoupledMassSpectrometer
+
+vstoi:InductivelyCoupledMassSpectrometer rdf:type owl:Class ;
+                                         
+                                         rdfs:label "Inductively Coupled Mass Spectrometer"^^xsd:string ;
+                                         
+                                         rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#Instrument
+
+vstoi:Instrument rdf:type owl:Class ;
+                 
+                 rdfs:label "Instrument"^^xsd:string ;
+                 
+                 owl:disjointWith vstoi:Observatory ;
+                 
+                 rdfs:comment "A device or mechanism that is used to achire attribute values of entities of interest.  An instrument does not necessarily require a way to store its measured quantity (e.g, a hard disk)."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#InstrumentOperatingMode
+
+vstoi:InstrumentOperatingMode rdf:type owl:Class ;
+                              
+                              rdfs:label "Instrument Operating Mode"^^xsd:string ;
+                              
+                              rdfs:comment "A configuration which allows the instrument to produce the required signal. "^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#InterferenceFilter
+
+vstoi:InterferenceFilter rdf:type owl:Class ;
+                         
+                         rdfs:label "Interface Filter Instrument"^^xsd:string ;
+                         
+                         rdfs:subClassOf vstoi:FilterInstrument ;
+                         
+                         owl:disjointWith vstoi:LyotFilter .
+
+
+
+###  http://hadatac.org/ont/vstoi#Interferometer
+
+vstoi:Interferometer rdf:type owl:Class ;
+                     
+                     rdfs:label "Interferometer"^^xsd:string ;
+                     
+                     rdfs:subClassOf vstoi:OpticalInstrument ;
+                     
+                     rdfs:comment "An instrument that uses the principle of interference of electromagnetic waves for purposes of measurement. Note: Interferometers may be used to measure a variety of physical variables, such as displacement (distance), temperature, pressure, and strain."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#IonCyclotronMassSpectrometer
+
+vstoi:IonCyclotronMassSpectrometer rdf:type owl:Class ;
+                                   
+                                   rdfs:label "Ion Cyclotron Mass Spectrometer"^^xsd:string ;
+                                   
+                                   rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#IonSonde
+
+vstoi:IonSonde rdf:type owl:Class ;
+               
+               rdfs:label "Ion Sonde"^^xsd:string ;
+               
+               rdfs:subClassOf vstoi:Sounder .
+
+
+
+###  http://hadatac.org/ont/vstoi#IonosphericDopplerRadar
+
+vstoi:IonosphericDopplerRadar rdf:type owl:Class ;
+                              
+                              rdfs:label "Ionospheric Doppler Radar"^^xsd:string ;
+                              
+                              rdfs:subClassOf vstoi:DopplerRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#IronLidar
+
+vstoi:IronLidar rdf:type owl:Class ;
+                
+                rdfs:label "Iron Lidar"^^xsd:string ;
+                
+                rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#KnudsenEffusionMassSpectrometer
+
+vstoi:KnudsenEffusionMassSpectrometer rdf:type owl:Class ;
+                                      
+                                      rdfs:label "Knudsen Effusion Mass Spectrometer"^^xsd:string ;
+                                      
+                                      rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#LFRadar
+
+vstoi:LFRadar rdf:type owl:Class ;
+              
+              rdfs:label "LF Radar"^^xsd:string ;
+              
+              rdfs:subClassOf vstoi:MiddleAtmosphereRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Laboratory
+
+vstoi:Laboratory rdf:type owl:Class ;
+                 
+                 rdfs:label "Laboratory" ;
+                 
+                 rdfs:subClassOf vstoi:Platform ;
+                 
+                 rdfs:comment "A platform where instruments are deployed under controlled operation conditions" .
+
+
+
+###  http://hadatac.org/ont/vstoi#Lidar
+
+vstoi:Lidar rdf:type owl:Class ;
+            
+            rdfs:label "Lidar"^^xsd:string ;
+            
+            rdfs:subClassOf vstoi:OpticalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#LyotFilter
+
+vstoi:LyotFilter rdf:type owl:Class ;
+                 
+                 rdfs:label "Lyot Filter Instrument"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:FilterInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#MFRadar
+
+vstoi:MFRadar rdf:type owl:Class ;
+              
+              rdfs:label "MF Radar"^^xsd:string ;
+              
+              rdfs:subClassOf vstoi:MiddleAtmosphereRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#MSTRadar
+
+vstoi:MSTRadar rdf:type owl:Class ;
+               
+               rdfs:label "MST Radar"^^xsd:string ;
+               
+               rdfs:subClassOf vstoi:MiddleAtmosphereRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Magnetometer
+
+vstoi:Magnetometer rdf:type owl:Class ;
+                   
+                   rdfs:label "Magnetometer"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#MassSpectrometer
+
+vstoi:MassSpectrometer rdf:type owl:Class ;
+                       
+                       rdfs:label "Mass Spectrometer"^^xsd:string ;
+                       
+                       rdfs:subClassOf vstoi:Spectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#MattauchHerzogSmallVolumeMassSpectrometer
+
+vstoi:MattauchHerzogSmallVolumeMassSpectrometer rdf:type owl:Class ;
+                                                
+                                                rdfs:label "Mattauch Herzog Small Volume Mass Spectrometer"^^xsd:string ;
+                                                
+                                                rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#MeteorWindRadar
+
+vstoi:MeteorWindRadar rdf:type owl:Class ;
+                      
+                      rdfs:label "Meteor Wind Radar"^^xsd:string ;
+                      
+                      rdfs:subClassOf vstoi:MiddleAtmosphereRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#MichelsonInterferometer
+
+vstoi:MichelsonInterferometer rdf:type owl:Class ;
+                              
+                              rdfs:label "Michelson Interferometer"^^xsd:string ;
+                              
+                              rdfs:subClassOf vstoi:Interferometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#MiddleAtmosphereRadar
+
+vstoi:MiddleAtmosphereRadar rdf:type owl:Class ;
+                            
+                            rdfs:label "Middle Stmosphere Radar"^^xsd:string ;
+                            
+                            rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Model
+
+vstoi:Model rdf:type owl:Class ;
+            
+            rdfs:label "Model"^^xsd:string ;
+            
+            rdfs:subClassOf vstoi:Instrument ;
+            
+            rdfs:comment "An instrument used to generate synthetic data values for formuli that describe entities of interest." .
+
+
+
+###  http://hadatac.org/ont/vstoi#MultiChannelPhotometer
+
+vstoi:MultiChannelPhotometer rdf:type owl:Class ;
+                             
+                             rdfs:label "Multi Channel Photometer"^^xsd:string ;
+                             
+                             rdfs:subClassOf vstoi:Photometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#MultiCollectorMassSpectrometer
+
+vstoi:MultiCollectorMassSpectrometer rdf:type owl:Class ;
+                                     
+                                     rdfs:label "Multi Collector Mass Spectrometer"^^xsd:string ;
+                                     
+                                     rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#Observatory
+
+vstoi:Observatory rdf:type owl:Class ;
+                  
+                  rdfs:label "Observatory"^^xsd:string ;
+                  
+                  rdfs:comment "A facility which houses and operates one or more instruments either synoptically or periodically.  It has a physical location and operating hours.  It can be either manned or remote."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#OpticalInstrument
+
+vstoi:OpticalInstrument rdf:type owl:Class ;
+                        
+                        rdfs:label "Optical Instrument"^^xsd:string ;
+                        
+                        rdfs:subClassOf vstoi:PhysicalInstrument ;
+                        
+                        owl:disjointWith vstoi:Telescope .
+
+
+
+###  http://hadatac.org/ont/vstoi#OzoneLidar
+
+vstoi:OzoneLidar rdf:type owl:Class ;
+                 
+                 rdfs:label "Ozone Lidar"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#OzoneSonde
+
+vstoi:OzoneSonde rdf:type owl:Class ;
+                 
+                 rdfs:label "Ozone Sounde"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:Sounder .
+
+
+
+###  http://hadatac.org/ont/vstoi#PhasedArrayRadar
+
+vstoi:PhasedArrayRadar rdf:type owl:Class ;
+                       
+                       rdfs:label "Phased Array Radar"^^xsd:string ;
+                       
+                       rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Photometer
+
+vstoi:Photometer rdf:type owl:Class ;
+                 
+                 rdfs:label "Photometer"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:OpticalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#PhysicalInstrument
+
+vstoi:PhysicalInstrument rdf:type owl:Class ;
+                         
+                         rdfs:label "Physical Instrument" ;
+                         
+                         rdfs:subClassOf vstoi:Instrument ;
+                         
+                         rdfs:comment """A device that measures a physical phenomenon or parameter.  At a minimum, it possesses a detector which produces a signal from which the desired quantity is calculated or inferred.  The detector signal possesses the information needed to either obtain the value of the phenomenon (e.g, temperature: a voltage is converted into a temperature unit) or infer its value using further processing and computation (magnetic fields: detector intensities at a different wavelengths and polarization states are processed to infer a magnetic field strength).
+ 
+An instrument does not necessarily require a way to store its measured quantity (e.g, a hard disk).""" .
+
+
+
+###  http://hadatac.org/ont/vstoi#Platform
+
+vstoi:Platform rdf:type owl:Class ;
+               
+               rdfs:label "Platform"^^xsd:string ;
+               
+               rdfs:comment "A surface onto which instruments are deployed to collect data"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Polarimeter
+
+vstoi:Polarimeter rdf:type owl:Class ;
+                  
+                  rdfs:label "Polarimeter"^^xsd:string ;
+                  
+                  rdfs:subClassOf vstoi:OpticalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#PotassiumLidar
+
+vstoi:PotassiumLidar rdf:type owl:Class ;
+                     
+                     rdfs:label "Potassium Lidar"^^xsd:string ;
+                     
+                     rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Questionnaire
+
+vstoi:Questionnaire rdf:type owl:Class ;
+                    
+                    rdfs:label "An instrument used to acquire data reported from human subjects." ,
+                               "Questionnaire" ;
+                    
+                    rdfs:subClassOf vstoi:Instrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#Radar
+
+vstoi:Radar rdf:type owl:Class ;
+            
+            rdfs:label "Radar"^^xsd:string ;
+            
+            rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#RamanLidar
+
+vstoi:RamanLidar rdf:type owl:Class ;
+                 
+                 rdfs:label "Raman Lidar"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#RayleighLidar
+
+vstoi:RayleighLidar rdf:type owl:Class ;
+                    
+                    rdfs:label "Rayleigh Lidar"^^xsd:string ;
+                    
+                    rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#ResonanceIonizationMassSpectrometer
+
+vstoi:ResonanceIonizationMassSpectrometer rdf:type owl:Class ;
+                                          
+                                          rdfs:label "Resonance Ionization Mass Spectrometer"^^xsd:string ;
+                                          
+                                          rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#STRadar
+
+vstoi:STRadar rdf:type owl:Class ;
+              
+              rdfs:label "ST Radar"^^xsd:string ;
+              
+              rdfs:subClassOf vstoi:CoherentIonosphericRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#SecondaryIonMassSpectrometer
+
+vstoi:SecondaryIonMassSpectrometer rdf:type owl:Class ;
+                                   
+                                   rdfs:label "Secondary Ion Mass Spectrometer"^^xsd:string ;
+                                   
+                                   rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#SectorFieldMassSpectrometer
+
+vstoi:SectorFieldMassSpectrometer rdf:type owl:Class ;
+                                  
+                                  rdfs:label "Sector Field Mass Spectrometer"^^xsd:string ;
+                                  
+                                  rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#SensingPerspective
+
+vstoi:SensingPerspective rdf:type owl:Class .
+
+
+
+###  http://hadatac.org/ont/vstoi#SingleChannelPhotometer
+
+vstoi:SingleChannelPhotometer rdf:type owl:Class ;
+                              
+                              rdfs:label "Single Channel Photometer"^^xsd:string ;
+                              
+                              rdfs:subClassOf vstoi:Photometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#SodiumLidar
+
+vstoi:SodiumLidar rdf:type owl:Class ;
+                  
+                  rdfs:label "Sodium Lidar"^^xsd:string ;
+                  
+                  rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Sounder
+
+vstoi:Sounder rdf:type owl:Class ;
+              
+              rdfs:label "Sounder"^^xsd:string ;
+              
+              rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#SpaceCraft
+
+vstoi:SpaceCraft rdf:type owl:Class ;
+                 
+                 rdfs:label "Space Craft"^^xsd:string ;
+                 
+                 rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#SparkSourceMassSpectrometer
+
+vstoi:SparkSourceMassSpectrometer rdf:type owl:Class ;
+                                  
+                                  rdfs:label "Spark Source Mass Spectrometer"^^xsd:string ;
+                                  
+                                  rdfs:subClassOf vstoi:MassSpectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#SpectroHeliograph
+
+vstoi:SpectroHeliograph rdf:type owl:Class ;
+                        
+                        rdfs:label "Spectro Heliograph Optical Instrument"^^xsd:string ;
+                        
+                        rdfs:subClassOf vstoi:Heliograph ,
+                                        vstoi:Spectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#SpectroPhotometer
+
+vstoi:SpectroPhotometer rdf:type owl:Class ;
+                        
+                        rdfs:label "Spectro Photometer"^^xsd:string ;
+                        
+                        rdfs:subClassOf vstoi:Photometer ,
+                                        vstoi:Spectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#SpectroPolarimeter
+
+vstoi:SpectroPolarimeter rdf:type owl:Class ;
+                         
+                         rdfs:label "Spectro Polarimeter"^^xsd:string ;
+                         
+                         rdfs:subClassOf vstoi:Polarimeter ,
+                                         vstoi:Spectrometer .
+
+
+
+###  http://hadatac.org/ont/vstoi#Spectrograph
+
+vstoi:Spectrograph rdf:type owl:Class ;
+                   
+                   rdfs:label "Spectrograph"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#Spectrometer
+
+vstoi:Spectrometer rdf:type owl:Class ;
+                   
+                   rdfs:label "Spectrometer"^^xsd:string ;
+                   
+                   rdfs:subClassOf vstoi:OpticalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#StationaryDeployment
+
+vstoi:StationaryDeployment rdf:type owl:Class ;
+                           
+                           rdfs:label "Stationary Deployment"^^xsd:string ;
+                           
+                           rdfs:subClassOf vstoi:Deployment ;
+                           
+                           rdfs:comment "A deployment of a platform that does not move, it remains in one place with a given latitude, longitude, and altitude."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#StrontiumLidar
+
+vstoi:StrontiumLidar rdf:type owl:Class ;
+                     
+                     rdfs:label "Strontium Lidar"^^xsd:string ;
+                     
+                     rdfs:subClassOf vstoi:Lidar .
+
+
+
+###  http://hadatac.org/ont/vstoi#SyntheticApertureRadar
+
+vstoi:SyntheticApertureRadar rdf:type owl:Class ;
+                             
+                             rdfs:label "Synthetic Aperture Radar"^^xsd:string ;
+                             
+                             rdfs:subClassOf vstoi:Radar .
+
+
+
+###  http://hadatac.org/ont/vstoi#Telescope
+
+vstoi:Telescope rdf:type owl:Class ;
+                
+                rdfs:label "Telescope"^^xsd:string ;
+                
+                rdfs:subClassOf vstoi:PhysicalInstrument .
+
+
+
+###  http://hadatac.org/ont/vstoi#Thermometer
+
+vstoi:Thermometer rdf:type owl:Class ;
+                  
+                  rdfs:label "Thermometer"^^xsd:string ;
+                  
+                  rdfs:subClassOf vstoi:Detector ;
+                  
+                  rdfs:comment "A device that measures temperature"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#UHFRadar
+
+vstoi:UHFRadar rdf:type owl:Class ;
+               
+               rdfs:label "UHF Radar"^^xsd:string ;
+               
+               rdfs:subClassOf vstoi:CoherentIonosphericRadar .
+
+
+
+###  http://hadatac.org/ont/vstoi#VHFRadar
+
+vstoi:VHFRadar rdf:type owl:Class ;
+               
+               rdfs:label "VHF Radar"^^xsd:string ;
+               
+               rdfs:subClassOf vstoi:CoherentIonosphericRadar .
+
+
+
+
+
+#################################################################
+#
+#    Individuals
+#
+#################################################################
+
+
+###  http://hadatac.org/ont/vstoi#Antarctic
+
+vstoi:Antarctic rdf:type owl:NamedIndividual ;
+                
+                vstoi:hasName "Antarctic"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#AntarcticCircle
+
+vstoi:AntarcticCircle rdf:type owl:NamedIndividual ;
+                      
+                      vstoi:hasName "Antarctic Circle"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Arctic
+
+vstoi:Arctic rdf:type owl:NamedIndividual ;
+             
+             vstoi:hasName "Arctic"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#ArcticCircle
+
+vstoi:ArcticCircle rdf:type owl:NamedIndividual ;
+                   
+                   vstoi:hasName "Arctic Circle"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Earth
+
+vstoi:Earth rdf:type owl:NamedIndividual ;
+            
+            vstoi:hasName "Earth"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthAtmosphere
+
+vstoi:EarthAtmosphere rdf:type owl:NamedIndividual ;
+                      
+                      vstoi:hasName "Earth Atmosphere"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthEquator
+
+vstoi:EarthEquator rdf:type owl:NamedIndividual ;
+                   
+                   vstoi:hasName "Equator"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthExosphere
+
+vstoi:EarthExosphere rdf:type owl:NamedIndividual ;
+                     
+                     vstoi:hasName "Earth Exosphere"^^xsd:string ;
+                     
+                     rdfs:comment "The region of the Earth Atmosphere above the Ionosphere, where the atmosphere thins out into space. This is the last major atmosphere."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthIonosphere
+
+vstoi:EarthIonosphere rdf:type owl:NamedIndividual ;
+                      
+                      vstoi:hasName "Earth Ionosphere"^^xsd:string ;
+                      
+                      rdfs:comment "The region of the Earth Atmosphere containing ions: approximately the mesosphere and thermosphere up to 550 km."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthMagnetosphere
+
+vstoi:EarthMagnetosphere rdf:type owl:NamedIndividual ;
+                         
+                         vstoi:hasName "Earth Magnetosphere"^^xsd:string ;
+                         
+                         rdfs:comment "The region of the Earth Atmosphere where the Earth's magnetic field interacts with the solar wind from the Sun. It extends for tens of thousands of kilometers, with a long tail away from the Sun."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthMesosphere
+
+vstoi:EarthMesosphere rdf:type owl:NamedIndividual ;
+                      
+                      vstoi:hasName "Earth Mesosphere"^^xsd:string ;
+                      
+                      rdfs:comment "From about 50 km (upper boundary of the Stratosphere) to the range of 80 km to 85 km, temperature decreasing with height."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthNorthPole
+
+vstoi:EarthNorthPole rdf:type owl:NamedIndividual ;
+                     
+                     vstoi:hasName "North Pole"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthOzoneLayer
+
+vstoi:EarthOzoneLayer rdf:type owl:NamedIndividual ;
+                      
+                      vstoi:hasName "Earth Ozone Layer"^^xsd:string ;
+                      
+                      rdfs:comment "Or ozonosphere, the region of the Earth's Atmosphere approximately in the range 10 - 50 km, where stratospheric ozone is found. Note that even within this region, ozone is a minor constituent by volume."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthSouthPole
+
+vstoi:EarthSouthPole rdf:type owl:NamedIndividual ;
+                     
+                     vstoi:hasName "South Pole"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthStratosphere
+
+vstoi:EarthStratosphere rdf:type owl:NamedIndividual ;
+                        
+                        vstoi:hasName "Earth Stratosphere"^^xsd:string ;
+                        
+                        rdfs:comment "From the 7–17 km range (upper boundary of the Troposphere) to about 50 km, temperature increasing with height."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthSurface
+
+vstoi:EarthSurface rdf:type owl:NamedIndividual ;
+                   
+                   vstoi:hasName "Earth Surface"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthThermosphere
+
+vstoi:EarthThermosphere rdf:type owl:NamedIndividual ;
+                        
+                        vstoi:hasName "Earth Troposphere"^^xsd:string ;
+                        
+                        rdfs:comment "From 80–85 km (upper boundary of the Mesosphere) to 640+ km, temperature increasing with height."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthTroposphere
+
+vstoi:EarthTroposphere rdf:type owl:NamedIndividual ;
+                       
+                       vstoi:hasName "Earth Troposphere"^^xsd:string ;
+                       
+                       rdfs:comment "From the Greek word \"tropos\" meaning to turn or mix. The troposphere is the lowest layer of the atmosphere starting at the surface going up to between 7 km at the poles and 17 km at the equator with some variation due to weather factors. The troposphere has a great deal of vertical mixing due to solar heating at the surface. This heating warms air masses, which then rise to release latent heat as sensible heat that further buoys the air mass. This process continues until all water vapor is removed. In the troposphere, on average, temperature decreases with height due to expansive cooling."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#EarthUpperAtmosphere
+
+vstoi:EarthUpperAtmosphere rdf:type owl:NamedIndividual ;
+                           
+                           vstoi:hasName "Earth Upper Atmosphere"^^xsd:string ;
+                           
+                           rdfs:comment "The region of the Earth's Atmosphere above the mesopause."^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#NegativeElectricCharge
+
+vstoi:NegativeElectricCharge rdf:type owl:NamedIndividual ;
+                             
+                             rdfs:comment "electric charge < 0"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#NegativeOneElectricCharge
+
+vstoi:NegativeOneElectricCharge rdf:type owl:NamedIndividual ;
+                                
+                                rdfs:comment "electric charge = -1"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#PositiveElectricCharge
+
+vstoi:PositiveElectricCharge rdf:type owl:NamedIndividual ;
+                             
+                             rdfs:comment "electric charge > 0"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#PositiveOneElectricCharge
+
+vstoi:PositiveOneElectricCharge rdf:type owl:NamedIndividual ;
+                                
+                                rdfs:comment "Electric Charge = +1"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#Sun
+
+vstoi:Sun rdf:type owl:NamedIndividual ;
+          
+          vstoi:hasName "Sun"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#SunAtmosphere
+
+vstoi:SunAtmosphere rdf:type owl:NamedIndividual ;
+                    
+                    vstoi:hasName "Sun Atmosphere"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#SunCorona
+
+vstoi:SunCorona rdf:type owl:NamedIndividual ;
+                
+                vstoi:hasName "Sun Corona"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#TropicOfCancer
+
+vstoi:TropicOfCancer rdf:type owl:NamedIndividual ;
+                     
+                     vstoi:hasName "Tropic of Cancer"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#TropicOfCapricorn
+
+vstoi:TropicOfCapricorn rdf:type owl:NamedIndividual ;
+                        
+                        vstoi:hasName "Tropic of Capricorn"^^xsd:string .
+
+
+
+###  http://hadatac.org/ont/vstoi#ZeroElectricCharge
+
+vstoi:ZeroElectricCharge rdf:type owl:NamedIndividual ;
+                         
+                         rdfs:comment "electric charge = 0"^^xsd:string .
+
+
+
+
+###  Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net
+
