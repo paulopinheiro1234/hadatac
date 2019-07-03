@@ -25,8 +25,11 @@ public class BrowseOntology extends Controller {
     }
 
     public Result graphIndex(String oper, String className) {
+    System.out.println(className);
+    System.out.println(EditingOptions.getHierarchy(className));
     return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList()));
     }
+
 
     private List<String> getCacheList(String oper) {
 
