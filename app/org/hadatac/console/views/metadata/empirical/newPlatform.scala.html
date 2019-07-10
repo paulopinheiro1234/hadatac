@@ -7,6 +7,7 @@
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.metadata.empirical._
 @import play._
 @import com.typesafe.config.ConfigFactory
 
@@ -123,10 +124,8 @@
 	  @if(fileId == null) {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
 		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(dir, fileId, da_uri)"/><br>
-	          @defining(0) { offset =>  
-       	          <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, fileId, da_uri, offset)" 
-       	          class="btn btn-primary" role="button">Back to Platform Management</a>
-       	      }
+	       	  <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_PLATFORM, dir, fileId, da_uri, 0)" 
+       	         class="btn btn-primary" role="button">Back to Platform Management</a>
           } else {
 	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Platform" disabled 
 		      formmethod="post" formaction="@org.hadatac.console.controllers.metadata.empirical.routes.NewPlatform.processForm(dir, fileId, da_uri)"/><br>

@@ -197,6 +197,123 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         return indicators;		
     }
 
+    public static Map<String, Map<String,String>> getValuesAndLabels(Map<String, String> indicatorMap) {
+        Map<String, Map<String,String>> indicatorValueMap = new HashMap<String, Map<String,String>>();
+        Map<String,String> values = new HashMap<String, String>();
+        String indicatorValue = "";
+        String indicatorValueLabel = "";
+        for (Map.Entry<String, String> entry : indicatorMap.entrySet()) {
+            values = new HashMap<String, String>();
+            String indicatorType = entry.getKey().toString();
+            String indvIndicatorQuery = 
+            		NameSpaces.getInstance().printSparqlNameSpaceList() +
+            		" SELECT DISTINCT ?indicator " +
+                    " (MIN(?label_) AS ?label)" +
+                    " WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
+                    "   ?indicator rdfs:label ?label_ . " + 
+                    " } GROUP BY ?indicator ?label_"; 
+            try {				
+                ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
+
+                while (resultsrwIndvInd.hasNext()) {
+                    QuerySolution soln = resultsrwIndvInd.next();
+                    indicatorValueLabel = "";
+                    if (soln.contains("label")){
+                        indicatorValueLabel = soln.get("label").toString();
+                    }
+                    else {
+                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+                    }
+                    if (soln.contains("indicator")){
+                        indicatorValue = URIUtils.replaceNameSpaceEx(soln.get("indicator").toString());
+                        values.put(indicatorValue,indicatorValueLabel);
+                    }
+                }
+                indicatorValueMap.put(indicatorType,values);
+            } catch (QueryExceptionHTTP e) {
+                e.printStackTrace();
+            }
+        }
+        return indicatorValueMap;
+    }
+
+    public static Map<String, List<String>> getValuesJustLabels(Map<String, String> indicatorMap){
+
+        Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        String indicatorValueLabel = "";
+        for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
+            values = new ArrayList<String>();
+            String indicatorType = entry.getKey().toString();
+            String indvIndicatorQuery = 
+            		NameSpaces.getInstance().printSparqlNameSpaceList() 
+                    + " SELECT DISTINCT ?indicator (MIN(?label_) AS ?label) WHERE { "
+                    + " ?indicator rdfs:subClassOf " + indicatorType + " . "
+                    + " ?indicator rdfs:label ?label_ . "
+                    + " } "
+                    + " GROUP BY ?indicator ?label_";
+            try {				
+                ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
+
+                while (resultsrwIndvInd.hasNext()) {
+                    QuerySolution soln = resultsrwIndvInd.next();
+                    indicatorValueLabel = "";
+                    if (soln.contains("label")){
+                        indicatorValueLabel = soln.get("label").toString();
+                    }
+                    else {
+                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+                    }
+                    if (soln.contains("indicator")){
+                        values.add(indicatorValueLabel);
+                    }
+                }
+                String indicatorTypeLabel = entry.getValue().toString();
+                indicatorValueMap.put(indicatorTypeLabel,values);
+            } catch (QueryExceptionHTTP e) {
+                e.printStackTrace();
+            }
+        }
+        return indicatorValueMap;
+    }
+
+    public static Map<String, List<String>> getValues(Map<String, String> indicatorMap) {
+        Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        String indicatorValueLabel = "";
+        for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
+            values = new ArrayList<String>();
+            String indicatorType = entry.getKey().toString();
+            String indvIndicatorQuery = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+            		" SELECT DISTINCT ?indicator " +
+                    "(MIN(?label_) AS ?label)" +
+                    "WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
+                    "?indicator rdfs:label ?label_ . " + 
+                    "} GROUP BY ?indicator ?label";
+            try {				
+                ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
+
+                while (resultsrwIndvInd.hasNext()) {
+                    QuerySolution soln = resultsrwIndvInd.next();
+                    if (soln.contains("label")){
+                        indicatorValueLabel = URIUtils.replaceNameSpaceEx(soln.get("indicator").toString());
+                        values.add(indicatorValueLabel);
+                    }
+                    else {
+                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+                    }
+                }
+                indicatorValueMap.put(indicatorType,values);
+            } catch (QueryExceptionHTTP e) {
+                e.printStackTrace();
+            }
+        }
+        return indicatorValueMap;
+    }	
+
     public static List<Indicator> findStudyIndicators() {
         List<Indicator> indicators = new ArrayList<Indicator>();
         String query = NameSpaces.getInstance().printSparqlNameSpaceList() 

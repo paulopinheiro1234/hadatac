@@ -1,6 +1,6 @@
 @(dir              : String,
-  folders          : List[String], 
-  workingFiles     : List[org.hadatac.entity.pojo.DataFile], 
+  folders          : List[String],
+  workingFiles     : List[org.hadatac.entity.pojo.DataFile],
   bAdmin           : Boolean)
 
 @import helper._
@@ -16,9 +16,9 @@
 @main("Working Files Management") {
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
-    
+
     <div class="container-fluid">
-	
+
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" class="btn btn-primary" role="button">Blank Metadata File</a>
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.index(dir)" class="btn btn-primary" role="button">Create Folder</a>
@@ -28,17 +28,17 @@
 	<a href="" class="btn btn-primary" role="button" disabled>Move Selection</a>
 	<a href="" class="btn btn-primary" role="button" disabled>Delete Selection</a>
 	<a href="" class="btn btn-primary" role="button" disabled>Download Selection</a>
-    
+
 	<div id="frame">
     <div class="resumable-error">
       Your browser, unfortunately, is not supported by Resumable.js.
     </div>
-    
+
     <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
       <h4>Working File Uploader</h4>
       Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
     </div>
-    
+
     <br>
     <div class="resumable-progress">
       <table>
@@ -52,15 +52,15 @@
         </tr>
       </table>
     </div>
-    
+
     <ul class="resumable-list"></ul>
     </div>
 
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadWorking.js")"></script>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
-    
+
     <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
-    
+
  	<table class="table">
     <thead>
          <tr>
@@ -111,6 +111,9 @@
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                 }
+                @if(file.getFileName().startsWith("SDD") || file.getFileName().startsWith("sdd")) {
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit SDD test</a>
+                }
                 </td>
                 <td>
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.renameDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="rename">Rename</a>
@@ -123,12 +126,12 @@
                     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn btn-xs btn-primary" role="button">Assign Owner</a>
                 }
                 *@
-                
+
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadDataFile(file.getId())" class="btn btn-xs btn-primary" role="button">Download</a>
-                </td>   
+                </td>
                 <td>
-                @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
-                    file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
+                @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
+                    file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
                     file.getFileName().startsWith("OAS-") || file.getFileName().startsWith("DA-")) {
                 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.ingestDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="ingest" onclick="return confirm('Are you sure to submit it to auto-annotator?')">Ingest</a>
 				}
@@ -136,12 +139,12 @@
                 	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="draft">Draft</a>
                 }
                 @if(file.getFileName().startsWith("SDD-")) {
-                    @defining("") { fileId => 
+                    @defining("") { fileId =>
                 	    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="headers">Add Headers</a>
 					}
 				}
-                @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") || 
-                    file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") || 
+                @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
+                    file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
                     file.getFileName().startsWith("OAS-")) {
                 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.verifyDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="verify">Verify</a>
                 }
@@ -156,11 +159,11 @@
     @if(workingFiles.isEmpty() && (folders.size() == 0 && dir == "/" || folders.size() == 1 && dir != "/")) {
         <p>No working files</p>
     }
-    
+
     <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
 	</div>
-	
+
 	<script type="text/javascript">
     var options = [];
 
@@ -183,7 +186,7 @@
 
        if (options.length > 0) {
     	   $("tbody tr[name='processed']").each(function(index) {
-               if (options.indexOf($(this).attr("data-value")) > -1 
+               if (options.indexOf($(this).attr("data-value")) > -1
                        || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
                    $(this).show();
                } else {
@@ -195,7 +198,7 @@
         	   $(this).show();
            });
        }
-       
+
        return false;
     });
     </script>

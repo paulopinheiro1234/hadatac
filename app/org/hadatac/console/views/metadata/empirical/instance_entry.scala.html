@@ -1,0 +1,15 @@
+@(dir        : String,
+  fileId     : String,
+  da_uri     : String,
+  instance   : org.hadatac.entity.pojo.GenericInstance)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+  <td>@if(instance.getLabel() != null) { @instance.getLabel() }</td>
+  <td>@if(instance.getTypeLabel() != null) { @instance.getTypeLabel() }</td>
+  <td>@if(instance.getComment() != null) { @instance.getComment() }</td>
+</tr>

@@ -1,0 +1,28 @@
+@(dir       : String,
+  fileId    : String,
+  da_uri    : String,
+  typeList  : List[org.hadatac.entity.pojo.HADatAcClass],
+  category  : String)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+
+<div class="container-fluid">
+   <table class="table">
+      <thead>
+         <tr>
+            <th>@category Name</th>
+            <th>@category SuperClass</th>
+            <th>Description</th>
+            <!--  <th>Operations</th>
+            -->
+         </tr>
+      </thead>
+      <tbody>
+         @for(typeClass <- typeList){
+	       @type_entry(dir, fileId, da_uri, typeClass)
+         }
+      </tbody>
+   </table>
+</div>

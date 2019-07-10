@@ -257,6 +257,7 @@ public class OtMSparqlQueryResults{
 		}
 
 		//DEBUG CODE - can be removed
+        /*
 		for(Map.Entry<String, String> entry : map.entrySet()) {
 			System.out.println("node " + entry.getKey());
 			if(entry.getValue() != null)
@@ -267,6 +268,7 @@ public class OtMSparqlQueryResults{
 		System.out.println("map size " + map.keySet().size());
 		System.out.println("nodes size " + nodes.size());
 		System.out.println("uri size " + uris.size());
+		*/
 		//END DEBUG CODE
 
 		TreeNode superTree = new TreeNode("");
@@ -414,26 +416,37 @@ public class OtMSparqlQueryResults{
         TreeNode topNode = null;
         while (elements.hasNext()){
             modelN = "";
-	    superN = "";
+	        superN = "";
             JsonNode binding = elements.next();
+            String modelLabel = binding.findPath("label").get("value").toString().replace(",","").replace("-","").replace("\"", "");
+            String superLabel = binding.findPath("superLabel").get("value").toString().replace(",","").replace("-","").replace("\"", "");
+            //System.out.println(modelLabel + "  " + superLabel);
             //System.out.println("Binding: " + binding + "\n");
             JsonNode modelNameNode = binding.findPath("id");
             //System.out.println("modelNameNode: " + modelNameNode + "\n");
-            if (modelNameNode != null && modelNameNode.get("value") != null) {
-                modelN = modelNameNode.get("value").asText();
+            if (modelLabel != null && !modelLabel.isEmpty()) {
+            	modelN = modelLabel;
+            } else {
+            	if (modelNameNode != null && modelNameNode.get("value") != null) {
+            		modelN = modelNameNode.get("value").asText();
+            	}
             }
-	    JsonNode superNameNode = binding.findPath("superId");
-	    //System.out.println("superNameNode: " + superNameNode + "\n");
-            if (superNameNode != null && superNameNode.get("value") != null) {
-                superN = superNameNode.get("value").asText();
-                //System.out.println("superN: " + superN + "\n");
+     	    JsonNode superNameNode = binding.findPath("superId");
+	        //System.out.println("superNameNode: " + superNameNode + "\n");
+            if (superLabel != null && !superLabel.isEmpty()) {
+            	superN = superLabel;
+            } else {
+            	if (superNameNode != null && superNameNode.get("value") != null) {
+            		superN = superNameNode.get("value").asText();
+            		//System.out.println("superN: " + superN + "\n");
+            	}
             }
-            if (usingURIs && ! modelN.equals("")) {
+            if (usingURIs && !modelN.equals("")) {
                 modelN = prettyFromURI(modelN);
                 modelN = DynamicFunctions.replaceURLWithPrefix(modelN);
                 //System.out.println("modelN: " + modelN + "\n");
-            }
-            if (usingURIs && ! superN.equals("")) {
+            } 
+            if (usingURIs && !superN.equals("")) {
                 superN = prettyFromURI(superN);
                 superN = DynamicFunctions.replaceURLWithPrefix(superN);
                 //System.out.println("usingURIs superN: " + superN + "\n");
@@ -442,7 +455,7 @@ public class OtMSparqlQueryResults{
             TreeNode currentBranch = new TreeNode(superN);
             currentBranch.addChild(modelN);
             if (binding.findPath("label").get("value").toString().replace(" ","").replace(",","").equals("\"" + tabName + "\"")){
-            	System.out.println("Found Top Level Branch: " + tabName + "\n");
+            	//System.out.println("Found Top Level Branch: " + tabName + "\n");
             	topNode = currentBranch;
             } else {
                 branchCollection.add(currentBranch);
@@ -463,7 +476,7 @@ public class OtMSparqlQueryResults{
 			resultsTree = new TreeNode(topNode.getName());
 			resultsTree.addChild(topNode.getChildren().get(0));
 		    } else {
-			System.out.println("Warning: No node matching tab name found!\n");
+			//System.out.println("Warning: No node matching tab name found!\n");
 		    }
 		    if (resultsTree.getName().equals("Empty")) {
 			resultsTree = new TreeNode(tn.getName());
@@ -496,10 +509,10 @@ public class OtMSparqlQueryResults{
         //System.out.println("Results Tree: " + resultsTree.toJson(0));
         this.treeResults = resultsTree.toJson(0);
         /*if (newTree == null) 
-	  this.treeResults = "";
-	  else
-	  this.treeResults = newTree.toJson(0);*/
-	//        System.out.println("New Tree : " + newTree.toJson(0) + "\n");
+	    this.treeResults = "";
+	    else
+	    this.treeResults = newTree.toJson(0);*/
+	    //        System.out.println("New Tree : " + newTree.toJson(0) + "\n");
         //System.out.println("Tree Results: " + this.treeResults);
     }// /buildTreeQueryResults
     

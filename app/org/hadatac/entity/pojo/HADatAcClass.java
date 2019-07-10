@@ -4,14 +4,22 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.query.ResultSetFormatter;
 import org.hadatac.utils.NameSpaces;
 
@@ -121,16 +129,114 @@ public class HADatAcClass extends HADatAcThing {
         }
         return -1;
     }
+    
+    public String getSuperClassLabel() {
+    	HADatAcClass superType = findGeneric(this.getSuperUri());
+    	if (superType == null || superType.getLabel() == null) {
+    		return "";
+    	}
+    	return superType.getLabel();
+    }
 
+
+    public List<HADatAcClass> findGeneric() {
+        List<HADatAcClass> typeClasses = new ArrayList<HADatAcClass>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?uri rdfs:subClassOf* " + className + " . " + 
+                "} ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            HADatAcClass typeClass = findGeneric(soln.getResource("uri").getURI());
+            typeClasses.add(typeClass);
+        }			
+
+
+        typeClasses.sort(Comparator.comparing(HADatAcClass::getLabel, (label1, label2) -> {
+        	int compare = label1.compareTo(label2);  
+        	return compare;
+        }));
+        
+        return typeClasses;   
+    }
+
+    public HADatAcClass findGeneric(String uri) {
+    	HADatAcClass typeClass = null;
+        Model model;
+        Statement statement;
+        RDFNode object;
+
+        String queryString = "DESCRIBE <" + uri + ">";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+        model = qexec.execDescribe();
+        StmtIterator stmtIterator = model.listStatements();
+
+        // returns null if not statement is found
+        if (!stmtIterator.hasNext()) {
+        	return typeClass;
+        }
+        
+        typeClass = new HADatAcClass("");
+
+        while (stmtIterator.hasNext()) {
+            statement = stmtIterator.next();
+            object = statement.getObject();
+            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            	typeClass.setLabel(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+            	typeClass.setSuperUri(object.asResource().getURI());
+            }
+        }
+
+        typeClass.setUri(uri);
+        typeClass.setLocalName(uri.substring(uri.indexOf('#') + 1));
+
+        return typeClass;
+    }
+
+    
     @JsonIgnore
     public String getHierarchyJson() {
         //System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
         String q = 
-                "SELECT ?id ?superId ?label ?comment WHERE { " + 
+                "SELECT ?id ?superId ?label ?superLabel ?comment WHERE { " + 
                         "   ?id rdfs:subClassOf* " + className + " . " + 
                         "   ?id rdfs:subClassOf ?superId .  " + 
                         "   OPTIONAL { ?id rdfs:label ?label . } " + 
+                        "   OPTIONAL { ?superId rdfs:label ?superLabel . } " + 
                         "   OPTIONAL { ?id rdfs:comment ?comment . } " +
+                        "}";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
+            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.
+                    getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+            ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
+
+            return outputStream.toString("UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    @JsonIgnore
+    public String getHierarchyJson2() {
+        //System.out.println("Inside HADatAcClass's getHierarchyJson: [" + className + "]");
+        String q = 
+                "SELECT ?model ?superModel ?modelName ?superModelName ?comment WHERE { " + 
+                        "   ?model rdfs:subClassOf* " + className + " . " + 
+                        "   ?model rdfs:subClassOf ?superModel .  " + 
+                        "   OPTIONAL { ?model rdfs:label ?modelName . } " + 
+                        "   OPTIONAL { ?superModel rdfs:label ?superModelName . } " + 
+                        "   OPTIONAL { ?model rdfs:comment ?comment . } " +
                         "}";
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
@@ -195,6 +301,55 @@ public class HADatAcClass extends HADatAcThing {
         }
 
         return new TreeNode("");
+    }
+
+    @JsonIgnore
+    public String mapTypeLabelToUri() {
+        String nodeUri = null;
+        String nodeLabel = null;
+        Map<String,String> resp = new HashMap<String,String>();
+        String q = 
+                "SELECT ?id ?label WHERE { " + 
+                        "   ?id rdfs:subClassOf* " + className + " . " + 
+                        "   ?id rdfs:label ?label .  " + 
+                        "}";
+        try {
+            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + q;
+
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                if (soln != null && soln.getResource("id") != null && soln.getResource("id").getURI() != null) {
+                    nodeUri  = soln.getResource("id").getURI();
+                }
+                if (soln != null && soln.getLiteral("label") != null && soln.getLiteral("label").getString() != null) {
+                    nodeLabel = soln.getLiteral("label").getString();
+                    nodeLabel = nodeLabel.replaceAll(" ", "");
+                }
+                resp.put(nodeLabel, nodeUri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        
+        String output = "{";
+        boolean first = true;
+        Iterator<Map.Entry<String, String>> itr = resp.entrySet().iterator(); 
+        while(itr.hasNext()) {
+        	if (first) {
+        		first = false;
+        	} else {
+        		output = output + ",";
+        	}
+             Map.Entry<String, String> entry = itr.next(); 
+             output = output + "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"";
+        }         
+        output = output + "}"; 
+        //System.out.println("[" + output + "]");
+        return output;
     }
 
     public static String getLabelByUri(String uri, Class<?> cls) {

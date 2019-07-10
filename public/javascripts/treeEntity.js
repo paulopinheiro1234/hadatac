@@ -2,7 +2,7 @@
 
 $("treecontent").empty();
 
-var query_res = document.getElementById('entityquery'); 
+var query_res = document.getElementById('entityquery');
 var results = query_res.dataset.results;
 
 var margin = {top: 30, right: 20, bottom: 30, left: 20},
@@ -25,7 +25,7 @@ var svg = d3.select("treecontent").append("svg")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-function resetSelection(d){   
+function resetSelection(d){
     d._isSelected = false;
     var children = (d.children)?d.children:d._children;
     if(children) {
@@ -41,11 +41,11 @@ function collapse(d) {
    }
 }
 
-function expand(d){   
+function expand(d){
     var children = (d.children)?d.children:d._children;
-    if (d._children) {        
+    if (d._children) {
         d.children = d._children;
-        d._children = null;       
+        d._children = null;
     }
     if(children) {
 	children.forEach(expand);
@@ -54,7 +54,7 @@ function expand(d){
 
 function exactSearchTree(obj,search,path){
     if(obj.name === search){ //if search is found return, add the object to the path and return it
-        obj._isSelected = true;  // mark is 
+        obj._isSelected = true;  // mark is
 	path.push(obj);
 	return path;
     }
@@ -129,7 +129,7 @@ function initialize(d) {
 var flare = JSON.parse(results);
     flare.x0 = 0;
     flare.y0 = 0;
-    root = flare; 
+    root = flare;
     initialize(root);
     update(root);
 
@@ -169,9 +169,9 @@ function update(source) {
     nodeEnter.append("text")
 	.attr("dy", 3.5)
 	.attr("dx", 5.5);
-      
+
     node.select('text')
-	.text(function(d) { 
+	.text(function(d) {
 		if (d.children) {
 		    return '+' + d.name;
 		} else if (d._children) {
@@ -257,24 +257,24 @@ function click(d) {
     update(d);
 }
 
-document.getElementById("collapse").onclick = function() { 
+document.getElementById("collapse").onclick = function() {
     resetSelection(root);
     lastClickD = null;
     root.children.forEach(collapse);
     update(root);
 };
 
-document.getElementById("expand").onclick = function() { 
+document.getElementById("expand").onclick = function() {
     expand(root);
     update(root);
 };
 
-document.getElementById("reset").onclick = function() { 
+document.getElementById("reset").onclick = function() {
     initialize(root);
     update(root);
 };
 
-document.getElementById("findTerm").onclick = function() { 
+document.getElementById("findTerm").onclick = function() {
     root.children.forEach(collapse);
     var paths = searchTree(root,document.getElementById("searchValue").value,[]);
     if(typeof(paths) !== "undefined"){
@@ -288,6 +288,24 @@ document.getElementById("findTerm").onclick = function() {
 document.getElementById("copyvalue").onclick = function() {
    $('#newEntity').val(lastClickD.name);
 }
+
+
+// Capture Right Click event
+if (document.addEventListener) { // IE >= 9; other browsers
+   document.addEventListener('contextmenu', function(e) {
+      console.log(Object.getOwnPropertyNames(e.target));
+      console.log(e.target.__data__.name.split("[")[1].split("]")[0]);
+      alert("You right clicked on " + e.target.__data__.name.split("[")[1].split("]")[0]);
+      //alert("You've tried to open context menu"); //here you draw your own menu
+      e.preventDefault();
+   }, false);
+} else { // IE < 9
+   document.attachEvent('oncontextmenu', function() {
+      alert("You've tried to open context menu");
+      window.event.returnValue = false;
+   });
+}
+
 
 function color(d) {
     if (d._isSelected) return 'red';

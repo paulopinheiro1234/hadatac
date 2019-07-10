@@ -1,0 +1,79 @@
+@* mode="PLAIN" means no use of main() template  *@
+
+@(mode    : String,   
+  message : String)
+
+@import helper._
+@import org.hadatac.utils.NameSpaces
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute
+@import org.hadatac.entity.pojo.HADatAcClass
+@import org.hadatac.entity.pojo.HADatAcThing
+@import org.hadatac.entity.pojo.Study
+@import org.hadatac.entity.pojo.StudyObject
+@import org.hadatac.data.loader.DataContext
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play
+@import com.typesafe.config.ConfigFactory
+
+@main("URI Lookup") {
+
+   <div class="container-fluid">
+ 
+     <div class="row">
+       <div class="col-md-1"></div>
+       <div class="col-md-8">
+         <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname") 's Human-Aware Data Acquisition Framework</font></h3>
+         @ConfigFactory.load().getString("hadatac.community.description") 
+         <hr>
+       </div>
+       <div class="col-md-1"></div>
+     </div>
+ 
+ 	 <script type="text/javascript">
+	   function checkform() {
+	      var cansubmit = true;
+	
+	      if (document.getElementById('field').value.length == 0) {
+	          cansubmit = false;
+	      }
+	
+	      if (cansubmit) {
+	          document.getElementById('submitbutton').disabled = false;
+	      } else {
+	          document.getElementById('submitbutton').disabled = 'disabled';
+	      }
+	   }
+	 </script>
+	
+     <div class="row">
+       <div class="col-md-1"></div>
+       <div class="col-md-10">
+	      <h3>URI Lookup</h3>
+          <form class="form-horizontal" name="urilookup" method="post"
+                action="@org.hadatac.console.controllers.lookup.routes.URILookup.processForm(mode)">
+    	     <div class="form-group">
+ 		        <input type="text" class="form-control col-sm-6" name="field" id="field" onchange="checkform()" >
+ 	         </div>
+             <div class="form-group" class="col-sm-6 col-offset-3">
+                <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Lookup" disabled="disabled" />
+             </div>
+    	     <div class="form-group">
+ 		        @message
+ 	         </div>
+          </form>
+       </div>    
+     </div> 
+     
+   </div>  
+   
+     <div class="row">
+       <div class="col-md-1"></div>
+       <div class="col-md-10">
+          <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+       </div>
+     </div>
+
+ }
