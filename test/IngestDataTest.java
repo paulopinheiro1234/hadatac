@@ -2,10 +2,13 @@
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.swing.JFrame;
 
 import org.junit.Test;
 
@@ -120,7 +123,7 @@ public class IngestDataTest {
 		{
 			test.execute();
 		}
-		
-		System.out.println("Congratulation: IngestDataTest Pass.");
+		//tests.get(4).execute();
+		System.out.println("\nCongratulation: IngestDataTest Pass.");
 	}
 }
