@@ -261,6 +261,8 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
                 instrument.setTypeUri(object.asResource().getURI());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
 		    	instrument.setSerialNumber(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasImage")) {
+                instrument.setImage(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 		    	instrument.setComment(object.asLiteral().getString());
 		    }

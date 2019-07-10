@@ -1,0 +1,28 @@
+@(dir      : String,
+  fileId   : String,
+  da_uri   : String,
+  detector : org.hadatac.entity.pojo.Detector)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.entity.pojo.DataFile
+@import java.net._
+
+@main("View detector") {
+
+<div>
+  <h3>detector - @detector.getLabel()</h3>
+  <p><b>URI</b>: @detector.getUri()</p>
+  <p><b>Model</b>: @detector.getTypeLabel() (@detector.getTypeUri())</p>
+  <p><b>Serial Number</b>: @detector.getSerialNumber()</p>
+  <p><b>Image</b>: @detector.getImage()</p>
+  @if(detector.getImage() != null && !detector.getImage().isEmpty()) {
+  	   @if(detector.getImage().startsWith("file:///media/")) {
+		  <ul>
+    	     <img src="@DataFile.getMediaUrl(detector.getImage())" alt="@detector.getImage()" width="300">  
+    	  </ul>
+	   }
+  }
+</div>
+
+}

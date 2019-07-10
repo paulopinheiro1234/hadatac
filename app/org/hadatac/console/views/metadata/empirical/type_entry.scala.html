@@ -1,0 +1,21 @@
+@(dir       : String,
+  fileId    : String,
+  da_uri    : String,
+  typeClass : org.hadatac.entity.pojo.HADatAcClass)
+
+@import play.Play
+@import org.hadatac.console.controllers.metadata._
+@import java.net._
+@import org.hadatac.utils._
+
+<tr>
+  <td>@if(typeClass.getLabel() != null)   { @typeClass.getLabel() }</td>
+  <td>@if(typeClass.getSuperClassLabel() != null)   { @typeClass.getSuperClassLabel() }</td>
+  <td>@if(typeClass.getComment() != null) { @typeClass.getComment() }</td>
+  <!-- 
+  <td>
+    <a href=""
+       class="btn-xs btn-primary disabled" role="button">View</a> 
+  </td>
+  -->
+</tr>

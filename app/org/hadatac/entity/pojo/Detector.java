@@ -26,6 +26,7 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 	private String localName;
 	private String label;
 	private String serialNumber;
+	private String image;
 	private String isInstrumentAttachment;
 	
 	public String getUri() {
@@ -59,6 +60,14 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 		this.serialNumber = serialNumber;
 	}
 	
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+    
 	public String getIsInstrumentAttachment() {
 		return isInstrumentAttachment;
 	}
@@ -105,6 +114,50 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 		return detectors;
 	}
 	
+    public static int getNumberDetectors() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " select (count(?uri) as ?tot) where { " + 
+                " ?detModel rdfs:subClassOf* vstoi:Detector . " + 
+                " ?uri a ?detModel ." + 
+                "}";
+
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public static List<Detector> findWithPages(int pageSize, int offset) {
+        List<Detector> detectors = new ArrayList<Detector>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        		"SELECT ?uri WHERE { " + 
+                " ?detModel rdfs:subClassOf* vstoi:Detector . " + 
+                " ?uri a ?detModel . } " + 
+                " LIMIT " + pageSize + 
+                " OFFSET " + offset;
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI() != null) {
+                Detector detector = Detector.find(soln.getResource("uri").getURI());
+                detectors.add(detector);
+            }
+        }
+        return detectors;
+    }
+
 	public static Detector find(String uri) {
 		Detector detector = null;
 		Model model;
@@ -127,6 +180,8 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 				detector.setLabel(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
 				detector.setSerialNumber(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasImage")) {
+                detector.setImage(object.asLiteral().getString());
 			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#isInstrumentAttachment")) {
 				detector.setIsInstrumentAttachment(object.asResource().getURI());
 			}

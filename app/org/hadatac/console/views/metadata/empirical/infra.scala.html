@@ -1,6 +1,9 @@
-@(dir          : String,
-  fileId       : String,
-  da_uri       : String)
+@(dir            : String,
+  fileId         : String,
+  da_uri         : String,
+  platformJson   : String,
+  instrumentJson : String,
+  detectorJson   : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,46 +14,95 @@
 @import play.api.Play
 @import com.typesafe.config.ConfigFactory
 
-@main("HADataC: Human-Aware Data Acquisition Framework") {
+@main("Infrastructure Dashboard") {
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+       .goog-tooltip {
+           z-index: 999;
+       }
+    </style>
+    
+    @empirical_navigation(dir, fileId, da_uri, "")
 
     <div class="container-fluid">
         <div class="row">
-          <div class="col-md-1 col-xs-0"></div>
-          <div class="col-md-9 col-xs-2">
-             <h4><font color="darkBlue">Instrument Infrastructure Management</font></h4>
-          </div>
-        </div>
-	   @defining("") { filename => @defining("") { da_uri => 
+           <div class="col-md-9">
+              <h4>Infrastructure Dashboard</h4>
+           </div>
+		</div>
+	    @defining("") { filename => @defining("") { da_uri => 
         <div class="row">
-          <div class="col-md-1 col-xs-0"></div>
-          <div class="col-md-3 col-xs-2">
-             <h4>Platform Management</h4>
-             @defining(0) { offset =>  
-                 <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, filename, da_uri, offset)" id="platbrowser" class="btn btn-primary btn-block" role="button">List Platforms</a>  
-             }
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformTypeManagement.index(dir, filename, da_uri)" id="platmodelbrowser" class="btn btn-primary btn-block" role="button">List Platform Models</a>
+          <div class="col-md-3 col-xs-2" id="Platforms">
+              <h4>Platforms</h4>
+			  <div id="chartPlatforms" name="charts"></div>
           </div>
-          <div class="col-md-3 col-xs-2">
-             <h4>Instrument Management</h4>  
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(dir, filename, da_uri)" id="insbrowser" class="btn btn-primary btn-block" role="button">List Instruments</a>  
-             <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentTypeManagement.index(dir, filename, da_uri)" id="insmodelbrowser" class="btn btn-primary btn-block" role="button">List Instrument Models</a>
+          <div class="col-md-3 col-xs-2" id="Instruments">
+              <h4>Instruments</h4>  
+			  <div id="chartInstruments" name="charts"></div>
           </div>
-          <div class="col-md-3 col-xs-2">
-             <h4>Detector Management</h4>  
-             <a href="" id="detbrowser" class="btn btn-primary btn-block" role="button">List Detectors</a>  
-             <a href="" id="detmodelbrowser" class="btn btn-primary btn-block" role="button">List Detector Models</a>
+          <div class="col-md-3 col-xs-2" id="Detectors">
+              <h4>Detectors</h4>  
+			  <div id="chartDetectors" name="charts"></div>
           </div>
           <div class="col-md-1 col-xs-0"></div>
         </div>
-      }}
-
-      <div class="row">
-        <div class="col-md-1 col-xs-0"></div>
-        <div class="col-md-1 col-xs-1">
-	       <br><br><br>@mainButton(false)
-	    </div>
-	  </div>
+       }}
 
     </div>
+
+<script>
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+    
+    function drawCharts() {
+		var plats = '@platformJson';
+        var platStr = plats.replace(/&#x27;/g,"'");
+        var platArray = eval(platStr);
+		var instrs = '@instrumentJson';
+        var instrStr = instrs.replace(/&#x27;/g,"'");
+        var instrArray = eval(instrStr);
+		var dets = '@detectorJson';
+        var detStr = dets.replace(/&#x27;/g,"'");
+        var detArray = eval(detStr);
+    	addPieChart("chartPlatforms", platArray);
+        addPieChart("chartInstruments", instrArray);
+        addPieChart("chartDetectors", detArray);
+    }
+    
+    function addPieChart(elementId, data) {
+    	var element = document.getElementById(elementId);
+    	if (element == null) {
+    		return;
+    	}
+    	
+    	var dataTable = google.visualization.arrayToDataTable(data);
+
+        var options = {
+       		legend: {
+       			position: 'top', 
+       			alignment: 'start', 
+       			maxLines: 100,
+       			textStyle: { fontSize: 12 }
+       		}
+        };
+        
+        $("#" + elementId).height(400);
+        
+        var chart = new google.visualization.PieChart(element);
+        
+        chart.draw(dataTable, options);
+    }
+    
+    $("#toggleCharts").click(function () {
+    	$("div[name='charts']").toggle();
+    	if ($(this).text() == "Show Charts") { 
+            $(this).text("Hide Charts"); 
+        } else { 
+            $(this).text("Show Charts"); 
+        }; 
+    });
+    
+</script>
 
 }

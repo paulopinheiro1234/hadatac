@@ -14,6 +14,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.metadata.loader.*;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpace;
@@ -51,7 +52,7 @@ public class DynamicFunctions extends Controller {
         List<String> indicatorURIs = new ArrayList<String>();
         
         Map<String, String> indicatorTypes = getIndicatorTypes();
-        Map<String, Map<String, String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicatorTypes);
+        Map<String, Map<String, String>> valueMapWithLabels = Indicator.getValuesAndLabels(indicatorTypes);
         
         for (String key : valueMapWithLabels.keySet()) {
             for (String k : valueMapWithLabels.get(key).keySet()) {
@@ -64,7 +65,7 @@ public class DynamicFunctions extends Controller {
 
     public static String getConceptUriByTabName(String tabName) {
         Map<String, String> indicatorTypes = getIndicatorTypes();
-        Map<String, Map<String, String>> valueMapWithLabels = getIndicatorValuesAndLabels(indicatorTypes);
+        Map<String, Map<String, String>> valueMapWithLabels = Indicator.getValuesAndLabels(indicatorTypes);
         
         System.out.println("valueMapWithLabels: " + valueMapWithLabels);
         
@@ -119,119 +120,6 @@ public class DynamicFunctions extends Controller {
         Map<String, String> indicatorMapSorted = new TreeMap<String, String>(indicatorMap);
         return indicatorMapSorted;
     }
-
-    public static Map<String, Map<String,String>> getIndicatorValuesAndLabels(Map<String, String> indicatorMap) {
-        Map<String, Map<String,String>> indicatorValueMap = new HashMap<String, Map<String,String>>();
-        Map<String,String> values = new HashMap<String, String>();
-        String indicatorValue = "";
-        String indicatorValueLabel = "";
-        for (Map.Entry<String, String> entry : indicatorMap.entrySet()) {
-            values = new HashMap<String, String>();
-            String indicatorType = entry.getKey().toString();
-            String indvIndicatorQuery = getPrefixes() + "SELECT DISTINCT ?indicator " +
-                    "(MIN(?label_) AS ?label)" +
-                    "WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-                    "?indicator rdfs:label ?label_ . " + 
-"} GROUP BY ?indicator ?label_"; 
-            try {				
-                ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
-
-                while (resultsrwIndvInd.hasNext()) {
-                    QuerySolution soln = resultsrwIndvInd.next();
-                    indicatorValueLabel = "";
-                    if (soln.contains("label")){
-                        indicatorValueLabel = soln.get("label").toString();
-                    }
-                    else {
-                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
-                    }
-                    if (soln.contains("indicator")){
-                        indicatorValue = replaceURLWithPrefix(soln.get("indicator").toString());
-                        values.put(indicatorValue,indicatorValueLabel);
-                    }
-                }
-                indicatorValueMap.put(indicatorType,values);
-            } catch (QueryExceptionHTTP e) {
-                e.printStackTrace();
-            }
-        }
-        return indicatorValueMap;
-    }
-
-    public static Map<String, List<String>> getIndicatorValuesJustLabels(Map<String, String> indicatorMap){
-
-        Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
-        List<String> values = new ArrayList<String>();
-        String indicatorValueLabel = "";
-        for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
-            values = new ArrayList<String>();
-            String indicatorType = entry.getKey().toString();
-            String indvIndicatorQuery = getPrefixes() 
-                    + " SELECT DISTINCT ?indicator (MIN(?label_) AS ?label) WHERE { "
-                    + " ?indicator rdfs:subClassOf " + indicatorType + " . "
-                    + " ?indicator rdfs:label ?label_ . "
-                    + " } "
-                    + " GROUP BY ?indicator ?label_";
-            try {				
-                ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
-
-                while (resultsrwIndvInd.hasNext()) {
-                    QuerySolution soln = resultsrwIndvInd.next();
-                    indicatorValueLabel = "";
-                    if (soln.contains("label")){
-                        indicatorValueLabel = soln.get("label").toString();
-                    }
-                    else {
-                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
-                    }
-                    if (soln.contains("indicator")){
-                        values.add(indicatorValueLabel);
-                    }
-                }
-                String indicatorTypeLabel = entry.getValue().toString();
-                indicatorValueMap.put(indicatorTypeLabel,values);
-            } catch (QueryExceptionHTTP e) {
-                e.printStackTrace();
-            }
-        }
-        return indicatorValueMap;
-    }
-
-    public static Map<String, List<String>> getIndicatorValues(Map<String, String> indicatorMap) {
-        Map<String, List<String>> indicatorValueMap = new HashMap<String, List<String>>();
-        List<String> values = new ArrayList<String>();
-        String indicatorValueLabel = "";
-        for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
-            values = new ArrayList<String>();
-            String indicatorType = entry.getKey().toString();
-            String indvIndicatorQuery = getPrefixes() + "SELECT DISTINCT ?indicator " +
-                    "(MIN(?label_) AS ?label)" +
-                    "WHERE { ?indicator rdfs:subClassOf " + indicatorType + " . " +
-                    "?indicator rdfs:label ?label_ . " + 
-                    "} GROUP BY ?indicator ?label";
-            try {				
-                ResultSetRewindable resultsrwIndvInd = SPARQLUtils.select(
-                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indvIndicatorQuery);
-
-                while (resultsrwIndvInd.hasNext()) {
-                    QuerySolution soln = resultsrwIndvInd.next();
-                    if (soln.contains("label")){
-                        indicatorValueLabel = replaceURLWithPrefix(soln.get("indicator").toString());
-                        values.add(indicatorValueLabel);
-                    }
-                    else {
-                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
-                    }
-                }
-                indicatorValueMap.put(indicatorType,values);
-            } catch (QueryExceptionHTTP e) {
-                e.printStackTrace();
-            }
-        }
-        return indicatorValueMap;
-    }	
 
     public static Map<String, Map<String,String>> findStudy(String study_uri) {
         String studyQueryString = "";
