@@ -16,12 +16,6 @@ public class EmptyTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPre() {
-		return;
-		
-	}
-
-	@Override
 	public void test() {
 		return;
 		

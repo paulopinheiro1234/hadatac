@@ -13,14 +13,6 @@ public class FacetedSearchTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPre() {
-		System.out.print("Step10: Pre-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadDA());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step10: Not yet implemented");
 		

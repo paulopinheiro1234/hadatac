@@ -13,14 +13,6 @@ public class LoadDPLTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPre() {
-		System.out.print("Step4: Pre-step Verification......");
-		assertTrue("Failed.", Verify.verifyUploadOntology());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step4: Not yet implemented");
 		

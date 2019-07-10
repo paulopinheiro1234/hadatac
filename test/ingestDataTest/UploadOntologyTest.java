@@ -40,12 +40,6 @@ public class UploadOntologyTest extends StepTest{
 	{
 		return test;
 	}
-	
-	@Override
-	public void verifyPre() {
-
-		return;
-	}
 
 	@Override
 	public void test() {
