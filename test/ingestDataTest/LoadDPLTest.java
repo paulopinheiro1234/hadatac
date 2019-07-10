@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Iterator;
 import java.util.List;
 
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
@@ -54,6 +53,8 @@ public class LoadDPLTest extends StepTest{
 	        dataFile.delete();
 		}
 		
+		System.out.println("[Step 4] Deleted all existing processed_csv file");
+		
 		//TODO: delete all files in unprocessed_csv
 		
 		
@@ -68,6 +69,8 @@ public class LoadDPLTest extends StepTest{
 		AnnotationWorker.scan();
 		AnnotationWorker.autoAnnotate();
 		
+		System.out.println("[Step 4] Process DPL pass.");
+		
 		//check absence of DPL in unprocessed_csv
 		File dplUnprocessed = new File("unprocessed_csv/DPL-CHEAR-v2.xlsx");
 		assertTrue("unprocessed_csv/DPL-CHEAR-v2.xlsx not deleted after loading DPL", !dplUnprocessed.exists());
@@ -76,6 +79,7 @@ public class LoadDPLTest extends StepTest{
 		File dplProcessed = new File("processed_csv/DPL-CHEAR-v2.xlsx");
 		assertTrue("Fail to detect processed_csv/DPL-CHEAR-v2.xlsx after loading DPL", dplProcessed.exists());
 		
+		System.out.println("[Step 4] Load DPL Test Pass.");
 	}
 
 	@Override
