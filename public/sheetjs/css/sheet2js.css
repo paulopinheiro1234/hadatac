@@ -1,0 +1,153 @@
+
+/* #heading { 
+    left:1000px;
+    top:200px;
+}  */
+.main-nav {
+    float:right;
+    background:cornflowerblue;
+    color:white;
+    font-family:Arial;
+    font-size: 12pt;
+    
+}
+#effect{
+    top:200px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size:14pt;
+}
+#hide{
+    display:none;
+}
+#show{
+    display:block;
+}
+
+.mobile-nav { 
+    position:absolute;
+    display: none;
+    top: 200px;
+    left:1000px;
+    
+}
+
+.Close {
+    color:white;
+    background-color: royalblue;
+    float:right;
+    margin-left:5px;
+    font-family:Arial;
+    font-size: 12pt;
+}
+.menuoptions{
+    max-width: 100%;
+    font-size: 15pt;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#menulist{
+    margin-left:60px;
+}
+
+.insertrowbtn{
+    background-color: cornflowerblue;
+    font-family:Arial;
+    color:white;
+    font-size: 10pt;
+    margin-top: 7px;
+    text-align: center;
+    padding:3px;
+
+}
+.removerowbtn{
+    background-color: cornflowerblue;
+    font-family:Arial;
+    color:white;
+    font-size: 10pt;
+    margin-top: 7px;
+    text-align: center;
+    padding:3px;
+
+}
+
+#varDescription{
+    width:30%;
+    font-size: 11pt;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left:5pt;
+    color:black;
+    border-block-color: black;
+}
+.cart{
+    margin-top: 3px;
+    border:1px solid black;
+    border-radius: 80px;
+    height:40px;
+    width: 165px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 11pt;
+    background-color: rgb(173, 217, 253);
+    
+    
+    
+ }
+ .cart:hover, .dropbtn:focus {
+    background-color: #2980B9;
+  }
+ .remove {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    right: 0%;
+    padding: 3px;
+    transform: translate(0%, -50%);
+  }
+  
+  .remove:hover {background: #bbb;}
+
+  .ontologydrop {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .ontologydrop-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  .ontologydrop-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  ul li {
+    display: block;
+    position: relative;
+  }
+  
+  
+ .submitOntologies{
+    background-color: #bbb;
+    text-align: center;
+    font-size: 10pt;
+    font-family: Arial, Helvetica, sans-serif;
+    border-color: transparent;
+    
+}
+.submitOntologies:hover {background:rgb(134, 130, 130);}

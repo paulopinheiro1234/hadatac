@@ -421,6 +421,13 @@ public class DataFile implements Cloneable {
         return list;
     }
 
+    public static List<DataFile> find(String ownerEmail) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "owner_email_str:\"" + ownerEmail + "\"");
+        query.set("rows", "10000000");
+        return findByQuery(query);
+    }
+
     public static List<DataFile> find(String ownerEmail, String status) {
         if (status == UNPROCESSED || status == PROCESSED || status == CREATING || status == CREATED || status == WORKING) {
             SolrQuery query = new SolrQuery();
