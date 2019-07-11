@@ -21,13 +21,6 @@ public class PreCheckTest extends StepTest{
 		System.out.println("[Step 1] Executing PreCheckTest:");
 		
 	}
-	
-	
-	@Override
-	public void verifyPre() {
-		
-		
-	}
 
 	
 	@Override

@@ -12,7 +12,6 @@ public abstract class StepTest {
 
 	public final static String FILEPATH = "test/ingestDataTest/step.txt";
 	public abstract int step();
-	public abstract void verifyPre();
 	public abstract void test();
 	public abstract void preMsg();
 	
@@ -22,7 +21,7 @@ public abstract class StepTest {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(FILEPATH));
 			int s = Integer.parseInt(reader.readLine());
-			assertTrue("Skip Step: Should be: " + String.valueOf(step()-1) + "But was: " + s, s == step()-1);
+			assertTrue("Skip Step: Should be: " + String.valueOf(step()-1) + " But was: " + s, s == step()-1);
 			reader.close();
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -44,7 +43,6 @@ public abstract class StepTest {
 	{
 		preMsg();
 		checkStep();
-		verifyPre();
 		test();
 		recordStep();
 	}

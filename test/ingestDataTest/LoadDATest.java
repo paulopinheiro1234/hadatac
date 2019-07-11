@@ -13,14 +13,6 @@ public class LoadDATest extends StepTest{
 	}
 
 	@Override
-	public void verifyPre() {
-		System.out.print("Step9: Pre-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadOAS());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step9: Not yet implemented");
 		
