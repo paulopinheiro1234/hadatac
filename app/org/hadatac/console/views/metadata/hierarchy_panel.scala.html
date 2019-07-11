@@ -30,6 +30,11 @@
                //var item = d.name;
                var infobox = document.getElementById('info');
     		   if (mapL[item]) {
+    		        /*
+  					$.ajax({url: "(mapL[item])", success: function(result){
+    					infobox.innerHTML = result;
+  					}});
+  					*/
     		   		infobox.innerHTML = mapL[item];
     		   } else {
                		infobox.innerHTML = item;

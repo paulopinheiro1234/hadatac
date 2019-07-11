@@ -559,7 +559,9 @@ public class RestApi extends Controller {
             return null;
         }
         
-        ObjectMapper mapper = new ObjectMapper();
+    	List<FieldOfView> fovs = FieldOfView.find();
+
+    	ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
 
         for (Platform plat : plats) {
@@ -623,7 +625,45 @@ public class RestApi extends Controller {
             }
             if (plat.getHeightUnit() != null && !plat.getHeightUnit().isEmpty()) {
             	temp.put("layoutHeightUnit", plat.getHeightUnitLabel());
-            }
+            }            
+            boolean cont = true;
+            Iterator<FieldOfView> fovIterator = fovs.iterator();
+    		while (fovIterator.hasNext() && cont) {
+    			FieldOfView fov = fovIterator.next();
+            	if (fov.getIsFOVOf() != null && fov.getIsFOVOf().equals(plat.getUri())) {
+                    if (fov.getGeometry() != null && !fov.getGeometry().isEmpty()) {
+                    	temp.put("fovgeometry" , fov.getGeometry());
+                    }
+                    if (fov.getFirstParameter() != null) {
+                    	temp.put("fovparam1", fov.getFirstParameter().toString());
+                    }
+                    if (fov.getFirstParameterUnitLabel() != null && !fov.getFirstParameterUnitLabel().isEmpty()) {
+                    	temp.put("fovparam1Unit", fov.getFirstParameterUnitLabel());
+                    }
+                    if (fov.getFirstParameterCharacteristicLabel() != null && !fov.getFirstParameterCharacteristicLabel().isEmpty()) {
+                    	temp.put("fovparam1Char", fov.getFirstParameterCharacteristicLabel());
+                    }
+                    if (fov.getSecondParameter() != null) {
+                    	temp.put("fovparam2", fov.getSecondParameter().toString());
+                    }
+                    if (fov.getSecondParameterUnitLabel() != null && !fov.getSecondParameterUnitLabel().isEmpty()) {
+                    	temp.put("fovparam2Unit", fov.getSecondParameterUnitLabel());
+                    }
+                    if (fov.getSecondParameterCharacteristicLabel() != null && !fov.getSecondParameterCharacteristicLabel().isEmpty()) {
+                    	temp.put("fovparam2Char", fov.getSecondParameterCharacteristicLabel());
+                    }
+                    if (fov.getThirdParameter() != null) {
+                    	temp.put("fovparam3", fov.getThirdParameter().toString());
+                    }
+                    if (fov.getThirdParameterUnitLabel() != null && !fov.getThirdParameterUnitLabel().isEmpty()) {
+                    	temp.put("fovparam3Unit", fov.getThirdParameterUnitLabel());
+                    }
+                    if (fov.getThirdParameterCharacteristicLabel() != null && !fov.getThirdParameterCharacteristicLabel().isEmpty()) {
+                    	temp.put("fovparam3Char", fov.getThirdParameterCharacteristicLabel());
+                    }
+                    cont = false;
+            	}
+    		}
             anode.add(temp);
         }
         System.out.println("[platformsQuery] parsed " + anode.size() + " results into array");
