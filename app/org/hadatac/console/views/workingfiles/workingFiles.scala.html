@@ -109,10 +109,14 @@
                 <td>
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls") || file.getFileName().endsWith(".csv")) {
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
+                    @if(((file.getFileName().endsWith(".xlsx"))&&(!file.getFileName().startsWith("SDD")))){
+                        <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
+                    }
+                    
                 }
+                
                 @if(file.getFileName().startsWith("SDD") || file.getFileName().startsWith("sdd")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit SDD test</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit SDD</a>
                 }
                 </td>
                 <td>

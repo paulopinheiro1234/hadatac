@@ -382,6 +382,8 @@ POST    /hadatac/annotator/sddeditor/upload            org.hadatac.console.contr
 GET     /hadatac/annotator/sddeditor_v2                org.hadatac.console.controllers.fileviewer.SDDEditorV2.index(file_id : String, bSavable : Boolean)
 POST    /hadatac/annotator/sddeditor_v2               org.hadatac.console.controllers.fileviewer.SDDEditorV2.postIndex(file_id : String, bSavable : Boolean)
 
+#GET     /hadatac/annotator/sddeditor_v2/addToCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.addToCart(ontology : String)
+#POST    /hadatac/annotator/sddeditor_v2/addToCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.addToCart(ontology : String)
 
 GET	    /hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(dir : String, file_id : String)
 POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(dir : String, file_id : String)

@@ -257,13 +257,13 @@ public class OtMSparqlQueryResults{
 		}
 
 		//DEBUG CODE - can be removed
-		for(Map.Entry<String, String> entry : map.entrySet()) {
-			System.out.println("node " + entry.getKey());
-			if(entry.getValue() != null)
-				System.out.println("parent " + entry.getValue());
-			else
-				System.out.println("parent null");
-		}
+		// for(Map.Entry<String, String> entry : map.entrySet()) {
+		// 	System.out.println("node " + entry.getKey());
+		// 	if(entry.getValue() != null)
+		// 		System.out.println("parent " + entry.getValue());
+		// 	else
+		// 		System.out.println("parent null");
+		// }
 		System.out.println("map size " + map.keySet().size());
 		System.out.println("nodes size " + nodes.size());
 		System.out.println("uri size " + uris.size());
@@ -313,6 +313,7 @@ public class OtMSparqlQueryResults{
 	}
 	String newName = prettyFromURI(currentName);
 	newName = "[" + DynamicFunctions.replaceURLWithPrefix(newName) + "]";
+	
 	if (labelMap.get(currentName) != null) {
 	    newName = labelMap.get(currentName) + " " + newName;
 	    return newName;
