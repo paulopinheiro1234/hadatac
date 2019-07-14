@@ -40,6 +40,7 @@ public class SDDEditorV2 extends Controller {
         files = DataFile.find(user.getEmail());
 
         String dd_filename=dataFile.getFileName();
+<<<<<<< HEAD
         dd_filename="DD-"+ dd_filename.split("-")[1];
         DataFile dd_dataFile = null;
  		for(DataFile df : files){
@@ -54,6 +55,17 @@ public class SDDEditorV2 extends Controller {
 
 
         return ok(sdd_editor_v2.render(dataFile, dd_dataFile, bSavable,loadedList,this));
+=======
+        dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
+        // dd_filename="DD-"+ dd_filename.split("-")[1]; // was reomved because it fails if SDD doesn't have -
+        DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
+        for(DataFile df : files){
+           if(df.getFileName().equals(dd_filename)){
+             dd_dataFile = df;
+          }
+       }
+        return ok(sdd_editor_v2.render(dataFile, dd_dataFile, bSavable));
+>>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

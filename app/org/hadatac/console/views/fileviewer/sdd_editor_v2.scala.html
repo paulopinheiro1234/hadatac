@@ -31,6 +31,7 @@
 
     <button class="btn btn-primary">Back</button>
       <button class="btn btn-primary" style=margin-left:5px>Consider SSD</button>
+<<<<<<< HEAD
         <input type="text" id="varDescription" value="Description of Column Variable:"/>
         <div class= shopbutton>
         <button class="cart" >
@@ -80,9 +81,14 @@
         </script> -->
 
         
+=======
+        Description of Column Variable:
+        <input type="text" id="varDescription" value=" "/>
+
+>>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
       <button class="main-nav" id="show">Show Options</button>
       <button class="Close" id="hide">Hide Options</button>
-      
+
         <div class="mobile-nav">
           <!-- <p id="effect" style="text-align:center">These are ontologies displayed below:</p> -->
           <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
@@ -102,28 +108,34 @@
             <div id="editRowsAdd">
               <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
               <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
-              <button class="removerowbtn" onclick="removeRow()">Remove Row</button> 
+              <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
             </div>
             <!-- <div class="ontologydrop">
                 <button class="cart" onclick="showOntologyList()">
-                    
+
                 <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="37" height="35" alt=""/>Ontology Terms</button>
                 <ul id="myDropdown" class="ontologydrop-content">
                   <li>item 1<span class="remove">&times;</span></li>
                   <li>item 2<span class="remove">&times;</span></li>
-                
+
                   <li>item 3<span class="remove">&times;</span></li>
                   <li>item 4<span class="remove">&times;</span></li>
-                
+
                   <li>item 5<span class="remove">&times;</span></li>
                   <button class=submitOntologies>Submit</button>
-                  
+
                 </ul>
+<<<<<<< HEAD
             </div> -->
             
             
+=======
+            </div>
+
+
+>>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
         </div>
-        
+
 
     <div><a id="error_msg"></a></div>
     <div id="grid"></div>
@@ -145,7 +157,7 @@
     <script type="text/javascript">
     /* set up async GET request */
     var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
-   
+
     var _upload = document.getElementById('upload');
     var _onreponse = function() {
     	$("#error_msg").html(decodeURIComponent(this.responseText));
@@ -191,16 +203,26 @@
     req.send();
     </script>
     <script>
+<<<<<<< HEAD
       if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
         alert("Please upload a valid Data Dictionary")
+=======
+      if ("@dd_dataFile.getFileName()" === ""){
+         alert("Please upload a valid Data Dictionary")
+>>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
       }
       else{
-        var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-        getURL(url);
-      }      
+         if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
+           alert("Could not find a Data Dictionary")
+         }
+         else{
+           var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+           getURL(url);
+         }
+      }
     </script>
 
-  
-  
+
+
 
 }

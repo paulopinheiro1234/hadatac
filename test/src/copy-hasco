@@ -1,0 +1,1171 @@
+@prefix : <http://hadatac.org/chear/hasco/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://hadatac.org/chear/hasco/> a owl:Ontology ;
+	owl:versionIRI <http://hadatac.org/ont/hasco/0.9> ;
+	owl:imports <http://purl.obolibrary.org/obo/uo/releases/2018-03-24/uo.owl> , <http://semanticscience.org/ontology/sio-subset-labels.owl> , <http://hadatac.org/ont/prov> , <http://hadatac.org/ont/vstoi> .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://www.w3.org/2004/02/skos/core#altLabel
+
+<http://www.w3.org/2004/02/skos/core#altLabel> a owl:AnnotationProperty .
+# 
+# http://www.w3.org/ns/prov#definition
+
+<http://www.w3.org/ns/prov#definition> a owl:AnnotationProperty .
+
+########################
+#
+#  ObjectCollection  
+#
+########################
+
+<http://hadatac.org/ont/hasco/LocationCollection> a owl:Class ;	
+    rdfs:subClassOf   <http://hadatac.org/ont/hasco/ObjectCollection> ;	
+    rdfs:label	   "Location Collection"  ;  
+    rdfs:comment "Collection of coordinates and/or names locations of a physical region of interest" ; 
+    <http://hadatac.org/ont/hasco/hasStudyObjectType> <http://semanticscience.org/resource/Location> ;
+    <http://hadatac.org/ont/hasco/hasAcronym> "LOC"  ;
+    <http://hadatac.org/ont/hasco/hasLabelFragment> "at" .
+
+<http://hadatac.org/ont/hasco/MatchingCollection> a owl:Class ;	
+    rdfs:subClassOf   <http://hadatac.org/ont/hasco/ObjectCollection> ;	
+    rdfs:label	   "Matching Collection"  ;  
+    rdfs:comment "Collection of matching objects" ; 
+    <http://hadatac.org/ont/hasco/hasStudyObjectType> <http://hadatac.org/ont/hasco/StudyObjectMatching> ;
+    <http://hadatac.org/ont/hasco/hasAcronym> "MATCH"  ;
+    <http://hadatac.org/ont/hasco/hasLabelFragment> "mathes" .
+
+<http://hadatac.org/ont/hasco/ObjectCollection> a owl:Class ;
+    rdfs:subClassOf   owl:Thing ;
+    rdfs:label	  "Object Collection" ;
+    rdfs:comment  "A collection of samples including other sample collections" ;
+    <http://hadatac.org/ont/hasco/hasStudyObjectType> <http://hadatac.org/ont/hasco/StudyObjectType> ;	
+    <http://hadatac.org/ont/hasco/hasAcronym> "OBJ" ; 
+    <http://hadatac.org/ont/hasco/hasLabelFragment> "object" .
+
+<http://hadatac.org/ont/hasco/SampleCollection> a owl:Class ;	
+    rdfs:subClassOf   <http://hadatac.org/ont/hasco/ObjectCollection> ;	
+    rdfs:label	 "Sample Collection" ; 
+    rdfs:comment "collection of material elements sampled from a region of interest or from other samples" ;
+    <http://hadatac.org/ont/hasco/hasStudyObjectType> <http://semanticscience.org/resource/Sample> ;       
+    <http://hadatac.org/ont/hasco/hasAcronym> "SPL" ;    
+    <http://hadatac.org/ont/hasco/hasLabelFragment> "sample" .
+
+<http://hadatac.org/ont/hasco/SubjectGroup> a owl:Class ;	
+    rdfs:subClassOf   <http://hadatac.org/ont/hasco/ObjectCollection>  ;	
+    rdfs:label	   "Subject Group" ;				   
+    rdfs:comment   "A group of human subjects" ;  
+    <http://hadatac.org/ont/hasco/hasStudyObjectType> <http://semanticscience.org/resource/Human> ;
+    <http://hadatac.org/ont/hasco/hasAcronym> "SUBJ" ;					       
+    <http://hadatac.org/ont/hasco/hasLabelFragment> "subject" .
+
+<http://hadatac.org/ont/hasco/TimeCollection> a owl:Class ;	
+    rdfs:subClassOf   <http://hadatac.org/ont/hasco/ObjectCollection> ;
+    rdfs:label	   "Time Collection" ;
+    rdfs:comment   "Time Collection" ;
+    <http://hadatac.org/ont/hasco/hasStudyObjectType> <http://semanticscience.org/resource/TimeInterval> ;	
+    <http://hadatac.org/ont/hasco/hasAcronym> "TIME" ;
+    <http://hadatac.org/ont/hasco/hasLabelFragment> "at" .
+
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# http://hadatac.org/ont/hasco/hasAction
+
+<http://hadatac.org/ont/hasco/hasAction> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/DataAcquisition> ;
+	rdfs:range <http://hadatac.org/ont/hasco/DataAcquisitionAction> ;
+	rdfs:label "has action" .
+# 
+# http://hadatac.org/ont/hasco/hasAttributeReference
+
+<http://hadatac.org/ont/hasco/hasAttributeReference> a owl:ObjectProperty ;
+	owl:inverseOf <http://hadatac.org/ont/hasco/isAttributeReferenceOf> .
+# 
+# http://hadatac.org/ont/hasco/hasConcern
+
+<http://hadatac.org/ont/hasco/hasConcern> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/Study> ;
+	rdfs:range <http://semanticscience.org/resource/Attribute> ;
+	rdfs:label "has concern"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/hasContext
+
+<http://hadatac.org/ont/hasco/hasContext> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/DataAcquisition> ;
+	rdfs:range <http://hadatac.org/ont/vstoi#Deployment> .
+# 
+# http://hadatac.org/ont/hasco/hasDataSet
+
+<http://hadatac.org/ont/hasco/hasDataSet> a owl:ObjectProperty ;
+	owl:inverseOf <http://hadatac.org/ont/hasco/isDataSetOf> .
+# 
+# http://hadatac.org/ont/hasco/hasFirstCoordinateCharacteristic
+
+<http://hadatac.org/ont/hasco/hasFirstCoordinateCharacteristic> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasFirstCoordinateUnit
+
+<http://hadatac.org/ont/hasco/hasFirstCoordinateUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasMaker
+
+<http://hadatac.org/ont/hasco/hasMaker> a owl:ObjectProperty ;
+	rdfs:range <http://hadatac.org/ont/hasco/Maker> .
+# 
+# http://hadatac.org/ont/hasco/hasMedia
+
+<http://hadatac.org/ont/hasco/hasMedia> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Instrument> .
+# 
+# http://hadatac.org/ont/hasco/hasOperatingTemperatureUnit
+
+<http://hadatac.org/ont/hasco/hasOperatingTemperatureUnit> a owl:ObjectProperty , owl:FunctionalProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasPerspectiveCharacteristic
+
+<http://hadatac.org/ont/hasco/hasPerspectiveCharacteristic> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#SensingPerspective> .
+# 
+# http://hadatac.org/ont/hasco/hasPossibleValue
+
+<http://hadatac.org/ont/hasco/hasPossibleValue> a owl:ObjectProperty ;
+	owl:inverseOf <http://hadatac.org/ont/hasco/isPossibleValueOf> .
+# 
+# http://hadatac.org/ont/hasco/hasResponseTimeUnit
+
+<http://hadatac.org/ont/hasco/hasResponseTimeUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#SensingPerspective> .
+# 
+# http://hadatac.org/ont/hasco/hasSecondCoordinateCharacteristic
+
+<http://hadatac.org/ont/hasco/hasSecondCoordinateCharacteristic> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasSecondCoordinateUnit
+
+<http://hadatac.org/ont/hasco/hasSecondCoordinateUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasStep
+
+<http://hadatac.org/ont/hasco/hasStep> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/Study> ;
+	rdfs:range <http://hadatac.org/ont/hasco/StudyStep> ;
+	rdfs:label "has step"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/hasThirdCoordinateCharacteristic
+
+<http://hadatac.org/ont/hasco/hasThirdCoordinateCharacteristic> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasThirdCoordinateUnit
+
+<http://hadatac.org/ont/hasco/hasThirdCoordinateUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasTimedRoute
+
+<http://hadatac.org/ont/hasco/hasTimedRoute> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> ;
+	rdfs:range <http://hadatac.org/ont/hasco/TimedRoute> .
+# 
+# http://hadatac.org/ont/hasco/hasXUnit
+
+<http://hadatac.org/ont/hasco/hasXUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasYUnit
+
+<http://hadatac.org/ont/hasco/hasYUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/hasZUnit
+
+<http://hadatac.org/ont/hasco/hasZUnit> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Platform> .
+# 
+# http://hadatac.org/ont/hasco/isAttributeReferenceOf
+
+<http://hadatac.org/ont/hasco/isAttributeReferenceOf> a owl:ObjectProperty ;
+	rdfs:range <http://hadatac.org/ont/vstoi#Dataset> .
+# 
+# http://hadatac.org/ont/hasco/isDataSetOf
+
+<http://hadatac.org/ont/hasco/isDataSetOf> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Dataset> ;
+	rdfs:range <http://hadatac.org/ont/hasco/Study> .
+# 
+# http://hadatac.org/ont/hasco/isGroupMember
+
+<http://hadatac.org/ont/hasco/isGroupMember> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/StudyObject> ;
+	rdfs:range <http://hadatac.org/ont/hasco/SOCGroup> ;
+	rdfs:label "is group member" .
+# 
+# http://hadatac.org/ont/hasco/isMatchingMember
+
+<http://hadatac.org/ont/hasco/isMatchingMember> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/StudyObject> ;
+	rdfs:range <http://hadatac.org/ont/hasco/StudyObjectMatching> ;
+ 	rdfs:label "is matching member" .
+# 
+# http://hadatac.org/ont/hasco/isPossibleValueOf
+
+<http://hadatac.org/ont/hasco/isPossibleValueOf> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/PossibleValue> .
+# 
+# http://hadatac.org/ont/hasco/matchesWith
+
+<http://hadatac.org/ont/hasco/matchesWith> a owl:ObjectProperty ;
+	rdfs:range <http://hadatac.org/ont/hasco/StudyObjectMatching> ;
+ 	rdfs:label "matches" .
+# 
+# http://hadatac.org/ont/hasco/recordedIn
+
+<http://hadatac.org/ont/hasco/recordedIn> a owl:ObjectProperty ;
+	rdfs:range <http://hadatac.org/ont/vstoi#Dataset> .
+# 
+# http://hadatac.org/ont/hasco/supportProject
+
+<http://hadatac.org/ont/hasco/supportProject> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/Study> ;
+	rdfs:range <http://hadatac.org/ont/hasco/Project> ;
+	rdfs:label "support project"^^xsd:string .
+# 
+# http://hadatac.org/ont/vstoi#hasMeasuredCharacteristic
+
+<http://hadatac.org/ont/vstoi#hasMeasuredCharacteristic> a owl:ObjectProperty ;
+	rdfs:domain <http://hadatac.org/ont/vstoi#Detector> .
+# 
+# http://hadatac.org/ont/vstoi#perspectiveOf
+
+<http://hadatac.org/ont/vstoi#perspectiveOf> rdfs:subPropertyOf <http://www.w3.org/ns/prov#specializationOf> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# http://hadatac.org/ont/hasco/hasAnticipatedDataVolume
+
+<http://hadatac.org/ont/hasco/hasAnticipatedDataVolume> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetStorageAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasBackupFrequency
+
+<http://hadatac.org/ont/hasco/hasBackupFrequency> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetStorageAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasBackupResponsibility
+
+<http://hadatac.org/ont/hasco/hasBackupResponsibility> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetPolicyAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasCodeValue
+
+<http://hadatac.org/ont/hasco/hasCodeValue> a owl:DatatypeProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/PossibleValue> ;
+	rdfs:range rdfs:Literal .
+# 
+# http://hadatac.org/ont/hasco/hasCreatingDateTime
+
+<http://hadatac.org/ont/hasco/hasCreatingDateTime> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetTimeAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasDataSetPolicyAttribute
+
+<http://hadatac.org/ont/hasco/hasDataSetPolicyAttribute> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/isDataSetAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasDataSetStorageAttribute
+
+<http://hadatac.org/ont/hasco/hasDataSetStorageAttribute> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/isDataSetAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasDataSetTimeAttribute
+
+<http://hadatac.org/ont/hasco/hasDataSetTimeAttribute> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/isDataSetAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasEmbargoPeriod
+
+<http://hadatac.org/ont/hasco/hasEmbargoPeriod> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetTimeAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasFirstCoordinate
+
+<http://hadatac.org/ont/hasco/hasFirstCoordinate> a owl:DatatypeProperty .
+# 
+# http://hadatac.org/ont/hasco/hasGroupId
+
+<http://hadatac.org/ont/hasco/hasGroupId> a owl:DatatypeProperty ;
+	rdfs:range xsd:string ;
+	rdfs:label "has group ID" .
+# 
+# http://hadatac.org/ont/hasco/hasImage
+
+<http://hadatac.org/ont/hasco/hasImage> a owl:DatatypeProperty ;
+	rdfs:range xsd:string .
+# 
+# http://hadatac.org/ont/hasco/hasIntellectualPropertyRights
+
+<http://hadatac.org/ont/hasco/hasIntellectualPropertyRights> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetPolicyAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasLicence
+
+<http://hadatac.org/ont/hasco/hasLicence> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetPolicyAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasParameterName
+
+<http://hadatac.org/ont/hasco/hasParameterName> a owl:DatatypeProperty ;
+	rdfs:range xsd:string .
+# 
+# http://hadatac.org/ont/hasco/hasParameterValue
+
+<http://hadatac.org/ont/hasco/hasParameterValue> a owl:DatatypeProperty ;
+	rdfs:range xsd:string .
+# 
+# http://hadatac.org/ont/hasco/hasPosition
+
+<http://hadatac.org/ont/hasco/hasPosition> a owl:DatatypeProperty ;
+	rdfs:range xsd:integer .
+# 
+# http://hadatac.org/ont/hasco/hasReference
+
+<http://hadatac.org/ont/hasco/hasReference> a owl:DatatypeProperty ;
+	rdfs:range rdfs:Literal .
+# 
+# http://hadatac.org/ont/hasco/hasRelatedPolicy
+
+<http://hadatac.org/ont/hasco/hasRelatedPolicy> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetPolicyAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasReportingDateTime
+
+<http://hadatac.org/ont/hasco/hasReportingDateTime> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetTimeAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasRetentionPeriod
+
+<http://hadatac.org/ont/hasco/hasRetentionPeriod> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetTimeAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasSecondCoordinate
+
+<http://hadatac.org/ont/hasco/hasSecondCoordinate> a owl:DatatypeProperty .
+# 
+# http://hadatac.org/ont/hasco/hasStorageFormat
+
+<http://hadatac.org/ont/hasco/hasStorageFormat> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetStorageAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasStorageMedia
+
+<http://hadatac.org/ont/hasco/hasStorageMedia> a owl:DatatypeProperty ;
+	rdfs:subPropertyOf <http://hadatac.org/ont/hasco/hasDataSetStorageAttribute> .
+# 
+# http://hadatac.org/ont/hasco/hasThirdCoordinate
+
+<http://hadatac.org/ont/hasco/hasThirdCoordinate> a owl:DatatypeProperty .
+# 
+# http://hadatac.org/ont/hasco/isDataSetAttribute
+
+<http://hadatac.org/ont/hasco/isDataSetAttribute> a owl:DatatypeProperty .
+# 
+# http://hadatac.org/ont/hasco/isPIConfirmed
+
+<http://hadatac.org/ont/hasco/isPIConfirmed> a owl:DatatypeProperty ;
+	rdfs:domain <http://hadatac.org/ont/hasco/PossibleValue> ;
+	rdfs:range xsd:boolean .
+# 
+# http://hadatac.org/ont/hasco/originalID
+
+<http://hadatac.org/ont/hasco/originalID> a owl:DatatypeProperty ;
+	rdfs:range xsd:string ;
+	rdfs:label "original ID" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# http://hadatac.org/ont/hasco/AnalyticalMethod
+
+<http://hadatac.org/ont/hasco/AnalyticalMethod> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Method> ;
+	rdfs:label "Analytical Method" .
+# 
+# http://hadatac.org/ont/hasco/Attribute
+
+<http://hadatac.org/ont/hasco/Attribute> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> ;
+	rdfs:label "Attribute" .
+# 
+# http://hadatac.org/ont/hasco/Chromatography
+
+<http://hadatac.org/ont/hasco/Chromatography> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/AnalyticalMethod> ;
+	rdfs:label "Chromatography" .
+# 
+# http://hadatac.org/ont/hasco/CodeEliciting
+
+<http://hadatac.org/ont/hasco/CodeEliciting> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Eliciting> ;
+	rdfs:label "code eliciting" .
+# 
+# http://hadatac.org/ont/hasco/Cohort
+
+<http://hadatac.org/ont/hasco/Cohort> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Collective> ;
+	rdfs:label "cohort"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/CohortStudy
+
+<http://hadatac.org/ont/hasco/CohortStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/LongitudinalStudy> ;
+	rdfs:label "cohort study"^^xsd:string ;
+	<http://www.w3.org/ns/prov#definition> "In a cohort study there is a passive follow-up of a group of people and a documentation of relevant characteristics or events related to this group of people." .
+# 
+# http://hadatac.org/ont/hasco/ComputationalExperiment
+
+<http://hadatac.org/ont/hasco/ComputationalExperiment> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisition> ;
+	rdfs:label "computational experiment" .
+# 
+# http://hadatac.org/ont/hasco/ConfigurationFile
+
+<http://hadatac.org/ont/hasco/ConfigurationFile> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> ;
+	rdfs:label "Configuration File" .
+# 
+# http://hadatac.org/ont/hasco/Configurator
+
+<http://hadatac.org/ont/hasco/Configurator> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Person> .
+# 
+# http://hadatac.org/ont/hasco/CrossSectionalStudy
+
+<http://hadatac.org/ont/hasco/CrossSectionalStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/ObservationalStudy> ;
+	rdfs:label "cross-sectional study"^^xsd:string ;
+	<http://www.w3.org/ns/prov#definition> "a type of observational study that involves the analysis of data collected from a population, or a representative subset, at one specific point in time." .
+# 
+# http://hadatac.org/ont/hasco/DataAcquisition
+
+<http://hadatac.org/ont/hasco/DataAcquisition> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/StudyStep> , <http://www.w3.org/ns/prov#Activity> ;
+	rdfs:comment "Process of using instruments to collect data values for attributes of objects of interest. A data acquisition process is composed of a set of data acquisition actions where the the operating procedures for performing the data acquisition actions are exactly the same." ;
+	rdfs:label "data acquisition" .
+# 
+# http://hadatac.org/ont/hasco/DataAcquisitionAction
+
+<http://hadatac.org/ont/hasco/DataAcquisitionAction> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Activity> ;
+	rdfs:label "Data Acquisition Action" .
+# 
+# http://hadatac.org/ont/hasco/DataVisualizationActivity
+
+<http://hadatac.org/ont/hasco/DataVisualizationActivity> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/DataAnalysis> ;
+	rdfs:label "data visualization activity"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/Eliciting
+
+<http://hadatac.org/ont/hasco/Eliciting> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisitionAction> .
+# 
+# http://hadatac.org/ont/hasco/EmpiricalExperiment
+
+<http://hadatac.org/ont/hasco/EmpiricalExperiment> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisition> ;
+	rdfs:comment "A data acquisition where agents directly or indirectly involved with the acquisition may  perform interventions to the entities of interest." ;
+	rdfs:label "empirical experiment" .
+# 
+# http://hadatac.org/ont/hasco/ExperimentalStudy
+
+<http://hadatac.org/ont/hasco/ExperimentalStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Study> ;
+	owl:disjointWith <http://hadatac.org/ont/hasco/ObservationalStudy> ;
+	rdfs:label "experimental study"^^xsd:string ;
+	<http://www.w3.org/ns/prov#definition> "a method of research in which there are two kinds of variables. The independent variable is manipulated by the experimenter, and the dependent variable is measured" .
+# 
+# http://hadatac.org/ont/hasco/FieldStudy
+
+<http://hadatac.org/ont/hasco/FieldStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Study> ;
+	owl:disjointWith <http://hadatac.org/ont/hasco/LaboratoryStudy> ;
+	rdfs:label "field study"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/GC-MS
+
+<http://hadatac.org/ont/hasco/GC-MS> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/TandemMassSpectrometry> ;
+	rdfs:label "Gas-chromatography Mass-Spectrometry" .
+# 
+# http://hadatac.org/ont/hasco/Immunoassay
+
+<http://hadatac.org/ont/hasco/Immunoassay> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/AnalyticalMethod> ;
+	rdfs:label "Immunoassay" .
+# 
+# http://hadatac.org/ont/hasco/Indicator
+
+<http://hadatac.org/ont/hasco/Indicator> a owl:Class ;
+	rdfs:label "Indicator" .
+# 
+# http://hadatac.org/ont/hasco/InstrumentPerspective
+
+<http://hadatac.org/ont/hasco/InstrumentPerspective> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/vstoi#Instrument> ;
+	rdfs:label "Instrument Perspective" .
+# 
+# http://hadatac.org/ont/hasco/LC-MS
+
+<http://hadatac.org/ont/hasco/LC-MS> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/TandemMassSpectrometry> ;
+	rdfs:label "Liquid-chromatography Mass-Spectrometry" .
+# 
+# http://hadatac.org/ont/hasco/LaboratoryStudy
+
+<http://hadatac.org/ont/hasco/LaboratoryStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Study> ;
+	rdfs:label "laboratory study"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/LongitudinalStudy
+
+<http://hadatac.org/ont/hasco/LongitudinalStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/ObservationalStudy> ;
+	rdfs:label "longitudinal study"^^xsd:string ;
+	<http://www.w3.org/ns/prov#definition> "a type of observational study an in which data is gathered for the same entities of interest repeatedly over a period of time." .
+# 
+# http://hadatac.org/ont/hasco/Maker
+
+<http://hadatac.org/ont/hasco/Maker> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Organization> .
+# 
+# http://hadatac.org/ont/hasco/MassSpectrometry
+
+<http://hadatac.org/ont/hasco/MassSpectrometry> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Spectrometry> ;
+	rdfs:comment "Mass spectrometry (MS) is an analytical technique that ionizes chemical species and sorts the ions based on their mass to charge ratio. In simpler terms, a mass spectrum measures the masses within a sample. (Wikipedia)" ;
+	rdfs:label "Mass Spectrometry" .
+# 
+# http://hadatac.org/ont/hasco/Measuring
+
+<http://hadatac.org/ont/hasco/Measuring> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisitionAction> .
+# 
+# http://hadatac.org/ont/hasco/Method
+
+<http://hadatac.org/ont/hasco/Method> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Activity> ;
+	rdfs:label "Method" .
+# 
+# http://hadatac.org/ont/hasco/Microscopy
+
+<http://hadatac.org/ont/hasco/Microscopy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/AnalyticalMethod> ;
+	rdfs:label "Microscopy" .
+# 
+# http://hadatac.org/ont/hasco/Observation
+
+<http://hadatac.org/ont/hasco/Observation> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisition> ;
+	rdfs:comment "A data acquisition where agents directly or indirectly involved with the acquisition do not perform any form of intervention to the entities of interest." .
+# 
+# http://hadatac.org/ont/hasco/ObservationalStudy
+
+<http://hadatac.org/ont/hasco/ObservationalStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Study> ;
+	rdfs:label "observational study"^^xsd:string ;
+	<http://www.w3.org/ns/prov#definition> "An observational study draws inferences from a sample to a population where the independent variable is not under the control of the researcher because of ethical concerns or logistical constraints" .
+# 
+# http://hadatac.org/ont/hasco/PossibleValue
+
+<http://hadatac.org/ont/hasco/PossibleValue> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/CollectionItem> ;
+	rdfs:label "Possible Value" .
+# 
+# http://hadatac.org/ont/hasco/Project
+
+<http://hadatac.org/ont/hasco/Project> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Process> ;
+	rdfs:label "project"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/QualityValue
+
+<http://hadatac.org/ont/hasco/QualityValue> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Class> ;
+	rdfs:label "Quality Value" .
+# 
+# http://hadatac.org/ont/hasco/QualityVariable
+
+<http://hadatac.org/ont/hasco/QualityVariable> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Class> ;
+	rdfs:label "Quality Variable" .
+# 
+# http://hadatac.org/ont/hasco/QuantityVariable
+
+<http://hadatac.org/ont/hasco/QuantityVariable> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Class> ;
+	rdfs:label "Quantity Variable" .
+# 
+# http://hadatac.org/ont/hasco/RandomizedExperimentalStudy
+
+<http://hadatac.org/ont/hasco/RandomizedExperimentalStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/ExperimentalStudy> ;
+	rdfs:label "randomized experimental study"^^xsd:string ;
+	<http://www.w3.org/ns/prov#definition> "Randomized experiments allow the greatest reliability and validity of statistical estimates of treatment effects. Increased reliability and validity comes from randomization, which involves randomly allocating experimental units across treatment groups." .
+# 
+# http://hadatac.org/ont/hasco/SampleIndicator
+
+<http://hadatac.org/ont/hasco/SampleIndicator> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Indicator> ;
+	rdfs:label "Sample Indicator" .
+# 
+# http://hadatac.org/ont/hasco/ScienceIndicator
+
+<http://hadatac.org/ont/hasco/ScienceIndicator> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Indicator> ;
+	rdfs:label "Science Indicator" .
+# 
+# http://hadatac.org/ont/hasco/Simulating
+
+<http://hadatac.org/ont/hasco/Simulating> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisitionAction> .
+# 
+# http://hadatac.org/ont/hasco/Spectrometry
+
+<http://hadatac.org/ont/hasco/Spectrometry> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/AnalyticalMethod> ;
+	rdfs:label "Spectrometry" .
+# 
+# http://hadatac.org/ont/hasco/Spectroscopy
+
+<http://hadatac.org/ont/hasco/Spectroscopy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/AnalyticalMethod> ;
+	rdfs:label "Spectroscopy" .
+# 
+# http://hadatac.org/ont/hasco/SOCGroup
+
+<http://hadatac.org/ont/hasco/SOCGroup> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/Resource/Object> ;
+	rdfs:label "group"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/Study
+
+<http://hadatac.org/ont/hasco/Study> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Activity> ;
+	rdfs:label "study"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/StudyIndicator
+
+<http://hadatac.org/ont/hasco/StudyIndicator> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Indicator> ;
+	rdfs:label "Study Indicator" .
+# 
+# http://hadatac.org/ont/hasco/StudyObject
+
+<http://hadatac.org/ont/hasco/StudyObject> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/Resource/Object> ;
+	rdfs:label "study object"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/StudyObjectMatching
+
+<http://hadatac.org/ont/hasco/StudyObjectMatching> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/StudyObject> ;
+	rdfs:label "matching"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/StudyStep
+
+<http://hadatac.org/ont/hasco/StudyStep> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Activity> ;
+	rdfs:label "study step"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/SubjectInterview
+
+<http://hadatac.org/ont/hasco/SubjectInterview> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/DataAcquisition> ;
+	rdfs:label "subject interview" .
+# 
+# http://hadatac.org/ont/hasco/SubjectStudy
+
+<http://hadatac.org/ont/hasco/SubjectStudy> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Study> ;
+	rdfs:label "subject study"^^xsd:string .
+# 
+# http://hadatac.org/ont/hasco/TandemMassSpectrometry
+
+<http://hadatac.org/ont/hasco/TandemMassSpectrometry> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/MassSpectrometry> ;
+	rdfs:label "Tandem Mass Spectrometry" .
+# 
+# http://hadatac.org/ont/hasco/TimedRoute
+
+<http://hadatac.org/ont/hasco/TimedRoute> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/GeographicRegion> ;
+	rdfs:label "Timed Route" .
+# 
+# http://hadatac.org/ont/hasco/ValueEliciting
+
+<http://hadatac.org/ont/hasco/ValueEliciting> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/Eliciting> ;
+	rdfs:label "value eliciting" .
+# 
+# http://hadatac.org/ont/vstoi#Dataset
+
+<http://hadatac.org/ont/vstoi#Dataset> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> .
+# 
+# http://hadatac.org/ont/vstoi#Deployment
+
+<http://hadatac.org/ont/vstoi#Deployment> rdfs:subClassOf <http://www.w3.org/ns/prov#Activity> .
+# 
+# http://hadatac.org/ont/vstoi#Detector
+
+<http://hadatac.org/ont/vstoi#Detector> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Device> .
+# 
+# http://hadatac.org/ont/vstoi#Instrument
+
+<http://hadatac.org/ont/vstoi#Instrument> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Device> .
+# 
+# http://hadatac.org/ont/vstoi#InstrumentOperatingMode
+
+<http://hadatac.org/ont/vstoi#InstrumentOperatingMode> rdfs:subClassOf <http://semanticscience.org/resource/Mode> .
+# 
+# http://hadatac.org/ont/vstoi#Observatory
+
+<http://hadatac.org/ont/vstoi#Observatory> rdfs:subClassOf <http://semanticscience.org/resource/Site> .
+# 
+# http://hadatac.org/ont/vstoi#Platform
+
+<http://hadatac.org/ont/vstoi#Platform> rdfs:subClassOf <http://semanticscience.org/resource/Site> .
+# 
+# http://hadatac.org/ont/vstoi#SensingPerspective
+
+<http://hadatac.org/ont/vstoi#SensingPerspective> owl:equivalentClass _:genid1 .
+
+_:genid1 a owl:Restriction ;
+	owl:onProperty <http://hadatac.org/ont/vstoi#perspectiveOf> ;
+	owl:someValuesFrom <http://hadatac.org/ont/vstoi#Detector> .
+
+<http://hadatac.org/ont/vstoi#SensingPerspective> rdfs:subClassOf <http://hadatac.org/ont/vstoi#Detector> ;
+	rdfs:label "Sensing Perspective" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000008
+
+obo:PATO_0000008 owl:equivalentClass <http://semanticscience.org/resource/Speed> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/RateOfChange> .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000033
+
+obo:PATO_0000033 owl:equivalentClass <http://semanticscience.org/resource/Concentration> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/3DExtentQuantity> .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000044
+
+obo:PATO_0000044 owl:equivalentClass <http://semanticscience.org/resource/Frequency> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/RateOfChange> .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000125
+
+obo:PATO_0000125 owl:equivalentClass <http://semanticscience.org/resource/Mass> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/SpatialQuantity> .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000128
+
+obo:PATO_0000128 rdfs:subClassOf <http://semanticscience.org/resource/SpatialQuantity> ;
+	rdfs:label "weight" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000133
+
+obo:PATO_0000133 owl:equivalentClass <http://semanticscience.org/resource/Orientation> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Position> .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000146
+
+obo:PATO_0000146 rdfs:subClassOf <http://semanticscience.org/resource/Quantity> ;
+	rdfs:label "temperature" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000165
+
+obo:PATO_0000165 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "time" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0000992
+
+obo:PATO_0000992 rdfs:subClassOf <http://semanticscience.org/resource/3DExtentQuantity> ;
+	rdfs:label "viscosity" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001019
+
+obo:PATO_0001019 rdfs:subClassOf <http://semanticscience.org/resource/3DExtentQuantity> ;
+	rdfs:label "mass density" ;
+	<http://www.w3.org/2004/02/skos/core#altLabel> "density" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001021
+
+obo:PATO_0001021 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "energy" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001022
+
+obo:PATO_0001022 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "impulse" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001023
+
+obo:PATO_0001023 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "momentum" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001024
+
+obo:PATO_0001024 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "power" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001025
+
+obo:PATO_0001025 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "pressure" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001026
+
+obo:PATO_0001026 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "work" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001028
+
+obo:PATO_0001028 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "acceleration" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001035
+
+obo:PATO_0001035 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "force" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001296
+
+obo:PATO_0001296 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/DimensionlessQuantity> ;
+	rdfs:label "light quantity" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001299
+
+obo:PATO_0001299 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/ObjectQuality> ;
+	rdfs:label "radiation quality" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001309
+
+obo:PATO_0001309 rdfs:subClassOf <http://semanticscience.org/resource/TimeInterval> ;
+	rdfs:label "duration" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001350
+
+obo:PATO_0001350 rdfs:subClassOf obo:PATO_0001028 ;
+	rdfs:label "angular acceleration" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001351
+
+obo:PATO_0001351 rdfs:subClassOf obo:PATO_0001019 ;
+	rdfs:label "area density" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001352
+
+obo:PATO_0001352 rdfs:subClassOf obo:PATO_0001019 ;
+	rdfs:label "linear density" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001353
+
+obo:PATO_0001353 rdfs:subClassOf obo:PATO_0001019 ;
+	rdfs:label "volumetric density" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001413
+
+obo:PATO_0001413 rdfs:subClassOf <http://semanticscience.org/resource/Velocity> ;
+	rdfs:label "angular velocity" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001414
+
+obo:PATO_0001414 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "catalytic activity" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001461
+
+obo:PATO_0001461 rdfs:subClassOf <http://semanticscience.org/resource/2DExtentQuantity> ;
+	rdfs:label "surface tension" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001464
+
+obo:PATO_0001464 rdfs:subClassOf <http://semanticscience.org/resource/ChargeQuality> ;
+	rdfs:label "electric potential" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001521
+
+obo:PATO_0001521 rdfs:subClassOf <http://semanticscience.org/resource/Quantity> ;
+	rdfs:label "sound amplitude" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001574
+
+obo:PATO_0001574 rdfs:subClassOf <http://semanticscience.org/resource/RateOfChange> ;
+	rdfs:label "flow rate" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001674
+
+obo:PATO_0001674 rdfs:subClassOf <http://semanticscience.org/resource/Concentration> ;
+	rdfs:label "catalytic (activity) concentration" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001680
+
+obo:PATO_0001680 rdfs:subClassOf <http://semanticscience.org/resource/Volume> ;
+	rdfs:label "molar volume" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001681
+
+obo:PATO_0001681 rdfs:subClassOf <http://semanticscience.org/resource/Mass> ;
+	rdfs:label "molar mass" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001682
+
+obo:PATO_0001682 rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "magnetism" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001708
+
+obo:PATO_0001708 owl:equivalentClass <http://semanticscience.org/resource/1DExtentQuantity> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/SpatialQuantity> ;
+	rdfs:label "1-D extent" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001709
+
+obo:PATO_0001709 owl:equivalentClass <http://semanticscience.org/resource/2DExtentQuantity> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/SpatialQuantity> ;
+	rdfs:label "2-D extent" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001710
+
+obo:PATO_0001710 owl:equivalentClass <http://semanticscience.org/resource/3DExtentQuantity> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/SpatialQuantity> ;
+	rdfs:label "3-D extent" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001717
+
+obo:PATO_0001717 a owl:Class ;
+	rdfs:subClassOf obo:PATO_0001299 ;
+	rdfs:label "radiation emitting intensity quality" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001718
+
+obo:PATO_0001718 a owl:Class ;
+	rdfs:subClassOf obo:PATO_0001296 ;
+	rdfs:label "luminance" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001740
+
+obo:PATO_0001740 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "activity (of a radionuclide)" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001744
+
+obo:PATO_0001744 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "radiation exposure" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001745
+
+obo:PATO_0001745 a owl:Class ;
+	rdfs:subClassOf obo:PATO_0001744 ;
+	rdfs:label "radiation absorbed dose" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001746
+
+obo:PATO_0001746 a owl:Class ;
+	rdfs:subClassOf obo:PATO_0001744 , <http://semanticscience.org/resource/Dose> ;
+	rdfs:label "radiation equivalent dose" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001747
+
+obo:PATO_0001747 a owl:Class ;
+	rdfs:subClassOf obo:PATO_0001744 , <http://semanticscience.org/resource/EffectiveDose> ;
+	rdfs:label "radiation effective dose" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001756
+
+obo:PATO_0001756 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "heat conductivity" .
+# 
+# http://purl.obolibrary.org/obo/PATO_0001757
+
+obo:PATO_0001757 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/DimensionalQuantity> ;
+	rdfs:label "electrical conductivity" .
+# 
+# http://purl.obolibrary.org/obo/UO_0000000
+
+obo:UO_0000000 a owl:Class ;
+	owl:equivalentClass <http://semanticscience.org/resource/UnitOfMeasurement> ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Quantity> .
+# 
+# http://purl.obolibrary.org/obo/UO_0000046
+
+obo:UO_0000046 a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Ratio> .
+# 
+# http://semanticscience.org/resource/Attribute
+
+<http://semanticscience.org/resource/Attribute> a owl:Class ;
+	rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> .
+# 
+# http://semanticscience.org/resource/Collective
+
+<http://semanticscience.org/resource/Collective> a owl:Class .
+# 
+# http://semanticscience.org/resource/Concentration
+# 
+# http://semanticscience.org/resource/DataAnalysis
+
+<http://semanticscience.org/resource/DataAnalysis> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/StudyStep> .
+# 
+# http://semanticscience.org/resource/Device
+
+<http://semanticscience.org/resource/Device> a owl:Class .
+# 
+# http://semanticscience.org/resource/Frequency
+# 
+# http://semanticscience.org/resource/Mass
+# 
+# http://semanticscience.org/resource/Object
+
+<http://semanticscience.org/resource/Object> rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> .
+# 
+# http://semanticscience.org/resource/Orientation
+# 
+# http://semanticscience.org/resource/Position
+
+<http://semanticscience.org/resource/Position> rdfs:subClassOf <http://hadatac.org/ont/hasco/Attribute> , <http://www.w3.org/ns/prov#Location> .
+# 
+# http://semanticscience.org/resource/Process
+
+<http://semanticscience.org/resource/Process> a owl:Class .
+# 
+# http://semanticscience.org/resource/Quality
+
+<http://semanticscience.org/resource/Quality> rdfs:subClassOf <http://hadatac.org/ont/hasco/Attribute> .
+# 
+# http://semanticscience.org/resource/Quantity
+
+<http://semanticscience.org/resource/Quantity> rdfs:subClassOf <http://hadatac.org/ont/hasco/Attribute> .
+# 
+# http://semanticscience.org/resource/RealizableEntity
+
+<http://semanticscience.org/resource/RealizableEntity> rdfs:subClassOf <http://hadatac.org/ont/hasco/Attribute> .
+# 
+# http://semanticscience.org/resource/Role
+
+<http://semanticscience.org/resource/Role> owl:equivalentClass <http://www.w3.org/ns/prov#Role> .
+# 
+# http://semanticscience.org/resource/Sampling
+
+<http://semanticscience.org/resource/Sampling> a owl:Class ;
+	rdfs:subClassOf <http://hadatac.org/ont/hasco/StudyStep> .
+# 
+# http://semanticscience.org/resource/Speed
+# 
+# http://semanticscience.org/resource/UnitOfMeasurement
+# 
+# http://semanticscience.org/resource/1DExtentQuantity
+# 
+# http://semanticscience.org/resource/2DExtentQuantity
+# 
+# http://semanticscience.org/resource/3DExtentQuantity
+# 
+# http://www.w3.org/ns/prov#Activity
+
+<http://www.w3.org/ns/prov#Activity> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Process> .
+# 
+# http://www.w3.org/ns/prov#Entity
+
+<http://www.w3.org/ns/prov#Entity> a owl:Class ;
+	rdfs:subClassOf <http://semanticscience.org/resource/Entity> .
+# 
+# http://www.w3.org/ns/prov#Influence
+
+<http://www.w3.org/ns/prov#Influence> rdfs:subClassOf <http://semanticscience.org/resource/Process> .
+# 
+# http://www.w3.org/ns/prov#InstantaneousEvent
+
+<http://www.w3.org/ns/prov#InstantaneousEvent> rdfs:subClassOf <http://semanticscience.org/resource/Process> .
+# 
+# http://www.w3.org/ns/prov#KeyEntityPair
+
+<http://www.w3.org/ns/prov#KeyEntityPair> rdfs:subClassOf <http://semanticscience.org/resource/DataItem> .
+# 
+# http://www.w3.org/ns/prov#Location
+
+<http://www.w3.org/ns/prov#Location> rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> .
+# 
+# http://www.w3.org/ns/prov#Organization
+
+<http://www.w3.org/ns/prov#Organization> a owl:Class .
+# 
+# http://www.w3.org/ns/prov#Person
+
+<http://www.w3.org/ns/prov#Person> a owl:Class .
+# 
+# http://www.w3.org/ns/prov#Role
+
+<http://www.w3.org/ns/prov#Role> rdfs:subClassOf <http://semanticscience.org/resource/RealizableEntity> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Annotations
+# #
+# #################################################################
+# 
+# 
+
+obo:PATO_0001428 rdfs:label "medium acidity" .
+# 
+# Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi
