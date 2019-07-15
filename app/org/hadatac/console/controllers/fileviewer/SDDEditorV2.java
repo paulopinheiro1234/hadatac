@@ -22,14 +22,14 @@ public class SDDEditorV2 extends Controller {
         List<String> loadedList=ns.listLoadedOntologies();
         List<String> currentCart=new ArrayList<String>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    
-   
+
+
     public Result index(String fileId, boolean bSavable) {
-         
+
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         if (null == dataFile) {
-            
+
             return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this));
         }
 
@@ -40,15 +40,16 @@ public class SDDEditorV2 extends Controller {
         files = DataFile.find(user.getEmail());
 
         String dd_filename=dataFile.getFileName();
-        dd_filename="DD-"+ dd_filename.split("-")[1];
-        DataFile dd_dataFile = null;
- 		for(DataFile df : files){
- 			if(df.getFileName().equals(dd_filename)){
- 				dd_dataFile = df;
- 			}
- 		}
-       
-       
+        dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
+        DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
+
+        for(DataFile df : files){
+           if(df.getFileName().equals(dd_filename)){
+             dd_dataFile = df;
+          }
+       }
+
+
     	// System.out.println("files = " + files);
     	// System.out.println("dd_dataFile = " + dd_dataFile.getFileName());
 
@@ -87,7 +88,7 @@ public class SDDEditorV2 extends Controller {
         for(int i=0;i<currentCart.size();i++){
             System.out.println(currentCart.get(i));
         }
-        
+
     }
 
     public void removeFromCart(String ontology){
