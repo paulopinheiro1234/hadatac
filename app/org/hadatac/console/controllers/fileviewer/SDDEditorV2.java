@@ -78,22 +78,26 @@ public class SDDEditorV2 extends Controller {
     //     System.out.println(s);
     //     return new Result(200);
     // }
+
     public List<String> getCart(){
         return currentCart;
     }
 
-    public void addToCart(String ontology){
+    public Result addToCart(String ontology){
         currentCart.add(ontology);
         for(int i=0;i<currentCart.size();i++){
             System.out.println(currentCart.get(i));
         }
-        
+        return new Result(200);
     }
 
-    public void removeFromCart(String ontology){
+    public Result removeFromCart(String ontology){
         currentCart.remove(ontology);
+        return new Result(200);
     }
-    public int sizeOfCart(){
-        return currentCart.size();
+    public Result sizeOfCart(int cartamount){
+        cart_amount= currentCart.size();
+        
+        return new Result(200);
     }
 }

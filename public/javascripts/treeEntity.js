@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 !(function (d3) {
     
@@ -41,56 +40,6 @@
           d._children.forEach(collapse);
           d.children = null;
        }
-=======
-!(function (d3) {
-
-$("treecontent").empty();
-
-var query_res = document.getElementById('entityquery');
-var results = query_res.dataset.results;
-
-var margin = {top: 30, right: 20, bottom: 30, left: 20},
-    width = 960 - margin.left - margin.right,
-    barHeight = 20,
-    barWidth = width * .8;
-
-var i = 0,
-    duration = 400,
-    root;
-
-var tree = d3.layout.tree()
-    .nodeSize([0, 20]);
-
-var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
-
-var svg = d3.select("treecontent").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-function resetSelection(d){
-    d._isSelected = false;
-    var children = (d.children)?d.children:d._children;
-    if(children) {
-	children.forEach(resetSelection);
-    }
-}
-
-function collapse(d) {
-   if (d.children) {
-      d._children = d.children;
-      d._children.forEach(collapse);
-      d.children = null;
-   }
-}
-
-function expand(d){
-    var children = (d.children)?d.children:d._children;
-    if (d._children) {
-        d.children = d._children;
-        d._children = null;
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
     }
     
     function expand(d){
@@ -103,7 +52,6 @@ function expand(d){
         children.forEach(expand);
         }
     }
-<<<<<<< HEAD
     
     function exactSearchTree(obj,search,path){
         if(obj.name === search){ //if search is found return, add the object to the path and return it
@@ -127,15 +75,6 @@ function expand(d){
         else{//not the right object, return false so it will continue to iterate in the loop
         return false;
         }
-=======
-}
-
-function exactSearchTree(obj,search,path){
-    if(obj.name === search){ //if search is found return, add the object to the path and return it
-        obj._isSelected = true;  // mark is
-	path.push(obj);
-	return path;
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
     }
     
     function searchTree(obj,search,path){
@@ -350,12 +289,7 @@ function exactSearchTree(obj,search,path){
     document.getElementById("copyvalue").onclick = function() {
        $('#newEntity').val(lastClickD.name);
     }
-    function color(d) {
-        if (d._isSelected) return 'red';
-        return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
-    }
     
-    })(d3);
     
     var cm=document.querySelector(".custom-cm");
     function showContextMenu(show=true){
@@ -450,9 +384,9 @@ function exactSearchTree(obj,search,path){
        });
     }
 
-    // var t=[];
-    // var ct=-1;
-    // updateCartCounter(t); 
+    var t=[];
+    var ct=-1;
+    
 
     var additem=document.getElementById("thisitem");
     additem.addEventListener('click', function(e) { 
@@ -460,17 +394,16 @@ function exactSearchTree(obj,search,path){
          $.ajax({
             type : 'GET',
             
-            url : 'http://localhost:9000/hadatac/metadata/graph/addToCart',
+            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/addToCart',
             data : {
                 ontology: onto
             },
             success : function(data) {
-                alert(onto);
+                //alert(onto);
             }
         });
         
-        // t.push(onto);
-        // updateCartCounter(t); 
+        updateCartCounter(); 
         // ct++;
         // createMenu(t,ct);
                 
@@ -479,37 +412,54 @@ function exactSearchTree(obj,search,path){
      
     
       
-    // function updateCartCounter(t){
-    //     console.log("T: ",t);
-    //     document.getElementById("cartctr").innerHTML=t.length;
+    function updateCartCounter(){
+        //document.getElementById("cartctr").innerHTML=t.length;
+        var cart_ctr=0;
+        $.ajax({
+            type : 'GET',
+            
+            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/sizeOfCart',
+            data : {
+                cartamount: cart_ctr
+            },
+            success : function(data) {
+                alert("cart_ctr");
+                //document.getElementById("cartctr").innerHTML=cart_size;
+            }
+        });
         
-    //  }
-    //  function removeCartItem(t,item){
-    //     var index = t.indexOf(item);
-    //     if (index !== -1) t.splice(index, 1);
-    //     return t;
+     }
+     function removeCartItem(t,item){
+        var index = t.indexOf(item);
+        if (index !== -1) t.splice(index, 1);
+        return t;
         
-    //  }
+     }
      
 
-    // function createMenu(t,ct){
-    //     console.log("T",t);
-    //     var select=document.getElementById("seecart"),t;
-    //         for(var i=ct;i<t.length;i++){
-    //             var span = document.createElement("span");
-    //             span.innerHTML = '&times;';
-    //             var li = document.createElement("li");
-    //             span.setAttribute("class", "remove");
+    function createMenu(t,ct){
+        console.log("T",t);
+        var select=document.getElementById("seecart"),t;
+            for(var i=ct;i<t.length;i++){
+                var span = document.createElement("span");
+                span.innerHTML = '&times;';
+                var li = document.createElement("li");
+                span.setAttribute("class", "remove");
                 
-    //             li.appendChild(document.createTextNode(t[i]+" "));
-    //             li.appendChild(span);
-    //             select.appendChild(li);
-    //             span.onclick = function() { this.parentElement.style.display='none';t=removeCartItem(t,t[i-1]);
-    //             updateCartCounter(t)};         
-    //     }
-    // }
+                li.appendChild(document.createTextNode(t[i]+" "));
+                li.appendChild(span);
+                select.appendChild(li);
+                span.onclick = function() { this.parentElement.style.display='none';t=removeCartItem(t,t[i-1]);
+                updateCartCounter(t)};         
+        }
+    }
      
+    function color(d) {
+        if (d._isSelected) return 'red';
+        return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+    }
     
+    })(d3);
 
      
     
