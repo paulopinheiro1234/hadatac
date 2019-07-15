@@ -354,138 +354,12 @@ function exactSearchTree(obj,search,path){
         if (d._isSelected) return 'red';
         return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
     }
-<<<<<<< HEAD
     
     })(d3);
     
     var cm=document.querySelector(".custom-cm");
     function showContextMenu(show=true){
         cm.style.display=show ?'block' :"none";
-=======
-}
-
-var flare = JSON.parse(results);
-    flare.x0 = 0;
-    flare.y0 = 0;
-    root = flare;
-    initialize(root);
-    update(root);
-
-function update(source) {
-
-    // Compute the flattened node list. TODO use d3.layout.hierarchy.
-    var nodes = tree.nodes(root);
-
-    var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom);
-
-    d3.select("svg").transition()
-	.duration(duration)
-	.attr("height", height);
-
-    // Compute the "layout".
-    nodes.forEach(function(n, i) {
-	    n.x = i * barHeight;
-	});
-
-    // Update the nodes…
-    var node = svg.selectAll("g.node")
-	.data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-    var nodeEnter = node.enter().append("g")
-	.attr("class", "node")
-	.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-	.style("opacity", 1e-6);
-
-    // Enter any new nodes at the parent's previous position.
-    nodeEnter.append("rect")
-	.attr("y", -barHeight / 2)
-	.attr("height", barHeight)
-	.attr("width", barWidth)
-	.style("fill", color)
-	.on("click", click);
-
-    nodeEnter.append("text")
-	.attr("dy", 3.5)
-	.attr("dx", 5.5);
-
-    node.select('text')
-	.text(function(d) {
-		if (d.children) {
-		    return '+' + d.name;
-		} else if (d._children) {
-		    return '-' + d.name;
-		} else {
-		    return d.name;
-		}
-	    });
-
-    // Transition nodes to their new position.
-    nodeEnter.transition()
-	.duration(duration)
-	.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-	.style("opacity", 1);
-
-    node.transition()
-	.duration(duration)
-	.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-	.style("opacity", 1)
-	.select("rect")
-	.style("fill", color);
-
-    // Transition exiting nodes to the parent's new position.
-    node.exit().transition()
-	.duration(duration)
-	.attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-	.style("opacity", 1e-6)
-	.remove();
-
-    // Update the links…
-    var link = svg.selectAll("path.link")
-	.data(tree.links(nodes), function(d) { return d.target.id; });
-
-    // Enter any new links at the parent's previous position.
-    link.enter().insert("path", "g")
-	.attr("class", "link")
-	.attr("d", function(d) {
-		var o = {x: source.x0, y: source.y0};
-		return diagonal({source: o, target: o});
-	    })
-	.transition()
-	.duration(duration)
-	.attr("d", diagonal);
-
-    // Transition links to their new position.
-    link.transition()
-	.duration(duration)
-	.attr("d", diagonal);
-
-    // Transition exiting nodes to the parent's new position.
-    link.exit().transition()
-	.duration(duration)
-	.attr("d", function(d) {
-		var o = {x: source.x, y: source.y};
-		return diagonal({source: o, target: o});
-	    })
-	.remove();
-
-    // Stash the old positions for transition.
-    nodes.forEach(function(d) {
-	    d.x0 = d.x;
-	    d.y0 = d.y;
-	});
-}
-
-// Toggle children on click.
-var lastClickD = null;
-document.getElementById('copyvalue').disabled = true;
-function click(d) {
-    if (d.children) {
-	d._children = d.children;
-	d.children = null;
-    } else {
-	d.children = d._children;
-	d._children = null;
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
     }
     var clickCoords;
   var clickCoordsX;
@@ -515,41 +389,10 @@ function click(d) {
       posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
       posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     }
-<<<<<<< HEAD
 
     return {
       x: posx,
       y: posy
-=======
-    d._isSelected = true;
-    lastClickD = d;
-    document.getElementById('copyvalue').disabled = false;
-    update(d);
-}
-
-document.getElementById("collapse").onclick = function() {
-    resetSelection(root);
-    lastClickD = null;
-    root.children.forEach(collapse);
-    update(root);
-};
-
-document.getElementById("expand").onclick = function() {
-    expand(root);
-    update(root);
-};
-
-document.getElementById("reset").onclick = function() {
-    initialize(root);
-    update(root);
-};
-
-document.getElementById("findTerm").onclick = function() {
-    root.children.forEach(collapse);
-    var paths = searchTree(root,document.getElementById("searchValue").value,[]);
-    if(typeof(paths) !== "undefined"){
-	openPaths(paths);
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
     }
   }
     function positionMenu(e) {
@@ -607,7 +450,6 @@ document.getElementById("findTerm").onclick = function() {
        });
     }
 
-<<<<<<< HEAD
     // var t=[];
     // var ct=-1;
     // updateCartCounter(t); 
@@ -671,29 +513,3 @@ document.getElementById("findTerm").onclick = function() {
 
      
     
-=======
-
-// Capture Right Click event
-if (document.addEventListener) { // IE >= 9; other browsers
-   document.addEventListener('contextmenu', function(e) {
-      console.log(Object.getOwnPropertyNames(e.target));
-      console.log(e.target.__data__.name.split("[")[1].split("]")[0]);
-      alert("You right clicked on " + e.target.__data__.name.split("[")[1].split("]")[0]);
-      //alert("You've tried to open context menu"); //here you draw your own menu
-      e.preventDefault();
-   }, false);
-} else { // IE < 9
-   document.attachEvent('oncontextmenu', function() {
-      alert("You've tried to open context menu");
-      window.event.returnValue = false;
-   });
-}
-
-
-function color(d) {
-    if (d._isSelected) return 'red';
-    return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
-}
-
-})(d3);
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786

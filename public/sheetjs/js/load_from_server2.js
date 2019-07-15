@@ -1,4 +1,8 @@
-function checkRecs (L,R){
+var copyOfL=0;
+var copyOfR=0;
+function checkRecs (L,R,checker){
+    copyOfL=L;
+    copyOfR=R;
     var cellName;
     var colIndex=0;
     var rowIndex=0;
@@ -12,21 +16,30 @@ function checkRecs (L,R){
         var colval=cdg.schema[colIndex].title;
         colval=colval.charAt(0).toLowerCase() + colval.slice(1);
         var rowval=cdg.data[rowIndex][0];
+        
+        if(checker==1){
+          if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
+            isVirtual=0;
+          }
+          else if(colval=="attributeOf"||colval=="Time"||colval=="inRelationTo"||colval=="wasDerivedFrom"||colval=="wasGeneratedBy"
+          || colval=="Relation"||colval=="Entity"){
+            isVirtual=1;
+          }
+          var menuoptns=[];
+          starRec(colval,rowval,menuoptns,isVirtual,L,R,rowIndex,colIndex);
   
-        if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
-          isVirtual=0;
         }
-        else if(colval=="attributeOf"||colval=="Time"||colval=="inRelationTo"||colval=="wasDerivedFrom"||colval=="wasGeneratedBy"
-        || colval=="Relation"||colval=="Entity"){
-          isVirtual=1;
+        else{
+          //str.replace('a', '');
+          if(cdg.data[i][j]!=null){
+            cdg.data[i][j]=cdg.data[i][j].replace(' * ','');
+          }
         }
-        var menuoptns=[];
-        starRec(colval,rowval,menuoptns,isVirtual,L,R,rowIndex,colIndex);
-  
-      }
+    
     }
     
   }
+}
 
   function starRec(colval,rowval,menuoptns,isVirtual,L,R,rowIndex,colIndex){
     var getJSON = function(url, callback) {
@@ -96,8 +109,6 @@ function checkRecs (L,R){
 }
 
 function drawStars(rowIndex,colIndex){
-    //console.log(rowval,colval,rowIndex,colIndex);
-    console.log(cdg.data[rowIndex][colIndex]);
     if(cdg.data[rowIndex][colIndex].includes(" * ")){
         
     }
@@ -108,4 +119,10 @@ function drawStars(rowIndex,colIndex){
     
 
     
+}
+
+function stripStars(){
+  console.log(copyOfL,copyOfR);
+  //str.replace('a', '');
+  checkRecs(copyOfL,copyOfR,0);
 }

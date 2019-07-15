@@ -26,12 +26,11 @@
     @if(bSavable) {
         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
     }
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+    <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
 
 
     <button class="btn btn-primary">Back</button>
-      <button class="btn btn-primary" style=margin-left:5px>Consider SSD</button>
-<<<<<<< HEAD
+      <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
         <input type="text" id="varDescription" value="Description of Column Variable:"/>
         <div class= shopbutton>
         <button class="cart" >
@@ -81,11 +80,6 @@
         </script> -->
 
         
-=======
-        Description of Column Variable:
-        <input type="text" id="varDescription" value=" "/>
-
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
       <button class="main-nav" id="show">Show Options</button>
       <button class="Close" id="hide">Hide Options</button>
 
@@ -125,15 +119,9 @@
                   <button class=submitOntologies>Submit</button>
 
                 </ul>
-<<<<<<< HEAD
             </div> -->
             
             
-=======
-            </div>
-
-
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
         </div>
 
 
@@ -203,13 +191,8 @@
     req.send();
     </script>
     <script>
-<<<<<<< HEAD
       if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
         alert("Please upload a valid Data Dictionary")
-=======
-      if ("@dd_dataFile.getFileName()" === ""){
-         alert("Please upload a valid Data Dictionary")
->>>>>>> 49129d2585aa9c71d6cdc6c762bc5e64a3866786
       }
       else{
          if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){

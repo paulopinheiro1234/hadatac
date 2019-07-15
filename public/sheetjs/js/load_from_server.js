@@ -41,6 +41,13 @@ function hideView(){
   cdg.style.width = (window.innerWidth - 100) + "px";
 
 }
+
+function changeHeader(){
+   for(var i=0;i<cdg.data[0].length;i++){
+    cdg.schema[i].title = cdg.data[0][cdg.schema[i].name];
+  }
+  
+}
 /* make the buttons for the sheets */
 var make_buttons = function(sheetnames, cb) {
   var buttons = document.getElementById('buttons');
@@ -55,7 +62,7 @@ var make_buttons = function(sheetnames, cb) {
     var txt = document.createElement('h5'); 
     txt.innerText = s; 
     btn.appendChild(txt);
-    btn.addEventListener('click', function() { cb(idx); hideView()}, false);
+    btn.addEventListener('click', function() {cb(idx); hideView();}, false);
     buttons.appendChild(btn);
   });
   buttons.appendChild(document.createElement('br'));
@@ -146,12 +153,12 @@ function _resize() {
 _resize();
 
 window.addEventListener('resize', _resize);
-
+var click_ctr=0;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
-  var click_ctr=0;
+  
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
-  console.log(click_ctr);
+  // console.log(click_ctr);
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
@@ -167,18 +174,15 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     json[0][i] = "";
   }
   cdg.data = json;
-  for(var i=0;i<cdg.data[0].length;i++){
-    cdg.schema[i].title = cdg.data[0][cdg.schema[i].name];
-  }
-  if(click_ctr==1){
-    cdg.deleteRow(0);
-  }
+  var copycdg=cdg;
+
+  changeHeader(copycdg);
   for(var i=0;i<cdg.data.length;i++){
     if(cdg.data[i][0]!=null){
       R++;
     }
   }
-  checkRecs(L,R);
+  checkRecs(L,R,1);
   cdg.draw();
 };
 
