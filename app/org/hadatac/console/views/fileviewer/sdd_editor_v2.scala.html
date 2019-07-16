@@ -46,21 +46,7 @@
   
         </ul>
       </div>
-      <script>
-
-        //  var str= "hello world";
-        //  $.ajax({
-        //     type : 'GET',
-        //     url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/testPrint',
-        //     data : {
-        //         s: str
-        //     },
-        //     success : function(data) {
-        //         alert('yeah');
-        //     }
-        // });
-        
-      </script>
+      
       <div class="cartbutton" id="viewcart">
         <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
             
@@ -74,10 +60,25 @@
       </ul>
       
       </div>
-      <!-- <script>
-        $( "#newdiv" ).load( "/hadatac/metadata/graph?oper=ent&className=uo #seecart" );
-        console.log("reached");
-        </script> -->
+      <script>
+        $.ajax({
+           type : 'GET',
+           url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+           data : {
+              //  s: str
+           },
+           success : function(data) {
+             var select=document.getElementById("seecart"),data;
+             for(var i=0;i<data.length;i++){  
+                var li = document.createElement("li");                
+                li.appendChild(document.createTextNode(data[i]+" "));
+                select.appendChild(li);
+                
+               }
+           }
+       });
+       
+     </script>
 
         
       <button class="main-nav" id="show">Show Options</button>

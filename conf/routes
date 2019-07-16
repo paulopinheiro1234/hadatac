@@ -388,6 +388,14 @@ POST    /hadatac/annotator/sddeditor_v2/addToCart               org.hadatac.cons
 GET     /hadatac/annotator/sddeditor_v2/sizeOfCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.sizeOfCart(cartamount:Int)
 POST    /hadatac/annotator/sddeditor_v2/sizeOfCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.sizeOfCart(cartamount:Int)
 
+GET     /hadatac/annotator/sddeditor_v2/getCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
+POST    /hadatac/annotator/sddeditor_v2/getCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
+
+GET     /hadatac/annotator/sddeditor_v2/removeFromCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.removeFromCart(item: String)
+POST    /hadatac/annotator/sddeditor_v2/removeFromCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.removeFromCart(item: String)
+
+
+
 GET	    /hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(dir : String, file_id : String)
 POST	/hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(dir : String, file_id : String)
 GET 	/hadatac/annotator/prepare/create              org.hadatac.console.controllers.annotator.PrepareIngestion.create(dir : String, file_id : String, da_uri: String)

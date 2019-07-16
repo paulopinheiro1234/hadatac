@@ -102,12 +102,32 @@ cdg.addEventListener('click', function (e) {
   
   else{
     var menuoptns=[];
+    //starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
     jsonparser(colval,rowval,menuoptns,isVirtual);
   }
 });
+cdg.addEventListener('endedit',function(e){
+  if (!e.cell) { return; }
+  console.log("EditEnded");
+  var colval=cdg.schema[e.cell.columnIndex].title;
+  colval=colval.charAt(0).toLowerCase() + colval.slice(1);
+  var rowval=cdg.data[e.cell.rowIndex][0];
 
+  if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
+    isVirtual=0;
+  }
+  else if(colval=="attributeOf"||colval=="Time"||colval=="inRelationTo"||colval=="wasDerivedFrom"||colval=="wasGeneratedBy"
+  || colval=="Relation"||colval=="Entity"){
+    isVirtual=1;
+  }
+  colNum=e.cell.columnIndex;
+  rowNum=e.cell.rowIndex;
+  var menuoptns=[];
+  starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
+})
 
 cdg.addEventListener('click', function (e) {
+  
   if (!e.cell) { return; }
     
   else{
