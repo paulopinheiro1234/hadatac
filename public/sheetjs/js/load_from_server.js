@@ -1,6 +1,9 @@
 /* oss.sheetjs.com (C) 2014-present SheetJS -- http://sheetjs.com */
 /* vim: set ts=2: */
 
+var demo_enabled = true;
+var sdd_suggestions;
+
 /** drop target **/
 var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
@@ -46,7 +49,7 @@ function changeHeader(){
    for(var i=0;i<cdg.data[0].length;i++){
     cdg.schema[i].title = cdg.data[0][cdg.schema[i].name];
   }
-  
+
 }
 /* make the buttons for the sheets */
 var make_buttons = function(sheetnames, cb) {
@@ -59,8 +62,8 @@ var make_buttons = function(sheetnames, cb) {
     btn.type = 'button';
     btn.name = 'btn' + idx;
     btn.text = s;
-    var txt = document.createElement('h5'); 
-    txt.innerText = s; 
+    var txt = document.createElement('h5');
+    txt.innerText = s;
     btn.appendChild(txt);
     btn.addEventListener('click', function() {cb(idx); hideView();}, false);
     buttons.appendChild(btn);
@@ -78,7 +81,7 @@ var rowNum=0;
 var isVirtual=0;
 cdg.addEventListener('click', function (e) {
   if (!e.cell) { return; }
-  
+
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
   var rowval=cdg.data[e.cell.rowIndex][0];
@@ -95,30 +98,68 @@ cdg.addEventListener('click', function (e) {
 
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
-  
+
   if(colNum==0){
     hideView();
   }
-  
+
   else{
     var menuoptns=[];
-    jsonparser(colval,rowval,menuoptns,isVirtual);
+    if(demo_enabled){
+      jsonparser(colval,rowval,menuoptns,isVirtual);
+    }
+    else{
+
+      // Check if we have gotten recomendations yet
+      if (typeof sdd_suggestions == 'undefined') {
+         // Get suggestions
+         getSuggestion();
+         alert('Requesting Suggestions');
+      }
+      else{
+         console.log(colval);
+         console.log(rowval);
+         console.log(sdd_suggestions);
+         applySuggestion(colval,rowval,menuoptns,isVirtual);
+      }
+    }
   }
 });
 
 
 cdg.addEventListener('click', function (e) {
   if (!e.cell) { return; }
-    
+
   else{
     colNum=e.cell.columnIndex;
     rowNum=e.cell.rowIndex;
     var varnameElement=cdg.data[rowNum][0];
-    
+
     DDExceltoJSON(dd_url,varnameElement);
   }
 
 });
+
+
+function applySuggestion(colval, rowval, menuoptns, isVirtual) {
+   var keyword="columns";
+   if(rowval.startsWith("??")){
+      keyword="virtual-columns";
+   }
+
+   for (const sddRow of sdd_suggestions["sdd"]["Dictionary Mapping"][keyword]){
+      if(sddRow["column"] == rowval){
+         for (const sddCol of sddRow[colval]){
+            menuoptns.push([sddCol.star, sddCol.value]);
+         }
+         break; // After we find the correct value we can quit searching
+      }
+   }
+
+   menuoptns=menuoptns.sort(sortByStar);
+   createNewMenu(menuoptns,colval,isVirtual);
+}
+
 
 
 function chooseItem(data) {
@@ -143,7 +184,7 @@ function removeRow(){
   alert("Warning! You are about to delete a row.");
   var intendedRow=parseFloat(rowNum);
   cdg.deleteRow(intendedRow);
-  
+
 
 }
 function _resize() {
@@ -155,7 +196,7 @@ _resize();
 window.addEventListener('resize', _resize);
 var click_ctr=0;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
-  
+
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
   // console.log(click_ctr);
@@ -202,7 +243,7 @@ function parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual){
             checkcolval=tempcolarray[m];
           }
         }
-      
+
       if(data["sdd"]["Dictionary Mapping"][keyword][index]["column"]==rowval && colval==checkcolval){
           for(var n=0;n<data["sdd"]["Dictionary Mapping"][keyword][index][colval].length;n++){
             var temp=[];
@@ -210,11 +251,86 @@ function parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual){
             temp.push(data["sdd"]["Dictionary Mapping"][keyword][index][colval][n].value);
             menuoptns.push(temp);
           }
-      
-      }    
-     
+
+      }
+
      menuoptns=menuoptns.sort(sortByStar);
      createNewMenu(menuoptns,colval,isVirtual);
+}
+
+function getSuggestion(){
+   var getJSON = function(url, callback) {
+
+      // Generate data dictionary map be reading DD in
+      var dataDictionary = []
+      var oReq = new XMLHttpRequest();
+      oReq.open("GET", dd_url, true);
+      oReq.responseType = "arraybuffer";
+
+      oReq.onload = function(e) {
+         var arraybuffer = oReq.response;
+
+         /* convert data to binary string */
+         var data = new Uint8Array(arraybuffer);
+         var arr = new Array();
+         for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
+         var bstr = arr.join("");
+
+         /* Call XLSX */
+         var workbook = XLSX.read(bstr, {
+             type: "binary"
+         });
+
+         /* Get worksheet */
+         var worksheet = workbook.Sheets[workbook.SheetNames[2]];
+         var xlarray=XLSX.utils.sheet_to_json(worksheet, {
+             raw: true
+         });
+
+         // Generate data dictionary
+         for(var i=0; i<xlarray.length; i++){
+            dataDictionary.push(
+               {
+                  "column": xlarray[i]['VARNAME '],
+                  "description": xlarray[i]['VARDESC ']
+               }
+            );
+         }
+
+         // Generating Suggestion Request
+         var request = {}
+         request["source-urls"] = ["http://semanticscience.org/resource/"];
+         request["N"] = 4;
+         request["data-dictionary"] = dataDictionary
+         console.log(request);
+
+         var xhr = new XMLHttpRequest();
+         xhr.open("POST", url);
+         xhr.setRequestHeader("Content-Type", "application/json")
+         xhr.setRequestHeader("cache-control", "no-cache");
+         xhr.responseType = 'json';
+         xhr.onload = function() {
+             var status = xhr.status;
+             if (status == 200) {
+                 callback(null, xhr.response);
+             } else {
+                 callback(status);
+             }
+         };
+         xhr.send(JSON.stringify(request));
+
+      }
+      oReq.send();
+   };
+
+   getJSON("http://127.0.0.1:5000/populate-sdd",  function(err, data) {
+      if (err != null) {
+         console.error(err);
+      }
+      else {
+         sdd_suggestions = data
+      }
+   });
 }
 
 function jsonparser(colval,rowval,menuoptns,isVirtual){
@@ -238,7 +354,7 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
   if (err != null) {
       console.error(err);
   }
-  
+
   else {
     if(rowval.startsWith("??")){
       var keyword="virtual-columns";
@@ -275,7 +391,7 @@ function createNewMenu(menuoptns,colval,isVirtual){
     displayMenu(menuoptns.length,isVirtual);
   }
   }
-  
+
 
 
 function displayMenu(sizeOfMenu,isVirtual){
@@ -284,7 +400,7 @@ function displayMenu(sizeOfMenu,isVirtual){
     menu.style.display = "block";
     closeMenu(1);
   }
-  else if (sizeOfMenu==0 && isVirtual==0){ 
+  else if (sizeOfMenu==0 && isVirtual==0){
     closeMenu(isVirtual);
   }
   else if(sizeOfMenu>0 && isVirtual==1){
@@ -292,10 +408,10 @@ function displayMenu(sizeOfMenu,isVirtual){
       menu.style.display = "block";
       closeMenu(0);
     }
-  else if (sizeOfMenu==0 && isVirtual==1){ 
+  else if (sizeOfMenu==0 && isVirtual==1){
     closeMenu(isVirtual);
   }
-  
+
 }
 
 function closeMenu(isVirtual){
@@ -336,8 +452,8 @@ function clearMenu(isVirtual){
     }
   }
 }
-    
-  
+
+
   function sortByStar(a,b){
     if (a[0] === b[0]) {
       return 0;
@@ -353,7 +469,7 @@ function clearTextbox(){
 }
 function DDExceltoJSON(dd_url,varnameElement){
 
-  
+
    var oReq = new XMLHttpRequest();
    oReq.open("GET", dd_url, true);
    oReq.responseType = "arraybuffer";
@@ -366,13 +482,13 @@ function DDExceltoJSON(dd_url,varnameElement){
       var arr = new Array();
       for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
       var bstr = arr.join("");
-      
+
       /* Call XLSX */
       var workbook = XLSX.read(bstr, {
           type: "binary"
       });
 
-      
+
       var first_sheet_name = workbook.SheetNames[2];
       /* Get worksheet */
       var worksheet = workbook.Sheets[first_sheet_name];
@@ -387,10 +503,10 @@ function DDExceltoJSON(dd_url,varnameElement){
           document.getElementById("varDescription").value=xlarray[indx]['VARDESC '];
 
         }
-        
+
       }
   }
-  
+
   oReq.send();
 
 
@@ -399,7 +515,7 @@ function DDExceltoJSON(dd_url,varnameElement){
 
 var closebtns = document.getElementsByClassName("remove");
   var i;
-  
+
   for (i = 0; i < closebtns.length; i++) {
     closebtns[i].addEventListener("click", function() {
       this.parentElement.style.display = 'none';
