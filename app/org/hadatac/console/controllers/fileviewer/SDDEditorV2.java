@@ -14,6 +14,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
+import play.libs.Json;
 
 
 
@@ -80,25 +81,39 @@ public class SDDEditorV2 extends Controller {
     //     return new Result(200);
     // }
 
-    public List<String> getCart(){
-        return currentCart;
+    public Result getCart(){
+        return ok(Json.toJson(currentCart));
     }
 
     public Result addToCart(String ontology){
-        currentCart.add(ontology);
-        for(int i=0;i<currentCart.size();i++){
-            System.out.println(currentCart.get(i));
+        if(currentCart.contains(ontology)){
+            System.out.println("This item already exists");
         }
+        else{
+            currentCart.add(ontology);
+        }
+        
         return new Result(200);
     }
 
-    public Result removeFromCart(String ontology){
-        currentCart.remove(ontology);
-        return new Result(200);
+    public Result removeFromCart(String item){
+        System.out.println(item);
+       currentCart.remove(item);
+       for(int i=0;i<currentCart.size();i++){
+           System.out.println(currentCart.get(i));
+       }
+       System.out.println(currentCart);
+        return ok(Json.toJson(currentCart));
     }
     public Result sizeOfCart(int cartamount){
-        cart_amount= currentCart.size();
+        cartamount= currentCart.size();
+        System.out.println(cartamount);
+        return ok(Json.toJson(cartamount));
         
-        return new Result(200);
+    }
+    public Result clearCart(){
+        currentCart.clear();
+        return ok(Json.toJson(currentCart));
+        
     }
 }
