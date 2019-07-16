@@ -13,11 +13,20 @@ import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.NameSpace;
 
 public class LoadDPLTest extends StepTest{
 	private static LoadDPLTest test = new LoadDPLTest();
+	
+	private final int PAGESIZE = 20;
+	private final int OFFSET = 0;
+	private final int PLATFORMSIZE = 2;
+	private final String NAME1 = "Measurement from Instrument";
+	private final String NAME2 = "Elicitation from Human";
+	private final String TYPE1 = "Platform";
+	private final String TYPE2 = "human";
 	
 	private LoadDPLTest() {}
 	
@@ -78,6 +87,19 @@ public class LoadDPLTest extends StepTest{
 		//check existence of DPL in processed_csv
 		File dplProcessed = new File("processed_csv/DPL-CHEAR-v2.xlsx");
 		assertTrue("Fail to detect processed_csv/DPL-CHEAR-v2.xlsx after loading DPL", dplProcessed.exists());
+		
+		System.out.println("[Step 4] DPL process file check pass.");
+		
+		//check platforms
+		List<Platform> platforms = Platform.findWithPages(PAGESIZE, OFFSET * PAGESIZE);
+		assertTrue(String.format("Incorrect size of platforms after loading DPL. Should be %d, but was %d.", PLATFORMSIZE, platforms.size()), PLATFORMSIZE == platforms.size());
+		
+		assertTrue(String.format("Incorrect platforms[0] label after loading DPL. Should be %s, but was %s", NAME1, platforms.get(0).getLabel()), platforms.get(0).getLabel().equals(NAME1));
+		assertTrue(String.format("Incorrect platforms[0] type after loading DPL. Should be %s, but was %s", TYPE1, platforms.get(0).getTypeLabel()), platforms.get(0).getTypeLabel().equals(TYPE1));
+		assertTrue(String.format("Incorrect platforms[1] label after loading DPL. Should be %s, but was %s", NAME2, platforms.get(1).getLabel()), platforms.get(1).getLabel().equals(NAME2));
+		assertTrue(String.format("Incorrect platforms[1] type after loading DPL. Should be %s, but was %s", TYPE2, platforms.get(1).getTypeLabel()), platforms.get(1).getTypeLabel().equals(TYPE2));
+
+		System.out.println("[Step 4] DPL Platform check pass.");
 		
 		System.out.println("[Step 4] Load DPL Test Pass.");
 	}
