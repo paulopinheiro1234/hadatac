@@ -43,16 +43,16 @@ loadedList : List[String]
       border-radius:50%;
       width:53px;
       height:53px;
-      background-color: rgb(173, 217, 253); 
+      background-color: rgb(173, 217, 253);
       }
-    
+
     .cartbutton{
       position:relative;
       display:inline-block;
     }
     .cartbutton:hover .cart-content{
         display:block;
-    
+
     }
     .cartbutton:hover .addtocart{
         background-color: cornflowerblue;
@@ -63,14 +63,14 @@ loadedList : List[String]
         box-shadow:1px 1px 5px rgba(0,0,0,1);
         font-family: Arial, Helvetica, sans-serif;
         text-align: center;
-        font-weight: bold; 
+        font-weight: bold;
         padding:5px;
         width:150px;
         display:none;
         position: fixed;
         z-index: 999999;
         margin-top:0px;
-        
+
     }
     .custom-cm__item{
         cursor: pointer;
@@ -101,7 +101,7 @@ loadedList : List[String]
       float:right;
       top: 5px;
       z-index:9999;
-      
+
 
   }
 
@@ -134,15 +134,15 @@ loadedList : List[String]
   padding: 5px 8px;
   text-decoration: none;
   display: block;
-  
+
 }
 .cart-content a:hover{
   color: black;
   padding: 5px 8px;
   text-decoration: none;
   display: block;
-  
- 
+
+
 }
 .cartitem{
     font-family: Arial, Helvetica, sans-serif;
@@ -152,8 +152,8 @@ background-color:lightgrey;
 }
 
 
-      
-  
+
+
 </style>
 
 <script type="text/javascript">
@@ -194,20 +194,29 @@ function checkform() {
               <div class="form-group">
                   <div style="display: inline-block;">
                       <input type="text"  id="searchValue" name="searchValue" value="">
-                      <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm" id="findTerm">    
+                      <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm" id="findTerm">
                           <span class="glyphicon glyphicon-search">   </span> Find Term
-                      </button> 
+                      </button>
+
+                      <button type="button" class="btn btn-info btn-sm" role="button" type="findPrev" id="findPrev">
+                         <span class="glyphicon glyphicon-circle-arrow-left">   </span> Find Previous
+                      </button>
+
+                      <button type="button" class="btn btn-info btn-sm" role="button" type="findNext" id="findNext">
+                          <span class="glyphicon glyphicon-circle-arrow-right">   </span> Find Next
+                      </button>
+
                   </div>
                   <button type="button" class="btn btn-info btn-sm" role="button" type="expand" id="expand" style="display: inline-block;">
                       <span class="glyphicon glyphicon-zoom-in">  </span> Expand All
                   </button>
-                  <button type="button" class="btn btn-info btn-sm" role="button" type="collapse" id="collapse" style="display: inline-block;">    
+                  <button type="button" class="btn btn-info btn-sm" role="button" type="collapse" id="collapse" style="display: inline-block;">
                       <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All
                   </button>
-                  <button type="button" class="btn btn-info btn-sm" role="button" type="reset" id="reset" style="display: inline-block;">       
+                  <button type="button" class="btn btn-info btn-sm" role="button" type="reset" id="reset" style="display: inline-block;">
                       <span class="glyphicon glyphicon-refresh">  </span> Reset
                   </button>
-                 
+
                   <div class="cartbutton" id="cart_button">
                           <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
                               <div class="cart_count" id="cartctr" value=''></div>
@@ -218,34 +227,34 @@ function checkform() {
                         <!-- <li class="cartitem" id="cart_item">Item 2<span class="remove">&times;</span></li>
                         <li class="cartitem" id="cart_item">Item 3<span class="remove">&times;</span></li> -->
                         </ul>
-                          
+
                   </div>
-                
-                  
-                  
+
+
+
               </div>
-  
+
               <div class="form-group" style="display:none">
                   <input type="hidden" class="form-control col-sm-6" id="newEntity" name="newEntity" value="" readonly>
-              </div> 
-              
+              </div>
+
               <div class="form-group" style="display:none">
                   <input type="hidden" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="" readonly>
               </div>
-          
-          
+
+
               <div class="form-group" style="display:none">
                   <input type="hidden" class="form-control col-sm-6" id="newUnit" name="newUnit" value="" readonly>
               </div>
-          
+
               <div class="form-group" style="display:none">
                   <input class="btn btn-success btn-sm" role="button" type="hidden" id="submit" value="Update DASA" />
                   <input class="btn btn-success btn-sm" role="button" type="hidden" id="copyvalue" value="Copy Selected Value" /> <br>
-              </div> 
-      
+              </div>
+
           </form>
     </div>
-    
+
     <div class="col-md-2 col-xs-2">
       <h4>Loaded Ontologies</h4>
       @for(loadedFile <- loadedList) {
@@ -261,7 +270,7 @@ function checkform() {
               <treecontent></treecontent>
               <div class="tab-pane" id="entity_tab">
                   <div id="entityquery" data-results="@hierarchy.treeResults"></div>
-                  
+
               </div>
               <ul class="custom-cm">
                   <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height=20px/> Add to Cart</a> </li>
@@ -269,11 +278,11 @@ function checkform() {
 
               </ul>
           </div>
-          
+
           <script src="/hadatac/assets/javascripts/jquery.min.js"></script>
           <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
           <script src="/hadatac/assets/javascripts/bootstrap.min.js"></script>
-         
+
 
           <script>
               $.ajaxSetup ({
@@ -283,10 +292,10 @@ function checkform() {
               });
 
               $.getScript("/hadatac/assets/javascripts/treeEntity.js");
-              
+
               $(".entitytab").click(function() {
                   $.getScript("/hadatac/assets/javascripts/treeEntity.js");
-                  
+
               })
           </script>
 
@@ -323,5 +332,5 @@ function checkform() {
     </div>
 
  </div>
-   
+
 }
