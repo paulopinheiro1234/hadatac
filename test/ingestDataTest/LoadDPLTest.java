@@ -12,10 +12,14 @@ import java.util.List;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.Deployment;
+import org.hadatac.entity.pojo.Instrument;
+import org.hadatac.entity.pojo.InstrumentType;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.NameSpace;
+import org.hadatac.utils.State;
 
 public class LoadDPLTest extends StepTest{
 	private static LoadDPLTest test = new LoadDPLTest();
@@ -23,10 +27,13 @@ public class LoadDPLTest extends StepTest{
 	private final int PAGESIZE = 20;
 	private final int OFFSET = 0;
 	private final int PLATFORMSIZE = 2;
-	private final String NAME1 = "Measurement from Instrument";
-	private final String NAME2 = "Elicitation from Human";
-	private final String TYPE1 = "Platform";
-	private final String TYPE2 = "human";
+	private final String PLATFORMNAME1 = "Measurement from Instrument";
+	private final String PLATFORMNAME2 = "Elicitation from Human";
+	private final String PLATFORMTYPE1 = "Platform";
+	private final String PLATFORMTYPE2 = "human";
+	private final int DEPLOYMENTSIZE = 2;
+	private final String DEPLOYMENTINS1 = "Generic Instrument";
+	private final String DEPLOYMENTINS2 = "Generic Questionnaire";
 	
 	private LoadDPLTest() {}
 	
@@ -94,12 +101,35 @@ public class LoadDPLTest extends StepTest{
 		List<Platform> platforms = Platform.findWithPages(PAGESIZE, OFFSET * PAGESIZE);
 		assertTrue(String.format("Incorrect size of platforms after loading DPL. Should be %d, but was %d.", PLATFORMSIZE, platforms.size()), PLATFORMSIZE == platforms.size());
 		
-		assertTrue(String.format("Incorrect platforms[0] label after loading DPL. Should be %s, but was %s", NAME1, platforms.get(0).getLabel()), platforms.get(0).getLabel().equals(NAME1));
-		assertTrue(String.format("Incorrect platforms[0] type after loading DPL. Should be %s, but was %s", TYPE1, platforms.get(0).getTypeLabel()), platforms.get(0).getTypeLabel().equals(TYPE1));
-		assertTrue(String.format("Incorrect platforms[1] label after loading DPL. Should be %s, but was %s", NAME2, platforms.get(1).getLabel()), platforms.get(1).getLabel().equals(NAME2));
-		assertTrue(String.format("Incorrect platforms[1] type after loading DPL. Should be %s, but was %s", TYPE2, platforms.get(1).getTypeLabel()), platforms.get(1).getTypeLabel().equals(TYPE2));
+		assertTrue(String.format("Incorrect platforms[0] label after loading DPL. Should be %s, but was %s", PLATFORMNAME1, platforms.get(0).getLabel()), platforms.get(0).getLabel().equals(PLATFORMNAME1));
+		assertTrue(String.format("Incorrect platforms[0] type after loading DPL. Should be %s, but was %s", PLATFORMTYPE1, platforms.get(0).getTypeLabel()), platforms.get(0).getTypeLabel().equals(PLATFORMTYPE1));
+		assertTrue(String.format("Incorrect platforms[1] label after loading DPL. Should be %s, but was %s", PLATFORMNAME2, platforms.get(1).getLabel()), platforms.get(1).getLabel().equals(PLATFORMNAME2));
+		assertTrue(String.format("Incorrect platforms[1] type after loading DPL. Should be %s, but was %s", PLATFORMTYPE2, platforms.get(1).getTypeLabel()), platforms.get(1).getTypeLabel().equals(PLATFORMTYPE2));
 
 		System.out.println("[Step 4] DPL Platform check pass.");
+		
+		List<Instrument> instruments = Instrument.find();
+		System.out.println("Instruments Size: "+instruments.size());
+		for(Instrument ins : instruments)
+		{
+			System.out.println("Instrument: Name: "+ins.getLabel() + " Type: "+ins.getTypeLabel());
+		}
+		List<InstrumentType> instrumentTypes = InstrumentType.find();
+		for(InstrumentType insT : instrumentTypes)
+		{
+			System.out.println("Instrument Type: Name: "+insT.getLabel()+" SuperClass: "+insT.getSuperLabel());
+		}
+		System.out.println("[Step 4] DPL Instrument check pass.");
+		
+		List<Deployment> deployments = Deployment.findWithPages(new State(State.ACTIVE), PAGESIZE, OFFSET * PAGESIZE);
+		assertTrue(String.format("Incorrect size of deployments after loading DPL. Should be %d, but was %d.", DEPLOYMENTSIZE, deployments.size()), DEPLOYMENTSIZE == deployments.size());
+		
+		assertTrue(String.format("Incorrect deployments[0] platform label after loading DPL. Should be %s, but was %s", PLATFORMNAME1, deployments.get(0).getPlatform().getLabel()), deployments.get(0).getPlatform().getLabel().equals(PLATFORMNAME1));
+		assertTrue(String.format("Incorrect deployments[0] instrument label after loading DPL. Should be %s, but was %s", DEPLOYMENTINS1, deployments.get(0).getInstrument().getLabel()), deployments.get(0).getInstrument().getLabel().equals(DEPLOYMENTINS1));
+		assertTrue(String.format("Incorrect deployments[1] platform label after loading DPL. Should be %s, but was %s", PLATFORMNAME2, deployments.get(1).getPlatform().getLabel()), deployments.get(1).getPlatform().getLabel().equals(PLATFORMNAME2));
+		assertTrue(String.format("Incorrect deployments[1] instrument label after loading DPL. Should be %s, but was %s", DEPLOYMENTINS2, platforms.get(1).getTypeLabel()), deployments.get(1).getInstrument().getLabel().equals(DEPLOYMENTINS2));
+
+		System.out.println("[Step 4] DPL Deployment check pass.");
 		
 		System.out.println("[Step 4] Load DPL Test Pass.");
 	}

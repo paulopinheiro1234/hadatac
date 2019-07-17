@@ -15,6 +15,7 @@ public class LoadSTDTest extends StepTest{
 	@Override
 	public void test() {
 		System.out.println("Step5: Not yet implemented");
+		//TODO: delete all files in unprocessed_csv
 		
 	}
 
