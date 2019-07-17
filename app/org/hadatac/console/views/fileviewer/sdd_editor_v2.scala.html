@@ -61,23 +61,34 @@
       
       </div>
       <script>
-        $.ajax({
-           type : 'GET',
-           url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
-           data : {
-              //  s: str
-           },
-           success : function(data) {
-             var select=document.getElementById("seecart"),data;
-             for(var i=0;i<data.length;i++){  
-                var li = document.createElement("li");                
-                li.appendChild(document.createTextNode(data[i]+" "));
-                select.appendChild(li);
-                
-               }
-           }
-       });
-       
+      //   var newOntology;
+      //   $.ajax({
+      //      type : 'GET',
+      //      url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+      //      data : {
+      //         //  s: str
+      //      },
+      //      success : function(data) {
+             
+      //        var select=document.getElementById("seecart"),data;
+      //        for(var i=0;i<data.length;i++){  
+      //           var li = document.createElement("li");                
+      //           li.appendChild(document.createTextNode(data[i]+" "));
+      //           li.setAttribute("class","inCart");
+      //           select.appendChild(li);
+      //           li.addEventListener("click",function(e){
+      //             alert(e.target.innerHTML);
+      //             newOntology=e.target.innerHTML;
+      //           })
+                                
+      //          }
+               
+      //      }
+      //  });
+      //  cdg.addEventListener("click",function(e){
+      //            e.cell.value=newOntology;
+      //            //cdg.data[rowNum][colNum]
+      //          })
      </script>
 
         

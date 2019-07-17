@@ -105,7 +105,19 @@ cdg.addEventListener('click', function (e) {
     //starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
     jsonparser(colval,rowval,menuoptns,isVirtual);
   }
+  
+  //newOntology="";
 });
+// function addFromCart(newOntology){
+//   cdg.addEventListener("click",function(e){
+//     colN=e.cell.columnIndex;
+//     rowN=e.cell.rowIndex;
+//     cdg.data[rowN][colN]=newOntology;
+    
+//     cdg.draw();
+//     newOntology=e.cell.value;
+//   })
+// }
 cdg.addEventListener('endedit',function(e){
   if (!e.cell) { return; }
   console.log("EditEnded");

@@ -362,7 +362,7 @@
     if (document.addEventListener) { // IE >= 9; other browsers
        document.addEventListener('contextmenu', function(e) {
        
-          onto=(e.target.__data__.name.split("[")[0])+(e.target.__data__.name.split("[")[1].split("]")[0]);
+          onto=(e.target.__data__.name.split(" [")[0])+","+(e.target.__data__.name.split("[")[1].split("]")[0]);
           e.preventDefault();
           showContextMenu();
           positionMenu(e);

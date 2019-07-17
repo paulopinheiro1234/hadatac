@@ -221,6 +221,14 @@ ul {
 .cartitem :hover,dropbtn:focus{
 background-color:lightgrey;
 }
+.inCart{
+  cursor:pointer;
+  color: red;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.inCart :hover,dropbtn:focus{
+  background-color:blue;
+}
 /*-----------------------------------------------------*/
 .recommended{
   justify-content: center;
@@ -252,54 +260,6 @@ background-color:lightgrey;
   text-align: center;
   background-color: rgb(173, 217, 253);
   }
+/*============================================================*/
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-
-.remove {
-  cursor: pointer;
-  position: absolute;
-  top: 0%;
-  right: 0%;
-  padding: 1px;
-  transform: translate(0%, -50%);
-}
-
-.remove:hover {background: #bbb;}
-.submitOntologies{
-  background-color: #bbb;
-  text-align: center;
-  font-size: 10pt;
-  font-family: Arial, Helvetica, sans-serif;
-  border-color: transparent;
-  
-}
-.submitOntologies:hover {background:rgb(134, 130, 130);} */
