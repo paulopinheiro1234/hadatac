@@ -13,14 +13,6 @@ public class LoadSDDTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPre() {
-		System.out.print("Step7: Pre-step Verification......");
-		assertTrue("Failed.", Verify.verifyLoadSSD());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step7: Not yet implemented");
 		

@@ -2,10 +2,13 @@
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.swing.JFrame;
 
 import org.junit.Test;
 
@@ -46,7 +49,7 @@ public class IngestDataTest {
 	public void test() throws IOException
 	{
 		loadTest();
-		int step = 0;
+		int step;
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(StepTest.FILEPATH));
 			step = Integer.parseInt(reader.readLine());
@@ -55,6 +58,9 @@ public class IngestDataTest {
 			fail(e.getMessage());
 		}
 
+		//UI not implemented yet
+		//due to unavailability of System.in stream under sbt mode
+		
 		/*System.out.println("You have currently arrived Test Step: " + step);
 		System.out.println("0: Reinitialize the step.");
 		System.out.println("1: SupportOntologyTest.");
@@ -76,6 +82,7 @@ public class IngestDataTest {
 		{
 			System.out.print("Choose a test option:");
 			System.out.println("\nUI implementation not completed. Choose \"all\" automatically.");
+			/*String cmd = scan.nextLine();*/
 			String cmd = "all";
 			if(cmd.equals("q"))
 			{
@@ -116,5 +123,7 @@ public class IngestDataTest {
 		{
 			test.execute();
 		}
+		//tests.get(4).execute();
+		System.out.println("\nCongratulation: IngestDataTest Pass.");
 	}
 }
