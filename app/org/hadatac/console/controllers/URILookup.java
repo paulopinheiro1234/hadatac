@@ -1,4 +1,4 @@
-package org.hadatac.console.controllers.lookup;
+package org.hadatac.console.controllers;
 
 import play.data.Form;
 import play.mvc.Controller;
@@ -29,9 +29,9 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class URILookup extends Controller {
 
-	@Inject
+    @Inject
 	private FormFactory formFactory;
-	
+    	
 	public Result index(String mode, String message) {
         return ok(uriLookup.render(mode, message)); 
     }
@@ -61,10 +61,14 @@ public class URILookup extends Controller {
     	}
     	
 		newURI = URIUtils.replacePrefixEx(newURI);
+		return processUri(mode, newURI);
+    }
 
-		//System.out.println("Input value: [" + data.getField() + "]   " + newURI);
-    	
-    	GenericInstance thingInstance = GenericInstance.find(newURI);
+	public Result processUri(String mode, String uri) {
+
+		System.out.println("Input value: [" + uri + "]");
+   
+    	GenericInstance thingInstance = GenericInstance.find(uri);
     	
     	if (thingInstance != null) {
     		Platform pt = Platform.find(thingInstance.getUri());
@@ -86,7 +90,7 @@ public class URILookup extends Controller {
     	}
 
     	HADatAcClass thingClass = new HADatAcClass(HADatAcThing.OWL_THING);
-    	thingClass = thingClass.findGeneric(newURI);
+    	thingClass = thingClass.findGeneric(uri);
 
     	if (thingClass != null) {
         	return ok(uriLookupClassResponse.render(mode, thingClass));

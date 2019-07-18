@@ -16,6 +16,7 @@
        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
        <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
        <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
+       <script type="text/javascript" src="@org.hadatac.console.controllers.routes.JS.jsRoutesMain"></script>
        <script type="text/javascript">
   		  var mapLabelUri = '@labelUri';
           var str = mapLabelUri.replace(/&quot;/g,'"')
@@ -23,19 +24,34 @@
                                .replace(/-/g,'')
                                .replace(/'/g,'\"');
 		  var mapL = JSON.parse(str);
+    	  var mode = '';
+    	  var item;
           d3.selectAll(".node")
             .on('mouseover', function (d,i){
-               var item = d.name.replace(/\W/g, '')
+               item = d.name.replace(/\W/g, '')
                                 .replace(/-/g,'');
-               //var item = d.name;
                var infobox = document.getElementById('info');
     		   if (mapL[item]) {
-    		        /*
-  					$.ajax({url: "(mapL[item])", success: function(result){
-    					infobox.innerHTML = result;
-  					}});
+					jsRoutesMain.org.hadatac.console.controllers.URILookup.processUri(mode, mapL[item]).ajax({
+    					success: function(result) { 
+    						infobox.innerHTML = result;
+    					}
+    				});
+    				/*
+    				$.ajax({
+    				    url: "org.hadatac.console.controllers.routes.URILookup.processUri",
+    				    data: {
+    				    	mode: "",
+    				    	uri: mapL[item]
+    				    },
+    				    success: function(result){
+    					    infobox.innerHTML = result;
+  						}
+  					});
   					*/
+					/*  			        
     		   		infobox.innerHTML = mapL[item];
+					*/
     		   } else {
                		infobox.innerHTML = item;
                }

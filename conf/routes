@@ -15,9 +15,10 @@ GET     /hadatac/sandbox                               org.hadatac.console.contr
 POST    /hadatac/sandbox                               org.hadatac.console.controllers.sandbox.Sandbox.postIndex()
 GET     /hadatac/sandbox/startmode                     org.hadatac.console.controllers.sandbox.Sandbox.startSandboxMode()
 GET     /hadatac/sandbox/exitmode                      org.hadatac.console.controllers.sandbox.Sandbox.exitSandboxMode()
-GET     /hadatac/URILookup                             org.hadatac.console.controllers.lookup.URILookup.index(mode : String, message : String)
-POST    /hadatac/URILookup                             org.hadatac.console.controllers.lookup.URILookup.postIndex(mode : String, message : String)
-POST 	/hadatac/URILookup/form	                       org.hadatac.console.controllers.lookup.URILookup.processForm(mode : String)
+GET     /hadatac/URILookup                             org.hadatac.console.controllers.URILookup.index(mode : String, message : String)
+POST    /hadatac/URILookup                             org.hadatac.console.controllers.URILookup.postIndex(mode : String, message : String)
+POST 	/hadatac/URILookup/form	                       org.hadatac.console.controllers.URILookup.processForm(mode : String)
+GET 	/hadatac/URILookup/uriform       	           org.hadatac.console.controllers.URILookup.processUri(mode : String, uri : String)
 GET	    /hadatac/knowledgegraph                        org.hadatac.console.controllers.kg.KnowledgeGraphBrowser.index(autoRefresh : Boolean, hasOntologies : Boolean, hasIndicators : Boolean, hasDeployments : Boolean, hasSDDs : Boolean, hasDASpecs : Boolean)
 POST    /hadatac/knowledgegraph                        org.hadatac.console.controllers.kg.KnowledgeGraphBrowser.postIndex(autoRefresh : Boolean, hasOntologies : Boolean, hasIndicators : Boolean, hasDeployments : Boolean,  hasSDDs : Boolean, hasDASpecs : Boolean)
 GET	    /hadatac/acquisitions                          org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.index(start: Int ?= 1, rows: Int ?= 15)
@@ -115,7 +116,6 @@ POST	/hadatac/stats/ont		                       org.hadatac.console.controllers.
 # Authorization URLs
 GET     /hadatac/auth                                  org.hadatac.console.controllers.AuthApplication.index
 GET     /hadatac/restricted                            org.hadatac.console.controllers.AuthApplication.restricted
-GET     /hadatac/assets/javascript/routes.js           org.hadatac.console.controllers.AuthApplication.jsRoutes
 GET     /hadatac/profile                               org.hadatac.console.controllers.AuthApplication.profile
 GET     /hadatac/login                                 org.hadatac.console.controllers.AuthApplication.login
 POST    /hadatac/login                                 org.hadatac.console.controllers.AuthApplication.doLogin
@@ -523,6 +523,9 @@ GET     /hadatac/api/measurements/dpl/:studyuri/:variableuri/:dpluri/timerange  
 GET     /hadatac/api/measurements/dpl/:studyuri/:variableuri/:dpluri/:fromdatetime/:todatetime  org.hadatac.console.controllers.restapi.RestApi.getMeasurementsForDplInPeriod(studyuri: String, variableuri: String, dpluri: String, fromdatetime: String, todatetime: String)
 GET     /hadatac/api/measurements/:studyuri/:variableuri                                        org.hadatac.console.controllers.restapi.RestApi.getMeasurements(studyuri: String, variableuri: String)
 
+# JavaScript Routing
+GET     /hadatac/assets/javascript/routesMain.js       org.hadatac.console.controllers.JS.jsRoutesMain()
+GET     /hadatac/assets/javascript/routes.js           org.hadatac.console.controllers.AuthApplication.jsRoutes
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /hadatac/assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
