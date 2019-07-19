@@ -475,7 +475,7 @@
             success : function(data) {
                 updateCartCounter();
                 ct++;
-                createMenu(ct);
+                //createMenu(ct);
             }
         });
 
@@ -502,6 +502,74 @@
         });
 
      }
+
+     document.getElementById("cart_button").onclick = function() {
+        $.ajax({
+            type : 'GET',
+
+            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+            data : {
+                //cartamount: cart_ctr
+            },
+            success : function(data) {
+             console.log(data);
+                
+                
+            var select=document.getElementById("seecart"),data;
+            for(var i=0;i<data.length;i++){
+                var span = document.createElement("span");
+                span.innerHTML = '&times;';
+                var li = document.createElement("li");
+                span.setAttribute("class", "remove");
+
+                li.appendChild(document.createTextNode(data[i]+" "));
+                li.appendChild(span);
+                select.appendChild(li);
+                span.onclick = function() { 
+                    var str=this.parentElement.innerText;
+                    a = str.split("\n");
+                    removeCartItem(a[0]);
+                    select[i].parentNode.removeChild(select[i]);
+                    //this.parentElement.style.display='none';
+                
+                 }
+            };
+            
+            var x = document.getElementsByClassName("cart-content");
+            
+            for (var i=0; i < x.length; i++) {
+                x[i].style.display = 'block';
+            }
+            window.addEventListener("click",function(){
+                var x = document.getElementsByClassName("cart-content");
+            
+                for (var i=0; i < x.length; i++) {
+                    x[i].style.display = 'none';
+                } 
+                
+
+                var li = document.querySelectorAll('.cart-content > li');
+                var listLength = li.length;
+
+                for (var i = listLength-1; i >=1 ; i--) {
+                    li[i].parentNode.removeChild(li[i]);   
+                }
+            })
+            }
+            
+            
+
+
+            
+        });
+     }
+
+
+
+
+
+
+
      function removeCartItem(itemToBeRemoved){
         $.ajax({
             type : 'GET',
@@ -521,37 +589,38 @@
      }
 
 
-    function createMenu(ct){
-        $.ajax({
-            type : 'GET',
+    // function createMenu(ct){
+    //     $.ajax({
+    //         type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
-            data : {
-                //cartamount: cart_ctr
-            },
-            success : function(data) {
-                console.log("ct: ",ct);
-                console.log(data);
-                var select=document.getElementById("seecart"),data;
-                for(var i=ct;i<data.length;i++){
-                    var span = document.createElement("span");
-                    span.innerHTML = '&times;';
-                    var li = document.createElement("li");
-                    span.setAttribute("class", "remove");
+    //         url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+    //         data : {
+    //             //cartamount: cart_ctr
+    //         },
+    //         success : function(data) {
+    //             console.log("ct: ",ct);
+    //             console.log(data);
+    //             var select=document.getElementById("seecart"),data;
+    //             for(var i=ct;i<data.length;i++){
+    //                 var span = document.createElement("span");
+    //                 span.innerHTML = '&times;';
+    //                 var li = document.createElement("li");
+    //                 span.setAttribute("class", "remove");
 
-                    li.appendChild(document.createTextNode(data[i]+" "));
-                    li.appendChild(span);
-                    select.appendChild(li);
-                    span.onclick = function() { this.parentElement.style.display='none';
-                    removeCartItem(data[i-1]);
-                    //updateCartCounter()
-                };
-                }
+    //                 li.appendChild(document.createTextNode(data[i]+" "));
+    //                 li.appendChild(span);
+    //                 select.appendChild(li);
+    //                 span.onclick = function() { this.parentElement.style.display='none';
+    //                 removeCartItem(data[i-1]);
+    //                 createMenu(ct);
+    //                 //updateCartCounter()
+    //             };
+    //             }
 
 
-            }
-        });
-    }
+    //         }
+    //     });
+    // }
 
 
     function color(d) {

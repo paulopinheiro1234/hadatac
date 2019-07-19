@@ -13,6 +13,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
+import org.hadatac.console.controllers.workingfiles.WorkingFiles;
+import org.hadatac.console.views.html.workingfiles.*;
+import org.hadatac.entity.pojo.DataFile;
 
 public class BrowseOntology extends Controller {
 
@@ -25,9 +28,10 @@ public class BrowseOntology extends Controller {
     }
 
     public Result graphIndex(String oper, String className) {
+        List<DataFile> wkFiles = null;
     //System.out.println(className);
     //System.out.println(EditingOptions.getHierarchy(className));
-    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList()));
+    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(), wkFiles));
     }
 
 

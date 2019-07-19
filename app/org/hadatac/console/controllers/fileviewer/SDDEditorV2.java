@@ -22,6 +22,8 @@ public class SDDEditorV2 extends Controller {
     NameSpaces ns = NameSpaces.getInstance();
         List<String> loadedList=ns.listLoadedOntologies();
         List<String> currentCart=new ArrayList<String>();
+        ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
+       // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 
 
@@ -111,9 +113,36 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(cartamount));
         
     }
-    public Result clearCart(){
-        currentCart.clear();
-        return ok(Json.toJson(currentCart));
-        
+
+    public Result addToEdits(String row, String col,String editValue){
+        ArrayList<String> temp = new ArrayList<String>();
+        temp.add(row);
+        temp.add(col);
+        temp.add(editValue);
+        storeEdits.add(temp);
+        //return new Result(200);
+        return ok(Json.toJson(storeEdits));
     }
+
+    // public Result addToEdits(String row,String cellValue){
+    //     ArrayList<String> temp = new ArrayList<String>();
+    //     temp.add(row);
+    //     temp.add(cellValue);
+    //     storeRows.add(temp);
+    //     //return new Result(200);
+    //     return ok(Json.toJson(storeRows));
+    // }
+
+    public Result getEdit(){
+        ArrayList<String> temp=storeEdits.get(storeEdits.size()-1);
+        
+        //String lastKnown=;
+        storeEdits.remove(storeEdits.size()-1);
+        
+        ArrayList<String> lastEdit=storeEdits.get(storeEdits.size()-1);
+        return ok(Json.toJson(lastEdit));
+    }
+
+
+    
 }

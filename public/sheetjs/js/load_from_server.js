@@ -46,7 +46,7 @@ function hideView(){
 }
 
 function changeHeader(){
-   for(var i=0;i<cdg.data[0].length;i++){
+  for(var i=0;i<cdg.data[0].length;i++){
     cdg.schema[i].title = cdg.data[0][cdg.schema[i].name];
   }
 
@@ -80,7 +80,18 @@ var colNum=0;
 var rowNum=0;
 var isVirtual=0;
 cdg.addEventListener('click', function (e) {
+  colNum=e.cell.columnIndex;
+  rowNum=e.cell.rowIndex;
+
+  var colNum_str=colNum.toString();
+  var rowNum_str=rowNum.toString();
   if (!e.cell) { return; }
+  
+  if(e.cell.value==null){
+    cdg.data[rowNum][colNum]=" ";
+    cdg.draw();
+    storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
+  }
 
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
@@ -95,9 +106,6 @@ cdg.addEventListener('click', function (e) {
   }
   closeMenu(isVirtual);
   clearMenu(isVirtual);
-
-  colNum=e.cell.columnIndex;
-  rowNum=e.cell.rowIndex;
 
   if(colNum==0){
     hideView();
@@ -117,29 +125,16 @@ cdg.addEventListener('click', function (e) {
          alert('Requesting Suggestions');
       }
       else{
-         console.log(colval);
-         console.log(rowval);
-         console.log(sdd_suggestions);
          applySuggestion(colval,rowval,menuoptns,isVirtual);
       }
     }
   }
-  
-  //newOntology="";
 });
-// function addFromCart(newOntology){
-//   cdg.addEventListener("click",function(e){
-//     colN=e.cell.columnIndex;
-//     rowN=e.cell.rowIndex;
-//     cdg.data[rowN][colN]=newOntology;
-    
-//     cdg.draw();
-//     newOntology=e.cell.value;
-//   })
-// }
+
 cdg.addEventListener('endedit',function(e){
   if (!e.cell) { return; }
-  console.log("EditEnded");
+  
+  
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
   var rowval=cdg.data[e.cell.rowIndex][0];
@@ -153,6 +148,9 @@ cdg.addEventListener('endedit',function(e){
   }
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
+  var colNum_str=colNum.toString();
+  var rowNum_str=rowNum.toString();
+  storeThisEdit(rowNum_str,colNum_str,e.value);
   var menuoptns=[];
   starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
 })
@@ -160,7 +158,7 @@ cdg.addEventListener('endedit',function(e){
 cdg.addEventListener('click', function (e) {
 
   if (!e.cell) { return; }
-
+  if(e.cell.value==null){return;}
   else{
     colNum=e.cell.columnIndex;
     rowNum=e.cell.rowIndex;
@@ -211,8 +209,23 @@ function insertRowBelow(){
   cdg.insertRow([],intendedRow+1); // The first argument splices a js array into the csv data, so to insert a blank row insert an empty array
 }
 
+var storeRow=[];
 function removeRow(){
-  alert("Warning! You are about to delete a row.");
+  // alert("Warning! You are about to delete a row.");
+  var temp=[];
+  temp.push(rowNum);
+  for(var i=0;i<cdg.data[rowNum].length+1;i++){
+    if(cdg.data[rowNum][i]==null){
+      temp.push(" ");
+    }
+    else{
+      temp.push(cdg.data[rowNum][i]);
+    }
+  }
+ 
+  
+  storeRow=temp;
+  
   var intendedRow=parseFloat(rowNum);
   cdg.deleteRow(intendedRow);
 
