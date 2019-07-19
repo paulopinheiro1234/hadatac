@@ -1,7 +1,8 @@
 @(oper       : String,
 graphName : String,
 hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
-loadedList : List[String]
+loadedList : List[String],
+workingFiles     : List[org.hadatac.entity.pojo.DataFile]
 )
 
 @import org.hadatac.console.views.html._
@@ -50,10 +51,10 @@ loadedList : List[String]
       position:relative;
       display:inline-block;
     }
-    .cartbutton:hover .cart-content{
+    /* .cartbutton:hover .cart-content{
         display:block;
 
-    }
+    } */
     .cartbutton:hover .addtocart{
         background-color: cornflowerblue;
     }

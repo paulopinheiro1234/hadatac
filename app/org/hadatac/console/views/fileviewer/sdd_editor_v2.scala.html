@@ -32,6 +32,9 @@
     <button class="btn btn-primary">Back</button>
       <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
         <input type="text" id="varDescription" value="Description of Column Variable:"/>
+        <div class="undo-edit">
+        <button class="undo-button" onclick="undoEdit()"> <img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="22" height="24" alt=""/> </button>
+        </div>
         <div class= shopbutton>
         <button class="cart" >
                     
@@ -55,48 +58,14 @@
           </button>
       <ul id="seecart" class="cart-content">
       <li class="cartitem" id="cart_item">Cart Items: </span></li>
-      <!-- <li class="cartitem" id="cart_item">Item 2<span class="remove">&times;</span></li>
-      <li class="cartitem" id="cart_item">Item 3<span class="remove">&times;</span></li> -->
       </ul>
       
       </div>
-      <script>
-      //   var newOntology;
-      //   $.ajax({
-      //      type : 'GET',
-      //      url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
-      //      data : {
-      //         //  s: str
-      //      },
-      //      success : function(data) {
              
-      //        var select=document.getElementById("seecart"),data;
-      //        for(var i=0;i<data.length;i++){  
-      //           var li = document.createElement("li");                
-      //           li.appendChild(document.createTextNode(data[i]+" "));
-      //           li.setAttribute("class","inCart");
-      //           select.appendChild(li);
-      //           li.addEventListener("click",function(e){
-      //             alert(e.target.innerHTML);
-      //             newOntology=e.target.innerHTML;
-      //           })
-                                
-      //          }
-               
-      //      }
-      //  });
-      //  cdg.addEventListener("click",function(e){
-      //            e.cell.value=newOntology;
-      //            //cdg.data[rowNum][colNum]
-      //          })
-     </script>
-
-        
       <button class="main-nav" id="show">Show Options</button>
       <button class="Close" id="hide">Hide Options</button>
 
         <div class="mobile-nav">
-          <!-- <p id="effect" style="text-align:center">These are ontologies displayed below:</p> -->
           <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
           <img src="https://clipart.wpblink.com/sites/default/files/wallpaper/bulb-clipart/451480/bulb-clipart-lightbulb-moment-451480-3674232.png"
           width="36" height="30" alt=""/> Recommended Terms</button>
@@ -115,24 +84,8 @@
               <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
               <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
               <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
+              <button class="undo-remove-row" onclick="revertRow()"><img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="15" height="18" alt=""/> </button>
             </div>
-            <!-- <div class="ontologydrop">
-                <button class="cart" onclick="showOntologyList()">
-
-                <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="37" height="35" alt=""/>Ontology Terms</button>
-                <ul id="myDropdown" class="ontologydrop-content">
-                  <li>item 1<span class="remove">&times;</span></li>
-                  <li>item 2<span class="remove">&times;</span></li>
-
-                  <li>item 3<span class="remove">&times;</span></li>
-                  <li>item 4<span class="remove">&times;</span></li>
-
-                  <li>item 5<span class="remove">&times;</span></li>
-                  <button class=submitOntologies>Submit</button>
-
-                </ul>
-            </div> -->
-            
             
         </div>
 
@@ -151,8 +104,6 @@
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
     <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
-    <script src="@controllers.routes.Assets.versioned("javascripts/treeEntity2.js")"></script>
-    <!-- <script src="@controllers.routes.Assets.versioned("javascripts/treeEntity.js")"></script> -->
     
     <script type="text/javascript">
     /* set up async GET request */

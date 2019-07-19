@@ -62,6 +62,10 @@
   margin-left:62px;
 }
 /*=========================================*/
+#editRowsAdd{
+  justify-content: center;
+  text-align: center;
+}
 .insertrowbtn{
   background-color: cornflowerblue;
   font-family:Arial;
@@ -82,7 +86,13 @@
   padding:3px;
 
 }
-
+.undo-remove-row{
+  background-color: rgb(173, 217, 253);
+  width:23px;
+  height:23px;
+  padding: 0;
+}
+/*============================================================*/
 #varDescription{
   width:30%;
   font-size: 11pt;
@@ -105,10 +115,8 @@
 }
 
 .shopbutton{
- 
  position:relative;
  display:inline-block;
-
 }
 .eachOntology{
  font-family: Arial, Helvetica, sans-serif;
@@ -261,5 +269,15 @@ background-color:lightgrey;
   background-color: rgb(173, 217, 253);
   }
 /*============================================================*/
-
-
+.undo-button{
+  margin-bottom: 1px;
+  border:1px solid black;
+  border-radius: 50%;
+  height:35px;
+  width: 35px;
+  background-color: rgb(173, 217, 253);
+}
+.undo-edit{
+position:relative;
+display:inline-block;
+}
