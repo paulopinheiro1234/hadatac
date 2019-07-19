@@ -20,7 +20,7 @@
   }
   @if(platform.getPartOf() != null && !platform.getPartOf().equals("")) {
     <p><b>Part Of</b>: @platform.getPartOfLabel() 
-        (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getPartOf()</a>)</p>
+        (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.ViewInfra.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getPartOf()</a>)</p>
   }
 
   @defining(platform.getImmediateSubPlatforms()) { subPlatforms => 	
@@ -30,7 +30,7 @@
        <ul>  
        @for(sub <- subPlatforms) {
  		  <li>@sub.getLabel()
-          (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(sub.getUri(),"UTF-8"))">@sub.getUri()</a>)
+          (<a href="@org.hadatac.console.controllers.metadata.empirical.routes.ViewInfra.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(sub.getUri(),"UTF-8"))">@sub.getUri()</a>)
           </li>
        }
        </ul>
@@ -42,7 +42,7 @@
   <ul>
 	  @if(platform.getReferenceLayout() != null && !platform.getReferenceLayout().isEmpty()) {
     	<p><b>Reference Layout</b>: @platform.getReferenceLayout() 
-        	(<a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getReferenceLayout()</a>)</p>
+        	(<a href="@org.hadatac.console.controllers.metadata.empirical.routes.ViewInfra.viewPlatform(dir, fileId, da_uri, URLEncoder.encode(platform.getPartOf(),"UTF-8"))">@platform.getReferenceLayout()</a>)</p>
   	  }
   	  <table class="table">
    		<thead>

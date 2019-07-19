@@ -1,0 +1,26 @@
+@(mode       : String,
+  classThing : org.hadatac.entity.pojo.HADatAcClass)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.entity.pojo.HADatAcClass
+@import java.net._
+
+@if(!mode.equals("PLAIN")) {
+   @main("Class Lookup") {
+     <div>
+        <h3>Class Lookup</h3>
+        <p><b>URI</b>: @classThing.getUri() </p>
+        <p><b>Name</b>: @classThing.getLabel() </p>
+        <br>
+        <a href="@org.hadatac.console.controllers.routes.URILookup.index(mode, "")" class="btn btn-primary" role="button">Lookup another URI</a>
+        <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+      </div>
+   }
+} else {
+   <div>
+     <h3>Class Lookup</h3>
+     <p><b>URI</b>: @classThing.getUri() </p>
+     <p><b>Name</b>: @classThing.getLabel() </p>
+   </div>
+}

@@ -36,7 +36,7 @@ public class MetadataEntry extends Controller {
         }
 
         Map<String, String> indicators = DynamicFunctions.getIndicatorTypes();
-        Map<String, List<String>> values = DynamicFunctions.getIndicatorValuesJustLabels(indicators);
+        Map<String, List<String>> values = Indicator.getValuesJustLabels(indicators);
 
         return ok(metadata_browser.render(theResults, tabName, values));
     }

@@ -1,0 +1,26 @@
+@(mode          :  String,
+  instanceThing : org.hadatac.entity.pojo.GenericInstance)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.entity.pojo.GenericInstance
+@import java.net._
+
+@if(!mode.equals("PLAIN")) {
+  @main("Instance Lookup") {
+     <div>
+       <h3>Instance Lookup</h3>
+       <p><b>URI</b>: @instanceThing.getUri() </p>
+       <p><b>Name</b>: @instanceThing.getLabel() </p>
+       <br>
+       <a href="@org.hadatac.console.controllers.routes.URILookup.index(mode, "")" class="btn btn-primary" role="button">Lookup another URI</a>
+       <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+     </div>
+  }
+} else {
+     <div>
+       <h3>Instance Lookup</h3>
+       <p><b>URI</b>: @instanceThing.getUri() </p>
+       <p><b>Name</b>: @instanceThing.getLabel() </p>
+     </div>
+}

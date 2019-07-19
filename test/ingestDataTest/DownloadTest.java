@@ -13,14 +13,6 @@ public class DownloadTest extends StepTest{
 	}
 
 	@Override
-	public void verifyPre() {
-		System.out.print("Step11: Pre-step Verification......");
-		assertTrue("Failed.", Verify.verifyFacetedSearch());
-		System.out.println("Passed.");
-		
-	}
-
-	@Override
 	public void test() {
 		System.out.println("Step11: Not yet implemented");
 		

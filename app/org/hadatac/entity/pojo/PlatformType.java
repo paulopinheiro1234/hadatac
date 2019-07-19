@@ -48,22 +48,6 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
         return platformTypes;   
     }
 
-    public static Map<String,String> getMap() {
-        List<PlatformType> list = find();
-        Map<String,String> map = new HashMap<String,String>();
-        for (PlatformType typ: list) 
-            map.put(typ.getUri(),typ.getLabel());
-        return map;
-    }
-
-    public String getSuperClassLabel() {
-    	PlatformType superType = PlatformType.find(this.getSuperUri());
-    	if (superType == null || superType.getLabel() == null) {
-    		return "";
-    	}
-    	return superType.getLabel();
-    }
-
     public static PlatformType find(String uri) {
         PlatformType platformType = null;
         Model model;
@@ -95,6 +79,7 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
         return platformType;
     }
 
+    
     @Override
     public int compareTo(PlatformType another) {
         if (this.getLabel() != null && another.getLabel() != null) {

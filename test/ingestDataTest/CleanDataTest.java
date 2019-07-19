@@ -35,13 +35,7 @@ public class CleanDataTest extends StepTest{
 		System.out.println("[Step 2] Executing cleanDataTest:");
 		
 	}
-	
-	
-	@Override
-	public void verifyPre() {
-		return;
-		
-	}
+
 	
 	@Override
 	public void test() {

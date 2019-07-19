@@ -12,8 +12,9 @@
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.deployments._
-@import org.hadatac.console.controllers.deployments._
 @import org.hadatac.console.controllers._
+@import org.hadatac.console.controllers.deployments._
+@import org.hadatac.console.controllers.metadata.empirical._
 @import org.hadatac.metadata.loader.URIUtils
 @import com.typesafe.config.ConfigFactory
 
@@ -101,14 +102,12 @@
    <h4>Operations</h4>
     <div class="row">
       <div class="navbar-collapse collapse navbar-secondary">
-	   @defining(0) { offset =>  
-           <a href="@org.hadatac.console.controllers.metadata.empirical.routes.PlatformManagement.indexWithPages(dir, filename, da_uri, offset)" 
+	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_PLATFORM, dir, filename, da_uri, 0)" 
 	       class="btn btn-primary" role="button">Manage Platforms</a>
-	   }
-        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.InstrumentManagement.index(dir, filename, da_uri)" 
-	   class="btn btn-primary" role="button">Manage Instruments</a>
-        <a href="" 
-	   class="btn btn-primary disabled" role="button">Manage Detectors</a>
+        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_INSTRUMENT, dir, filename, da_uri, 0)" 
+	       class="btn btn-primary" role="button">Manage Instruments</a>
+        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_DETECTOR, dir, filename, da_uri, 0)" 
+	       class="btn btn-primary" role="button">Manage Detectors</a>
       </div>
     </div>
     <br>

@@ -3,7 +3,7 @@ var results = query_res.dataset.results;
 
 var m = [20, 120, 20, 120],
     w = 1280 - m[1] - m[3],
-    h = 800 - m[0] - m[2],
+    h = 600 - m[0] - m[2],
     i = 0,
     root;
 
@@ -25,8 +25,8 @@ var vis = d3.select("#body").append("svg:svg")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-//d3.json("http://mbostock.github.io/d3/talk/20111018/flare.json", function(json) {
-//alert(results);
+  //d3.json("http://mbostock.github.io/d3/talk/20111018/flare.json", function(json) {
+  //alert(results);
   root.x0 = h / 2;
   root.y0 = 0;
 
@@ -166,3 +166,62 @@ function toggle(d) {
     d._children = null;
   }
 }
+
+function expand(d){   
+    var children = (d.children)?d.children:d._children;
+    if (d._children) {        
+      d.children = d._children;
+      d._children = null;       
+    }
+    if(children) {
+      children.forEach(expand);
+    }
+}
+
+function collapse(d) {
+    if (d.children) {
+      d._children = d.children;
+      d._children.forEach(collapse);
+      d.children = null;
+    }
+}
+
+function collapseBelowLevel(d, l, limit) {
+	if (l < limit) {
+		var newL = l + 1;
+		if (d.children) {
+			var i;
+			for (i = 0; i < d.children.length; i++) {
+			    collapseBelowLevel(d.children[i], newL, limit);   
+			}
+		}
+	} else {
+		if (d.children) {
+			d.children.forEach(collapse);
+		}
+	}
+}
+
+function expandAll(){
+   expand(root); 
+   update(root);
+}
+
+function collapseAll(){
+   root.children.forEach(collapse);
+   collapse(root);
+   update(root);
+}
+
+function initialState(){
+	expand(root);
+	if (root.children) {
+	   var i;
+	   for (i = 0; i < root.children.length; i++) {
+	       collapseBelowLevel(root.children[i], 0, 1);   
+	   }
+   }
+   update(root);
+}
+
+

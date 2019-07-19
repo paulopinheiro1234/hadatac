@@ -1,23 +1,23 @@
-@( results : org.hadatac.console.models.SparqlQueryResults,
+@( dir      : String,
+   filename : String, 
+   da_uri   : String, 
+   results  : org.hadatac.console.models.SparqlQueryResults,
    category : String)
-
-@*****************************
-	public TreeMap<String,TripleDocument> sparqlResults;
-    public String treeResults;
-    public String json;
-*****************************@
 
 @import helper._
 @import org.hadatac.console.views.html._
+@*
 @import org.hadatac.console.views.html.metadata.concepts._
+*@
 @import org.hadatac.console.views.html.metadata.empirical._
 
 @main("Hierarchies") {
+    @* 
     @if((category == "Units") || (category == "Characteristics") || (category == "Indicators")) { 
         @science_navigation(category)
-    } else {
-        @empirical_navigation(category)
-    }
+    } else { *@
+        @empirical_navigation(dir, filename, da_uri, category)
+    @* } *@
     <div class="container-fluid container-spaced">
       <div class="row">
             <div class="col-sm-9 col-md-9 main">
@@ -40,6 +40,7 @@
                 <div><p>(click for more information)</p></div>
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                         <div class="panel panel-default">
+                        @*
                         @category match{
                             case "InstrumentModels" => {
                                 @for((k, triple) <- results.sparqlResults){
@@ -79,6 +80,7 @@
                             case _ => {
                             }
                         }
+                        *@
                         </div>
                     </div>
                 </div>
@@ -89,7 +91,7 @@
                     <div id="body"></div>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.js"></script>
                         <script type="text/javascript" src="/hadatac/assets/javascripts/d3.layout.js"></script>
-                        <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
+                        <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer2.js"></script>
                         <script type="text/javascript">
                             d3.selectAll(".node")
                                 .on('mouseover', function (d,i){
@@ -115,6 +117,7 @@
     <script type="text/javascript" src="/hadatac/assets/javascripts/extra.js"></script>
     <div class="visible-print-block">
         <table>
+            @*
             @category match{
                 case "InstrumentModels" => {
                     @for((k, triple) <- results.sparqlResults){
@@ -153,7 +156,7 @@
                 }
                 case _ => {
                 }
-            }
+            } *@
         </table>
     </div>
 }
