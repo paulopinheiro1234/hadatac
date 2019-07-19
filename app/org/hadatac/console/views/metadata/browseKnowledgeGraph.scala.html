@@ -1,7 +1,9 @@
 @(oper       : String,
-  graphName : String,
-  hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
-  loadedList : List[String])
+graphName : String,
+hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
+loadedList : List[String],
+workingFiles     : List[org.hadatac.entity.pojo.DataFile]
+)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
@@ -12,166 +14,324 @@
 
 <style>
 
-     .node rect {
-         cursor: pointer;
-         fill: #fff;
-         fill-opacity: .5;
-         stroke: #3182bd;
-         stroke-width: 1.5px;
+   .node rect {
+       cursor: pointer;
+       fill: #fff;
+       fill-opacity: .5;
+       stroke: #3182bd;
+       stroke-width: 1.5px;
+    }
+
+    .node text {
+       font: 10px sans-serif;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #9ecae1;
+        stroke-width: 1.5px;
+    }
+
+    .tab-content {
+       border-left: 1px solid #ddd;
+       border-right: 1px solid #ddd;
+       padding: 10px;
+    }
+    .addtocart{
+      margin-top: 3px;
+      border:1px solid cornflowerblue;
+      border-radius:50%;
+      width:53px;
+      height:53px;
+      background-color: rgb(173, 217, 253);
       }
 
-      .node text {
-         font: 10px sans-serif;
-          pointer-events: none;
-      }
+    .cartbutton{
+      position:relative;
+      display:inline-block;
+    }
+    /* .cartbutton:hover .cart-content{
+        display:block;
 
-      path.link {
-          fill: none;
-          stroke: #9ecae1;
-          stroke-width: 1.5px;
-      }
+    } */
+    .cartbutton:hover .addtocart{
+        background-color: cornflowerblue;
+    }
+    .custom-cm{
+        background-color: lightgrey;
+        border:1px solid black;
+        box-shadow:1px 1px 5px rgba(0,0,0,1);
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+        font-weight: bold;
+        padding:5px;
+        width:150px;
+        display:none;
+        position: fixed;
+        z-index: 999999;
+        margin-top:0px;
 
-      .tab-content {
-         border-left: 1px solid #ddd;
-         border-right: 1px solid #ddd;
-         padding: 10px;
-      }
+    }
+    .custom-cm__item{
+        cursor: pointer;
+        padding: 3px 3px;
+    }
+    .custom-cm__item:hover{
+        background-color: rgb(175, 159, 159);
+    }
+    * {
+        box-sizing: border-box;
+        }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+  }
+  ul li {
+    display: block;
+    position: relative;
+  }
+  .cart_count{
+      background-color:rgb(182, 164, 164);
+      border-radius:50%;
+      width:18px;
+      height:18px;
+      text-align: center;
+      font-weight:bold;
+      float:right;
+      top: 5px;
+      z-index:9999;
+
+
+  }
+
+  .remove {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  padding: 3px;
+  transform: translate(0%, -50%);
+}
+
+.remove:hover {background: #bbb;}
+
+.cart-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  overflow:auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
+  right: 0;
+  width:150px;
+}
+
+.cart-content a {
+  color: black;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: block;
+
+}
+.cart-content a:hover{
+  color: black;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: block;
+
+
+}
+.cartitem{
+    font-family: Arial, Helvetica, sans-serif;
+}
+.cartitem :hover,dropbtn:focus{
+background-color:lightgrey;
+}
+
+
+
 
 </style>
 
 <script type="text/javascript">
-  function checkform() {
+function checkform() {
 
-      alert(lasClikedD)
-      var cansubmit = true;
-  
-      if (lastClickD == null) {
-          cansubmit = false;
-      }
-  
-      if (cansubmit) {
-          document.getElementById('copyvalue').disabled = false;
-      } else {
-          document.getElementById('copyvalue').disabled = 'disabled';
-      }
+    alert(lasClikedD)
+    var cansubmit = true;
 
-  }
+    if (lastClickD == null) {
+        cansubmit = false;
+    }
+
+    if (cansubmit) {
+        document.getElementById('copyvalue').disabled = false;
+    } else {
+        document.getElementById('copyvalue').disabled = 'disabled';
+    }
+
+}
 
 </script>
 
 
-   <div class="container-fluid">
+ <div class="container-fluid">
 
-      <h2>Browse Loaded Ontologies</h2>
-      <h5>Currently displaying @graphName</h5>
-      <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
-            <form class="form-horizontal" name="editForm" method="post" action="" onkeypress="return event.keyCode != 13;" style="float:right;margin-right:15px;">
-                <div class="form-group">
-                    <div style="display: inline-block;">
-                        <input type="text"  id="searchValue" name="searchValue" value="">
-                        <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm" id="findTerm">    
-                            <span class="glyphicon glyphicon-search">   </span> Find Term
-                        </button> 
-                    </div>
-                    <button type="button" class="btn btn-info btn-sm" role="button" type="expand" id="expand" style="display: inline-block;">
-                        <span class="glyphicon glyphicon-zoom-in">  </span> Expand All
-                    </button>
-                    <button type="button" class="btn btn-info btn-sm" role="button" type="collapse" id="collapse" style="display: inline-block;">    
-                        <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All
-                    </button>
-                    <button type="button" class="btn btn-info btn-sm" role="button" type="reset" id="reset" style="display: inline-block;">       
-                        <span class="glyphicon glyphicon-refresh">  </span> Reset
-                    </button>
-                    
-                </div>
-    
-                <div class="form-group" style="display:none">
-                    <input type="hidden" class="form-control col-sm-6" id="newEntity" name="newEntity" value="" readonly>
-                </div> 
-                
-                <div class="form-group" style="display:none">
-                    <input type="hidden" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="" readonly>
-                </div>
-            
-            
-                <div class="form-group" style="display:none">
-                    <input type="hidden" class="form-control col-sm-6" id="newUnit" name="newUnit" value="" readonly>
-                </div>
-            
-                <div class="form-group" style="display:none">
-                    <input class="btn btn-success btn-sm" role="button" type="hidden" id="submit" value="Update DASA" />
-                    <input class="btn btn-success btn-sm" role="button" type="hidden" id="copyvalue" value="Copy Selected Value" /> <br>
-                </div> 
+    <h2>Browse Loaded Ontologies</h2>
+    <div style="float:right" style="margin-bottom: 5px">
         
-            </form>
-      </div>
-      <div class="col-md-2 col-xs-2">
-        <h4>Loaded Ontologies</h4>
-        @for(loadedFile <- loadedList) {
-            <a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile"><button class="btn btn-info btn-md" style="display:block;margin-bottom:10px">@loadedFile</button></a>
-        }
-      </div>
-      <div class="col-md-10 col-xs-6">
+    
+    <button type="button" class="btn btn-info btn-sm" role="button" style="display: inline-block;">
+        <span class="glyphicon glyphicon-circle-arrow-left">  </span> Back to SDD Edit
+    </button>
+    
+    </div>
+    <h5>Currently displaying @graphName</h5>
+    <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
+          <form class="form-horizontal" name="editForm" method="post" action="" onkeypress="return event.keyCode != 13;" style="float:right;margin-right:15px;">
+              <div class="form-group">
+                  <div style="display: inline-block;">
+                      <input type="text"  id="searchValue" name="searchValue" value="">
+                      <button type="button" class="btn btn-info btn-sm" role="button" type="findTerm" id="findTerm">
+                          <span class="glyphicon glyphicon-search">   </span> Find Term
+                      </button>
 
-            <ul class="nav nav-tabs">
-                <li class="active"><a class="entitytab" href="#entity_tab" data-toggle="tab">Entity Hierachy</a></li>
-            </ul>
-            <div class="tab-content">
-                <treecontent></treecontent>
-                <div class="tab-pane" id="entity_tab">
-                    <div id="entityquery" data-results="@hierarchy.treeResults"></div>
-                </div>
-            </div>
+                      <button type="button" class="btn btn-info btn-sm" role="button" type="findPrev" id="findPrev">
+                         <span class="glyphicon glyphicon-circle-arrow-left">   </span> Find Previous
+                      </button>
 
-            <script src="/hadatac/assets/javascripts/jquery.min.js"></script>
-            <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
-            <script src="/hadatac/assets/javascripts/bootstrap.min.js"></script>
+                      <button type="button" class="btn btn-info btn-sm" role="button" type="findNext" id="findNext">
+                          <span class="glyphicon glyphicon-circle-arrow-right">   </span> Find Next
+                      </button>
 
-            <script>
-                $.ajaxSetup ({
-                    // Disable caching of AJAX responses
-                    // Used when debugging
-                    cache: false
-                });
+                  </div>
+                  <button type="button" class="btn btn-info btn-sm" role="button" type="expand" id="expand" style="display: inline-block;">
+                      <span class="glyphicon glyphicon-zoom-in">  </span> Expand All
+                  </button>
+                  <button type="button" class="btn btn-info btn-sm" role="button" type="collapse" id="collapse" style="display: inline-block;">
+                      <span class="glyphicon glyphicon-zoom-out"> </span> Collapse All
+                  </button>
+                  <button type="button" class="btn btn-info btn-sm" role="button" type="reset" id="reset" style="display: inline-block;">
+                      <span class="glyphicon glyphicon-refresh">  </span> Reset
+                  </button>
 
-                $.getScript("/hadatac/assets/javascripts/treeEntity.js");
-                $(".entitytab").click(function() {
-                    $.getScript("/hadatac/assets/javascripts/treeEntity.js");
-                })
-            </script>
+                  <div class="cartbutton" id="cart_button">
+                          <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
+                              <div class="cart_count" id="cartctr" value=''></div>
+                              <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="38" height="32" alt=""/>
+                          </button>
+                        <ul id="seecart" class="cart-content">
+                        <li class="cartitem" id="cart_item">Cart Items: </span></li>
+                        <!-- <li class="cartitem" id="cart_item">Item 2<span class="remove">&times;</span></li>
+                        <li class="cartitem" id="cart_item">Item 3<span class="remove">&times;</span></li> -->
+                        </ul>
 
-            <script>
-	      function dasachange() {
-	         var x = document.getElementById("metadasaselect").value;
-	         $('#newEntity').val("");
-	         $('#newAttribute').val(x.substring(x.indexOf(":") + 1) + " [" + x + "]" );
-	         $('#newUnit').val("");
-	         initialize(root);
-	         update(root);
-	      };
+                  </div>
 
-              document.getElementById("clearEntity").onclick = function() {
-                 $('#newEntity').val("");
-                 initialize(root);
-                 update(root);
-              };
 
-              document.getElementById("clearAttribute").onclick = function() {
-                 $('#newAttribute').val("");
-                 initialize(root);
-                 update(root);
-              };
 
-              document.getElementById("clearUnit").onclick = function() {
-                 $('#newUnit').val("");
-                 initialize(root);
-                 update(root);
-              };
+              </div>
 
-           </script>
+              <div class="form-group" style="display:none">
+                  <input type="hidden" class="form-control col-sm-6" id="newEntity" name="newEntity" value="" readonly>
+              </div>
 
-      </div>
+              <div class="form-group" style="display:none">
+                  <input type="hidden" class="form-control col-sm-6" id="newAttribute" name="newAttribute" value="" readonly>
+              </div>
 
-   </div>
-	 
+
+              <div class="form-group" style="display:none">
+                  <input type="hidden" class="form-control col-sm-6" id="newUnit" name="newUnit" value="" readonly>
+              </div>
+
+              <div class="form-group" style="display:none">
+                  <input class="btn btn-success btn-sm" role="button" type="hidden" id="submit" value="Update DASA" />
+                  <input class="btn btn-success btn-sm" role="button" type="hidden" id="copyvalue" value="Copy Selected Value" /> <br>
+              </div>
+
+          </form>
+    </div>
+
+    <div class="col-md-2 col-xs-2">
+      <h4>Loaded Ontologies</h4>
+      @for(loadedFile <- loadedList) {
+          <a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile"><button class="btn btn-info btn-md" style="display:block;margin-bottom:10px">@loadedFile</button></a>
+      }
+    </div>
+    <div class="col-md-10 col-xs-6">
+
+          <ul class="nav nav-tabs">
+              <li class="active"><a class="entitytab" href="#entity_tab" data-toggle="tab">Entity Hierachy</a></li>
+          </ul>
+          <div class="tab-content">
+              <treecontent></treecontent>
+              <div class="tab-pane" id="entity_tab">
+                  <div id="entityquery" data-results="@hierarchy.treeResults"></div>
+
+              </div>
+              <ul class="custom-cm">
+                  <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height=20px/> Add to Cart</a> </li>
+                  <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
+
+              </ul>
+          </div>
+
+          <script src="/hadatac/assets/javascripts/jquery.min.js"></script>
+          <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
+          <script src="/hadatac/assets/javascripts/bootstrap.min.js"></script>
+
+
+          <script>
+              $.ajaxSetup ({
+                  // Disable caching of AJAX responses
+                  // Used when debugging
+                  cache: false
+              });
+
+              $.getScript("/hadatac/assets/javascripts/treeEntity.js");
+
+              $(".entitytab").click(function() {
+                  $.getScript("/hadatac/assets/javascripts/treeEntity.js");
+
+              })
+          </script>
+
+          <script>
+        function dasachange() {
+           var x = document.getElementById("metadasaselect").value;
+           $('#newEntity').val("");
+           $('#newAttribute').val(x.substring(x.indexOf(":") + 1) + " [" + x + "]" );
+           $('#newUnit').val("");
+           initialize(root);
+           update(root);
+        };
+
+            document.getElementById("clearEntity").onclick = function() {
+               $('#newEntity').val("");
+               initialize(root);
+               update(root);
+            };
+
+            document.getElementById("clearAttribute").onclick = function() {
+               $('#newAttribute').val("");
+               initialize(root);
+               update(root);
+            };
+
+            document.getElementById("clearUnit").onclick = function() {
+               $('#newUnit').val("");
+               initialize(root);
+               update(root);
+            };
+
+         </script>
+
+    </div>
+
+ </div>
+
 }

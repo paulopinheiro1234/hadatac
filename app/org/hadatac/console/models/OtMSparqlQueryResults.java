@@ -19,13 +19,13 @@ public class OtMSparqlQueryResults{
     public Map<String,String> labelMap = new HashMap<String,String>();
     public String treeResults;
     public String json;
-    
+
     private ArrayList<String> vars = new ArrayList<String>();
     private int numVars;
     private TreeNode newTree;
-    
+
     public OtMSparqlQueryResults() {}
-    
+
     public OtMSparqlQueryResults(String json_result){
         this.json = json_result;
         ObjectMapper mapper = new ObjectMapper();
@@ -39,7 +39,7 @@ public class OtMSparqlQueryResults{
 		header = header.get("vars");
 		JsonNode bindings = node.get("results");
 		bindings = bindings.get("bindings");
-	
+
 		Iterator<JsonNode> parseHead = header.iterator();
 		String var = "";
 		try{
@@ -50,13 +50,13 @@ public class OtMSparqlQueryResults{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-	
+
 		Iterator<JsonNode> parseResults = bindings.iterator();
 		numVars = vars.size();
 
         if(vars.contains("id") && vars.contains("superId"))
             buildTreeQueryResults(bindings);
-		else 
+		else
 	    	this.treeResults = "";
         this.sparqlResults = new TreeMap<String,OtMTripleDocument>();
         while (parseResults.hasNext()){
@@ -80,7 +80,7 @@ public class OtMSparqlQueryResults{
 	    	}
 		}
     }
-    
+
     public OtMSparqlQueryResults(String json_result, boolean usingURIs){
         this.json = json_result;
         //System.out.println(this.json);
@@ -97,7 +97,7 @@ public class OtMSparqlQueryResults{
 	header = header.get("vars");
 	JsonNode bindings = node.get("results");
 	bindings = bindings.get("bindings");
-	
+
 	// parse the head, and record the bindings
 	Iterator<JsonNode> parseHead = header.iterator();
 	String var = "";
@@ -109,12 +109,12 @@ public class OtMSparqlQueryResults{
 	} catch (Exception e){
 	    e.printStackTrace();
 	}// /try/catch
-	
+
 	Iterator<JsonNode> parseResults = bindings.iterator();
 	numVars = vars.size();
 	//System.out.println("Number of Vars: " + numVars + "\n");
 	//System.out.println("Vars: " + vars + "\n");
-	
+
 	// build TreeQueryResults:
         if(vars.contains("id") && vars.contains("superId"))
             buildTreeQueryResults(bindings, usingURIs);
@@ -144,7 +144,7 @@ public class OtMSparqlQueryResults{
 	    }
 	}// /while
     }// /constructor
-    
+
     public OtMSparqlQueryResults(String json_result, boolean usingURIs, String tabName){
         this.json = json_result;
         //System.out.println("INPUT JSON:\n" + this.json);
@@ -161,7 +161,7 @@ public class OtMSparqlQueryResults{
 	header = header.get("vars");
 	JsonNode bindings = node.get("results");
 	bindings = bindings.get("bindings");
-	
+
 	// parse the head, and record the bindings
 	Iterator<JsonNode> parseHead = header.iterator();
 	String var = "";
@@ -173,12 +173,12 @@ public class OtMSparqlQueryResults{
 	} catch (Exception e){
 	    e.printStackTrace();
 	}// /try/catch
-	
+
 	Iterator<JsonNode> parseResults = bindings.iterator();
 	numVars = vars.size();
 	//System.out.println("Number of Vars: " + numVars + "\n");
 	//System.out.println("Vars: " + vars + "\n");
-	
+
 	// build TreeQueryResults:
         if(vars.contains("id") && vars.contains("superId"))
             buildTreeQueryResults(bindings, usingURIs, tabName);
@@ -208,7 +208,7 @@ public class OtMSparqlQueryResults{
 	    }
 	}// /while
     }// /constructor
-    
+
     private void buildTreeQueryResults(JsonNode bindings){
 		this.newTree = null;
         Iterator<JsonNode> elements = bindings.elements();
@@ -217,7 +217,7 @@ public class OtMSparqlQueryResults{
 		HashMap<String, String> map = new HashMap<String, String>();
 		ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
 		ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
-		ArrayList<String> uris = new ArrayList<String>(); 
+		ArrayList<String> uris = new ArrayList<String>();
         while (elements.hasNext()){
             modelN = "";
 	    	superN = "";
@@ -241,14 +241,14 @@ public class OtMSparqlQueryResults{
             //    superN = prettyFromURI(superN);
             //    superN = DynamicFunctions.replaceURLWithPrefix(superN);
 			//}
-			
+
 			if(!map.containsKey(modelN)) {
 				nodes.add(new TreeNode(modelN));
 				uris.add(modelN);
 			}
 			//If we find this node is no longer a root node it gets overwritten
-			map.put(modelN, superN); 
-			
+			map.put(modelN, superN);
+
 			if(!map.containsKey(superN)) {
 				nodes.add(new TreeNode(superN));
 				map.put(superN, null);
@@ -257,18 +257,16 @@ public class OtMSparqlQueryResults{
 		}
 
 		//DEBUG CODE - can be removed
-        /*
-		for(Map.Entry<String, String> entry : map.entrySet()) {
-			System.out.println("node " + entry.getKey());
-			if(entry.getValue() != null)
-				System.out.println("parent " + entry.getValue());
-			else
-				System.out.println("parent null");
-		}
-		System.out.println("map size " + map.keySet().size());
-		System.out.println("nodes size " + nodes.size());
-		System.out.println("uri size " + uris.size());
-		*/
+		// for(Map.Entry<String, String> entry : map.entrySet()) {
+		// 	System.out.println("node " + entry.getKey());
+		// 	if(entry.getValue() != null)
+		// 		System.out.println("parent " + entry.getValue());
+		// 	else
+		// 		System.out.println("parent null");
+		// }
+		// System.out.println("map size " + map.keySet().size());
+		// System.out.println("nodes size " + nodes.size());
+		// System.out.println("uri size " + uris.size());
 		//END DEBUG CODE
 
 		TreeNode superTree = new TreeNode("");
@@ -279,18 +277,18 @@ public class OtMSparqlQueryResults{
 			}
 			else {
 				branchCollection.add(node);
-			}	
+			}
 		}
 
 		for(TreeNode tn : branchCollection) {
 			superTree.addChild(tn);
 		}
-        
+
 		addLabels(superTree,true);
 		addLabels(superTree,false);
 		this.treeResults = superTree.toJson(0);
     }
-    
+
     public void addLabels(TreeNode aNode, boolean isReset) {
 	String name = aNode.getName();
 	if (isReset) {
@@ -308,19 +306,20 @@ public class OtMSparqlQueryResults{
 	    addLabels(aNode.getChildren().get(i),isReset);
 	}
     }
-    
+
     private String finalName (String currentName) {
 	if (currentName == null || currentName.equals("")) {
 	    return "";
 	}
 	String newName = prettyFromURI(currentName);
 	newName = "[" + DynamicFunctions.replaceURLWithPrefix(newName) + "]";
+
 	if (labelMap.get(currentName) != null) {
 	    newName = labelMap.get(currentName) + " " + newName;
 	    return newName;
 	}
 	return newName;
-    }	
+    }
 
     // This is the same as SparqlQueryResults regardless of whether the
     //    properties are one-to-one or one-to-many
@@ -356,7 +355,7 @@ public class OtMSparqlQueryResults{
                 superN = DynamicFunctions.replaceURLWithPrefix(superN);
                 //System.out.println("usingURIs superN: " + superN + "\n");
             }
-            //System.out.println("model Name = <"+ modelN + " , " + superN + ">"); 
+            //System.out.println("model Name = <"+ modelN + " , " + superN + ">");
             TreeNode currentBranch = new TreeNode(superN);
             currentBranch.addChild(modelN);
             branchCollection.add(currentBranch);
@@ -404,7 +403,7 @@ public class OtMSparqlQueryResults{
         this.treeResults = resultsTree.toJson(0);
         //System.out.println("Tree Results: " + this.treeResults);
     }// /buildTreeQueryResults
-    
+
     // This is the same as SparqlQueryResults regardless of whether the
     //    properties are one-to-one or one-to-many
     private void buildTreeQueryResults(JsonNode bindings, boolean usingURIs, String tabName){
@@ -445,7 +444,7 @@ public class OtMSparqlQueryResults{
                 modelN = prettyFromURI(modelN);
                 modelN = DynamicFunctions.replaceURLWithPrefix(modelN);
                 //System.out.println("modelN: " + modelN + "\n");
-            } 
+            }
             if (usingURIs && !superN.equals("")) {
                 superN = prettyFromURI(superN);
                 superN = DynamicFunctions.replaceURLWithPrefix(superN);
@@ -508,19 +507,19 @@ public class OtMSparqlQueryResults{
         }
         //System.out.println("Results Tree: " + resultsTree.toJson(0));
         this.treeResults = resultsTree.toJson(0);
-        /*if (newTree == null) 
+        /*if (newTree == null)
 	    this.treeResults = "";
 	    else
 	    this.treeResults = newTree.toJson(0);*/
 	    //        System.out.println("New Tree : " + newTree.toJson(0) + "\n");
         //System.out.println("Tree Results: " + this.treeResults);
     }// /buildTreeQueryResults
-    
+
     public OtMTripleDocument getTriple (String key){
 	OtMTripleDocument item = this.sparqlResults.get(key);
 	return item;
     }
-    
+
     /*public ArrayList<OtMTripleDocument> getMatching (String prop, String value){
       ArrayList<TripleDocument> results = new ArrayList<TripleDocument>();
       TripleDocument doc;
@@ -532,7 +531,7 @@ public class OtMSparqlQueryResults{
       }
       return results;
       }*/
-    
+
     private static String prettyFromURI (String origURI) {
 	if (!origURI.contains("#"))
 	    return origURI;

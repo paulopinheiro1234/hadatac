@@ -1,66 +1,92 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
   dd_dataFile: org.hadatac.entity.pojo.DataFile,
-  bSavable : Boolean)
+  bSavable : Boolean,
+  loadedList : List[String],
+  testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
+
 @import java.net._
 
 @main("SDD Editor Version 2"){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
     <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
 
-    <div id="rcorners">
+    <div id="rcorners" >
     <h4>@dataFile.getFileName()</h4>
     @if(bSavable) {
         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
     }
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+    <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
 
 
     <button class="btn btn-primary">Back</button>
-      <button class="btn btn-primary" style=margin-left:5px>Consider SSD</button>
-        Description of Column Variable:
-        <input type="text" id="varDescription" value=" "/>
-
+      <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
+        <input type="text" id="varDescription" value="Description of Column Variable:"/>
+        <div class="undo-edit">
+        <button class="undo-button" onclick="undoEdit()"> <img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="22" height="24" alt=""/> </button>
+        </div>
+        <div class= shopbutton>
+        <button class="cart" >
+                    
+          <img src="http://www.sclance.com/pngs/shop-png/shop_png_1237358.png" width="45" height="35" alt=""/>Shop Terms</button>
+        
+        <ul id="myDropdown" class="ontologydrop-content">
+          
+          @for(loadedFile <- loadedList) {
+           
+            <li class=eachOntology><a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile">@loadedFile</a></li>
+          }
+  
+        </ul>
+      </div>
+      
+      <div class="cartbutton" id="viewcart">
+        <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
+            
+            <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="35" height="32" alt=""/>
+          View Cart
+          </button>
+      <ul id="seecart" class="cart-content">
+      <li class="cartitem" id="cart_item">Cart Items: </span></li>
+      </ul>
+      
+      </div>
+             
       <button class="main-nav" id="show">Show Options</button>
       <button class="Close" id="hide">Hide Options</button>
 
         <div class="mobile-nav">
-          <p id="effect" style="text-align:center">These are ontologies displayed below:</p>
+          <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
+          <img src="https://clipart.wpblink.com/sites/default/files/wallpaper/bulb-clipart/451480/bulb-clipart-lightbulb-moment-451480-3674232.png"
+          width="36" height="30" alt=""/> Recommended Terms</button>
             <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
                 <option value="Choose from Below">Choose from Below</option>
             </select>
+            
+            <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
+              <img src="http://www.transparentpng.com/thumb/virtual-reality/virtual-reality-free-download-10.png"
+              width="36" height="32" alt=""/> Recommended Columns</button>
+              <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
+                  <option value="Choose from Below">Choose from Below</option>
+              </select>
+            
             <div id="editRowsAdd">
               <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
               <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
               <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
+              <button class="undo-remove-row" onclick="revertRow()"><img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="15" height="18" alt=""/> </button>
             </div>
-            <div class="ontologydrop">
-                <button class="cart" onclick="showOntologyList()">
-
-                <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="37" height="35" alt=""/>Ontology Terms</button>
-                <ul id="myDropdown" class="ontologydrop-content">
-                  <li>item 1<span class="remove">&times;</span></li>
-                  <li>item 2<span class="remove">&times;</span></li>
-
-                  <li>item 3<span class="remove">&times;</span></li>
-                  <li>item 4<span class="remove">&times;</span></li>
-
-                  <li>item 5<span class="remove">&times;</span></li>
-                  <button class=submitOntologies>Submit</button>
-
-                </ul>
-            </div>
-
-
+            
         </div>
 
 
@@ -74,9 +100,11 @@
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
-
+    <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
+    
     <script type="text/javascript">
     /* set up async GET request */
     var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
@@ -126,8 +154,8 @@
     req.send();
     </script>
     <script>
-      if ("@dd_dataFile.getFileName()" === ""){
-         alert("Please upload a valid Data Dictionary")
+      if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
+        alert("Please upload a valid Data Dictionary")
       }
       else{
          if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){

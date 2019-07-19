@@ -4,150 +4,280 @@
     top:200px;
 }  */
 .main-nav {
-    float:right;
-    background:cornflowerblue;
-    color:white;
-    font-family:Arial;
-    font-size: 12pt;
-    
+  float:right;
+  background:cornflowerblue;
+  color:white;
+  font-family:Arial;
+  font-size: 12pt;
+  
 }
 #effect{
-    top:200px;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    font-size:14pt;
+  top:200px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size:14pt;
 }
 #hide{
-    display:none;
+  display:none;
 }
 #show{
-    display:block;
+  display:block;
 }
 
 .mobile-nav { 
-    position:absolute;
-    display: none;
-    top: 200px;
-    left:1000px;
-    
+  position:absolute;
+  display: none;
+  top: 200px;
+  left:1000px;
+  
 }
 
 .Close {
-    color:white;
-    background-color: royalblue;
-    float:right;
-    margin-left:5px;
-    font-family:Arial;
-    font-size: 12pt;
+  color:white;
+  background-color: royalblue;
+  float:right;
+  margin-left:5px;
+  font-family:Arial;
+  font-size: 12pt;
 }
 .menuoptions{
-    max-width: 100%;
-    font-size: 15pt;
-    font-family: Arial, Helvetica, sans-serif;
+  max-width: 100%;
+  font-size: 15pt;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 4px;
+  display:none;
+  overflow: hidden;
+}
+.virtualoptions{
+  max-width: 100%;
+  font-size: 15pt;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 4px;
+  display:none;
+  overflow: hidden;
 }
 #menulist{
-    margin-left:60px;
+  margin-left:62px;
 }
-
+#virtuallist{
+  margin-left:62px;
+}
+/*=========================================*/
+#editRowsAdd{
+  justify-content: center;
+  text-align: center;
+}
 .insertrowbtn{
-    background-color: cornflowerblue;
-    font-family:Arial;
-    color:white;
-    font-size: 10pt;
-    margin-top: 7px;
-    text-align: center;
-    padding:3px;
+  background-color: cornflowerblue;
+  font-family:Arial;
+  color:white;
+  font-size: 10pt;
+  margin-top: 7px;
+  text-align: center;
+  padding:3px;
 
 }
 .removerowbtn{
-    background-color: cornflowerblue;
-    font-family:Arial;
-    color:white;
-    font-size: 10pt;
-    margin-top: 7px;
-    text-align: center;
-    padding:3px;
+  background-color: cornflowerblue;
+  font-family:Arial;
+  color:white;
+  font-size: 10pt;
+  margin-top: 7px;
+  text-align: center;
+  padding:3px;
 
 }
-
+.undo-remove-row{
+  background-color: rgb(173, 217, 253);
+  width:23px;
+  height:23px;
+  padding: 0;
+}
+/*============================================================*/
 #varDescription{
-    width:30%;
-    font-size: 11pt;
-    font-family: Arial, Helvetica, sans-serif;
-    margin-left:5pt;
-    color:black;
-    border-block-color: black;
+  width:30%;
+  font-size: 11pt;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-left:5pt;
+  color:black;
+  border-block-color: black;
 }
+/*===========================================================================*/
 .cart{
-    margin-top: 3px;
-    border:1px solid black;
-    border-radius: 80px;
-    height:40px;
-    width: 165px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    font-size: 11pt;
-    background-color: rgb(173, 217, 253);
-    
-    
-    
- }
- .cart:hover, .dropbtn:focus {
-    background-color: #2980B9;
-  }
- .remove {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    right: 0%;
-    padding: 3px;
-    transform: translate(0%, -50%);
-  }
-  
-  .remove:hover {background: #bbb;}
-
-  .ontologydrop {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .ontologydrop-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 160px;
-    overflow: auto;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  
-  .ontologydrop-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  ul li {
-    display: block;
-    position: relative;
-  }
-  
-  
- .submitOntologies{
-    background-color: #bbb;
-    text-align: center;
-    font-size: 10pt;
-    font-family: Arial, Helvetica, sans-serif;
-    border-color: transparent;
-    
+  margin-top: 1px;
+  border:1px solid black;
+  border-radius: 80px;
+  height:35px;
+  width: 160px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 11pt;
+  background-color: rgb(173, 217, 253);
 }
-.submitOntologies:hover {background:rgb(134, 130, 130);}
+
+.shopbutton{
+ position:relative;
+ display:inline-block;
+}
+.eachOntology{
+ font-family: Arial, Helvetica, sans-serif;
+}
+.eachOntology :hover,dropbtn:focus{
+background-color:lightgrey;
+}
+
+.ontologydrop-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  width:150px;
+}
+
+.ontologydrop-content a {
+  color: black;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: block;
+  
+}
+.ontologydrop-content a:hover{
+  color: black;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: block;
+ 
+}
+.shopbutton:hover .ontologydrop-content{
+  display:block;
+  
+}
+.shopbutton:hover .cart{
+  background-color: cornflowerblue;
+}
+
+
+
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+/*-----------------------------------------------------*/
+.addtocart{
+  margin-top: 1px;
+  border:1px solid black;
+  border-radius:80px;
+  height:34px;
+  margin-bottom: 2px;
+  width: 160px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 11pt;
+  text-align: center;
+  background-color: rgb(173, 217, 253);
+  }
+
+.cartbutton{
+  position:relative;
+  display:inline-block;
+}
+.cartbutton:hover .cart-content{
+    display:block;
+
+}
+.cartbutton:hover .addtocart{
+    background-color: cornflowerblue;
+}
+
+.cart-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  overflow:auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
+  left: 0;
+  width:150px;
+}
+
+.cart-content a {
+  color: black;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: block;
+  
+}
+.cart-content a:hover{
+  color: black;
+  padding: 5px 8px;
+  text-decoration: none;
+  display: block;
+  
+ 
+}
+.cartitem{
+    font-family: Arial, Helvetica, sans-serif;
+}
+.cartitem :hover,dropbtn:focus{
+background-color:lightgrey;
+}
+.inCart{
+  cursor:pointer;
+  color: red;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.inCart :hover,dropbtn:focus{
+  background-color:blue;
+}
+/*-----------------------------------------------------*/
+.recommended{
+  justify-content: center;
+  border:1px solid black;
+  border-radius:80px;
+  height:34px;
+  margin-bottom: 5px;
+  margin: 0 auto;
+  width: 207;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 11pt;
+  text-align: center;
+  background-color: rgb(173, 217, 253);
+  }
+  /*-----------------------------------------------------*/
+.recommendedcol{
+  justify-content: center;
+  border:1px solid black;
+  border-radius:80px;
+  height:34px;
+  margin-bottom: 3px;
+  margin: 0 auto;
+  margin-top:3px;
+  width: 220;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 11pt;
+  text-align: center;
+  background-color: rgb(173, 217, 253);
+  }
+/*============================================================*/
+.undo-button{
+  margin-bottom: 1px;
+  border:1px solid black;
+  border-radius: 50%;
+  height:35px;
+  width: 35px;
+  background-color: rgb(173, 217, 253);
+}
+.undo-edit{
+position:relative;
+display:inline-block;
+}
