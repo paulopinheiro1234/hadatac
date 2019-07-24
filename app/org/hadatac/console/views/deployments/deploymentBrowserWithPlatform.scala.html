@@ -54,11 +54,43 @@
 			.tooltip-inner {
   				border: 2px solid white;
 			}
+			.slider-wrapper {
+				width: 100px;
+				height: 20px;
+				padding: 0 30px;
+			}
+			/* output { 
+				position: absolute;
+				background-image: linear-gradient(#444444, #999999);
+				width: 40px; 
+				height: 30px; 
+				text-align: center; 
+				color: white; 
+				border-radius: 10px; 
+				display: inline-block; 
+				font: bold 15px/30px Georgia;
+				bottom: 175%;
+				left: 0;
+			}
+			output:after { 
+				content: "";
+				position: absolute; 
+				width: 0;
+				height: 0;
+				border-top: 10px solid #999999;
+				border-left: 5px solid transparent;
+				border-right: 5px solid transparent;
+				top: 100%;
+				left: 50%;
+				margin-left: -5px;
+				margin-top: -1px;
+			}
+			form { position: relative; margin: 50px; width: 1200px; } */
 		</style>	
 	</head>
     <body>
 
-    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
+    <script type="text/javascript" charset="utf-8" src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
 
 	<div class="row">
    		<div class="col-md-1">
@@ -74,22 +106,33 @@
    		 </div>
     	 <div class="col-md-11">
             <div class="navbar-collapse collapse navbar-secondary">
-              <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index("/", "", "", "", "")" class="btn-sm btn-primary" role="button">Back</a>
-              <a href="" class="btn-sm btn-primary" role="button">Filter By Instrument Model</a>
-              <a href="" class="btn-sm btn-primary" role="button">Visualize Fields of View</a>
-              <a href="" class="btn-sm btn-primary" role="button">Visualize Platform Data</a>
-            </div>
+			  <a href="/hadatac/deployments/browser?dir=%2F&amp;filename=&amp;da_uri=&amp;plat_uri=&amp;prev_platUri=" class="btn-sm btn-primary" role="button">Back</a>
+			  <!-- <a href="" class="btn-sm btn-primary" role="button">Filter By Instrument Model</a> -->
+			  <button id = "ShowSelected">Filter by Instrument Model </button>
+			  <button id="ShowFOV">Visualize Field of View</button>
+			  <input type="number" id="buttonSize" value="" step = 0.01>
+			  <button id="change">show continuous change</button>
+			  <!-- <a href="#" class="btn-sm btn-primary" role="button">Visualize Fields of View</a> -->
+			  <!-- <a href="" class="btn-sm btn-primary" role="button">Visualize Platform Data</a> -->
+			  <!-- create slider; improve: need to read the height from data(room height)-->
+			</div>
+
+			<!-- <div class="slider-wrapper">
+				<input type="range" name="Slider" id=mySlider min="0" max="2.86" step="0.01" style="width: 300px;" value = 2.86>
+			</div>  -->
          </div>
        </div>
-    </div>
+	</div>
+	
+
 
 	<div class="row">
    		<div class="col-md-1">
    		</div>
    		<div class="col-md-11">
-            <h4>Reference Platform: @platform.getLabel()</h4>
+            <h4>Reference Platform: CII 7003 - Smart Conference Room (SCR)</h4>
 			<ul>
-			  	<p>Dimensions: <b>Width:</b> @platform.getWidth() @platform.getWidthUnitLabel() <b>Depth</b>: @platform.getDepth() @platform.getDepthUnitLabel()</p>
+			  	<p>Dimensions: <b>Width:</b> 9.8  <b>Depth</b>: 4.8 </p>
 			</ul>
        		<div class="row text-center">
 			<svg width="1150" height="500">
@@ -98,7 +141,7 @@
 				    </pattern>
   				</defs>
 			</svg>
-            <script type="text/javascript">
+			<script type="text/javascript">
                 var browser_url = '@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "XXXX", previous_platUri)';
 		        var coordinates = '@coordinates';
         		var coordinatesStr = coordinates.replace(/&#x27;/g,"'");
@@ -110,9 +153,10 @@
         		var namesStr = pltNames.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
 	    		var names = eval(namesStr);
 		        var pltUris = '@platformUris';
-        		var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'").replace(/#/g,"%23");
+        		var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'").replace(/%23/g,"#");
 	    		var uris = eval(uriStr);
 
+				
 				var svg = d3.select("svg");
     			var imgPattern = d3.select("pattern");
         
@@ -120,8 +164,9 @@
 			    
 			    var widthLayout = dims[0];
 			    var heightLayout = dims[1];
-			    
-			    var widthPixels = 850;
+				
+				//imporve: wideth pixels should be read in from the data
+			    var widthPixels = 725;
 			    var widthOffset = 50;
 			    var heightPixels = (heightLayout * widthPixels) /widthLayout;
 			    
@@ -134,7 +179,7 @@
     				.attr("width", "850")
     				.attr("height", heightPixels)
         			.attr("xlink:href", function(d) {
-          				return "@DataFile.getMediaUrl(platform.getLayout())";
+          				return "http://localhost:9000/hadatac/media/SCR-FLOORPLAN.png";
         			});
 				  
 				// Define the div for the tooltip
@@ -163,12 +208,78 @@
                         .attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
                         .attr("title", function(d,i) { return names[i]; })
         				.style("fill", "red")
+				var conedata = [];
+				var cuboiddata = [];
+				var piramiddata = [];
+				var geometryAll = [];
+				//improve: SensorAll should be read from the data, but current link reading is really slow so cant afford wait
+				var SensorAll = ["None", "TOF", "COS", "Wall Sensor"];
+				//currently gives all Field of view, need to be for specific room in future
+				var FovUri = "http://localhost:9000/hadatac/api/fieldsofview/all"
+				$.getJSON(FovUri, function(dataset) {
+					var data = dataset.body;
+					//console.log(data.body);
+					data.forEach(function(item){	
+						for (var i=0; i<uris.length; i++){
+							//uri is the link between FOV and DPL files
+							if (uris[i] == item.platform_uri){
+								//here we need to add different geometry 
+								if(item.geometry == "http://hadatac.org/ont/lesa#Cone"){													
+									//need location on map, radius
+									geometryAll.push("Cone");
+									SensorAll.push("COS")
+									conedata.push([coords[i*2],coords[i*2+1],parseFloat(item.param2)]);
+								}else if(item.geometry == "http://hadatac.org/ont/lesa#REtangularCuboid"){
+									//need location, width and length
+									//wallsensor, the dot location is at the mid-upmost side of the rectangular
+									geometryAll.push("Cuboid");
+									SensorAll.push("Wall Sensor")
+									cuboiddata.push([coords[i*2],coords[i*2+1], parseFloat(item.param2), parseFloat(item.param3)]);
+								}else if(item.geometry == "http://hadatac.org/ont/lesa#Piramid"){	
+									//need location, width and length
+									//celling sensor, the dot location is at the center of the rectangular
+									geometryAll.push("Cuboid");
+									SensorAll.push("COS");
+									piramiddata.push([coords[i*2],coords[i*2+1], parseFloat(item.param2), parseFloat(item.param3)]);
+								}
+							}
+						}
+					});	
+				   });
+
+				var dropdownButton = d3.select("#ShowSelected")
+					  .append('select')
+					  
+				dropdownButton 
+					.selectAll('myOptions') 
+						.data(SensorAll)
+					.enter()
+						.append('option')
+					.text(function (d) { return d; }) 
+					.attr("value", function (d) { return d; }) 
+
+				dropdownButton.on("change", function(d) {
+					var selectedOption = d3.select(this).property("value")
+					UpdateGeometry(selectedOption)
+				})
+
+				d3.select("#ShowFOV").on("click", function(){
+					if(d3.select(this).text() == "hide"){
+						HideFov();
+						d3.select(this).text("Visualize Field of View");
+					}else{
+						ShowFOV(FovUri, conedata, cuboiddata, piramiddata);
+						d3.select(this).text("hide");
+					}
+				})
+				
+				
         		   
 				function showTooltip(evt, text) {
 			           	div.transition()		
             			    .duration(200)		
                 			.style("opacity", .9);		
-			            div.html(text)	
+			            div.html(text)
             			    .style("left", (evt.pageX) + "px")		
                 			.style("top", (evt.pageY - 28) + "px");	
 				}
@@ -183,8 +294,124 @@
 		             	window.location.href = browser_url.replace("XXXX",uri).replace(/amp;/g,"").replace(/#/g,"%23");
 						//alert("test " + uri);
 				}
+				
+
+				function HideFov(){
+					//imporve: group shapes by "g"
+					//bug: multiple time click cause point lost
+					d3.selectAll("circle").data(names).remove();
+					d3.selectAll("rect").data(names).remove();
+					
+					svg.selectAll("rect").data([0])
+      				.enter().append("rect")
+        				.attr("x", "0")
+      					.attr("y", "0")
+        				.attr("width", "850")
+        				.attr("height", heightPixels)
+        				.style("stroke", "blue")
+        				.style("stroke-width", "3")   
+        				.style("fill", "url(#Img)");   
+
+					svg.selectAll("foo").data(names)
+      				.enter().append("circle")
+        				.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
+      					.attr("cy", function(d,i) { return heightPixels - (coords[i * 2 + 1] * heightScale); })
+      					.attr("r", 4)
+      					.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
+      					.attr("onmouseout", onmouseout="hideTooltip();")
+                        .attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
+                        .attr("title", function(d,i) { return names[i]; })
+        				.style("fill", "red")
+					
+				}
+
+				function drawCone(conedata){	
+					var circles = svg.selectAll("foo")
+						.data(conedata)
+						.enter()
+						.append("circle");
+							
+					d3.selectAll("circle").data(conedata).remove();
+					
+					circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
+						.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
+						.attr("r", function(d) {return widthPixels*d[2]/widthLayout} )
+						.style("fill", "blue")
+						.attr("fill-opacity", 0.5)	
+				
+				}
+
+				function drawPiramid(piramidData){
+					var rect = svg.selectAll("foo")
+						.data(piramidData)
+						.enter()
+						.append("rect");
+							
+					d3.selectAll("circle").data(piramidData).remove();
+					rect.attr("x", function(d) { return widthOffset + (d[0]-1/2*d[2]) * widthScale; })
+						.attr("y", function(d) { return heightPixels - (d[1]+1/2*d[3]) * heightScale;})
+						.attr("width", function(d) {return widthPixels*d[2]/widthLayout})
+        				.attr("height", function(d) {return heightPixels*d[3]/heightLayout})
+						.style("fill", "green")
+						.attr("fill-opacity", 0.5)	
+				}
+
+				//question: how to we tell if the wall sensor is up or down or left or right
+				function drawCuboid(cuboiddata){
+					var circles = svg.selectAll("foo")
+						.data(cuboiddata)
+						.enter()
+						.append("circle");
+							
+					d3.selectAll("circle").data(cuboiddata).remove();
+					
+					circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
+						.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
+						.attr("r", 8)
+						.style("fill", "orange")
+					
+				}
+
+				function ShowFOV(FovUri, conedata, cuboiddata, piramiddata){
+					drawCone(conedata);
+					drawCuboid(cuboiddata);
+					drawPiramid(piramiddata);
+
+				}
+
+				var allcircle = svg.selectAll("foo")
+					.data(conedata)
+					.enter()
+					.append("circle")
+	
+					allcircle.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
+						.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
+						.attr("r", function(d) {return widthPixels*d[2]/widthLayout} )
+						.style("fill", "blue")
+						.attr("fill-opacity", 0.5)
+
+
+				function changeSize() {
+					allcircle.attr("r", this.value) 
+				}
+				d3.select("#buttonSize").on("input", changeSize )
+				
+				function UpdateGeometry(selectedOption){
+					if(selectedOption == "TOF"){
+						HideFov();
+						drawCuboid(cuboiddata);
+					}else if(selectedOption == "COS"){
+						HideFov();
+						drawCone(conedata);
+					}else if(selectedOption == "Wall Sensor"){
+						HideFov();
+						drawPiramid(piramiddata);
+					}else if(selectedOption == "None"){
+						HideFov();
+					}
+				}
+
 
     		</script>
     </div>
-
 }
