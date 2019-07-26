@@ -1,6 +1,8 @@
-@(dir      : String,
-  sdd_name : String,
-  dirFile  : org.hadatac.entity.pojo.DataFile)
+@(dir                : String,
+  dd_name            : String,
+  dirFile            : org.hadatac.entity.pojo.DataFile,
+  headerSheetColumn  : String,
+  commentSheetColumn : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -73,18 +75,17 @@
       <div class="form-group">
          <h3>Add File Headers into SDD</h3>
 	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>	
-	     <p>This option extract column headers from CSV files and add them into a give Semantic Data Dictionary.</p>
+	     <p>This option extract column headers from data dictionary (DD) files and add them into a give Semantic Data Dictionary (SDD).</p>
 	  </div>
 	  
       <div class="form-group">
-		<label>SDD:</label> This is the Semantic Data Dictionary where the column headers are going to be inserted.
- 		<input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@sdd_name >
+		<label>SDD:</label> This is the Data Dictionary file providing the column headers and comments to be added into an SDD.
+ 		<input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@dd_name >
       </div>
       
       <div class="form-group">
-		<label>Selected File:</label> The data file where the column headers are going to be extracted need to be loaded inside of working files. 
-		Use the drop box in working files to include the data file into working files. If the data file is already on working files, use the option
-		below to expand the directories and select the file.
+		<label>Selected File:</label> The SDD file receiving the DD information needs to be selected. If the SDD is already on working files, use the option
+		below to expand the directories and select the target SDD.
 	      <ul class="tree">
             @if(dirFile != null) {
 		   		@tree_node_generic(DataFile.getHierarchy("/","",false),"targetFile", "", false)
@@ -95,10 +96,8 @@
       
       @defining("") { labels => 
       	  <div class="form-group" class="col-sm-6 col-offset-3">
-        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Create labels and positions" disabled="disabled" 
+        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Copy Column Headers" disabled="disabled" 
         	         formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFile(labels)"/>
-        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton2" value="Create just labels" disabled="disabled" 
-        	         formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFileLabels(labels)"/> 
       	  </div>
       }
       

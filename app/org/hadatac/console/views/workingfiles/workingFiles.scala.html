@@ -142,11 +142,13 @@
                 @if(file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-")) {
                 	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="draft">Draft</a>
                 }
+                @*
                 @if(file.getFileName().startsWith("SDD-")) {
                     @defining("") { fileId =>
                 	    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="headers">Add Headers</a>
 					}
 				}
+				*@
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
                     file.getFileName().startsWith("OAS-")) {
