@@ -1,6 +1,9 @@
 @(dir      : String,
   sdd_name : String,
-  dirFile  : org.hadatac.entity.pojo.DataFile)
+  dirFile  : org.hadatac.entity.pojo.DataFile,
+  headerSheetColumn : String,
+  commentSheetColumn : String
+  )
 
 @import helper._
 @import org.hadatac.utils._
@@ -72,13 +75,16 @@
 	
       <div class="form-group">
          <h3>Add File Headers into SDD</h3>
+         <h3>@headerSheetColumn, @commentSheetColumn</h3>
 	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>	
 	     <p>This option extract column headers from CSV files and add them into a give Semantic Data Dictionary.</p>
 	  </div>
 	  
       <div class="form-group">
 		<label>SDD:</label> This is the Semantic Data Dictionary where the column headers are going to be inserted.
- 		<input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@sdd_name >
+     <input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@sdd_name >
+     
+     
       </div>
       
       <div class="form-group">

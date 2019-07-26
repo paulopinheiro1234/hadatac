@@ -55,7 +55,6 @@ public class Folder extends Controller {
     public Result processForm(String dir) {
         Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
         NewFileForm data = form.get();
-
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }

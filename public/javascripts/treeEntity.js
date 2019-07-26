@@ -502,6 +502,14 @@
         });
 
      }
+     function hideCart(){
+        var x = document.getElementsByClassName("cart-content");
+            
+        for (var i=0; i < x.length; i++) {
+            console.log(i);
+            x[i].style.display = 'none';
+        }    
+     }
 
      document.getElementById("cart_button").onclick = function() {
         $.ajax({
@@ -529,25 +537,18 @@
                     var str=this.parentElement.innerText;
                     a = str.split("\n");
                     removeCartItem(a[0]);
-                    select[i].parentNode.removeChild(select[i]);
-                    //this.parentElement.style.display='none';
-                
+                    document.getElementById("seecrat").children[i].style.display = "none"
+                    var li = document.querySelectorAll('.cart-content > li');
+                    li[i].parentNode.removeChild(li[i]);                
                  }
             };
             
             var x = document.getElementsByClassName("cart-content");
-            
             for (var i=0; i < x.length; i++) {
                 x[i].style.display = 'block';
             }
             window.addEventListener("click",function(){
-                var x = document.getElementsByClassName("cart-content");
-            
-                for (var i=0; i < x.length; i++) {
-                    x[i].style.display = 'none';
-                } 
-                
-
+                hideCart();
                 var li = document.querySelectorAll('.cart-content > li');
                 var listLength = li.length;
 
@@ -589,41 +590,7 @@
      }
 
 
-    // function createMenu(ct){
-    //     $.ajax({
-    //         type : 'GET',
-
-    //         url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
-    //         data : {
-    //             //cartamount: cart_ctr
-    //         },
-    //         success : function(data) {
-    //             console.log("ct: ",ct);
-    //             console.log(data);
-    //             var select=document.getElementById("seecart"),data;
-    //             for(var i=ct;i<data.length;i++){
-    //                 var span = document.createElement("span");
-    //                 span.innerHTML = '&times;';
-    //                 var li = document.createElement("li");
-    //                 span.setAttribute("class", "remove");
-
-    //                 li.appendChild(document.createTextNode(data[i]+" "));
-    //                 li.appendChild(span);
-    //                 select.appendChild(li);
-    //                 span.onclick = function() { this.parentElement.style.display='none';
-    //                 removeCartItem(data[i-1]);
-    //                 createMenu(ct);
-    //                 //updateCartCounter()
-    //             };
-    //             }
-
-
-    //         }
-    //     });
-    // }
-
-
-    function color(d) {
+       function color(d) {
         if (d._isSelected) return 'red';
         return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
     }

@@ -23,6 +23,7 @@ public class SDDEditorV2 extends Controller {
         List<String> loadedList=ns.listLoadedOntologies();
         List<String> currentCart=new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 
@@ -99,12 +100,9 @@ public class SDDEditorV2 extends Controller {
     }
 
     public Result removeFromCart(String item){
-        System.out.println(item);
+       
        currentCart.remove(item);
-       for(int i=0;i<currentCart.size();i++){
-           System.out.println(currentCart.get(i));
-       }
-       System.out.println(currentCart);
+       
         return ok(Json.toJson(currentCart));
     }
     public Result sizeOfCart(int cartamount){
@@ -123,24 +121,32 @@ public class SDDEditorV2 extends Controller {
         //return new Result(200);
         return ok(Json.toJson(storeEdits));
     }
-
-    // public Result addToEdits(String row,String cellValue){
-    //     ArrayList<String> temp = new ArrayList<String>();
-    //     temp.add(row);
-    //     temp.add(cellValue);
-    //     storeRows.add(temp);
-    //     //return new Result(200);
-    //     return ok(Json.toJson(storeRows));
-    // }
+   
+    public Result removingRow(String removedValue){
+        for( int i=0;i<storeEdits.size();i++){
+            if(storeEdits.get(i).get(2)==removedValue){
+                storeEdits.remove(storeEdits.get(i));
+            }
+        }
+        return ok(Json.toJson(storeEdits));
+    }
 
     public Result getEdit(){
         ArrayList<String> temp=storeEdits.get(storeEdits.size()-1);
         
         //String lastKnown=;
+        System.out.println(temp);
+        oldEdits.add(temp);
         storeEdits.remove(storeEdits.size()-1);
         
         ArrayList<String> lastEdit=storeEdits.get(storeEdits.size()-1);
         return ok(Json.toJson(lastEdit));
+    }
+    
+    public Result getOldEdits(){
+         ArrayList<String> recentoldEdit=oldEdits.get(0);
+         oldEdits.remove(0);
+        return ok(Json.toJson(recentoldEdit));
     }
 
 

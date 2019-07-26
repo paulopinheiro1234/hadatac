@@ -19,7 +19,8 @@ import play.mvc.Result;
 public class FileHeadersIntoSDD extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result createHeaders(String dir, String sdd_id) {
+	public Result createHeaders(String dir, String sdd_id,String headerSheetColumn,String commentSheetColumn  ) {
+        
         final SysUser user = AuthApplication.getLocalUser(session());
 
     	DataFile dataFile = null;
@@ -36,16 +37,16 @@ public class FileHeadersIntoSDD extends Controller {
         DataFile dirFile = new DataFile("/");
         dirFile.setStatus(DataFile.WORKING);
         
-		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile));
+		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile,headerSheetColumn,commentSheetColumn));
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreateHeaders(String dir, String sdd_uri) {
-        return createHeaders(dir, sdd_uri);
+    public Result postCreateHeaders(String dir, String sdd_uri,String headerSheetColumn,String commentSheetColumn) {
+        return createHeaders(dir, sdd_uri,headerSheetColumn,commentSheetColumn);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result createHeadersForm(String dir, String sdd_uri) {
+    public Result createHeadersForm(String dir, String sdd_uri,String headerSheetColumn,String commentSheetColumn) {
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
 

@@ -19,8 +19,28 @@
 		var msg = '@log';
 		var msg2 = decodeURIComponent(msg);
        	$('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
-      	document.getElementById('end-process-box').style.display = 'inline';
+		  document.getElementById('end-process-box').style.display = 'inline';
+		  
+		  //document.write("write here!");
+		//   $.ajax({
+		// 	url: "http://localhost:8080/blazegraph/namespce/store/sparql",
+			
+		// 	type: 'POST',
+		// 	format: 'json',
+		// 	dataType: 'json',
+		// 	contentType: 'application/json',
+			
+		// 	data: 'query=ASK{ <http://semanticscience.org/resource/TimeMeasurement> ?p ?o }',
+		// 	success: function (data) {
+		// 		alert(JSON.stringify(data));
+		// 	},
+		// 	error: function(){
+		// 		alert("Cannot get data");
+		// 	}
+		// });
+	
 	</script>
+	
 	
     <br><br>
     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>

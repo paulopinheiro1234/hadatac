@@ -56,16 +56,16 @@
   overflow: hidden;
 }
 #menulist{
-  margin-left:62px;
+  margin-left:85px;
 }
 #virtuallist{
-  margin-left:62px;
+  margin-left:85px;
 }
 /*=========================================*/
-#editRowsAdd{
+/* #editRowsAdd{
   justify-content: center;
   text-align: center;
-}
+} */
 .insertrowbtn{
   background-color: cornflowerblue;
   font-family:Arial;

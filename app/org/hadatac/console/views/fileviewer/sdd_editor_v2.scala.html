@@ -35,6 +35,9 @@
         <div class="undo-edit">
         <button class="undo-button" onclick="undoEdit()"> <img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="22" height="24" alt=""/> </button>
         </div>
+        <div class="undo-edit">
+          <button class="undo-button" onclick="reundoEdit()"> <img src="https://cdn4.iconfinder.com/data/icons/arrows-2-11/48/120-512.png" width="24" height="26" alt=""/> </button>
+        </div>
         <div class= shopbutton>
         <button class="cart" >
                     
@@ -49,7 +52,24 @@
   
         </ul>
       </div>
-      
+  
+      <script>
+       
+        var fid="@dataFile.getId()";
+        console.log(fid);
+        
+      $.ajax({
+        type : 'GET',
+        url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getfile_ID',
+        data : {
+          fileid: fid
+        },
+        success : function(data) {
+          //console.log(data);
+          
+        }
+      });
+      </script>
       <div class="cartbutton" id="viewcart">
         <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
             

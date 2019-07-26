@@ -151,6 +151,9 @@ $.ajax({
             //alert(newOntology);
             
             cdg.data[rowNum][colNum]=newOntology;
+            var colNum_str=colNum.toString();
+            var rowNum_str=rowNum.toString();
+            storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
             cdg.draw();
           })
                           
@@ -172,7 +175,7 @@ function storeThisEdit(rowNum_str,colNum_str,changeValue){
       editValue: changeValue
     },
     success : function(data) {
-      console.log(data);
+      
     }
   });
 }
@@ -185,7 +188,6 @@ function undoEdit(){
        //editValue: changeValue
     },
     success : function(data) {
-      console.log(data);
       var rnum=Number(data[0]);
       var cnum=Number(data[1]);
       var valueRevert=data[2];
@@ -194,12 +196,32 @@ function undoEdit(){
     }
   });
 }
+
+function reundoEdit(){
+  $.ajax({
+    type : 'GET',
+    url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getOldEdits',
+    data : {
+       //editValue: changeValue
+    },
+    success : function(data) {
+      var rnum=Number(data[0]);
+      var cnum=Number(data[1]);
+      var valueRevert=data[2];
+      cdg.data[rnum][cnum]=valueRevert;
+      cdg.draw();
+      
+    }
+  });
+}
+
 function revertRow(){
-  console.log(storeRow);
-  storeRow[0]
-  var temp=[]
-  for(var i=1;i<storeRow.length;i++){
-    temp.push(storeRow[i]);
+  
+  var temp=[];
+  for(var i=1;i<storeRow[storeRow.length-1].length;i++){
+    temp.push(storeRow[storeRow.length-1][i]);
   }
-  cdg.insertRow(temp,storeRow[0]);
+  cdg.insertRow(temp,storeRow[storeRow.length-1][0]);
+  storeRow.pop();
+  
 }

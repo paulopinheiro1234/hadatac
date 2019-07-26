@@ -16,9 +16,10 @@ import java.util.HashMap;
 import org.hadatac.console.controllers.workingfiles.WorkingFiles;
 import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
+import play.libs.Json;
 
 public class BrowseOntology extends Controller {
-
+    String file_id;
     public Result index(String oper) {
 	return ok(browseOntology.render(oper, EditingOptions.getEntities(), EditingOptions.getAttributes(), EditingOptions.getUnits()));
     }
@@ -28,10 +29,10 @@ public class BrowseOntology extends Controller {
     }
 
     public Result graphIndex(String oper, String className) {
-        List<DataFile> wkFiles = null;
+        
     //System.out.println(className);
     //System.out.println(EditingOptions.getHierarchy(className));
-    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(), wkFiles));
+    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(),getF_ID()));
     }
 
 
@@ -71,5 +72,13 @@ public class BrowseOntology extends Controller {
         NameSpaces ns = NameSpaces.getInstance();
         return ns.listLoadedOntologies();
     }
+    public Result getfile_ID(String fileid){
+        file_id=fileid;
+        return new Result(200);
+    }
+    
 
+    public String getF_ID(){
+        return file_id;
+    }
 }
