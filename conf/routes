@@ -468,9 +468,9 @@ POST	/hadatac/working/newfolder/form     	       org.hadatac.console.controllers
 GET	    /hadatac/working/deletefolder	        	   org.hadatac.console.controllers.workingfiles.Folder.delete(dir : String, path : String)
 POST	/hadatac/working/deletefolder     	           org.hadatac.console.controllers.workingfiles.Folder.postDelete(dir: String, path : String)
 POST	/hadatac/working/deletefolder/form     	       org.hadatac.console.controllers.workingfiles.Folder.deleteForm(dir: String, path : String)
-GET	    /hadatac/working/headers	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeaders(dir : String, sdd_uri : String,headerSheetColumn:String,commentSheetColumn:String)
-POST	/hadatac/working/headers     	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.postCreateHeaders(dir: String, sdd_uri : String,headerSheetColumn:String,commentSheetColumn:String)
-POST	/hadatac/working/headers/form     	           org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeadersForm(dir: String, sdd_uri : String,headerSheetColumn:String,commentSheetColumn:String)
+GET	    /hadatac/working/headers	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeaders(dir : String, sdd_uri : String, headerSheetColumn : String, commentSheetColumn : String)
+POST	/hadatac/working/headers     	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.postCreateHeaders(dir: String, sdd_uri : String, headerSheetColumn : String, commentSheetColumn : String)
+POST	/hadatac/working/headers/form     	           org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeadersForm(dir: String, dd_uri : String, sdd_uri : String, headerSheetColumn : String, commentSheetColumn : String)
 
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)

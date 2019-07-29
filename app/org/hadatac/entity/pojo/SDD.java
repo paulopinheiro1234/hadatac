@@ -71,7 +71,7 @@ public class SDD {
     }
 
     public String getName() {
-        String sddName = mapCatalog.get("Study_ID");
+        String sddName = mapCatalog.get("SDD_ID");
         //System.out.println("sddName: " + sddName);
         if (sddName == null) {
             return "";
