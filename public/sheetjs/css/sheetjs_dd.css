@@ -1,0 +1,43 @@
+.isHeader{
+  border:1px solid black;
+  border-radius:80px;
+  height:34px;
+  margin-bottom: 5px;
+  width: 209;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 11pt;
+  text-align: center;
+  background-color: rgb(173, 217, 253);
+}
+#headerdetails{
+    width:20%;
+    font-size: 11pt;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left:5pt;
+    color:black;
+    border-block-color: black;
+    position: relative;
+  }
+.isDesc{
+border:1px solid black;
+border-radius:80px;
+height:34px;
+margin-bottom: 5px;
+width: 207;
+font-family: Arial, Helvetica, sans-serif;
+font-weight: bold;
+font-size: 11pt;
+text-align: center;
+background-color: rgb(173, 217, 253);
+
+}
+#descdetails{
+width:20%;
+font-size: 11pt;
+font-family: Arial, Helvetica, sans-serif;
+margin-left:5pt;
+color:black;
+border-block-color: black;
+position: relative;
+}

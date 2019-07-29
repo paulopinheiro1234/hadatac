@@ -113,9 +113,13 @@
                         <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                     }
                     
+                    
                 }
-                
+                @if(file.getFileName().startsWith("DD") || file.getFileName().startsWith("dd")){
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.DDEditor.index(file.getId(), true, dir)" class="btn btn-xs btn-primary" role="button" id="edit">Edit DD</a>
+                }
                 @if(file.getFileName().startsWith("SDD") || file.getFileName().startsWith("sdd")) {
+                    
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit SDD</a>
                 }
                 </td>
@@ -145,7 +149,7 @@
                 @*
                 @if(file.getFileName().startsWith("SDD-")) {
                     @defining("") { fileId =>
-                	    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="headers">Add Headers</a>
+                	    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, file.getId(),null,null)" class="btn btn-xs btn-primary" role="button" id="headers">Add Headers</a>
 					}
 				}
 				*@

@@ -17,11 +17,11 @@
 <script type="text/javascript">
 	   function checkform() {
 	      var cansubmit = true;
-	      
+
 	      if (document.getElementById('targetFile').value.length == 0) {
 	          cansubmit = false;
 	      }
-	
+
 	      if (cansubmit) {
 	          document.getElementById('submitbutton1').disabled = false;
 	          document.getElementById('submitbutton2').disabled = false;
@@ -71,18 +71,19 @@
   <div class="container">
 
     <form class="form-horizontal" name="newDAS" method="post">
-	
+
       <div class="form-group">
          <h3>Add File Headers into SDD</h3>
-	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>	
+         <h3>@headerSheetColumn, @commentSheetColumn</h3>
+	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>
 	     <p>This option extract column headers from data dictionary (DD) files and add them into a give Semantic Data Dictionary (SDD).</p>
 	  </div>
-	  
+
       <div class="form-group">
 		<label>SDD:</label> This is the Data Dictionary file providing the column headers and comments to be added into an SDD.
  		<input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@dd_name >
       </div>
-      
+
       <div class="form-group">
 		<label>Selected File:</label> The SDD file receiving the DD information needs to be selected. If the SDD is already on working files, use the option
 		below to expand the directories and select the target SDD.
@@ -91,20 +92,20 @@
 		   		@tree_node_generic(DataFile.getHierarchy("/","",false),"targetFile", "", false)
 			}
           </ul>
-		
+
       </div>
-      
-      @defining("") { labels => 
+
+      @defining("") { labels =>
       	  <div class="form-group" class="col-sm-6 col-offset-3">
-        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Copy Column Headers" disabled="disabled" 
+        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Copy Column Headers" disabled="disabled"
         	         formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFile(labels)"/>
       	  </div>
       }
-      
+
       <div class="form-group" class="col-sm-6 col-offset-3">
 	     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Back to Working Files</a>
       </div>
-      
+
     </form>
   </div>
  	<script>
@@ -131,6 +132,6 @@
          });
        }
        </script>
- 
-  
+
+
   }

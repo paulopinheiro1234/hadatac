@@ -2,7 +2,7 @@
 graphName : String,
 hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
 loadedList : List[String],
-workingFiles     : List[org.hadatac.entity.pojo.DataFile]
+f_id: String
 )
 
 @import org.hadatac.console.views.html._
@@ -179,14 +179,13 @@ function checkform() {
 
 
  <div class="container-fluid">
-
+ 
     <h2>Browse Loaded Ontologies</h2>
     <div style="float:right" style="margin-bottom: 5px">
-        
-    
-    <button type="button" class="btn btn-info btn-sm" role="button" style="display: inline-block;">
-        <span class="glyphicon glyphicon-circle-arrow-left">  </span> Back to SDD Edit
-    </button>
+
+    <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(f_id, true)" 
+    class="btn btn-xs btn-primary" role="button" id="togoback"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</a>
+   
     
     </div>
     <h5>Currently displaying @graphName</h5>

@@ -1,0 +1,105 @@
+@(dataFile : org.hadatac.entity.pojo.DataFile,
+dd_dataFile: org.hadatac.entity.pojo.DataFile,
+bSavable : Boolean,
+dir: String,
+headerSheetColumn: String,
+commentSheetColumn: String
+)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.views.html.annotator._
+@import org.hadatac.console.controllers.annotator._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Edit DD_2"){
+    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
+    <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
+
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs_dd.css")">
+    <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+    
+    <div id="rcorners">
+    <h4>@dataFile.getFileName()</h4>
+    @if(bSavable) {
+        <input class="btn btn-primary" type="button" id="upload" value="Save"/>
+    }
+    
+    
+    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+    <button type="button" class="isHeader" role="button">
+    <img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/heading-387783.png" width="36" height="30" alt=""/> Column Header 
+    </button>
+    <input type="text" id="headerdetails" value=" "/>
+    <button type="button" class="isDesc" role="button">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Notepad_icon.svg/1024px-Notepad_icon.svg.png" width="34" height="28" alt=""/> Description
+    </button>
+    <input type="text" id="descdetails" value=" "/>
+    <button class="btn btn-primary" onclick="saveLocations()">Save Locations</button>
+    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId(),headerSheetColumn,commentSheetColumn)" 
+    class="btn btn-primary" role="button">Add to SDD</a>
+    <div><a id="alarmmsg"></a></div>
+    
+    
+    <div><a id="error_msg"></a></div>
+    <div id="grid"></div>
+    <div id="footnote"></div>
+    <div id="buttons"></div>
+    </div>
+
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server_dd.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
+    
+    <script type="text/javascript">
+    /* set up async GET request */
+    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
+    var _upload = document.getElementById('upload');    
+    var _onreponse = function() {
+    	$("#error_msg").html(decodeURIComponent(this.responseText));
+    	setTimeout(function() {
+    		$("#error_msg").html("");
+    	}, 3000);
+    };
+    
+    var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.responseType = "arraybuffer";
+
+    req.onload = function(e) {
+      var data = new Uint8Array(req.response);
+      
+      // var workbook = XLSX.read(data, {type:"array"});
+      // console.log("SheetNames: " + workbook.SheetNames);
+
+      DropSheet({
+        data: data,
+        file: _file,
+        filetype: "@dataFile.getFileExtention()",
+        drop: _target,
+        upload: _upload,
+        upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",
+        formdata: JSON.stringify({"fileId": "@dataFile.getId()"}),
+        reponse_action: _onreponse,
+        on: {
+            workstart: _workstart,
+            workend: _workend,
+            sheet: _onsheet,
+            foo: 'bar'
+        },
+        errors: {
+            badfile: _badfile,
+            pending: _pending,
+            failed: _failed,
+            large: _large,
+            foo: 'bar'
+        }
+      });
+    }
+    req.send();
+    </script>
+}
