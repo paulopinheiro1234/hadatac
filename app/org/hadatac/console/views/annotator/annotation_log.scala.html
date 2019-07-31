@@ -1,8 +1,13 @@
 @(log : String,
-  postAction : String)
+  postAction : String,
+  dataFile: org.hadatac.entity.pojo.DataFile)
 
 @import helper._
 @import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.annotator._
+
+
+@import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
 @import java.net._
 
@@ -14,32 +19,24 @@
   	</div>
 	
 	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-	
+	<script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
+	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 	<script>
 		var msg = '@log';
 		var msg2 = decodeURIComponent(msg);
        	$('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
 		  document.getElementById('end-process-box').style.display = 'inline';
 		  
-		  //document.write("write here!");
-		//   $.ajax({
-		// 	url: "http://localhost:8080/blazegraph/namespce/store/sparql",
-			
-		// 	type: 'POST',
-		// 	format: 'json',
-		// 	dataType: 'json',
-		// 	contentType: 'application/json',
-			
-		// 	data: 'query=ASK{ <http://semanticscience.org/resource/TimeMeasurement> ?p ?o }',
-		// 	success: function (data) {
-		// 		alert(JSON.stringify(data));
-		// 	},
-		// 	error: function(){
-		// 		alert("Cannot get data");
-		// 	}
-		// });
+		var url2="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&') ;
+		openSDD(url2);
+	// 	console.log(url2);
+	//    var url="@dataFile.getId()";
+	//    console.log(url);
+	// 	getURL("/hadatac/annotator/downloadfile?file_id="+"@dataFile.getId()");
 	
 	</script>
+	<div id="found" style="font-family: 'Courier New', Courier, monospace" style="font-size: 16pt"></div>
+	<div id="notfound" style="font-family: 'Courier New', Courier, monospace" style="font-size: 16pt"></div>
 	
 	
     <br><br>

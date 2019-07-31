@@ -97,7 +97,9 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   }
   cdg.draw();
 };
-
+if(document.getElementById("headerdetails").value==" "){
+  document.getElementById('carryover').setAttribute("disabled", "disabled");
+}
 cdg.addEventListener('contextmenu', function (e) {
     e.items.push({
         title: 'Choose Header or Description',
@@ -110,6 +112,8 @@ cdg.addEventListener('contextmenu', function (e) {
                     var header_location=sheet_name+"-"+val;
                     var header_=document.getElementById("headerdetails");
                     header_.value=header_location;
+                    document.getElementById('carryover').removeAttribute("disabled");
+                   
                     storeHeader(header_location);
                 }
             },
@@ -127,11 +131,12 @@ cdg.addEventListener('contextmenu', function (e) {
         ]
     });
 });
+
 function storeHeader(header_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/annotator/dd_editor/getHeaderLoc',
+    url : 'http://localhost:9000/hadatac/working/headers/getHeaderLoc',
     data : {
       header_loc: header_location
       
@@ -148,7 +153,7 @@ function storeDesc(desc_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/annotator/dd_editor/getDescLoc',
+    url : 'http://localhost:9000/hadatac/working/headers/getCommentLoc',
     data : {
       desc_loc: desc_location
       
@@ -160,12 +165,15 @@ function storeDesc(desc_location){
   });
   
 }
-function saveLocations(){
-  location.reload();
-  var msg="Locations stored Successfully";
-  document.getElementById("alarmmsg").innerHTML = msg;
+// function saveLocations(){
+//   location.reload();
+//   var msg="Locations stored Successfully";
+//   document.getElementById("alarmmsg").innerHTML = msg;
 
-  setTimeout(function(){
-      document.getElementById("alarmmsg").innerHTML = '';
-  }, 3000);
-}
+//   setTimeout(function(){
+//       document.getElementById("alarmmsg").innerHTML = '';
+//   }, 3000);
+// }
+// alert(document.getElementById("headerdetails").value);
+// console.log(document.getElementById("headerdetails"));
+

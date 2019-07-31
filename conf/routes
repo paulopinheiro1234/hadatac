@@ -370,17 +370,13 @@ POST    /hadatac/annotator/sddeditor                   org.hadatac.console.contr
 POST    /hadatac/annotator/sddeditor/upload            org.hadatac.console.controllers.fileviewer.SDDEditor.uploadSDDFile()
 #GET	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(dir : String, file_id : String, da_uri: String)
 #POST	/hadatac/annotator/csvpreview/selectCol        org.hadatac.console.controllers.fileviewer.CSVPreview.selectColumn(dir : String, file_id : String, da_uri: String)
-GET     /hadatac/annotator/sddeditor_v2                org.hadatac.console.controllers.fileviewer.SDDEditorV2.index(file_id : String, bSavable : Boolean)
-POST    /hadatac/annotator/sddeditor_v2               org.hadatac.console.controllers.fileviewer.SDDEditorV2.postIndex(file_id : String, bSavable : Boolean)
+GET     /hadatac/annotator/sddeditor_v2                org.hadatac.console.controllers.fileviewer.SDDEditorV2.index(file_id : String, bSavable : Boolean, headerSheetColumn:String,commentSheetColumn:String)
+POST    /hadatac/annotator/sddeditor_v2               org.hadatac.console.controllers.fileviewer.SDDEditorV2.postIndex(file_id : String, bSavable : Boolean, headerSheetColumn:String,commentSheetColumn:String)
 
 GET     /hadatac/annotator/dd_editor                org.hadatac.console.controllers.fileviewer.DDEditor.index(file_id : String, bSavable : Boolean, dir:String)
 POST    /hadatac/annotator/dd_editor               org.hadatac.console.controllers.fileviewer.DDEditor.postIndex(file_id : String, bSavable : Boolean, dir:String)
 
-GET     /hadatac/annotator/dd_editor/getHeaderLoc               org.hadatac.console.controllers.fileviewer.DDEditor.getHeaderLoc(header_loc  : String)
-POST    /hadatac/annotator/dd_editor/getHeaderLoc               org.hadatac.console.controllers.fileviewer.DDEditor.getHeaderLoc(header_loc  : String)
 
-GET     /hadatac/annotator/dd_editor/getDescLoc               org.hadatac.console.controllers.fileviewer.DDEditor.getDescLoc(desc_loc:String)
-POST    /hadatac/annotator/dd_editor/getDescLoc               org.hadatac.console.controllers.fileviewer.DDEditor.getDescLoc(desc_loc:String)
 
 GET     /hadatac/annotator/sddeditor_v2/addToCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.addToCart(ontology : String)
 POST    /hadatac/annotator/sddeditor_v2/addToCart               org.hadatac.console.controllers.fileviewer.SDDEditorV2.addToCart(ontology : String)
@@ -408,6 +404,7 @@ POST    /hadatac/annotator/sddeditor_v2/removingRow               org.hadatac.co
 
 GET     /hadatac/annotator/sddeditor_v2/getOldEdits               org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOldEdits()
 POST    /hadatac/annotator/sddeditor_v2/getOldEdits               org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOldEdits()
+
 
 
 GET	    /hadatac/annotator/schema                      org.hadatac.console.controllers.annotator.SchemaFromFile.create(dir : String, file_id : String)
@@ -468,10 +465,15 @@ POST	/hadatac/working/newfolder/form     	       org.hadatac.console.controllers
 GET	    /hadatac/working/deletefolder	        	   org.hadatac.console.controllers.workingfiles.Folder.delete(dir : String, path : String)
 POST	/hadatac/working/deletefolder     	           org.hadatac.console.controllers.workingfiles.Folder.postDelete(dir: String, path : String)
 POST	/hadatac/working/deletefolder/form     	       org.hadatac.console.controllers.workingfiles.Folder.deleteForm(dir: String, path : String)
-GET	    /hadatac/working/headers	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeaders(dir : String, sdd_uri : String, headerSheetColumn : String, commentSheetColumn : String)
-POST	/hadatac/working/headers     	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.postCreateHeaders(dir: String, sdd_uri : String, headerSheetColumn : String, commentSheetColumn : String)
-POST	/hadatac/working/headers/form     	           org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeadersForm(dir: String, dd_uri : String, sdd_uri : String, headerSheetColumn : String, commentSheetColumn : String)
+GET	    /hadatac/working/headers	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeaders(dir : String, sdd_uri : String, sdd_id:String)
+POST	/hadatac/working/headers     	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.postCreateHeaders(dir: String, sdd_uri : String,sdd_id:String)
+POST	/hadatac/working/headers/form     	           org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.createHeadersForm(dir: String, dd_uri : String, sdd_uri : String)
 
+GET	    /hadatac/working/headers/getHeaderLoc	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getHeaderLoc(header_loc:String)
+POST	/hadatac/working/headers/getHeaderLoc   	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getHeaderLoc(header_loc:String)
+
+GET	    /hadatac/working/headers/getCommentLoc	        	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getCommentLoc(desc_loc:String)
+POST	/hadatac/working/headers/getCommentLoc   	               org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getCommentLoc(desc_loc:String)
 # metadata store management URLs
 GET     /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.clean(oper: String)
 POST    /hadatac/ts/clean                              org.hadatac.console.controllers.triplestore.Clean.postClean(oper: String)

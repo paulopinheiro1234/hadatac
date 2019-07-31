@@ -2,7 +2,9 @@
   dd_dataFile: org.hadatac.entity.pojo.DataFile,
   bSavable : Boolean,
   loadedList : List[String],
-  testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2)
+  testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2,
+  headerSheetColumn:String,
+  commentSheetColumn: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -33,7 +35,7 @@
       <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
         <input type="text" id="varDescription" value="Description of Column Variable:"/>
         <div class="undo-edit">
-        <button class="undo-button" onclick="undoEdit()"> <img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="22" height="24" alt=""/> </button>
+        <button class="undo-button" onclick="undoEdit()"> <img src="https://cdn1.iconfinder.com/data/icons/navigation-elements/512/left-rotate-back-motion-arrow-512.png" width="28" height="33" alt=""/> </button>
         </div>
         <div class="undo-edit">
           <button class="undo-button" onclick="reundoEdit()"> <img src="https://cdn4.iconfinder.com/data/icons/arrows-2-11/48/120-512.png" width="24" height="26" alt=""/> </button>
@@ -81,7 +83,23 @@
       </ul>
       
       </div>
-             
+      <button type="button"role="button" id="populatesdd" style="display: inline-block;" onclick="populateSDD()">Pop</button>
+      <script>
+        function populateSDD(){
+          //var header="@headerSheetColumn";
+          
+          var header="DATA DICTIONARY-VARNAME";
+          var headersheet=header.split('-')[0];
+          var headercol=header.split('-')[1];
+          //var comments="@commentSheetColumn";
+          var comments="DATA DICTIONARY-VARDESC";
+          var commentsheet=comments.split('-')[0];
+          var commentcol=comments.split('-')[1];
+          var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+          DDforPopulate(durl,headersheet,headercol)
+        }
+      </script>
+
       <button class="main-nav" id="show">Show Options</button>
       <button class="Close" id="hide">Hide Options</button>
 
@@ -104,7 +122,7 @@
               <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
               <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
               <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
-              <button class="undo-remove-row" onclick="revertRow()"><img src="https://www.iconsdb.com/icons/preview/purple/undo-4-xxl.png" width="15" height="18" alt=""/> </button>
+              <button class="undo-remove-row" onclick="revertRow()"><img src="https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png" width="15" height="18" alt=""/> </button>
             </div>
             
         </div>

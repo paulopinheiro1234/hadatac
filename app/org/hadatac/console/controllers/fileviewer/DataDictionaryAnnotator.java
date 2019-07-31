@@ -105,10 +105,12 @@ public class DataDictionaryAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    
     public Result checkAnnotationLog(String fileId) {
+        DataFile dataFile = DataFile.findById(fileId);
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLog()), 
-                routes.SDDEditor.index().url()));
+                routes.SDDEditor.index().url(),dataFile));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

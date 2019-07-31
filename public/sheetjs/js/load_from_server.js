@@ -56,6 +56,7 @@ function changeHeader(headers,json){
 
 }
 /* make the buttons for the sheets */
+
 var make_buttons = function(sheetnames, cb) {
   var buttons = document.getElementById('buttons');
   buttons.innerHTML = "";
@@ -66,6 +67,7 @@ var make_buttons = function(sheetnames, cb) {
     btn.type = 'button';
     btn.name = 'btn' + idx;
     btn.text = s;
+    sheetName=s;
     var txt = document.createElement('h5');
     txt.innerText = s;
     btn.appendChild(txt);
@@ -588,4 +590,57 @@ var closebtns = document.getElementsByClassName("remove");
     closebtns[i].addEventListener("click", function() {
       this.parentElement.style.display = 'none';
     });
+}
+
+
+function DDforPopulate(durl,headersheet,headercol){
+  console.log(headercol)
+  headercol+=" ";
+  var oReq = new XMLHttpRequest();
+   oReq.open("GET", durl, true);
+   oReq.responseType = "arraybuffer";
+
+  oReq.onload = function(e) {
+      var arraybuffer = oReq.response;
+
+      /* convert data to binary string */
+      var data = new Uint8Array(arraybuffer);
+      var arr = new Array();
+      for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
+      var bstr = arr.join("");
+
+      /* Call XLSX */
+      var workbook = XLSX.read(bstr, {
+          type: "binary"
+      });
+
+
+      var first_sheet_name = headersheet;
+      /* Get worksheet */
+      console.log(first_sheet_name);
+      var worksheet = workbook.Sheets[first_sheet_name];
+      var xlarray=XLSX.utils.sheet_to_json(worksheet, {
+          raw: true
+      });
+      var headersCol=[];
+      xlarray.forEach(function(item) {
+      Object.keys(item).forEach(function(key) {
+        if(key==headercol){
+          headersCol.push(item[key]);
+        }
+      });
+    });
+    populateThis(headersCol);
+  }
+
+  oReq.send();
+
+}
+function populateThis(headersCol){
+  var ct=0;
+  for(var i=0;i<headersCol.length;i++){
+    ct++;
+    cdg.data[ct][0]=headersCol[i];
+  }
+  
 }

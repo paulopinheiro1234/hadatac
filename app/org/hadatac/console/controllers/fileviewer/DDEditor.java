@@ -19,8 +19,7 @@ import play.libs.Json;
 
 
 public class DDEditor extends Controller {
-   String headerSheetColumn="*";
-   String commentSheetColumn="*";
+   
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 
     
@@ -29,7 +28,7 @@ public class DDEditor extends Controller {
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         if (null == dataFile) {
 
-            return ok(dd_editor.render(dataFile, null, false,dir,headerSheetColumn,commentSheetColumn));
+            return ok(dd_editor.render(dataFile, null, false,dir));
         }
         
         List<DataFile> files = null;
@@ -37,23 +36,20 @@ public class DDEditor extends Controller {
 
         files = DataFile.find(user.getEmail());
 
-        String dd_filename=dataFile.getFileName();
-        dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
-        DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
+        String sdd_filename=dataFile.getFileName();
+        sdd_filename = "S"+sdd_filename; // Only files with the prefix SDD are allowed so were always going to have a second character
+        DataFile sdd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
 
         for(DataFile df : files){
-           if(df.getFileName().equals(dd_filename)){
-             dd_dataFile = df;
+           if(df.getFileName().equals(sdd_filename)){
+             sdd_dataFile = df;
           }
        }
 
-         System.out.println(headerSheetColumn);
-          System.out.println(commentSheetColumn);
-    	// System.out.println("files = " + files);
-    	// System.out.println("dd_dataFile = " + dd_dataFile.getFileName());
+        
 
         
-        return ok(dd_editor.render(dataFile, dd_dataFile, bSavable,dir,headerSheetColumn,commentSheetColumn));
+        return ok(dd_editor.render(dataFile, sdd_dataFile, bSavable,dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -67,19 +63,12 @@ public class DDEditor extends Controller {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile,null, false,dir,headerSheetColumn,commentSheetColumn));
+        return ok(dd_editor.render(dataFile,null, false,dir));
     }
 
     public Result postFromSharedLink(String sharedId,String dir) {
         return fromSharedLink(sharedId,dir);
     }
-    public Result getHeaderLoc(String header_loc){
-        headerSheetColumn=header_loc;
-        return ok(Json.toJson(headerSheetColumn)); 
-    }   
-    public Result getDescLoc(String desc_loc){
-        commentSheetColumn=desc_loc;
-        return ok(Json.toJson(commentSheetColumn)); 
-    } 
+   
 
 }

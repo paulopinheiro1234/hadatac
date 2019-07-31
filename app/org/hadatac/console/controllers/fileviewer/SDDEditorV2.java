@@ -24,17 +24,18 @@ public class SDDEditorV2 extends Controller {
         List<String> currentCart=new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
         ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
+        
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 
 
-    public Result index(String fileId, boolean bSavable) {
+    public Result index(String fileId, boolean bSavable,String headerSheetColumn, String commentSheetColumn) {
 
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         if (null == dataFile) {
 
-            return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this));
+            return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this,headerSheetColumn,commentSheetColumn));
         }
 
 
@@ -58,25 +59,25 @@ public class SDDEditorV2 extends Controller {
     	// System.out.println("dd_dataFile = " + dd_dataFile.getFileName());
 
 
-        return ok(sdd_editor_v2.render(dataFile, dd_dataFile, bSavable,loadedList,this));
+        return ok(sdd_editor_v2.render(dataFile, dd_dataFile, bSavable,loadedList,this,headerSheetColumn,commentSheetColumn));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String fileId, boolean bSavable) {
-        return index(fileId, bSavable);
+    public Result postIndex(String fileId, boolean bSavable, String headerSheetColumn, String commentSheetColumn) {
+        return index(fileId, bSavable,headerSheetColumn,commentSheetColumn);
     }
 
-    public Result fromSharedLink(String sharedId) {
+    public Result fromSharedLink(String sharedId,String headerSheetColumn,String commentSheetColumn) {
         DataFile dataFile = DataFile.findBySharedId(sharedId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(sdd_editor_v2.render(dataFile,null, false,loadedList,this));
+        return ok(sdd_editor_v2.render(dataFile,null, false,loadedList,this,headerSheetColumn,commentSheetColumn));
     }
 
-    public Result postFromSharedLink(String sharedId) {
-        return fromSharedLink(sharedId);
+    public Result postFromSharedLink(String sharedId,String headerSheetColumn,String commentSheetColumn) {
+        return fromSharedLink(sharedId,headerSheetColumn,commentSheetColumn);
     }
 
     // public Result testPrint(String s){
@@ -149,6 +150,7 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(recentoldEdit));
     }
 
+    
 
     
 }

@@ -17,11 +17,13 @@ import play.mvc.*;
 import play.mvc.Result;
 
 public class FileHeadersIntoSDD extends Controller {
-
+    String headerSheetColumn;
+    String commentSheetColumn;
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result createHeaders(String dir, String dd_id, String headerSheetColumn, String commentSheetColumn) {
+    
+	public Result createHeaders(String dir, String dd_id,String sdd_id) {
         final SysUser user = AuthApplication.getLocalUser(session());
-
+        
     	DataFile dataFile = null;
         if (user.isDataManager()) {
             dataFile = DataFile.findById(dd_id);
@@ -36,20 +38,28 @@ public class FileHeadersIntoSDD extends Controller {
         DataFile dirFile = new DataFile("/");
         dirFile.setStatus(DataFile.WORKING);
 
-		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile, headerSheetColumn, commentSheetColumn));
+		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile,headerSheetColumn,commentSheetColumn,sdd_id));
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreateHeaders(String dir, String dd_uri, String headerSheetColumn, String commentSheetColumn) {
-        return createHeaders(dir, dd_uri, headerSheetColumn, commentSheetColumn);
+    public Result postCreateHeaders(String dir, String dd_uri,String sdd_id) {
+        return createHeaders(dir, dd_uri,sdd_id);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result createHeadersForm(String dir, String dd_uri, String sdd_uri, String headerSheetColumn, String commentSheetColumn) {
+    public Result createHeadersForm(String dir, String dd_uri, String sdd_uri) {
 
     	/* ADD THE DD CONTENT FROM DD_URI INTO THE SDD)URI  */
 
     	return redirect(routes.WorkingFiles.index(dir, "."));
+    }
+    public Result getHeaderLoc(String header_loc){
+        headerSheetColumn=header_loc;
+        return new Result(200);
+    }
+    public Result getCommentLoc(String desc_loc){
+        commentSheetColumn=desc_loc;
+        return new Result(200);
     }
 
 }

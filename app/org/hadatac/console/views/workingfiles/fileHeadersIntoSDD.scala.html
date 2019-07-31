@@ -2,7 +2,9 @@
   dd_name            : String,
   dirFile            : org.hadatac.entity.pojo.DataFile,
   headerSheetColumn  : String,
-  commentSheetColumn : String)
+  commentSheetColumn : String,
+  sdd_id             : String
+)
 
 @import helper._
 @import org.hadatac.utils._
@@ -13,7 +15,7 @@
 @import org.hadatac.entity.pojo._
 
 @main("Add File Headers into SDD") {
-
+<h1>@headerSheetColumn,@commentSheetColumn,@sdd_id</h1> 
 <script type="text/javascript">
 	   function checkform() {
 	      var cansubmit = true;
@@ -74,7 +76,7 @@
 
       <div class="form-group">
          <h3>Add File Headers into SDD</h3>
-         <h3>@headerSheetColumn, @commentSheetColumn</h3>
+         
 	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>
 	     <p>This option extract column headers from data dictionary (DD) files and add them into a give Semantic Data Dictionary (SDD).</p>
 	  </div>
@@ -96,30 +98,51 @@
       </div>
 
       @defining("") { labels =>
-      	  <div class="form-group" class="col-sm-6 col-offset-3">
-        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Copy Column Headers" disabled="disabled"
-        	         formaction="@org.hadatac.console.controllers.schema.routes.NewDAS.processFormFromFile(labels)"/>
+      	  <div class="form-group" class="col-sm-6 col-offset-3" id="form_group">
+        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Copy Column Headers" disabled="disabled"/>
+            <div id="donemsg"></div>
       	  </div>
       }
+      <script> 
+      
+       document.getElementById("submitbutton1").onclick = function() {
+          var msg="Copied Successfully";
+          document.getElementById("donemsg").innerHTML=msg;
 
+          setTimeout(function(){
+              document.getElementById("donemsg").innerHTML = '';
+          }, 7000);
+          
+      }
+      </script>
+      <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(sdd_id, true,headerSheetColumn,commentSheetColumn)" 
+      class="btn btn-xs btn-primary" role="button" id="togoback" style="margin-bottom: 8pt"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</a>
       <div class="form-group" class="col-sm-6 col-offset-3">
 	     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Back to Working Files</a>
       </div>
 
     </form>
   </div>
+  <div id="lg"></div>
  	<script>
+     $( "input" ).on( "click", function() {
+       alert(( "input:checked" ).val());
+      //$( "#lg" ).html( $( "input:checked" ).val() + " is checked!" );
+    });
        function typechange() {
           var newType = $("input[name=newStudyType]:checked").val();
- 	  $('#currentType').val(newType);
+          
+     $('#currentType').val(newType);
           checkform();
        };
 
        var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
        for(var i = 0; i < tree.length; i++){
           tree[i].addEventListener('click', function(e) {
+           
           var parent = e.target.parentElement;
           var classList = parent.classList;
+          
           if(classList.contains("open")) {
             classList.remove('open');
             var opensubs = parent.querySelectorAll(':scope .open');
