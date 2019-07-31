@@ -15,7 +15,7 @@
 @import org.hadatac.entity.pojo._
 
 @main("Add File Headers into SDD") {
-<h1>@headerSheetColumn,@commentSheetColumn,@sdd_id</h1> 
+
 <script type="text/javascript">
 	   function checkform() {
 	      var cansubmit = true;
@@ -116,10 +116,8 @@
       }
       </script>
       <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(sdd_id, true,headerSheetColumn,commentSheetColumn)" 
-      class="btn btn-xs btn-primary" role="button" id="togoback" style="margin-bottom: 8pt"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</a>
-      <div class="form-group" class="col-sm-6 col-offset-3">
-	     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Back to Working Files</a>
-      </div>
+      class="btn btn-primary" role="button" id="togoback" style="margin-bottom: 8pt"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</a>
+      
 
     </form>
   </div>

@@ -31,8 +31,28 @@
     <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
 
 
-    <button class="btn btn-primary">Back</button>
+    
       <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
+
+      <button class="btn btn-primary" type="button"role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
+      
+      <script>
+        function populateSDD(){
+          //var header="@headerSheetColumn";
+          
+          var header="DATA DICTIONARY-VARNAME";
+          var headersheet=header.split('-')[0];
+          var headercol=header.split('-')[1];
+          //var comments="@commentSheetColumn";
+          var comments="DATA DICTIONARY-VARDESC";
+          var commentsheet=comments.split('-')[0];
+          var commentcol=comments.split('-')[1];
+          var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+          DDforPopulate(durl,headersheet,headercol)
+        }
+      </script>
+
+
         <input type="text" id="varDescription" value="Description of Column Variable:"/>
         <div class="undo-edit">
         <button class="undo-button" onclick="undoEdit()"> <img src="https://cdn1.iconfinder.com/data/icons/navigation-elements/512/left-rotate-back-motion-arrow-512.png" width="28" height="33" alt=""/> </button>
@@ -83,22 +103,7 @@
       </ul>
       
       </div>
-      <button type="button"role="button" id="populatesdd" style="display: inline-block;" onclick="populateSDD()">Pop</button>
-      <script>
-        function populateSDD(){
-          //var header="@headerSheetColumn";
-          
-          var header="DATA DICTIONARY-VARNAME";
-          var headersheet=header.split('-')[0];
-          var headercol=header.split('-')[1];
-          //var comments="@commentSheetColumn";
-          var comments="DATA DICTIONARY-VARDESC";
-          var commentsheet=comments.split('-')[0];
-          var commentcol=comments.split('-')[1];
-          var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-          DDforPopulate(durl,headersheet,headercol)
-        }
-      </script>
+      
 
       <button class="main-nav" id="show">Show Options</button>
       <button class="Close" id="hide">Hide Options</button>
