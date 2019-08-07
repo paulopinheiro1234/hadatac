@@ -1,10 +1,16 @@
 package ingestDataTest;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.hadatac.entity.pojo.OperationMode;
 
 public class PreCheckTest extends StepTest{
 	private static final PreCheckTest test = new PreCheckTest();
@@ -25,6 +31,7 @@ public class PreCheckTest extends StepTest{
 	
 	@Override
 	public void test() {
+		String email = "userTest@test";
 		String host = "localhost";
 		int solrPort = 8983;
 		int blazePort = 8080;
@@ -51,6 +58,21 @@ public class PreCheckTest extends StepTest{
 		}
 		System.out.println("[Step 1] Blazegraph Check Pass.");
 		
+		//enter sandbox mode
+        //List<OperationMode> modes = OperationMode.findAll();
+        OperationMode m = OperationMode.findByEmail(email);
+        if(m != null) {
+        	System.out.println("[Step 1] Test Sandbox Mode has been found.");
+        	assertTrue("Test Sandbox delete unsuccessfully", m.delete() != -1);
+        }
+        
+        OperationMode mode = new OperationMode();
+        mode.setUserEmail(email);
+        mode.setOperationMode(OperationMode.SANDBOX);
+        mode.setLastEnterTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        mode.save();
+        
+        System.out.println("[Step 1] Test Sandbox Mode has been created.");
 	}
 
 

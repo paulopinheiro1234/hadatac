@@ -1,4 +1,5 @@
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -10,6 +11,9 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
+import org.hadatac.entity.pojo.OperationMode;
+import org.hadatac.utils.ConfigProp;
+import org.junit.After;
 import org.junit.Test;
 
 import ingestDataTest.CleanDataTest;
@@ -119,11 +123,31 @@ public class IngestDataTest {
 	
 	public void testAll()
 	{
-		for(StepTest test : tests)
-		{
-			test.execute();
+		try {
+			for(StepTest test : tests)
+			{
+				test.execute();
+			}
 		}
-		//tests.get(4).execute();
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return;
+		}
+		
 		System.out.println("\nCongratulation: IngestDataTest Pass.");
+		
+	}
+	
+	@After
+	public void exitSandbox()
+	{
+		String email = "userTest@test";
+		OperationMode m = OperationMode.findByEmail(email);
+        if(m != null) {
+        	System.out.println("[After Test] Test Sandbox Mode has been found.");
+        	assertTrue("Sandbox mode deletes unsuccessfully after test", m.delete() != -1);
+        }
+        System.out.println("[After Test] Sandbox mode has been successfully deleted.");
 	}
 }

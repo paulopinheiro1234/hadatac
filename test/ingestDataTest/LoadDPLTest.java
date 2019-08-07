@@ -18,6 +18,7 @@ import org.hadatac.entity.pojo.InstrumentType;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpace;
 import org.hadatac.utils.State;
 
@@ -69,16 +70,43 @@ public class LoadDPLTest extends StepTest{
 	        dataFile.delete();
 		}
 		
-		System.out.println("[Step 4] Deleted all existing processed_csv file");
+		System.out.println("[Step 4] Deleted all existing processed csv file");
 		
-		//TODO: delete all files in unprocessed_csv
+		//delete all unprocessed files
+		List<DataFile> unprocessed = DataFile.findByStatus(DataFile.UNPROCESSED);
+		for(DataFile dataFile : unprocessed)
+		{
+			File file = new File(dataFile.getAbsolutePath());
+			dataFile.delete();
+			file.delete();
+		}
+		System.out.println("[Step 4] Deleted all existing unprocessed csv file");
 		
+		//delete all freezed files
+		List<DataFile> freezed = DataFile.findByStatus(DataFile.FREEZED);
+		for(DataFile dataFile : freezed)
+		{
+			File file = new File(dataFile.getAbsolutePath());
+			dataFile.delete();
+			file.delete();
+		}
+		System.out.println("[Step 4] Deleted all existing freezed csv file");
+		
+		//delete all working files
+		List<DataFile> working = DataFile.findByStatus(DataFile.WORKING);
+		for(DataFile dataFile : working)
+		{
+			File file = new File(dataFile.getAbsolutePath());
+			dataFile.delete();
+			file.delete();
+		}
+		System.out.println("[Step 4] Deleted all existing working csv file");
 		
 		//put DPL into unprocessed_csv
 		try {
-			Files.copy(java.nio.file.Paths.get("test/src/DPL-CHEAR-v2.xlsx"), java.nio.file.Paths.get("unprocessed_csv/DPL-CHEAR-v2.xlsx"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(java.nio.file.Paths.get("test/src/DPL-CHEAR-v2.xlsx"), java.nio.file.Paths.get(ConfigProp.getPathUnproc()+"/DPL-CHEAR-v2.xlsx"), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			fail("Fail to copy DPL from test/src to unprocessed_csv");
+			fail("Fail to copy DPL from test/src to "+ConfigProp.getPathUnproc());
 		}
 		
 		//process the DPL
@@ -88,12 +116,12 @@ public class LoadDPLTest extends StepTest{
 		System.out.println("[Step 4] Process DPL pass.");
 		
 		//check absence of DPL in unprocessed_csv
-		File dplUnprocessed = new File("unprocessed_csv/DPL-CHEAR-v2.xlsx");
-		assertTrue("unprocessed_csv/DPL-CHEAR-v2.xlsx not deleted after loading DPL", !dplUnprocessed.exists());
+		File dplUnprocessed = new File(ConfigProp.getPathUnproc()+"/DPL-CHEAR-v2.xlsx");
+		assertTrue(ConfigProp.getPathUnproc()+"/DPL-CHEAR-v2.xlsx not deleted after loading DPL", !dplUnprocessed.exists());
 		
 		//check existence of DPL in processed_csv
-		File dplProcessed = new File("processed_csv/DPL-CHEAR-v2.xlsx");
-		assertTrue("Fail to detect processed_csv/DPL-CHEAR-v2.xlsx after loading DPL", dplProcessed.exists());
+		File dplProcessed = new File(ConfigProp.getPathProc()+"/DPL-CHEAR-v2.xlsx");
+		assertTrue("Fail to detect "+ConfigProp.getPathProc()+"/DPL-CHEAR-v2.xlsx after loading DPL", dplProcessed.exists());
 		
 		System.out.println("[Step 4] DPL process file check pass.");
 		
@@ -108,7 +136,9 @@ public class LoadDPLTest extends StepTest{
 
 		System.out.println("[Step 4] DPL Platform check pass.");
 		
-		List<Instrument> instruments = Instrument.find();
+		//check instruments
+		//TODO: not fully implemented. Unable to know the correct result of instruments.
+		/*List<Instrument> instruments = Instrument.find();
 		System.out.println("Instruments Size: "+instruments.size());
 		for(Instrument ins : instruments)
 		{
@@ -119,8 +149,9 @@ public class LoadDPLTest extends StepTest{
 		{
 			System.out.println("Instrument Type: Name: "+insT.getLabel()+" SuperClass: "+insT.getSuperLabel());
 		}
-		System.out.println("[Step 4] DPL Instrument check pass.");
+		System.out.println("[Step 4] DPL Instrument check pass.");*/
 		
+		//check deployments
 		List<Deployment> deployments = Deployment.findWithPages(new State(State.ACTIVE), PAGESIZE, OFFSET * PAGESIZE);
 		assertTrue(String.format("Incorrect size of deployments after loading DPL. Should be %d, but was %d.", DEPLOYMENTSIZE, deployments.size()), DEPLOYMENTSIZE == deployments.size());
 		
