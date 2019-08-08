@@ -41,17 +41,20 @@ public class DeploymentBrowser extends Controller {
 		// Looking for georeferenced platforms 
 		if (plat_uri == null || plat_uri.isEmpty()) {
 			geoDeployments();
+			//System.out.println("geoCoordList: " + geoCoordList);
+			//System.out.println("platformNameList: " + platformNameList);
+			//System.out.println("platformUriList: " + platformUriList);
 	    	return ok(deploymentBrowser.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList));
 		}
 		Platform platform = Platform.find(plat_uri);
 		if (platform == null) {
 	    	return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]"));
 		}
-		System.out.println("Platform URI: " + platform.getUri());
-		System.out.println("Platform Layout: " + platform.getLayout());
+		//System.out.println("Platform URI: " + platform.getUri());
+		//System.out.println("Platform Layout: " + platform.getLayout());
 		if (platform.getLayout() == null || platform.getLayout().isEmpty()) {
 			List<Deployment> dpls = Deployment.findByPlatformAndStatus(plat_uri, allState);
-			System.out.println("# Deployments: " + dpls.size());
+			//System.out.println("# Deployments: " + dpls.size());
 			if (dpls.size() <= 0) {
 		    	return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]"));
 			}
@@ -72,10 +75,14 @@ public class DeploymentBrowser extends Controller {
     }
 
 	private void geoDeployments() {
-		List<Deployment> deployments = Deployment.find(allState);
+		//List<Deployment> deployments = Deployment.find(allState);
 		List<Platform> platforms = new ArrayList<Platform>();
-		for (Deployment dp : deployments) {
-			Platform plt = dp.getPlatform();
+		List<Platform> existingPlts = Platform.find();
+		//for (Deployment dp : deployments) {
+		for (Platform plt : existingPlts) {
+			//System.out.println("Deployment: " + dp.getUri());
+			//Platform plt = dp.getPlatform();
+			//System.out.println("Platform: " + plt.getUri());
 			if (plt != null) {
 				//System.out.println(plt.getLabel() + ":  " + plt.getUri() + " " + plt.getFirstCoordinate() + " " + plt.getFirstCoordinateCharacteristic() +  
 				//		" " + plt.getSecondCoordinate() + " " + plt.getSecondCoordinateCharacteristic());
@@ -85,6 +92,8 @@ public class DeploymentBrowser extends Controller {
 				if (plt.getSecondCoordinateCharacteristic() == null) {
 					plt.setSecondCoordinateCharacteristic("");
 				}
+
+				/*
 				while (plt != null && !plt.getFirstCoordinateCharacteristic().equals(Platform.LAT) && !plt.getSecondCoordinateCharacteristic().equals(Platform.LONG)) {
 					//System.out.println(plt.getLabel() + " (" + plt.getUri() + "): " + plt.getPartOf() + " " + plt.getFirstCoordinate() + " " + plt.getFirstCoordinateCharacteristic() +  
 					//		" " + plt.getSecondCoordinate() + " " + plt.getSecondCoordinateCharacteristic());
@@ -103,7 +112,10 @@ public class DeploymentBrowser extends Controller {
 						}
 					}
 				}
-				if (plt != null) {
+				*/
+
+				if (plt.getFirstCoordinateCharacteristic().equals(Platform.LAT) && plt.getSecondCoordinateCharacteristic().equals(Platform.LONG)) {
+				//if (plt != null) {
 					//totDeployments++;
 					if (!platforms.contains(plt)) {
 						platforms.add(plt);

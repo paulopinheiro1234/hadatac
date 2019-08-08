@@ -203,25 +203,34 @@ function generate_bbox(locations){
     var maxlon = -100000000.0;
     var maxlat = -100000000.0;
 
-    if (locations.length <= 2){
-	return generated_bbox;
+    if (locations.length <= 0){
+	    return generated_bbox;
     }
 
-    for (i = 0; i < locations.length - 1; i = i + 2){
-        lon = parseFloat(locations[i+1]);
-        lat = parseFloat(locations[i]);
-        if (lon < minlon){
-            minlon = lon;
-        }
-        if (lon > maxlon){
-            maxlon = lon; 
-        }
-        if (lat < minlat){
-            minlat = lat;
-        }
-        if (lat > maxlat){
-            maxlat = lat;
-        }
+    if (locations.length <= 2){
+        lon = parseFloat(locations[1]);
+        lat = parseFloat(locations[0]);
+        minlon = lon - 0.01;
+        maxlon = lon + 0.01;
+        minlat = lat - 0.01;
+        maxlat = lat + 0.01;
+    } else {
+	    for (i = 0; i < locations.length - 1; i = i + 2){
+	        lon = parseFloat(locations[i+1]);
+	        lat = parseFloat(locations[i]);
+	        if (lon < minlon){
+	            minlon = lon;
+	        }
+	        if (lon > maxlon){
+	            maxlon = lon; 
+	        }
+	        if (lat < minlat){
+	            minlat = lat;
+	        }
+	        if (lat > maxlat){
+	            maxlat = lat;
+	        }
+	    }
     }
 
     //Order is min lat, max lat, min lon, max lon
