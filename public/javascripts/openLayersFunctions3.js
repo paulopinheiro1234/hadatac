@@ -153,32 +153,45 @@ function generate_bbox(locations){
     var generated_bbox = [];
     var lon;
     var lat;
-    var minlon = 100000000.0;
-    var minlat = 100000000.0;
-    var maxlon = -100000000.0;
-    var maxlat = -100000000.0;
+    var minlon;
+    var minlat;
+    var maxlon;
+    var maxlat;
 
-    if (locations.length <= 2){
+    if (locations.length <= 0){
 	return generated_bbox;
     }
 
-    for (i = 0; i < locations.length - 1; i = i + 2){
-        lon = parseFloat(locations[i+1]);
-        lat = parseFloat(locations[i]);
-        if (lon < minlon){
-            minlon = lon;
-        }
-        if (lon > maxlon){
-            maxlon = lon; 
-        }
-        if (lat < minlat){
-            minlat = lat;
-        }
-        if (lat > maxlat){
-            maxlat = lat;
-        }
+    if (locations.length <= 2) {
+        lon = parseFloat(locations[1]);
+        lat = parseFloat(locations[0]);
+        minlon = lon - 0.0008;
+        maxlon = lon + 0.0008;
+        minlat = lat - 0.0008;
+        maxlat = lat + 0.0008;
+    } else {
+        minlon = 100000000.0;
+        minlat = 100000000.0;
+        maxlon = -100000000.0;
+        maxlat = -100000000.0;
+    	for (i = 0; i < locations.length - 1; i = i + 2){
+	        lon = parseFloat(locations[i+1]);
+	        lat = parseFloat(locations[i]);
+	        if (lon < minlon){
+	            minlon = lon;
+	        }
+	        if (lon > maxlon){
+	            maxlon = lon; 
+	        }
+	        if (lat < minlat){
+	            minlat = lat;
+	        }
+	        if (lat > maxlat){
+	            maxlat = lat;
+	        }
+    	}
     }
-
+    	
     //Order is min lat, max lat, min lon, max lon
     generated_bbox.push(minlat);
     generated_bbox.push(maxlat);

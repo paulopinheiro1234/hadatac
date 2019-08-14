@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
@@ -33,6 +35,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class LoadOnt extends Controller {
 
+	public static final String LAST_LOADED_NAMESPACE = "/last-loaded-namespaces-properties";
+	
     @Inject
     private FormFactory formFactory;
 
@@ -168,10 +172,11 @@ public class LoadOnt extends Controller {
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result importNamespaces() {
         System.out.println("importNamespaces is called");
-
+        String name_last_loaded_namespace = "";
         FilePart uploadedfile = request().body().asMultipartFormData().getFile("ttl");
         if (uploadedfile != null) {
             File file = (File)uploadedfile.getFile();
+            name_last_loaded_namespace = uploadedfile.getFilename();
             FileInputStream inputStream;
             try {
                 inputStream = new FileInputStream(file);
@@ -190,9 +195,34 @@ public class LoadOnt extends Controller {
         }
         NameSpaces.getInstance().reload();
 
+        // save the name of the last uploaded namespace
+        File lastloadedfile = new File(ConfigProp.getPathDownload() + LAST_LOADED_NAMESPACE);
+        try {
+            FileOutputStream lastLoadedOutputStream = new FileOutputStream(lastloadedfile);
+            System.out.println("Name last loaded prop file: " + lastLoadedOutputStream);
+            lastLoadedOutputStream.write(name_last_loaded_namespace.getBytes());
+            lastLoadedOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
 
+    public static String getNameLastLoadedNamespace() {
+        File lastloadedfile = new File(ConfigProp.getPathDownload() + LAST_LOADED_NAMESPACE);
+        String name_last_loaded_namespace = "";
+        try {
+            FileInputStream inputStream = new FileInputStream(lastloadedfile);
+            name_last_loaded_namespace = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+            inputStream.close();
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+    	return name_last_loaded_namespace;
+    }
+    
+    
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result exportNamespaces() {
         String path = ConfigProp.getPathDownload();
