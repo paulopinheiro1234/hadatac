@@ -2,8 +2,7 @@
   dd_name            : String,
   dirFile            : org.hadatac.entity.pojo.DataFile,
   headerSheetColumn  : String,
-  commentSheetColumn : String,
-  sdd_id             : String
+  commentSheetColumn : String
 )
 
 @import helper._
@@ -15,7 +14,7 @@
 @import org.hadatac.entity.pojo._
 
 @main("Add File Headers into SDD") {
-
+ 
 <script type="text/javascript">
 	   function checkform() {
 	      var cansubmit = true;
@@ -25,10 +24,10 @@
 	      }
 
 	      if (cansubmit) {
-	          document.getElementById('submitbutton1').disabled = false;
+	          document.getElementById('togoback').disabled = false;
 	          document.getElementById('submitbutton2').disabled = false;
 	      } else {
-	          document.getElementById('submitbutton1').disabled = 'disabled';
+	          document.getElementById('togoback').disabled = 'disabled';
 	          document.getElementById('submitbutton2').disabled = 'disabled';
 	      }
 	   }
@@ -77,13 +76,13 @@
       <div class="form-group">
          <h3>Add File Headers into SDD</h3>
          
-	     <p><b>!!!THIS OPTION IS NOT FUNCTIONAL YET!!!</b></p>
 	     <p>This option extract column headers from data dictionary (DD) files and add them into a give Semantic Data Dictionary (SDD).</p>
 	  </div>
 
       <div class="form-group">
 		<label>SDD:</label> This is the Data Dictionary file providing the column headers and comments to be added into an SDD.
- 		<input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@dd_name >
+     <input type="text" class="form-control col-sm-6" name="label" id="label" readonly  value=@dd_name >
+     
       </div>
 
       <div class="form-group">
@@ -97,43 +96,50 @@
 
       </div>
 
-      @defining("") { labels =>
+      <!-- @defining("") { labels =>
       	  <div class="form-group" class="col-sm-6 col-offset-3" id="form_group">
-        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="Copy Column Headers" disabled="disabled"/>
-            <div id="donemsg"></div>
+        	  <input class="btn btn-success" role="button" type="submit" id="submitbutton1" value="n" disabled="disabled"/>
+            
       	  </div>
-      }
-      <script> 
+      } -->
       
-       document.getElementById("submitbutton1").onclick = function() {
-          var msg="Copied Successfully";
-          document.getElementById("donemsg").innerHTML=msg;
-
-          setTimeout(function(){
-              document.getElementById("donemsg").innerHTML = '';
-          }, 7000);
-          
-      }
-      </script>
-      <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(sdd_id, true,headerSheetColumn,commentSheetColumn)" 
-      class="btn btn-primary" role="button" id="togoback" style="margin-bottom: 8pt"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</a>
-      
-
     </form>
+    <button class="btn btn-primary" role="button" id="togoback" onclick="goToSDD()" disabled="disabled"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</button>
   </div>
   <div id="lg"></div>
  	<script>
-     $( "input" ).on( "click", function() {
-       alert(( "input:checked" ).val());
-      //$( "#lg" ).html( $( "input:checked" ).val() + " is checked!" );
-    });
+  
+  var headerSheetColumn="@headerSheetColumn";
+  var commentSheetColumn="@commentSheetColumn";
+  var sddId;
        function typechange() {
           var newType = $("input[name=newStudyType]:checked").val();
+          var checkedSDDName=$("input:checked").val();
+          checkedSDDName=checkedSDDName.replace('/',"")
           
+          $.ajax({
+          type : 'GET',
+          url : 'http://localhost:9000/hadatac/working/headers/getCheckedSDD',
+          data : {
+            sddFileName: checkedSDDName
+            
+          },
+          success : function(data) {
+            console.log(data);
+            sddId=data;
+            
+          },
+        
+        });
      $('#currentType').val(newType);
           checkform();
        };
-
+       
+       function goToSDD(){
+         window.location.href="/hadatac/annotator/sddeditor_v2?file_id="+sddId+"&bSavable=true&indicator=1";
+      
+        
+       }
        var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
        for(var i = 0; i < tree.length; i++){
           tree[i].addEventListener('click', function(e) {

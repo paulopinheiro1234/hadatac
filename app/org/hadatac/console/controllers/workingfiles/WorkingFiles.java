@@ -347,7 +347,7 @@ public class WorkingFiles extends Controller {
         DataFile dataFile = DataFile.findById(fileId);
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLog()), 
-                routes.WorkingFiles.index(dir, dir).url(),dataFile));
+                routes.WorkingFiles.index(dir, dir).url()));
     }
 
     public Result getAnnotationStatus(String fileId) {
@@ -464,7 +464,7 @@ public class WorkingFiles extends Controller {
         String strLog = dataFile.getLog();
         
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
-                routes.WorkingFiles.index("/", ".").url(),dataFile));
+                routes.WorkingFiles.index("/", ".").url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

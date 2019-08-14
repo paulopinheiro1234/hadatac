@@ -2,9 +2,8 @@
   dd_dataFile: org.hadatac.entity.pojo.DataFile,
   bSavable : Boolean,
   loadedList : List[String],
-  testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2,
-  headerSheetColumn:String,
-  commentSheetColumn: String)
+  testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
+  )
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -24,6 +23,7 @@
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
 
     <div id="rcorners" >
+  
     <h4>@dataFile.getFileName()</h4>
     @if(bSavable) {
         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
@@ -37,19 +37,45 @@
       <button class="btn btn-primary" type="button"role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
       
       <script>
+        
         function populateSDD(){
-          //var header="@headerSheetColumn";
           
-          var header="DATA DICTIONARY-VARNAME";
-          var headersheet=header.split('-')[0];
-          var headercol=header.split('-')[1];
-          //var comments="@commentSheetColumn";
-          var comments="DATA DICTIONARY-VARDESC";
-          var commentsheet=comments.split('-')[0];
-          var commentcol=comments.split('-')[1];
+          $.ajax({
+          type : 'GET',
+          url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getHeaderLoc',
+          data : {
+            
+          },
+          success : function(data) {
+            console.log(data);
+            getHeaderData(data);
+          }
+        });
+        $.ajax({
+          type : 'GET',
+          url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCommentLoc',
+          data : {
+            
+          },
+          success : function(data) {
+            console.log(data);
+            comments_data= data;
+                
+          // var commentsheet=comments_data.split('-')[0];
+          // var commentcol=comments_data.split('-')[1];
+          }
+        });
+        
+        }
+        function getHeaderData(data){
+          var headersheet=data.split('-')[0];
+          var headercol=data.split('-')[1];
+          console.log(headersheet);
+          console.log(headercol);
           var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
           DDforPopulate(durl,headersheet,headercol)
         }
+
       </script>
 
 
@@ -78,8 +104,7 @@
       <script>
        
         var fid="@dataFile.getId()";
-        console.log(fid);
-        
+                
       $.ajax({
         type : 'GET',
         url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getfile_ID',
@@ -103,11 +128,13 @@
       </ul>
       
       </div>
+
       
-
-      <button class="main-nav" id="show">Show Options</button>
-      <button class="Close" id="hide">Hide Options</button>
-
+      <button class="main-nav" id="show"><img src=" https://cdn3.iconfinder.com/data/icons/eye-and-view/100/eye_view_vision-07-512.png "
+        width="36" height="33" alt=""/> Show Options</button>
+      <button class="Close" id="hide"><img src=" https://cdn0.iconfinder.com/data/icons/security-line/100/eye_closed-512.png "
+        width="36" height="33" alt=""/> Hide Options</button>
+      
         <div class="mobile-nav">
           <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
           <img src="https://clipart.wpblink.com/sites/default/files/wallpaper/bulb-clipart/451480/bulb-clipart-lightbulb-moment-451480-3674232.png"
@@ -129,8 +156,21 @@
               <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
               <button class="undo-remove-row" onclick="revertRow()"><img src="https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png" width="15" height="18" alt=""/> </button>
             </div>
-            
+            <div id="verifysdd" >
+                <button onclick="verifySDD()" style="display: block; margin: 0 auto; margin-top: 3pt;background-color: cornflowerblue; color:white">Verify</button>
+            </div>
+            <div id="irifound" >
+                
+            </div>
+            <div id="irinotfound" >
+                
+              </div>
+              
         </div>
+        
+        
+       
+        
 
 
     <div><a id="error_msg"></a></div>
@@ -141,9 +181,12 @@
 
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
     <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>

@@ -56,7 +56,7 @@ function changeHeader(headers,json){
 
 }
 /* make the buttons for the sheets */
-
+var sheetName;
 var make_buttons = function(sheetnames, cb) {
   var buttons = document.getElementById('buttons');
   buttons.innerHTML = "";
@@ -71,7 +71,8 @@ var make_buttons = function(sheetnames, cb) {
     var txt = document.createElement('h5');
     txt.innerText = s;
     btn.appendChild(txt);
-    btn.addEventListener('click', function() {cb(idx); hideView();}, false);
+    
+    btn.addEventListener('click', function() {cb(idx); hideView();sheetName=s;}, false);
     buttons.appendChild(btn);
   });
   buttons.appendChild(document.createElement('br'));
@@ -259,6 +260,8 @@ _resize();
 
 window.addEventListener('resize', _resize);
 var click_ctr=0;
+var copyOfL=0;
+var copyOfR=0;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
@@ -293,6 +296,8 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       R++;
     }
   }
+  copyOfL=L;
+  copyOfR=R;
   checkRecs(L,R,1);
   cdg.draw();
 };
@@ -594,8 +599,7 @@ var closebtns = document.getElementsByClassName("remove");
 
 
 function DDforPopulate(durl,headersheet,headercol){
-  console.log(headercol)
-  headercol+=" ";
+  
   var oReq = new XMLHttpRequest();
    oReq.open("GET", durl, true);
    oReq.responseType = "arraybuffer";
@@ -630,16 +634,30 @@ function DDforPopulate(durl,headersheet,headercol){
         }
       });
     });
-    populateThis(headersCol);
+    console.log(sheetName,headersheet);
+    
+    if("Dictionary Mapping"==sheetName){
+      
+      var popElement=document.getElementById("populatesdd");
+      popElement.removeAttribute("disabled");
+      populateThis(headersCol);
+      popElement.setAttribute("disabled", "disabled");
+    }
+    else if(sheetName!="Dictionary Mapping"){
+      var popElement=document.getElementById("populatesdd");
+      popElement.setAttribute("disabled", "disabled");
+    }
   }
 
   oReq.send();
 
 }
 function populateThis(headersCol){
+  
   var ct=0;
   for(var i=0;i<headersCol.length;i++){
     ct++;
+    console.log(headersCol[i]);
     cdg.data[ct][0]=headersCol[i];
   }
   

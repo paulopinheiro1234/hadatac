@@ -328,11 +328,11 @@ public class AutoAnnotator extends Controller {
     	if (DataFile.findById(fileId) == null || 
     		DataFile.findById(fileId).getLogger() == null) {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), 
-                    routes.AutoAnnotator.index(dir, ".").url(),dataFile));
+                    routes.AutoAnnotator.index(dir, ".").url()));
     	}
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLogger().getLog()), 
-                routes.AutoAnnotator.index(dir, ".").url(),dataFile));
+                routes.AutoAnnotator.index(dir, ".").url()));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

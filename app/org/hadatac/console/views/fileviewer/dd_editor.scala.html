@@ -1,5 +1,4 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
-sdd_dataFile: org.hadatac.entity.pojo.DataFile,
 bSavable : Boolean,
 dir: String
 
@@ -38,8 +37,9 @@ dir: String
     <input type="text" id="descdetails" value=" "/>
   
     
-    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId(),sdd_dataFile.getId())" 
-    class="btn btn-primary" role="button" id="carryover">Add to SDD</a>
+    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId())" 
+    class="btn btn-primary" role="button" id="carryover" style="padding:3pt"><img src="https://cdn3.iconfinder.com/data/icons/stroke/53/Button-512.png"
+     width="28" height="28" alt=""/>  Add to SDD  </a>
     <div><a id="alarmmsg"></a></div>
     
     

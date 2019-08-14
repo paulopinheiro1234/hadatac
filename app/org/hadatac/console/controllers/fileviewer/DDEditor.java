@@ -28,7 +28,7 @@ public class DDEditor extends Controller {
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         if (null == dataFile) {
 
-            return ok(dd_editor.render(dataFile, null, false,dir));
+            return ok(dd_editor.render(dataFile,false,dir));
         }
         
         List<DataFile> files = null;
@@ -36,20 +36,20 @@ public class DDEditor extends Controller {
 
         files = DataFile.find(user.getEmail());
 
-        String sdd_filename=dataFile.getFileName();
-        sdd_filename = "S"+sdd_filename; // Only files with the prefix SDD are allowed so were always going to have a second character
-        DataFile sdd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
+    //     String sdd_filename=dataFile.getFileName();
+    //     sdd_filename = "S"+sdd_filename; // Only files with the prefix SDD are allowed so were always going to have a second character
+    //     DataFile sdd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
 
-        for(DataFile df : files){
-           if(df.getFileName().equals(sdd_filename)){
-             sdd_dataFile = df;
-          }
-       }
-
-        
+    //     for(DataFile df : files){
+    //        if(df.getFileName().equals(sdd_filename)){
+    //          sdd_dataFile = df;
+    //       }
+    //    }
 
         
-        return ok(dd_editor.render(dataFile, sdd_dataFile, bSavable,dir));
+
+        
+        return ok(dd_editor.render(dataFile, bSavable,dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -63,7 +63,7 @@ public class DDEditor extends Controller {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile,null, false,dir));
+        return ok(dd_editor.render(dataFile, false,dir));
     }
 
     public Result postFromSharedLink(String sharedId,String dir) {

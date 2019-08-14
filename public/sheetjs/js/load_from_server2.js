@@ -1,5 +1,4 @@
-var copyOfL=0;
-var copyOfR=0;
+
 function checkRecs (L,R,checker){
     copyOfL=L;
     copyOfR=R;

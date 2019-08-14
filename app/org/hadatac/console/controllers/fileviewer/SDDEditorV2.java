@@ -15,7 +15,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
 import play.libs.Json;
-
+import org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD;
+import play.core.j.JavaResultExtractor; 
 
 
 public class SDDEditorV2 extends Controller {
@@ -24,66 +25,71 @@ public class SDDEditorV2 extends Controller {
         List<String> currentCart=new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
         ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
-        
+        DataFile ddDF;
+        String headerSheetColumn;
+        String commentSheetColumn;
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 
 
-    public Result index(String fileId, boolean bSavable,String headerSheetColumn, String commentSheetColumn) {
-
+    public Result index(String fileId, boolean bSavable, int indicator) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        if (null == dataFile) {
+        if (null == dataFile && indicator==1) {
 
-            return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this,headerSheetColumn,commentSheetColumn));
+            return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this));
         }
-
-
-        List<DataFile> files = null;
-        String path = ConfigProp.getPathDownload();
-
-        files = DataFile.find(user.getEmail());
-
-        String dd_filename=dataFile.getFileName();
-        dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
-        DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
-
-        for(DataFile df : files){
-           if(df.getFileName().equals(dd_filename)){
-             dd_dataFile = df;
-          }
-       }
-
+        DataFile finalDF=new DataFile("");;
+        if(indicator==1 && dataFile!=null){
+            headerSheetColumn=FileHeadersIntoSDD.headerSheetColumn;
+            commentSheetColumn=FileHeadersIntoSDD.commentSheetColumn;
+            
+            ddDF=FileHeadersIntoSDD.dd_df;
+            finalDF=ddDF;
+            
+        }
+        else if(indicator==0){
+            List<DataFile> files = null;
+            String path = ConfigProp.getPathDownload();
+            files = DataFile.find(user.getEmail());
+            String dd_filename=dataFile.getFileName();
+            dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
+            DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
+            for(DataFile df : files){  
+                if(df.getFileName().equals(dd_filename)){
+                    dd_dataFile = df;
+                }
+            }
+            finalDF=dd_dataFile;
+        }
+        
+       
 
     	// System.out.println("files = " + files);
     	// System.out.println("dd_dataFile = " + dd_dataFile.getFileName());
 
 
-        return ok(sdd_editor_v2.render(dataFile, dd_dataFile, bSavable,loadedList,this,headerSheetColumn,commentSheetColumn));
+        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable,loadedList,this));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String fileId, boolean bSavable, String headerSheetColumn, String commentSheetColumn) {
-        return index(fileId, bSavable,headerSheetColumn,commentSheetColumn);
+    public Result postIndex(String fileId, boolean bSavable,int indicator) {
+        return index(fileId, bSavable,indicator);
     }
 
-    public Result fromSharedLink(String sharedId,String headerSheetColumn,String commentSheetColumn) {
+    public Result fromSharedLink(String sharedId) {
         DataFile dataFile = DataFile.findBySharedId(sharedId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(sdd_editor_v2.render(dataFile,null, false,loadedList,this,headerSheetColumn,commentSheetColumn));
+        return ok(sdd_editor_v2.render(dataFile,null, false,loadedList,this));
     }
 
-    public Result postFromSharedLink(String sharedId,String headerSheetColumn,String commentSheetColumn) {
-        return fromSharedLink(sharedId,headerSheetColumn,commentSheetColumn);
+    public Result postFromSharedLink(String sharedId) {
+        return fromSharedLink(sharedId);
     }
 
-    // public Result testPrint(String s){
-    //     System.out.println(s);
-    //     return new Result(200);
-    // }
 
     public Result getCart(){
         return ok(Json.toJson(currentCart));
@@ -148,6 +154,14 @@ public class SDDEditorV2 extends Controller {
          ArrayList<String> recentoldEdit=oldEdits.get(0);
          oldEdits.remove(0);
         return ok(Json.toJson(recentoldEdit));
+    }
+    public Result getHeaderLoc(){
+        
+        return ok(Json.toJson(headerSheetColumn));
+    }
+    public Result getCommentLoc(){
+        
+        return ok(Json.toJson(commentSheetColumn));
     }
 
     

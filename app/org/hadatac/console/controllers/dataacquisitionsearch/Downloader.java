@@ -143,11 +143,11 @@ public class Downloader extends Controller {
         DataFile dataFile = DataFile.findById(fileId);
     	if (DataFile.findById(fileId) == null) {
         	return ok(annotation_log.render(Feedback.print(Feedback.WEB,""), 
-                    routes.Downloader.index().url(),dataFile));
+                    routes.Downloader.index().url()));
     	}
     	return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLog()), 
-                routes.Downloader.index().url(),dataFile));
+                routes.Downloader.index().url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -13,15 +13,20 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
 
+import java.util.List;
+import java.util.ArrayList;
 import play.mvc.*;
 import play.mvc.Result;
 
+import play.libs.Json;
+
 public class FileHeadersIntoSDD extends Controller {
-    String headerSheetColumn;
-    String commentSheetColumn;
+    public static String headerSheetColumn;
+    public static String commentSheetColumn;
+    public static DataFile dd_df;
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     
-	public Result createHeaders(String dir, String dd_id,String sdd_id) {
+	public Result createHeaders(String dir, String dd_id) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
     	DataFile dataFile = null;
@@ -37,13 +42,15 @@ public class FileHeadersIntoSDD extends Controller {
 
         DataFile dirFile = new DataFile("/");
         dirFile.setStatus(DataFile.WORKING);
-
-		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile,headerSheetColumn,commentSheetColumn,sdd_id));
+        getdd_df(dataFile);
+        // dd_id=dataFile.getId();
+        // System.out.println(dd_id);
+		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile,headerSheetColumn,commentSheetColumn));
 	}
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreateHeaders(String dir, String dd_uri,String sdd_id) {
-        return createHeaders(dir, dd_uri,sdd_id);
+    public Result postCreateHeaders(String dir, String dd_uri) {
+        return createHeaders(dir, dd_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -53,6 +60,10 @@ public class FileHeadersIntoSDD extends Controller {
 
     	return redirect(routes.WorkingFiles.index(dir, "."));
     }
+    public Result getdd_df(DataFile d){
+        dd_df=d;
+        return new Result(200);
+    }
     public Result getHeaderLoc(String header_loc){
         headerSheetColumn=header_loc;
         return new Result(200);
@@ -61,5 +72,27 @@ public class FileHeadersIntoSDD extends Controller {
         commentSheetColumn=desc_loc;
         return new Result(200);
     }
+   
+    
+    public Result getCheckedSDD(String sddFileName){
+        
+        final SysUser user = AuthApplication.getLocalUser(session());
+        List<DataFile> files = null;
+        String path = ConfigProp.getPathDownload();
+
+        files = DataFile.find(user.getEmail());
+        String sdd_filename=sddFileName;
+        DataFile sdd_dataFile = new DataFile("");
+        for(DataFile df : files){
+           if(df.getFileName().equals(sdd_filename)){
+             sdd_dataFile = df;
+          }
+       }
+      
+       String sdd_id=sdd_dataFile.getId();
+       return ok(Json.toJson(sdd_id));
+    }
 
 }
+
+

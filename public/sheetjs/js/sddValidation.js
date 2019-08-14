@@ -1,91 +1,42 @@
-function openSDD(sdd_url){ 
-    console.log(sdd_url);
-    
-        
-        // Generate data dictionary map be reading DD in
-       
-        var oReq = new XMLHttpRequest();
-        oReq.open("GET", sdd_url, true);
-        
-        oReq.responseType = "arraybuffer";
-    
-        oReq.onload = function(e) {
-            var arraybuffer = oReq.response;
-    
-            /* convert data to binary string */
-            var data = new Uint8Array(arraybuffer);
-            var arr = new Array();
-            for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
-            var bstr = arr.join("");
-    
-            /* Call XLSX */
-            var workbook = XLSX.read(bstr, {
-                type: "binary"
-            });
-            
-            /* Get worksheet */
-            var worksheet = workbook.Sheets[workbook.SheetNames[3]];
-            
-            var xlarray=XLSX.utils.sheet_to_json(worksheet, {
-                raw: true
-            });
-            var cellElements=[]
-            console.log(xlarray);
-            // for(var i=0;i<xlarray.length;i++){
-            //     if(xlarray[i]!="Attribute"||xlarray[i]!="attributeOf"||xlarray[i]!="Unit"||
-            //     xlarray[i]!="Time"||xlarray[i]!="Entity"||xlarray[i]!="Role"||xlarray[i]!="Relation"||
-            //     xlarray[i]!="inRelationTo"||xlarray[i]!="wasDerivedFrom"||xlarray[i]!="wasGeneratedBy"){
-            //         cellElements.push(xlarray[i])
-            //     }
-            // }
-            
-            for(var i=0;i<xlarray.length;i++){
-                if(xlarray[i]["Attribute"]!=null){
-                    cellElements.push(xlarray[i]["Attribute"]);
-                }
-                
-                else if(xlarray[i]["Unit"]!=null){
-                    cellElements.push(xlarray[i]["Unit"]);
-                }
-                
-                else if(xlarray[i]["Entity"]!=null){
-                    cellElements.push(xlarray[i]["Entity"]);
-                }
-                
-                else if(xlarray[i]["Relation"]!=null){
-                    cellElements.push(xlarray[i]["Relation"]);
-                }
-                
-                // else if(xlarray[i]["wasDerivedFrom"]!=null){
-                //     cellElements.push(xlarray[i]["wasDerivedFrom"]);
-                // }
-                // else if(xlarray[i]["wasGeneratedBy"]!=null){
-                //     cellElements.push(xlarray[i]["wasGeneratedBy"]);
-                //  }
-            }
-            console.log(cellElements);
-            validateElements(cellElements);
-            console.log(cellElements);
-    
-        }
-        oReq.send();
-}
-function validateElements(cellElements){
-    cellElements.push("sio:isPartOf");
-    for(var i=0;i<cellElements.length;i++){
-        
-       var label= cellElements[i];
-       var origlabel=label;
-       label = label.split(":").pop();
-        checkBlazegraph(label,origlabel);
-    //    checkBlazegraph(cellElements[1])
-       
-    }
-}
-function checkBlazegraph(label,origlabel){
+function verifySDD(){
+    document.getElementById("irifound").innerHTML = "";
+    document.getElementById("irinotfound").innerHTML = "";
+    for (var i=1;i<copyOfR;i++){
+      for(var j=1;j<copyOfL;j++){
+          if(cdg.data[i][j]==null ||cdg.data[i][j].startsWith("??")){
 
-    var urlStr="<http://semanticscience.org/resource/"+label+">";
-    console.log(urlStr);
+          }
+          else{
+            
+            var cellItem=cdg.data[i][j];
+            
+            var label= cellItem;
+            var label1 = label.split(":")[0];
+            var label2 = label.split(":")[1];
+            getOwlUrl(label1,label2,label);
+          }
+        
+        
+        }
+      }
+    }
+function getOwlUrl(label1,label2,label){
+    if(label1=="sio"){
+        var urlStr="<http://semanticscience.org/resource/"+label2+">";
+    }
+    else if(label1=="hasco"){
+        var urlStr="<http://hadatac.org/ont/hasco/"+label2+">";
+    }
+    else if(label1=="chear"){
+        var urlStr="<http://hadatac.org/ont/chear#"+label2+">";
+    }
+    else if(label1=="uberon"){
+        var urlStr="<http://purl.obolibrary.org/obo/UBERON_"+label2+">";
+    }
+    searchForIri(label1,label2,label,urlStr);
+
+}
+function searchForIri(label1,label2,label,urlStr){
     var url = "http://localhost:8080/blazegraph/namespace/store/sparql";
         
         var query=[
@@ -99,18 +50,17 @@ function checkBlazegraph(label,origlabel){
     dataType: "json",  
     url: queryUrl,
     success: function( _data ) {
-        console.log("reached");
-        console.log(queryUrl);
-        console.log(_data.boolean);
+        
         if(_data.boolean==true){
-            document.getElementById("found").style.color = 'green';
-            document.getElementById('found').innerHTML += origlabel+": "+"found"+"<br />";
+            document.getElementById("irifound").style.color = 'green';
+            document.getElementById('irifound').innerHTML += label+": "+"found"+"<br />";
         }
         else if(_data.boolean==false){
-            document.getElementById("notfound").style.color = 'red';
-            document.getElementById('notfound').innerHTML += origlabel+": "+"not found"+"<br />";
+            document.getElementById("irinotfound").style.color = 'red';
+            document.getElementById('irinotfound').innerHTML += label+": "+"not found"+"<br />";
         }
     }
     });
 }
+
 
