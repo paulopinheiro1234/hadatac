@@ -321,6 +321,7 @@ public class AutoAnnotator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String fileId) {
+        DataFile dataFile = DataFile.findById(fileId);
     	if (fileId == null) {
     		fileId = "";
     	}

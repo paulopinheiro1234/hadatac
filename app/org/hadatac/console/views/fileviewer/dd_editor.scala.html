@@ -1,9 +1,7 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
-dd_dataFile: org.hadatac.entity.pojo.DataFile,
 bSavable : Boolean,
-dir: String,
-headerSheetColumn: String,
-commentSheetColumn: String
+dir: String
+
 )
 
 @import helper._
@@ -37,9 +35,11 @@ commentSheetColumn: String
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Notepad_icon.svg/1024px-Notepad_icon.svg.png" width="34" height="28" alt=""/> Description
     </button>
     <input type="text" id="descdetails" value=" "/>
-    <button class="btn btn-primary" onclick="saveLocations()">Save Locations</button>
-    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId(),headerSheetColumn,commentSheetColumn)" 
-    class="btn btn-primary" role="button">Add to SDD</a>
+  
+    
+    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId())" 
+    class="btn btn-primary" role="button" id="carryover" style="padding:3pt"><img src="https://cdn3.iconfinder.com/data/icons/stroke/53/Button-512.png"
+     width="28" height="28" alt=""/>  Add to SDD  </a>
     <div><a id="alarmmsg"></a></div>
     
     

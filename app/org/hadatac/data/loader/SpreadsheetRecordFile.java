@@ -27,6 +27,7 @@ public class SpreadsheetRecordFile implements RecordFile {
     private int numberOfSheets = 1;
     private int numberOfRows;
     private List<String> headers;
+    List<String> cellValues = new ArrayList<String>();
     
     public SpreadsheetRecordFile(File file) {
         this.file = file;
@@ -198,6 +199,7 @@ public class SpreadsheetRecordFile implements RecordFile {
         for (int i = row.getFirstCellNum(); i <= row.getLastCellNum(); i++) {
             if (row.getCell(i) != null) {
                 values.add(row.getCell(i).toString());
+                
             } else {
                 values.add("");
             }
@@ -206,3 +208,4 @@ public class SpreadsheetRecordFile implements RecordFile {
         return values;
     }
 }
+    

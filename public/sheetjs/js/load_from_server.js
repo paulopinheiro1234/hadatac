@@ -56,6 +56,7 @@ function changeHeader(headers,json){
 
 }
 /* make the buttons for the sheets */
+var sheetName;
 var make_buttons = function(sheetnames, cb) {
   var buttons = document.getElementById('buttons');
   buttons.innerHTML = "";
@@ -66,10 +67,12 @@ var make_buttons = function(sheetnames, cb) {
     btn.type = 'button';
     btn.name = 'btn' + idx;
     btn.text = s;
+    sheetName=s;
     var txt = document.createElement('h5');
     txt.innerText = s;
     btn.appendChild(txt);
-    btn.addEventListener('click', function() {cb(idx); hideView();}, false);
+    
+    btn.addEventListener('click', function() {cb(idx); hideView();sheetName=s;}, false);
     buttons.appendChild(btn);
   });
   buttons.appendChild(document.createElement('br'));
@@ -257,6 +260,8 @@ _resize();
 
 window.addEventListener('resize', _resize);
 var click_ctr=0;
+var copyOfL=0;
+var copyOfR=0;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
@@ -291,6 +296,8 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       R++;
     }
   }
+  copyOfL=L;
+  copyOfR=R;
   checkRecs(L,R,1);
   cdg.draw();
 };
@@ -588,4 +595,70 @@ var closebtns = document.getElementsByClassName("remove");
     closebtns[i].addEventListener("click", function() {
       this.parentElement.style.display = 'none';
     });
+}
+
+
+function DDforPopulate(durl,headersheet,headercol){
+  
+  var oReq = new XMLHttpRequest();
+   oReq.open("GET", durl, true);
+   oReq.responseType = "arraybuffer";
+
+  oReq.onload = function(e) {
+      var arraybuffer = oReq.response;
+
+      /* convert data to binary string */
+      var data = new Uint8Array(arraybuffer);
+      var arr = new Array();
+      for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
+      var bstr = arr.join("");
+
+      /* Call XLSX */
+      var workbook = XLSX.read(bstr, {
+          type: "binary"
+      });
+
+
+      var first_sheet_name = headersheet;
+      /* Get worksheet */
+      console.log(first_sheet_name);
+      var worksheet = workbook.Sheets[first_sheet_name];
+      var xlarray=XLSX.utils.sheet_to_json(worksheet, {
+          raw: true
+      });
+      var headersCol=[];
+      xlarray.forEach(function(item) {
+      Object.keys(item).forEach(function(key) {
+        if(key==headercol){
+          headersCol.push(item[key]);
+        }
+      });
+    });
+    console.log(sheetName,headersheet);
+    
+    if("Dictionary Mapping"==sheetName){
+      
+      var popElement=document.getElementById("populatesdd");
+      popElement.removeAttribute("disabled");
+      populateThis(headersCol);
+      popElement.setAttribute("disabled", "disabled");
+    }
+    else if(sheetName!="Dictionary Mapping"){
+      var popElement=document.getElementById("populatesdd");
+      popElement.setAttribute("disabled", "disabled");
+    }
+  }
+
+  oReq.send();
+
+}
+function populateThis(headersCol){
+  
+  var ct=0;
+  for(var i=0;i<headersCol.length;i++){
+    ct++;
+    console.log(headersCol[i]);
+    cdg.data[ct][0]=headersCol[i];
+  }
+  
 }

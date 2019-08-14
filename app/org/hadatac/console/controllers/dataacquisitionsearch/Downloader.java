@@ -140,6 +140,7 @@ public class Downloader extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String fileId) {
+        DataFile dataFile = DataFile.findById(fileId);
     	if (DataFile.findById(fileId) == null) {
         	return ok(annotation_log.render(Feedback.print(Feedback.WEB,""), 
                     routes.Downloader.index().url()));

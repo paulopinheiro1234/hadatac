@@ -354,6 +354,15 @@ public class SDD {
         //System.out.println("SDD: mapEAmerge :" + mapEAmerge.keySet());
         return response;
     }
+    // public void getCellValues(RecordFile file){
+    //     if (file.getHeaders().size() > 0) {
+    //         logger.println(file.getHeaders().size() + " columns!!!!!");
+    //     }
+    //     List<String> cvalues=file.getRowValues;
+    //     for (int i=0;i<cvalues.size();i++){
+    //         logger.println(cvalues.get(i));
+    //     }
+    // }
 
     public boolean readDataDictionary(RecordFile file) {
 

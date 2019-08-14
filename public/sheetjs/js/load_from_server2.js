@@ -1,5 +1,4 @@
-var copyOfL=0;
-var copyOfR=0;
+
 function checkRecs (L,R,checker){
     copyOfL=L;
     copyOfR=R;
@@ -15,7 +14,7 @@ function checkRecs (L,R,checker){
         colIndex=j;
         var colval=cdg.schema[colIndex].title;
         colval=colval.charAt(0).toLowerCase() + colval.slice(1);
-        var rowval=cdg.data[rowIndex][0];
+        var rowval=cdg.data[rowIndex][0];       
         
         if(checker==1){
           if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
@@ -32,13 +31,14 @@ function checkRecs (L,R,checker){
         else{
           //str.replace('a', '');
           if(cdg.data[i][j]!=null){
-            cdg.data[i][j]=cdg.data[i][j].replace(' * ','');
+            cdg.data[i+1][j]=cdg.data[i][j].replace(' * ','');
           }
         }
     
     }
     
   }
+
 }
 
   function starRec(colval,rowval,menuoptns,isVirtual,L,R,rowIndex,colIndex){

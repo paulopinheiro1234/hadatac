@@ -537,7 +537,7 @@
                     var str=this.parentElement.innerText;
                     a = str.split("\n");
                     removeCartItem(a[0]);
-                    document.getElementById("seecrat").children[i].style.display = "none"
+                    document.getElementById("seecart").children[i].style.display = "none"
                     var li = document.querySelectorAll('.cart-content > li');
                     li[i].parentNode.removeChild(li[i]);                
                  }
