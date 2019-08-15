@@ -1,4 +1,4 @@
-@(files  : List[org.hadatac.entity.pojo.DataFile], 
+@(files  : List[org.hadatac.entity.pojo.DataFile],
   bAdmin : Boolean)
 
 @import helper._
@@ -10,11 +10,11 @@
 
 @main("SDD Editor"){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
-    <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
 
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
-    
+
 <style>
 #loader {
     border: 16px solid #f3f3f3; /* Light grey */
@@ -39,7 +39,7 @@
 
     <div>
         <h3>Upload Data Dictionary Files for Automatic Annotation</h3>
-        <form name="fileUploadForm" id='upload_form_dd' method="POST" enctype="multipart/form-data" 
+        <form name="fileUploadForm" id='upload_form_dd' method="POST" enctype="multipart/form-data"
         action="@org.hadatac.console.controllers.fileviewer.routes.DataDictionaryAnnotator.uploadDataDictionaryFile()">
             <input type="file" id="dd_file" value="" name="file"/>
             <input class="btn btn-primary" type="submit" id="upload_dd" value="Upload" disabled/>
@@ -73,22 +73,22 @@
                 <td>@file.getCompletionPercentage().toInt%</td>
                 <td>@file.getStatus()</td>
                 <td>
-                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.downloadDataFile(file.getFileName())" 
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.downloadDataFile(file.getFileName())"
                    class="btn btn-xs btn-primary" name="download" role="button">Download</a>
-                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.deleteDataFile(file.getFileName())" 
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.deleteDataFile(file.getFileName())"
                    class="btn btn-xs btn-primary" name="delete" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
                     @if(bAdmin) {
-                        <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getId())" 
+                        <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getId())"
                        class="btn btn-xs btn-primary" name="assign_owner" role="button">Assign Owner</a>
                     }
-                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getFileName())" 
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getFileName())"
                    class="btn btn-xs btn-primary" name="logs" role="button">Logs</a>
                 </td>
             </tr>
         }
     </tbody>
     </table>
-    
+
     @if(files.isEmpty()) {
         <p>No records for uploaded files</p>
     }
@@ -102,25 +102,25 @@
         <input class="btn btn-primary" type="button" id="upload" value="Submit" disabled/>
         <a class="btn btn-primary" role="button" id="download" disabled>Download</a>
       </div>
-      
+
       <div id="end-process-box" style="display:none;">
         <h4>File Ingestion Results: </h4>
         <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
       </div>
-      
+
       <div>
         <div id="grid"></div>
         <div id="buttons"></div>
         <div id="footnote"></div>
       </div>
     </div>
-    
+
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
-    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/xlsx.full.min.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/main.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
-    
+
     <script>
     var _upload = document.getElementById('upload');
     var _download = document.getElementById('download');
@@ -129,18 +129,18 @@
         $("#upload").attr("disabled", "disabled");
         $("#download").attr("disabled", "disabled");
     };
-    
+
     var _ondownload = function(e) {
         return $("input:file").val().replace(/.*(\/|\\)/, '');
     };
-    
+
     var _onreponse = function() {
         if (this.readyState == 4 && this.status == 200) {
             $("#loader").hide();
             var msg2 = decodeURIComponent(this.responseText);
             $('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
             document.getElementById('end-process-box').style.display = 'inline';
-            
+
             $("#upload").removeAttr("disabled");
             $("#download").removeAttr("disabled");
         }
@@ -169,7 +169,7 @@
         foo: 'bar'
       }
     });
-    
+
     $("#file").change(function () {
         var fileName = $(this).val();
         if (fileName.length > 0) {
@@ -177,7 +177,7 @@
             $("#download").removeAttr("disabled");
         }
     });
-    
+
     $("#dd_file").change(function () {
         var fileName = $(this).val();
         if (fileName.length > 0) {
