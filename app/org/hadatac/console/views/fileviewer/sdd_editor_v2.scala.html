@@ -1,9 +1,9 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
-  dd_dataFile: org.hadatac.entity.pojo.DataFile,
-  bSavable : Boolean,
-  loadedList : List[String],
-  testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
-  )
+dd_dataFile: org.hadatac.entity.pojo.DataFile,
+bSavable : Boolean,
+loadedList : List[String],
+testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
+)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -14,21 +14,21 @@
 @import java.net._
 
 @main("SDD Editor Version 2"){
-    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/jquery-1.10.2.js")"></script>
+   <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
+   <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
+   <script src="@controllers.routes.Assets.versioned("sheetjs/js/jquery-1.10.2.js")"></script>
 
-    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
-    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
-    <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+   <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
+   <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
+   <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
 
-    <div id="rcorners" >
+   <div id="rcorners" >
 
-    <h4>@dataFile.getFileName()</h4>
-    @if(bSavable) {
-        <input class="btn btn-primary" type="button" id="upload" value="Save"/>
-    }
-    <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+      <h4>@dataFile.getFileName()</h4>
+      @if(bSavable) {
+         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
+      }
+      <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
 
 
 
@@ -38,222 +38,225 @@
 
       <script>
 
-        function populateSDD(){
+         function populateSDD(){
 
-          $.ajax({
-          type : 'GET',
-          url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getHeaderLoc',
-          data : {
+            $.ajax({
+               type : 'GET',
+               url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getHeaderLoc',
+               data : {
 
-          },
-          success : function(data) {
-            console.log(data);
-            getHeaderData(data);
-          }
-        });
-        $.ajax({
-          type : 'GET',
-          url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCommentLoc',
-          data : {
+               },
+               success : function(data) {
+                  console.log(data);
+                  getHeaderData(data);
+               }
+            });
+            $.ajax({
+               type : 'GET',
+               url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCommentLoc',
+               data : {
 
-          },
-          success : function(data) {
-            console.log(data);
-            comments_data= data;
+               },
+               success : function(data) {
+                  console.log(data);
+                  comments_data= data;
 
-          // var commentsheet=comments_data.split('-')[0];
-          // var commentcol=comments_data.split('-')[1];
-          }
-        });
+                  // var commentsheet=comments_data.split('-')[0];
+                  // var commentcol=comments_data.split('-')[1];
+               }
+            });
 
-        }
-        function getHeaderData(data){
-          var headersheet=data.split('-')[0];
-          var headercol=data.split('-')[1];
-          console.log(headersheet);
-          console.log(headercol);
-          var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-          DDforPopulate(durl,headersheet,headercol)
-        }
+         }
+         function getHeaderData(data){
+            var headersheet=data.split('-')[0];
+            var headercol=data.split('-')[1];
+            console.log(headersheet);
+            console.log(headercol);
+            var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+            DDforPopulate(durl,headersheet,headercol)
+         }
 
       </script>
-
-
-        <input type="text" id="varDescription" value="Description of Column Variable:"/>
-        <div class="undo-edit">
-        <button class="undo-button" onclick="undoEdit()"> <img src="https://cdn1.iconfinder.com/data/icons/navigation-elements/512/left-rotate-back-motion-arrow-512.png" width="28" height="33" alt=""/> </button>
-        </div>
-        <div class="undo-edit">
-          <button class="undo-button" onclick="reundoEdit()"> <img src="https://cdn4.iconfinder.com/data/icons/arrows-2-11/48/120-512.png" width="24" height="26" alt=""/> </button>
-        </div>
-        <div class= shopbutton>
-        <button class="cart" >
-
-          <img src="http://www.sclance.com/pngs/shop-png/shop_png_1237358.png" width="45" height="35" alt=""/>Shop Terms</button>
-
-        <ul id="myDropdown" class="ontologydrop-content">
-
-          @for(loadedFile <- loadedList) {
-
-            <li class=eachOntology><a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile">@loadedFile</a></li>
-          }
-
-        </ul>
+      <div class="undo-edit">
+         <button class="undo-button" onclick="undoEdit()"> <img src="https://cdn1.iconfinder.com/data/icons/navigation-elements/512/left-rotate-back-motion-arrow-512.png" width="28" height="33" alt=""/> </button>
       </div>
-
-      <script>
-
-        var fid="@dataFile.getId()";
-
-      $.ajax({
-        type : 'GET',
-        url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getfile_ID',
-        data : {
-          fileid: fid
-        },
-        success : function(data) {
-          //console.log(data);
-
-        }
-      });
-      </script>
-      <div class="cartbutton" id="viewcart">
-        <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
-
-            <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="35" height="32" alt=""/>
-          View Cart
-          </button>
-      <ul id="seecart" class="cart-content">
-      <li class="cartitem" id="cart_item">Cart Items: </span></li>
-      </ul>
-
+      <div class="undo-edit">
+         <button class="undo-button" onclick="reundoEdit()"> <img src="https://cdn4.iconfinder.com/data/icons/arrows-2-11/48/120-512.png" width="24" height="26" alt=""/> </button>
       </div>
+      <div class= shopbutton>
+         <button class="cart" >
+
+            <img src="http://www.sclance.com/pngs/shop-png/shop_png_1237358.png" width="45" height="35" alt=""/>Shop Terms</button>
+
+            <ul id="myDropdown" class="ontologydrop-content">
+
+               @for(loadedFile <- loadedList) {
+
+                  <li class=eachOntology><a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile">@loadedFile</a></li>
+               }
+
+            </ul>
+         </div>
+
+         <script>
+
+            var fid="@dataFile.getId()";
+
+            $.ajax({
+               type : 'GET',
+               url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getfile_ID',
+               data : {
+                  fileid: fid
+               },
+               success : function(data) {
+                  //console.log(data);
+
+               }
+            });
+         </script>
+         <div class="cartbutton" id="viewcart">
+            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
+
+               <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="35" height="32" alt=""/>
+               View Cart
+            </button>
+            <ul id="seecart" class="cart-content">
+               <li class="cartitem" id="cart_item">Cart Items: </span></li>
+            </ul>
+
+         </div>
 
 
-      <button class="main-nav" id="show"><img src=" https://cdn3.iconfinder.com/data/icons/eye-and-view/100/eye_view_vision-07-512.png "
-        width="36" height="33" alt=""/> Show Options</button>
-      <button class="Close" id="hide"><img src=" https://cdn0.iconfinder.com/data/icons/security-line/100/eye_closed-512.png "
-        width="36" height="33" alt=""/> Hide Options</button>
+         <button class="main-nav" id="show"><img src=" https://cdn3.iconfinder.com/data/icons/eye-and-view/100/eye_view_vision-07-512.png "
+            width="36" height="33" alt=""/> Show Options</button>
+            <button class="Close" id="hide"><img src=" https://cdn0.iconfinder.com/data/icons/security-line/100/eye_closed-512.png "
+               width="36" height="33" alt=""/> Hide Options</button>
 
-        <div class="mobile-nav">
-          <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
-          <img src="https://clipart.wpblink.com/sites/default/files/wallpaper/bulb-clipart/451480/bulb-clipart-lightbulb-moment-451480-3674232.png"
-          width="36" height="30" alt=""/> Recommended Terms</button>
-            <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
-                <option value="Choose from Below">Choose from Below</option>
-            </select>
+               <div class="mobile-nav">
+                  <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
+                     <img src="https://clipart.wpblink.com/sites/default/files/wallpaper/bulb-clipart/451480/bulb-clipart-lightbulb-moment-451480-3674232.png"
+                     width="36" height="30" alt=""/> Recommended Terms</button>
+                     <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
+                        <option value="Choose from Below">Choose from Below</option>
+                     </select>
 
-            <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
-              <img src="http://www.transparentpng.com/thumb/virtual-reality/virtual-reality-free-download-10.png"
-              width="36" height="32" alt=""/> Recommended Columns</button>
-              <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
-                  <option value="Choose from Below">Choose from Below</option>
-              </select>
+                     <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
+                        <img src="http://www.transparentpng.com/thumb/virtual-reality/virtual-reality-free-download-10.png"
+                        width="36" height="32" alt=""/> Recommended Columns</button>
+                        <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
+                           <option value="Choose from Below">Choose from Below</option>
+                        </select>
 
-            <div id="editRowsAdd">
-              <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
-              <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
-              <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
-              <button class="undo-remove-row" onclick="revertRow()"><img src="https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png" width="15" height="18" alt=""/> </button>
-            </div>
-            <div id="verifysdd" >
-                <button onclick="verifySDD()" style="display: block; margin: 0 auto; margin-top: 3pt;background-color: cornflowerblue; color:white">Verify</button>
-            </div>
-            <div id="irifound" >
+                        <div id="editRowsAdd">
+                           <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
+                           <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
+                           <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
+                           <button class="undo-remove-row" onclick="revertRow()"><img src="https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png" width="15" height="18" alt=""/> </button>
+                        </div>
+                        <div id="verifysdd" >
+                           <button onclick="verifySDD()" style="display: block; margin: 0 auto; margin-top: 3pt;background-color: cornflowerblue; color:white">Verify</button>
+                        </div>
+                        <div id="irifound" >
 
-            </div>
-            <div id="irinotfound" >
+                        </div>
+                        <div id="irinotfound" >
 
-              </div>
+                        </div>
 
-        </div>
-
-
+                     </div>
 
 
+                     <div class="text-area">
+                        Cell Value: <input type="text" id="cellText" value=""/>
+                     </div>
 
-
-    <div><a id="error_msg"></a></div>
-    <div id="grid"></div>
-    <div id="footnote"></div>
-    <div id="buttons"></div>
-    </div>
-
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/xlsx.full.min.js")"></script>
-
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
-    <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
-
-    <script type="text/javascript">
-    /* set up async GET request */
-    var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
-
-    var _upload = document.getElementById('upload');
-    var _onreponse = function() {
-    	$("#error_msg").html(decodeURIComponent(this.responseText));
-    	setTimeout(function() {
-    		$("#error_msg").html("");
-    	}, 3000);
-    };
-
-    var req = new XMLHttpRequest();
-    req.open("GET", url, true);
-    req.responseType = "arraybuffer";
-
-    req.onload = function(e) {
-      var data = new Uint8Array(req.response);
-
-      // var workbook = XLSX.read(data, {type:"array"});
-      // console.log("SheetNames: " + workbook.SheetNames);
-
-      DropSheet({
-        data: data,
-        file: _file,
-        filetype: "@dataFile.getFileExtention()",
-        drop: _target,
-        upload: _upload,
-        upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",
-        formdata: JSON.stringify({"fileId": "@dataFile.getId()"}),
-        reponse_action: _onreponse,
-        on: {
-            workstart: _workstart,
-            workend: _workend,
-            sheet: _onsheet,
-            foo: 'bar'
-        },
-        errors: {
-            badfile: _badfile,
-            pending: _pending,
-            failed: _failed,
-            large: _large,
-            foo: 'bar'
-        }
-      });
-    }
-    req.send();
-    </script>
-    <script>
-      if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
-        alert("Please upload a valid Data Dictionary")
-      }
-      else{
-         if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
-           alert("Could not find a Data Dictionary")
-         }
-         else{
-           var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-           getURL(url);
-         }
-      }
-    </script>
+                     <div class="text-area2">
+                        Description: <input type="text" id="varDescription" value="" input disabled="disabled"/>
+                     </div>
 
 
 
+                     <div><a id="error_msg"></a></div>
+                     <div id="grid"></div>
+                     <div id="footnote"></div>
+                     <div id="buttons"></div>
+                  </div>
 
-}
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/xlsx.full.min.js")"></script>
+
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
+                  <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
+
+                  <script type="text/javascript">
+                     /* set up async GET request */
+                     var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
+
+                     var _upload = document.getElementById('upload');
+                     var _onreponse = function() {
+                        $("#error_msg").html(decodeURIComponent(this.responseText));
+                        setTimeout(function() {
+                           $("#error_msg").html("");
+                        }, 3000);
+                     };
+
+                     var req = new XMLHttpRequest();
+                     req.open("GET", url, true);
+                     req.responseType = "arraybuffer";
+
+                     req.onload = function(e) {
+                        var data = new Uint8Array(req.response);
+
+                        // var workbook = XLSX.read(data, {type:"array"});
+                        // console.log("SheetNames: " + workbook.SheetNames);
+
+                        DropSheet({
+                           data: data,
+                           file: _file,
+                           filetype: "@dataFile.getFileExtention()",
+                           drop: _target,
+                           upload: _upload,
+                           upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",
+                           formdata: JSON.stringify({"fileId": "@dataFile.getId()"}),
+                           reponse_action: _onreponse,
+                           on: {
+                              workstart: _workstart,
+                              workend: _workend,
+                              sheet: _onsheet,
+                              foo: 'bar'
+                           },
+                           errors: {
+                              badfile: _badfile,
+                              pending: _pending,
+                              failed: _failed,
+                              large: _large,
+                              foo: 'bar'
+                           }
+                        });
+                     }
+                     req.send();
+                  </script>
+                  <script>
+                     if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
+                        alert("Please upload a valid Data Dictionary")
+                     }
+                     else{
+                        if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
+                           alert("Could not find a Data Dictionary")
+                        }
+                        else{
+                           var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+                           getURL(url);
+                        }
+                     }
+                  </script>
+
+
+
+
+               }
