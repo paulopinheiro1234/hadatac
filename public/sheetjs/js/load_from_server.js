@@ -44,16 +44,12 @@ function hideView(){
 
 }
 
-function changeHeader(headers,json){
-
-  for(var i=0;i<headers.length;i++){
-
+function changeHeader(headers){
+  for(var i = 0; i < headers.length; i++){
     cdg.schema[i].title = headers[i];
   }
-
-
-
 }
+
 /* make the buttons for the sheets */
 var sheetName;
 var make_buttons = function(sheetnames, cb) {
@@ -66,15 +62,15 @@ var make_buttons = function(sheetnames, cb) {
     btn.type = 'button';
     btn.name = 'btn' + idx;
     btn.text = s;
-    sheetName=s;
     var txt = document.createElement('h5');
     txt.innerText = s;
     btn.appendChild(txt);
 
     btn.addEventListener('click', function() {
+      sheetName=s;
       cb(idx);
       hideView();
-      sheetName=s;
+      cdg.draw();
       }, false);
     buttons.appendChild(btn);
   });
@@ -289,46 +285,66 @@ window.addEventListener('resize', _resize);
 var click_ctr=0;
 var copyOfL=0;
 var copyOfR=0;
+
+var headerMap = new Map();
+
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
-  // console.log(click_ctr);
+
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
   _grid.style.display = "block";
   _resize();
 
-  /* set up table headers */
+
+  if (sheetName === undefined){ // sheetname will be undefined for the first sheet so set it to the default
+     sheetName = sheetnames[0];
+  }
+
+  /* clean json */
   var L = 0;
-  var R=0;
-  json.forEach(function(r) { if(L < r.length) L = r.length; });
-  // console.log(L);
-  //alert(json[0][0]);
-  var headers=[];
-  for(var i = 0; i <L; ++i) {
-    headers.push(json[0][i]);
+  json.forEach(function(r) { if(L < r.length) L = r.length; }); // Gets the max width row
+
+  var cleanJson = [];
+  for(var i = 0; i < json.length; i++){
+    if(json[i].length > 0){
+      var temp = [];
+      var j;
+      for(j = 0; j < json[i].length; j++){
+         if(typeof json[i][j] === 'string'){
+            temp.push(json[i][j]);
+         }
+         else{
+            temp.push(""); // replaces empty slots with a string
+         }
+      }
+      while(j < L){
+         temp.push("");
+         j++;
+      }
+      cleanJson.push(temp)
+   }
+  }
+  json = cleanJson;
+
+  /* set up table headers */
+  if(headerMap.has(sheetName)){
+    cdg.data = json;
+    changeHeader(headerMap.get(sheetName));
+  }
+  else{
+    headerMap.set(sheetName, json[0]);
+    cdg.data = json.slice(1);
+    changeHeader(json[0]);
   }
 
-  for(var i = json[0].length; i < L; ++i) {
-    json[0][i] = "";
-  }
-  cdg.data = json;
-
-
-  changeHeader(headers,json);
-  for(var i=0;i<cdg.data.length;i++){
-    if(cdg.data[i][0]!=null){
-      R++;
-    }
-  }
-  copyOfL=L;
-  copyOfR=R;
-  checkRecs(L,R,1);
   cdg.draw();
 };
 
+// setSheet
 
 function parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual){
     var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
@@ -667,7 +683,7 @@ function DDforPopulate(durl,headersheet,headercol){
 
       var popElement=document.getElementById("populatesdd");
       popElement.removeAttribute("disabled");
-      populateThis(headersCol);
+      // populateThis(headersCol);
       popElement.setAttribute("disabled", "disabled");
     }
     else if(sheetName!="Dictionary Mapping"){
