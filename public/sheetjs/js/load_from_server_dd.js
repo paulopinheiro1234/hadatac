@@ -32,12 +32,26 @@ var _failed = function(e) {
   console.log(e, e.stack);
   alertify.alert('We unfortunately dropped the ball here.  Please test the file using the <a href="/js-xlsx/">raw parser</a>.  If there are issues with the file processor, please send this file to <a href="mailto:dev@sheetjs.com?subject=I+broke+your+stuff">dev@sheetjs.com</a> so we can make things right.', function(){});
 };
+function changeHeader(headers,emptySheet){
+  if(emptySheet==0){
+      for(var i = 0; i < headers.length; i++){
+        cdg.schema[i].title = headers[i];
 
+      }
+     cdg.deleteRow(0);
+    }
+    else{
+      for(var i = 0; i < headers.length; i++){
+        cdg.schema[i].title = headers[i];
+      }
+    }
+}
 /* make the buttons for the sheets */
 var sheet_name;
 function getSheetname(s){
     sheet_name=s;
 }
+var sheetName;
 var make_buttons = function(sheetnames, cb) {
   var buttons = document.getElementById('buttons');
   buttons.innerHTML = "";
@@ -51,7 +65,13 @@ var make_buttons = function(sheetnames, cb) {
     var txt = document.createElement('h5');
     txt.innerText = s;
     btn.appendChild(txt);
-    btn.addEventListener('click', function() {cb(idx);getSheetname(s);}, false);
+
+    btn.addEventListener('click', function() {
+      sheetName=s;
+      cb(idx);
+      hideView();
+      cdg.draw();
+      }, false);
     buttons.appendChild(btn);
   });
   buttons.appendChild(document.createElement('br'));
@@ -71,30 +91,69 @@ _resize();
 
 window.addEventListener('resize', _resize);
 var click_ctr=0;
+var headerMap = new Map();
+
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
-  // console.log(click_ctr);
+
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
   _grid.style.display = "block";
   _resize();
 
-  /* set up table headers */
+
+  if (sheetName === undefined){ // sheetname will be undefined for the first sheet so set it to the default
+     sheetName = sheetnames[0];
+  }
+
+  /* clean json */
   var L = 0;
-  var R=0;
-  json.forEach(function(r) { if(L < r.length) L = r.length; });
-  
-  
-  for(var i = json[0].length; i < L; ++i) {
-    json[0][i] = "";
+  json.forEach(function(r) { if(L < r.length) L = r.length; }); // Gets the max width row
+
+  var cleanJson = [];
+  for(var i = 0; i < json.length; i++){
+    if(json[i].length > 0){
+      var temp = [];
+      var j;
+      for(j = 0; j < json[i].length; j++){
+         if(typeof json[i][j] === 'string'){
+            temp.push(json[i][j]);
+         }
+         else{
+            temp.push(""); // replaces empty slots with a string
+         }
+      }
+      while(j < L){
+         temp.push("");
+         j++;
+      }
+      cleanJson.push(temp)
+   }
   }
-  cdg.data = json;
-  for(var i=0;i<cdg.data[0].length;i++){
-    cdg.schema[i].title = cdg.data[0][i];   
+  json = cleanJson;
+  var emptySheet;
+  /* set up table headers */
+  if(headerMap.has(sheetName)){
+    cdg.data = json;
+    console.log(headerMap.get(sheetName));
+    changeHeader(headerMap.get(sheetName),1);
   }
+  else{
+    headerMap.set(sheetName, json[0]);
+    
+    if(json.length==1){
+      cdg.data = json;
+      emptySheet=0;
+    }
+    else{
+      cdg.data = json.slice(1);
+    }
+    changeHeader(json[0],emptySheet);
+  }
+ 
   cdg.draw();
 };
 if(document.getElementById("headerdetails").value==" "){
@@ -109,7 +168,7 @@ cdg.addEventListener('contextmenu', function (e) {
                 click: function (ev) {
                     var val;
                     val=cdg.schema[e.cell.columnIndex].title
-                    var header_location=sheet_name+"-"+val;
+                    var header_location=sheetName+"-"+val;
                     var header_=document.getElementById("headerdetails");
                     header_.value=header_location;
                     document.getElementById('carryover').removeAttribute("disabled");
@@ -122,7 +181,7 @@ cdg.addEventListener('contextmenu', function (e) {
                 click: function (ev) {
                     var val;
                     val=cdg.schema[e.cell.columnIndex].title
-                    var desc_location=sheet_name+"-"+val;
+                    var desc_location=sheetName+"-"+val;
                     var desc_=document.getElementById("descdetails");
                     desc_.value=desc_location;
                     storeDesc(desc_location);

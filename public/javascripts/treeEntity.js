@@ -78,6 +78,7 @@
     }
 
     function searchTree(obj,search,path){
+        console.log(obj);
         if(obj.name.indexOf(search) != -1){ //if search is found return, add the object to the path and return it
             obj._isSelected = true;  // mark is
         lastClickD = obj;
@@ -312,7 +313,7 @@
       lastClickD = null;
       root.children.forEach(collapse);
       update(root);
-
+    console.log(root);
       searchResults = getPartialMatches(root, document.getElementById("searchValue").value);
       searchIndex = 0;
 
