@@ -337,6 +337,15 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       cleanJson.push(temp)
    }
   }
+
+  if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
+     var temp = [];
+     for(var j = 0; j < L; j++){
+        temp.push("");
+     }
+     cleanJson.push(temp)
+  }
+
   json = cleanJson;
   var emptySheet;
   /* set up table headers */
