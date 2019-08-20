@@ -353,29 +353,22 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   if(headerMap.has(sheetName)){
     cdg.data = json;
     console.log(headerMap.get(sheetName));
-    changeHeader(headerMap.get(sheetName),1);
-    for(var i=0;i<cdg.data.length;i++){
-      R++;
-      checkRecs(L,R,1);
-    }
+    changeHeader(headerMap.get(sheetName), 1);
   }
   else{
     headerMap.set(sheetName, json[0]);
-    
+
     if(json.length==1){
       cdg.data = json;
       emptySheet=0;
     }
     else{
       cdg.data = json.slice(1);
-      for(var i=0;i<cdg.data.length;i++){
-        R++;
-        checkRecs(L,R,1);
-      }
     }
-    changeHeader(json[0],emptySheet);
+    changeHeader(json[0], emptySheet);
   }
- 
+
+  checkRecs(L, cdg.data.length, 1);
   cdg.draw();
 };
 
