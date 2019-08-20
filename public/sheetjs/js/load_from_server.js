@@ -315,6 +315,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   /* clean json */
   var L = 0;
+  var R=0;
   json.forEach(function(r) { if(L < r.length) L = r.length; }); // Gets the max width row
 
   var cleanJson = [];
@@ -353,6 +354,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     cdg.data = json;
     console.log(headerMap.get(sheetName));
     changeHeader(headerMap.get(sheetName),1);
+    for(var i=0;i<cdg.data.length;i++){
+      R++;
+      checkRecs(L,R,1);
+    }
   }
   else{
     headerMap.set(sheetName, json[0]);
@@ -363,6 +368,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     else{
       cdg.data = json.slice(1);
+      for(var i=0;i<cdg.data.length;i++){
+        R++;
+        checkRecs(L,R,1);
+      }
     }
     changeHeader(json[0],emptySheet);
   }
