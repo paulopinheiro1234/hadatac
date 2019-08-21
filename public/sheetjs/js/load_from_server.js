@@ -15,6 +15,30 @@ var spinner;
 var _workstart = function() { spinner = new Spinner().spin(_target); }
 var _workend = function() { spinner.stop(); }
 
+// Load spinner
+var spinnerOpts = {
+      lines: 13, // The number of lines to draw
+      length: 4, // The length of each line
+      width: 2, // The line thickness
+      radius: 6, // The radius of the inner circle
+      corners: 1, // Corner roundness (0..1)
+      rotate: 0, // The rotation offset
+      color: '#00047c', // #rgb or #rrggbb
+      speed: 1, // Rounds per second
+      trail: 40, // Afterglow percentage
+      shadow: false, // Whether to render a shadow
+      hwaccel: false, // Whether to use hardware acceleration
+      className: 'spinner', // The CSS class to assign to the spinner
+      zIndex: 2e9
+    };
+    var spinnerTarget = document.getElementById('spinnerContainer');
+    var spinnerStatus = new Spinner(spinnerOpts).spin(spinnerTarget);
+
+    var imageStatus = document.getElementById('imageStatus');
+    imageStatus.style.visibility = 'hidden';
+
+    var imgPath = imageStatus.src.substr(0, imageStatus.src.length-11)
+
 /** Alerts **/
 var _badfile = function() {
   alertify.alert('This file does not appear to be a valid Excel file.  If we made a mistake, please send this file to <a href="mailto:dev@sheetjs.com?subject=I+broke+your+stuff">dev@sheetjs.com</a> so we can take a look.', function(){});
@@ -151,6 +175,8 @@ cdg.addEventListener('click', function (e) {
 
   else{
     var menuoptns=[];
+    // spinnerStatus.start();
+    // imageStatus.style.visibility = 'hidden';
     if(demo_enabled){
       jsonparser(colval,rowval,menuoptns,isVirtual);
     }
@@ -195,7 +221,6 @@ cdg.addEventListener('endedit',function(e){
 })
 
 cdg.addEventListener('click', function (e) {
-
   if (!e.cell) { return; }
   if(e.cell.value==null){return;}
   else{
@@ -472,9 +497,16 @@ function getSuggestion(){
    getJSON("http://127.0.0.1:5000/populate-sdd",  function(err, data) {
       if (err != null) {
          console.error(err);
+         spinnerStatus.stop();
+         imageStatus.style.visibility = 'visible';
+         imageStatus.src = imgPath + 'fail.png'
+
       }
       else {
          sdd_suggestions = data
+         spinnerStatus.stop();
+         imageStatus.style.visibility = 'visible';
+         imageStatus.src = imgPath + 'success.png'
       }
    });
 }
@@ -487,14 +519,21 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
   xhr.onload = function() {
       var status = xhr.status;
       if (status == 200) {
+          spinnerStatus.stop();
+          imageStatus.style.visibility = 'visible';
+          imageStatus.src = imgPath + 'success.png';
           callback(null, xhr.response);
       } else {
           callback(status);
+          spinnerStatus.stop();
+          imageStatus.style.visibility = 'visible';
+          imageStatus.src = imgPath + 'fail.png';
       }
   };
 
   xhr.send();
   };
+
 
   getJSON('http://128.113.106.57:5000/get-sdd/',  function(err, data) {
   if (err != null) {
