@@ -531,6 +531,12 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
       }
   };
 
+  xhr.onerror = function() {
+      spinnerStatus.stop();
+      imageStatus.style.visibility = 'visible';
+      imageStatus.src = imgPath + 'fail.png'
+  };
+
   xhr.send();
   };
 

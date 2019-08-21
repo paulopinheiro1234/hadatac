@@ -49,17 +49,32 @@ function checkRecs (L,R,checker){
         var status = xhr.status;
         if (status == 200) {
             callback(null, xhr.response);
+            spinnerStatus.stop();
+            imageStatus.style.visibility = 'visible';
+            imageStatus.src = imgPath + 'success.png'
         } else {
             callback(status);
+            spinnerStatus.stop();
+            imageStatus.style.visibility = 'visible';
+            imageStatus.src = imgPath + 'fail.png'
         }
     };
 
-    xhr.send();
+    xhr.onerror = function() {
+        spinnerStatus.stop();
+        imageStatus.style.visibility = 'visible';
+        imageStatus.src = imgPath + 'fail.png'
+    };
+
+      xhr.send();
     };
 
     getJSON('http://128.113.106.57:5000/get-sdd/',  function(err, data) {
     if (err != null) {
         console.error(err);
+        spinnerStatus.stop();
+        imageStatus.style.visibility = 'visible';
+        imageStatus.src = imgPath + 'fail.png'
     }
 
     else {
