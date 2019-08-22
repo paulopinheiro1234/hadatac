@@ -38,7 +38,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies--{{ checksum "build.sbt" }}
 
-      - run:  cat /dev/null | ./install_hadatac.sh
-      
+      - run:  ./install_hadatac.sh Y ~/hadatac-solr ~/hadatac-blazegraph
+
       # run tests!
       - run: cat /dev/null | sbt test:test
