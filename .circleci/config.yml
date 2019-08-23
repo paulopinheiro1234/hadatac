@@ -31,8 +31,9 @@ jobs:
             - v1-dependencies-{{ checksum "build.sbt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
+      - run: echo $PATH
       - run: source ~/.bashrc
+      - run: echo $PATH
       - run: cat /dev/null | sbt test:compile
 
       - save_cache:
