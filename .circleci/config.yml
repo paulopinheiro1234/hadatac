@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # - image: circleci/openjdk:8-jdk
-      -image: circleci/jdk8
+      - image: johnsm21/hadatac:latest
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -39,7 +39,6 @@ jobs:
             - ~/.m2
           key: v1-dependencies--{{ checksum "build.sbt" }}
 
-      - run: sudo apt-get install lsof
       - run:  ./install_hadatac.sh Y ~/hadatac-solr ~/hadatac-blazegraph
 
       # run tests!
