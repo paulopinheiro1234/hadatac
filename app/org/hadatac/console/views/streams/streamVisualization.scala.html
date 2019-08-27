@@ -1,0 +1,444 @@
+@(dir              : String,
+  filename         : String,
+  da_uri           : String,
+  measurements     : String,
+  minDate          : String,
+  maxDate          : String)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.entity.pojo._
+@import play.api.Play._
+@import java.net.URLEncoder
+
+@main("Data Visualization") {
+
+	<head>
+	  <meta charset="utf-8">
+	  <script src="https://d3js.org/d3.v4.min.js"></script>
+	  <style>
+	    body {
+	      font-family:"avenir next", Arial, sans-serif;
+	      font-size: 12px;
+	      color: #696969;
+	    }
+	
+	    #play-button {
+	      position: absolute;
+	      top: 140px;
+	      left: 50px;
+	      background: #f08080;
+	      padding-right: 26px;
+	      border-radius: 3px;
+	      border: none;
+	      color: white;
+	      margin: 0;
+	      padding: 0 12px;
+	      width: 60px;
+	      cursor: pointer;
+	      height: 30px;
+	    }
+	
+	    #play-button:hover {
+	      background-color: #696969;
+	    }    
+	    
+	    .ticks {
+	      font-size: 10px;
+	    }
+	
+	    .track,
+	    .track-inset,
+	    .track-overlay {
+	      stroke-linecap: round;
+	    }
+	
+	    .track {
+	      stroke: #000;
+	      stroke-opacity: 0.3;
+	      stroke-width: 10px;
+	    }
+	
+	    .track-inset {
+	      stroke: #dcdcdc;
+	      stroke-width: 8px;
+	    }
+	
+	    .track-overlay {
+	      pointer-events: stroke;
+	      stroke-width: 50px;
+	      stroke: transparent;
+	      cursor: crosshair;
+	    }
+	
+	    .handle {
+	      fill: #fff;
+	      stroke: #000;
+	      stroke-opacity: 0.5;
+	      stroke-width: 1.25px;
+	    }
+	  </style>
+	</head>
+
+	<body>
+
+	<div class="row">
+   		<div class="col-md-1">
+   		</div>
+   		<div class="col-md-11">
+        	<h3>Data Visualization</h3>
+        </div>
+	</div>
+
+    <div class="container-fluid">
+       <div class="row">
+    	 <div class="col-md-1">
+   		 </div>
+    	 <div class="col-md-11">
+            <div class="navbar-collapse collapse navbar-secondary">
+			  <a href="/hadatac/deployments/browser?dir=%2F&amp;filename=&amp;da_uri=&amp;plat_uri=&amp;prev_platUri=" class="btn-sm btn-primary" role="button">Back</a>
+     	      <br><br><br>
+			  <!-- this scale max and value is abitrary, exact value read from data later -->
+			  <div class="btn-group mx-sm-3 mb-2 text-center">
+					<input min="0.01" max="2.86" type="range" id="scale" value="2.86" step = "0.01" type = "text">
+			  </div>
+			</div>
+         </div>
+       </div>
+	</div>
+	
+	<div class="row">
+   		<div class="col-md-1">
+   		</div>
+   		<div class="col-md-11">
+       		<div class="row text-center">
+       	    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+	            <!-- Indicators -->
+	            <ol class="carousel-indicators" id="carousel-indicators">
+	              <!--
+	              <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+	              <li data-target="#myCarousel" data-slide-to="1"></li>
+	              <li data-target="#myCarousel" data-slide-to="2"></li>
+	              -->
+	            </ol>
+	            <div class="carousel-inner" id="carousel-inner" role="listbox">
+	              <!-- <div class="item active" id="chartArea1">
+	              </div>
+	              <div class="item" id="chartArea2">
+	              </div>  -->
+	            </div>
+	            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+	              <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+	              <span class="sr-only">Previous</span>
+	            </a>
+	            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+	              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+	              <span class="sr-only">Next</span>
+	            </a>
+            </div><!-- /.carousel -->
+            <!--
+            <div id="vis">
+  				<button id="play-button">Play</button>
+			</div>
+			<svg width="1150" height="500">
+  				<defs>
+    				<pattern id="Img" width="1100" height="500" patternUnits="userSpaceOnUse">
+				    </pattern>
+  				</defs>
+			</svg>
+			-->
+			<script type="text/javascript">
+				let scale=$("#scale");
+				scale.hide();
+		        var measurements = '@measurements';
+        		var jsonMeasurements = measurements.replace(/&quot;/g,'"');
+        		var obj = JSON.parse(jsonMeasurements);
+                alert(JSON.stringify(obj,null,'\t'));
+        		//alert(jsonMeasurements);
+        		
+				//var formatDateIntoYear = d3.timeFormat("%Y");
+				var formatDateIntoMinute = d3.timeFormat("%M");
+				var formatDate = d3.timeFormat("%b %Y");
+				//var parseDate = d3.timeParse("%m/%d/%y");
+
+				var parseUTCDate = d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ");
+				var formatUTCDate = d3.timeFormat("%Y-%m-%d");
+				var parseDate = d3.timeParse("%Y-%m-%d");
+				
+				//var startDate = new Date("2015-11-01"),
+				//    endDate = new Date("2017-04-01");
+				var startDate = d3.utcParse('@minDate'),
+				    endDate = d3.utcParse('@maxDate');
+				
+				alert(startDate);
+				alert(endDate);
+				
+				var margin = {top:50, right:50, bottom:0, left:50},
+				    width = 960 - margin.left - margin.right,
+				    height = 500 - margin.top - margin.bottom;
+				
+				//var svg = d3.select("#vis")
+				//    .append("svg")
+				//    .attr("width", width + margin.left + margin.right)
+				//    .attr("height", height + margin.top + margin.bottom);  
+				
+				////////// slider //////////
+				
+				var moving = false;
+				var currentValue = 0;
+				var targetValue;
+				if (width < obj.length) {
+					targetValue = width;
+				} else {
+					targetValue = obj.length;
+				}
+				
+				//var playButton = d3.select("#play-button");
+				    
+				//var x = d3.scaleTime()
+				//    .domain([startDate, endDate])
+				//    .range([0, targetValue])
+				//    .clamp(true);
+				
+				//var slider = svg.append("g")
+				//    .attr("class", "slider")
+				//    .attr("transform", "translate(" + margin.left + "," + height/5 + ")");
+				
+				//slider.append("line")
+				//    .attr("class", "track")
+				//    .attr("x1", x.range()[0])
+				//    .attr("x2", x.range()[1])
+				//  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+				//    .attr("class", "track-inset")
+				//  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+				//    .attr("class", "track-overlay")
+				//    .call(d3.drag()
+				//        .on("start.interrupt", function() { slider.interrupt(); })
+				//        .on("start drag", function() {
+				//          currentValue = d3.event.x;
+				//          update(x.invert(currentValue)); 
+				//       })
+				//   );
+				
+				//slider.insert("g", ".track-overlay")
+				//    .attr("class", "ticks")
+				//    .attr("transform", "translate(0," + 18 + ")")
+				//  .selectAll("text")
+				//    .data(x.ticks(10))
+				//    .enter()
+				//    .append("text")
+				//    .attr("x", x)
+				//    .attr("y", 10)
+				//    .attr("text-anchor", "middle")
+				//    .text(function(d) { return formatDateIntoMinute(d); });
+				
+				//var handle = slider.insert("circle", ".track-overlay")
+				//    .attr("class", "handle")
+				//    .attr("r", 9);
+				
+				//var label = slider.append("text")  
+				//    .attr("class", "label")
+				//    .attr("text-anchor", "middle")
+				//    .text(formatDate(startDate))
+				//    .attr("transform", "translate(0," + (-25) + ")");
+				
+				container_block = document.getElementById('carousel-inner');
+				container_indicator = document.getElementById('carousel-indicators');
+
+	            indicator_to_insert_001 = document.createElement('li');
+	            indicator_to_insert_001.setAttribute('class', 'active');
+	            indicator_to_insert_001.setAttribute('data-target', '#myCarousel');
+	            indicator_to_insert_001.setAttribute('data-slide-to', '0')
+	            container_indicator.appendChild(indicator_to_insert_001);	
+				
+	            indicator_to_insert_002 = document.createElement('li');
+	            indicator_to_insert_002.setAttribute('data-target', '#myCarousel');
+	            indicator_to_insert_002.setAttribute('data-slide-to', '1')
+	            container_indicator.appendChild(indicator_to_insert_002);	
+				
+	            indicator_to_insert_003 = document.createElement('li');
+	            indicator_to_insert_003.setAttribute('data-target', '#myCarousel');
+	            indicator_to_insert_003.setAttribute('data-slide-to', '2')
+	            container_indicator.appendChild(indicator_to_insert_003);	
+				
+	            indicator_to_insert_004 = document.createElement('li');
+	            indicator_to_insert_004.setAttribute('data-target', '#myCarousel');
+	            indicator_to_insert_004.setAttribute('data-slide-to', '3')
+	            container_indicator.appendChild(indicator_to_insert_004);	
+				
+	            indicator_to_insert_005 = document.createElement('li');
+	            indicator_to_insert_005.setAttribute('data-target', '#myCarousel');
+	            indicator_to_insert_005.setAttribute('data-slide-to', '4')
+	            container_indicator.appendChild(indicator_to_insert_005);	
+				
+	            indicator_to_insert_006 = document.createElement('li');
+	            indicator_to_insert_006.setAttribute('data-target', '#myCarousel');
+	            indicator_to_insert_006.setAttribute('data-slide-to', '5')
+	            container_indicator.appendChild(indicator_to_insert_006);	
+				
+				
+				block_to_insert_001 = document.createElement('div');
+				block_to_insert_001.innerHTML = 'Text 1';
+				block_to_insert_001.setAttribute('class', 'item active');
+				block_to_insert_001.setAttribute('id', 'inner001')
+				container_block.appendChild(block_to_insert_001);	
+				
+				block_to_insert_002 = document.createElement('div');
+				block_to_insert_002.innerHTML = 'Text 2';
+				block_to_insert_002.setAttribute('class', 'item');
+				block_to_insert_002.setAttribute('id', 'inner002')
+				container_block.appendChild(block_to_insert_002);	
+
+				block_to_insert_003 = document.createElement('div');
+				block_to_insert_003.innerHTML = 'Text 3';
+				block_to_insert_003.setAttribute('class', 'item');
+				block_to_insert_003.setAttribute('id', 'inner003')
+				container_block.appendChild(block_to_insert_003);	
+
+				block_to_insert_004 = document.createElement('div');
+				block_to_insert_004.innerHTML = 'Text 1';
+				block_to_insert_004.setAttribute('class', 'item active');
+				block_to_insert_004.setAttribute('id', 'inner004')
+				container_block.appendChild(block_to_insert_004);	
+				
+				block_to_insert_005 = document.createElement('div');
+				block_to_insert_005.innerHTML = 'Text 2';
+				block_to_insert_005.setAttribute('class', 'item');
+				block_to_insert_005.setAttribute('id', 'inner005')
+				container_block.appendChild(block_to_insert_005);	
+
+				block_to_insert_006 = document.createElement('div');
+				block_to_insert_006.innerHTML = 'Text 3';
+				block_to_insert_006.setAttribute('class', 'item');
+				block_to_insert_006.setAttribute('id', 'inner006')
+				container_block.appendChild(block_to_insert_006);	
+				//var svg = d3.select("#chartArea1").append("svg")
+			    //	.attr("width", 400)
+				//	.attr("height", 100);
+
+				//var circle = svg.append("circle")
+				//	.attr("cx", 300)
+				//	.attr("cy", 100)
+				//	.attr("r", 50);
+
+				//var text = svg.append('text').text('This is some information about whatever 1')
+                //	.attr('x', 50)
+                //	.attr('y', 80);
+                //  .attr('fill', 'black')
+                
+				//var circle = svg.append("rect")
+				//	.attr("x", 250)
+				//	.attr("y", 50)
+				//	.attr("width", 100)
+				//	.attr("height", 100)
+				//	.text("hi 1");
+
+				//var svg2 = d3.select("#chartArea2").append("svg")
+				//	.attr("width", 400)
+				//	.attr("height", 100);
+
+				//var text = svg2.append('text').text('This is some information about whatever 2')
+            	//	.attr('x', 50)
+            	//	.attr('y', 80);
+
+				//var circle = svg2.append("rect")
+				//	.attr("x", 250)
+				//	.attr("y", 50)
+				//	.attr("width", 100)
+				//	.attr("height", 100)
+				//	.text("hi 2");
+				 
+				////////// plot //////////
+				
+				//var dataset;
+				
+				//var plot = svg.append("g")
+				//  .attr("class", "plot")
+				//  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				
+				//d3.csv("circles.csv", prepare, function(data) 
+				//d3.json(jsonMeasurements, prepare, function(data)  
+				//  dataset = data;
+				//  dataset = obj;
+				//  drawPlot(dataset);
+				  
+				//  playButton
+				//  .on("click", function() {
+				//  var button = d3.select(this);
+				//  if (button.text() == "Pause") {
+				//    moving = false;
+				//    clearInterval(timer);
+			    //    timer = 0;
+				//    button.text("Play");
+				//  } else {
+				//    moving = true;
+				//    timer = setInterval(step, 100);
+				//    button.text("Pause");
+				//  }
+				//  console.log("Slider moving: " + moving);
+				// })
+				//)
+				
+				//function prepare(d) {
+				//  d.id = d.value;
+				//  d.date = parseDate(formatUTCDate(parseUTCDate(d.date)));
+				//  return d;
+				//}
+				  
+				//function step() {
+				//  update(x.invert(currentValue));
+				//  currentValue = currentValue + (targetValue/151);
+				//  if (currentValue > targetValue) {
+				//    moving = false;
+				//    currentValue = 0;
+				//    clearInterval(timer);
+				//    timer = 0;
+				//    playButton.text("Play");
+				//    console.log("Slider moving: " + moving);
+				//  }
+				//}
+				
+				//function drawPlot(data) {
+				//  var locations = plot.selectAll(".location")
+				//    .data(data);
+				
+				// if filtered dataset has more circles than already existing, transition new ones in
+				// locations.enter()
+				//  .append("circle")
+				//  .attr("class", "location")
+				//  .attr("cx", function(d) { return x(d.date); })
+				//  .attr("cy", height/2)
+				//  .style("fill", function(d) { return d3.hsl(d.date/1000000000, 0.8, 0.8)})
+				//  .style("stroke", function(d) { return d3.hsl(d.date/1000000000, 0.7, 0.7)})
+				//  .style("opacity", 0.5)
+				//  .attr("r", 8)
+				//    .transition()
+				//    .duration(400)
+				//    .attr("r", 25)
+				//      .transition()
+				//      .attr("r", 8);
+				
+				// if filtered dataset has less circles than already existing, remove excess
+				//  locations.exit()
+				//    .remove();
+				//}
+				
+				// function update(h) {
+				// update position and text of label according to slider scale
+				//  handle.attr("cx", x(h));
+				//  label
+				//  .attr("x", x(h))
+				//  .text(formatDate(h));
+				
+				// filter data set and redraw plot
+				// var newData = dataset.filter(function(d) {
+				//  return d.date < h;
+				//})
+				//drawPlot(newData);
+				//}
+				
+    		</script>
+    	</div>
+    </div>
+    </body>
+}

@@ -28,7 +28,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.SDD;
-import org.hadatac.entity.pojo.SSD;
+import org.hadatac.entity.pojo.SSDSheet;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
@@ -569,10 +569,10 @@ public class AnnotationWorker {
         String studyId = dataFile.getRecordFile().getFileName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + studyId + "...");
 
-        SSD ssd = new SSD(dataFile);
+        SSDSheet ssd = new SSDSheet(dataFile);
         Map<String, String> mapCatalog = ssd.getCatalog();
         Map<String, List<String>> mapContent = ssd.getMapContent();
-
+        
         RecordFile SSDsheet = new SpreadsheetRecordFile(dataFile.getFile(), "SSD");
         dataFile.setRecordFile(SSDsheet);
 
@@ -582,9 +582,11 @@ public class AnnotationWorker {
 
             VirtualColumnGenerator vcgen = new VirtualColumnGenerator(dataFile);
             chain.addGenerator(vcgen);
+            //System.out.println("added VirtualColumnGenerator for " + dataFile.getAbsolutePath());
             
             SSDGenerator socgen = new SSDGenerator(dataFile);
             chain.addGenerator(socgen);
+            //System.out.println("added SSDGenerator for " + dataFile.getAbsolutePath());
 
             String studyUri = socgen.getStudyUri();
             if (studyUri == null || studyUri == "") {
@@ -609,12 +611,16 @@ public class AnnotationWorker {
 
         String study_uri = chain.getStudyUri();
         for (String i : mapCatalog.keySet()) {
-            if (mapCatalog.get(i).length() > 0) {
+            if (mapCatalog.get(i) != null && mapCatalog.get(i).length() > 0) {
                 try {
                     RecordFile SOsheet = new SpreadsheetRecordFile(dataFile.getFile(), mapCatalog.get(i).replace("#", ""));
                     DataFile dataFileForSheet = (DataFile)dataFile.clone();
                     dataFileForSheet.setRecordFile(SOsheet);
-                    chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri));
+                    if (mapContent == null || mapContent.get(i) == null) {
+                        dataFile.getLogger().printException("No value for MapContent with index [" + i + "]");
+                    } else {
+                    	chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri));
+                    }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }

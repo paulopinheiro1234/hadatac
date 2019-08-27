@@ -10,9 +10,9 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Change Object Access Specification Permission") {
+@main("Change Data Stream Permission") {
 
-    <h2>Change Object Access Specification Permission</h2>
+    <h2>Change Data Stream Permission</h2>
     
     <h3>Listing below shows new permission</h3>
 
@@ -52,7 +52,7 @@
        <br>
        @if(fileId == null || fileId.equals("")) {
           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 
-	     class="btn btn-primary" role="button">Back to Object Access Specification Management</a>
+	     class="btn btn-primary" role="button">Back to Data Stream Management</a>
        } else {
     	  <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da.getUri())" 
 	     class="btn btn-primary" role="button">Back to Prepare Ingestion</a>

@@ -14,7 +14,7 @@
 @import org.hadatac.metadata.loader.URIUtils; 
 
 
-@main("New Object Access Specification") {
+@main("New Data Stream") {
 
 <script type="text/javascript">
 	   function checkform() {
@@ -59,7 +59,7 @@
 	</script>
 
 <div class="container">
-	<h2>New Object Access Specification</h2>
+	<h2>New Data Stream</h2>
 
 	<form class="form-horizontal" name="newDataAcquisition" method="post"
 		action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.generateOASFileFromForm("/")">
@@ -205,11 +205,11 @@
 
 		<div class="form-group" class="col-sm-6 col-offset-3">
 			<input class="btn btn-primary" role="button" id="submitbutton"
-				type="submit" value="Create OAS file and Submit to Auto-Annotator"
+				type="submit" value="Create stream file and Submit to Auto-Annotator"
 				disabled="disabled" /> <a
 				href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
 				class="btn btn-primary" role="button">Cancel</a>
-			@*<p>The created deployment will be saved in LabKey</p>*@
+			@*<p>The created stream will be saved in LabKey</p>*@
 		</div>
 	</form>
 </div>
