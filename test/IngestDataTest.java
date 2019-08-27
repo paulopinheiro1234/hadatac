@@ -26,9 +26,13 @@ import ingestDataTest.PreCheckTest;
 import ingestDataTest.StepTest;
 import ingestDataTest.UploadOntologyTest;
 
+import module.OnStart;
+
 public class IngestDataTest {
 	private final int TESTNUM = 11;
 	private ArrayList<StepTest> tests= new ArrayList<StepTest>(TESTNUM);
+
+
 	public void loadTest()
 	{
 		tests.add(0, EmptyTest.getTest());
@@ -44,10 +48,13 @@ public class IngestDataTest {
 		tests.add(10, FacetedSearchTest.getTest());
 		tests.add(11, DownloadTest.getTest());
 	}
-	
+
 	@Test
 	public void test() throws IOException
 	{
+      // Init HADatAc cache
+      new OnStart();
+
 		loadTest();
 		int step;
 		try {
@@ -60,7 +67,7 @@ public class IngestDataTest {
 
 		//UI not implemented yet
 		//due to unavailability of System.in stream under sbt mode
-		
+
 		/*System.out.println("You have currently arrived Test Step: " + step);
 		System.out.println("0: Reinitialize the step.");
 		System.out.println("1: SupportOntologyTest.");
@@ -77,7 +84,7 @@ public class IngestDataTest {
 		System.out.println("all: Go through all steps.");
 		System.out.println("q: exit.");*/
 		Scanner scan = new Scanner(System.in);
-		
+
 		while(true)
 		{
 			System.out.print("Choose a test option:");
@@ -95,7 +102,7 @@ public class IngestDataTest {
 				scan.close();
 				return;
 			}
-			
+
 			int index = 0;
 			try
 			{
@@ -105,18 +112,18 @@ public class IngestDataTest {
 			{
 				continue;
 			}
-			
+
 			if(index < 0 || index > TESTNUM)
 			{
 				continue;
 			}
-			
+
 			tests.get(index).execute();
 			scan.close();
 			break;
 		}
 	}
-	
+
 	public void testAll()
 	{
 		for(StepTest test : tests)
