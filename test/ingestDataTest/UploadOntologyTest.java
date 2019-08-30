@@ -33,9 +33,9 @@ public class UploadOntologyTest extends StepTest{
 	private int UOTRIPLE = 5674;
 	private int VSTOITRIPLE = 497;
 	private int TOTALTRIPLE = 305821;
-	
+
 	private UploadOntologyTest() {}
-	
+
 	public static UploadOntologyTest getTest()
 	{
 		return test;
@@ -45,7 +45,7 @@ public class UploadOntologyTest extends StepTest{
 	public void test() {
 		//clean cache
 		//equivalent to org.hadatac.console.controllers.triplestore.LoadOnt.erasecache()
-        File folder = new File(NameSpaces.CACHE_PATH); 
+        File folder = new File(NameSpaces.CACHE_PATH);
         folder.listFiles();
         String name = "";
 
@@ -57,13 +57,15 @@ public class UploadOntologyTest extends StepTest{
                 }
             }
         }
-		
+
         //check result of clean cache
 		assertTrue("Clean Cache failed.", folder.listFiles().length == 0);
 		System.out.println("[Step 3] Clean Cache Pass.");
-		
+
 		//move all ontologies into cache file
 		try {
+         System.out.println(java.nio.file.Paths.get("test/src/copy-chear"));
+         System.out.println(java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-chear"));
 			Files.copy(java.nio.file.Paths.get("test/src/copy-chear"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-chear"), StandardCopyOption.REPLACE_EXISTING);
 			Files.copy(java.nio.file.Paths.get("test/src/copy-cogat"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-cogat"), StandardCopyOption.REPLACE_EXISTING);
 			Files.copy(java.nio.file.Paths.get("test/src/copy-doid"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-doid"), StandardCopyOption.REPLACE_EXISTING);
@@ -79,18 +81,18 @@ public class UploadOntologyTest extends StepTest{
 		}catch(IOException e) {
 			fail("Fail to copy ontologies from test/src to tmp/cache");
 		}
-		
-		
+
+
 		//upload ontology from cache
 		//equivalent to org.hadatac.console.controllers.triplestore.LoadOnt.playLoadOntologies("conformedCache")
 		NameSpaces.getInstance();
-        MetadataContext metadata = new 
-                MetadataContext("user", 
-                        "password", 
-                        ConfigFactory.load().getString("hadatac.solr.triplestore"), 
+        MetadataContext metadata = new
+                MetadataContext("user",
+                        "password",
+                        ConfigFactory.load().getString("hadatac.solr.triplestore"),
                         false);
         metadata.loadOntologies(0, "confirmedCache");
-        
+
         //check result after upload ontology from cache
         for(NameSpace ns : NameSpaces.getInstance().getOrderedNamespacesAsList())
         {
@@ -100,47 +102,47 @@ public class UploadOntologyTest extends StepTest{
 			case "chear":
 				assertTrue(String.format("Triples after loading \"chear\" ontologies should be %d, but was %d", CHEARTRIPLE, num), num == CHEARTRIPLE);
 				break;
-				
+
 			case "cogat":
 				assertTrue(String.format("Triples after loading \"cogat\" ontologies should be %d, but was %d", COGATTRIPLE, num), num == COGATTRIPLE);
 				break;
-				
+
 			case "doid":
 				assertTrue(String.format("Triples after loading \"doid\" ontologies should be %d, but was %d", DOIDTRIPLE, num), num == DOIDTRIPLE);
 				break;
-				
+
 			case "hasco":
 				assertTrue(String.format("Triples after loading \"hasco\" ontologies should be %d, but was %d", HASCOTRIPLE, num), num == HASCOTRIPLE);
 				break;
-				
+
 			case "owl":
 				assertTrue(String.format("Triples after loading \"owl\" ontologies should be %d, but was %d", OWLTRIPLE, num), num == OWLTRIPLE);
 				break;
-				
+
 			case "pato":
 				assertTrue(String.format("Triples after loading \"pato\" ontologies should be %d, but was %d", PATOTRIPLE, num), num == PATOTRIPLE);
 				break;
-				
+
 			case "prov":
 				assertTrue(String.format("Triples after loading \"prov\" ontologies should be %d, but was %d", PROVTRIPLE, num), num == PROVTRIPLE);
 				break;
-				
+
 			case "rdf":
 				assertTrue(String.format("Triples after loading \"rdf\" ontologies should be %d, but was %d", RDFTRIPLE, num), num == RDFTRIPLE);
 				break;
-				
+
 			case "rdfs":
 				assertTrue(String.format("Triples after loading \"rdfs\" ontologies should be %d, but was %d", RDFSTRIPLE, num), num == RDFSTRIPLE);
 				break;
-				
+
 			case "sio":
 				assertTrue(String.format("Triples after loading \"sio\" ontologies should be %d, but was %d", SIOTRIPLE, num), num == SIOTRIPLE);
 				break;
-				
+
 			case "uo":
 				assertTrue(String.format("Triples after loading \"uo\" ontologies should be %d, but was %d", UOTRIPLE, num), num == UOTRIPLE);
 				break;
-				
+
 			case "vstoi":
 				assertTrue(String.format("Triples after loading \"vstoi\" ontologies should be %d, but was %d", VSTOITRIPLE, num), num == VSTOITRIPLE);
 				break;
@@ -148,7 +150,7 @@ public class UploadOntologyTest extends StepTest{
 				break;
 			}
         }
-        
+
         long tripleNum = metadata.totalTriples();
         assertTrue(String.format("Triples after loading all ontologies should be %d, but was %d", TOTALTRIPLE, tripleNum), tripleNum == TOTALTRIPLE);
 		System.out.println("[Step 3] Upload Ontology Test Pass. " + tripleNum);
@@ -157,7 +159,7 @@ public class UploadOntologyTest extends StepTest{
 	@Override
 	public void preMsg() {
 		System.out.println("[Step 3] Executing uploadOntologyTest:");
-		
+
 	}
 
 	@Override
