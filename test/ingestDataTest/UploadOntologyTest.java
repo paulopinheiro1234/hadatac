@@ -91,7 +91,7 @@ public class UploadOntologyTest extends StepTest{
                         "password",
                         ConfigFactory.load().getString("hadatac.solr.triplestore"),
                         false);
-        metadata.loadOntologies(0, "confirmedCache");
+        System.out.println(metadata.loadOntologies(0, "confirmedCache"));
 
         //check result after upload ontology from cache
         for(NameSpace ns : NameSpaces.getInstance().getOrderedNamespacesAsList())
