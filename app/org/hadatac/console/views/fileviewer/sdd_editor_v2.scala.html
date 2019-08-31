@@ -115,7 +115,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             });
          </script>
          <div class="cartbutton" id="viewcart">
-            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block;"  >
+            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; position: relative;"  >
 
                <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="35" height="32" alt=""/>
                View Cart
@@ -123,9 +123,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             <ul id="seecart" class="cart-content">
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
-
          </div>
-
 
          <button class="main-nav" id="show"><img src=" https://cdn3.iconfinder.com/data/icons/eye-and-view/100/eye_view_vision-07-512.png "
             width="36" height="33" alt=""/> Show Options</button>
@@ -168,6 +166,11 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                      <div class="text-area">
                         Cell Value: <input type="text" id="cellText" value=""/>
+
+                        <div id="suggestion-box" style="float: right;">
+                           Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
+                              <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
+                        </div>
                      </div>
 
                      <div class="text-area2">
@@ -182,6 +185,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      <div id="buttons"></div>
                   </div>
 
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/xlsx.full.min.js")"></script>
 
@@ -189,7 +193,6 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
-                  <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
                   <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
 

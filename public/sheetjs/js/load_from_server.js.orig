@@ -378,11 +378,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   if(headerMap.has(sheetName)){
     cdg.data = json;
     console.log(headerMap.get(sheetName));
-    changeHeader(headerMap.get(sheetName),1);
-    for(var i=0;i<cdg.data.length;i++){
-      R++;
-      checkRecs(L,R,1);
-    }
+    changeHeader(headerMap.get(sheetName), 1);
   }
   else{
     headerMap.set(sheetName, json[0]);
@@ -393,11 +389,14 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     else{
       cdg.data = json.slice(1);
+<<<<<<< HEAD
       for(var i=0;i<cdg.data.length;i++){
         R++;
         checkRecs(L,R,1);
         console.log(L,R);
       }
+=======
+>>>>>>> b70d5511daeb86131c9a82c705a095b69d16835b
     }
     changeHeader(json[0], emptySheet);
   }
