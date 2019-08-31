@@ -371,6 +371,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       for(var i=0;i<cdg.data.length;i++){
         R++;
         checkRecs(L,R,1);
+        console.log(L,R);
       }
     }
     changeHeader(json[0],emptySheet);
