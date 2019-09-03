@@ -249,16 +249,13 @@ public class User implements Comparable<User> {
 
         boolean bHasEmail = false;
         String queryString = "DESCRIBE <" + uri + ">";
-        Query query = QueryFactory.create(queryString);
 
-        Model modelPublic;
-        Model modelPrivate;
         Statement statement;
         RDFNode object;
 
-        QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
-        modelPrivate = qexecPrivate.execDescribe();
+        Model modelPrivate = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
+        
         if (!modelPrivate.isEmpty()) {
             user = new User();
         }
@@ -305,9 +302,9 @@ public class User implements Comparable<User> {
             }
         }
 
-        QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        modelPublic = qexecPublic.execDescribe();
+        Model modelPublic = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);        
+        
         if (!modelPublic.isEmpty() && user == null) {
             user = new User();
         }

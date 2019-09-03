@@ -104,15 +104,12 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 
 	public static ObjectCollectionType find(String uri) {
 		ObjectCollectionType objectCollectionType = null;
-		Model model;
 		Statement statement;
 		RDFNode object;
 
 		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-		model = qexec.execDescribe();
+		Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		objectCollectionType = new ObjectCollectionType();
 		StmtIterator stmtIterator = model.listStatements();

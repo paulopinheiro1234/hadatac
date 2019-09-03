@@ -83,10 +83,8 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
 
     public static Entity find(String uri) {
         String queryString = "DESCRIBE <" + uri + ">";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        Model model = qexec.execDescribe();
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         Entity entity = new Entity();
         StmtIterator stmtIterator = model.listStatements();

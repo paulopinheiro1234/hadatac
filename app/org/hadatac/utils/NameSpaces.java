@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Comparator;
 import java.util.Collections;
 import java.io.File;
@@ -21,7 +22,7 @@ public class NameSpaces {
     public static String CACHE_PATH   = "tmp/cache/";
     public static String CACHE_PREFIX = "copy-";
 
-    private Map<String, NameSpace> table = new HashMap<String, NameSpace>();
+    private ConcurrentHashMap<String, NameSpace> table = new ConcurrentHashMap<String, NameSpace>();
 
     private String turtleNameSpaceList = "";
     private String sparqlNameSpaceList = "";
@@ -118,7 +119,7 @@ public class NameSpaces {
         return namespaces;
     }
     
-    public Map<String, NameSpace> getNamespaces() {
+    public ConcurrentHashMap<String, NameSpace> getNamespaces() {
         return table;
     }
     

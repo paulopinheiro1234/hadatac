@@ -51,15 +51,12 @@ public class Aggregate extends HADatAcClass implements Comparable<Aggregate> {
 	
 	public static Aggregate find(String uri) {
 		Aggregate aggregate = null;
-		Model model;
 		Statement statement;
 		RDFNode object;
 
 		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-		model = qexec.execDescribe();
+		Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+		        CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		aggregate = new Aggregate();
 		StmtIterator stmtIterator = model.listStatements();

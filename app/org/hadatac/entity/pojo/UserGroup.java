@@ -23,16 +23,13 @@ public class UserGroup extends User {
 		User user = null;
 		
 		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
 		
-		Model modelPublic;
-		Model modelPrivate;
 		Statement statement;
 		RDFNode object;
 		
-		QueryExecution qexecPrivate = QueryExecutionFactory.sparqlService(
-				CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
-		modelPrivate = qexecPrivate.execDescribe();
+		Model modelPrivate = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+		        CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
+		
 		if (!modelPrivate.isEmpty()) {
 			user = new User();
 			user.setUri(uri);
@@ -72,8 +69,9 @@ public class UserGroup extends User {
 		    }
 		}
 		
-		QueryExecution qexecPublic = QueryExecutionFactory.sparqlService(CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-		modelPublic = qexecPublic.execDescribe();
+		Model modelPublic = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
+		
 		if (!modelPublic.isEmpty()) {
 			user = new User();
 			user.setUri(uri);

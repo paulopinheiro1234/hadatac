@@ -117,10 +117,10 @@ public class CSVExporterContext{
 	}
 	
 	public void getDescribeQueryResult(String query, Set<String> properties) {
-		String service = kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_SPARQL.get());
-		QueryExecution qe = QueryExecutionFactory.sparqlService(service, query);
+		String service = kbURL + CollectionUtil.getCollectionName(
+		        CollectionUtil.Collection.METADATA_SPARQL.get());
 		
-		Model model = qe.execDescribe();
+		Model model = SPARQLUtils.describe(service, query);
 		StmtIterator stmtIterator = model.listStatements();
 		Statement statement;
 		while (stmtIterator.hasNext()) {

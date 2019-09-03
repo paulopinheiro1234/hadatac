@@ -50,15 +50,13 @@ public class PlatformType extends HADatAcClass implements Comparable<PlatformTyp
 
     public static PlatformType find(String uri) {
         PlatformType platformType = null;
-        Model model;
+        
         Statement statement;
         RDFNode object;
 
         String queryString = "DESCRIBE <" + uri + ">";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        model = qexec.execDescribe();
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         platformType = new PlatformType();
         StmtIterator stmtIterator = model.listStatements();

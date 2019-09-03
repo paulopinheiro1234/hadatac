@@ -8,6 +8,7 @@ import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.rdf.model.Model;
 
 
 public class SPARQLUtils {
@@ -23,6 +24,22 @@ public class SPARQLUtils {
             qexec.close();
             
             return resultsrw;
+        } catch (QueryParseException e) {
+            System.out.println("[ERROR] queryString: " + queryString);
+            throw e;
+        }
+    }
+    
+    public static Model describe(String sparqlService, String queryString) {
+        // System.out.println("\nqueryString: " + queryString + "\n");
+        
+        try {
+            Query query = QueryFactory.create(queryString);
+            QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
+            Model model = qexec.execDescribe();
+            qexec.close();
+            
+            return model;
         } catch (QueryParseException e) {
             System.out.println("[ERROR] queryString: " + queryString);
             throw e;

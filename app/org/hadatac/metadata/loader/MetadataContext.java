@@ -1,7 +1,7 @@
 package org.hadatac.metadata.loader;
 
 import java.io.File;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -156,9 +156,9 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
             message += Feedback.println(mode," ");
 
-            for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getNamespaces().entrySet()) {
-                String abbrev = entry.getKey().toString();
-                NameSpace ns = entry.getValue();
+            ConcurrentHashMap<String, NameSpace> namespaces = NameSpaces.getInstance().getNamespaces();
+            for (String abbrev : namespaces.keySet()) {
+                NameSpace ns = namespaces.get(abbrev);
                 String nsURL = ns.getURL();
                 if (abbrev != null && nsURL != null && !nsURL.equals("") && ns.getType() != null) {
                     String path = "";
