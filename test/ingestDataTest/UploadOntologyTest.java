@@ -64,20 +64,18 @@ public class UploadOntologyTest extends StepTest{
 
 		//move all ontologies into cache file
 		try {
-         System.out.println(java.nio.file.Paths.get("test/src/copy-chear"));
-         System.out.println(java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-chear"));
 			Files.copy(java.nio.file.Paths.get("test/src/copy-chear"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-chear"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-cogat"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-cogat"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-doid"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-doid"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-hasco"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-hasco"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-owl"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-owl"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-pato"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-pato"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-prov"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-prov"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-rdf"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-rdf"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-rdfs"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-rdfs"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-sio"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-sio"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-uo"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-uo"), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(java.nio.file.Paths.get("test/src/copy-vstoi"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-vstoi"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-cogat"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-cogat"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-doid"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-doid"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-hasco"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-hasco"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-owl"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-owl"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-pato"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-pato"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-prov"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-prov"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-rdf"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-rdf"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-rdfs"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-rdfs"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-sio"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-sio"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-uo"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-uo"), StandardCopyOption.REPLACE_EXISTING);
+			// Files.copy(java.nio.file.Paths.get("test/src/copy-vstoi"), java.nio.file.Paths.get(NameSpaces.CACHE_PATH+"copy-vstoi"), StandardCopyOption.REPLACE_EXISTING);
 		}catch(IOException e) {
 			fail("Fail to copy ontologies from test/src to tmp/cache");
 		}
