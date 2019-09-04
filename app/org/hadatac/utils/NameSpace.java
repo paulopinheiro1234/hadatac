@@ -34,7 +34,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 
 public class NameSpace {
-    
+
 	@Field("abbreviation")
 	private String nsAbbrev = "";
 	@Field("name_str")
@@ -45,41 +45,41 @@ public class NameSpace {
 	private String nsURL = "";
 	@Field("number_of_loaded_triples_int")
     private int numberOfLoadedTriples = 0;
-	
+
 	public NameSpace () {
 	}
-	
+
 	public NameSpace (String abbrev, String name, String type, String url) {
 		nsAbbrev = abbrev;
 		nsName = name;
 		nsType = type;
 		nsURL = url;
-	}   
-	
+	}
+
 	public String getAbbreviation() {
 		return nsAbbrev;
 	}
-	
+
 	public void setAbbreviation(String abbrev) {
-		nsAbbrev = abbrev;		
+		nsAbbrev = abbrev;
 	}
-	
+
 	public String getName() {
 		return nsName;
 	}
-	
+
 	public void setName(String name) {
 		nsName = name;
 	}
-	
+
 	public String getType() {
 		return nsType;
 	}
-	
+
 	public void setType(String type) {
 		nsType = type;
 	}
-	
+
 	public String getURL() {
 		return nsURL;
 	}
@@ -87,15 +87,15 @@ public class NameSpace {
 	public void setURL(String url) {
 		nsURL = url;
 	}
-	
+
 	public int getNumberOfLoadedTriples() {
 	    return numberOfLoadedTriples;
     }
-	
+
 	public void setNumberOfLoadedTriples(int numberOfLoadedTriples) {
 	    this.numberOfLoadedTriples = numberOfLoadedTriples;
     }
-	
+
 	public String toString() {
 		if (nsAbbrev == null) {
 			return "null";
@@ -105,10 +105,10 @@ public class NameSpace {
 			showType = nsType;
 		if (nsURL == null)
 			return "<" + nsAbbrev + ":> " + nsName + " (" + showType + ", NO URL)";
-		else 
+		else
 			return "<" + nsAbbrev + ":> " + nsName + " (" + showType + ", " + nsURL + ")";
 	}
-	
+
 	public void updateLoadedTripleSize() {
         try {
             String queryString = "SELECT (COUNT(*) as ?tot) \n"
@@ -124,17 +124,18 @@ public class NameSpace {
             save();
         } catch (Exception e) {
             System.out.println("Error in updateLoadedTripleSize()");
+            System.out.println(e);
         }
     }
-	
-	public void loadTriples(String address, boolean fromRemote) { 
+
+	public void loadTriples(String address, boolean fromRemote) {
         try {
             Repository repo = new SPARQLRepository(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             repo.initialize();
             RepositoryConnection con = repo.getConnection();
             ValueFactory factory = repo.getValueFactory();
-            
+
             System.out.println("Loading triples from " + address);
             if (fromRemote) {
                 con.add(new URL(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
@@ -154,20 +155,20 @@ public class NameSpace {
             System.out.println("Exception: " + e.getMessage());
         }
     }
-	
+
 	public void deleteTriples() {
 	    deleteTriplesByNamedGraph(getName());
 	}
-	
+
         public static void deleteTriplesByNamedGraph(String namedGraphUri) {
 	    if (!namedGraphUri.isEmpty()) {
 		String queryString = "";
 		queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
 		queryString += "WITH <" + namedGraphUri + "> ";
 		queryString += "DELETE { ?s ?p ?o } WHERE { ?s ?p ?o . } ";
-		
+
 		UpdateRequest req = UpdateFactory.create(queryString);
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(req,
 					    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
 		try {
 		    processor.execute();
@@ -177,12 +178,12 @@ public class NameSpace {
 		}
 	    }
 	}
-    
-	public int save() {        
+
+	public int save() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.NAMESPACE)).build();
-            
+
             int status = client.addBean(this).getStatus();
             client.commit();
             client.close();
@@ -192,7 +193,7 @@ public class NameSpace {
             return -1;
         }
     }
-	
+
 	public int delete() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
@@ -208,10 +209,10 @@ public class NameSpace {
         } catch (Exception e) {
             System.out.println("[ERROR] NameSpace.delete() - Exception message: " + e.getMessage());
         }
-        
+
         return -1;
     }
-	
+
 	public static int deleteAll() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
@@ -227,10 +228,10 @@ public class NameSpace {
         } catch (Exception e) {
             System.out.println("[ERROR] NameSpace.delete() - Exception message: " + e.getMessage());
         }
-        
+
         return -1;
     }
-    
+
     public static NameSpace convertFromSolr(SolrDocument doc) {
         NameSpace object = new NameSpace();
         object.setAbbreviation(doc.getFieldValue("abbreviation").toString());
@@ -238,13 +239,13 @@ public class NameSpace {
         object.setType(doc.getFieldValue("mime_type_str").toString());
         object.setURL(doc.getFieldValue("url_str").toString());
         object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
-        
+
         return object;
     }
-    
+
     public static List<NameSpace> findByQuery(SolrQuery query) {
         List<NameSpace> list = new ArrayList<NameSpace>();
-        
+
         SolrClient solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.NAMESPACE)).build();
 
@@ -260,18 +261,18 @@ public class NameSpace {
             list.clear();
             System.out.println("[ERROR] OperationMode.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
         }
-        
+
         return list;
     }
-    
+
     public static List<NameSpace> findAll() {
         SolrQuery query = new SolrQuery();
         query.set("q", "*:*");
         query.set("rows", "10000000");
-        
+
         return findByQuery(query);
     }
-    
+
     public static NameSpace findByAbbreviation(String abbreviation) {
         SolrQuery query = new SolrQuery();
         query.set("q", "abbreviation:\"" + abbreviation + "\"");
@@ -280,10 +281,10 @@ public class NameSpace {
         if (namespaces.isEmpty()) {
             return null;
         }
-        
+
         return namespaces.get(0);
     }
-    
+
     public static RDFFormat getRioFormat(String contentType) {
         if (contentType.contains("turtle")) {
             return RDFFormat.TURTLE;
