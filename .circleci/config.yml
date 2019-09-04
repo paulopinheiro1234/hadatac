@@ -43,7 +43,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies--{{ checksum "build.sbt" }}
 
-      # - run: ./install_hadatac.sh Y ~/hadatac-solr ~/hadatac-blazegraph
+      - run: ./install_hadatac.sh Y ~/hadatac-solr ~/hadatac-blazegraph
       - run: bash ~/hadatac-solr/solr/run_solr6.sh start
       - run: bash ~/hadatac-blazegraph/jetty-distribution-9.4.12.v20180830/bin/jetty.sh start
       - run: curl http://localhost:8080/blazegraph/#query
