@@ -465,8 +465,12 @@ public class AnnotationWorker {
         SDD sdd = new SDD(dataFile);
         String fileName = dataFile.getFileName();
         String sddName = sdd.getName();
+        String sddVersion = sdd.getVersion();
         if (sddName == "") {
             dataFile.getLogger().printExceptionById("SDD_00003");
+        }
+        if (sddVersion == "") {
+            dataFile.getLogger().printExceptionById("SDD_00018");
         }
         Map<String, String> mapCatalog = sdd.getCatalog();
 
@@ -558,6 +562,7 @@ public class AnnotationWorker {
         row.put("a", "hasco:DASchema");
         row.put("rdfs:label", "SDD-" + sddName);
         row.put("rdfs:comment", "");
+        row.put("hasco:hasVersion", sddVersion);
         generalGenerator.addRow(row);
         chain.addGenerator(generalGenerator);
         chain.setNamedGraphUri(URIUtils.replacePrefixEx(sddUri));

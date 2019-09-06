@@ -60,6 +60,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     private String uri = "";
     private String label = "";
+    private String version = "";
     private String timestampLabel = "";
     private String timeInstantLabel = "";
     private String namedTimeLabel = "";
@@ -89,7 +90,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public static void resetCache() {
         DataAcquisitionSchemaAttribute.resetCache();
-        //DataAcquisitionSchemaEvent.resetCache();
         DataAcquisitionSchemaObject.resetCache();
         DASCache = null;
     }
@@ -123,6 +123,14 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getTimestampLabel() {
@@ -357,31 +365,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return null;
     }
 
-    //public List<DataAcquisitionSchemaEvent> getEvents() {
-    //    return DataAcquisitionSchemaEvent.findBySchema(this.getUri());
-    //}
-
-    /*public void setEvents(List<String> events) {
-        if (events == null) {
-            System.out.println("[WARNING] No DataAcquisitionSchemaEvent for " + uri + " is defined in the knowledge base. ");
-        } else {
-            this.events = events;
-            //for (DataAcquisitionSchemaEvent dase : events) {
-            //    System.out.println("[OK] DataAcquisitionSchemaEvent <" + dase.getUri() + "> is defined in the knowledge base. " + 
-            //            "Label: \""  + dase.getLabel() + "\"");
-	    //}
-        }
-	}*/
-
-    /*public DataAcquisitionSchemaEvent getEvent(String daseUri) {
-        for (String dase : events) {
-            if (dase.equals(daseUri)) {
-                return DataAcquisitionSchemaEvent.find(dase);
-            }
-        }
-        return null;
-	}*/
-
     public DataAcquisitionSchemaObject getEvent(String daseUri) {
         return DataAcquisitionSchemaObject.find(daseUri);
     }
@@ -468,22 +451,29 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                " ASK { <" + schemaUri + "> a hasco:DASchema . } ";
-        Query query = QueryFactory.create(queryString);
+                "SELECT ?version WHERE { " + 
+                "   <" + schemaUri + "> a hasco:DASchema . " +
+                "   <" + schemaUri + "> hasco:hasVersion ?version . } ";
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        boolean uriExist = qexec.execAsk();
-        qexec.close();
-
-        if (!uriExist) {
-            System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
-            return null;
-        }
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         DataAcquisitionSchema schema = new DataAcquisitionSchema();
         schema.setUri(schemaUri);
         schema.setLabel(FirstLabel.getLabel(schemaUri));
+
+        if (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln == null) {
+                System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
+                return null;
+            }
+            if (soln.get("version") != null) {
+                schema.setVersion(soln.get("version").toString());
+            }
+        }
+
+        //schema.setVersion("1.0");
         //schema.setAttributes(DataAcquisitionSchemaAttribute.findBySchema(schemaUri));
         schema.setAttributes(DataAcquisitionSchemaAttribute.findUriBySchema(schemaUri));
         //schema.setObjects(DataAcquisitionSchemaObject.findBySchema(schemaUri));

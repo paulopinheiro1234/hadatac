@@ -55,7 +55,7 @@
            <h4>Metadata Recording and Data Upload</h4>  
 	   @defining("") { filename => @defining("") { da_uri => 
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", ".")" 
-		   id="autoannotate" class="btn btn-primary btn-block" role="button">Manage Data Files</a>
+		   id="autoannotate" class="btn btn-primary btn-block" role="button">Ingest Files</a>
 		<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")" 
 		   id="workingfiles" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
@@ -67,9 +67,9 @@
 		      id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments [DPL]</a>
 		}
 		<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  
-		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Streams [OAS]</a>
+		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Streams [STR]</a>
 		<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" 
-		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Data Dictionaries [SDD]</a>
+		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Semantic Data Dictionaries [SDD]</a>
 		<a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" 
 		   id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
      @* <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditor.index()" 
