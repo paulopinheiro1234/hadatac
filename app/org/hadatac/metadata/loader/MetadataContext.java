@@ -120,7 +120,7 @@ public class MetadataContext implements RDFContext {
             if (file.exists()) {
                 Repository repo = new SPARQLRepository(
                         kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
-                repo.initialize();
+                repo.init();
                 RepositoryConnection con = repo.getConnection();
                 ValueFactory factory = repo.getValueFactory();
                 con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));

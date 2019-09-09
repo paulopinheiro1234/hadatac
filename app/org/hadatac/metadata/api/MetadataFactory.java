@@ -73,7 +73,7 @@ public class MetadataFactory {
     
     public static int commitModelToTripleStore(Model model, String endpointUrl) {
         Repository repo = new SPARQLRepository(endpointUrl);
-        repo.initialize();
+        repo.init();
         
         RepositoryConnection con = null;
         try {
