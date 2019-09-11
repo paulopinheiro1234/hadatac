@@ -65,10 +65,8 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 
 		String queryString = "DESCRIBE <" + uri + ">";
 		try {
-		    Query query = QueryFactory.create(queryString);
-		    QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		            CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-		    model = qexec.execDescribe();
+		    model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+		            CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");
 		    return null;

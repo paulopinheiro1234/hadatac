@@ -157,15 +157,12 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
     public static Attribute find(String uri) {
         Attribute attribute = null;
-        Model model;
         Statement statement;
         RDFNode object;
 
         String queryString = "DESCRIBE <" + uri + ">";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        model = qexec.execDescribe();
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         attribute = new Attribute();
         StmtIterator stmtIterator = model.listStatements();

@@ -106,7 +106,6 @@ public class Agent implements Comparable<Agent> {
 
     public static Agent find(String agent_uri) {
         Agent agent = null;
-        Model model;
         Statement statement;
         RDFNode object;
         String queryString;
@@ -116,10 +115,9 @@ public class Agent implements Comparable<Agent> {
         } else {
             queryString = "DESCRIBE <" + agent_uri + ">";
         }
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        model = qexec.execDescribe();
+        
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         agent = new Agent();
         StmtIterator stmtIterator = model.listStatements();

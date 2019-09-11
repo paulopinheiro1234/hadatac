@@ -33,10 +33,11 @@ public class JsonHandler {
         String response = "";
         try {
             response = IOUtils.toString(in, "utf-8");
-        } 
-        finally {
-            IOUtils.closeQuietly(in);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        
         // create an ObjectMapper instance.
         ObjectMapper mapper = new ObjectMapper();
         // use the ObjectMapper to read the json string and create a tree

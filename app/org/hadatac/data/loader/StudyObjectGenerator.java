@@ -34,9 +34,9 @@ public class StudyObjectGenerator extends BaseGenerator {
         super(dataFile);
         //this.study_id = study_id; 
         file_name = file.getFile().getName();
-        System.out.println("We are in StudyObject Generator!");
+        //System.out.println("We are in StudyObject Generator!");
         //System.out.println("Study URI: " + study_uri);
-
+        
         study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
 
         setStudyUri(study_uri);       
@@ -70,13 +70,13 @@ public class StudyObjectGenerator extends BaseGenerator {
 
     private String getUri(Record rec) {
         String originalID = rec.getValueByColumnName(mapCol.get("originalID"));
-        System.out.println("StudyObjectGenerator: " + originalID);
+        //System.out.println("StudyObjectGenerator: " + originalID);
         if (URIUtils.isValidURI(originalID)) {
-            System.out.println("StudyObjectGenerator: VALID URI");
+            //System.out.println("StudyObjectGenerator: VALID URI");
             return URIUtils.replaceNameSpaceEx(originalID);
         }
 
-        System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
+        //System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
         return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
     }
 

@@ -45,19 +45,28 @@ public class VirtualColumnGenerator extends BaseGenerator {
 
     public VirtualColumn createVirtualColumn(Record record) throws Exception {
   
-        // Skip the study row in the SSD sheet
-        //System.out.println("VirtualColumnGenerator: row's type: [" + this.getTypeUri(record) + "]   [" + URIUtils.replacePrefix("hasco:Study") + "]");
-        if (this.getTypeUri(record).equals("hasco:Study")) {
-            return null;
+        // Skip if type URI, study URI and SOC Reference are all blank
+    	String typeUri = this.getTypeUri(record);
+        this.studyUri = this.getStudyUri(record);
+        String SOCReference = this.getSOCReference(record);
+        if ((typeUri == null || typeUri.equals("")) && 
+        	(this.studyUri == null || this.studyUri.equals("")) && 
+        	(SOCReference == null || SOCReference.equals(""))) {
+        	return null;
         }
         
-        this.studyUri = getStudyUri(record);
+        // Skip the study row in the SSD sheet
+        if (typeUri.equals("hasco:Study")) {
+            return null;
+        }
+    	
+        // generate error if only study URI is missing
         if (this.studyUri == null || this.studyUri.equals("")) {
             logger.printExceptionByIdWithArgs("SSD_00003", this.getTypeUri(record));
             return null;
         }
             
-        String SOCReference = getSOCReference(record);
+        // generate error if only SOC reference is missing
         if (SOCReference == null || SOCReference.equals("")) {
             logger.printException("SSD_00004");
             return null;
@@ -66,7 +75,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
         VirtualColumn vc = new VirtualColumn(
                 getStudyUri(record),
                 getGroundingLabel(record),
-                getSOCReference(record));
+                SOCReference);
 
         return vc;
     }   

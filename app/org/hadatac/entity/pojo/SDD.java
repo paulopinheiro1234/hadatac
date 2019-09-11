@@ -87,6 +87,14 @@ public class SDD {
         return sddfile.getFileName();
     }
 
+    public String getVersion() {
+        String sddVersion = mapCatalog.get("Version");
+        if (sddVersion == null) {
+            return "";
+        }
+        return sddVersion;
+    }
+
     public Map<String, String> getCatalog() {
         return mapCatalog;
     }

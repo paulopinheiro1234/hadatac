@@ -133,7 +133,7 @@ public class NameSpace {
         try {
             Repository repo = new SPARQLRepository(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            repo.initialize();
+            repo.init();
             RepositoryConnection con = repo.getConnection();
             ValueFactory factory = repo.getValueFactory();
 

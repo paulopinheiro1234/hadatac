@@ -13,13 +13,13 @@ import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 
 
-public class SSD {
+public class SSDSheet {
 
     private Map<String, String> mapCatalog = new HashMap<String, String>();
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
     private RecordFile ssdfile = null;
 
-    public SSD(DataFile dataFile) {
+    public SSDSheet(DataFile dataFile) {
         this.ssdfile = dataFile.getRecordFile();
         readCatalog(dataFile.getRecordFile());
         readContent(dataFile.getRecordFile());
@@ -46,7 +46,12 @@ public class SSD {
             return;
         }
         for (Record record : file.getRecords()) {
-            mapCatalog.put(record.getValueByColumnIndex(1), record.getValueByColumnIndex(0));
+        	if ((record.getValueByColumnIndex(1) == null || record.getValueByColumnIndex(1).isEmpty()) && 
+        	    (record.getValueByColumnIndex(0) == null || record.getValueByColumnIndex(0).isEmpty())) {
+        		return;
+        	}
+        	//System.out.println("Catalog: [" + record.getValueByColumnIndex(1) + "]  [" + record.getValueByColumnIndex(0) + "]");
+        	mapCatalog.put(record.getValueByColumnIndex(1), record.getValueByColumnIndex(0));
         }
     }
 
@@ -60,6 +65,7 @@ public class SSD {
             tmp.add(record.getValueByColumnName("type"));
             tmp.add(record.getValueByColumnName("hasScope"));
             tmp.add(record.getValueByColumnName("hasTimeScope"));
+            tmp.add(record.getValueByColumnName("hasSpaceScope"));
             tmp.add(record.getValueByColumnName("role"));
             tmp.add(record.getValueByColumnName("hasSOCReference"));
             tmp.add(record.getValueByColumnName("groundingLabel"));

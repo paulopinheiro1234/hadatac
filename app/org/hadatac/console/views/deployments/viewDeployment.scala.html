@@ -2,6 +2,7 @@
   dataCollections : List[org.hadatac.entity.pojo.ObjectAccessSpec],
   urlReturn       : String)
 
+@import java.net._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.deployments._
@@ -91,7 +92,7 @@
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-11">
-            <h3>Deployment's Data Acquisitions</h3>
+            <h3>Deployment's Data Streams</h3>
                <div class="container-fluid">
                  <table class="table">
                     <thead>
@@ -100,6 +101,7 @@
                         <th>Start Date/Time</th>
                         <th>End Date/Time</th>
                         <th># of Data Points</th>
+                        <th>Operations</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -109,6 +111,10 @@
                              <td>@dc.getStartedAt()</td>
                              <td>@dc.getEndedAt()</td>
                              <td>@dc.getNumberDataPoints()</td>
+                             <td>
+                                <a href="@org.hadatac.console.controllers.streams.routes.StreamVisualization.index("", "", URLEncoder.encode(dc.getUri(), "UTF-8"))"
+                                         class="btn-xs btn-primary" role="button">Visualize Data</a>
+                             </td>
                           </tr>
                        }
                     </tbody>

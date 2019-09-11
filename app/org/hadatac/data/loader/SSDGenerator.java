@@ -129,19 +129,25 @@ public class SSDGenerator extends BaseGenerator {
     public ObjectCollection createObjectCollection(Record record) throws Exception {
 
         // Skip the study row in the SSD sheet
-        System.out.println("SSDGenerator: row's type: [" + this.getTypeUri(record) + "]   [" + URIUtils.replacePrefix("hasco:Study") + "]");
-        if (this.getTypeUri(record).equals("hasco:Study")) {
+    	String typeUri = this.getTypeUri(record);
+    	if (typeUri.equals("hasco:Study")) {
             return null;
         }
         
         // Skip the SOC generator for columns with just VirtualColumn info (i.e., blank type and filled out SOC reference
         String SOCReference = getSOCReference(record);
-        if (this.getTypeUri(record).equals("") && SOCReference != null && !SOCReference.equals("")) {
+        if (typeUri.equals("") && SOCReference != null && !SOCReference.equals("")) {
             return null;
         }
         
+        if (typeUri.isEmpty() && SOCReference.isEmpty()) {
+        	return null;
+        }
+        
+        System.out.println("SSDGenerator: row's type: [" + typeUri + "]   [" + SOCReference + "]");
+
         if (this.studyUri == null || this.studyUri.equals("")) {
-            logger.printExceptionByIdWithArgs("SSD_00001", this.getTypeUri(record));
+            logger.printExceptionByIdWithArgs("SSD_00001", typeUri);
             return null;
         }
             
@@ -152,7 +158,7 @@ public class SSDGenerator extends BaseGenerator {
             
         ObjectCollection oc = new ObjectCollection(
                 URIUtils.replacePrefixEx(getUri(record)),
-                URIUtils.replacePrefixEx(getTypeUri(record)),
+                URIUtils.replacePrefixEx(typeUri),
                 getLabel(record),
                 getLabel(record),
                 getStudyUri(record),

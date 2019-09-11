@@ -13,7 +13,7 @@ import com.typesafe.config.ConfigFactory;
 public class Version extends Controller {
 	
     public Result index() {
-        String code_version = "1.1.12";
+        String code_version = "1.1.15";
         String base_ontology = ConfigFactory.load().getString("hadatac.community.ont_prefix");
         String loaded_base_ontology = NameSpaces.getInstance().getNameByAbbreviation(base_ontology);
         String loaded_base_ontology_version = Ontology.getVersionFromAbbreviation(base_ontology);

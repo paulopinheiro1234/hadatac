@@ -148,15 +148,12 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
     public static Indicator find(String uri) {
         Indicator indicator = null;
-        Model model;
         Statement statement;
         RDFNode object;
 
         String queryString = "DESCRIBE <" + uri + ">";
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        model = qexec.execDescribe();
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         indicator = new Indicator();
         StmtIterator stmtIterator = model.listStatements();

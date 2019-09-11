@@ -3,6 +3,7 @@ package org.hadatac.data.loader;
 import java.time.Instant;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -294,12 +295,22 @@ public class MeasurementGenerator extends BaseGenerator {
             } else if (!schema.getTimeInstantLabel().equals("")) {
                 // full-row regular (XSD) time interval
                 String timeValue = record.getValueByColumnIndex(posTimeInstant);
+                //timeValue = timeValue.replace("-05:00","-0500");
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 //System.out.println("Timestamp received: " + timeValue);
                 if (timeValue != null) {
+                	if (timeValue.length() > 24) {
+                     	timeValue = timeValue.substring(0, 23) + timeValue.substring(timeValue.length() - 6);
+                        //System.out.println("Timestamp adjusted: " + timeValue);
+                    }
                     try {
-                        measurement.setTimestamp(timeValue);
+                        Date date = formatter.parse(timeValue);
+                        System.out.println(date);
+                        System.out.println(formatter.format(date));
+                        //measurement.setTimestamp(timeValue);
+                        measurement.setTimestamp(date);
                     } catch (Exception e) {
-                        //System.out.println("Setting current time!");
+                    	System.out.println("Setting current time!");
                         measurement.setTimestamp(new Date(0).toInstant().toString());
                     }
                 }

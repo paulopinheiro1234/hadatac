@@ -81,15 +81,12 @@ public class InstrumentType extends HADatAcClass implements Comparable<Instrumen
 
 	public static InstrumentType find(String uri) {
 		InstrumentType instrumentType = null;
-		Model model;
 		Statement statement;
 		RDFNode object;
 
 		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-		model = qexec.execDescribe();
+		Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		instrumentType = new InstrumentType();
 		StmtIterator stmtIterator = model.listStatements();

@@ -1,0 +1,95 @@
+@()
+
+@import helper._
+@import org.hadatac.utils.NameSpaces
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute
+@import org.hadatac.entity.pojo.HADatAcClass
+@import org.hadatac.entity.pojo.HADatAcThing
+@import org.hadatac.entity.pojo.Study
+@import org.hadatac.entity.pojo.StudyObject
+@import org.hadatac.data.loader.DataContext
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play
+@import com.typesafe.config.ConfigFactory
+
+@main("RESTful API") {
+
+   <div class="container-fluid">
+ 
+     <div class="row">
+       <div class="col-md-1"></div>
+       <div class="col-md-8">
+         <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname") 's Human-Aware Data Acquisition Framework</font></h3>
+         @ConfigFactory.load().getString("hadatac.community.description") 
+         <hr>
+       </div>
+       <div class="col-md-1"></div>
+     </div>
+ 	
+     <div class="row">
+       <div class="col-md-1"></div>
+       <div class="col-md-10">
+	      <h3>RESTful API</h3>
+
+			<a href="studies/all">studies/all</a> - Return all studies in HADatAc, with the properties specified here.<br>
+
+			studies/(studyUri) - Return additional meta-information about a study given a study URI. Things like PI, Institution, etc.<br>
+
+			studies/variables/(studyUri) -<br>
+
+			studies/objectcollections/(studyUri) - Given a Study URI, return the URI’s of all ObjectCollections that are a part of that Study, and the Type of that collection (Subjects, Samples, etc).<br>
+
+			studies/units/(studyUri) -<br>
+
+			<a href="variables/all">variables/all</a> - Return all variables<br>
+
+			variables/(variableUri) - Return additional meta-information about a variable given a variable URI.<br>
+
+			<a href="deployments/all">deployments/all</a> - Return all deployments<br>
+
+			objectcollections/(ocUri)/all - Given an ObjectCollection URI, return all StudyObjects in that collection<br>
+
+			objectcollections/size/(ocUri) -<br>
+
+			objectcollections/(ocUri)/(offset) -<br>
+
+			<a href="indicators/all">indicators/all</a> -<br>
+
+			<a href="units/all">units/all</a> - Get all units used for all variables.<br>
+
+			<a href="platforms/all">platforms/all</a> - Get all the platforms<br>
+
+			<a href="fieldsofview/all">fieldsofview/all</a> - Get all the fields for view<br>
+
+			measurements/(studyUri)/(variableUri)/(objectUri) - Returns measurements of the given variable taken of the given subject for the given study<br>
+
+			measurements/(studyUri)/(variableUri)/(objectUri)/(fromdatetime)/(todatetime) - Returns measurements of the given variable taken of the given subject for the given study between the specified time range.<br>
+
+			measurements/(studyUri)/(variableUri) - Returns all measurements for all subjects of the given variable.<br>
+
+			measurements/dpl/(studyUri)/(variableUri)/(dplUri) -<br>
+
+			measurements/dpl/(studyUri)/(variableUri)/(dplUri)/timerange -<br>
+
+			measurements/dpl/(studyUri)/(variableUri)/(dplUri)/(fromdatetime)/(todatetime) -<br>
+
+			measurements/(studyUri)/(variableUri) -<br>
+
+			<br><br><br>
+
+       </div>    
+     </div> 
+     
+   </div>  
+   
+     <div class="row">
+       <div class="col-md-1"></div>
+       <div class="col-md-10">
+          <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+       </div>
+     </div>
+
+ }

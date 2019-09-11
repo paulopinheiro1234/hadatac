@@ -76,8 +76,8 @@
         },
         {
           "id": "SDD_00003",
-          "detail": "This SDD has no Study_ID filled.",
-          "solution": ""
+          "detail": "This SDD has no SDD_ID filled.",
+          "solution": "In the Info sheet of the SDD, fill in the value for SDD_ID"
         },
         {
           "id": "SDD_00004",
@@ -148,6 +148,11 @@
           "id": "SDD_00017",
           "detail": "Failed to download the CodeMapping of this SDD . ",
           "solution": ""
+        },
+        {
+          "id": "SDD_00018",
+          "detail": "This SDD has no Version filled.",
+          "solution": "In the Info sheet of the SDD, fill in the value for Version"
         }
       ]
     },

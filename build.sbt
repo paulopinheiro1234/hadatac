@@ -29,12 +29,12 @@ val appDependencies = Seq(
   //"org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
   "org.apache.poi" % "poi-ooxml" % "3.14",
   "org.apache.commons" % "commons-configuration2" % "2.0",
-  "org.apache.solr" % "solr-solrj" % "6.5.0",
+  "org.apache.solr" % "solr-solrj" % "7.5.0",
   "org.apache.jena" % "jena-core" % "3.0.1",
   "org.apache.jena" % "jena-arq" % "3.0.1",
-  "org.eclipse.rdf4j" % "rdf4j-model" % "2.4.0-M3",
-  "org.eclipse.rdf4j" % "rdf4j-repository-api" % "2.4.0-M3",
-  "org.eclipse.rdf4j" % "rdf4j-runtime" % "2.4.0-M3",
+  "org.eclipse.rdf4j" % "rdf4j-model" % "3.0.0",
+  "org.eclipse.rdf4j" % "rdf4j-repository-api" % "3.0.0",
+  "org.eclipse.rdf4j" % "rdf4j-runtime" % "3.0.0",
   //"de.fuberlin.wiwiss.ng4j" % "ng4j" % "0.9.3" from "file:///public/lib/ng4j-0.9.3/lib/ng4j-0.9.3.jar",
   "args4j" % "args4j" % "2.33",
   "joda-time" % "joda-time" % "2.9.2",
@@ -53,6 +53,7 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 javacOptions ++= Seq("-Xlint:deprecation")
 javacOptions ++= Seq("-Xlint:unchecked")
+javaOptions ++= Seq("-Dorg.eclipse.rdf4j.rio.verify_uri_syntax=false")
 
 lazy val root = project.in(file("."))
   .enablePlugins(PlayJava, PlayEbean)

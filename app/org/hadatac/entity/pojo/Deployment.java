@@ -304,10 +304,8 @@ public class Deployment extends HADatAcThing {
         }
         // System.out.println("FIND DEPLOYMENT (queryString): " + queryString);
         
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-        Model model = qexec.execDescribe();
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         StmtIterator stmtIterator = model.listStatements();
         if (!model.isEmpty()) {
