@@ -57,7 +57,7 @@ public class UploadOntologyTest extends StepTest{
          // new NameSpace ("doid", "copy-doid", "Ontology", "<http://purl.obolibrary.org/obo/DOID_>"),
          new NameSpace ("hasco", "copy-hasco", "Ontology", "<http://hadatac.org/ont/hasco/>"),
          new NameSpace ("owl", "copy-owl", "Ontology", "owl:"),
-         new NameSpace ("pato", "copy-pato", "Ontology", "<http://purl.obolibrary.org/obo/PATO_>"),
+         // new NameSpace ("pato", "copy-pato", "Ontology", "<http://purl.obolibrary.org/obo/PATO_>"),
          new NameSpace ("prov", "copy-prov", "Ontology", "<http://www.w3.org/ns/prov#>"),
          new NameSpace ("rdf", "copy-rdf", "Ontology", "rdf:"),
          new NameSpace ("rdfs", "copy-rdfs", "Ontology", "rdfs:"),
