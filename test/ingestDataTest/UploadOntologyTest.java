@@ -51,12 +51,10 @@ public class UploadOntologyTest extends StepTest{
 	@Override
 	public void test() {
 
-      // String[] ontologyList = new String[] { "copy-chear", "copy-cogat", "copy-doid", "copy-hasco", "copy-owl", "copy-pato", "copy-prov", "copy-rdf", "copy-rdfs", "copy-sio", "copy-uo", "copy-vstoi"};
-
       NameSpace[] ontologyList = new NameSpace[] {
          new NameSpace ("chear", "copy-chear", "Ontology", "<http://hadatac.org/ont/chear#>"),
          new NameSpace ("cogat", "copy-cogat", "Ontology", "<http://www.cognitiveatlas.org/ontology/cogat.owl#CAO_>"),
-         new NameSpace ("doid", "copy-doid", "Ontology", "<http://purl.obolibrary.org/obo/DOID_>"),
+         // new NameSpace ("doid", "copy-doid", "Ontology", "<http://purl.obolibrary.org/obo/DOID_>"),
          new NameSpace ("hasco", "copy-hasco", "Ontology", "<http://hadatac.org/ont/hasco/>"),
          new NameSpace ("owl", "copy-owl", "Ontology", "owl:"),
          new NameSpace ("pato", "copy-pato", "Ontology", "<http://purl.obolibrary.org/obo/PATO_>"),
