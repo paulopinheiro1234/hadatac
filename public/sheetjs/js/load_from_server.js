@@ -15,6 +15,30 @@ var spinner;
 var _workstart = function() { spinner = new Spinner().spin(_target); }
 var _workend = function() { spinner.stop(); }
 
+// Load spinner
+var spinnerOpts = {
+      lines: 13, // The number of lines to draw
+      length: 4, // The length of each line
+      width: 2, // The line thickness
+      radius: 6, // The radius of the inner circle
+      corners: 1, // Corner roundness (0..1)
+      rotate: 0, // The rotation offset
+      color: '#00047c', // #rgb or #rrggbb
+      speed: 1, // Rounds per second
+      trail: 40, // Afterglow percentage
+      shadow: false, // Whether to render a shadow
+      hwaccel: false, // Whether to use hardware acceleration
+      className: 'spinner', // The CSS class to assign to the spinner
+      zIndex: 2e9
+    };
+    var spinnerTarget = document.getElementById('spinnerContainer');
+    var spinnerStatus = new Spinner(spinnerOpts).spin(spinnerTarget);
+
+    var imageStatus = document.getElementById('imageStatus');
+    imageStatus.style.visibility = 'hidden';
+
+    var imgPath = imageStatus.src.substr(0, imageStatus.src.length-11)
+
 /** Alerts **/
 var _badfile = function() {
   alertify.alert('This file does not appear to be a valid Excel file.  If we made a mistake, please send this file to <a href="mailto:dev@sheetjs.com?subject=I+broke+your+stuff">dev@sheetjs.com</a> so we can take a look.', function(){});
@@ -40,21 +64,25 @@ function hideView(){
   $("#hide").css('display','none');
   $(".mobile-nav").fadeOut(50);
   $("#show").show();
-  cdg.style.height = (window.innerHeight - 200) + "px";
-  cdg.style.width = (window.innerWidth - 100) + "px";
+  _resize();
 
 }
 
-function changeHeader(headers,json){
-  
-  for(var i=0;i<headers.length;i++){
-   
-    cdg.schema[i].title = headers[i];   
-  }
-  
+function changeHeader(headers,emptySheet){
+  if(emptySheet==0){
+      for(var i = 0; i < headers.length; i++){
+        cdg.schema[i].title = headers[i];
 
-
+      }
+     cdg.deleteRow(0);
+    }
+    else{
+      for(var i = 0; i < headers.length; i++){
+        cdg.schema[i].title = headers[i];
+      }
+    }
 }
+
 /* make the buttons for the sheets */
 var sheetName;
 var make_buttons = function(sheetnames, cb) {
@@ -67,12 +95,16 @@ var make_buttons = function(sheetnames, cb) {
     btn.type = 'button';
     btn.name = 'btn' + idx;
     btn.text = s;
-    sheetName=s;
     var txt = document.createElement('h5');
     txt.innerText = s;
     btn.appendChild(txt);
-    
-    btn.addEventListener('click', function() {cb(idx); hideView();sheetName=s;}, false);
+
+    btn.addEventListener('click', function() {
+      sheetName=s;
+      cb(idx);
+      hideView();
+      cdg.draw();
+      }, false);
     buttons.appendChild(btn);
   });
   buttons.appendChild(document.createElement('br'));
@@ -86,19 +118,42 @@ cdg.style.width = '100%';
 var colNum=0;
 var rowNum=0;
 var isVirtual=0;
+
+var cellEntry = document.getElementById('cellText');
+var textCell = null;
+cellEntry.value = "";
+
+cellEntry.addEventListener('input', function (evt){
+   if(textCell != null){
+      cdg.data[textCell.rowIndex][textCell.columnIndex] = cellEntry.value;
+   }
+});
+
+cellEntry.addEventListener('keyup', function (e){
+   if(e.which==13||e.keyCode==13){
+      cdg.data[textCell.rowIndex][textCell.columnIndex] = cellEntry.value;
+      cellEntry.blur();
+   }
+});
+
 cdg.addEventListener('click', function (e) {
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
 
+  textCell = e.cell;
+
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   if (!e.cell) { return; }
-  
+
   if(e.cell.value==null){
     cdg.data[rowNum][colNum]=" ";
     cdg.draw();
     storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   }
+
+  cellEntry.value = cdg.data[rowNum][colNum];
+
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
@@ -120,6 +175,8 @@ cdg.addEventListener('click', function (e) {
 
   else{
     var menuoptns=[];
+    // spinnerStatus.start();
+    // imageStatus.style.visibility = 'hidden';
     if(demo_enabled){
       jsonparser(colval,rowval,menuoptns,isVirtual);
     }
@@ -140,8 +197,8 @@ cdg.addEventListener('click', function (e) {
 
 cdg.addEventListener('endedit',function(e){
   if (!e.cell) { return; }
-  
-  
+
+
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
   var rowval=cdg.data[e.cell.rowIndex][0];
@@ -155,6 +212,7 @@ cdg.addEventListener('endedit',function(e){
   }
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
+  cellEntry.value = cdg.data[rowNum][colNum];
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,e.value);
@@ -163,7 +221,6 @@ cdg.addEventListener('endedit',function(e){
 })
 
 cdg.addEventListener('click', function (e) {
-
   if (!e.cell) { return; }
   if(e.cell.value==null){return;}
   else{
@@ -206,7 +263,7 @@ function chooseItem(data) {
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   drawStars(rowNum,colNum);
   cdg.draw();
-  
+
 }
 
 function insertRowAbove(){
@@ -226,12 +283,12 @@ function removeRow(){
   temp.push(rowNum);
   for(var i=0;i<cdg.data[rowNum].length+1;i++){
     if(cdg.data[rowNum][i]==null){
-      temp.push(" "); 
+      temp.push(" ");
     }
     else{
       temp.push(cdg.data[rowNum][i]);
     }
-  } 
+  }
   for( var i=1;i<temp.length;i++){
     $.ajax({
       type : 'GET',
@@ -240,12 +297,12 @@ function removeRow(){
         removedValue:temp[i]
       },
       success : function(data) {
-        
+
       }
     });
   }
-  
-  
+
+
   storeRow.push(temp);
   var intendedRow=parseFloat(rowNum);
   cdg.deleteRow(intendedRow);
@@ -253,7 +310,7 @@ function removeRow(){
 
 }
 function _resize() {
-  _grid.style.height = (window.innerHeight - 200) + "px";
+  _grid.style.height = (window.innerHeight - 300) + "px";
   _grid.style.width = (window.innerWidth - 100) + "px";
 }
 _resize();
@@ -262,46 +319,85 @@ window.addEventListener('resize', _resize);
 var click_ctr=0;
 var copyOfL=0;
 var copyOfR=0;
+
+var headerMap = new Map();
+
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
-  // console.log(click_ctr);
+
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
   _grid.style.display = "block";
   _resize();
 
-  /* set up table headers */
+
+  if (sheetName === undefined){ // sheetname will be undefined for the first sheet so set it to the default
+     sheetName = sheetnames[0];
+  }
+
+  /* clean json */
   var L = 0;
   var R=0;
-  json.forEach(function(r) { if(L < r.length) L = r.length; });
-  // console.log(L);
-  //alert(json[0][0]);
-  var headers=[];
-  for(var i = 0; i <L; ++i) {
-    headers.push(json[0][i]);
-  }
-  
-  for(var i = json[0].length; i < L; ++i) {
-    json[0][i] = "";
-  }
-  cdg.data = json;
+  json.forEach(function(r) { if(L < r.length) L = r.length; }); // Gets the max width row
 
+  var cleanJson = [];
+  for(var i = 0; i < json.length; i++){
+    if(json[i].length > 0){
+      var temp = [];
+      var j;
+      for(j = 0; j < json[i].length; j++){
+         if(typeof json[i][j] === 'string'){
+            temp.push(json[i][j]);
+         }
+         else{
+            temp.push(""); // replaces empty slots with a string
+         }
+      }
+      while(j < L){
+         temp.push("");
+         j++;
+      }
+      cleanJson.push(temp)
+   }
+  }
 
-  changeHeader(headers,json);
-  for(var i=0;i<cdg.data.length;i++){
-    if(cdg.data[i][0]!=null){
-      R++;
+  if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
+     var temp = [];
+     for(var j = 0; j < L; j++){
+        temp.push("");
+     }
+     cleanJson.push(temp)
+  }
+
+  json = cleanJson;
+  var emptySheet;
+  /* set up table headers */
+  if(headerMap.has(sheetName)){
+    cdg.data = json;
+    console.log(headerMap.get(sheetName));
+    changeHeader(headerMap.get(sheetName), 1);
+  }
+  else{
+    headerMap.set(sheetName, json[0]);
+
+    if(json.length==1){
+      cdg.data = json;
+      emptySheet=0;
     }
+    else{
+      cdg.data = json.slice(1);
+    }
+    changeHeader(json[0], emptySheet);
   }
-  copyOfL=L;
-  copyOfR=R;
-  checkRecs(L,R,1);
+
+  checkRecs(L, cdg.data.length, 1);
   cdg.draw();
 };
 
+// setSheet
 
 function parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual){
     var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
@@ -401,9 +497,16 @@ function getSuggestion(){
    getJSON("http://127.0.0.1:5000/populate-sdd",  function(err, data) {
       if (err != null) {
          console.error(err);
+         spinnerStatus.stop();
+         imageStatus.style.visibility = 'visible';
+         imageStatus.src = imgPath + 'fail.png'
+
       }
       else {
          sdd_suggestions = data
+         spinnerStatus.stop();
+         imageStatus.style.visibility = 'visible';
+         imageStatus.src = imgPath + 'success.png'
       }
    });
 }
@@ -416,14 +519,27 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
   xhr.onload = function() {
       var status = xhr.status;
       if (status == 200) {
+          spinnerStatus.stop();
+          imageStatus.style.visibility = 'visible';
+          imageStatus.src = imgPath + 'success.png';
           callback(null, xhr.response);
       } else {
           callback(status);
+          spinnerStatus.stop();
+          imageStatus.style.visibility = 'visible';
+          imageStatus.src = imgPath + 'fail.png';
       }
+  };
+
+  xhr.onerror = function() {
+      spinnerStatus.stop();
+      imageStatus.style.visibility = 'visible';
+      imageStatus.src = imgPath + 'fail.png'
   };
 
   xhr.send();
   };
+
 
   getJSON('http://128.113.106.57:5000/get-sdd/',  function(err, data) {
   if (err != null) {
@@ -599,7 +715,7 @@ var closebtns = document.getElementsByClassName("remove");
 
 
 function DDforPopulate(durl,headersheet,headercol){
-  
+
   var oReq = new XMLHttpRequest();
    oReq.open("GET", durl, true);
    oReq.responseType = "arraybuffer";
@@ -635,12 +751,12 @@ function DDforPopulate(durl,headersheet,headercol){
       });
     });
     console.log(sheetName,headersheet);
-    
+
     if("Dictionary Mapping"==sheetName){
-      
+
       var popElement=document.getElementById("populatesdd");
       popElement.removeAttribute("disabled");
-      populateThis(headersCol);
+       populateThis(headersCol);
       popElement.setAttribute("disabled", "disabled");
     }
     else if(sheetName!="Dictionary Mapping"){
@@ -653,12 +769,13 @@ function DDforPopulate(durl,headersheet,headercol){
 
 }
 function populateThis(headersCol){
-  
-  var ct=0;
+
+  var ct=-1;
   for(var i=0;i<headersCol.length;i++){
+    cdg.insertRow([],i);
     ct++;
     console.log(headersCol[i]);
     cdg.data[ct][0]=headersCol[i];
   }
-  
+
 }

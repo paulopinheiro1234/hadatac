@@ -31,7 +31,7 @@ public class URIUtils {
         if (str == null) {
             return false;
         }
-        if (str.length() != replaceNameSpaceEx(str).length() || 
+        if (str.length() != replaceNameSpaceEx(str).length() ||
                 str.length() != replacePrefixEx(str).length()) {
             return true;
         }
@@ -40,7 +40,7 @@ public class URIUtils {
     }
 
     /*
-     *  the method verifies if cellContent contains a set of URIs, which we call an object set. Returns true if 
+     *  the method verifies if cellContent contains a set of URIs, which we call an object set. Returns true if
      *  the content is regarded to be an object set.
      */
     public static boolean isObjectSet (String cellContent) {
@@ -78,7 +78,7 @@ public class URIUtils {
         return (isFullURI(firstToken) || isAbbreviatedURI(firstToken));
     }
 
-    /* 
+    /*
      *  if the argument str starts with the URI of one of the name spaces registered in NameSpaces.table, the
      *  URI gets replaced by the name space's abbreviation. Otherwise, the string is returned wrapper
      *  around angular brackets.
@@ -112,7 +112,7 @@ public class URIUtils {
         return str;
     }
 
-    /* 
+    /*
      *  if the argument str starts with the abbreviation of one of the name spaces registered in NameSpaces.table, the
      *  abbreviation gets replaced by the name space's URI. Otherwise, the string is returned wrapper
      *  around angular brackets.
@@ -124,13 +124,13 @@ public class URIUtils {
             String nsString = entry.getValue().getName();
             if (str.startsWith(abbrev + ":")) {
                 resp = str.replace(abbrev + ":", nsString);
-                return resp; 
+                return resp;
             }
         }
         return "<" + str + ">";
     }
 
-    /* 
+    /*
      *  if the argument str starts with the abbreviation of one of the name spaces registered in NameSpaces.table, the
      *  abbreviation gets replaced by the name space's URI. Otherwise, the string is returned wrapper
      *  around angular brackets.
@@ -142,7 +142,7 @@ public class URIUtils {
             String nsString = entry.getValue().getName();
             if (str.startsWith(abbrev + ":")) {
                 resp = str.replace(abbrev + ":", nsString);
-                return resp; 
+                return resp;
             }
         }
 
@@ -162,9 +162,9 @@ public class URIUtils {
         return "";
     }
 
-    /* 
-     *  check if the namespace in str is in the namamespace list (NameSpaces.table). 
-     *  If not, it issues a warning message. A warning message is issue if the name 
+    /*
+     *  check if the namespace in str is in the namamespace list (NameSpaces.table).
+     *  If not, it issues a warning message. A warning message is issue if the name
      *  space used in the argument str is not registered in NameSpaces.table.
      */
     public static void validateNameSpace(String str) {
@@ -193,7 +193,7 @@ public class URIUtils {
 
     public static String processObjectValue(String object) {
         // if abbreviated URI, just print it
-        if (isAbbreviatedURI(object)) { 
+        if (isAbbreviatedURI(object)) {
             validateNameSpace(object);
             return object;
         }

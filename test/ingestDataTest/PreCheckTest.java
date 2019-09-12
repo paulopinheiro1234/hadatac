@@ -16,26 +16,26 @@ public class PreCheckTest extends StepTest{
 	private static final PreCheckTest test = new PreCheckTest();
 
 	private PreCheckTest() {}
-	
+
 	public static PreCheckTest getTest() {
 		return test;
 	}
-	
-	
+
+
 	@Override
 	public void preMsg() {
 		System.out.println("[Step 1] Executing PreCheckTest:");
-		
+
 	}
 
-	
+
 	@Override
 	public void test() {
 		String email = "userTest@test";
 		String host = "localhost";
 		int solrPort = 8983;
 		int blazePort = 8080;
-		
+
 		//detect solr on localhost:8983
 		try {
 			Socket solr = new Socket(host, solrPort);
@@ -46,7 +46,7 @@ public class PreCheckTest extends StepTest{
 			fail("[Step 1] Unable to detect solr at "+ host + ":" + solrPort);
 		}
 		System.out.println("[Step 1] Solr Check Pass.");
-		
+
 		//detect blazegraph on localhost:8080
 		try {
 			Socket blaze = new Socket(host, blazePort);
@@ -57,22 +57,22 @@ public class PreCheckTest extends StepTest{
 			fail("[Step 1] Unable to detect blazegraph at "+ host + ":" + blazePort);
 		}
 		System.out.println("[Step 1] Blazegraph Check Pass.");
-		
-		//enter sandbox mode
-        //List<OperationMode> modes = OperationMode.findAll();
-        OperationMode m = OperationMode.findByEmail(email);
-        if(m != null) {
-        	System.out.println("[Step 1] Test Sandbox Mode has been found.");
-        	assertTrue("Test Sandbox delete unsuccessfully", m.delete() != -1);
-        }
-        
-        OperationMode mode = new OperationMode();
-        mode.setUserEmail(email);
-        mode.setOperationMode(OperationMode.SANDBOX);
-        mode.setLastEnterTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-        mode.save();
-        
-        System.out.println("[Step 1] Test Sandbox Mode has been created.");
+
+		// //enter sandbox mode
+      //   //List<OperationMode> modes = OperationMode.findAll();
+      //   OperationMode m = OperationMode.findByEmail(email);
+      //   if(m != null) {
+      //   	System.out.println("[Step 1] Test Sandbox Mode has been found.");
+      //   	assertTrue("Test Sandbox delete unsuccessfully", m.delete() != -1);
+      //   }
+      //
+      //   OperationMode mode = new OperationMode();
+      //   mode.setUserEmail(email);
+      //   mode.setOperationMode(OperationMode.SANDBOX);
+      //   mode.setLastEnterTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+      //   mode.save();
+      //
+      //   System.out.println("[Step 1] Test Sandbox Mode has been created.");
 	}
 
 

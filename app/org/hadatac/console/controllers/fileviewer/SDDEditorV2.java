@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.fileviewer;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
@@ -16,12 +17,12 @@ import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
 import play.libs.Json;
 import org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD;
-import play.core.j.JavaResultExtractor; 
+import play.core.j.JavaResultExtractor;
 
 
 public class SDDEditorV2 extends Controller {
     NameSpaces ns = NameSpaces.getInstance();
-        List<String> loadedList=ns.listLoadedOntologies();
+        List<String> loadedList = ns.listLoadedOntologies();
         List<String> currentCart=new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
         ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
@@ -33,6 +34,7 @@ public class SDDEditorV2 extends Controller {
 
 
     public Result index(String fileId, boolean bSavable, int indicator) {
+        Collections.sort(loadedList);
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         if (null == dataFile && indicator==1) {
@@ -43,10 +45,10 @@ public class SDDEditorV2 extends Controller {
         if(indicator==1 && dataFile!=null){
             headerSheetColumn=FileHeadersIntoSDD.headerSheetColumn;
             commentSheetColumn=FileHeadersIntoSDD.commentSheetColumn;
-            
+
             ddDF=FileHeadersIntoSDD.dd_df;
             finalDF=ddDF;
-            
+
         }
         else if(indicator==0){
             List<DataFile> files = null;
@@ -55,15 +57,15 @@ public class SDDEditorV2 extends Controller {
             String dd_filename=dataFile.getFileName();
             dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
             DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
-            for(DataFile df : files){  
+            for(DataFile df : files){
                 if(df.getFileName().equals(dd_filename)){
                     dd_dataFile = df;
                 }
             }
             finalDF=dd_dataFile;
         }
-        
-       
+
+
 
     	// System.out.println("files = " + files);
     	// System.out.println("dd_dataFile = " + dd_dataFile.getFileName());
@@ -78,6 +80,7 @@ public class SDDEditorV2 extends Controller {
     }
 
     public Result fromSharedLink(String sharedId) {
+        Collections.sort(loadedList);
         DataFile dataFile = DataFile.findBySharedId(sharedId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
@@ -102,21 +105,21 @@ public class SDDEditorV2 extends Controller {
         else{
             currentCart.add(ontology);
         }
-        
+
         return new Result(200);
     }
 
     public Result removeFromCart(String item){
-       
+
        currentCart.remove(item);
-       
+
         return ok(Json.toJson(currentCart));
     }
     public Result sizeOfCart(int cartamount){
         cartamount= currentCart.size();
         System.out.println(cartamount);
         return ok(Json.toJson(cartamount));
-        
+
     }
 
     public Result addToEdits(String row, String col,String editValue){
@@ -128,7 +131,7 @@ public class SDDEditorV2 extends Controller {
         //return new Result(200);
         return ok(Json.toJson(storeEdits));
     }
-   
+
     public Result removingRow(String removedValue){
         for( int i=0;i<storeEdits.size();i++){
             if(storeEdits.get(i).get(2)==removedValue){
@@ -140,31 +143,31 @@ public class SDDEditorV2 extends Controller {
 
     public Result getEdit(){
         ArrayList<String> temp=storeEdits.get(storeEdits.size()-1);
-        
+
         //String lastKnown=;
         System.out.println(temp);
         oldEdits.add(temp);
         storeEdits.remove(storeEdits.size()-1);
-        
+
         ArrayList<String> lastEdit=storeEdits.get(storeEdits.size()-1);
         return ok(Json.toJson(lastEdit));
     }
-    
+
     public Result getOldEdits(){
          ArrayList<String> recentoldEdit=oldEdits.get(0);
          oldEdits.remove(0);
         return ok(Json.toJson(recentoldEdit));
     }
     public Result getHeaderLoc(){
-        
+
         return ok(Json.toJson(headerSheetColumn));
     }
     public Result getCommentLoc(){
-        
+
         return ok(Json.toJson(commentSheetColumn));
     }
 
-    
 
-    
+
+
 }

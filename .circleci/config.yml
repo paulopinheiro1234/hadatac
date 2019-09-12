@@ -1,0 +1,52 @@
+# Scala CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/sample-config/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      # - image: circleci/openjdk:8-jdk
+      - image: johnsm21/hadatac:latest
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+      BASH_ENV: /root/.bashrc
+
+      JAVA_HOME: /root/jdk1.8.0_221
+      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/jdk1.8.0_221/bin
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.sbt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: cat /dev/null | sbt test:compile
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies--{{ checksum "build.sbt" }}
+
+      # - run: ./install_hadatac.sh Y ~/hadatac-solr ~/hadatac-blazegraph
+      - run: bash ~/hadatac-solr/solr/run_solr6.sh start
+      - run: bash ~/hadatac-blazegraph/jetty-distribution-9.4.12.v20180830/bin/jetty.sh start
+      # - run: curl http://localhost:8080/blazegraph/#query
+
+      # run tests!
+      - run: cat /dev/null | sbt test:test
