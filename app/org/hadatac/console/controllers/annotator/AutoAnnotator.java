@@ -51,6 +51,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.labkey.remoteapi.CommandException;
 
+import com.typesafe.config.ConfigException.Null;
+
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.twirl.api.Html;
@@ -97,11 +99,13 @@ public class AutoAnnotator extends Controller {
                 basePath = basePath.substring(1, basePath.length());
             }
             
+            /*
             DataFile.includeUnrecognizedFiles(Paths.get(pathProc, newDir).toString(), 
                     basePath, procFiles, user.getEmail(), DataFile.PROCESSED);
             
         	DataFile.includeUnrecognizedFiles(pathUnproc, "", 
         	        unprocFiles, user.getEmail(), DataFile.UNPROCESSED);
+        	*/
         } else {
             procFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.PROCESSED);
             
@@ -402,7 +406,7 @@ public class AutoAnnotator extends Controller {
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder + "/" + dataFile.getPureFileName()));
+        file.renameTo(new File(destFolder + "/" + dataFile.getStorageFileName()));
         file.delete();
 
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB,
@@ -437,7 +441,7 @@ public class AutoAnnotator extends Controller {
         if (!destFolder.exists()) {
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getPureFileName()));
+        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getStorageFileName()));
         file.delete();
         
         dataFile.getLogger().resetLog();
@@ -579,7 +583,7 @@ public class AutoAnnotator extends Controller {
         List<DataFile> dfs = DataFile.findInDir(dir, DataFile.PROCESSED);
         for (DataFile df : dfs) {
             File file = new File(df.getAbsolutePath());
-            System.out.println(df.getAbsolutePath() + "  " + df.getPureFileName());
+            System.out.println(df.getAbsolutePath() + "  " + df.getStorageFileName());
             
             if (df.getPureFileName().startsWith("DA-")) {
                 Measurement.deleteFromSolr(df.getDatasetUri());
@@ -693,13 +697,27 @@ public class AutoAnnotator extends Controller {
         }
 
         String fileName = path.getFileName().toString();
-        DataFile file = DataFile.findByNameAndStatus(fileName, DataFile.UNPROCESSED);
-        if (file != null && file.existsInFileSystem(ConfigProp.getPathUnproc())) {
-            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
-        }
+        DataFile dataFile = null;
+        
+        // DataFile.findByNameAndStatus(fileName, DataFile.UNPROCESSED);
+        // if (dataFile != null && dataFile.existsInFileSystem(ConfigProp.getPathUnproc())) {
+        //    return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
+        // }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
-            DataFile.create(fileName, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.UNPROCESSED);
+            dataFile = DataFile.create(
+                    fileName, "", AuthApplication.getLocalUser(session()).getEmail(), 
+                    DataFile.UNPROCESSED);
+            
+            String originalPath = Paths.get(ConfigProp.getPathUnproc(), dataFile.getPureFileName()).toString();
+            File file = new File(originalPath);
+            
+            String newPath = originalPath.replace(
+                    "/" + dataFile.getPureFileName(), 
+                    "/" + dataFile.getStorageFileName());
+            file.renameTo(new File(newPath));
+            file.delete();
+            
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

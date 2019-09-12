@@ -30,7 +30,7 @@ public class MyActorSystem {
 		Runnable scanning = new Runnable() {
 			@Override
 			public void run() {
-			    AnnotationWorker.scan();
+			    // AnnotationWorker.scan();
 			}
 		};
 		

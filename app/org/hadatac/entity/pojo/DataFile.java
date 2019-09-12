@@ -140,16 +140,16 @@ public class DataFile implements Cloneable {
     }
     
     public String getAbsolutePath() {
-        if (getStatus().equals(UNPROCESSED)) {
-            return Paths.get(ConfigProp.getPathUnproc(), getDir(), getFileName()).toString();
+        if (Arrays.asList(UNPROCESSED, FREEZED).contains(getStatus())) {
+            return Paths.get(ConfigProp.getPathUnproc(), getDir(), getStorageFileName()).toString();
         } else if (getStatus().equals(PROCESSED)) {
-            return Paths.get(ConfigProp.getPathProc(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathProc(), getDir(), getStorageFileName()).toString();
         } else if (getStatus().equals(WORKING)) {
-            return Paths.get(ConfigProp.getPathWorking(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathWorking(), getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(CREATED, CREATING, DELETED).contains(getStatus())) {
-            return Paths.get(ConfigProp.getPathDownload(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathDownload(), getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(DD_UNPROCESSED, DD_PROCESSED, DD_FREEZED).contains(getStatus())) {
-            return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getStorageFileName()).toString();
         }
         
         return "";
@@ -232,6 +232,14 @@ public class DataFile implements Cloneable {
         }
         this.dir = dir;
     }
+    
+    public String getPureFileName() {
+        return Paths.get(fileName).getFileName().toString();
+    }
+    
+    public String getStorageFileName() {
+        return id + "_" + getPureFileName();
+    }
 
     public String getStatus() {
         return status;
@@ -306,7 +314,6 @@ public class DataFile implements Cloneable {
     }
 
     public int delete() {
-    	
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
@@ -326,8 +333,9 @@ public class DataFile implements Cloneable {
         return -1;
     }
     
-    public String getPureFileName() {
-        return Paths.get(fileName).getFileName().toString();
+    public void freeze() {
+        setStatus(FREEZED);
+        save();
     }
     
     public void resetForUnprocessed() {
@@ -347,7 +355,7 @@ public class DataFile implements Cloneable {
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() && getPureFileName().equals(listOfFiles[i].getName())) {
+            if (listOfFiles[i].isFile() && getStorageFileName().equals(listOfFiles[i].getName())) {
                 return true;
             }
         }
@@ -577,7 +585,7 @@ public class DataFile implements Cloneable {
         while (iterFile.hasNext()) {
             DataFile file = iterFile.next();
             try {
-                Path p = Paths.get(path, file.getDir(), file.getFileName());
+                Path p = Paths.get(path, file.getDir(), file.getId() + "_" + file.getFileName());
                 if (!Files.exists(p) || Files.isHidden(p)) {
                     iterFile.remove();
                 }

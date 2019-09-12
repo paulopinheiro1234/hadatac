@@ -159,7 +159,12 @@ public class WorkingFiles extends Controller {
             return badRequest(renameFile.render(dir, dataFile));
         } else {
             String newFileName = Paths.get(data.getNewName()).getFileName().toString();
-            String newFilePath = Paths.get(Paths.get(dataFile.getAbsolutePath()).getParent().toString(), newFileName).toString();
+            dataFile.setFileName(newFileName);
+            dataFile.save();
+            
+            String newFilePath = Paths.get(
+                    Paths.get(dataFile.getAbsolutePath()).getParent().toString(), 
+                    dataFile.getStorageFileName()).toString();
             
             File originalFile = new File(dataFile.getAbsolutePath());
             File newFile = new File(newFilePath);
@@ -169,9 +174,6 @@ public class WorkingFiles extends Controller {
                 try {
                     originalFile.renameTo(newFile);
                     originalFile.delete();
-                    
-                    dataFile.setFileName(newFileName);
-                    dataFile.save();
                     
                     logger.info("newFilePath: " + newFilePath);
                 } catch (Exception e) {
@@ -236,10 +238,9 @@ public class WorkingFiles extends Controller {
         	
             DataFile root = new DataFile("/");
             root.setStatus(DataFile.WORKING);
-        	String fileName = dataFile.getFileName();
         	String oldFilePath = dataFile.getAbsolutePath();
-            String newFilePath = Paths.get(root.getAbsolutePath(), destination, fileName).toString();
-            System.out.println("fileName " + fileName);
+            String newFilePath = Paths.get(root.getAbsolutePath(), destination, dataFile.getStorageFileName()).toString();
+            System.out.println("fileName " + dataFile.getStorageFileName());
             System.out.println("oldFilePath " + oldFilePath);
             System.out.println("newFilePath " + newFilePath);
 
@@ -251,9 +252,6 @@ public class WorkingFiles extends Controller {
                 try {
                     originalFile.renameTo(newFile);
                     originalFile.delete();
-                    
-                    dataFile.setFileName(fileName);
-                    dataFile.save();
                     
                     logger.info("newFilePath: " + newFilePath);
                 } catch (Exception e) {
@@ -429,7 +427,7 @@ public class WorkingFiles extends Controller {
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getPureFileName()));
+        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getStorageFileName()));
         file.delete();
         
         dataFile.getLogger().resetLog();

@@ -96,11 +96,11 @@
         @for(file <- unprocessedFiles) {
             <tr name="unprocessed">
                 @if(file.getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
                 } else { @if(file.getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
                 } else {
-                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')) } else { @file.getFileName() }</td>
+                    <td name="file_name">@file.getFileName()</td>
                 }}
                 @if(bAdmin) {
                     <td>@file.getOwnerEmail()</td>
@@ -171,11 +171,11 @@
         @for(file <- processedFiles){
             <tr name="processed" data-value="@file.getStudyUri()">
                 @if(file.getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
                 } else { @if(file.getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
                 } else {
-                    <td name="file_name">@if(file.getFileName().indexOf('/') >= 0) { @file.getFileName().substring(file.getFileName().indexOf('/')+1) } else { @file.getFileName() }</td>
+                    <td name="file_name">@file.getFileName()</td>
                 }}
                 @if(bAdmin) {
                     <td>@file.getOwnerEmail()</td>
