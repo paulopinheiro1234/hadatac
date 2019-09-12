@@ -86,7 +86,6 @@ public class UploadOntologyTest extends StepTest{
 
          //check result after upload ontology from cache
          String ab = ns.getAbbreviation();
-
          int num = NameSpaces.getInstance().getNamespaces().get(ab).getNumberOfLoadedTriples();
 
          try{

@@ -141,20 +141,20 @@ public class IngestDataTest {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		System.out.println("\nCongratulation: IngestDataTest Pass.");
-		
+
 	}
-	
-	@After
-	public void exitSandbox()
-	{
-		String email = "userTest@test";
-		OperationMode m = OperationMode.findByEmail(email);
-        if(m != null) {
-        	System.out.println("[After Test] Test Sandbox Mode has been found.");
-        	assertTrue("Sandbox mode deletes unsuccessfully after test", m.delete() != -1);
-        }
-        System.out.println("[After Test] Sandbox mode has been successfully deleted.");
-	}
+
+	// @After
+	// public void exitSandbox()
+	// {
+	// 	String email = "userTest@test";
+	// 	OperationMode m = OperationMode.findByEmail(email);
+   //      if(m != null) {
+   //      	System.out.println("[After Test] Test Sandbox Mode has been found.");
+   //      	assertTrue("Sandbox mode deletes unsuccessfully after test", m.delete() != -1);
+   //      }
+   //      System.out.println("[After Test] Sandbox mode has been successfully deleted.");
+	// }
 }
