@@ -238,7 +238,8 @@ public class DataFile implements Cloneable {
     }
     
     public String getStorageFileName() {
-        return id + "_" + getPureFileName();
+        return FilenameUtils.getBaseName(fileName) + "_" + id 
+                + "." + FilenameUtils.getExtension(fileName);
     }
 
     public String getStatus() {
@@ -554,7 +555,7 @@ public class DataFile implements Cloneable {
 
     public static boolean search(String fileName, String dir, List<DataFile> pool) {
         for (DataFile file : pool) {
-            if (file.getFileName().equals(fileName) && file.getDir().equals(dir)) {
+            if (file.getStorageFileName().equals(fileName) && file.getDir().equals(dir)) {
                 return true;
             }
         }
@@ -574,8 +575,17 @@ public class DataFile implements Cloneable {
                     && hasValidExtension(listOfFiles[i].getName())
                     && !listOfFiles[i].getName().startsWith(".") 
                     && !search(listOfFiles[i].getName(), basePath, dataFiles)) {
-                DataFile df = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
-                dataFiles.add(df);
+                DataFile dataFile = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
+                
+                String originalPath = Paths.get(curPath, dataFile.getPureFileName()).toString();
+                File file = new File(originalPath);
+                String newPath = originalPath.replace(
+                        "/" + dataFile.getPureFileName(), 
+                        "/" + dataFile.getStorageFileName());
+                file.renameTo(new File(newPath));
+                file.delete();
+                
+                dataFiles.add(dataFile);
             }
         }
     }
@@ -585,7 +595,7 @@ public class DataFile implements Cloneable {
         while (iterFile.hasNext()) {
             DataFile file = iterFile.next();
             try {
-                Path p = Paths.get(path, file.getDir(), file.getId() + "_" + file.getFileName());
+                Path p = Paths.get(path, file.getDir(), file.getStorageFileName());
                 if (!Files.exists(p) || Files.isHidden(p)) {
                     iterFile.remove();
                 }

@@ -117,8 +117,6 @@ public class NameSpace {
 
             ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
                     CollectionUtil.Collection.METADATA_SPARQL), queryString);
-           System.out.println(CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL));
-           System.out.println(queryString);
             QuerySolution soln = resultsrw.next();
 
             setNumberOfLoadedTriples(Integer.valueOf(soln.getLiteral("tot").getValue().toString()).intValue());

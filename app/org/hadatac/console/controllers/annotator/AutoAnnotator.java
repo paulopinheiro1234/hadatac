@@ -99,13 +99,11 @@ public class AutoAnnotator extends Controller {
                 basePath = basePath.substring(1, basePath.length());
             }
             
-            /*
             DataFile.includeUnrecognizedFiles(Paths.get(pathProc, newDir).toString(), 
                     basePath, procFiles, user.getEmail(), DataFile.PROCESSED);
             
         	DataFile.includeUnrecognizedFiles(pathUnproc, "", 
         	        unprocFiles, user.getEmail(), DataFile.UNPROCESSED);
-        	*/
         } else {
             procFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.PROCESSED);
             
