@@ -53,17 +53,17 @@ public class UploadOntologyTest extends StepTest{
 
       NameSpace[] ontologyList = new NameSpace[] {
          new NameSpace ("chear", "copy-chear", "Ontology", "<http://hadatac.org/ont/chear#>"),
-         new NameSpace ("cogat", "copy-cogat", "Ontology", "<http://www.cognitiveatlas.org/ontology/cogat.owl#CAO_>"),
+         // new NameSpace ("cogat", "copy-cogat", "Ontology", "<http://www.cognitiveatlas.org/ontology/cogat.owl#CAO_>"),
          // new NameSpace ("doid", "copy-doid", "Ontology", "<http://purl.obolibrary.org/obo/DOID_>"),
          new NameSpace ("hasco", "copy-hasco", "Ontology", "<http://hadatac.org/ont/hasco/>"),
          new NameSpace ("owl", "copy-owl", "Ontology", "owl:"),
          // new NameSpace ("pato", "copy-pato", "Ontology", "<http://purl.obolibrary.org/obo/PATO_>"),
-         new NameSpace ("prov", "copy-prov", "Ontology", "<http://www.w3.org/ns/prov#>"),
+         // new NameSpace ("prov", "copy-prov", "Ontology", "<http://www.w3.org/ns/prov#>"),
          // new NameSpace ("rdf", "copy-rdf", "Ontology", "rdf:"),
          // new NameSpace ("rdfs", "copy-rdfs", "Ontology", "rdfs:"),
-         // new NameSpace ("sio", "copy-sio", "Ontology", "<http://semanticscience.org/resource/>"),
+         new NameSpace ("sio", "copy-sio", "Ontology", "<http://semanticscience.org/resource/>"),
          // new NameSpace ("uo", "copy-uo", "Ontology", "<http://purl.obolibrary.org/obo/UO_>"),
-         // new NameSpace ("vstoi", "copy-vstoi", "Ontology", "<http://hadatac.org/ont/vstoi#>")
+         new NameSpace ("vstoi", "copy-vstoi", "Ontology", "<http://hadatac.org/ont/vstoi#>")
       };
 
 
