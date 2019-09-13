@@ -238,6 +238,11 @@ public class DataFile implements Cloneable {
     }
     
     public String getStorageFileName() {
+        if (FilenameUtils.getExtension(fileName).isEmpty()) {
+            // directory
+            return fileName;
+        }
+        
         return FilenameUtils.getBaseName(fileName) + "_" + id 
                 + "." + FilenameUtils.getExtension(fileName);
     }
@@ -693,9 +698,15 @@ public class DataFile implements Cloneable {
     	} else {
     		path = path + "/" + current;
     	}
+    	
+    	System.out.println("path: " + path);
+    	
 		dirFile = new DataFile(path);
 		dirFile.setStatus(DataFile.WORKING);
+		
+		System.out.println("dirFile.getAbsolutePath(): " + dirFile.getAbsolutePath());
         File fileAux = new File(dirFile.getAbsolutePath());
+        
         TreeNode node = null;
         if (fileAux.isDirectory() && !justDir) {
         	node = new TreeNode("+" + path);

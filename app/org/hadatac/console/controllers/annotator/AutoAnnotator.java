@@ -540,6 +540,7 @@ public class AutoAnnotator extends Controller {
             return badRequest("You do NOT have the permission to download this file!");
         }
         
+        System.out.println("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
         return ok(new File(dataFile.getAbsolutePath()));
     }
     
@@ -695,15 +696,9 @@ public class AutoAnnotator extends Controller {
         }
 
         String fileName = path.getFileName().toString();
-        DataFile dataFile = null;
-        
-        // DataFile.findByNameAndStatus(fileName, DataFile.UNPROCESSED);
-        // if (dataFile != null && dataFile.existsInFileSystem(ConfigProp.getPathUnproc())) {
-        //    return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
-        // }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathUnproc())) {
-            dataFile = DataFile.create(
+            DataFile dataFile = DataFile.create(
                     fileName, "", AuthApplication.getLocalUser(session()).getEmail(), 
                     DataFile.UNPROCESSED);
             
