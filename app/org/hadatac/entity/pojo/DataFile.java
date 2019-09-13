@@ -239,7 +239,6 @@ public class DataFile implements Cloneable {
     
     public String getStorageFileName() {
         if (FilenameUtils.getExtension(fileName).isEmpty()) {
-            // directory
             return fileName;
         }
         
@@ -566,6 +565,17 @@ public class DataFile implements Cloneable {
         }
         return false;
     }
+    
+    public static DataFile find(String fileName, String dir, List<DataFile> pool) {
+        for (DataFile dataFile : pool) {
+            if (dataFile.getPureFileName().equals(fileName) 
+                    && dataFile.getDir().equals(dir)) {
+                return dataFile;
+            }
+        }
+        
+        return null;
+    }
 
     public static void includeUnrecognizedFiles(String curPath, String basePath, 
             List<DataFile> dataFiles, String ownerEmail, String defaultStatus) {
@@ -580,7 +590,10 @@ public class DataFile implements Cloneable {
                     && hasValidExtension(listOfFiles[i].getName())
                     && !listOfFiles[i].getName().startsWith(".") 
                     && !search(listOfFiles[i].getName(), basePath, dataFiles)) {
-                DataFile dataFile = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
+                DataFile dataFile = find(listOfFiles[i].getName(), basePath, dataFiles);
+                if (null == dataFile) {
+                    dataFile = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
+                }
                 
                 String originalPath = Paths.get(curPath, dataFile.getPureFileName()).toString();
                 File file = new File(originalPath);

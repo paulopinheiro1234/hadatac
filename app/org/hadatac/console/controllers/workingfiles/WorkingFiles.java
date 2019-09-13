@@ -469,6 +469,9 @@ public class WorkingFiles extends Controller {
         }
         
         String strLog = dataFile.getLog();
+        if (strLog.isEmpty()) {
+            strLog += "This file can be ingested without errors";
+        }
         
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
                 routes.WorkingFiles.index("/", ".").url()));
