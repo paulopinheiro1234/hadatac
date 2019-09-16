@@ -211,7 +211,6 @@ public class AnnotationWorker {
         Record record = dataFile.getRecordFile().getRecords().get(0);
         String studyName = record.getValueByColumnName("Study ID");
         String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
-        String fileName = dataFile.getRecordFile().getFileName();
 
         dataFile.getLogger().println("Study ID found: " + studyName);
         dataFile.getLogger().println("Study URI found: " + studyUri);
@@ -570,7 +569,7 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSSDFile(DataFile dataFile) {
-        String studyId = dataFile.getRecordFile().getFileName().replaceAll("SSD-", "");
+        String studyId = dataFile.getBaseName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + studyId + "...");
 
         SSDSheet ssd = new SSDSheet(dataFile);

@@ -36,10 +36,13 @@ import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.TreeNode;
+import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.RecordFile;
+import org.hadatac.data.loader.SpreadsheetRecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -103,9 +106,20 @@ public class DataFile implements Cloneable {
         logger = new AnnotationLogger(this);
     }
     
-    public DataFile(RecordFile recordFile) {
-        this(recordFile.getFileName());
-        this.file = recordFile.getFile();
+    public boolean attachFile(File file) {
+        RecordFile recordFile = null;
+        if (file.getName().endsWith(".csv")) {
+            recordFile = new CSVRecordFile(file);
+        } else if (file.getName().endsWith(".xlsx")) {
+            recordFile = new SpreadsheetRecordFile(file);
+        } else {
+            getLogger().addLine(Feedback.println(Feedback.WEB, String.format(
+                    "[ERROR] Unknown file format: %s", file.getName())));
+            return false;
+        }
+        
+        setRecordFile(recordFile);
+        return true;
     }
     
     public Object clone()throws CloneNotSupportedException {
@@ -181,6 +195,10 @@ public class DataFile implements Cloneable {
     
     public File getFile() {
         return file;
+    }
+    
+    public String getBaseName() {
+        return FilenameUtils.getBaseName(fileName);
     }
     
     public String getFileExtention() {

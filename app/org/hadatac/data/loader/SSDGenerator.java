@@ -20,8 +20,7 @@ public class SSDGenerator extends BaseGenerator {
 
     public SSDGenerator(DataFile dataFile) {
         super(dataFile);
-        String str = file.getFile().getName().replaceAll("SSD-", "");
-        this.SDDName = str.substring(0, str.lastIndexOf('.'));
+        this.SDDName = dataFile.getBaseName().replaceAll("SSD-", "");
         
         if (records.get(0) != null) {
             studyUri = URIUtils.replacePrefixEx(getUri(records.get(0)));

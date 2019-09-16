@@ -15,10 +15,11 @@ public class TimeInstantGenerator extends BaseGenerator {
     String study_id;
     String file_name;
     final String kbPrefix = ConfigProp.getKbPrefix();
+    
     public TimeInstantGenerator(DataFile dataFile) {
         super(dataFile);
-        file_name = file.getFile().getName();
-        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
+        file_name = dataFile.getFileName();
+        study_id = dataFile.getBaseName().replaceAll("SSD-", "");
         
         setStudyUri(URIUtils.replacePrefixEx(kbPrefix + "STD-" + study_id));
     }

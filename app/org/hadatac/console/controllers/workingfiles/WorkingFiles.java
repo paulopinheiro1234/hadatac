@@ -453,19 +453,13 @@ public class WorkingFiles extends Controller {
         DataFile dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
         
-        RecordFile recordFile = null;
-        if (dataFile.getFileName().endsWith(".csv")) {
-            recordFile = new CSVRecordFile(file);
-        } else if (dataFile.getFileName().endsWith(".xlsx")) {
-            recordFile = new SpreadsheetRecordFile(file);
-        }
-        
-        dataFile.setRecordFile(recordFile);
         dataFile.getLogger().resetLog();
         
-        GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
-        if (null != chain) {
-            chain.generate(false);
+        if (dataFile.attachFile(file)) {
+            GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
+            if (null != chain) {
+                chain.generate(false);
+            }
         }
         
         String strLog = dataFile.getLog();

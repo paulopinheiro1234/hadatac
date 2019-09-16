@@ -513,18 +513,10 @@ public class AutoAnnotator extends Controller {
     public static void deleteAddedTriples(File file, DataFile dataFile) {
         System.out.println("Deleting the added triples from the moving file ...");
 
-        RecordFile recordFile = null;
-        if (file.getName().endsWith(".csv")) {
-            recordFile = new CSVRecordFile(file);
-        } else if (file.getName().endsWith(".xlsx")) {
-            recordFile = new SpreadsheetRecordFile(file);
-        } else {
-            dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, String.format(
-                    "[ERROR] Unknown file format: %s", file.getName())));
+        if (!dataFile.attachFile(file)) {
             return;
-        }
-        
-        dataFile.setRecordFile(recordFile);
+        }        
+
         GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
         
         if (chain != null) {

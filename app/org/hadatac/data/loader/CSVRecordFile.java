@@ -74,7 +74,7 @@ public class CSVRecordFile implements RecordFile {
     }
     
     @Override
-    public String getFileName() {
+    public String getStorageFileName() {
         return file.getName();
     }
     

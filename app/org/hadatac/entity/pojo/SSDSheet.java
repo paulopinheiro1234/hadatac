@@ -17,20 +17,20 @@ public class SSDSheet {
 
     private Map<String, String> mapCatalog = new HashMap<String, String>();
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
-    private RecordFile ssdfile = null;
+    private DataFile ssdfile = null;
 
     public SSDSheet(DataFile dataFile) {
-        this.ssdfile = dataFile.getRecordFile();
+        this.ssdfile = dataFile;
         readCatalog(dataFile.getRecordFile());
         readContent(dataFile.getRecordFile());
     }
 
     public String getNameFromFileName() {
-        return (ssdfile.getFile().getName().split("\\.")[0]).replace("_", "-").replace("SSD-", "");
+        return ssdfile.getBaseName().replace("_", "-").replace("SSD-", "");
     }
 
     public String getFileName() {
-        return ssdfile.getFile().getName();
+        return ssdfile.getFileName();
     }
 
     public Map<String, String> getCatalog() {

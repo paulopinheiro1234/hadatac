@@ -152,7 +152,7 @@ public class SpreadsheetRecordFile implements RecordFile {
     }
     
     @Override
-    public String getFileName() {
+    public String getStorageFileName() {
         return fileName;
     }
 

@@ -31,8 +31,8 @@ public class SSDSampleMapper extends BaseGenerator {
     public SSDSampleMapper(DataFile dataFile) {
         super(dataFile);
         mapIdUriCache = getMapIdUri();
-        file_name = file.getFile().getName();
-        study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "").replaceAll(".csv", "");
+        file_name = dataFile.getFileName();
+        study_id = dataFile.getBaseName().replaceAll("SSD-", "");
     }
 
     @Override
