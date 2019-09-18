@@ -32,7 +32,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         this.SDDName = SDDName;
         this.mergedEA = merging.get(0);
         this.mergedAA = merging.get(1);
-        this.fileName = file.getFile().getName();
+        this.fileName = dataFile.getFileName();
         logger.println("[Merged Attributes] : " + mergedEA.keySet());
         logger.println("[Derived Attributes] : " + mergedAA.keySet());
 

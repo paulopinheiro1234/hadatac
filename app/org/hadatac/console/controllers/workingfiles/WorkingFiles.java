@@ -159,9 +159,14 @@ public class WorkingFiles extends Controller {
             return badRequest(renameFile.render(dir, dataFile));
         } else {
             String newFileName = Paths.get(data.getNewName()).getFileName().toString();
-            String newFilePath = Paths.get(Paths.get(dataFile.getAbsolutePath()).getParent().toString(), newFileName).toString();
             
+            String dirPath = Paths.get(dataFile.getAbsolutePath()).getParent().toString();
             File originalFile = new File(dataFile.getAbsolutePath());
+            
+            dataFile.setFileName(newFileName);
+            dataFile.save();
+            
+            String newFilePath = Paths.get(dirPath, dataFile.getStorageFileName()).toString();
             File newFile = new File(newFilePath);
             if (newFile.exists()) {
                 return badRequest("A file with the new name already exists in the current folder!");
@@ -169,9 +174,6 @@ public class WorkingFiles extends Controller {
                 try {
                     originalFile.renameTo(newFile);
                     originalFile.delete();
-                    
-                    dataFile.setFileName(newFileName);
-                    dataFile.save();
                     
                     logger.info("newFilePath: " + newFilePath);
                 } catch (Exception e) {
@@ -236,12 +238,13 @@ public class WorkingFiles extends Controller {
         	
             DataFile root = new DataFile("/");
             root.setStatus(DataFile.WORKING);
-        	String fileName = dataFile.getFileName();
         	String oldFilePath = dataFile.getAbsolutePath();
-            String newFilePath = Paths.get(root.getAbsolutePath(), destination, fileName).toString();
-            System.out.println("fileName " + fileName);
+            String newFilePath = Paths.get(root.getAbsolutePath(), destination, dataFile.getStorageFileName()).toString();
+            
+            System.out.println("fileName " + dataFile.getStorageFileName());
             System.out.println("oldFilePath " + oldFilePath);
             System.out.println("newFilePath " + newFilePath);
+            System.out.println("destination: " + destination);
 
             File originalFile = new File(oldFilePath);
             File newFile = new File(newFilePath);
@@ -252,7 +255,11 @@ public class WorkingFiles extends Controller {
                     originalFile.renameTo(newFile);
                     originalFile.delete();
                     
-                    dataFile.setFileName(fileName);
+                    if (destination.startsWith("/")) {
+                        dataFile.setDir(destination.substring(1));
+                    } else {
+                        dataFile.setDir(destination);
+                    }
                     dataFile.save();
                     
                     logger.info("newFilePath: " + newFilePath);
@@ -429,7 +436,7 @@ public class WorkingFiles extends Controller {
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getPureFileName()));
+        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getStorageFileName()));
         file.delete();
         
         dataFile.getLogger().resetLog();
@@ -446,22 +453,19 @@ public class WorkingFiles extends Controller {
         DataFile dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
         
-        RecordFile recordFile = null;
-        if (dataFile.getFileName().endsWith(".csv")) {
-            recordFile = new CSVRecordFile(file);
-        } else if (dataFile.getFileName().endsWith(".xlsx")) {
-            recordFile = new SpreadsheetRecordFile(file);
-        }
-        
-        dataFile.setRecordFile(recordFile);
         dataFile.getLogger().resetLog();
         
-        GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
-        if (null != chain) {
-            chain.generate(false);
+        if (dataFile.attachFile(file)) {
+            GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
+            if (null != chain) {
+                chain.generate(false);
+            }
         }
         
         String strLog = dataFile.getLog();
+        if (strLog.isEmpty()) {
+            strLog += "This file can be ingested without errors";
+        }
         
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
                 routes.WorkingFiles.index("/", ".").url()));
@@ -503,13 +507,21 @@ public class WorkingFiles extends Controller {
         }
 
         String fileName = path.getFileName().toString();
-        DataFile file = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
-        if (file != null && file.existsInFileSystem(ConfigProp.getPathWorking())) {
-            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
-        }
 
         if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathWorking())) {
-            DataFile.create(fileName, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
+            DataFile dataFile = DataFile.create(
+                    fileName, "", AuthApplication.getLocalUser(session()).getEmail(), 
+                    DataFile.WORKING);
+            
+            String originalPath = Paths.get(ConfigProp.getPathWorking(), dataFile.getPureFileName()).toString();
+            File file = new File(originalPath);
+            
+            String newPath = originalPath.replace(
+                    "/" + dataFile.getPureFileName(), 
+                    "/" + dataFile.getStorageFileName());
+            file.renameTo(new File(newPath));
+            file.delete();
+            
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

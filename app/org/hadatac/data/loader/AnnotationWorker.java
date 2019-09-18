@@ -106,6 +106,7 @@ public class AnnotationWorker {
         for (DataFile dataFile : unprocFiles) {
         	//System.out.println("Processing file: " + dataFile.getFileName());
             dataFile.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.getLogger().resetLog();
             dataFile.save();
 
             String fileName = dataFile.getFileName();
@@ -113,6 +114,7 @@ public class AnnotationWorker {
             // file is rejected if it already exists in the folder of processed files
             if (procFiles.contains(dataFile)) {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00002", fileName);
+                dataFile.freeze();
                 return;
             }
 
@@ -131,6 +133,7 @@ public class AnnotationWorker {
                 return;
             } else {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00003", fileName);
+                dataFile.freeze();
                 return;
             }
             
@@ -170,13 +173,10 @@ public class AnnotationWorker {
                 }
                 dataFile.save();
 
-                file.renameTo(new File(destFolder + "/" + fileName));
+                file.renameTo(new File(destFolder + "/" + dataFile.getStorageFileName()));
                 file.delete();
             } else {
-                // Freeze file
-                System.out.println("Freezed file " + dataFile.getFileName());
-                dataFile.setStatus(DataFile.FREEZED);
-                dataFile.save();
+                dataFile.freeze();
             }
         }
     }
@@ -189,7 +189,6 @@ public class AnnotationWorker {
     	//Move the file to the folder for processed files
         String new_path = ConfigProp.getPathMedia();
  
-        String fileName = dataFile.getFileName();
         File file = new File(dataFile.getAbsolutePath());
 
         File destFolder = new File(new_path);
@@ -203,7 +202,7 @@ public class AnnotationWorker {
         dataFile.setStudyUri("");
         dataFile.save();
 
-        file.renameTo(new File(destFolder + "/" + fileName));
+        file.renameTo(new File(destFolder + "/" + dataFile.getStorageFileName()));
         file.delete();
     }
     
@@ -212,7 +211,6 @@ public class AnnotationWorker {
         Record record = dataFile.getRecordFile().getRecords().get(0);
         String studyName = record.getValueByColumnName("Study ID");
         String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
-        String fileName = dataFile.getRecordFile().getFileName();
 
         dataFile.getLogger().println("Study ID found: " + studyName);
         dataFile.getLogger().println("Study URI found: " + studyUri);
@@ -571,7 +569,7 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSSDFile(DataFile dataFile) {
-        String studyId = dataFile.getRecordFile().getFileName().replaceAll("SSD-", "");
+        String studyId = dataFile.getBaseName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + studyId + "...");
 
         SSDSheet ssd = new SSDSheet(dataFile);

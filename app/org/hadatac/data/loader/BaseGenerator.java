@@ -52,7 +52,7 @@ public abstract class BaseGenerator {
         this.dataFile = dataFile;
         file = dataFile.getRecordFile();
         records = file.getRecords();
-        fileName = file.getFile().getName();
+        fileName = dataFile.getPureFileName();
         logger = dataFile.getLogger();
         
         initMapping();

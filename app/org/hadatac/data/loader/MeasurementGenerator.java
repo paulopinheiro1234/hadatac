@@ -78,7 +78,12 @@ public class MeasurementGenerator extends BaseGenerator {
         if (da.hasCellScope()) {
         	System.out.println("Measurement Generator: hasCellScope is TRUE");
         	cellScopeObject = StudyObject.find(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-        	cellScopeSOC = ObjectCollection.find(cellScopeObject.getIsMemberOf());
+        	System.out.println("StudyObject's URI: [" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + "]");
+        	if (cellScopeObject == null) {
+        		System.out.println("No scope object");
+        	} else {
+        		cellScopeSOC = ObjectCollection.find(cellScopeObject.getIsMemberOf());
+        	}
         } else {
         	System.out.println("Measurement Generator: hasCellScope is FALSE");
         	if (!dasoiGen.initiateCache(da.getStudyUri())) {

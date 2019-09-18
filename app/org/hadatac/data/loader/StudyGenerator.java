@@ -12,11 +12,11 @@ import org.hadatac.utils.Templates;
 public class StudyGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
-    String file_name;
+    String fileName;
 
     public StudyGenerator(DataFile dataFile) {
         super(dataFile);
-        this.file_name = file.getFile().getName();
+        this.fileName = dataFile.getFileName();
     }
 
     @Override

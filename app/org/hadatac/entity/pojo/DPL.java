@@ -9,16 +9,16 @@ import org.hadatac.data.loader.RecordFile;
 
 public class DPL {
 
-	private RecordFile dplfile = null;
+	private DataFile dplfile = null;
 	private Map<String, String> mapCatalog = new HashMap<String, String>();
 	
 	public DPL(DataFile dataFile) {
-		this.dplfile = dataFile.getRecordFile();
+		this.dplfile = dataFile;
 		readCatalog(dataFile.getRecordFile());
 	}
 	
 	public String getFileName() {
-	    return dplfile.getFile().getName();
+	    return dplfile.getFileName();
     }
 	
 	public Map<String, String> getCatalog() {
