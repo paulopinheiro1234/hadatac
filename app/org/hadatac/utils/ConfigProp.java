@@ -18,13 +18,15 @@ import com.typesafe.config.ConfigFactory;
 public class ConfigProp {
 
 	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
-	
+
 	public static final String GUI_CONFIG_FILE = "gui.config";
-	
+
 	public static final String LABKEY_CONFIG_FILE = "labkey.config";
-	
+
+   public static final String SEARCH_CONFIG_FILE = "search.config";
+
 	public static final String MEDIA_FOLDER = "media";
-	
+
 	private static Properties getProperties(String confFileName) {
 		Properties prop = new Properties();
 		try {
@@ -34,10 +36,10 @@ public class ConfigProp {
 		} catch (Exception e) {
 			return null;
 		}
-		
+
 		return prop;
 	}
-	
+
 	public static String getPropertyValue(String confFileName, String field) {
 		Properties prop = getProperties(confFileName);
 		if (null == prop) {
@@ -45,7 +47,7 @@ public class ConfigProp {
 		}
 		return prop.getProperty(field);
 	}
-	
+
 	public static void setPropertyValue(String confFileName, String field, String value) {
 		Properties prop = getProperties(confFileName);
 		if (null == prop) {
@@ -63,44 +65,44 @@ public class ConfigProp {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static String getBasePrefix() {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix");
 	}
-	
+
 	public static String getKbPrefix() {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix") + "-kb:";
 	}
-	
+
 	public static String getTemplateFileName() {
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "template_file_name");
 	}
-	
+
 	public static String getPathUnproc() {
 	    if (CollectionUtil.isSandboxMode()) {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + Sandbox.SUFFIX;
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
-	} 
-	
+	}
+
 	public static String getPathProc() {
 	    if (CollectionUtil.isSandboxMode()) {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + Sandbox.SUFFIX;
 	    }
 	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
 	}
-	
+
 	public static String getPathMedia() {
 	    return Paths.get(getPathProc(), "/" + MEDIA_FOLDER + "/").toString();
 	}
-	
+
 	public static String getPathDownload() {
 	    if (CollectionUtil.isSandboxMode()) {
 	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + Sandbox.SUFFIX;
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
 	}
-	
+
 	public static String getPathDataDictionary() {
         if (CollectionUtil.isSandboxMode()) {
             return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict") + Sandbox.SUFFIX;
@@ -114,50 +116,68 @@ public class ConfigProp {
 	    }
 		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working");
 	}
-	
+
 	public static String getDefaultOwnerEmail() {
         return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
     }
-	
+
 	public static String getFacetedDataUnit() {
         return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_unit");
     }
-	
+
 	public static String getFacetedDataTime() {
         return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_time");
     }
-	
+
 	public static String getFacetedDataSpace() {
         return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_space");
     }
-	
+
 	public static String getFacetedDataPlatform() {
         return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_platform");
     }
-	
+
 	public static String getLabKeySite() {
         return getPropertyValue(LABKEY_CONFIG_FILE, "site");
     }
-	
+
 	public static String getLabKeyProjectPath() {
         return "/" + getPropertyValue(LABKEY_CONFIG_FILE, "folder");
     }
-	
+
 	public static boolean getLabKeyLoginRequired() {
         String flag = getPropertyValue(LABKEY_CONFIG_FILE, "login_required");
-        
+
         if (flag.equalsIgnoreCase("true")) {
             return true;
         }
-        
+
         return false;
     }
-	
+
+    public static String getBioportalApiKey() {
+        return getPropertyValue(SEARCH_CONFIG_FILE, "bioportal_api_key");
+    }
+
+    public static boolean hasBioportalApiKey() {
+      String apikey = getBioportalApiKey();
+      if(apikey.isEmpty()){
+         return false;
+      }
+
+      if(apikey.length() != 36){
+         System.err.println("Bad Bioportal API key, please update search.config");
+         return false;
+      }
+
+      return true;
+    }
+
 	@SuppressWarnings("unchecked")
 	public static String toGuiJson() {
-    	
+
     	JSONArray gui = new JSONArray();
-	
+
     	gui.add(true);
     	gui.add(true);
     	gui.add(true);
@@ -176,8 +196,8 @@ public class ConfigProp {
     	} else {
     		gui.add(false);
     	}
-    	
+
     	return gui.toJSONString();
     }
-	
+
 }
