@@ -431,6 +431,7 @@
       $.size = file.size;
       // $.relativePath = file.relativePath || file.webkitRelativePath || $.fileName;
       $.relativePath = $.resumableObj.opts["resumableRelativePath"];
+      console.log("relativePath: " + $.relativePath);
       $.uniqueIdentifier = uniqueIdentifier;
       $._pause = false;
       $.container = '';
