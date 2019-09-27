@@ -481,8 +481,9 @@ public class WorkingFiles extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
-        if (ResumableUpload.uploadFileByChunking(request(), 
-                ConfigProp.getPathWorking())) {
+
+        String baseDir = Paths.get(ConfigProp.getPathWorking(), resumableRelativePath).toString();
+        if (ResumableUpload.uploadFileByChunking(request(), baseDir)) {
             //This Chunk has been Uploaded.
             return ok("Uploaded.");
         } else {
@@ -501,6 +502,7 @@ public class WorkingFiles extends Controller {
             String resumableFilename,
             String resumableRelativePath) {
 
+        String baseDir = Paths.get(ConfigProp.getPathWorking(), resumableRelativePath).toString();
         Path path = Paths.get(resumableFilename);
         if (path == null) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">Could not get file path!</a>");
@@ -508,12 +510,12 @@ public class WorkingFiles extends Controller {
 
         String fileName = path.getFileName().toString();
 
-        if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathWorking())) {
+        if (ResumableUpload.postUploadFileByChunking(request(), baseDir)) {
             DataFile dataFile = DataFile.create(
-                    fileName, "", AuthApplication.getLocalUser(session()).getEmail(), 
+                    fileName, resumableRelativePath, AuthApplication.getLocalUser(session()).getEmail(), 
                     DataFile.WORKING);
             
-            String originalPath = Paths.get(ConfigProp.getPathWorking(), dataFile.getPureFileName()).toString();
+            String originalPath = Paths.get(baseDir, dataFile.getPureFileName()).toString();
             File file = new File(originalPath);
             
             String newPath = originalPath.replace(

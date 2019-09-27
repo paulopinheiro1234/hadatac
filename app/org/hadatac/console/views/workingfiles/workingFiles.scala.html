@@ -57,6 +57,9 @@
     </div>
 
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadWorking.js")"></script>
+    <script>
+        r.opts["resumableRelativePath"] = "@dir";
+    </script>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
 
     <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
