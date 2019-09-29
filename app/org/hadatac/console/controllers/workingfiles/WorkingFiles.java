@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -400,6 +401,39 @@ public class WorkingFiles extends Controller {
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result deleteDataFiles(String dir) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        List<String> selectedFileIds = new LinkedList<String>();
+        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        if (name_map != null) {
+            List<String> keys = new ArrayList<String>(name_map.keySet());
+            selectedFileIds.addAll(keys);
+        }
+        System.out.println("selectedFileIds: " + selectedFileIds);
+        
+        for (String fileId : selectedFileIds) {
+        	DataFile dataFile = null;
+            if (user.isDataManager()) {
+                dataFile = DataFile.findById(fileId);
+            } else {
+                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+            }
+            
+            if (null == dataFile) {
+                return badRequest(String.format(
+                		"You do NOT have the permission to operate the file with id %s!", fileId));
+            }
+            
+            File file = new File(dataFile.getAbsolutePath());
+            file.delete();
+            dataFile.delete();
+        }
+
+        return redirect(routes.WorkingFiles.index(dir, "."));
+    }
+    
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());

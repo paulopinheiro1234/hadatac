@@ -189,8 +189,8 @@ public class DataAcquisitionSearch extends Controller {
         String email = getUserEmail();
 
         String facets = "";
-	String objectType = "";
-	String categoricalValues = "";
+        String objectType = "";
+        String categoricalValues = "";
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request().body().asFormUrlEncoded();
         if (name_map != null) {
@@ -202,10 +202,10 @@ public class DataAcquisitionSearch extends Controller {
         AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
 
         final String finalFacets = facets;
-	final String categoricalOption = categoricalValues;
+        final String categoricalOption = categoricalValues;
         CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByAlignment(
 	        results.getDocuments(), finalFacets, email, categoricalOption), 
-                ec.current());
+        		ec.current());
 
         try {
             Thread.sleep(2000);
