@@ -20,9 +20,7 @@ import play.libs.Json;
 
 public class DDEditor extends Controller {
    
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-
-    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))    
     public Result index(String fileId, boolean bSavable,String dir) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -57,6 +55,7 @@ public class DDEditor extends Controller {
         return index(fileId, bSavable,dir);
     }
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result fromSharedLink(String sharedId,String dir) {
         DataFile dataFile = DataFile.findBySharedId(sharedId);
         if (null == dataFile) {

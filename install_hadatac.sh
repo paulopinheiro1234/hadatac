@@ -75,14 +75,11 @@ echo "=== Downloading JTS Topology Suite 1.14..."
 wget -O $HADATAC_DOWNLOAD/jts-1.14.zip https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip
 
 echo "=== Uncompressing Apache Solr 6.5.0..."
-tar xfz $HADATAC_DOWNLOAD/solr-6.5.0.tgz -C $HADATAC_SOLR
+tar -xzf $HADATAC_DOWNLOAD/solr-6.5.0.tgz -C $HADATAC_SOLR
 wait $!
 echo "=== Uncompressing JTS Topology Suite 1.14..."
 unzip -o -qq $HADATAC_DOWNLOAD/jts-1.14.zip -d $HADATAC_DOWNLOAD/jts-1.14
 wait $!
-
-mv $HADATAC_SOLR/solr/* $HADATAC_SOLR
-rm -rf $HADATAC_SOLR/solr
 
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
 cat $HADATAC_SOLR/solr6.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
