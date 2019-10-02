@@ -82,7 +82,7 @@ public class UploadOntologyTest extends StepTest{
             ConfigFactory.load().getString("hadatac.solr.triplestore"),
             false);
 
-         System.out.println(metadata.loadOntologies(0, "confirmedCache"));
+         metadata.loadOntologies(0, "confirmedCache");
 
          //check result after upload ontology from cache
          String ab = ns.getAbbreviation();
@@ -180,8 +180,8 @@ public class UploadOntologyTest extends StepTest{
    }
 
    private void deleteNameSpace(NameSpace ns) throws IOException {
-      String url = "http://localhost:8080/blazegraph/namespace/store/sparql";
-      System.out.println(ns.getURL());
+      String url = ConfigFactory.load().getString("hadatac.solr.triplestore") + "/store/sparql";
+      // String url = "http://localhost:8080/blazegraph/namespace/store/sparql";
 		url += "?c=" + URLEncoder.encode("<" + ns.getURL() + ">", StandardCharsets.UTF_8.toString());
 
 		URL obj = new URL(url);
@@ -204,8 +204,5 @@ public class UploadOntologyTest extends StepTest{
 			response.append(inputLine);
 		}
 		in.close();
-
-		//print result
-		System.out.println(response.toString());
    }
 }

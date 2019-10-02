@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hadatac.entity.pojo.OperationMode;
+import com.typesafe.config.ConfigFactory;
 
 public class PreCheckTest extends StepTest{
 	private static final PreCheckTest test = new PreCheckTest();
@@ -31,10 +32,15 @@ public class PreCheckTest extends StepTest{
 
 	@Override
 	public void test() {
+      String triplestore = ConfigFactory.load().getString("hadatac.solr.triplestore");
+      String host = triplestore.split("//")[1].split(":")[0];
+      // String host = "localhost";
+      // int blazePort = 8080;
+      int blazePort = Integer.parseInt(triplestore.split("//")[1].split(":")[1].split("/")[0]);
+
 		String email = "userTest@test";
-		String host = "localhost";
 		int solrPort = 8983;
-		int blazePort = 8080;
+      System.out.println("Unable to detect blazegraph at " + host + ":" + blazePort);
 
 		//detect solr on localhost:8983
 		try {
