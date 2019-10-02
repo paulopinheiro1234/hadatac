@@ -27,7 +27,7 @@ if [ "$#" -gt 0 ]; then
 else
   read -r -p "Proceed with installation? [y/N] " response
   case $response in
-    [yY][eE][sS]|[yY]) 
+    [yY][eE][sS]|[yY])
         ;;
     *)
         exit
@@ -80,6 +80,9 @@ wait $!
 echo "=== Uncompressing JTS Topology Suite 1.14..."
 unzip -o -qq $HADATAC_DOWNLOAD/jts-1.14.zip -d $HADATAC_DOWNLOAD/jts-1.14
 wait $!
+
+mv $HADATAC_SOLR/solr/* $HADATAC_SOLR
+rm -rf $HADATAC_SOLR/solr
 
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
 cat $HADATAC_SOLR/solr6.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
