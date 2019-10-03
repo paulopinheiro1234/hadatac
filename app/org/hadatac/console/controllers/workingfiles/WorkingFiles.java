@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
@@ -210,8 +212,8 @@ public class WorkingFiles extends Controller {
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postMoveDataFile(String dir, String fileId) {
         return moveDataFile(dir, fileId);
-    } 
-
+    }
+    
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result processMoveDataFileForm(String dir, String fileId) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(session());
@@ -236,10 +238,10 @@ public class WorkingFiles extends Controller {
             return badRequest(moveFile.render(dir, dataFile, dirFile));
         } else {
             String destination = data.getNewDest();
-        	
+            
             DataFile root = new DataFile("/");
             root.setStatus(DataFile.WORKING);
-        	String oldFilePath = dataFile.getAbsolutePath();
+            String oldFilePath = dataFile.getAbsolutePath();
             String newFilePath = Paths.get(root.getAbsolutePath(), destination, dataFile.getStorageFileName()).toString();
             
             System.out.println("fileName " + dataFile.getStorageFileName());
@@ -270,6 +272,125 @@ public class WorkingFiles extends Controller {
             }
             
             return redirect(routes.WorkingFiles.index(dir, "."));
+        }
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result moveDataFiles(String dir) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        List<String> selectedFileIds = new ArrayList<String>();
+        String fileIdString = name_map.get("fileIds")[0];
+        if (fileIdString.length() > 0) {
+            for (String id : fileIdString.split(",")) {
+                selectedFileIds.add(id);
+            }
+        }
+        
+        List<DataFile> dataFiles = new ArrayList<DataFile>();
+        for (String fileId : selectedFileIds) {
+            DataFile dataFile = null;
+            if (user.isDataManager()) {
+                dataFile = DataFile.findById(fileId);
+            } else {
+                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+            }
+            
+            if (null == dataFile) {
+                return badRequest(String.format(
+                        "You do NOT have the permission to operate this file with id %s !", fileId));
+            }
+            
+            dataFiles.add(dataFile);
+        }
+        
+        DataFile dirFile = new DataFile(dir);
+        dirFile.setStatus(DataFile.WORKING);
+        
+        return ok(moveFiles.render(dir, dataFiles, dirFile));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postMoveDataFiles(String dir) {
+        return moveDataFiles(dir);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processMoveDataFilesForm(String dir) throws Exception {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        List<String> selectedFileIds = new ArrayList<String>();
+        String fileIdString = name_map.get("fileIds")[0];
+        if (fileIdString.length() > 0) {
+            for (String id : fileIdString.split(",")) {
+                selectedFileIds.add(id);
+            }
+        }
+        
+        for (String fileId : selectedFileIds) {
+            DataFile dataFile = null;
+            if (user.isDataManager()) {
+                dataFile = DataFile.findById(fileId);
+            } else {
+                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+            }
+            
+            if (null == dataFile) {
+                return badRequest(String.format(
+                        "You do NOT have the permission to operate this file with id %s !", fileId));
+            }
+            
+            Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+            NewFileForm data = form.get();
+
+            if (form.hasErrors()) {
+                return badRequest("THE FORM HAS ERRORS");
+            } else {
+                try {
+                    String destination = data.getNewDest();
+                    moveSingleDataFile(dataFile, destination);
+                } catch (Exception e) {
+                    return badRequest(e.getMessage());
+                }
+            }
+        }
+        
+        return redirect(routes.WorkingFiles.index(dir, "."));
+    }
+    
+    public void moveSingleDataFile(DataFile dataFile, String destination) throws Exception {
+        DataFile root = new DataFile("/");
+        root.setStatus(DataFile.WORKING);
+        String oldFilePath = dataFile.getAbsolutePath();
+        String newFilePath = Paths.get(root.getAbsolutePath(), destination, dataFile.getStorageFileName()).toString();
+        
+        System.out.println("fileName " + dataFile.getStorageFileName());
+        System.out.println("oldFilePath " + oldFilePath);
+        System.out.println("newFilePath " + newFilePath);
+        System.out.println("destination: " + destination);
+
+        File originalFile = new File(oldFilePath);
+        File newFile = new File(newFilePath);
+        if (newFile.exists()) {
+            throw new Exception("A file with the same name already exists in the destination folder!");
+        } else {
+            try {
+                originalFile.renameTo(newFile);
+                originalFile.delete();
+                
+                if (destination.startsWith("/")) {
+                    dataFile.setDir(destination.substring(1));
+                } else {
+                    dataFile.setDir(destination);
+                }
+                dataFile.save();
+                
+                logger.info("newFilePath: " + newFilePath);
+            } catch (Exception e) {
+                throw new Exception("Failed to move the file!");
+            }
         }
     }
     
@@ -405,14 +526,16 @@ public class WorkingFiles extends Controller {
     public Result deleteDataFiles(String dir) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
-        List<String> selectedFileIds = new LinkedList<String>();
         Map<String, String[]> name_map = request().body().asFormUrlEncoded();
-        if (name_map != null) {
-            List<String> keys = new ArrayList<String>(name_map.keySet());
-            selectedFileIds.addAll(keys);
+        List<String> selectedFileIds = new ArrayList<String>();
+        String fileIdString = name_map.get("fileIds")[0];
+        if (fileIdString.length() > 0) {
+            for (String id : fileIdString.split(",")) {
+                selectedFileIds.add(id);
+            }
         }
-        System.out.println("selectedFileIds: " + selectedFileIds);
         
+        System.out.println("selectedFileIds: " + selectedFileIds);
         for (String fileId : selectedFileIds) {
         	DataFile dataFile = null;
             if (user.isDataManager()) {
