@@ -23,8 +23,6 @@ public class ConfigProp {
 
 	public static final String LABKEY_CONFIG_FILE = "labkey.config";
 
-   public static final String SEARCH_CONFIG_FILE = "search.config";
-
 	public static final String MEDIA_FOLDER = "media";
 
 	private static Properties getProperties(String confFileName) {
@@ -156,7 +154,7 @@ public class ConfigProp {
     }
 
     public static String getBioportalApiKey() {
-        return getPropertyValue(SEARCH_CONFIG_FILE, "bioportal_api_key");
+        return ConfigFactory.load().getString("hadatac.search.bioportal_api_key");
     }
 
     public static boolean hasBioportalApiKey() {
@@ -166,7 +164,7 @@ public class ConfigProp {
       }
 
       if(apikey.length() != 36){
-         System.err.println("Bad Bioportal API key, please update search.config");
+         System.err.println("Bad Bioportal API key, please update hadatac.config");
          return false;
       }
 
