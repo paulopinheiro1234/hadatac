@@ -172,15 +172,14 @@ public class Downloader extends Controller {
             String facets, List<String> selectedFields, String ownerEmail) {
         Date date = new Date();
         String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
-        File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
 
-        DataFile dataFile = new DataFile(fileName);
-        dataFile.setOwnerEmail(ownerEmail);
-        dataFile.setStatus(DataFile.CREATING);
+        DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
         dataFile.save();
+        
+        File file = new File(dataFile.getAbsolutePath());
 
         Measurement.outputAsCSV(measurements, selectedFields, file, dataFile.getId());
         System.out.println("Generated CSV files ...");
@@ -194,15 +193,14 @@ public class Downloader extends Controller {
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
         String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
-        File file = new File(ConfigProp.getPathDownload() + "/" + fileName);
 
-        DataFile dataFile = new DataFile(fileName);
-        dataFile.setOwnerEmail(ownerEmail);
-        dataFile.setStatus(DataFile.CREATING);
+        DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
         System.out.println("Created download " + fileName);
+        
+        File file = new File(dataFile.getAbsolutePath());
 
         Measurement.outputAsCSVByAlignment(measurements, file, dataFile.getId(), categoricalOption);
         System.out.println("Generated CSV files ...");
