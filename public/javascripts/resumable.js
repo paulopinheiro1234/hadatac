@@ -429,7 +429,9 @@
       $.file = file;
       $.fileName = file.fileName||file.name; // Some confusion in different versions of Firefox
       $.size = file.size;
-      $.relativePath = file.relativePath || file.webkitRelativePath || $.fileName;
+      // $.relativePath = file.relativePath || file.webkitRelativePath || $.fileName;
+      $.relativePath = $.resumableObj.opts["resumableRelativePath"];
+      console.log("relativePath: " + $.relativePath);
       $.uniqueIdentifier = uniqueIdentifier;
       $._pause = false;
       $.container = '';

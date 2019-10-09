@@ -68,6 +68,7 @@ public class ResumableUpload {
         String resumableRelativePath = request.getQueryString("resumableRelativePath");
 
         // Here we add a ".temp" to every upload file to indicate NON-FINISHED
+        System.out.println("base_dir: " + base_dir);
         File folder = new File(base_dir);
         if (!folder.exists()) {
             folder.mkdirs();

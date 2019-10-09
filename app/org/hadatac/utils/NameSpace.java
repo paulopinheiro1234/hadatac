@@ -122,8 +122,7 @@ public class NameSpace {
             setNumberOfLoadedTriples(Integer.valueOf(soln.getLiteral("tot").getValue().toString()).intValue());
             save();
         } catch (Exception e) {
-            System.out.println("Error in updateLoadedTripleSize()");
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
