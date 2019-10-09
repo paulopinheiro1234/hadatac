@@ -648,6 +648,7 @@ public class StudyObject extends HADatAcThing {
                         && soln.get("scopeUri") != null) {
                     String key = soln.get("socUri").toString() + ":" + soln.get("scopeUri").toString();
                     cache.put(key, soln.get("objUri").toString());
+                    //System.out.println("buildCachedUriBySocAndScopeUri: [" + key + "][" + soln.get("objUri") + "]");
                 }
             }
         }
@@ -704,6 +705,7 @@ public class StudyObject extends HADatAcThing {
                         && soln.get("objUri") != null) {
                     String key = soln.get("socUri").toString() + ":" + soln.get("objUri").toString();
                     cache.put(key, soln.get("scopeUri").toString());
+                    //System.out.println("buildCachedScopeBySocAndObjectUri: [" + key + "][" + soln.get("scopeUri") + "]");
                 }
             }
         }
