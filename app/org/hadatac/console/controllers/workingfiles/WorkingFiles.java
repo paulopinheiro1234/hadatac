@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.workingfiles;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -588,19 +589,25 @@ public class WorkingFiles extends Controller {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
         
+        DataFile newDataFile = DataFile.create(
+                dataFile.getFileName(), "", dataFile.getOwnerEmail(), DataFile.UNPROCESSED);
+        newDataFile.getLogger().resetLog();
+        newDataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        newDataFile.save();
+        
+        // Send a copy of file to the auto-annotator
         File file = new File(dataFile.getAbsolutePath());
+        File newFile = new File(newDataFile.getAbsolutePath());
         File destFolder = new File(ConfigProp.getPathUnproc());
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getStorageFileName()));
-        file.delete();
         
-        dataFile.getLogger().resetLog();
-        dataFile.setDir("");
-        dataFile.setStatus(DataFile.UNPROCESSED);
-        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-        dataFile.save();
+        try {
+            Files.copy(file, newFile);
+        } catch (IOException e) {
+            System.out.println("Failed to copy the file at " + dataFile.getAbsolutePath());
+        }
         
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", "."));
     }

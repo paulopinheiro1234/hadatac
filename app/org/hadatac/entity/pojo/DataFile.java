@@ -161,7 +161,7 @@ public class DataFile implements Cloneable {
         } else if (getStatus().equals(WORKING)) {
             return Paths.get(ConfigProp.getPathWorking(), getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(CREATED, CREATING, DELETED).contains(getStatus())) {
-            return Paths.get(ConfigProp.getPathDownload(), getDir(), getStorageFileName()).toString();
+            return Paths.get(ConfigProp.getPathDownload(), getDir(), getFileName()).toString();
         } else if (Arrays.asList(DD_UNPROCESSED, DD_PROCESSED, DD_FREEZED).contains(getStatus())) {
             return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getStorageFileName()).toString();
         }

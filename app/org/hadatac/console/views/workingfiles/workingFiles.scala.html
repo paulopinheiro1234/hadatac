@@ -60,10 +60,12 @@
     <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
 
     <form id="fileListForm" method="post">
-    <label><input type="checkbox" id="select_all"> Select All</label>
-    <button class="btn btn-primary btn-sm" id="move_selection" style="display:none;">Move Selection</button>
-    <button class="btn btn-primary btn-sm" id="delete_selection" style="display:none;">Delete Selection</button>
-    <!-- <button class="btn btn-primary btn-sm" id="download_selection" role="button" style="display:none;">Download Selection</button> -->
+    @if(!workingFiles.isEmpty()) {
+        <label><input type="checkbox" id="select_all"> Select All</label>
+        <button class="btn btn-primary btn-sm" id="move_selection" style="display:none;">Move Selection</button>
+        <button class="btn btn-primary btn-sm" id="delete_selection" style="display:none;" onclick="return confirm('Are you sure to delete?')">Delete Selection</button>
+        <!-- <button class="btn btn-primary btn-sm" id="download_selection" role="button" style="display:none;">Download Selection</button> -->   
+    }
  	<table class="table">
     <thead>
          <tr>
