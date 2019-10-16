@@ -55,17 +55,32 @@ function prehttp(termToSearch){
     var resultsArray=[];
     var client = new HttpClient();
     var theUrl;
+    var bioportal_key="";
     console.log(numToPage)
+    $.ajax({
+        type : 'GET',
+        url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getBioportalKey',
+        data : {
+           //editValue: changeValue
+        },
+        success : function(data) {
+          bioportal_key=data;
+    
+        }
+      });
+    
+    console.log
     if(numToPage=="All"){
-        theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey=3b6101b1-fc1a-45c2-a8a6-136a04f228c5";
+        theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key;
     }
     else if(numToPage==null){
         numToPage=5;
-        theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey=3b6101b1-fc1a-45c2-a8a6-136a04f228c5&pagesize="+numToPage
+        theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key+"&pagesize="+numToPage
     }
     else{
-        theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey=3b6101b1-fc1a-45c2-a8a6-136a04f228c5&pagesize="+numToPage;
+        theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key+"&pagesize="+numToPage;
     }
+    
     //var theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey=3b6101b1-fc1a-45c2-a8a6-136a04f228c5&pagesize=5";
     client.get(theUrl, function(response) {
         
