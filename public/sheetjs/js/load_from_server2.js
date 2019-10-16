@@ -136,49 +136,101 @@ function drawStars(rowIndex,colIndex){
 }
 
 function stripStars(){
-  console.log(copyOfL,copyOfR);
+  
   //str.replace('a', '');
   checkRecs(copyOfL,copyOfR,0);
 }
 
 
+// $.ajax({
+//     type : 'GET',
+//     url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+//     data : {
+//       //  s: str
+//     },
+//     success : function(data) {
+
+
+
+//       var select=document.getElementById("seecart"),data;
+//       for(var i=0;i<data.length;i++){
+//           var li = document.createElement("li");
+//           li.appendChild(document.createTextNode(data[i]+" "));
+//           li.setAttribute("class","inCart");
+//           select.appendChild(li);
+//           li.addEventListener("click",function(e){
+
+//             var newOntology=e.target.innerHTML.split(",")[1];
+//             // //addFromCart(newOntology);
+//             //alert(newOntology);
+
+//             cdg.data[rowNum][colNum]=newOntology;
+//             var colNum_str=colNum.toString();
+//             var rowNum_str=rowNum.toString();
+//             storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
+//             cdg.draw();
+//           })
+
+//         }
+//       }
+
+
+
+
+// });
+addcartlocal()
+function addcartlocal(){
+  clearCart();
 $.ajax({
-    type : 'GET',
-    url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
-    data : {
-      //  s: str
-    },
-    success : function(data) {
+  type : 'GET',
+  url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+  data : {
+    //  s: str
+  },
+  success : function(data) {
 
 
 
-      var select=document.getElementById("seecart"),data;
-      for(var i=0;i<data.length;i++){
-          var li = document.createElement("li");
-          li.appendChild(document.createTextNode(data[i]+" "));
-          li.setAttribute("class","inCart");
-          select.appendChild(li);
-          li.addEventListener("click",function(e){
+    var select=document.getElementById("seecart"),data;
+    for(var i=0;i<data.length;i++){
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(data[i]+" "));
+        li.setAttribute("class","inCart");
+        select.appendChild(li);
+        li.addEventListener("click",function(e){
 
-            var newOntology=e.target.innerHTML.split(",")[1];
-            // //addFromCart(newOntology);
-            //alert(newOntology);
+          var newOntology=e.target.innerHTML;
+          console.log(newOntology);
+          // //addFromCart(newOntology);
+          //alert(newOntology);
 
-            cdg.data[rowNum][colNum]=newOntology;
-            var colNum_str=colNum.toString();
-            var rowNum_str=rowNum.toString();
-            storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
-            cdg.draw();
-          })
+           cdg.data[rowNum][colNum]=newOntology;
+          var colNum_str=colNum.toString();
+          var rowNum_str=rowNum.toString();
+          storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
+          cdg.draw();
+        })
+        li.addEventListener("onmouseover",function(e){
+          console.log("hi")
+          li.setAttribute("style", "background-color:green;")
+        })
 
-        }
       }
+    }
 
 
 
 
 });
+}
+function clearCart(){
+  var ul = document.querySelector('.cart-content');
+  var listLength = ul.children.length;
 
+  for (i = 1; i < listLength; i++) {
+    ul.removeChild(ul.children[0]);
+  }
+}
 function storeThisEdit(rowNum_str,colNum_str,changeValue){
   $.ajax({
     type : 'GET',
