@@ -183,7 +183,7 @@ function addcartlocal(){
   clearCart();
 $.ajax({
   type : 'GET',
-  url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+  url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
   data : {
     //  s: str
   },
