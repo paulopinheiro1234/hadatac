@@ -16,7 +16,7 @@
 }
 #effect{
   top:200px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size:14pt;
 }
 #hide{
@@ -37,6 +37,7 @@
   display: none;
   top: 200px;
   left:1000px;
+
 }
 
 .Close {
@@ -225,7 +226,7 @@ ul {
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 12pt;
+  font-size: 10pt;
   left: 0;
   width:150px;
 }
@@ -242,6 +243,7 @@ ul {
   padding: 5px 8px;
   text-decoration: none;
   display: block;
+  background-color: aliceblue;
 
 
 }
@@ -256,8 +258,8 @@ background-color:lightgrey;
   color: red;
   font-family: Arial, Helvetica, sans-serif;
 }
-.inCart :hover,dropbtn:focus{
-  background-color:blue;
+.inCart a:hover{
+  background-color:aliceblue;
 }
 /*-----------------------------------------------------*/
 .recommended{
@@ -307,3 +309,95 @@ display:inline-block;
   position:relative;
   display:inline-block;
   }
+/*===========================================================*/
+
+
+.searchResults{
+  max-width: 100pt;
+  font-size: 8pt;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 4px;
+  display:none;
+  overflow: scroll;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  word-wrap: break-word
+}
+#displaySearchResults{
+display:none;
+}
+/* #listeningTable{
+  display: none;
+} */
+#pagekey{
+  display:none;
+}
+/* #btn_prev{
+  display:none;
+}
+#btn_next{
+  display:none;
+} */
+
+#returnView{
+  display:none;
+  background-color: cornflowerblue;
+  color:white;
+  justify-content: center;
+  
+}
+
+.input-container{
+  width:250px;
+  border: 1px solid #a9a9a9;
+  float: left;
+}
+.input-container input:focus, .input-container input:active {
+  outline: none;
+}
+.input-container input {
+  width: 80%;
+  float: left;
+  border: none;
+}
+
+.input-container button {
+  float: right;
+  background-color: lightsteelblue;
+}
+.custom-cm{
+  background-color: lightgrey;
+  border:1px solid black;
+  box-shadow:1px 1px 5px rgba(0,0,0,1);
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  font-weight: bold;
+  padding:5px;
+  width:150px;
+  display:none;
+  position: fixed;
+  z-index: 999999;
+  margin-top:0px;
+
+}
+.custom-cm__item{
+  cursor: pointer;
+  padding: 3px 3px;
+}
+.custom-cm__item:hover{
+  background-color: rgb(175, 159, 159);
+}
+
+
+* {
+  box-sizing: border-box;
+  }
+ul {
+list-style-type: none;
+padding: 0;
+margin: 0;
+}
+ul li {
+display: block;
+position: relative;
+}

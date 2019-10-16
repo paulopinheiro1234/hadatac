@@ -64,7 +64,8 @@ function hideView(){
   $("#hide").css('display','none');
   $(".mobile-nav").fadeOut(50);
   $("#show").show();
-  _resize();
+  cdg.style.height = (window.innerHeight - 300) + "px";
+  cdg.style.width = (window.innerWidth - 100) + "px";
 
 }
 
@@ -90,14 +91,31 @@ var make_buttons = function(sheetnames, cb) {
   buttons.innerHTML = "";
   sheetnames.forEach(function(s,idx) {
     var btn = document.createElement('button');
-    btn.style.height='35px';
-    btn.style.padding='5px 5px 5px 5px';
+    btn.style.height='40px';
+    
+    btn.style.display="inline-block";
+    btn.style.padding="3px 3px 3px 3px"
+    btn.style.fontSize='9pt';
+    btn.style.fontFamily= 'Arial, Helvetica, sans-serif';
+    btn.style.border="border:1px solid black";
+    btn.style.marginTop="0px";
+    btn.style.backgroundColor="lightgrey";
+    btn.style.textAlign="center";
     btn.type = 'button';
     btn.name = 'btn' + idx;
-    btn.text = s;
-    var txt = document.createElement('h5');
-    txt.innerText = s;
-    btn.appendChild(txt);
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext("2d");
+    ctx.font = "9pt Arial";        
+    var width = ctx.measureText(s).width;
+    width+=10;
+    btn.style.width=width;
+    // if(s=="Dictionary Mapping Summary"){
+    //   btn.style.width='120px';
+    // }
+    btn.innerHTML = s;
+    // var txt = document.createElement('h6');
+    // txt.innerText = s;
+    // btn.appendChild(txt);
 
     btn.addEventListener('click', function() {
       sheetName=s;
@@ -222,7 +240,7 @@ cdg.addEventListener('endedit',function(e){
 
 cdg.addEventListener('click', function (e) {
   if (!e.cell) { return; }
-  if(e.cell.value==null){return;}
+  if(e.cell.value==null){console.log("non");return;}
   else{
     colNum=e.cell.columnIndex;
     rowNum=e.cell.rowIndex;
@@ -377,7 +395,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   /* set up table headers */
   if(headerMap.has(sheetName)){
     cdg.data = json;
-    console.log(headerMap.get(sheetName));
+    
     changeHeader(headerMap.get(sheetName),1);
     for(var i=0;i<cdg.data.length;i++){
       R++;
@@ -396,7 +414,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       for(var i=0;i<cdg.data.length;i++){
         R++;
         checkRecs(L,R,1);
-        console.log(L,R);
+        
       }
     }
     changeHeader(json[0], emptySheet);
@@ -746,7 +764,7 @@ function DDforPopulate(durl,headersheet,headercol){
 
       var first_sheet_name = headersheet;
       /* Get worksheet */
-      console.log(first_sheet_name);
+     
       var worksheet = workbook.Sheets[first_sheet_name];
       var xlarray=XLSX.utils.sheet_to_json(worksheet, {
           raw: true
@@ -759,7 +777,7 @@ function DDforPopulate(durl,headersheet,headercol){
         }
       });
     });
-    console.log(sheetName,headersheet);
+    
 
     if("Dictionary Mapping"==sheetName){
 
@@ -788,3 +806,4 @@ function populateThis(headersCol){
   }
 
 }
+

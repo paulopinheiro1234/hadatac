@@ -34,7 +34,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
       <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
 
-      <button class="btn btn-primary" type="button"role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
+      <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
 
       <script>
 
@@ -78,15 +78,18 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
       </script>
       <div class="undo-edit">
-         <button class="undo-button" onclick="undoEdit()"> <img src="https://cdn1.iconfinder.com/data/icons/navigation-elements/512/left-rotate-back-motion-arrow-512.png" width="28" height="33" alt=""/> </button>
+            
+         <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="undoEdit()">
+               <span class="glyphicon glyphicon-circle-arrow-left">   </span> Undo </button>
       </div>
       <div class="undo-edit">
-         <button class="undo-button" onclick="reundoEdit()"> <img src="https://cdn4.iconfinder.com/data/icons/arrows-2-11/48/120-512.png" width="24" height="26" alt=""/> </button>
+         <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="reundoEdit()">
+               <span class="glyphicon glyphicon-circle-arrow-right"> </span> Redo </button>
       </div>
       <div class= shopbutton>
          <button class="cart" >
 
-            <img src="http://www.sclance.com/pngs/shop-png/shop_png_1237358.png" width="45" height="35" alt=""/>Shop Terms</button>
+               <img src="@controllers.routes.Assets.versioned("icons/shop.png")" width="40" height="32" alt=""/> Shop Terms</button>
 
             <ul id="myDropdown" class="ontologydrop-content">
 
@@ -114,10 +117,10 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                }
             });
          </script>
-         <div class="cartbutton" id="viewcart">
+         <div class="cartbutton" id="f">
             <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; position: relative;"  >
 
-               <img src="https://cdn4.iconfinder.com/data/icons/adiante-apps-app-templates-incos-in-grey/512/app_type_shop_512px_GREY.png" width="35" height="32" alt=""/>
+               <img src="@controllers.routes.Assets.versioned("icons/shopping-cart.png")" width="38" height="30" alt=""/>
                View Cart
             </button>
             <ul id="seecart" class="cart-content">
@@ -125,22 +128,23 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             </ul>
          </div>
 
-         <button class="main-nav" id="show"><img src=" https://cdn3.iconfinder.com/data/icons/eye-and-view/100/eye_view_vision-07-512.png "
+         <button class="main-nav" id="show"> <img src="@controllers.routes.Assets.versioned("icons/open-eye.png")"
             width="36" height="33" alt=""/> Show Options</button>
-            <button class="Close" id="hide"><img src=" https://cdn0.iconfinder.com/data/icons/security-line/100/eye_closed-512.png "
+            <button class="Close" id="hide"> <img src="@controllers.routes.Assets.versioned("icons/closed-eye.png")"
                width="36" height="33" alt=""/> Hide Options</button>
 
                <div class="mobile-nav">
+                    <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
                   <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
-                     <img src="https://clipart.wpblink.com/sites/default/files/wallpaper/bulb-clipart/451480/bulb-clipart-lightbulb-moment-451480-3674232.png"
+                     <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
                      width="36" height="30" alt=""/> Recommended Terms</button>
                      <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
                         <option value="Choose from Below">Choose from Below</option>
                      </select>
 
                      <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
-                        <img src="http://www.transparentpng.com/thumb/virtual-reality/virtual-reality-free-download-10.png"
-                        width="36" height="32" alt=""/> Recommended Columns</button>
+                        <img src="@controllers.routes.Assets.versioned("icons/vr-icon.png")"
+                        width="40" height="32" alt=""/>Recommended Columns</button>
                         <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
                            <option value="Choose from Below">Choose from Below</option>
                         </select>
@@ -149,23 +153,52 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                            <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
                            <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
                            <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
-                           <button class="undo-remove-row" onclick="revertRow()"><img src="https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png" width="15" height="18" alt=""/> </button>
+                           <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
                         </div>
                         <div id="verifysdd" >
-                           <button onclick="verifySDD()" style="display: block; margin: 0 auto; margin-top: 3pt;background-color: cornflowerblue; color:white">Verify</button>
+                           <button onclick="verifySDD()" style="display: block; margin: 0 auto; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify</button>
                         </div>
-                        <div id="irifound" >
+                        <div id="irifound">
+
 
                         </div>
-                        <div id="irinotfound" >
+                        <div id="searchForTerm" class="input-container">
+                           <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
+                           <button type="button"  role="button" id="searchOnt" class="input-button" >
+                              <span class="glyphicon glyphicon-search">   </span> 
+                          </button>
+                          </div>
 
+                           <select id="numToSearch" onchange="showTop()" style="font-size:20px;">
+                              <option value="5" selected="selected">5</option>
+                              <option value="10">10</option>
+                              <option value="50">50</option>
+                              <option value="All">All</option>
+                          </select>
+                           
+                          
+                        
+                        <div id="numberResults"></div>
+                        
+                        <div id="listingTable">
+                          
+                        </div>
+                        
+                        <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
+                        <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+                        <a href="javascript:nextPage()" id="btn_next">Next</a>
+                        page:<span id="page"></span>
                         </div>
 
                      </div>
-
+                     <ul class="custom-cm">
+                        <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height="20px"/> Add to Cart</a> </li>
+                        <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
+      
+                    </ul>
 
                      <div class="text-area">
-                        Cell Value: <input type="text" id="cellText" value=""/>
+                        Cell Value: <input type="text" style="width:450px" id="cellText" value=""/>
 
                         <div id="suggestion-box" style="float: right;">
                            Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
@@ -174,7 +207,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      </div>
 
                      <div class="text-area2">
-                        Description: <input type="text" id="varDescription" value="" input disabled="disabled"/>
+                        Description : <input type="text" id="varDescription" style="width:450px" value="" input disabled="disabled"/>
                      </div>
 
 
@@ -193,6 +226,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/searchTerm.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
                   <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
 
