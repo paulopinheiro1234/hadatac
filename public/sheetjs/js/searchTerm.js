@@ -69,7 +69,7 @@ function prehttp(termToSearch){
         }
       });
     
-    console.log
+
     if(numToPage=="All"){
         theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key;
     }
