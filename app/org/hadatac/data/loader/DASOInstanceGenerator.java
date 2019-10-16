@@ -45,9 +45,12 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private Map<String, ObjectCollection> requiredSocs = new ConcurrentHashMap<String, ObjectCollection>();  
     private List<ObjectCollection> socsList = null;  
     private List<ObjectCollection> groundingPath = new ArrayList<ObjectCollection>();  
+    private List<ObjectCollection> reverseGroundingPath;
+    private List<String> groundingPathUris = new ArrayList<String>();
     private Map<String, List<ObjectCollection>> socPaths = new HashMap<String, List<ObjectCollection>>(); 
     private Map<String, String> socLabels = new ConcurrentHashMap<String, String>();
     private Map<String, ObjectCollection> socMatchingSOCs = new ConcurrentHashMap<String, ObjectCollection>();
+//    private Map<String, String > groundingIds = new ArrayList<String>();
     
     public DASOInstanceGenerator(DataFile dataFile, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
         super(dataFile);
@@ -176,6 +179,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         logger.println("DASOInstanceGenerator: (2/10) ============= MAIN DASO ================");
         logger.println("DASOInstanceGenerator: Main DASO: " + mainDasoUri);
         logger.println("DASOInstanceGenerator: Main SOC: " + mainSocUri);
+        groundingPathUris.clear();
         
         return true;
     }
@@ -192,6 +196,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         } else {
             logger.println("DASOInstanceGenerator: Main SOC is not grounded. Computing grouding path");
             ObjectCollection currentSoc = mainSoc;
+            groundingPath.add(mainSoc);
             while (currentSoc.getHasScopeUri() != null && !currentSoc.getHasScopeUri().equals("") && !containsUri(currentSoc.getHasScopeUri(), groundingPath)) {
 
                 ObjectCollection nextSoc = ObjectCollection.find(currentSoc.getHasScopeUri());
@@ -205,8 +210,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
                     currentSoc = nextSoc;
                 }
             }
+            int i = 0;
             for (ObjectCollection soc : groundingPath) {
-                logger.println("DASOInstanceGenerator: SOC in grouding path: " + soc.getUri());
+                logger.println("DASOInstanceGenerator: SOC in grouding path: " + soc.getUri() + " at index " + i++);
+                groundingPathUris.add(soc.getUri());
+            }
+            i = 0;
+            for (String socUri : groundingPathUris) {
+                logger.println("DASOInstanceGenerator: SOCURI in grouding path: " + socUri + " at index " + i++);
             }
         }
         
@@ -313,26 +324,77 @@ public class DASOInstanceGenerator extends BaseGenerator {
             List<ObjectCollection> socs = new ArrayList<ObjectCollection>();
             logger.println("DASOInstanceGenerator: START: " + soc.getUri());
             logger.println("DASOInstanceGenerator: PATH ---->> ");
-            if (soc.getHasScope() == null) {
+            if (groundingPathUris.contains(soc.getUri())) {
+                //logger.println("DASOInstanceGenerator:       " + soc.getUri() + " (in grounding path)");
+            	String socAux = null;
+            	boolean start = false;
+    			logger.println("DASOInstanceGenerator:       DBG: grounding path size = " + groundingPathUris.size());
+            	for (int index = groundingPathUris.size() - 1; index >= 0; index--) {
+            		socAux = groundingPathUris.get(index);
+            		if (socAux.equals(soc.getUri())) {
+            			start = true;
+            		}
+            		if (start) {
+            			logger.println("DASOInstanceGenerator:       " + socAux + " (in grounding path)");
+            			if (groundingPath.get(index) == null || !groundingPath.get(index).getUri().equals(socAux)) {
+                            logger.println("DASOInstanceGenerator:       ERROR: Could not find SOC for " + socAux);
+            			} else {
+            				socs.add(groundingPath.get(index));
+            			}
+            		}
+        			logger.println("DASOInstanceGenerator:       DBG: " + socAux + " (" + index + ")  start (" + start + ")");
+            	}
+            } else if (soc.getHasScope() == null) {
                 logger.println("DASOInstanceGenerator:       " + soc.getUri());
                 socs.add(soc);
-                socPaths.put(key,socs);
             } else {
                 String toUri = soc.getHasScope().getUri();
                 ObjectCollection nextTarget = soc;
                 logger.println("DASOInstanceGenerator:       " + nextTarget.getUri());
                 socs.add(nextTarget);
-                while (!nextTarget.getUri().equals(mainSocUri)) {
+                while (nextTarget != null && !nextTarget.getUri().equals(mainSocUri)) {
                     String nextTargetUri = nextTarget.getHasScopeUri();
                     nextTarget =  requiredSocs.get(nextTargetUri);
-                    if (nextTarget == null) {
-                        logger.printException("DASOInstanceGenerator: Could not complete path for " + toUri);
-                        return false;
+                    if (nextTarget != null) {
+                    	logger.println("DASOInstanceGenerator:       " + nextTarget.getUri());
+                    	socs.add(nextTarget);
                     }
-                    logger.println("DASOInstanceGenerator:       " + nextTarget.getUri());
-                    socs.add(nextTarget);
                 }
-                socPaths.put(key,socs);
+                if (nextTarget == null) {
+                	reverseGroundingPath = new ArrayList<ObjectCollection>(); 
+                	//reverseGroundingPath.add(mainSoc);
+                	boolean validPath = false;
+                	for (ObjectCollection socTmp : groundingPath) {
+                		if (socTmp.getUri().equals(toUri)) {
+                			validPath = true;
+                			break;
+                		}
+                		reverseGroundingPath.add(socTmp);
+                	}
+                	if (!validPath) {
+                    	logger.printException("DASOInstanceGenerator: Could not complete path for " + toUri);
+                    	return false;
+                	}
+                	ObjectCollection socTmp2 = null;
+                	if (reverseGroundingPath.size() > 0) {
+                		for (int index = reverseGroundingPath.size() - 1; index >= 0; index--) {
+                			socTmp2 = reverseGroundingPath.get(index);
+                        	logger.println("DASOInstanceGenerator:       " + socTmp2.getUri());
+                        	socs.add(socTmp2);
+                		}
+                	}
+                }
+            } 
+            socPaths.put(key,socs);
+        }
+        for (Map.Entry<String, List<ObjectCollection>> entry : socPaths.entrySet()) {
+            String key = entry.getKey();
+            List<ObjectCollection> path = entry.getValue();
+            List<ObjectCollection> socs = new ArrayList<ObjectCollection>();
+            logger.println("DASOInstanceGenerator: DEBUG START: " + key);
+            logger.println("DASOInstanceGenerator:    DEBUG PATH ---->> ");
+            for (ObjectCollection socTmp : path) {
+                logger.println("DASOInstanceGenerator:    DEBUG ELEMENT:  " + socTmp.getUri());
             } 
         }
         
@@ -634,6 +696,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
                     " and if the corresponding label in ths file is a valid identifier.");
             return null;
         }
+        
         if (DEBUG_MODE) { 
         	System.out.println("DASOInstanceGenerator: generate row instances for : " + id);
         }
@@ -658,26 +721,38 @@ public class DASOInstanceGenerator extends BaseGenerator {
             	System.out.println("DASOInstanceGenerator:     PATH >>> ");
             }
 
-            // Lookup first study object
-            ObjectCollection currentSoc = iter.previous();
-            String currentObjUri = getCachedObjectBySocAndOriginalId(currentSoc.getUri(), id); 
-            if (DEBUG_MODE) { 
-            	System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
-            }
+        	// Lookup first study object
+        	ObjectCollection currentSoc = iter.previous();
+        	String currentObjUri = getCachedObjectBySocAndOriginalId(currentSoc.getUri(), id); 
+        	if (DEBUG_MODE) { 
+        		System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
+        	}
 
+        	/* 
+             *   Test if there is Grounding Path. If so, replace ID of a main SOC's object by the ID of 
+             *   the corresponding grounding scope object of the main SOC's object
+             */
+        	boolean hasGrounding = groundingPath.size() > 0;
+        	
             ObjectCollection previousSoc = null;
             String previousObjUri = null;
             while (currentObjUri != null && !currentObjUri.equals("") && iter.hasPrevious()) {
                 ObjectCollection nextSoc = iter.previous();
                 if (DEBUG_MODE) { 
-                	System.out.println("            " + nextSoc.getUri() + "  ");
+                	System.out.println("           Next SOC : [" + nextSoc.getUri() + "]    Current Obj URI : [" + currentObjUri + "]");
                 }
 
                 /*
                  *   RETRIEVE/CREATE next object in the path
                  */
 
-                String nextObjUri = getCachedSocAndScopeUri(nextSoc.getUri(), currentObjUri); 
+                String nextObjUri = null;
+                if (hasGrounding) {
+                	nextObjUri = getCachedScopeBySocAndObjectUri(nextSoc.getUri(), currentObjUri); 
+                } else {
+                	nextObjUri = getCachedSocAndScopeUri(nextSoc.getUri(), currentObjUri); 
+                }
+                
                 if (nextObjUri == null || nextObjUri.equals("")) {
                     nextObjUri = createStudyObject(nextSoc, currentObjUri);
                 }

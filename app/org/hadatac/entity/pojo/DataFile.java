@@ -36,10 +36,13 @@ import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.TreeNode;
+import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.RecordFile;
+import org.hadatac.data.loader.SpreadsheetRecordFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -103,9 +106,20 @@ public class DataFile implements Cloneable {
         logger = new AnnotationLogger(this);
     }
     
-    public DataFile(RecordFile recordFile) {
-        this(recordFile.getFileName());
-        this.file = recordFile.getFile();
+    public boolean attachFile(File file) {
+        RecordFile recordFile = null;
+        if (file.getName().endsWith(".csv")) {
+            recordFile = new CSVRecordFile(file);
+        } else if (file.getName().endsWith(".xlsx")) {
+            recordFile = new SpreadsheetRecordFile(file);
+        } else {
+            getLogger().addLine(Feedback.println(Feedback.WEB, String.format(
+                    "[ERROR] Unknown file format: %s", file.getName())));
+            return false;
+        }
+        
+        setRecordFile(recordFile);
+        return true;
     }
     
     public Object clone()throws CloneNotSupportedException {
@@ -140,16 +154,16 @@ public class DataFile implements Cloneable {
     }
     
     public String getAbsolutePath() {
-        if (getStatus().equals(UNPROCESSED)) {
-            return Paths.get(ConfigProp.getPathUnproc(), getDir(), getFileName()).toString();
+        if (Arrays.asList(UNPROCESSED, FREEZED).contains(getStatus())) {
+            return Paths.get(ConfigProp.getPathUnproc(), getDir(), getStorageFileName()).toString();
         } else if (getStatus().equals(PROCESSED)) {
-            return Paths.get(ConfigProp.getPathProc(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathProc(), getDir(), getStorageFileName()).toString();
         } else if (getStatus().equals(WORKING)) {
-            return Paths.get(ConfigProp.getPathWorking(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathWorking(), getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(CREATED, CREATING, DELETED).contains(getStatus())) {
-            return Paths.get(ConfigProp.getPathDownload(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathDownload(), getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(DD_UNPROCESSED, DD_PROCESSED, DD_FREEZED).contains(getStatus())) {
-            return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getFileName()).toString();
+            return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getStorageFileName()).toString();
         }
         
         return "";
@@ -181,6 +195,10 @@ public class DataFile implements Cloneable {
     
     public File getFile() {
         return file;
+    }
+    
+    public String getBaseName() {
+        return FilenameUtils.getBaseName(fileName);
     }
     
     public String getFileExtention() {
@@ -231,6 +249,19 @@ public class DataFile implements Cloneable {
             dir = dir.substring(1, dir.length());
         }
         this.dir = dir;
+    }
+    
+    public String getPureFileName() {
+        return Paths.get(fileName).getFileName().toString();
+    }
+    
+    public String getStorageFileName() {
+        if (FilenameUtils.getExtension(fileName).isEmpty()) {
+            return fileName;
+        }
+        
+        return FilenameUtils.getBaseName(fileName) + "_" + id 
+                + "." + FilenameUtils.getExtension(fileName);
     }
 
     public String getStatus() {
@@ -306,7 +337,6 @@ public class DataFile implements Cloneable {
     }
 
     public int delete() {
-    	
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
@@ -326,8 +356,9 @@ public class DataFile implements Cloneable {
         return -1;
     }
     
-    public String getPureFileName() {
-        return Paths.get(fileName).getFileName().toString();
+    public void freeze() {
+        setStatus(FREEZED);
+        save();
     }
     
     public void resetForUnprocessed() {
@@ -347,7 +378,7 @@ public class DataFile implements Cloneable {
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() && getPureFileName().equals(listOfFiles[i].getName())) {
+            if (listOfFiles[i].isFile() && getStorageFileName().equals(listOfFiles[i].getName())) {
                 return true;
             }
         }
@@ -546,11 +577,22 @@ public class DataFile implements Cloneable {
 
     public static boolean search(String fileName, String dir, List<DataFile> pool) {
         for (DataFile file : pool) {
-            if (file.getFileName().equals(fileName) && file.getDir().equals(dir)) {
+            if (file.getStorageFileName().equals(fileName) && file.getDir().equals(dir)) {
                 return true;
             }
         }
         return false;
+    }
+    
+    public static DataFile find(String fileName, String dir, List<DataFile> pool) {
+        for (DataFile dataFile : pool) {
+            if (dataFile.getPureFileName().equals(fileName) 
+                    && dataFile.getDir().equals(dir)) {
+                return dataFile;
+            }
+        }
+        
+        return null;
     }
 
     public static void includeUnrecognizedFiles(String curPath, String basePath, 
@@ -566,8 +608,20 @@ public class DataFile implements Cloneable {
                     && hasValidExtension(listOfFiles[i].getName())
                     && !listOfFiles[i].getName().startsWith(".") 
                     && !search(listOfFiles[i].getName(), basePath, dataFiles)) {
-                DataFile df = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
-                dataFiles.add(df);
+                DataFile dataFile = find(listOfFiles[i].getName(), basePath, dataFiles);
+                if (null == dataFile) {
+                    dataFile = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
+                }
+                
+                String originalPath = Paths.get(curPath, dataFile.getPureFileName()).toString();
+                File file = new File(originalPath);
+                String newPath = originalPath.replace(
+                        "/" + dataFile.getPureFileName(), 
+                        "/" + dataFile.getStorageFileName());
+                file.renameTo(new File(newPath));
+                file.delete();
+                
+                dataFiles.add(dataFile);
             }
         }
     }
@@ -577,7 +631,7 @@ public class DataFile implements Cloneable {
         while (iterFile.hasNext()) {
             DataFile file = iterFile.next();
             try {
-                Path p = Paths.get(path, file.getDir(), file.getFileName());
+                Path p = Paths.get(path, file.getDir(), file.getStorageFileName());
                 if (!Files.exists(p) || Files.isHidden(p)) {
                     iterFile.remove();
                 }
@@ -675,9 +729,15 @@ public class DataFile implements Cloneable {
     	} else {
     		path = path + "/" + current;
     	}
+    	
+    	System.out.println("path: " + path);
+    	
 		dirFile = new DataFile(path);
 		dirFile.setStatus(DataFile.WORKING);
+		
+		System.out.println("dirFile.getAbsolutePath(): " + dirFile.getAbsolutePath());
         File fileAux = new File(dirFile.getAbsolutePath());
+        
         TreeNode node = null;
         if (fileAux.isDirectory() && !justDir) {
         	node = new TreeNode("+" + path);

@@ -10,7 +10,7 @@ public interface RecordFile {
     
     public File getFile();
     
-    public String getFileName();
+    public String getStorageFileName();
     
     public boolean isValid();
     

@@ -1,5 +1,6 @@
 package org.hadatac.console.models;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +40,13 @@ public class FacetTree {
         try {
             Facetable object = null;
             if (facets.isEmpty()) {
-                object = (Facetable)targetFacet.newInstance();
+                object = (Facetable)targetFacet.getDeclaredConstructor().newInstance();
             } else if (level > facets.size()) {
                 return;
             } else if (level == facets.size()) {
-                object = (Facetable)targetFacet.newInstance();
+                object = (Facetable)targetFacet.getDeclaredConstructor().newInstance();
             } else {
-                object = (Facetable)facets.get(level).newInstance();
+                object = (Facetable)facets.get(level).getDeclaredConstructor().newInstance();
             }
 
             Map<Facetable, List<Facetable>> dict = object.getTargetFacets(facet, facetHandler);
@@ -84,6 +85,18 @@ public class FacetTree {
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     } 

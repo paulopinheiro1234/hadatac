@@ -1,7 +1,7 @@
 package org.hadatac.metadata.loader;
 
 import java.io.File;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -44,15 +44,15 @@ public class MetadataContext implements RDFContext {
 
     public static Long playTotalTriples() {
         MetadataContext metadata = new MetadataContext(
-                "user", "password", 
-                ConfigFactory.load().getString("hadatac.solr.triplestore"), 
+                "user", "password",
+                ConfigFactory.load().getString("hadatac.solr.triplestore"),
                 false);
         return metadata.totalTriples();
     }
 
     public Long totalTriples() {
         try {
-            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                     "SELECT (COUNT(*) as ?tot) WHERE { ?s ?p ?o . }";
 
             ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -75,7 +75,7 @@ public class MetadataContext implements RDFContext {
         queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
         queryString += "DELETE WHERE { ?s ?p ?o . } ";
         UpdateRequest req = UpdateFactory.create(queryString);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(req, 
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(req,
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         try {
             processor.execute();
@@ -87,16 +87,16 @@ public class MetadataContext implements RDFContext {
         message += Feedback.println(mode, " ");
         message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
 
-        return message; 
+        return message;
     }
 
     public String cleanStudy(int mode, String study) {
         String message = "";
-        message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());        
+        message += Feedback.println(mode,"   Triples before [clean]: " + totalTriples());
         NameSpace.deleteTriplesByNamedGraph(study);
         message += Feedback.print(mode, "   Triples after [clean]: " + totalTriples());
 
-        return message; 
+        return message;
     }
 
     public String getLang(String contentType) {
@@ -109,7 +109,7 @@ public class MetadataContext implements RDFContext {
         }
     }
 
-    /* 
+    /*
      *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
      *   used to process rdf/xml content.
      */
@@ -120,7 +120,7 @@ public class MetadataContext implements RDFContext {
             if (file.exists()) {
                 Repository repo = new SPARQLRepository(
                         kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
-                repo.initialize();
+                repo.init();
                 RepositoryConnection con = repo.getConnection();
                 ValueFactory factory = repo.getValueFactory();
                 con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
@@ -146,8 +146,6 @@ public class MetadataContext implements RDFContext {
      *        "cache" cache ontologies from the web
      */
     public String loadOntologies(int mode, String oper) {
-        System.out.println("loadOntologies oper: " + oper);
-
         String message = "";
         if ("cache".equals(oper)) {
             message += NameSpaces.getInstance().copyNameSpacesLocally(mode);
@@ -156,9 +154,9 @@ public class MetadataContext implements RDFContext {
             message += Feedback.println(mode, "   Triples before [loadOntologies]: " + total);
             message += Feedback.println(mode," ");
 
-            for (Map.Entry<String, NameSpace> entry : NameSpaces.getInstance().getNamespaces().entrySet()) {
-                String abbrev = entry.getKey().toString();
-                NameSpace ns = entry.getValue();
+            ConcurrentHashMap<String, NameSpace> namespaces = NameSpaces.getInstance().getNamespaces();
+            for (String abbrev : namespaces.keySet()) {
+                NameSpace ns = namespaces.get(abbrev);
                 String nsURL = ns.getURL();
                 if (abbrev != null && nsURL != null && !nsURL.equals("") && ns.getType() != null) {
                     String path = "";
@@ -178,7 +176,7 @@ public class MetadataContext implements RDFContext {
                     Long newTotal = totalTriples();
                     message += Feedback.println(mode, "   Added " + (newTotal - total) + " triples from " + path + " .");
                     total = newTotal;
-                }             
+                }
             }
             message += Feedback.println(mode," ");
             message += Feedback.println(mode, "   Triples after [loadOntologies]: " + totalTriples());
@@ -187,5 +185,4 @@ public class MetadataContext implements RDFContext {
 
         return message;
     }
-}	
-
+}

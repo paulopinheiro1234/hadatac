@@ -3,8 +3,8 @@ package org.hadatac.data.loader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.entity.pojo.DataFile;
+
 
 public class GeneratorChain {
 

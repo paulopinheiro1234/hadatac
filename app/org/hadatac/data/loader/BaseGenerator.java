@@ -52,7 +52,7 @@ public abstract class BaseGenerator {
         this.dataFile = dataFile;
         file = dataFile.getRecordFile();
         records = file.getRecords();
-        fileName = file.getFile().getName();
+        fileName = dataFile.getPureFileName();
         logger = dataFile.getLogger();
         
         initMapping();
@@ -149,11 +149,21 @@ public abstract class BaseGenerator {
         }
 
         int rowNumber = 0;
+        int skippedRows = 0;
+        Record lastRecord = null;
         for (Record record : records) {
-            Map<String, Object> tempRow = createRow(record, ++rowNumber);
-            if (tempRow != null) {
-                rows.add(tempRow);
-            }
+        	if (lastRecord != null && record.equals(lastRecord)) {
+        		skippedRows++;
+        	} else {
+        		Map<String, Object> tempRow = createRow(record, ++rowNumber);
+        		if (tempRow != null) {
+        			rows.add(tempRow);
+        			lastRecord = record;
+        		}
+        	}
+        }
+        if (skippedRows > 0) {
+        	System.out.println("Skipped rows: " + skippedRows);
         }
     }
 
@@ -355,7 +365,7 @@ public abstract class BaseGenerator {
 
         Repository repo = new SPARQLRepository(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        repo.initialize();
+        repo.init();
 
         RepositoryConnection con = repo.getConnection();
         con.remove(model);

@@ -5,7 +5,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Object Access Specification Browser Home") {
+@main("Data Stream Browser Home") {
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
 	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
@@ -121,9 +121,7 @@ jQuery(document).ready(function($) {
 	<hr>  
     <div class="container-fluid">
     <div class="page-header">
-      <h2>
-      Object Access Specification Faceted Search
-      </h2>
+      <h2>Data Stream Faceted Search</h2>
    </div>
     @if(bAdmin) {
 		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.update()" class="btn btn-primary" role="button">Update</a>

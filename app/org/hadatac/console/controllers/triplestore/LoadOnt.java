@@ -105,20 +105,32 @@ public class LoadOnt extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result reloadNamedGraph(String abbreviation) {
+    public Result reloadNamedGraphFromRemote(String abbreviation) {
         NameSpace ns = NameSpaces.getInstance().getNamespaces().get(abbreviation);
         ns.deleteTriples();
+        
+        String url = ns.getURL();
+        if (!url.isEmpty()) {
+            ns.loadTriples(url, true);
+        }
+        ns.updateLoadedTripleSize();
+        
+        return redirect(routes.LoadOnt.loadOnt("init"));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result reloadNamedGraphFromCache(String abbreviation) {
+        NameSpace ns = NameSpaces.getInstance().getNamespaces().get(abbreviation);
+        ns.deleteTriples();
+        
         String filePath = NameSpaces.CACHE_PATH + "copy" + "-" + ns.getAbbreviation().replace(":", "");
         File localFile = new File(filePath);
         if (localFile.exists()) {
             ns.loadTriples(filePath, false);
+            ns.updateLoadedTripleSize();
         } else {
-            String url = ns.getURL();
-            if (!url.isEmpty()) {
-                ns.loadTriples(url, true);
-            }
+            return badRequest("No cache for this namespace!");
         }
-        ns.updateLoadedTripleSize();
         
         return redirect(routes.LoadOnt.loadOnt("init"));
     }

@@ -28,7 +28,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.SDD;
-import org.hadatac.entity.pojo.SSD;
+import org.hadatac.entity.pojo.SSDSheet;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
@@ -106,6 +106,7 @@ public class AnnotationWorker {
         for (DataFile dataFile : unprocFiles) {
         	//System.out.println("Processing file: " + dataFile.getFileName());
             dataFile.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.getLogger().resetLog();
             dataFile.save();
 
             String fileName = dataFile.getFileName();
@@ -113,6 +114,7 @@ public class AnnotationWorker {
             // file is rejected if it already exists in the folder of processed files
             if (procFiles.contains(dataFile)) {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00002", fileName);
+                dataFile.freeze();
                 return;
             }
 
@@ -131,6 +133,7 @@ public class AnnotationWorker {
                 return;
             } else {
                 dataFile.getLogger().printExceptionByIdWithArgs("GBL_00003", fileName);
+                dataFile.freeze();
                 return;
             }
             
@@ -170,13 +173,10 @@ public class AnnotationWorker {
                 }
                 dataFile.save();
 
-                file.renameTo(new File(destFolder + "/" + fileName));
+                file.renameTo(new File(destFolder + "/" + dataFile.getStorageFileName()));
                 file.delete();
             } else {
-                // Freeze file
-                System.out.println("Freezed file " + dataFile.getFileName());
-                dataFile.setStatus(DataFile.FREEZED);
-                dataFile.save();
+                dataFile.freeze();
             }
         }
     }
@@ -189,7 +189,6 @@ public class AnnotationWorker {
     	//Move the file to the folder for processed files
         String new_path = ConfigProp.getPathMedia();
  
-        String fileName = dataFile.getFileName();
         File file = new File(dataFile.getAbsolutePath());
 
         File destFolder = new File(new_path);
@@ -203,7 +202,7 @@ public class AnnotationWorker {
         dataFile.setStudyUri("");
         dataFile.save();
 
-        file.renameTo(new File(destFolder + "/" + fileName));
+        file.renameTo(new File(destFolder + "/" + dataFile.getStorageFileName()));
         file.delete();
     }
     
@@ -212,7 +211,6 @@ public class AnnotationWorker {
         Record record = dataFile.getRecordFile().getRecords().get(0);
         String studyName = record.getValueByColumnName("Study ID");
         String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
-        String fileName = dataFile.getRecordFile().getFileName();
 
         dataFile.getLogger().println("Study ID found: " + studyName);
         dataFile.getLogger().println("Study URI found: " + studyUri);
@@ -465,8 +463,12 @@ public class AnnotationWorker {
         SDD sdd = new SDD(dataFile);
         String fileName = dataFile.getFileName();
         String sddName = sdd.getName();
+        String sddVersion = sdd.getVersion();
         if (sddName == "") {
             dataFile.getLogger().printExceptionById("SDD_00003");
+        }
+        if (sddVersion == "") {
+            dataFile.getLogger().printExceptionById("SDD_00018");
         }
         Map<String, String> mapCatalog = sdd.getCatalog();
 
@@ -558,6 +560,7 @@ public class AnnotationWorker {
         row.put("a", "hasco:DASchema");
         row.put("rdfs:label", "SDD-" + sddName);
         row.put("rdfs:comment", "");
+        row.put("hasco:hasVersion", sddVersion);
         generalGenerator.addRow(row);
         chain.addGenerator(generalGenerator);
         chain.setNamedGraphUri(URIUtils.replacePrefixEx(sddUri));
@@ -566,13 +569,13 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSSDFile(DataFile dataFile) {
-        String studyId = dataFile.getRecordFile().getFileName().replaceAll("SSD-", "");
+        String studyId = dataFile.getBaseName().replaceAll("SSD-", "");
         System.out.println("Processing SSD file of " + studyId + "...");
 
-        SSD ssd = new SSD(dataFile);
+        SSDSheet ssd = new SSDSheet(dataFile);
         Map<String, String> mapCatalog = ssd.getCatalog();
         Map<String, List<String>> mapContent = ssd.getMapContent();
-
+        
         RecordFile SSDsheet = new SpreadsheetRecordFile(dataFile.getFile(), "SSD");
         dataFile.setRecordFile(SSDsheet);
 
@@ -582,9 +585,11 @@ public class AnnotationWorker {
 
             VirtualColumnGenerator vcgen = new VirtualColumnGenerator(dataFile);
             chain.addGenerator(vcgen);
+            //System.out.println("added VirtualColumnGenerator for " + dataFile.getAbsolutePath());
             
             SSDGenerator socgen = new SSDGenerator(dataFile);
             chain.addGenerator(socgen);
+            //System.out.println("added SSDGenerator for " + dataFile.getAbsolutePath());
 
             String studyUri = socgen.getStudyUri();
             if (studyUri == null || studyUri == "") {
@@ -609,12 +614,16 @@ public class AnnotationWorker {
 
         String study_uri = chain.getStudyUri();
         for (String i : mapCatalog.keySet()) {
-            if (mapCatalog.get(i).length() > 0) {
+            if (mapCatalog.get(i) != null && mapCatalog.get(i).length() > 0) {
                 try {
                     RecordFile SOsheet = new SpreadsheetRecordFile(dataFile.getFile(), mapCatalog.get(i).replace("#", ""));
                     DataFile dataFileForSheet = (DataFile)dataFile.clone();
                     dataFileForSheet.setRecordFile(SOsheet);
-                    chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri));
+                    if (mapContent == null || mapContent.get(i) == null) {
+                        dataFile.getLogger().printException("No value for MapContent with index [" + i + "]");
+                    } else {
+                    	chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri));
+                    }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }

@@ -34,6 +34,9 @@ public class SDDEditorV2 extends Controller {
 
 
     public Result index(String fileId, boolean bSavable, int indicator) {
+        // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
+        // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
+
         Collections.sort(loadedList);
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -64,13 +67,6 @@ public class SDDEditorV2 extends Controller {
             }
             finalDF=dd_dataFile;
         }
-
-
-
-    	// System.out.println("files = " + files);
-    	// System.out.println("dd_dataFile = " + dd_dataFile.getFileName());
-
-
         return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable,loadedList,this));
     }
 
@@ -166,8 +162,4 @@ public class SDDEditorV2 extends Controller {
 
         return ok(Json.toJson(commentSheetColumn));
     }
-
-
-
-
 }

@@ -1,15 +1,19 @@
 package org.hadatac.console.controllers.workingfiles;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -159,9 +163,14 @@ public class WorkingFiles extends Controller {
             return badRequest(renameFile.render(dir, dataFile));
         } else {
             String newFileName = Paths.get(data.getNewName()).getFileName().toString();
-            String newFilePath = Paths.get(Paths.get(dataFile.getAbsolutePath()).getParent().toString(), newFileName).toString();
             
+            String dirPath = Paths.get(dataFile.getAbsolutePath()).getParent().toString();
             File originalFile = new File(dataFile.getAbsolutePath());
+            
+            dataFile.setFileName(newFileName);
+            dataFile.save();
+            
+            String newFilePath = Paths.get(dirPath, dataFile.getStorageFileName()).toString();
             File newFile = new File(newFilePath);
             if (newFile.exists()) {
                 return badRequest("A file with the new name already exists in the current folder!");
@@ -169,9 +178,6 @@ public class WorkingFiles extends Controller {
                 try {
                     originalFile.renameTo(newFile);
                     originalFile.delete();
-                    
-                    dataFile.setFileName(newFileName);
-                    dataFile.save();
                     
                     logger.info("newFilePath: " + newFilePath);
                 } catch (Exception e) {
@@ -207,8 +213,8 @@ public class WorkingFiles extends Controller {
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postMoveDataFile(String dir, String fileId) {
         return moveDataFile(dir, fileId);
-    } 
-
+    }
+    
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result processMoveDataFileForm(String dir, String fileId) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(session());
@@ -233,15 +239,16 @@ public class WorkingFiles extends Controller {
             return badRequest(moveFile.render(dir, dataFile, dirFile));
         } else {
             String destination = data.getNewDest();
-        	
+            
             DataFile root = new DataFile("/");
             root.setStatus(DataFile.WORKING);
-        	String fileName = dataFile.getFileName();
-        	String oldFilePath = dataFile.getAbsolutePath();
-            String newFilePath = Paths.get(root.getAbsolutePath(), destination, fileName).toString();
-            System.out.println("fileName " + fileName);
+            String oldFilePath = dataFile.getAbsolutePath();
+            String newFilePath = Paths.get(root.getAbsolutePath(), destination, dataFile.getStorageFileName()).toString();
+            
+            System.out.println("fileName " + dataFile.getStorageFileName());
             System.out.println("oldFilePath " + oldFilePath);
             System.out.println("newFilePath " + newFilePath);
+            System.out.println("destination: " + destination);
 
             File originalFile = new File(oldFilePath);
             File newFile = new File(newFilePath);
@@ -252,7 +259,11 @@ public class WorkingFiles extends Controller {
                     originalFile.renameTo(newFile);
                     originalFile.delete();
                     
-                    dataFile.setFileName(fileName);
+                    if (destination.startsWith("/")) {
+                        dataFile.setDir(destination.substring(1));
+                    } else {
+                        dataFile.setDir(destination);
+                    }
                     dataFile.save();
                     
                     logger.info("newFilePath: " + newFilePath);
@@ -262,6 +273,125 @@ public class WorkingFiles extends Controller {
             }
             
             return redirect(routes.WorkingFiles.index(dir, "."));
+        }
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result moveDataFiles(String dir) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        List<String> selectedFileIds = new ArrayList<String>();
+        String fileIdString = name_map.get("fileIds")[0];
+        if (fileIdString.length() > 0) {
+            for (String id : fileIdString.split(",")) {
+                selectedFileIds.add(id);
+            }
+        }
+        
+        List<DataFile> dataFiles = new ArrayList<DataFile>();
+        for (String fileId : selectedFileIds) {
+            DataFile dataFile = null;
+            if (user.isDataManager()) {
+                dataFile = DataFile.findById(fileId);
+            } else {
+                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+            }
+            
+            if (null == dataFile) {
+                return badRequest(String.format(
+                        "You do NOT have the permission to operate this file with id %s !", fileId));
+            }
+            
+            dataFiles.add(dataFile);
+        }
+        
+        DataFile dirFile = new DataFile(dir);
+        dirFile.setStatus(DataFile.WORKING);
+        
+        return ok(moveFiles.render(dir, dataFiles, dirFile));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postMoveDataFiles(String dir) {
+        return moveDataFiles(dir);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processMoveDataFilesForm(String dir) throws Exception {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        List<String> selectedFileIds = new ArrayList<String>();
+        String fileIdString = name_map.get("fileIds")[0];
+        if (fileIdString.length() > 0) {
+            for (String id : fileIdString.split(",")) {
+                selectedFileIds.add(id);
+            }
+        }
+        
+        for (String fileId : selectedFileIds) {
+            DataFile dataFile = null;
+            if (user.isDataManager()) {
+                dataFile = DataFile.findById(fileId);
+            } else {
+                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+            }
+            
+            if (null == dataFile) {
+                return badRequest(String.format(
+                        "You do NOT have the permission to operate this file with id %s !", fileId));
+            }
+            
+            Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+            NewFileForm data = form.get();
+
+            if (form.hasErrors()) {
+                return badRequest("THE FORM HAS ERRORS");
+            } else {
+                try {
+                    String destination = data.getNewDest();
+                    moveSingleDataFile(dataFile, destination);
+                } catch (Exception e) {
+                    return badRequest(e.getMessage());
+                }
+            }
+        }
+        
+        return redirect(routes.WorkingFiles.index(dir, "."));
+    }
+    
+    public void moveSingleDataFile(DataFile dataFile, String destination) throws Exception {
+        DataFile root = new DataFile("/");
+        root.setStatus(DataFile.WORKING);
+        String oldFilePath = dataFile.getAbsolutePath();
+        String newFilePath = Paths.get(root.getAbsolutePath(), destination, dataFile.getStorageFileName()).toString();
+        
+        System.out.println("fileName " + dataFile.getStorageFileName());
+        System.out.println("oldFilePath " + oldFilePath);
+        System.out.println("newFilePath " + newFilePath);
+        System.out.println("destination: " + destination);
+
+        File originalFile = new File(oldFilePath);
+        File newFile = new File(newFilePath);
+        if (newFile.exists()) {
+            throw new Exception("A file with the same name already exists in the destination folder!");
+        } else {
+            try {
+                originalFile.renameTo(newFile);
+                originalFile.delete();
+                
+                if (destination.startsWith("/")) {
+                    dataFile.setDir(destination.substring(1));
+                } else {
+                    dataFile.setDir(destination);
+                }
+                dataFile.save();
+                
+                logger.info("newFilePath: " + newFilePath);
+            } catch (Exception e) {
+                throw new Exception("Failed to move the file!");
+            }
         }
     }
     
@@ -394,6 +524,41 @@ public class WorkingFiles extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result deleteDataFiles(String dir) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        List<String> selectedFileIds = new ArrayList<String>();
+        String fileIdString = name_map.get("fileIds")[0];
+        if (fileIdString.length() > 0) {
+            for (String id : fileIdString.split(",")) {
+                selectedFileIds.add(id);
+            }
+        }
+        
+        System.out.println("selectedFileIds: " + selectedFileIds);
+        for (String fileId : selectedFileIds) {
+        	DataFile dataFile = null;
+            if (user.isDataManager()) {
+                dataFile = DataFile.findById(fileId);
+            } else {
+                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+            }
+            
+            if (null == dataFile) {
+                return badRequest(String.format(
+                		"You do NOT have the permission to operate the file with id %s!", fileId));
+            }
+            
+            File file = new File(dataFile.getAbsolutePath());
+            file.delete();
+            dataFile.delete();
+        }
+
+        return redirect(routes.WorkingFiles.index(dir, "."));
+    }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -424,19 +589,25 @@ public class WorkingFiles extends Controller {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
         }
         
+        DataFile newDataFile = DataFile.create(
+                dataFile.getFileName(), "", dataFile.getOwnerEmail(), DataFile.UNPROCESSED);
+        newDataFile.getLogger().resetLog();
+        newDataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+        newDataFile.save();
+        
+        // Send a copy of file to the auto-annotator
         File file = new File(dataFile.getAbsolutePath());
+        File newFile = new File(newDataFile.getAbsolutePath());
         File destFolder = new File(ConfigProp.getPathUnproc());
         if (!destFolder.exists()){
             destFolder.mkdirs();
         }
-        file.renameTo(new File(destFolder.getPath() + "/" + dataFile.getPureFileName()));
-        file.delete();
         
-        dataFile.getLogger().resetLog();
-        dataFile.setDir("");
-        dataFile.setStatus(DataFile.UNPROCESSED);
-        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-        dataFile.save();
+        try {
+            Files.copy(file, newFile);
+        } catch (IOException e) {
+            System.out.println("Failed to copy the file at " + dataFile.getAbsolutePath());
+        }
         
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", "."));
     }
@@ -446,22 +617,19 @@ public class WorkingFiles extends Controller {
         DataFile dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
         
-        RecordFile recordFile = null;
-        if (dataFile.getFileName().endsWith(".csv")) {
-            recordFile = new CSVRecordFile(file);
-        } else if (dataFile.getFileName().endsWith(".xlsx")) {
-            recordFile = new SpreadsheetRecordFile(file);
-        }
-        
-        dataFile.setRecordFile(recordFile);
         dataFile.getLogger().resetLog();
         
-        GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
-        if (null != chain) {
-            chain.generate(false);
+        if (dataFile.attachFile(file)) {
+            GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
+            if (null != chain) {
+                chain.generate(false);
+            }
         }
         
         String strLog = dataFile.getLog();
+        if (strLog.isEmpty()) {
+            strLog += "This file can be ingested without errors";
+        }
         
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
                 routes.WorkingFiles.index("/", ".").url()));
@@ -477,8 +645,9 @@ public class WorkingFiles extends Controller {
             String resumableIdentifier,
             String resumableFilename,
             String resumableRelativePath) {
-        if (ResumableUpload.uploadFileByChunking(request(), 
-                ConfigProp.getPathWorking())) {
+
+        String baseDir = Paths.get(ConfigProp.getPathWorking(), resumableRelativePath).toString();
+        if (ResumableUpload.uploadFileByChunking(request(), baseDir)) {
             //This Chunk has been Uploaded.
             return ok("Uploaded.");
         } else {
@@ -497,19 +666,28 @@ public class WorkingFiles extends Controller {
             String resumableFilename,
             String resumableRelativePath) {
 
+        String baseDir = Paths.get(ConfigProp.getPathWorking(), resumableRelativePath).toString();
         Path path = Paths.get(resumableFilename);
         if (path == null) {
             return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">Could not get file path!</a>");
         }
 
         String fileName = path.getFileName().toString();
-        DataFile file = DataFile.findByNameAndStatus(fileName, DataFile.WORKING);
-        if (file != null && file.existsInFileSystem(ConfigProp.getPathWorking())) {
-            return badRequest("<a style=\"color:#cc3300; font-size: x-large;\">A file with this name already exists!</a>");
-        }
 
-        if (ResumableUpload.postUploadFileByChunking(request(), ConfigProp.getPathWorking())) {
-            DataFile.create(fileName, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.WORKING);
+        if (ResumableUpload.postUploadFileByChunking(request(), baseDir)) {
+            DataFile dataFile = DataFile.create(
+                    fileName, resumableRelativePath, AuthApplication.getLocalUser(session()).getEmail(), 
+                    DataFile.WORKING);
+            
+            String originalPath = Paths.get(baseDir, dataFile.getPureFileName()).toString();
+            File file = new File(originalPath);
+            
+            String newPath = originalPath.replace(
+                    "/" + dataFile.getPureFileName(), 
+                    "/" + dataFile.getStorageFileName());
+            file.renameTo(new File(newPath));
+            file.delete();
+            
             return(ok("Upload finished"));
         } else {
             return(ok("Upload"));

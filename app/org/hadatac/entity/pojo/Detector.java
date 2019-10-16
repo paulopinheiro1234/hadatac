@@ -160,15 +160,12 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 
 	public static Detector find(String uri) {
 		Detector detector = null;
-		Model model;
 		Statement statement;
 		RDFNode object;
 		
 		String queryString = "DESCRIBE <" + uri + ">";
-		Query query = QueryFactory.create(queryString);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
-		model = qexec.execDescribe();
+		Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		
 		detector = new Detector();
 		StmtIterator stmtIterator = model.listStatements();

@@ -8,9 +8,9 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Delete Object Access Specification") {
+@main("Delete Data Stream") {
 
-    <h2>Delete Object Access Specification</h2>
+    <h2>Delete Data Stream</h2>
     
     <div class="container-fluid">
        <ul>
@@ -32,7 +32,7 @@
  
     @if(oper=="init") {
         <div id="question-box">
-           Are your sure you want to delete this OAS? 
+           Are your sure you want to delete this data stream? 
            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", da.getUri())" class="btn btn-success" role="button">Confirm</a>
            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", da.getUri())" class="btn btn-danger" role="button">Cancel</a>
         </div>
@@ -42,14 +42,14 @@
          
     @if(oper=="cancelled") {
         <div id="cancel-box">
-          <h4>Operation [Delete Object Access Specification] has been cancelled.</h4>
-          Press OK button to return to Object Access Specification Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
+          <h4>Operation [Delete Data Stream] has been cancelled.</h4>
+          Press OK button to return to Data Stream Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
 	    </div>
     }
 
              
      <div id="end-process-box" style="display:none;">
-          Press OK button to return to Object Access Specification Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
+          Press OK button to return to Data Stream Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
 	 </div>
 
 	 @if(oper=="confirmed") {

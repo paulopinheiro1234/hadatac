@@ -29,7 +29,7 @@ public class SDD {
     private Map<String, String> mapAttrObj = new HashMap<String, String>();
     private Map<String, Map<String, String>> codebook = new HashMap<String, Map<String, String>>();
     private Map<String, Map<String, String>> timeline = new HashMap<String, Map<String, String>>();
-    private RecordFile sddfile = null;
+    private DataFile sddfile = null;
     
     private AnnotationLogger logger = null;
 
@@ -64,7 +64,7 @@ public class SDD {
     }
 
     public SDD(DataFile dataFile) {
-        this.sddfile = dataFile.getRecordFile();
+        this.sddfile = dataFile;
         getMetaAttributes();
         readCatalog(dataFile.getRecordFile());
         logger = dataFile.getLogger();
@@ -80,11 +80,19 @@ public class SDD {
     }
 
     public String getNameFromFileName() {
-        return (sddfile.getFileName().split("\\.")[0]).replace("_", "-").replace("SDD-", "");
+        return sddfile.getBaseName().replace("_", "-").replace("SDD-", "");
     }
 
     public String getFileName() {
         return sddfile.getFileName();
+    }
+
+    public String getVersion() {
+        String sddVersion = mapCatalog.get("Version");
+        if (sddVersion == null) {
+            return "";
+        }
+        return sddVersion;
     }
 
     public Map<String, String> getCatalog() {

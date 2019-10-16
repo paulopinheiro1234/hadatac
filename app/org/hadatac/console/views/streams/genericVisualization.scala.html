@@ -1,0 +1,144 @@
+@(dir              : String,
+  filename         : String,
+  da_uri           : String,
+  measurements     : String,
+  minDate          : String,
+  maxDate          : String)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.entity.pojo._
+@import play.api.Play._
+@import java.net.URLEncoder
+
+@main("Time Series Data Visualization") {
+
+  <head>
+	  <meta charset="utf-8">
+	  <script src="https://d3js.org/d3.v4.min.js"></script>
+	  <style>
+	    body {
+	      font-family:"avenir next", Arial, sans-serif;
+	      font-size: 12px;
+	      color: #696969;
+	    }
+	
+	    #play-button {
+	      position: absolute;
+	      top: 140px;
+	      left: 50px;
+	      background: #f08080;
+	      padding-right: 26px;
+	      border-radius: 3px;
+	      border: none;
+	      color: white;
+	      margin: 0;
+	      padding: 0 12px;
+	      width: 60px;
+	      cursor: pointer;
+	      height: 30px;
+	    }
+	
+	    #play-button:hover {
+	      background-color: #696969;
+	    }    
+	    
+	    .ticks {
+	      font-size: 10px;
+	    }
+	
+	    .track,
+	    .track-inset,
+	    .track-overlay {
+	      stroke-linecap: round;
+	    }
+	
+	    .track {
+	      stroke: #000;
+	      stroke-opacity: 0.3;
+	      stroke-width: 10px;
+	    }
+	
+	    .track-inset {
+	      stroke: #dcdcdc;
+	      stroke-width: 8px;
+	    }
+	
+	    .track-overlay {
+	      pointer-events: stroke;
+	      stroke-width: 50px;
+	      stroke: transparent;
+	      cursor: crosshair;
+	    }
+	
+	    .handle {
+	      fill: #fff;
+	      stroke: #000;
+	      stroke-opacity: 0.5;
+	      stroke-width: 1.25px;
+	    }
+	  </style>
+  </head>
+
+  <body>
+	<div class="row">
+   		<div class="col-md-1">
+   		</div>
+   		<div class="col-md-11">
+        	<h3>Time Series Data Visualization</h3>
+        	<h4>Generic Instrument</h4>
+        </div>
+	</div>
+
+	<!-- buttons --> 
+    <div class="container-fluid">
+       <div class="row">
+    	 <div class="col-md-1">
+   		 </div>
+    	 <div class="col-md-11">
+            <div class="navbar-collapse collapse navbar-secondary">
+			  <a href="/hadatac/deployments/browser?dir=%2F&amp;filename=&amp;da_uri=&amp;plat_uri=&amp;prev_platUri=" class="btn-sm btn-primary" role="button">Back</a>
+			</div>
+         </div>
+       </div>
+	</div>
+	
+	<!-- Data Values -->
+	<div class="row">
+		<div class="col-md-1">
+		</div>
+		<div class="col-md-11">
+		<div id="start_date_time"></div>
+		<div id="end_date_time"></div>
+		<div id="data_values"></div>
+		</div>
+	</div>
+
+	<!-- main visualization -->
+	<!--
+	<div class="row">
+		<div class="col-md-1">
+		</div>
+		<div class="col-md-11">
+		<div id="heat_map"></div>
+		</div>
+	</div>
+    -->
+
+	<!-- time slider with main javascript code -->
+	<div class="row">
+   		<div class="col-md-1">
+   		</div>
+   		<div class="col-md-11">
+       		<div class="row text-center">
+            <div id="vis">
+  				<button id="play-button">Play</button>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/genericTimeSeriesVisualization.js")"></script>	
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/9PixelPodeVizualization.js")"></script>	
+    
+  </body>
+}

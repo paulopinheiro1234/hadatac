@@ -23,11 +23,6 @@
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
 	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.index(dir)" class="btn btn-primary" role="button">Create Folder</a>
 	<a href="" class="btn btn-primary" role="button" disabled>Delete Current Folder</a>
-	<a href="" class="btn btn-primary" role="button" disabled>Select All</a>
-	<a href="" class="btn btn-primary" role="button" disabled>Unselect All</a>
-	<a href="" class="btn btn-primary" role="button" disabled>Move Selection</a>
-	<a href="" class="btn btn-primary" role="button" disabled>Delete Selection</a>
-	<a href="" class="btn btn-primary" role="button" disabled>Download Selection</a>
 
 	<div id="frame">
     <div class="resumable-error">
@@ -57,10 +52,20 @@
     </div>
 
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadWorking.js")"></script>
+    <script>
+        r.opts["resumableRelativePath"] = "@dir";
+    </script>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
 
     <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
 
+    <form id="fileListForm" method="post">
+    @if(!workingFiles.isEmpty()) {
+        <label><input type="checkbox" id="select_all"> Select All</label>
+        <button class="btn btn-primary btn-sm" id="move_selection" style="display:none;">Move Selection</button>
+        <button class="btn btn-primary btn-sm" id="delete_selection" style="display:none;" onclick="return confirm('Are you sure to delete?')">Delete Selection</button>
+        <!-- <button class="btn btn-primary btn-sm" id="download_selection" role="button" style="display:none;">Download Selection</button> -->   
+    }
  	<table class="table">
     <thead>
          <tr>
@@ -86,7 +91,7 @@
               <td></td>
               <td>
               @if(folder != "..") {
-              	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.delete(dir,folder)" class="btn btn-xs btn-primary" role="button">Delete</a>
+              	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.delete(dir, folder)" class="btn btn-xs btn-primary" role="button">Delete</a>
 			  }
               </td>
               <td></td>
@@ -96,11 +101,11 @@
         @for(file <- workingFiles) {
             <tr name="working">
                 @if(file.getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name"><input type="checkbox">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
+                    <td bgcolor="#FF9999" name="file_name"><input type="checkbox" id="@file.getId()"> @file.getFileName()</td>
                 } else { @if(file.getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name"><input type="checkbox">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/')+1)) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
+                    <td bgcolor="#FFFF99" name="file_name"><input type="checkbox" id="@file.getId()"> @file.getFileName()</td>
                 } else {
-                    <td name="file_name"><input type="checkbox">@if(file.getFileName().indexOf('/') >= 0) { @DataFile.fileNameFromPath(file.getFileName().substring(file.getFileName().indexOf('/'))) } else { @DataFile.fileNameFromPath(file.getFileName()) }</td>
+                    <td name="file_name"><input type="checkbox" id="@file.getId()"> @file.getFileName()</td>
                 }}
                 @if(bAdmin) {
                     <td>@file.getOwnerEmail()</td>
@@ -112,14 +117,11 @@
                     @if(((file.getFileName().endsWith(".xlsx"))&&(!file.getFileName().startsWith("SDD")))){
                         <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                     }
-                    
-                    
                 }
                 @if(file.getFileName().startsWith("DD") || file.getFileName().startsWith("dd")){
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.DDEditor.index(file.getId(), true, dir)" class="btn btn-xs btn-primary" role="button" id="edit">Edit DD</a>
                 }
                 @if(file.getFileName().startsWith("SDD") || file.getFileName().startsWith("sdd")) {
-                    
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(file.getId(), true,0)" class="btn btn-xs btn-primary" role="button" id="edit">Edit SDD</a>
                 }
                 </td>
@@ -169,12 +171,58 @@
     @if(workingFiles.isEmpty() && (folders.size() == 0 && dir == "/" || folders.size() == 1 && dir != "/")) {
         <p>No working files</p>
     }
+    </form>
 
     <br><br>
     <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
 	</div>
 
 	<script type="text/javascript">
+	$("#select_all").change(function() {
+        $("tr input:checkbox").not(this).prop("checked", this.checked);
+    });
+    
+    $("#move_selection").click(function() {
+        $("#fileListForm").attr("action", "@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.moveDataFiles(dir)");
+    });
+    
+    $("#delete_selection").click(function() {
+        $("#fileListForm").attr("action", "@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFiles(dir)");
+    });
+	
+	$("#fileListForm").submit(function(eventObj) {
+	   var fileIds = [];
+	   $("td input:checkbox").each(function () {
+	       if ($(this).attr("checked")) {
+	           fileIds.push($(this).attr("id"));
+	       }
+       });
+	   
+	   $('<input />').attr('type', 'hidden')
+               .attr("name", "fileIds")
+               .attr("value", fileIds)
+               .appendTo(this);
+       return true;
+    });
+    
+    $("input:checkbox").change(function() {
+        var numSelected = 0;
+        $("td input:checkbox").each(function () {
+            if ($(this).attr("checked")) {
+                numSelected++;
+            }
+        });
+       
+        if (numSelected > 0) {
+            $('#move_selection').show();
+            $('#delete_selection').show();
+        } else {
+            $('#move_selection').hide();
+            $('#delete_selection').hide();
+        }
+        return true;
+    });
+	
     var options = [];
 
     $('#study-filter a').on('click', function(event) {

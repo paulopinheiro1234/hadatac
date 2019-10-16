@@ -15,20 +15,20 @@
 @main("Move File") {
 
 <script type="text/javascript">
-	   function checkform() {
-	      var cansubmit = true;
-	      
-	      if (document.getElementById('newName').value.length == 0) {
-	          cansubmit = false;
-	      }
-	
-	      if (cansubmit) {
-	          document.getElementById('submitbutton').disabled = false;
-	      } else {
-	          document.getElementById('submitbutton').disabled = 'disabled';
-	      }
-	   }
-	</script>
+       function checkform() {
+          var cansubmit = true;
+          
+          if (document.getElementById('newName').value.length == 0) {
+              cansubmit = false;
+          }
+    
+          if (cansubmit) {
+              document.getElementById('submitbutton').disabled = false;
+          } else {
+              document.getElementById('submitbutton').disabled = 'disabled';
+          }
+       }
+    </script>
    <style>
       ul.tree li {
         list-style-type: none;
@@ -67,39 +67,39 @@
       }
    </style>
 
-	<div class="container">
-		<h3>Move File</h3>
-	
-		<form class="form-horizontal" name="newFile" method="post" 
-		action="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.processMoveDataFileForm(dir, dataFile.getId())">
-	
-			<div class="form-group">
-				<label>Current folder: @dir</label> 
-			</div>
-			<div class="form-group">
-				<label>Destination folder:</label>  (Use selector below to set destination folder)
+    <div class="container">
+        <h3>Move File</h3>
+    
+        <form class="form-horizontal" name="newFile" method="post" 
+        action="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.processMoveDataFileForm(dir, dataFile.getId())">
+    
+            <div class="form-group">
+                <label>Current folder: @dir</label> 
+            </div>
+            <div class="form-group">
+                <label>Destination folder:</label>  (Use selector below to set destination folder)
                    <ul class="tree">
                     @if(dirFile != null) {
-		   			    @tree_node_generic(DataFile.getHierarchy("/","",true),"newDest", "", true)
-					}
+                        @tree_node_generic(DataFile.getHierarchy("/","",true),"newDest", "", true)
+                    }
                    </ul>
-			</div>
-	
-			<div class="form-group">
-				<label>File Name</label>
-				<input type="text" class="form-control col-sm-6" name="newName" id="newName" value="@dataFile.getFileName()" onchange="checkform()" readonly>
-			</div>
-	
-			<div class="form-group" class="col-sm-6 col-offset-3">
-				<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" /> 
-				<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
-			</div>
-		</form>
-	</div>
-	<script>
+            </div>
+    
+            <div class="form-group">
+                <label>File Name</label>
+                <input type="text" class="form-control col-sm-6" name="newName" id="newName" value="@dataFile.getFileName()" onchange="checkform()" readonly>
+            </div>
+    
+            <div class="form-group" class="col-sm-6 col-offset-3">
+                <input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" /> 
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <script>
        function typechange() {
           var newType = $("input[name=newStudyType]:checked").val();
- 	      $('#currentType').val(newType);
+          $('#currentType').val(newType);
           checkform();
        };
 
@@ -120,5 +120,5 @@
          });
        }
        </script>
-		   
+           
 }
