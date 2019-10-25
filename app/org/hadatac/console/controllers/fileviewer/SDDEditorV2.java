@@ -22,6 +22,7 @@ import play.core.j.JavaResultExtractor;
 
 public class SDDEditorV2 extends Controller {
     NameSpaces ns = NameSpaces.getInstance();
+        String bioportalKey="";
         List<String> loadedList = ns.listLoadedOntologies();
         List<String> currentCart=new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
@@ -30,12 +31,13 @@ public class SDDEditorV2 extends Controller {
         String headerSheetColumn;
         String commentSheetColumn;
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-
-
     public Result index(String fileId, boolean bSavable, int indicator) {
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
+
+        // bioportalKey=ConfigProp.getBioportalApiKey()
 
         Collections.sort(loadedList);
         final SysUser user = AuthApplication.getLocalUser(session());
@@ -105,6 +107,12 @@ public class SDDEditorV2 extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postFromEditableLink(String editableId) {
         return fromEditableLink(editableId);
+    }
+    
+    public Result getBioportalKey() {
+        bioportalKey=ConfigProp.getBioportalApiKey();
+        System.out.println("bioportalKey = " + bioportalKey);
+        return ok(Json.toJson(bioportalKey));
     }
     
     public Result getCart(){
