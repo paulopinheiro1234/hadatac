@@ -75,21 +75,38 @@ public class SDDEditorV2 extends Controller {
         return index(fileId, bSavable,indicator);
     }
 
-    public Result fromSharedLink(String sharedId) {
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result fromViewableLink(String viewableId) {
         Collections.sort(loadedList);
-        DataFile dataFile = DataFile.findBySharedId(sharedId);
+        DataFile dataFile = DataFile.findByViewableId(viewableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(sdd_editor_v2.render(dataFile,null, false,loadedList,this));
+        return ok(sdd_editor_v2.render(dataFile,null, false, loadedList, this));
     }
 
-    public Result postFromSharedLink(String sharedId) {
-        return fromSharedLink(sharedId);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postFromViewableLink(String viewableId) {
+        return fromViewableLink(viewableId);
     }
 
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result fromEditableLink(String editableId) {
+        Collections.sort(loadedList);
+        DataFile dataFile = DataFile.findByEditableId(editableId);
+        if (null == dataFile) {
+            return badRequest("Invalid link!");
+        }
 
+        return ok(sdd_editor_v2.render(dataFile,null, false, loadedList, this));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postFromEditableLink(String editableId) {
+        return fromEditableLink(editableId);
+    }
+    
     public Result getCart(){
         return ok(Json.toJson(currentCart));
     }
