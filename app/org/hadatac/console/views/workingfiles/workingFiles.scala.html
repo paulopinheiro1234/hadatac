@@ -129,7 +129,7 @@
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.renameDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="rename">Rename</a>
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.moveDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="move">Move</a>
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
-                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.getLinkForSharing(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="share">Share</a>
+                <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.shareDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="share">Share</a>
 
 				@*
                 @if(bAdmin) {

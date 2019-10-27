@@ -56,18 +56,32 @@ public class DDEditor extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result fromSharedLink(String sharedId,String dir) {
-        DataFile dataFile = DataFile.findBySharedId(sharedId);
+    public Result fromViewableLink(String viewableId, String dir) {
+        DataFile dataFile = DataFile.findByViewableId(viewableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile, false,dir));
+        return ok(dd_editor.render(dataFile, false, dir));
     }
 
-    public Result postFromSharedLink(String sharedId,String dir) {
-        return fromSharedLink(sharedId,dir);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postFromViewableLink(String viewableId, String dir) {
+        return fromViewableLink(viewableId, dir);
     }
    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result fromEditableLink(String editableId, String dir) {
+        DataFile dataFile = DataFile.findByEditableId(editableId);
+        if (null == dataFile) {
+            return badRequest("Invalid link!");
+        }
 
+        return ok(dd_editor.render(dataFile, false, dir));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postFromEditableLink(String editableId, String dir) {
+        return fromEditableLink(editableId, dir);
+    }
 }
