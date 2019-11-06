@@ -5,17 +5,22 @@ dir: String
 )
 
 @import helper._
+@import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
 @import java.net._
+@import org.hadatac.console.views.html.schema._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo._
 
 @main("Edit DD_2"){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
     <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
 
-    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
+
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs_dd.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
     
@@ -35,15 +40,34 @@ dir: String
         <img src="@controllers.routes.Assets.versioned("icons/notepad.png")"  width="30" height="28" alt=""/> Description
     </button>
     <input type="text" id="descdetails" value=" "/>
-  
+    <a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" target="_blank" class="btn btn-primary" role="button">Blank Metadata File</a>
     
-    <a href="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId())" 
-    class="btn btn-primary" role="button" id="carryover" style="padding:3pt">
-    <img src="@controllers.routes.Assets.versioned("icons/add.png")" 
-     width="28" height="28" alt=""/>  Add to SDD  </a>
+    <button class="main-navi" id="showcarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
+        width="36" height="33" alt=""/> Add to SDD</button>
+        <button class="Close" id="hidecarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
+           width="36" height="33" alt=""/> Hide</button>
+
+    
     <div><a id="alarmmsg"></a></div>
+    <div id="mobile-navi">
+        <div id="ifr">
+        <iframe id="iframeadd" src="@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId())"></iframe>
+    </div>
+    </div>
+
+    <script>
+        function addHeaders(){
+            var loc=document.getElementById("mobile-nav");
+            var iframe = document.createElement('iframe');
+            
+            iframe.src = "@org.hadatac.console.controllers.workingfiles.routes.FileHeadersIntoSDD.createHeaders(dir, dataFile.getId())";
+            loc.appendChild(iframe);
+
+        }
+    </script>
     
-    
+
+
     <div><a id="error_msg"></a></div>
     <div id="grid"></div>
     <div id="footnote"></div>
@@ -54,6 +78,7 @@ dir: String
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server_dd.js")"></script>
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/ddhideshow.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
     
     <script type="text/javascript">
