@@ -1,38 +1,74 @@
-Vagrant.configure(2) do |config|
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/xenial64"
-  config.vm.provider "virtualbox" do |vb|
-       vb.name = "hadatac-virtual"
-       vb.customize ["modifyvm", :id, "--memory", "6144"]
-       vb.customize ["modifyvm", :id, "--cpus", "2"]
-       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-       vb.customize ["modifyvm", :id, "--cpuexecutioncap", "80"]
-       vb.customize ["modifyvm", :id, "--vram", "256"]       
-  end
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8983, host: 8983, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 9000, host: 9000, host_ip: "127.0.0.1"
 
-  config.vm.network "private_network", ip: "192.168.54.55"
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
 
-  #config.ssh.forward_agent = true
-  #config.ssh.pty = true
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
   # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
 
-  #config.vm.provision "shell", path: "install.sh", privileged: false
-  config.vm.provision "shell", privileged: false, inline: <<-SHELL
-    echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt update
-    sudo apt install -y git unzip sbt default-jdk wget
-    cd ~
-    echo "alias jetty='bash /home/vagrant/hadatac-blazegraph/jetty-distribution-9.4.12.v20180830/bin/jetty.sh'" >> .bash_aliases
-    echo "alias solr='bash /home/vagrant/hadatac-solr/solr/run_solr6.sh'" >> .bash_aliases
-    source .bash_aliases
-    git clone https://github.com/paulopinheiro1234/hadatac.git
-    cd hadatac
-    ./install_hadatac.sh Y ~/hadatac-solr ~/hadatac-blazegraph
-    sed \'s/com\\.bigdata\\.journal\\.AbstractJournal\\.file\\=\[\^ \]\*\\.jnl/com\\.bigdata\\.journal\\.AbstractJournal\\.file\\=\\/home\\/vagrant\\/hadatac\\-blazegraph\\/blazegraph\\.jnl/\' -i /home/vagrant/hadatac-blazegraph/jetty-distribution-9.4.12.v20180830/webapps/blazegraph/WEB-INF/classes/RWStore.properties
-    bash /home/vagrant/hadatac-blazegraph/jetty-distribution-9.4.12.v20180830/bin/jetty.sh restart
-    bash /home/vagrant/hadatac-solr/solr/run_solr6.sh restart
-    ./create_namespaces.sh
-  SHELL
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+    config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+      vb.memory = "4096"
+      vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
+    end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   apt-get install -y apache2
+  # SHELL
 end
