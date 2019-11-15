@@ -56,6 +56,10 @@
 	   @defining("") { filename => @defining("") { da_uri => 
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", ".")" 
 		   id="autoannotate" class="btn btn-primary btn-block" role="button">Ingest Files</a>
+    	@defining(0) { page =>  
+           <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index("/", filename, da_uri, page)" 
+		      id="messages" class="btn btn-primary btn-block" role="button">Ingest Messages</a>
+		}
 		<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")" 
 		   id="workingfiles" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
 		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" 
@@ -128,10 +132,10 @@
       <div class="row">
          <div class="col-md-1 col-xs-0"></div>
          @* <div class="col-md-3 col-xs-0">
-             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
+             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
          </div> *@
          <div class="col-md-3 col-xs-0">
-             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADataC-User-Guide" class="btn btn-warning btn-block" role="button">User Guide</a>
+             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-User-Guide" class="btn btn-warning btn-block" role="button">User Guide</a>
          </div>
          <div class="col-md-2 col-xs-0"></div>
       </div>
@@ -151,6 +155,7 @@
               $('#apicall').attr( 'class', 'btn btn-primary btn-block' );
               $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block' );
+              $('#messages').attr( 'class', 'btn btn-primary btn-block' );
               $('#workingfiles').attr( 'class', 'btn btn-primary btn-block' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block' );
@@ -172,6 +177,7 @@
               $('#downloader').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#apicall').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#autoannotate').attr( 'class', 'btn btn-primary btn-block disabled' );
+              $('#messages').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#workingfiles').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#studies').attr( 'class', 'btn btn-primary btn-block disabled' );
               $('#indicators').attr( 'class', 'btn btn-primary btn-block disabled' );
