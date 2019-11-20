@@ -1,0 +1,33 @@
+@(dir      : String,
+  filename : String,
+  da_uri   : String,
+  page     : Integer,
+  results  : List[org.hadatac.entity.pojo.MessageStream])
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+
+@main("Message Ingestion") {
+
+    <h2>Message Ingestion</h2>
+    
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Stream Name</th>
+                    <th>IP</th>
+                    <th>Port</th>
+                    <th>Status</th>
+                    <th>Protocol</th>
+                    <th>Operations</th>
+                 </tr>
+            </thead>
+            <tbody>
+              @for(stream <- results){
+                  @stream_entry(dir, filename, da_uri, page, stream)
+              }
+            </tbody>
+        </table>
+        @mainButton(false)
+    </div>
+}

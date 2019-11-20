@@ -1279,16 +1279,20 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static void outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
 	try {
-	    File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
+	    //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
+	    String fileName = "download_" + file.getName().substring(10, file.getName().lastIndexOf("_")) + "_codebook.csv";
 	    Date date = new Date();
-	    DataFile dataFile = new DataFile(codeBookFile.getName());
-	    dataFile.setOwnerEmail(ownerEmail);
-	    dataFile.setStatus(DataFile.CREATING);
+	    //String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + "_codebook.csv";
+	    //DataFile dataFile = new DataFile(codeBookFile.getName());
+	    //dataFile.setOwnerEmail(ownerEmail);
+	    //dataFile.setStatus(DataFile.CREATING);
+	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
 	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 	    dataFile.save();
 
 	    // Write empty string to create the file
-	    FileUtils.writeStringToFile(codeBookFile, "", "utf-8", true);
+        File codeBookFile = new File(dataFile.getAbsolutePath());
+        FileUtils.writeStringToFile(codeBookFile, "", "utf-8", true);
 	    
 	    System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
 	    
