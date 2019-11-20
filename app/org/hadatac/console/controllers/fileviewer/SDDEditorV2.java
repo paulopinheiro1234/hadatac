@@ -15,31 +15,28 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.NameSpace;
 import play.libs.Json;
 import org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD;
 import play.core.j.JavaResultExtractor;
+
+import org.hadatac.entity.pojo.Ontology;
 
 
 public class SDDEditorV2 extends Controller {
     NameSpaces ns = NameSpaces.getInstance();
         String bioportalKey="";
         List<String> loadedList = ns.listLoadedOntologies();
-        List<String> currentCart=new ArrayList<String>();
+        List<String> currentCart = new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
         ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
         DataFile ddDF;
         String headerSheetColumn;
         String commentSheetColumn;
+
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-
-
     public Result index(String fileId, boolean bSavable, int indicator) {
-        // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
-        // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
-
-        // bioportalKey=ConfigProp.getBioportalApiKey()
-
         Collections.sort(loadedList);
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -95,9 +92,13 @@ public class SDDEditorV2 extends Controller {
 
     public Result getBioportalKey() {
         bioportalKey=ConfigProp.getBioportalApiKey();
-        System.out.println("bioportalKey = " + bioportalKey);
         return ok(Json.toJson(bioportalKey));
     }
+
+    public Result getOntologies() {
+        return ok(Json.toJson(Ontology.find()));
+    }
+
     public Result getCart(){
         return ok(Json.toJson(currentCart));
     }
