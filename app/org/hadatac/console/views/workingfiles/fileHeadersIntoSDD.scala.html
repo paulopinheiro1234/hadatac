@@ -25,10 +25,10 @@
 
 	      if (cansubmit) {
 	          document.getElementById('togoback').disabled = false;
-	          document.getElementById('submitbutton2').disabled = false;
+	          
 	      } else {
 	          document.getElementById('togoback').disabled = 'disabled';
-	          document.getElementById('submitbutton2').disabled = 'disabled';
+	          
 	      }
 	   }
 	</script>
@@ -116,7 +116,10 @@
           var newType = $("input[name=newStudyType]:checked").val();
           var checkedSDDName=$("input:checked").val();
           checkedSDDName=checkedSDDName.replace('/',"")
-          
+         
+          checkedSDDName = checkedSDDName.split('_')[0];
+          checkedSDDName=checkedSDDName+".xlsx"
+         
           $.ajax({
           type : 'GET',
           url : 'http://localhost:9000/hadatac/working/headers/getCheckedSDD',
@@ -125,8 +128,9 @@
             
           },
           success : function(data) {
-            console.log(data);
+            
             sddId=data;
+            
             
           },
         
@@ -136,7 +140,7 @@
        };
        
        function goToSDD(){
-         window.location.href="/hadatac/annotator/sddeditor_v2?file_id="+sddId+"&bSavable=true&indicator=1";
+         window.location.href="/hadatac/sddeditor_v2?file_id="+sddId+"&bSavable=true&indicator=1";
       
         
        }
@@ -145,6 +149,7 @@
           tree[i].addEventListener('click', function(e) {
            
           var parent = e.target.parentElement;
+        
           var classList = parent.classList;
           
           if(classList.contains("open")) {
