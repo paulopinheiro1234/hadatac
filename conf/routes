@@ -395,6 +395,16 @@ GET     /hadatac/sddeditor_v2                          org.hadatac.console.contr
 POST    /hadatac/sddeditor_v2                          org.hadatac.console.controllers.fileviewer.SDDEditorV2.postIndex(file_id : String, bSavable : Boolean,indicator:Int)
 GET     /hadatac/dd_editor                             org.hadatac.console.controllers.fileviewer.DDEditor.index(file_id : String, bSavable : Boolean, dir:String)
 POST    /hadatac/dd_editor                             org.hadatac.console.controllers.fileviewer.DDEditor.postIndex(file_id : String, bSavable : Boolean, dir:String)
+
+GET	    /hadatac/dd_editor/getHeaderLoc	       org.hadatac.console.controllers.fileviewer.DDEditor.getHeaderLoc(header_loc:String)
+POST	/hadatac/dd_editor/getHeaderLoc  	   org.hadatac.console.controllers.fileviewer.DDEditor.getHeaderLoc(header_loc:String)
+GET	    /hadatac/dd_editor/getCommentLoc	       org.hadatac.console.controllers.fileviewer.DDEditor.getCommentLoc(desc_loc:String)
+POST	/hadatac/dd_editor/getCommentLoc   	   org.hadatac.console.controllers.fileviewer.DDEditor.getCommentLoc(desc_loc:String)
+GET	    /hadatac/dd_editor/getCheckedSDD	       org.hadatac.console.controllers.fileviewer.DDEditor.getCheckedSDD(sddFileName : String)
+POST	/hadatac/dd_editor/getCheckedSDD	       org.hadatac.console.controllers.fileviewer.DDEditor.getCheckedSDD(sddFileName: String)
+
+
+
 GET     /hadatac/sddeditor_v2/getHeaderLoc             org.hadatac.console.controllers.fileviewer.SDDEditorV2.getHeaderLoc()
 POST    /hadatac/sddeditor_v2/getHeaderLoc             org.hadatac.console.controllers.fileviewer.SDDEditorV2.getHeaderLoc()
 GET     /hadatac/sddeditor_v2/getCommentLoc            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCommentLoc()
@@ -409,6 +419,8 @@ POST    /hadatac/sddeditor_v2/getfile_ID               org.hadatac.console.contr
 #POST   /hadatac/sddeditor_v2/getdd_ID                 org.hadatac.console.controllers.fileviewer.SDDEditorV2.getdd_ID()
 GET     /hadatac/sddeditor_v2/getCart                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
 POST    /hadatac/sddeditor_v2/getCart                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
+
+
 
 GET     /hadatac/sddeditor_v2/getBioportalKey                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
 POST    /hadatac/sddeditor_v2/getBioportalKey                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
@@ -453,6 +465,12 @@ GET     /hadatac/working/ingestfile                    org.hadatac.console.contr
 POST    /hadatac/working/ingestfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.ingestDataFile(file_id : String)
 GET     /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_id : String)
 POST    /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_id : String)
+
+
+
+GET     /hadatac/working/verifyDataFileTemp                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFileTemp(file_id : String)
+POST    /hadatac/working/verifyDataFileTemp                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFileTemp(file_id : String)
+
 GET	    /hadatac/working/log                           org.hadatac.console.controllers.workingfiles.WorkingFiles.checkAnnotationLog(dir : String, file_id : String)
 POST	/hadatac/working/log                           org.hadatac.console.controllers.workingfiles.WorkingFiles.checkAnnotationLog(dir : String, file_id : String)
 GET     /hadatac/working/queryfile                     org.hadatac.console.controllers.workingfiles.WorkingFiles.getAnnotationStatus(file_id: String)
@@ -475,6 +493,8 @@ GET	    /hadatac/working/headers/getHeaderLoc	       org.hadatac.console.control
 POST	/hadatac/working/headers/getHeaderLoc   	   org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getHeaderLoc(header_loc:String)
 GET	    /hadatac/working/headers/getCommentLoc	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getCommentLoc(desc_loc:String)
 POST	/hadatac/working/headers/getCommentLoc   	   org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getCommentLoc(desc_loc:String)
+
+
 GET	    /hadatac/working/headers/getCheckedSDD	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getCheckedSDD(sddFileName : String)
 POST	/hadatac/working/headers/getCheckedSDD	       org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getCheckedSDD(sddFileName: String)
 #GET	/hadatac/working/headers/getDDId	           org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD.getDDId()

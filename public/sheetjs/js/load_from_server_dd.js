@@ -203,7 +203,7 @@ function storeHeader(header_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/working/headers/getHeaderLoc',
+    url : 'http://localhost:9000/hadatac/dd_editor/getHeaderLoc',
     data : {
       header_loc: header_location
       
@@ -220,7 +220,7 @@ function storeDesc(desc_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/working/headers/getCommentLoc',
+    url : 'http://localhost:9000/hadatac/dd_editor/getCommentLoc',
     data : {
       desc_loc: desc_location
       

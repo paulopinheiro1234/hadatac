@@ -155,6 +155,7 @@ cellEntry.addEventListener('keyup', function (e){
 });
 
 cdg.addEventListener('click', function (e) {
+  returnToView();
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
 
@@ -239,6 +240,7 @@ cdg.addEventListener('endedit',function(e){
 })
 
 cdg.addEventListener('click', function (e) {
+  returnToView();
   if (!e.cell) { return; }
   if(e.cell.value==null){console.log("non");return;}
   else{
@@ -310,7 +312,7 @@ function removeRow(){
   for( var i=1;i<temp.length;i++){
     $.ajax({
       type : 'GET',
-      url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/removingRow',
+      url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
       data : {
         removedValue:temp[i]
       },

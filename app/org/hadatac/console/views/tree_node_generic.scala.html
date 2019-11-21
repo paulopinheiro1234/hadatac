@@ -16,6 +16,7 @@
 } else {
    @if(isDir) {
 	   @if(!selected.equals("") && node.getName().equals(selected)) {
+		  
     	  <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@node.getName()" 
     	         onchange="typechange()" checked>&nbsp;&nbsp; @DataFile.getFolderLabel(node.getName())</a>
    	   } else {

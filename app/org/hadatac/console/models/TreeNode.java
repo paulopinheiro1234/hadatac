@@ -21,7 +21,16 @@ public class TreeNode {
     }
     
     public String getName() {
-        return name;
+		String toRet=name;
+		if(name.endsWith(".xlsx")==true){
+			String before = name.split("_")[0]; // "Gets the first part of the file name with the extension"
+			toRet=before+".xlsx";
+		}
+		
+		
+		System.out.println(toRet);
+
+        return toRet;
     }
     
     public void setName(String name) {
