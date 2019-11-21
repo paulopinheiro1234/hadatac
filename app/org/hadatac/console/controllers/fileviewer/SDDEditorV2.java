@@ -112,6 +112,12 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(bioportalKey));
     }
 
+
+   public Result getSDDGenAddress() {
+      String sddAddress = ConfigProp.getSDDGenAddress();
+      return ok(Json.toJson(sddAddress));
+   }
+
     public Result getOntologies() {
         return ok(Json.toJson(Ontology.find()));
     }

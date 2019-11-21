@@ -3,6 +3,7 @@
 
 var demo_enabled = false;
 var sdd_suggestions;
+var sddgenAdress;
 
 /** drop target **/
 var _target = document.getElementById('drop');
@@ -568,15 +569,22 @@ function getSuggestion(){
                   callback(status, xhr.response);
               }
           };
-          xhr.send(JSON.stringify(request));
 
+          xhr.addEventListener("error", function() {
+            console.log('Couldnt connect to SDDgen');
+            spinnerStatus.stop();
+            imageStatus.style.visibility = 'visible';
+            imageStatus.src = imgPath + 'fail.png'
+          });
+
+          xhr.send(JSON.stringify(request));
          }
          ontRequest.send();
       }
       oReq.send();
    };
 
-   getJSON("http://127.0.0.1:5000/populate-sdd",  function(err, data) {
+   var sddGenFunction = function(err, data) {
       if (err != null) {
          console.error(err);
          console.log(data);
@@ -595,7 +603,22 @@ function getSuggestion(){
          imageStatus.style.visibility = 'visible';
          imageStatus.src = imgPath + 'success.png'
       }
-   });
+   };
+
+   if(sddgenAdress == null){
+      var getSDDGenRequest = new XMLHttpRequest();
+      getSDDGenRequest.open("GET", 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress', true);
+      getSDDGenRequest.responseType = 'json';
+      getSDDGenRequest.onload = function(e) {
+         sddgenAdress = getSDDGenRequest.response;
+         console.log(sddgenAdress)
+         getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+      }
+      getSDDGenRequest.send();
+   }
+   else{
+      getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+   }
 }
 
 function jsonparser(colval,rowval,menuoptns,isVirtual){
