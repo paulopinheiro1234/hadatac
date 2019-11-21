@@ -111,7 +111,16 @@ public class DDEditor extends Controller {
        System.out.println("sdd fileid: "+sdd_id);
        return ok(Json.toJson(sdd_id));
     }
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result fromEditableLink(String editableId, String dir) {
+        DataFile dataFile = DataFile.findByEditableId(editableId);
+        if (null == dataFile) {
+            return badRequest("Invalid link!");
+        }
 
+
+        return ok(dd_editor.render(dataFile, false, dir,dirFile));
+    }
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postFromEditableLink(String editableId, String dir) {
         return fromEditableLink(editableId, dir);
