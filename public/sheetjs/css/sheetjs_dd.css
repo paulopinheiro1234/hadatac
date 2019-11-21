@@ -15,16 +15,17 @@
 #showcarry{
   display:block;
 }
-#mobile-navi {
+.mobile-navi {
   position:absolute;
   display: none;
-  top: 200px;
+  top: 160px;
   left:1000px;
+  word-wrap: break-word;
+  
 
 }
-#iframeadd{
-  display:none;
-  
+.mobile-navi p{
+  word-wrap: break-word;
 }
 .Close {
   color:black;

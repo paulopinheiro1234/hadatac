@@ -23,7 +23,7 @@
 	<script>
 		var msg = '@log';
 		var msg2 = decodeURIComponent(msg);
-		console.log(msg2);
+		console.log(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
        	$('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
 		  document.getElementById('end-process-box').style.display = 'inline';
 		

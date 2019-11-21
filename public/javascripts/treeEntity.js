@@ -469,7 +469,7 @@
          $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/addToCart',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/addToCart',
             data : {
                 ontology: str
             },
@@ -493,7 +493,7 @@
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
             data : {
                 //cartamount: cart_ctr
             },
@@ -516,7 +516,7 @@
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
             data : {
                 //cartamount: cart_ctr
             },
@@ -576,7 +576,7 @@
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/removeFromCart',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/removeFromCart',
             data : {
                 item: itemToBeRemoved
             },

@@ -19,16 +19,22 @@ import play.libs.Json;
 
 
 public class DDEditor extends Controller {
-   
+    public static String headerSheetColumn;
+    public static String commentSheetColumn;
+    DataFile dirFile = new DataFile("/");
+    public static DataFile dd_df;
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))    
     public Result index(String fileId, boolean bSavable,String dir) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        dirFile.setStatus(DataFile.WORKING);
         if (null == dataFile) {
 
-            return ok(dd_editor.render(dataFile,false,dir));
+            return ok(dd_editor.render(dataFile,false,dir,dirFile));
         }
         
+        
+        getdd_df(dataFile);
         List<DataFile> files = null;
         String path = ConfigProp.getPathDownload();
 
@@ -47,7 +53,7 @@ public class DDEditor extends Controller {
         
 
         
-        return ok(dd_editor.render(dataFile, bSavable,dir));
+        return ok(dd_editor.render(dataFile, bSavable,dir,dirFile));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -62,14 +68,49 @@ public class DDEditor extends Controller {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile, false, dir));
+        return ok(dd_editor.render(dataFile, false,dir,dirFile));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postFromViewableLink(String viewableId, String dir) {
         return fromViewableLink(viewableId, dir);
     }
+    public Result getdd_df(DataFile d){
+        dd_df=d;
+        return new Result(200);
+    }
+   public Result getHeaderLoc(String header_loc){
+        
+        headerSheetColumn=header_loc;
+        System.out.println(headerSheetColumn);
+        return new Result(200);
+    }
+    public Result getCommentLoc(String desc_loc){
+        commentSheetColumn=desc_loc;
+        System.out.println(commentSheetColumn);
+        return new Result(200);
+    }
    
+    
+    public Result getCheckedSDD(String sddFileName){
+        System.out.println("sdd filename: "+sddFileName);
+        final SysUser user = AuthApplication.getLocalUser(session());
+        List<DataFile> files = null;
+        String path = ConfigProp.getPathDownload();
+
+        files = DataFile.find(user.getEmail());
+        String sdd_filename=sddFileName;
+        DataFile sdd_dataFile = new DataFile("");
+        for(DataFile df : files){
+           if(df.getFileName().equals(sdd_filename)){
+             sdd_dataFile = df;
+          }
+       }
+
+       String sdd_id=sdd_dataFile.getId();
+       System.out.println("sdd fileid: "+sdd_id);
+       return ok(Json.toJson(sdd_id));
+    }
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result fromEditableLink(String editableId, String dir) {
         DataFile dataFile = DataFile.findByEditableId(editableId);
@@ -77,9 +118,9 @@ public class DDEditor extends Controller {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile, false, dir));
-    }
 
+        return ok(dd_editor.render(dataFile, false, dir,dirFile));
+    }
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postFromEditableLink(String editableId, String dir) {
         return fromEditableLink(editableId, dir);

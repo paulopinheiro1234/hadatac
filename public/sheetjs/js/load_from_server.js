@@ -162,6 +162,7 @@ cellEntry.addEventListener('keyup', function (e){
 });
 
 cdg.addEventListener('click', function (e) {
+  returnToView();
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
 
@@ -246,6 +247,7 @@ cdg.addEventListener('endedit',function(e){
 })
 
 cdg.addEventListener('click', function (e) {
+  returnToView();
   if (!e.cell) { return; }
   if(e.cell.value==null){console.log("non");return;}
   else{

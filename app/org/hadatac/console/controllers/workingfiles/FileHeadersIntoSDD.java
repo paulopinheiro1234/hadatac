@@ -65,11 +65,14 @@ public class FileHeadersIntoSDD extends Controller {
         return new Result(200);
     }
     public Result getHeaderLoc(String header_loc){
+        
         headerSheetColumn=header_loc;
+        System.out.println(headerSheetColumn);
         return new Result(200);
     }
     public Result getCommentLoc(String desc_loc){
         commentSheetColumn=desc_loc;
+        System.out.println(commentSheetColumn);
         return new Result(200);
     }
    

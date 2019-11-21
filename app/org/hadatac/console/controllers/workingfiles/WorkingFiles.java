@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 
 import com.google.common.io.Files;
 import com.typesafe.config.ConfigFactory;
-
+import play.libs.Json;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.twirl.api.Html;
@@ -632,6 +632,28 @@ public class WorkingFiles extends Controller {
         
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
                 routes.WorkingFiles.index("/", ".").url()));
+    }
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result verifyDataFileTemp(String file_id) {
+        DataFile dataFile = DataFile.findByIdAndStatus(file_id, DataFile.WORKING);
+        File file = new File(dataFile.getAbsolutePath());
+        
+        dataFile.getLogger().resetLog();
+        
+        if (dataFile.attachFile(file)) {
+            GeneratorChain chain = AnnotationWorker.getGeneratorChain(dataFile);
+            if (null != chain) {
+                chain.generate(false);
+            }
+        }
+        
+        String strLog = dataFile.getLog();
+        if (strLog.isEmpty()) {
+            strLog += "This file can be ingested without errors";
+        }
+        //logString=Feedback.print(Feedback.WEB, strLog);
+        return ok(Json.toJson(Feedback.print(Feedback.WEB, strLog)));
+        
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

@@ -53,6 +53,7 @@ function starRec(colval, rowval, menuoptns, isVirtual, L, R, rowIndex, colIndex)
    }
 }
 
+    
 
 function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R, rowIndex, colIndex){
    var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
@@ -101,10 +102,11 @@ function drawStars(rowIndex,colIndex){
 }
 
 function stripStars(){
-
+  
   //str.replace('a', '');
   checkRecs(copyOfL,copyOfR,0);
 }
+
 
 
 addcartlocal()
