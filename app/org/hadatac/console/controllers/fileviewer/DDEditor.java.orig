@@ -68,7 +68,11 @@ public class DDEditor extends Controller {
             return badRequest("Invalid link!");
         }
 
+<<<<<<< HEAD
         return ok(dd_editor.render(dataFile, false,dir,dirFile));
+=======
+        return ok(dd_editor.render(dataFile, false, dir));
+>>>>>>> 757c8aeb21c37ff3587df23447a1fcf5a67a1399
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -91,6 +95,7 @@ public class DDEditor extends Controller {
         return new Result(200);
     }
    
+<<<<<<< HEAD
     
     public Result getCheckedSDD(String sddFileName){
         System.out.println("sdd filename: "+sddFileName);
@@ -110,6 +115,17 @@ public class DDEditor extends Controller {
        String sdd_id=sdd_dataFile.getId();
        System.out.println("sdd fileid: "+sdd_id);
        return ok(Json.toJson(sdd_id));
+    }
+=======
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result fromEditableLink(String editableId, String dir) {
+        DataFile dataFile = DataFile.findByEditableId(editableId);
+        if (null == dataFile) {
+            return badRequest("Invalid link!");
+        }
+>>>>>>> 757c8aeb21c37ff3587df23447a1fcf5a67a1399
+
+        return ok(dd_editor.render(dataFile, false, dir));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

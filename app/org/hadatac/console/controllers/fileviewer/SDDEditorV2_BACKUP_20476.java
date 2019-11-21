@@ -39,14 +39,15 @@ public class SDDEditorV2 extends Controller {
 
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-
-
     public Result index(String fileId, boolean bSavable, int indicator) {
+<<<<<<< HEAD
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
 
         // bioportalKey=ConfigProp.getBioportalApiKey()
         FileID=fileId;
+=======
+>>>>>>> 757c8aeb21c37ff3587df23447a1fcf5a67a1399
         Collections.sort(loadedList);
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -121,7 +122,6 @@ public class SDDEditorV2 extends Controller {
 
     public Result getBioportalKey() {
         bioportalKey=ConfigProp.getBioportalApiKey();
-        System.out.println("bioportalKey = " + bioportalKey);
         return ok(Json.toJson(bioportalKey));
     }
 

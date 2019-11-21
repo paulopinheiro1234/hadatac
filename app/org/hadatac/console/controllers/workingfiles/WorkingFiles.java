@@ -396,7 +396,7 @@ public class WorkingFiles extends Controller {
     }
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result getLinkForSharing(String dir, String fileId) {
+    public Result shareDataFile(String dir, String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
@@ -410,18 +410,17 @@ public class WorkingFiles extends Controller {
             return badRequest("You do NOT have the permission to share this file!");
         }
         
-        String sharedId = dataFile.getSharedId();
-        if (sharedId.isEmpty()) {
-            sharedId = UUID.randomUUID().toString();
-            dataFile.setSharedId(sharedId);
+        String viewableId = dataFile.getViewableId();
+        if (viewableId.isEmpty()) {
+            viewableId = UUID.randomUUID().toString();
+            dataFile.setViewableId(viewableId);
             dataFile.save();
         }
         
         String sharedlink = ConfigFactory.load().getString("hadatac.console.host_deploy") + 
-                org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.fromSharedLink(sharedId).toString();
+                org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.fromViewableLink(viewableId).toString();
         
-        return ok("<a style=\"color:#0000FF; font-size: large;\">Please copy this link for sharing: <br/><u>" + sharedlink 
-                + "</u><br/>With this link, one can preview the shared file!&#128521;</a>").as("text/html");
+        return ok(shareFile.render(dir, sharedlink, dataFile));
     }
     
     /*

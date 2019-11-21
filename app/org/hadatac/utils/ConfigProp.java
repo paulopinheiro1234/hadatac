@@ -171,6 +171,17 @@ public class ConfigProp {
       return true;
     }
 
+    public static String getSDDGenAddress() {
+        return ConfigFactory.load().getString("hadatac.search.sdd_gen_address");
+    }
+
+    public static boolean hasSDDGenAddress() {
+      String sddAddress = getSDDGenAddress();
+      return !sddAddress.isEmpty();
+    }
+
+
+
 	@SuppressWarnings("unchecked")
 	public static String toGuiJson() {
 

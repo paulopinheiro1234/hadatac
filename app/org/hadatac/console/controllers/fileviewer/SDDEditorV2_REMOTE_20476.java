@@ -19,8 +19,6 @@ import org.hadatac.utils.NameSpace;
 import play.libs.Json;
 import org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD;
 import play.core.j.JavaResultExtractor;
-import org.hadatac.console.controllers.fileviewer.DDEditor;
-import org.hadatac.console.controllers.workingfiles.WorkingFiles;
 
 import org.hadatac.entity.pojo.Ontology;
 
@@ -28,7 +26,6 @@ import org.hadatac.entity.pojo.Ontology;
 public class SDDEditorV2 extends Controller {
     NameSpaces ns = NameSpaces.getInstance();
         String bioportalKey="";
-        String FileID="";
         List<String> loadedList = ns.listLoadedOntologies();
         List<String> currentCart = new ArrayList<String>();
         ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
@@ -39,14 +36,7 @@ public class SDDEditorV2 extends Controller {
 
        // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-
-
     public Result index(String fileId, boolean bSavable, int indicator) {
-        // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
-        // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
-
-        // bioportalKey=ConfigProp.getBioportalApiKey()
-        FileID=fileId;
         Collections.sort(loadedList);
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -54,14 +44,12 @@ public class SDDEditorV2 extends Controller {
 
             return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this));
         }
-        DataFile finalDF=new DataFile("");
+        DataFile finalDF=new DataFile("");;
         if(indicator==1 && dataFile!=null){
-            headerSheetColumn=DDEditor.headerSheetColumn;
-            System.out.println(headerSheetColumn);
-            commentSheetColumn=DDEditor.commentSheetColumn;
-             System.out.println(commentSheetColumn);
+            headerSheetColumn=FileHeadersIntoSDD.headerSheetColumn;
+            commentSheetColumn=FileHeadersIntoSDD.commentSheetColumn;
 
-            ddDF=DDEditor.dd_df;
+            ddDF=FileHeadersIntoSDD.dd_df;
             finalDF=ddDF;
 
         }
@@ -121,7 +109,6 @@ public class SDDEditorV2 extends Controller {
 
     public Result getBioportalKey() {
         bioportalKey=ConfigProp.getBioportalApiKey();
-        System.out.println("bioportalKey = " + bioportalKey);
         return ok(Json.toJson(bioportalKey));
     }
 
@@ -207,6 +194,4 @@ public class SDDEditorV2 extends Controller {
 
         return ok(Json.toJson(commentSheetColumn));
     }
-
-    
 }

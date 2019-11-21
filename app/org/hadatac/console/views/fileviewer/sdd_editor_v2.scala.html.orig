@@ -172,7 +172,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         <div id="searchForTerm" class="input-container">
                            <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
                            <button type="button"  role="button" id="searchOnt" class="input-button" >
-                              <span class="glyphicon glyphicon-search">   </span> 
+                              <span class="glyphicon glyphicon-search">   </span>
                           </button>
                           </div>
 
@@ -182,10 +182,11 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                               <option value="50">50</option>
                               <option value="All">All</option>
                           </select>
-                           
-                          
-                        
+
+
+
                         <div id="numberResults"></div>
+<<<<<<< HEAD
                         <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
                            <a href="javascript:prevPage()" id="btn_prev">Prev</a>
                            <a href="javascript:nextPage()" id="btn_next">Next</a>
@@ -195,12 +196,24 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         word-break: keep-all;margin-bottom:5px;"></div>
                         
                         
+=======
+
+                        <div id="listingTable">
+
+                        </div>
+
+                        <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
+                        <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+                        <a href="javascript:nextPage()" id="btn_next">Next</a>
+                        page:<span id="page"></span>
+                        </div>
+>>>>>>> 757c8aeb21c37ff3587df23447a1fcf5a67a1399
 
                      </div>
                      <ul class="custom-cm">
                         <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height="20px"/> Add to Cart</a> </li>
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
-      
+
                     </ul>
 
                      <div class="text-area">

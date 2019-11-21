@@ -69,14 +69,20 @@ public class DataFile implements Cloneable {
 
     @Field("id")
     private String id;
-    @Field("shared_id_str")
-    private String sharedId = "";
+    @Field("viewable_id_str")
+    private String viewableId = "";
+    @Field("editable_id_str")
+    private String editableId = "";
     @Field("file_name_str")
     private String fileName = "";
     @Field("dir_str")
     private String dir = "";
     @Field("owner_email_str")
     private String ownerEmail = "";
+    @Field("viewer_email_str_multi")
+    private List<String> viewerEmails;
+    @Field("editor_email_str_multi")
+    private List<String> editorEmails;
     @Field("study_uri_str")
     private String studyUri = "";
     @Field("acquisition_uri_str")
@@ -146,11 +152,18 @@ public class DataFile implements Cloneable {
         this.id = id;
     }
     
-    public String getSharedId() {
-        return sharedId;
+    public String getViewableId() {
+        return viewableId;
     }
-    public void setSharedId(String sharedId) {
-        this.sharedId = sharedId;
+    public void setViewableId(String viewableId) {
+        this.viewableId = viewableId;
+    }
+    
+    public String getEditableId() {
+        return editableId;
+    }
+    public void setEditableId(String editableId) {
+        this.editableId = editableId;
     }
     
     public String getAbsolutePath() {
@@ -210,6 +223,40 @@ public class DataFile implements Cloneable {
     }
     public void setOwnerEmail(String ownerEmail) {
         this.ownerEmail = ownerEmail;
+    }
+    
+    public List<String> getViewerEmails() {
+        return viewerEmails;
+    }
+    public void setViewerEmails(List<String> viewerEmails) {
+        this.viewerEmails = viewerEmails;
+    }
+    public void addViewerEmail(String viewerEmail) {
+        if (!viewerEmails.contains(viewerEmail)) {
+            viewerEmails.add(viewerEmail);
+        }
+    }
+    public void removeViewerEmail(String viewerEmail) {
+        if (viewerEmails.contains(viewerEmail)) {
+            viewerEmails.remove(viewerEmail);
+        }
+    }
+    
+    public List<String> getEditorEmails() {
+        return editorEmails;
+    }
+    public void setEditorEmails(List<String> editorEmails) {
+        this.editorEmails = editorEmails;
+    }
+    public void addEditorEmail(String editorEmail) {
+        if (!editorEmails.contains(editorEmail)) {
+            editorEmails.add(editorEmail);
+        }
+    }
+    public void removeEditorEmail(String editorEmail) {
+        if (editorEmails.contains(editorEmail)) {
+            editorEmails.remove(editorEmail);
+        }
     }
 
     public String getStudyUri() {
@@ -407,9 +454,12 @@ public class DataFile implements Cloneable {
         DataFile object = new DataFile(SolrUtils.getFieldValue(doc, "file_name_str").toString());
 
         object.setId(SolrUtils.getFieldValue(doc, "id").toString());
-        object.setSharedId(SolrUtils.getFieldValue(doc, "shared_id_str").toString());
+        object.setViewableId(SolrUtils.getFieldValue(doc, "viewable_id_str").toString());
+        object.setEditableId(SolrUtils.getFieldValue(doc, "editable_id_str").toString());
         object.setDir(SolrUtils.getFieldValue(doc, "dir_str").toString());
         object.setOwnerEmail(SolrUtils.getFieldValue(doc, "owner_email_str").toString());
+        object.setViewerEmails(SolrUtils.getFieldValues(doc, "viewer_email_str_multi"));
+        object.setEditorEmails(SolrUtils.getFieldValues(doc, "editor_email_str_multi"));
         object.setStudyUri(SolrUtils.getFieldValue(doc, "study_uri_str").toString());
         object.setDataAcquisitionUri(URIUtils.replaceNameSpaceEx(SolrUtils.getFieldValue(doc, "acquisition_uri_str").toString()));
         object.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str").toString());
@@ -548,9 +598,22 @@ public class DataFile implements Cloneable {
         return null;
     }
     
-    public static DataFile findBySharedId(String id) {
+    public static DataFile findByViewableId(String id) {
         SolrQuery query = new SolrQuery();
-        query.set("q", "shared_id_str:\"" + id + "\"");
+        query.set("q", "viewable_id_str:\"" + id + "\"");
+        query.set("rows", "10000000");
+
+        List<DataFile> results = findByQuery(query);
+        if (!results.isEmpty()) {
+            return results.get(0);
+        }
+
+        return null;
+    }
+    
+    public static DataFile findByEditableId(String id) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "editable_id_str:\"" + id + "\"");
         query.set("rows", "10000000");
 
         List<DataFile> results = findByQuery(query);
