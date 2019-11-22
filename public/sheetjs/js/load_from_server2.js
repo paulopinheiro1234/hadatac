@@ -40,86 +40,52 @@ function checkRecs (L,R,checker){
 
 }
 
-  function starRec(colval,rowval,menuoptns,isVirtual,L,R,rowIndex,colIndex){
-    var getJSON = function(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.responseType = 'json';
-    xhr.onload = function() {
-        var status = xhr.status;
-        if (status == 200) {
-            callback(null, xhr.response);
-            spinnerStatus.stop();
-            imageStatus.style.visibility = 'visible';
-            imageStatus.src = imgPath + 'success.png'
-        } else {
-            callback(status);
-            spinnerStatus.stop();
-            imageStatus.style.visibility = 'visible';
-            imageStatus.src = imgPath + 'fail.png'
-        }
-    };
-
-    xhr.onerror = function() {
-        spinnerStatus.stop();
-        imageStatus.style.visibility = 'visible';
-        imageStatus.src = imgPath + 'fail.png'
-    };
-
-      xhr.send();
-    };
-
-    getJSON('http://128.113.106.57:5000/get-sdd/',  function(err, data) {
-    if (err != null) {
-        console.error(err);
-        spinnerStatus.stop();
-        imageStatus.style.visibility = 'visible';
-        imageStatus.src = imgPath + 'fail.png'
-    }
-
-    else {
+function starRec(colval, rowval, menuoptns, isVirtual, L, R, rowIndex, colIndex){
+   if (typeof sdd_suggestions != 'undefined') {
       if(rowval.startsWith("??")){
-        var keyword="virtual-columns";
-        helperStarRec(keyword,rowval,colval,data,menuoptns,isVirtual,L,R,rowIndex,colIndex);
-    }
+         var keyword="virtual-columns";
+         helperStarRec(keyword, rowval, colval, sdd_suggestions, menuoptns, isVirtual, L, R, rowIndex, colIndex);
+      }
       else{
-        var keyword="columns";
-        helperStarRec(keyword,rowval,colval,data,menuoptns,isVirtual,L,R,rowIndex,colIndex);
-        }
-    }
-    });
-  }
-
-  function helperStarRec(keyword,rowval,colval,data,menuoptns,isVirtual,L,R,rowIndex,colIndex){
-    var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
-      var index=0;
-      var checkcolval="";
-      for (var i =0;i<data["sdd"]["Dictionary Mapping"][keyword].length;i++){
-        if(data["sdd"]["Dictionary Mapping"][keyword][i]["column"]==rowval){
-          index=i;
-        }
+         var keyword="columns";
+         helperStarRec(keyword, rowval, colval, sdd_suggestions, menuoptns, isVirtual, L, R, rowIndex, colIndex);
       }
-      var tempcolarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword][index]);
+   }
+}
+
+    
+
+function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R, rowIndex, colIndex){
+   var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
+   var index=0;
+   var checkcolval="";
+   for (var i =0;i<data["sdd"]["Dictionary Mapping"][keyword].length;i++){
+      if(data["sdd"]["Dictionary Mapping"][keyword][i]["column"]==rowval){
+         index=i;
+      }
+   }
+
+   if(index < data["sdd"]["Dictionary Mapping"][keyword].length){
+      var tempcolarray = Object.keys(data["sdd"]["Dictionary Mapping"][keyword][index]);
       for (var m=0;m<tempcolarray.length;m++){
-          if(tempcolarray[m]==colval){
-            checkcolval=tempcolarray[m];
-          }
-        }
+         if(tempcolarray[m] == colval){
+            checkcolval = tempcolarray[m];
+            if(data["sdd"]["Dictionary Mapping"][keyword][index]["column"]==rowval && colval==checkcolval){
+               for(var n=0;n<data["sdd"]["Dictionary Mapping"][keyword][index][colval].length;n++){
+                  var temp=[];
+                  temp.push(data["sdd"]["Dictionary Mapping"][keyword][index][colval][n].star);
+                  temp.push(data["sdd"]["Dictionary Mapping"][keyword][index][colval][n].value);
+                  menuoptns.push(temp);
+               }
+            }
 
-      if(data["sdd"]["Dictionary Mapping"][keyword][index]["column"]==rowval && colval==checkcolval){
-          for(var n=0;n<data["sdd"]["Dictionary Mapping"][keyword][index][colval].length;n++){
-            var temp=[];
-            temp.push(data["sdd"]["Dictionary Mapping"][keyword][index][colval][n].star);
-            temp.push(data["sdd"]["Dictionary Mapping"][keyword][index][colval][n].value);
-            menuoptns.push(temp);
-          }
-
+            if(menuoptns.length>0){
+               drawStars(rowIndex,colIndex);
+            }
+            break; // leave for loop early
+         }
       }
-
-     if(menuoptns.length>0){
-         drawStars(rowIndex,colIndex);
-     }
-
+   }
 }
 
 function drawStars(rowIndex,colIndex){
@@ -142,42 +108,7 @@ function stripStars(){
 }
 
 
-// $.ajax({
-//     type : 'GET',
-//     url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCart',
-//     data : {
-//       //  s: str
-//     },
-//     success : function(data) {
 
-
-
-//       var select=document.getElementById("seecart"),data;
-//       for(var i=0;i<data.length;i++){
-//           var li = document.createElement("li");
-//           li.appendChild(document.createTextNode(data[i]+" "));
-//           li.setAttribute("class","inCart");
-//           select.appendChild(li);
-//           li.addEventListener("click",function(e){
-
-//             var newOntology=e.target.innerHTML.split(",")[1];
-//             // //addFromCart(newOntology);
-//             //alert(newOntology);
-
-//             cdg.data[rowNum][colNum]=newOntology;
-//             var colNum_str=colNum.toString();
-//             var rowNum_str=rowNum.toString();
-//             storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
-//             cdg.draw();
-//           })
-
-//         }
-//       }
-
-
-
-
-// });
 addcartlocal()
 function addcartlocal(){
   clearCart();
@@ -234,7 +165,7 @@ function clearCart(){
 function storeThisEdit(rowNum_str,colNum_str,changeValue){
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/addToEdits',
+    url : 'http://localhost:9000/hadatac/sddeditor_v2/addToEdits',
     data : {
       row: rowNum_str,
       col:colNum_str,
@@ -249,7 +180,7 @@ function storeThisEdit(rowNum_str,colNum_str,changeValue){
 function undoEdit(){
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getEdit',
+    url : 'http://localhost:9000/hadatac/sddeditor_v2/getEdit',
     data : {
        //editValue: changeValue
     },
@@ -266,7 +197,7 @@ function undoEdit(){
 function reundoEdit(){
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getOldEdits',
+    url : 'http://localhost:9000/hadatac/sddeditor_v2/getOldEdits',
     data : {
        //editValue: changeValue
     },

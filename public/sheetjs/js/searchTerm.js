@@ -1,6 +1,7 @@
 var current_page = 1;
 var records_per_page = 4;
 var numToPage;
+
 function showTop(){
     //numToPage=document.getElementById('numToSearch').value;
     var e = document.getElementById("numToSearch");
@@ -14,10 +15,16 @@ function returnToView(){
     document.getElementById("recommendedterms").style.display="block";
     document.getElementById("recommendedcolumn").style.display="block";
     document.getElementById("editRowsAdd").style.display="block";
-    document.getElementById("verifysdd").style.display="block";
+    document.getElementById("verifysdd").style.display="flex";
+    document.getElementById("verifysdd").style.justifyContent="center";
+    document.getElementById("verifysdd").style.margin="0 auto";
     document.getElementById("returnView").style.display="none";
-    document.getElementById("listingTable").innerHTML="";
-    document.getElementById("termToSearch").innerHTML="";
+    document.getElementById("menulist").style.display="none";
+    document.getElementById("virtuallist").style.display="none";
+    document.getElementById("irifound").style.display="none";
+    // document.getElementById("listingTable").innerHTML="";
+    document.getElementById("listingTable").style.display="none";
+    document.getElementById("termToSearch").value="";
     document.getElementById("numberResults").innerHTML="";
     document.getElementById("pagekey").style.display="none";
     document.getElementById("numToSearch").style.display="block";
@@ -26,14 +33,18 @@ function returnToView(){
 }
 var searchItem=document.getElementById("searchOnt");
 searchItem.addEventListener('click', function(e) {
-    document.getElementById("listingTable").innerHTML="";
-    document.getElementById("numberResults").innerHTML="";
+    // document.getElementById("listingTable").innerHTML="";
+    if(document.getElementById("numberResults").innerHTML!=""){
+        document.getElementById("numberResults").innerHTML="";
+    }
+   
     document.getElementById("recommendedterms").style.display="none";
     document.getElementById("recommendedcolumn").style.display="none";
     document.getElementById("editRowsAdd").style.display="none";
     document.getElementById("verifysdd").style.display="none";
     document.getElementById("returnView").style.display="block";
     var termToSearch=document.getElementById("termToSearch").value;
+    console.log(termToSearch);
     prehttp(termToSearch);
 });
 
@@ -112,7 +123,7 @@ function prehttp(termToSearch){
 
              }
 
-
+             console.log(resultsArray);
              createDisplay(resultsArray,numResults);
 
          });
@@ -159,6 +170,7 @@ function createDisplay(resultsArray,numResults){
     numRes(numResults);
      var pgekey = document.getElementById("pagekey");
     pgekey.style.display="block";
+    console.log(objJson);
     changePage(1,objJson);
 
 
@@ -181,6 +193,7 @@ function nextPage()
     }
 }
 function numRes(numResults){
+    console.log("number results reached!");
     document.getElementById("numberResults").style.color = 'green';
     document.getElementById("numberResults").style.float = 'left';
     document.getElementById("numberResults").innerHTML+=numResults+" Results Found"
@@ -257,14 +270,14 @@ function positionMenu(e) {
 var termdict=new Map();
 
 function callFunction(vari){
-    alert(vari);
+    // alert(vari);
 }
-function changePage(page,objJson)
-{
+function changePage(page,objJson){
 
     var btn_next = document.getElementById("btn_next");
     var btn_prev = document.getElementById("btn_prev");
     var listing_table = document.getElementById("listingTable");
+    listing_table.style.display="block";
     var page_span = document.getElementById("page");
     // Validate page
     if (page < 1) page = 1;
@@ -272,7 +285,7 @@ function changePage(page,objJson)
 
     listing_table.innerHTML = "";
     var tabchar="-";
-    var colors_background=["gainsboro","whitesmoke"];
+    
     for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < objJson.length; i++) {
         var num=i+1;
         listing_table.style.background = "AliceBlue";
@@ -286,7 +299,7 @@ function changePage(page,objJson)
         element.style.color="black";
         element.style.border="transparent";
         element.style.border="0";
-        element.style.width="350px";
+        element.style.width="340px";
         element.style.fontFamily="Optima, sans-serif";
         element.style.fontsize="12pt";
         element.style.fontWeight="bold";
@@ -323,11 +336,14 @@ function changePage(page,objJson)
         des.style.color="black";
         des.style.border="transparent";
         des.style.border="0";
-        des.style.width="350px";
-        des.style.fontFamily="Optima, sans-serif";
-        des.style.fontsize="11pt";
+        des.style.width="340px";
+        des.style.fontFamily="Gill Sans, sans-serif";
+        des.style.fontsize="10pt";
         des.style.textAlign="left";
-        des.innerHTML="- Decription: "+objJson[i].description;
+        des.style.wordWrap="break-word";
+        des.style.wordBreak="keep-all";
+        des.style.padding="0px";
+        des.innerHTML="-Decription: "+objJson[i].description;
 
 
         var ont = document.createElement("button");
@@ -335,11 +351,15 @@ function changePage(page,objJson)
         ont.style.color="black";
         ont.style.border="transparent";
         ont.style.border="0";
-        ont.style.width="350px";
-        ont.style.fontFamily="Optima, sans-serif";
-        ont.style.fontsize="11pt";
+        ont.style.width="340px";
+        ont.style.fontFamily="Gill Sans, sans-serif";
+        ont.style.fontsize="8pt";
         ont.style.textAlign="left";
-        ont.innerHTML="- "+objJson[i].ontolink;
+        ont.style.wordWrap="break-word";
+        ont.style.wordBreak="keep-all";
+        ont.style.padding="0px";
+        ont.innerHTML="-"+objJson[i].ontolink;
+    
         ont.addEventListener('click',function(){
             location.href=objJson[i].ontolink
         })

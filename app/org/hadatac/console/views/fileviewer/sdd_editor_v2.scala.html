@@ -42,7 +42,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
             $.ajax({
                type : 'GET',
-               url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getHeaderLoc',
+               url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
                data : {
 
                },
@@ -53,7 +53,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             });
             $.ajax({
                type : 'GET',
-               url : 'http://localhost:9000/hadatac/annotator/sddeditor_v2/getCommentLoc',
+               url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
                data : {
 
                },
@@ -78,7 +78,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
       </script>
       <div class="undo-edit">
-            
+
          <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="undoEdit()">
                <span class="glyphicon glyphicon-circle-arrow-left">   </span> Undo </button>
       </div>
@@ -116,6 +116,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                }
             });
+           
          </script>
          <div class="cartbutton" id="f">
             <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; position: relative;"  >
@@ -127,7 +128,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
-
+         
+         
          <button class="main-nav" id="show"> <img src="@controllers.routes.Assets.versioned("icons/open-eye.png")"
             width="36" height="33" alt=""/> Show Options</button>
             <button class="Close" id="hide"> <img src="@controllers.routes.Assets.versioned("icons/closed-eye.png")"
@@ -155,13 +157,18 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                            <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
                            <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
                         </div>
-                        <div id="verifysdd" >
-                           <button onclick="verifySDD()" style="display: block; margin: 0 auto; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify</button>
+                        <div id="verifysdd" style="display: flex; align-items: center; justify-content: center; margin:0 auto;" >
+                           <button onclick="verifySDD()" style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify SDD</button>
+                           <button style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white;" onclick="external()">External Verify</button>
                         </div>
-                        <div id="irifound">
-
-
-                        </div>
+                        <script>
+                           function external(){
+                              var f_id="@dataFile.getId()";
+                              externalValidate(f_id);
+                           }
+                        </script>
+                        <div id="loadingmsg"></div>
+                        <div id="irifound" style="overflow-y:auto;"></div>
                         <div id="searchForTerm" class="input-container">
                            <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
                            <button type="button"  role="button" id="searchOnt" class="input-button" >
@@ -179,16 +186,15 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                           
                         
                         <div id="numberResults"></div>
-                        
-                        <div id="listingTable">
-                          
-                        </div>
-                        
                         <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
-                        <a href="javascript:prevPage()" id="btn_prev">Prev</a>
-                        <a href="javascript:nextPage()" id="btn_next">Next</a>
-                        page:<span id="page"></span>
-                        </div>
+                           <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+                           <a href="javascript:nextPage()" id="btn_next">Next</a>
+                           page:<span id="page"></span>
+                           </div>
+                        <div id="listingTable" style="overflow-y:scroll; width:350px; height:345px;word-wrap: break-word;
+                        word-break: keep-all;margin-bottom:5px;"></div>
+                        
+                        
 
                      </div>
                      <ul class="custom-cm">
@@ -208,6 +214,9 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                      <div class="text-area2">
                         Description : <input type="text" id="varDescription" style="width:450px" value="" input disabled="disabled"/>
+
+                        <div id="suggestion-box" style="float: right;">
+                           Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
                      </div>
 
 

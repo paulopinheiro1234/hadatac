@@ -1054,14 +1054,15 @@ public class DASOInstanceGenerator extends BaseGenerator {
         if (DEBUG_MODE) { 
         	System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
         }
-
-        for (ObjectCollection nextSoc : groundingPath) {
+        
+        for (int index=1; index < groundingPath.size(); index++) {
+        	ObjectCollection nextSoc = groundingPath.get(index);
             if (DEBUG_MODE) { 
             	System.out.println("DASOInstanceGenerator:      nextSOC=[" + nextSoc.getUri() + "] Obj URI=[" + currentObjUri + "]");
             }
             String nextObjUri = getCachedScopeBySocAndObjectUri(nextSoc.getUri(), currentObjUri); 
             if (nextObjUri == null || nextObjUri.equals("")) {
-                //System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
+                System.out.println("DASOInstanceGenerator:          [ERROR] Path generation stopped. Error ocurred retrieving/creating objects in path. See log above.");
                 currentSoc = nextSoc;
                 currentObjUri = nextObjUri;
                 break;

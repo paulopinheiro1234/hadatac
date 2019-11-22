@@ -32,6 +32,14 @@ var _failed = function(e) {
   console.log(e, e.stack);
   alertify.alert('We unfortunately dropped the ball here.  Please test the file using the <a href="/js-xlsx/">raw parser</a>.  If there are issues with the file processor, please send this file to <a href="mailto:dev@sheetjs.com?subject=I+broke+your+stuff">dev@sheetjs.com</a> so we can make things right.', function(){});
 };
+function hideView(){
+  $("#hidecarry").css('display','none');
+  $(".mobile-navi").fadeOut(50);
+  $("#showcarry").show();
+  cdg.style.height = (window.innerHeight - 200) + "px";
+  cdg.style.width = (window.innerWidth - 100) + "px";
+
+}
 function changeHeader(headers,emptySheet){
   if(emptySheet==0){
       for(var i = 0; i < headers.length; i++){
@@ -157,7 +165,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   cdg.draw();
 };
 if(document.getElementById("headerdetails").value==" "){
-  document.getElementById('carryover').setAttribute("disabled", "disabled");
+  document.getElementById('showcarry').setAttribute("disabled", "disabled");
 }
 cdg.addEventListener('contextmenu', function (e) {
     e.items.push({
@@ -171,7 +179,7 @@ cdg.addEventListener('contextmenu', function (e) {
                     var header_location=sheetName+"-"+val;
                     var header_=document.getElementById("headerdetails");
                     header_.value=header_location;
-                    document.getElementById('carryover').removeAttribute("disabled");
+                    document.getElementById('showcarry').removeAttribute("disabled");
                    
                     storeHeader(header_location);
                 }
@@ -195,7 +203,7 @@ function storeHeader(header_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/working/headers/getHeaderLoc',
+    url : 'http://localhost:9000/hadatac/dd_editor/getHeaderLoc',
     data : {
       header_loc: header_location
       
@@ -212,7 +220,7 @@ function storeDesc(desc_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/working/headers/getCommentLoc',
+    url : 'http://localhost:9000/hadatac/dd_editor/getCommentLoc',
     data : {
       desc_loc: desc_location
       

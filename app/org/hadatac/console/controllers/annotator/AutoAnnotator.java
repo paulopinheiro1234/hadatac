@@ -338,6 +338,7 @@ public class AutoAnnotator extends Controller {
                 routes.AutoAnnotator.index(dir, ".").url()));
     }
     
+
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkErrorDictionary() {
         InputStream inputStream = getClass().getClassLoader()
