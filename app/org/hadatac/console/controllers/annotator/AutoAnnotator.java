@@ -51,6 +51,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.labkey.remoteapi.CommandException;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.typesafe.config.ConfigException.Null;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -524,12 +525,22 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.FILE_VIEWER_EDITOR_ROLE))
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
-        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        
+        DataFile dataFile = null;
+        dataFile = DataFile.findByIdAndEmail(fileId, null);
+        
         if (null == dataFile) {
-            return badRequest("You do NOT have the permission to download this file!");
+            return badRequest("Invalid file id!");
+        }
+        
+        if (!user.isDataManager()) {
+            if (!dataFile.getViewerEmails().contains(user.getEmail()) 
+                    && !dataFile.getEditorEmails().contains(user.getEmail())) {
+                return badRequest("You do NOT have the permission to download this file!");
+            }
         }
         
         System.out.println("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());

@@ -19,7 +19,7 @@ public class MyResolver extends Resolver {
     public Call afterAuth() {
         // The user will be redirected to this page after authentication
         // if no original URL was saved
-    	return org.hadatac.console.controllers.routes.AuthApplication.index();
+        return org.hadatac.console.controllers.routes.AuthApplication.index();
     }
 
     @Override

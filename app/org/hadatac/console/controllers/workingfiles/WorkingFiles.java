@@ -423,6 +423,72 @@ public class WorkingFiles extends Controller {
         return ok(shareFile.render(dir, sharedlink, dataFile));
     }
     
+    @SuppressWarnings("unchecked")
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result saveViewerEmails() throws Exception {
+        Form form = formFactory.form().bindFromRequest();
+        Map<String, String> data = form.rawData();
+        
+        String dir = data.get("dir");
+        String fileId = data.get("fileId");
+        
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        List<String> emails = new ArrayList<String>();
+        for (int i = 0; i < data.size() - 2; i++) {
+            if (!data.containsKey("viewerEmail" + String.valueOf(i + 1))) {
+                continue;
+            }
+
+            emails.add(data.get("viewerEmail" + String.valueOf(i + 1)));
+        }
+        
+        dataFile.setViewerEmails(emails);
+        dataFile.save();
+        
+        return redirect(routes.WorkingFiles.shareDataFile(dir, fileId));
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result saveEditorEmails() throws Exception {
+        Form form = formFactory.form().bindFromRequest();
+        Map<String, String> data = form.rawData();
+        
+        String dir = data.get("dir");
+        String fileId = data.get("fileId");
+        
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        List<String> emails = new ArrayList<String>();
+        for (int i = 0; i < data.size() - 2; i++) {
+            if (!data.containsKey("editorEmail" + String.valueOf(i + 1))) {
+                continue;
+            }
+
+            emails.add(data.get("editorEmail" + String.valueOf(i + 1)));
+        }
+        
+        dataFile.setEditorEmails(emails);
+        dataFile.save();
+        
+        return redirect(routes.WorkingFiles.shareDataFile(dir, fileId));
+    }
+    
     /*
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {	

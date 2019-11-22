@@ -32,29 +32,29 @@ public class LinkedAccount {
 	
 	@Field("id")
 	public String id_s;
-
+	
 	@Field("provider_user_id_str")
-	public String providerUserId;
+    public String providerUserId;
+
+	@Field("user_id_str")
+	public String userId;
 	
 	@Field("provider_key_str")
 	public String providerKey;
 	
-	public SysUser user;
-	
 	public String getUserId() {
-		return user.getId();
+		return userId;
 	}
 	
-	@Field("user_id_str")
-	public void setUserId(String id) {
-		user = SysUser.findByIdSolr(id);
+	public void setUserId(String userId) {
+	    this.userId = userId;
 	}
 
 	public static LinkedAccount findByProviderKey(final SysUser user, String key) {
 		return findByProviderKeySolr(user, key);
 	}
 	
-	public static LinkedAccount findByProviderKeySolr(final SysUser user, String key) {
+	public static LinkedAccount findByProviderKeySolr(final SysUser user, String key) {	    
 		LinkedAccount account = null;
 		SolrClient solrClient = new HttpSolrClient.Builder(
 		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
@@ -66,7 +66,7 @@ public class LinkedAccount {
 			SolrDocumentList list = queryResponse.getResults();
 			if (list.size() == 1) {
 				account = convertSolrDocumentToLinkedAccount(list.get(0));
-				account.user = user;
+				account.setUserId(user.getId());
 			}
 		} catch (Exception e) {
 			System.out.println("[ERROR] LinkedAccount.findByProviderKeySolr - Exception message: " + e.getMessage());
@@ -89,7 +89,7 @@ public class LinkedAccount {
 			
 			while (i.hasNext()) {
 				LinkedAccount account = convertSolrDocumentToLinkedAccount(i.next());
-				account.user = user;
+				account.setUserId(user.getId());
 				accounts.add(account);
 			}
 		} catch (Exception e) {
@@ -98,6 +98,30 @@ public class LinkedAccount {
     	
     	return accounts;
 	}
+	
+	public static List<LinkedAccount> findByProviderUserIdSolr(String providerUserId) {
+        List<LinkedAccount> accounts = new ArrayList<LinkedAccount>(); 
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
+        SolrQuery solrQuery = new SolrQuery("provider_user_id_str:" + providerUserId);
+        
+        try {
+            QueryResponse queryResponse = solrClient.query(solrQuery);
+            solrClient.close();
+            SolrDocumentList list = queryResponse.getResults();
+            Iterator<SolrDocument> i = list.iterator();
+            
+            while (i.hasNext()) {
+                LinkedAccount account = convertSolrDocumentToLinkedAccount(i.next());
+                accounts.add(account);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("[ERROR] LinkedAccount.findByProviderUserIdSolr - Exception message: " + e.getMessage());
+        }
+        
+        return accounts;
+    }
 	
 	public static String outputAsJson() {
 		SolrClient solrClient = new HttpSolrClient.Builder(
@@ -134,6 +158,7 @@ public class LinkedAccount {
 		ret.id_s = UUID.randomUUID().toString();
 		ret.providerKey = acc.providerKey;
 		ret.providerUserId = acc.providerUserId;
+		ret.userId = acc.providerUserId;
 
 		return ret;
 	}
@@ -169,11 +194,12 @@ public class LinkedAccount {
 		return -1;
 	}
 	
-	private static LinkedAccount convertSolrDocumentToLinkedAccount(SolrDocument doc) {
+	private static LinkedAccount convertSolrDocumentToLinkedAccount(SolrDocument doc) {	    
 		LinkedAccount account = new LinkedAccount();
 		account.id_s = doc.getFieldValue("id").toString();
 		account.providerUserId = doc.getFieldValue("provider_user_id_str").toString();
 		account.providerKey = doc.getFieldValue("provider_key_str").toString();
+		account.userId = doc.getFieldValue("user_id_str").toString();
 		
 		return account;
 	}

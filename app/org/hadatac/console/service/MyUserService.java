@@ -6,6 +6,7 @@ import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.service.AbstractUserService;
+
 import javax.inject.Inject;
 
 
@@ -21,7 +22,7 @@ public class MyUserService extends AbstractUserService {
 		return saveSolr(authUser);
 	}
 	
-	public Object saveSolr(final AuthUser authUser) {
+	public Object saveSolr(final AuthUser authUser) {	    
 		final boolean isLinked = SysUser.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
 			return SysUser.create(authUser).getId();
@@ -36,7 +37,7 @@ public class MyUserService extends AbstractUserService {
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get deactivated/deleted
 		final SysUser u = SysUser.findByAuthUserIdentity(identity);
-		if(u != null) {
+		if (u != null) {
 			return u.getId();
 		} else {
 			return null;

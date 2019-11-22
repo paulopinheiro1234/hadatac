@@ -445,6 +445,8 @@ POST    /hadatac/working/movefiles                     org.hadatac.console.contr
 POST    /hadatac/working/movefiles/form                org.hadatac.console.controllers.workingfiles.WorkingFiles.processMoveDataFilesForm(dir : String)
 GET     /hadatac/working/sharefile                     org.hadatac.console.controllers.workingfiles.WorkingFiles.shareDataFile(dir : String, file_id : String)
 POST    /hadatac/working/sharefile                     org.hadatac.console.controllers.workingfiles.WorkingFiles.shareDataFile(dir : String, file_id : String)
+POST    /hadatac/working/sharefile/viewerform          org.hadatac.console.controllers.workingfiles.WorkingFiles.saveViewerEmails()
+POST    /hadatac/working/sharefile/editorform          org.hadatac.console.controllers.workingfiles.WorkingFiles.saveEditorEmails()
 GET     /hadatac/working/deletefile		               org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFile(dir : String, file_id : String)
 POST	/hadatac/working/deletefile    	               org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFile(dir : String, file_id : String)
 GET     /hadatac/working/deletefiles                   org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFiles(dir : String)

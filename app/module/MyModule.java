@@ -7,6 +7,7 @@ import com.feth.play.module.pa.Resolver;
 import com.feth.play.module.pa.providers.openid.OpenIdAuthProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.feth.play.module.pa.providers.oauth2.google.GoogleAuthProvider;
 
 import org.hadatac.console.providers.MyStupidBasicAuthProvider;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
@@ -20,7 +21,8 @@ public class MyModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		install(new FactoryModuleBuilder().implement(IMailer.class, Mailer.class).build(MailerFactory.class));
+		install(new FactoryModuleBuilder().implement(IMailer.class, Mailer.class)
+		        .build(MailerFactory.class));
 
 		bind(Resolver.class).to(MyResolver.class);
 		bind(MyUserService.class).asEagerSingleton();
@@ -28,7 +30,7 @@ public class MyModule extends AbstractModule {
 		bind(OnStart.class).asEagerSingleton();
 		bind(MyActorSystem.class).asEagerSingleton();
 		
-		//bind(GoogleAuthProvider.class).asEagerSingleton();
+		bind(GoogleAuthProvider.class).asEagerSingleton();
 		//bind(FacebookAuthProvider.class).asEagerSingleton();
 		//bind(FoursquareAuthProvider.class).asEagerSingleton();
 		bind(MyUsernamePasswordAuthProvider.class).asEagerSingleton();
