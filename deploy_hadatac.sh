@@ -120,9 +120,8 @@ wait $!
 service hadatac start
 wait $!
 
-cd ${GIT_HOME}
-chmod +x init_role.sh
-sh init_role.sh
+chmod +x ${GIT_HOME}/init_role.sh
+sh ${GIT_HOME}/init_role.sh
 
 echo ""
 echo "Deployment Complete"
