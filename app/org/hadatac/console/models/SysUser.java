@@ -432,6 +432,9 @@ public class SysUser implements Subject {
 
 		sys_user.roles.add(SecurityRole
 				.findByRoleNameSolr(AuthApplication.DATA_OWNER_ROLE));
+		sys_user.roles.add(SecurityRole.findByRoleNameSolr(
+                AuthApplication.FILE_VIEWER_EDITOR_ROLE));
+		
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = Instant.now().toString();

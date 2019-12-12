@@ -120,6 +120,8 @@ wait $!
 service hadatac start
 wait $!
 
+sh init_role.sh
+
 echo ""
 echo "Deployment Complete"
 echo ""

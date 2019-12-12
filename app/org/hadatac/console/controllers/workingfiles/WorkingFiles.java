@@ -627,6 +627,7 @@ public class WorkingFiles extends Controller {
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to download this file!");
         }
