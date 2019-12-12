@@ -120,6 +120,8 @@ wait $!
 service hadatac start
 wait $!
 
+cd ${GIT_HOME}
+chmod +x init_role.sh
 sh init_role.sh
 
 echo ""
