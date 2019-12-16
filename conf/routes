@@ -167,14 +167,27 @@ POST 	/hadatac/deployments/urigenerator/form	       org.hadatac.console.controll
 # message management
 GET	    /hadatac/messages/		                       org.hadatac.console.controllers.messages.MessageManagement.index(dir : String, filename : String, da_uri : String, page : Integer)
 POST	/hadatac/messages/     	                       org.hadatac.console.controllers.messages.MessageManagement.postIndex(dir : String, filename : String, da_uri : String, page : Integer)
-GET	    /hadatac/messages/start		                   org.hadatac.console.controllers.messages.MessageManagement.start(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
-POST	/hadatac/messages/start	                       org.hadatac.console.controllers.messages.MessageManagement.postStart(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
+GET	    /hadatac/messages/initiate		               org.hadatac.console.controllers.messages.MessageManagement.initiate(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/initiate	                   org.hadatac.console.controllers.messages.MessageManagement.postInitiate(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/subscribe		               org.hadatac.console.controllers.messages.MessageManagement.subscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/subscribe	                   org.hadatac.console.controllers.messages.MessageManagement.postSubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/unsubscribe	               org.hadatac.console.controllers.messages.MessageManagement.unsubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/unsubscribe                  org.hadatac.console.controllers.messages.MessageManagement.postUnsubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
 GET	    /hadatac/messages/stop		                   org.hadatac.console.controllers.messages.MessageManagement.stop(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
 POST	/hadatac/messages/stop		                   org.hadatac.console.controllers.messages.MessageManagement.postStop(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
 GET	    /hadatac/messages/view		                   org.hadatac.console.controllers.messages.MessageManagement.view(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
 POST	/hadatac/messages/view	                       org.hadatac.console.controllers.messages.MessageManagement.postView(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
-GET	    /hadatac/messages/rawdata		               org.hadatac.console.controllers.messages.MessageRawData.index(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
-POST	/hadatac/messages/rawdata	                   org.hadatac.console.controllers.messages.MessageRawData.postIndex(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+GET	    /hadatac/messages/rawdata		               org.hadatac.console.controllers.messages.MessageRawData.index(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topic_uri : String)
+POST	/hadatac/messages/rawdata	                   org.hadatac.console.controllers.messages.MessageRawData.postIndex(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topic_uri : String)
+GET	    /hadatac/messages/log                          org.hadatac.console.controllers.messages.MessageManagement.checkAnnotationLog(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+GET	    /hadatac/messages/topics		               org.hadatac.console.controllers.messages.MessageManagement.listTopics(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+POST	/hadatac/messages/topics	                   org.hadatac.console.controllers.messages.MessageManagement.postListTopics(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+GET	    /hadatac/messages/test/connection              org.hadatac.console.controllers.messages.MessageManagement.testConnection(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/test/connection              org.hadatac.console.controllers.messages.MessageManagement.postTestConnection(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/test/topics                  org.hadatac.console.controllers.messages.MessageManagement.testTopics(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/test/topics                  org.hadatac.console.controllers.messages.MessageManagement.postTestTopics(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/test/labels                  org.hadatac.console.controllers.messages.MessageManagement.testLabels(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
+POST	/hadatac/messages/test/labels                  org.hadatac.console.controllers.messages.MessageManagement.postTestLabels(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
 
 # schema management
 GET	    /hadatac/schema/		    	               org.hadatac.console.controllers.schema.DASManagement.index()
@@ -417,8 +430,6 @@ POST	/hadatac/dd_editor/getCommentLoc   	   org.hadatac.console.controllers.file
 GET	    /hadatac/dd_editor/getCheckedSDD	       org.hadatac.console.controllers.fileviewer.DDEditor.getCheckedSDD(sddFileName : String)
 POST	/hadatac/dd_editor/getCheckedSDD	       org.hadatac.console.controllers.fileviewer.DDEditor.getCheckedSDD(sddFileName: String)
 
-
-
 GET     /hadatac/sddeditor_v2/getHeaderLoc             org.hadatac.console.controllers.fileviewer.SDDEditorV2.getHeaderLoc()
 POST    /hadatac/sddeditor_v2/getHeaderLoc             org.hadatac.console.controllers.fileviewer.SDDEditorV2.getHeaderLoc()
 GET     /hadatac/sddeditor_v2/getCommentLoc            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCommentLoc()
@@ -482,8 +493,6 @@ GET     /hadatac/working/ingestfile                    org.hadatac.console.contr
 POST    /hadatac/working/ingestfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.ingestDataFile(file_id : String)
 GET     /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_id : String)
 POST    /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_id : String)
-
-
 
 GET     /hadatac/working/verifyDataFileTemp                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFileTemp(file_id : String)
 POST    /hadatac/working/verifyDataFileTemp                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFileTemp(file_id : String)

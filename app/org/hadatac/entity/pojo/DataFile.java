@@ -475,6 +475,7 @@ public class DataFile implements Cloneable {
 
     public static List<DataFile> findByQuery(SolrQuery query) {
         List<DataFile> list = new ArrayList<DataFile>();
+        Date date = new Date();
 
         SolrClient solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();

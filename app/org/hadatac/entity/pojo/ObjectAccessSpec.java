@@ -493,6 +493,13 @@ public class ObjectAccessSpec extends HADatAcThing {
         return schemaUri;
     }
 
+    public DataAcquisitionSchema getSchema() {
+    	if (schemaUri == null || schemaUri.equals(""))
+    		return null;
+    	DataAcquisitionSchema schema = DataAcquisitionSchema.find(schemaUri);
+    	return schema;
+    }
+    
     public void setSchemaUri(String schemaUri) {
         this.schemaUri = schemaUri;
     }
@@ -1135,7 +1142,7 @@ public class ObjectAccessSpec extends HADatAcThing {
             Iterator<ObjectAccessSpec> iterDA = listDA.iterator();
             while (iterDA.hasNext()) {
                 ObjectAccessSpec dataAcquisition = iterDA.next();
-                if (dataAcquisition.isFinished() == false) {
+                if (dataAcquisition.isFinished() != false) {
                     iterDA.remove();
                 }
             }

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.hadatac.console.models.SecurityRole;
+import org.hadatac.data.loader.mqtt.MessageWorker;
 
 @Singleton
 public class OnStart {
@@ -30,6 +31,9 @@ public class OnStart {
 		// (NOT SURE THIS FUNCTION SHOULD BE CALLED ON ONSTART) check if instances are loaded. 
 		//       If not, show how to upload some default instances  
 		// TODO: implement this code
+
+    	MessageWorker.getInstance();
+    
     }
     
     private void initDirectoryStructure(){

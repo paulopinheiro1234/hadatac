@@ -243,7 +243,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public void setTimestamp(Date timestamp) {
-    	System.out.println("Inside Measurement.setTimestamp()");
+    	//System.out.println("Inside Measurement.setTimestamp()");
     	this.timestamp = timestamp;
         if (timestamp != null) {
             this.strTimestamp = timestamp.toString();

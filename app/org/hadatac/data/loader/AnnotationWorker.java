@@ -697,9 +697,9 @@ public class AnnotationWorker {
             			dataFile, oas.getStudyUri(), oas.getUri(), 
             			schema, dataFile.getFileName());
             	chain.addGenerator(dasoInstanceGen);	
-            	chain.addGenerator(new MeasurementGenerator(dataFile, oas, schema, dasoInstanceGen));
+            	chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, oas, schema, dasoInstanceGen));
             } else {
-                chain.addGenerator(new MeasurementGenerator(dataFile, oas, schema, null));
+                chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, oas, schema, null));
             }
             chain.setNamedGraphUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         }

@@ -2,15 +2,24 @@
   filename : String,
   da_uri   : String,
   page     : Integer,
+  clientId : String,
   results  : List[org.hadatac.entity.pojo.MessageStream])
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
+@import org.hadatac.utils._
+@import play.api.Play._
+@import java.net.URLEncoder
 
-@main("Message Ingestion") {
+@main("Message Stream Ingestion") {
 
-    <h2>Message Ingestion</h2>
+    <h2>Message Stream Ingestion</h2>
     
     <div class="container-fluid">
+
+        <h3>Stream Status</h3>
+
+	    Current Client ID: @clientId
+    
         <table class="table">
             <thead>
                  <tr>
@@ -19,7 +28,10 @@
                     <th>Port</th>
                     <th>Status</th>
                     <th>Protocol</th>
-                    <th>Operations</th>
+                    <th>#ReceivedMsgs</th>
+                    <th>#IngestedMsgs</th>
+                    <th>State Operations</th>
+                    <th>Other Operations</th>
                  </tr>
             </thead>
             <tbody>
@@ -28,6 +40,47 @@
               }
             </tbody>
         </table>
+
+        <h3>Status Explanation</h3>
+
+        <table class="table">
+            <thead>
+                 <tr>
+                    <th>Status</th>
+                    <th>Meaning</th>
+                 </tr>
+            </thead>
+            <tbody>
+                 <tr>
+                    <td>CLOSED</td>
+                    <td>Stream is inactive. Stream's topics are unprepared for data ingestion</td>
+                 </tr>
+                 <tr>
+                    <td>INITIATED</td>
+                    <td>A stream is initiated when each one of its topics has been triggered to be prepared for data ingestion. 
+                        An initiated stream does not assure that all topics were successfully prepared for data ingestion.</td>
+                 </tr>
+                 <tr>
+                    <td>ACTIVE</td>
+                    <td>Streamed data for prepared topics is being ingested. Raw data for all topics, prepared or not, is being 
+                        archived.</td>
+                 </tr>
+            </tbody>
+        </table>
         @mainButton(false)
     </div>
+
+    <!--
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+    <script>
+    var refreshVar
+	refreshVar = setTimeout(function() { 
+		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)";
+		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+		window.location.href = hrefValue; 
+	}, 2000);
+   </script> 
+   -->
+
 }

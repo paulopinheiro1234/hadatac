@@ -25,14 +25,20 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
 
 public class MeasurementGenerator extends BaseGenerator {
 
+	public static final int FILEMODE = 0;
+	public static final int MSGMODE = 1;
+	
+    private int mode;
     private ObjectAccessSpec da;
     private DataFile dataFile;
+    private MessageTopic topic;
 
     private DataAcquisitionSchema schema = null;
     private Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
@@ -66,26 +72,33 @@ public class MeasurementGenerator extends BaseGenerator {
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
     private DASOInstanceGenerator dasoiGen = null; 
 
-    public MeasurementGenerator(DataFile dataFile, ObjectAccessSpec da, 
+    public MeasurementGenerator(int mode, DataFile dataFile, MessageTopic topic, ObjectAccessSpec da, 
             DataAcquisitionSchema schema, DASOInstanceGenerator dasoiGen) {
         super(dataFile);
+        this.mode = mode;
+        if (mode == MSGMODE) {
+        	this.topic = topic;
+        	this.logger = topic.getLogger();
+        }
+        if (mode == FILEMODE) {
+            this.dataFile = dataFile;
+        }
         this.da = da;
         this.schema = schema;
-        this.dataFile = dataFile;
     	this.dasoiGen = dasoiGen;
     	
     	boolean cont = true;
         if (da.hasCellScope()) {
-        	System.out.println("Measurement Generator: hasCellScope is TRUE");
+        	//System.out.println("Measurement Generator: hasCellScope is TRUE");
         	cellScopeObject = StudyObject.find(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
-        	System.out.println("StudyObject's URI: [" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + "]");
+        	//System.out.println("StudyObject's URI: [" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + "]");
         	if (cellScopeObject == null) {
         		System.out.println("No scope object");
         	} else {
         		cellScopeSOC = ObjectCollection.find(cellScopeObject.getIsMemberOf());
         	}
         } else {
-        	System.out.println("Measurement Generator: hasCellScope is FALSE");
+        	//System.out.println("Measurement Generator: hasCellScope is FALSE");
         	if (!dasoiGen.initiateCache(da.getStudyUri())) {
         		logger.printExceptionById("DA_00001");
         		cont = false;
@@ -93,7 +106,7 @@ public class MeasurementGenerator extends BaseGenerator {
         	matchingSOCs = dasoiGen.getMatchingSOCs();
         }
         if (cont) {
-        	System.out.println("Measurement Generator: setting STUDY URI");
+        	//System.out.println("Measurement Generator: setting STUDY URI");
     		setStudyUri(da.getStudyUri());
     		urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
         }
@@ -102,10 +115,15 @@ public class MeasurementGenerator extends BaseGenerator {
 
     @Override
     public void preprocess() throws Exception {
-        System.out.println("[Parser] indexMeasurements()...");
+        //System.out.println("[Parser] indexMeasurements()...");
 
         // ASSIGN values for tempPositionInt
-        List<String> unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
+        List<String> unknownHeaders;
+        if (mode == FILEMODE) {
+        	unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
+        } else {
+        	unknownHeaders = schema.defineTemporaryPositions(topic.getHeaders());
+        }
         if (!unknownHeaders.isEmpty()) {
             logger.addLine(Feedback.println(Feedback.WEB, 
                     "[WARNING] Failed to match the following " 
@@ -114,47 +132,47 @@ public class MeasurementGenerator extends BaseGenerator {
 
         if (!schema.getTimestampLabel().equals("")) {
             posTimestamp = schema.tempPositionOfLabel(schema.getTimestampLabel());
-            System.out.println("posTimestamp: " + posTimestamp);
+            //System.out.println("posTimestamp: " + posTimestamp);
         }
         if (!schema.getTimeInstantLabel().equals("")) {
             posTimeInstant = schema.tempPositionOfLabel(schema.getTimeInstantLabel());
-            System.out.println("posTimeInstant: " + posTimeInstant);
+            //System.out.println("posTimeInstant: " + posTimeInstant);
         }
         if (!schema.getNamedTimeLabel().equals("")) {
             posNamedTime = schema.tempPositionOfLabel(schema.getNamedTimeLabel());
-            System.out.println("posNamedTime: " + posNamedTime);
+            //System.out.println("posNamedTime: " + posNamedTime);
         }
         if (!schema.getIdLabel().equals("")) {
             posId = schema.tempPositionOfLabel(schema.getIdLabel());
-            System.out.println("posId: " + posId);
+            //System.out.println("posId: " + posId);
         }
         if (!schema.getOriginalIdLabel().equals("")) {
             posOriginalId = schema.tempPositionOfLabel(schema.getOriginalIdLabel());
-            System.out.println("posOriginalId: " + posOriginalId);
+            //System.out.println("posOriginalId: " + posOriginalId);
         }
         if (!schema.getEntityLabel().equals("")) {
             posEntity = schema.tempPositionOfLabel(schema.getEntityLabel());
-            System.out.println("posEntity: " + posEntity);
+            //System.out.println("posEntity: " + posEntity);
         }
         if (!schema.getUnitLabel().equals("")) {
             posUnit = schema.tempPositionOfLabel(schema.getUnitLabel());
-            System.out.println("posUnit: " + posUnit);
+            //System.out.println("posUnit: " + posUnit);
         }
         if (!schema.getInRelationToLabel().equals("")) {
             posInRelation = schema.tempPositionOfLabel(schema.getInRelationToLabel());
-            System.out.println("posInRelation: " + posInRelation);
+            //System.out.println("posInRelation: " + posInRelation);
         }
         if (!schema.getLODLabel().equals("")) {
             posLOD = schema.tempPositionOfLabel(schema.getLODLabel());
-            System.out.println("posLOD: " + posLOD);
+            //System.out.println("posLOD: " + posLOD);
         }
         if (!schema.getGroupLabel().equals("")) {
             posGroup = schema.tempPositionOfLabel(schema.getGroupLabel());
-            System.out.println("posGroup: " + posGroup);
+            //System.out.println("posGroup: " + posGroup);
         }
         if (!schema.getMatchingLabel().equals("")) {
             posMatching = schema.tempPositionOfLabel(schema.getMatchingLabel());
-            System.out.println("posMatching: " + posMatching);
+            //System.out.println("posMatching: " + posMatching);
         }
 
         // Store necessary information before hand to avoid frequent SPARQL queries
@@ -172,7 +190,7 @@ public class MeasurementGenerator extends BaseGenerator {
 
     @Override
     public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
-        System.out.println("rowNumber: " + rowNumber);
+        //System.out.println("rowNumber: " + rowNumber);
         
         Map<String, Map<String,String>> objList = null;
         Map<String,String> groundObj = null;
@@ -310,12 +328,12 @@ public class MeasurementGenerator extends BaseGenerator {
                     }
                     try {
                         Date date = formatter.parse(timeValue);
-                        System.out.println(date);
-                        System.out.println(formatter.format(date));
+                        //System.out.println(date);
+                        //System.out.println(formatter.format(date));
                         //measurement.setTimestamp(timeValue);
                         measurement.setTimestamp(date);
                     } catch (Exception e) {
-                    	System.out.println("Setting current time!");
+                    	//System.out.println("Setting current time!");
                         measurement.setTimestamp(new Date(0).toInstant().toString());
                     }
                 }
@@ -517,10 +535,17 @@ public class MeasurementGenerator extends BaseGenerator {
              *                                     *
              *=====================================*/
 
-            measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-                    URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
-                    dasa.getLabel() + "/" + 
-                    dataFile.getFileName() + "-" + totalCount++);
+            if (mode == FILEMODE) {
+            	measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+            			URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+            			dasa.getLabel() + "/" + 
+            			dataFile.getFileName() + "-" + totalCount++);
+            } else {
+                measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+                        URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+                        dasa.getLabel() + "/" + 
+                        topic.getLabel() + "-" + totalCount++);
+            }
             measurement.setOwnerUri(da.getOwnerUri());
             measurement.setAcquisitionUri(da.getUri());
 
@@ -629,7 +654,11 @@ public class MeasurementGenerator extends BaseGenerator {
              *   SET DATASET                   *
              *                                 *
              *=================================*/
-            measurement.setDatasetUri(dataFile.getDatasetUri());
+            if (mode == FILEMODE) {
+            	measurement.setDatasetUri(dataFile.getDatasetUri());
+            } else {
+            	measurement.setDatasetUri(topic.getUri());
+            }
 
             objects.add(measurement);
         }
@@ -670,12 +699,31 @@ public class MeasurementGenerator extends BaseGenerator {
         return true;
     }
 
+    public boolean commitObjectToSolr(HADatAcThing object) throws Exception {
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+        	
+        try {
+        	solr.addBean(object);
+        } catch (IOException | SolrServerException e) {
+        	System.out.println("[ERROR] SolrClient.addBean - e.Message: " + e.getMessage());
+        }
+        commitToSolr(solr, -1);
+        return true;
+    }
+
     private void commitToSolr(SolrClient solr, int batch_size) throws Exception {
         try {
-            System.out.println("solr.commit()...");
+        	/*
+        	if (batch_size != -1) {
+        		System.out.println("solr.commit()...");
+        	}
+        	*/
             solr.commit();
-            System.out.println(String.format("[OK] Committed %s measurements!", batch_size));
-            logger.addLine(Feedback.println(Feedback.WEB, String.format("[OK] Committed %s measurements!", batch_size)));
+        	if (batch_size != -1) {
+        		//System.out.println(String.format("[OK] Committed %s measurements!", batch_size));
+        		logger.addLine(Feedback.println(Feedback.WEB, String.format("[OK] Committed %s measurements!", batch_size)));
+        	}
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] SolrClient.commit - e.Message: " + e.getMessage());
             try {

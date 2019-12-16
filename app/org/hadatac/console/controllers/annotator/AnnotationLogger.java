@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.MessageStream;
+import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.utils.Feedback;
 
 
@@ -11,13 +13,33 @@ public class AnnotationLogger {
 
     private String log = "";
     private DataFile parent = null;
+    private MessageStream stream = null;
+    private MessageTopic topic = null;
     
     public AnnotationLogger(DataFile parent) {
         this.parent = parent;
     }
     
+    public AnnotationLogger(MessageStream stream) {
+        this.stream = stream;
+    }
+    
+    public AnnotationLogger(MessageTopic topic) {
+        this.topic = topic;
+    }
+    
 	public AnnotationLogger(DataFile parent, String log) {
 	    this.parent = parent;
+	    this.log = log;
+	}
+	
+	public AnnotationLogger(MessageStream stream, String log) {
+	    this.stream = stream;
+	    this.log = log;
+	}
+	
+	public AnnotationLogger(MessageTopic topic, String log) {
+	    this.topic = topic;
 	    this.log = log;
 	}
 	
@@ -27,17 +49,41 @@ public class AnnotationLogger {
 	
 	public void setLog(String log) {
 		this.log = log;
-		parent.save();
+		if (parent != null) {
+			parent.save();
+		}
+		if (stream != null) {
+			stream.save();
+		}
+		if (topic != null) {
+			topic.save();
+		}
 	}
 	
 	public void resetLog() {
 	    log = "";
-	    parent.save();
+		if (parent != null) {
+			parent.save();
+		}
+		if (stream != null) {
+			stream.save();
+		}
+		if (topic != null) {
+			topic.save();
+		}
 	}
 	
 	public void addLine(String newLine) {
 	    log += (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()) + " " + newLine;
-		parent.save();
+		if (parent != null) {
+			parent.save();
+		}
+		if (stream != null) {
+			stream.save();
+		}
+		if (topic != null) {
+			topic.save();
+		}
 	}
 	
 	public void printExceptionById(String id) {

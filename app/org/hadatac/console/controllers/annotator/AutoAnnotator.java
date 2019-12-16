@@ -386,7 +386,8 @@ public class AutoAnnotator extends Controller {
         }
 
         if (null == dataFile) {
-            return badRequest("You do NOT have the permission to operate this file!");
+            return badRequest("You do NOT have t		        object.setLogger(new AnnotationLogger(object, SolrUtils.getFieldValue(doc, \"log_str\").toString()));\n" + 
+            		"he permission to operate this file!");
         }
 
         String pathProc = ConfigProp.getPathProc();

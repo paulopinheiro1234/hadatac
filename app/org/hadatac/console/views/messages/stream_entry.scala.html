@@ -13,14 +13,28 @@
 	  <td>@stream.getPort()</td> 
 	  <td>@stream.getStatus()</td> 
 	  <td>@stream.getProtocol()</td> 
+	  <td>@stream.getTotalMessages()</td> 
+	  <td>@stream.getIngestedMessages()</td> 
       <td>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.start(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
-            class="btn-xs btn-primary" role="button">turn on</a>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.start(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
-            class="btn-xs btn-primary" role="button">turn off</a>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.start(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
-            class="btn-xs btn-primary" role="button">topics</a>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
-            class="btn-xs btn-primary" role="button">raw data</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.initiate(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Initiate</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.subscribe(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Subscribe</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.unsubscribe(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Unsubscribe</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.stop(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Close</a>
+      </td>
+      <td>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testConnection(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Test Connection</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.listTopics(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Browse Topics</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testTopics(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            class="btn-xs btn-primary" role="button">Test Topics</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), null)"
+            class="btn-xs btn-primary" role="button">Raw Data</a>
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.checkAnnotationLog(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))" 
+            class="btn-xs btn-primary" role="button">Logs</a>
       </td>
 	</tr>

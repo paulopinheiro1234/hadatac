@@ -2,9 +2,8 @@
   filename       : String,
   da_uri         : String,
   page           : Integer,
-  stream_uri     : String,
-  topic_uri      : String,
-  topic_label    : String,
+  stream_uri     : String,	
+  stream_label   : String,
   results        : List[String]
   )
     
@@ -14,7 +13,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@maingraph("Message Stream Raw Data") {
+@maingraph("Test Stream Connection") {
 	<head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
@@ -25,16 +24,9 @@
     <body>
 
     <div class="container-fluid">
-    	<h4>Stream Raw Data View</h4>
-    	@if(topic_uri.equals("")) {
-    	   <h4>Topic: All</h4>
-    	} else {		   	
-    	   <h4>Topic: @topic_label</h4>
-    	}
+    	<h3>Test Stream Connection</h3>
+    	<h3>Stream: @stream_label</h3>
 
-		<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)" class="btn btn-primary" 
-	       role="button">Back to Ingest </a>  		
-	
 	    <div class="row">
         	<div class="col-lg-12">
 
@@ -50,18 +42,13 @@
             </div>
 		</div>
 
+		<br>
+		<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)" class="btn btn-primary" 
+	       role="button">Back to Ingest </a>  		
+	
 	</div>
 
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-    <script>
-    var refreshVar
-	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri, topic_uri)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-	}, 1000);
-
-    </script> 
    	</body>
 } 
