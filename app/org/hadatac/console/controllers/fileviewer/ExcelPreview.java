@@ -16,12 +16,22 @@ public class ExcelPreview extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String fileId, boolean bSavable) {
         final SysUser user = AuthApplication.getLocalUser(session());
-        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        DataFile dataFile = DataFile.findById(fileId);
         if (null == dataFile) {
             return ok(excel_preview.render(dataFile, false));
         }
         
-        return ok(excel_preview.render(dataFile, bSavable));
+        dataFile.updatePermissionByUserEmail(user.getEmail());
+        
+        if (dataFile.getAllowEditing()) {
+            return ok(excel_preview.render(dataFile, bSavable));
+        }
+        
+        if (dataFile.getAllowViewing()) {
+            return ok(excel_preview.render(dataFile, false));
+        }
+        
+        return badRequest("No perview permission!");
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

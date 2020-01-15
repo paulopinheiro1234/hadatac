@@ -112,38 +112,58 @@
                 }
                 <td>@file.getSubmissionTime()</td>
                 <td>
+                @if(file.getAllowViewing()) {
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls") || file.getFileName().endsWith(".csv")) {
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
                     @if(((file.getFileName().endsWith(".xlsx"))&&(!file.getFileName().startsWith("SDD")))){
                         <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                     }
                 }
+                }
+                
+                @if(file.getAllowEditing()) {
                 @if(file.getFileName().startsWith("DD") || file.getFileName().startsWith("dd")){
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.DDEditor.index(file.getId(), true, dir)" class="btn btn-xs btn-primary" role="button" id="edit">Edit DD</a>
                 }
                 @if(file.getFileName().startsWith("SDD") || file.getFileName().startsWith("sdd")) {
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditorV2.index(file.getId(), true,0)" class="btn btn-xs btn-primary" role="button" id="edit">Edit SDD</a>
                 }
+                }
                 </td>
                 <td>
+                @if(file.getAllowRenaming()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.renameDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="rename">Rename</a>
+                }
+                
+                @if(file.getAllowMoving()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.moveDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="move">Move</a>
+                }
+                
+                @if(file.getAllowDeleting()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                }
+                
+                @if(file.getAllowSharing()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.shareDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="share">Share</a>
-
+                }
+                
 				@*
                 @if(bAdmin) {
                     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn btn-xs btn-primary" role="button">Assign Owner</a>
                 }
                 *@
 
+                @if(file.getAllowDownloading()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadDataFile(file.getId())" class="btn btn-xs btn-primary" role="button">Download</a>
+                }
                 </td>
                 <td>
+                @if(file.getAllowIngesting()) {
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
                     file.getFileName().startsWith("OAS-") || file.getFileName().startsWith("DA-")) {
                 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.ingestDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="ingest" onclick="return confirm('Are you sure to submit it to auto-annotator?')">Ingest</a>
+				}
 				}
                 @if(file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-")) {
                 	<a href="" class="btn btn-xs btn-primary disabled" role="button" id="draft">Draft</a>
@@ -155,10 +175,13 @@
 					}
 				}
 				*@
+				
+				@if(file.getAllowVerifying()) {
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
                     file.getFileName().startsWith("OAS-")) {
                 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.verifyDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="verify">Verify</a>
+                }
                 }
                 </td>
                 <td>
