@@ -39,7 +39,7 @@ import org.hadatac.data.loader.RecordFile;
 import org.hadatac.data.loader.SpreadsheetRecordFile;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;

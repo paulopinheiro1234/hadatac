@@ -86,12 +86,12 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
 		return namedGraphUri;
 	}
 	
-	public ObjectAccessSpec getStreamSpec() {
+	public STR getStreamSpec() {
 		if (streamSpecUri == null || streamSpecUri.equals("")) {
 			return null;
 		}
-		ObjectAccessSpec oas = ObjectAccessSpec.findByUri(streamSpecUri);
-		return oas;
+		STR str = STR.findByUri(streamSpecUri);
+		return str;
 	}
 
 	public void setStreamSpecUri(String streamSpecUri) {

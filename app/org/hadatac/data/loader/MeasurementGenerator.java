@@ -14,7 +14,7 @@ import java.util.HashMap;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.SOCGroup;
 import org.hadatac.entity.pojo.StudyObject;
@@ -36,7 +36,7 @@ public class MeasurementGenerator extends BaseGenerator {
 	public static final int MSGMODE = 1;
 	
     private int mode;
-    private ObjectAccessSpec da;
+    private STR da;
     private DataFile dataFile;
     private MessageTopic topic;
 
@@ -72,7 +72,7 @@ public class MeasurementGenerator extends BaseGenerator {
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
     private DASOInstanceGenerator dasoiGen = null; 
 
-    public MeasurementGenerator(int mode, DataFile dataFile, MessageTopic topic, ObjectAccessSpec da, 
+    public MeasurementGenerator(int mode, DataFile dataFile, MessageTopic topic, STR da, 
             DataAcquisitionSchema schema, DASOInstanceGenerator dasoiGen) {
         super(dataFile);
         this.mode = mode;

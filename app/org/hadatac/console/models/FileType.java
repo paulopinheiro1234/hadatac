@@ -14,9 +14,9 @@ public class FileType {
     public static FileType STD = new FileType("STD", "Study Specification", ".xlsx");
     public static FileType SSD = new FileType("SSD", "Semantic Study Design", ".xlsx");
     public static FileType SDD = new FileType("SDD", "Semantic Data Dictionary", ".xlsx");
-    public static FileType OAS = new FileType("OAS", "Object Access Specification", ".csv");
+    public static FileType STR = new FileType("STR", "Stream Specification", ".csv");
 
-    public static List<FileType> FILETYPES = new ArrayList<FileType>(Arrays.asList(DPL, STD, SSD, SDD, OAS));
+    public static List<FileType> FILETYPES = new ArrayList<FileType>(Arrays.asList(DPL, STD, SSD, SDD, STR));
 
     public static FileType find(String name) {
     	for (FileType ft : FILETYPES) {

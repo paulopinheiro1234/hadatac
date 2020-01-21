@@ -441,7 +441,7 @@ public class DataFile implements Cloneable {
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 
         if (fileName.startsWith("DA-")) {
-            String dataAcquisitionUri = ObjectAccessSpec.getProperDataAcquisitionUri(fileName);
+            String dataAcquisitionUri = STR.getProperDataAcquisitionUri(fileName);
             dataFile.setDataAcquisitionUri(dataAcquisitionUri == null ? "" : dataAcquisitionUri);
         }
 
@@ -730,7 +730,11 @@ public class DataFile implements Cloneable {
         }
         
         SolrQuery query = new SolrQuery();
-        query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"");
+        query.set("q", "dir_str:\"" + dir + "\"" + " AND ( " + 
+        "viewer_email_str_multi:\"" + ownerEmail + "\"" + 
+        " OR " +
+        "owner_email_str:\"" + ownerEmail + "\"" + 
+        " ) AND " + "status_str:\"" + status + "\"");
         query.set("rows", "10000000");
         
         return findByQuery(query);

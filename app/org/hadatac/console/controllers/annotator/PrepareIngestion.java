@@ -17,7 +17,7 @@ import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -42,7 +42,7 @@ public class PrepareIngestion extends Controller {
     public Result create(String dir, String fileId, String da_uri) {
         final String kbPrefix = ConfigProp.getKbPrefix();
         String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
-        ObjectAccessSpec da = null;
+        STR da = null;
 
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, ownerEmail);
         if (dataFile == null) {
@@ -53,7 +53,7 @@ public class PrepareIngestion extends Controller {
 
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
-            da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
+            da = STR.findByUri(URIUtils.replacePrefixEx(da_uri));
             //System.out.println("Row scope: [" + da.getRowScopeUri() + "]  hasScope: " + da.hasScope());
 
             if (da != null) {
@@ -82,7 +82,7 @@ public class PrepareIngestion extends Controller {
         da_label = da_label.replace(".csv","").replace(".","").replace("+","-");
         new_da_uri = kbPrefix + da_label;
 
-        da = new ObjectAccessSpec();
+        da = new STR();
         da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
         da.setLabel(da_label);
         da.setUri(URIUtils.replacePrefixEx(new_da_uri));
@@ -113,7 +113,7 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result reconfigure(String dir, String fileId, String da_uri) {
-        ObjectAccessSpec dataAcquisition = ObjectAccessSpec.findByUri(da_uri);
+        STR dataAcquisition = STR.findByUri(da_uri);
         if (null != dataAcquisition) {
             dataAcquisition.setStatus(0);
             dataAcquisition.save();
@@ -124,11 +124,11 @@ public class PrepareIngestion extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result refine(String dir, String fileId, String da_uri, String message) {
 
-        ObjectAccessSpec da = null;
+        STR da = null;
 
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
-            da = ObjectAccessSpec.findByUri(da_uri);
+            da = STR.findByUri(da_uri);
             if (da != null) {
                 return ok(prepareIngestion.render(dir, fileId, da, message));
             } else {
@@ -239,9 +239,9 @@ public class PrepareIngestion extends Controller {
                 return refine(dir, fileId, da_uri, message);
             }
 
-            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+            STR da = STR.findByUri(da_uri);
             if (da == null) {
-                message = "ERROR - Could not retrieve Object Access Specification from its URI.";
+                message = "ERROR - Could not retrieve Stream Specification from its URI.";
                 return refine(dir, fileId, da_uri, message);
             }
 
@@ -252,7 +252,7 @@ public class PrepareIngestion extends Controller {
                 da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             }
 
-            return ok(prepareIngestion.render(dir, fileId, da, "Updated Object Access Specification with deployment information"));
+            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
         }
 
         message = "DA is now associated with study " + std_uri;
@@ -280,9 +280,9 @@ public class PrepareIngestion extends Controller {
             cellScopeUriList = Arrays.asList(cellUriStr);
         }
 
-        ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+        STR da = STR.findByUri(da_uri);
         if (da == null) {
-            message = "ERROR - Could not retrieve Object Access Specification from its URI.";
+            message = "ERROR - Could not retrieve Stream Specification from its URI.";
             return refine(dir, fileId, da_uri, message);
         }
 
@@ -294,7 +294,7 @@ public class PrepareIngestion extends Controller {
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
         }
 
-        return ok(prepareIngestion.render(dir, fileId, da, "Updated Object Access Specification with scope information"));
+        return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with scope information"));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -313,9 +313,9 @@ public class PrepareIngestion extends Controller {
                 return refine(dir, fileId, da_uri, message);
             }
 
-            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+            STR da = STR.findByUri(da_uri);
             if (da == null) {
-                message = "ERROR - Could not retrieve Object Access Specification from its URI.";
+                message = "ERROR - Could not retrieve Stream Specification from its URI.";
                 return refine(dir, fileId, da_uri, message);
             }
 
@@ -326,7 +326,7 @@ public class PrepareIngestion extends Controller {
                 da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             }
             
-            return ok(prepareIngestion.render(dir, fileId, da, "Updated Object Access Specification with deployment information"));
+            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
         }
 
         message = "DA is now associated with deployment " + dep_uri;
@@ -345,13 +345,13 @@ public class PrepareIngestion extends Controller {
 
             DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
             if (das == null) {
-                message = "ERROR - Could not retrieve Object Access Specification Schema from its URI.";
+                message = "ERROR - Could not retrieve Stream Specification Schema from its URI.";
                 return refine(dir, fileId, da_uri, message);
             }
 
-            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+            STR da = STR.findByUri(da_uri);
             if (da == null) {
-                message = "ERROR - Could not retrieve Object Access Specification from its URI.";
+                message = "ERROR - Could not retrieve Stream Specification from its URI.";
                 return refine(dir, fileId, da_uri, message);
             }
 
@@ -362,7 +362,7 @@ public class PrepareIngestion extends Controller {
                 da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
             }
             
-            return ok(prepareIngestion.render(dir, fileId, da, "Updated Object Access Specification with data acquisition schema information"));
+            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with data acquisition schema information"));
         }
 
         message = "DA is now associated with data acquisition schema " + das_uri;
@@ -373,9 +373,9 @@ public class PrepareIngestion extends Controller {
     public Result removeAssociation(String dir, String fileId, String da_uri, String daComponent) {
 
         String message = "";
-        ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+        STR da = STR.findByUri(da_uri);
         if (da == null) {
-            message = "ERROR - Could not retrieve Object Access Specification from its URI.";
+            message = "ERROR - Could not retrieve Stream Specification from its URI.";
             return refine(dir, fileId, da_uri, message);
         }
 
@@ -410,16 +410,16 @@ public class PrepareIngestion extends Controller {
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
         }
             
-        message = "Association with " + daComponent + " removed from the Object Access Specification.";
+        message = "Association with " + daComponent + " removed from the Stream Specification.";
         return ok(prepareIngestion.render(dir, fileId, da, message));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result completeDataAcquisition(String dir, String fileId, String da_uri) {
         String message = "";
-        ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+        STR da = STR.findByUri(da_uri);
         if (da == null) {
-            message = "ERROR - Could not retrieve Object Access Specification from its URI.";
+            message = "ERROR - Could not retrieve Stream Specification from its URI.";
             return refine(dir, fileId, da_uri, message);
         }
 
@@ -430,7 +430,7 @@ public class PrepareIngestion extends Controller {
             da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
         }
         
-        message = "Object Access Specification set as complete";
+        message = "Stream Specification set as complete";
         return ok(prepareIngestion.render(dir, fileId, da, message));
     }
 }

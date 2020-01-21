@@ -22,16 +22,16 @@ public class FileTemplate {
     public static FileTemplate STD_GEN = new FileTemplate("STD", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/STD.xlsx")).toString());
     public static FileTemplate SSD_GEN = new FileTemplate("SSD", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/SSD.xlsx")).toString());
     public static FileTemplate SDD_GEN = new FileTemplate("SDD", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/SDD.xlsx")).toString());
-    public static FileTemplate OAS_GEN = new FileTemplate("OAS", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/OAS.csv")).toString());
+    public static FileTemplate STR_GEN = new FileTemplate("STR", "GENERIC", routes.Assets.versioned(new Asset("example/data/templates/generic/STR.csv")).toString());
     public static FileTemplate DPL_CHEAR = new FileTemplate("DPL", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/DPL.xlsx")).toString());
     public static FileTemplate STD_CHEAR = new FileTemplate("STD", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/STD.xlsx")).toString());
     public static FileTemplate SSD_CHEAR = new FileTemplate("SSD", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/SSD.xlsx")).toString());
     public static FileTemplate SDD_CHEAR = new FileTemplate("SDD", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/SDD.xlsx")).toString());
-    public static FileTemplate OAS_CHEAR = new FileTemplate("OAS", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/OAS.csv")).toString());
+    public static FileTemplate STR_CHEAR = new FileTemplate("STR", "CHEAR", routes.Assets.versioned(new Asset("example/data/templates/chear/STR.csv")).toString());
     
     public static List<FileTemplate> FILETEMPLATES = Arrays.asList(
-            DPL_GEN, STD_GEN, SSD_GEN, SDD_GEN, OAS_GEN, 
-            DPL_CHEAR, STD_CHEAR, SSD_CHEAR, SDD_CHEAR, OAS_CHEAR);
+            DPL_GEN, STD_GEN, SSD_GEN, SDD_GEN, STR_GEN, 
+            DPL_CHEAR, STD_CHEAR, SSD_CHEAR, SDD_CHEAR, STR_CHEAR);
 
     public FileTemplate(String name, String template, String path) {
     	this.name = name;

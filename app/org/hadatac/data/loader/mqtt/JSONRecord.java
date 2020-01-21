@@ -15,6 +15,7 @@ public class JSONRecord implements Record {
 	public List<String> headers = null;
 	public List<String> values = null;
 	
+	@SuppressWarnings("unchecked")
 	public JSONRecord(String json) {
 	    JSONParser parser = new JSONParser();
 	    JSONObject obj = new JSONObject();

@@ -32,7 +32,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private final String SIO_SAMPLE = "sio:Sample";;
     private final String kbPrefix = ConfigProp.getKbPrefix();
     private String studyUri;
-    private String oasUri;
+    private String strUri;
     private DataAcquisitionSchema das;
     private String mainLabel;
     private DataAcquisitionSchemaObject mainDaso;
@@ -52,11 +52,11 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private Map<String, ObjectCollection> socMatchingSOCs = new ConcurrentHashMap<String, ObjectCollection>();
 //    private Map<String, String > groundingIds = new ArrayList<String>();
     
-    public DASOInstanceGenerator(DataFile dataFile, String studyUri, String oasUri, DataAcquisitionSchema das, String fileName) {
+    public DASOInstanceGenerator(DataFile dataFile, String studyUri, String strUri, DataAcquisitionSchema das, String fileName) {
         super(dataFile);
 
         this.studyUri = studyUri;
-        this.oasUri = oasUri;
+        this.strUri = strUri;
         this.das = das;
         socPaths.clear();
         socLabels.clear();
@@ -647,13 +647,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
             if (newVc == null) {
                 newVc = new VirtualColumn(studyUri, "", daso.getLabel());
-                newVc.setNamedGraph(oasUri);
+                newVc.setNamedGraph(strUri);
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
             ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
             		newVc.getUri(), "", scopeUri, null, null, null, "0");
-            newSoc.setNamedGraph(oasUri);
+            newSoc.setNamedGraph(strUri);
             newSoc.saveToTripleStore();
             // addObject(newSoc);
 
@@ -850,7 +850,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         StudyObject newObj = new StudyObject(newUri, newTypeUri, newOriginalId, newLabel, nextSoc.getUri(), "Automatically generated",
                 newScopeUris, newTimeScopeUris, newSpaceScopeUris);
-        newObj.setNamedGraph(oasUri);
+        newObj.setNamedGraph(strUri);
         newObj.setDeletable(false);
         addObjectToCache(newObj, currentObjUri);
 

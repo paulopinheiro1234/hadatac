@@ -20,7 +20,7 @@ import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
@@ -60,7 +60,7 @@ public class EditDataAcquisition extends Controller {
         }
 
         if (!uri.equals("")) {
-            ObjectAccessSpec dataAcquisition = ObjectAccessSpec.findByUri(uri);
+            STR dataAcquisition = STR.findByUri(uri);
             if (null == dataAcquisition) {
                 return badRequest("Invalid data acquisition URI!");
             }
@@ -107,10 +107,10 @@ public class EditDataAcquisition extends Controller {
             return badRequest("The submitted form has errors!");
         }
 
-        ObjectAccessSpec da = ObjectAccessSpec.findByUri(acquisitionUri);
+        STR da = STR.findByUri(acquisitionUri);
         if (null != data.getNewDataAcquisitionUri()) {
             if (!data.getNewDataAcquisitionUri().equals("")) {
-                if (null != ObjectAccessSpec.findByUri(data.getNewDataAcquisitionUri())) {
+                if (null != STR.findByUri(data.getNewDataAcquisitionUri())) {
                     return badRequest("Data acquisition with this uri already exists!");
                 }
 

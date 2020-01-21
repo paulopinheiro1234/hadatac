@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.messages;
 import org.apache.commons.io.FileUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.ResumableUpload;
+import org.hadatac.console.models.DataAcquisitionForm;
+import org.hadatac.console.models.OneStringFieldForm;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +28,7 @@ import org.hadatac.data.loader.mqtt.MessageAnnotation;
 import org.hadatac.data.loader.mqtt.MessageAnnotationSubscribe;
 import org.hadatac.data.loader.mqtt.MessageWorker;
 import org.hadatac.data.loader.mqtt.Subscribe;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
@@ -50,13 +52,24 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class MessageManagement extends Controller {
 
+    @Inject
+	private FormFactory formFactory;
+    	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, int offset) {
-        List<MessageStream> results = MessageStream.find();
+
+    	// get an updated list of stream
+    	List<MessageStream> results = MessageStream.find();
+    	
+    	// get the ID of the last connection
     	String clientId = "";
     	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
     		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}        return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, results));
+    	}        
+    	
+    	// get an updated list of studies
+        List<String> studyIdList = Study.findIds();
+    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, studyIdList, results));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -67,22 +80,32 @@ public class MessageManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result initiate(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
-    	String uri = null;
+    	// retrieve selected study
+    	Form<OneStringFieldForm> form = formFactory.form(OneStringFieldForm.class).bindFromRequest();
+    	OneStringFieldForm data = form.get();
+
+    	String newStudyId = null;
+    	if (data.getField() == null || data.getField().equals("")) {
+            return badRequest("The submitted form has an empty field!");
+    	} else {
+    		newStudyId = data.getField();
+    	}
+
+    	// retrieve stream
+        String uri = null;
     	try {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         MessageStream stream = MessageStream.find(uri);
+
+        // call operation
         if (stream != null) {
-            MessageAnnotation.initiateMessageStream(stream);
+            MessageAnnotation.initiateMessageStream(stream, newStudyId);
         }
         
-        List<MessageStream> results = MessageStream.find();
-    	String clientId = "";
-    	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
-    		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, results));
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -93,6 +116,7 @@ public class MessageManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
+    	// retrieve stream
     	String uri = null;
     	try {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
@@ -100,15 +124,15 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         MessageStream stream = MessageStream.find(uri);
+
+        // call operation
         if (stream != null) {
             MessageAnnotation.subscribeMessageStream(stream);
+        	//MessageAnnotationSubscribe subscription = new MessageAnnotationSubscribe();
+        	//subscription.exec(stream);
         }
         
-        List<MessageStream> results = MessageStream.find();
-    	String clientId = "";
-    	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
-    		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, results));
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -119,6 +143,7 @@ public class MessageManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
+    	// retrieve stream
     	String uri = null;
     	try {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
@@ -126,15 +151,13 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         MessageStream stream = MessageStream.find(uri);
+
+        // call action
         if (stream != null) {
             MessageAnnotation.unsubscribeMessageStream(stream);
         }
         
-        List<MessageStream> results = MessageStream.find();
-    	String clientId = "";
-    	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
-    		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, results));
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -150,21 +173,22 @@ public class MessageManagement extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result stop(String dir, String filename, String da_uri, int offset, String stream_uri) {
+
+    	// retrieve stream
     	String uri = null;
     	try {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
-
     	MessageStream stream = MessageStream.find(uri);
-    	stopStream(stream);
 
-    	List<MessageStream> results = MessageStream.find();
-    	String clientId = "";
-    	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
-    		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, results));
+    	// call action
+    	if (stream != null) {
+    		stopStream(stream);
+    	}
+
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -172,20 +196,31 @@ public class MessageManagement extends Controller {
         return stop(dir, filename, da_uri, offset, stream_uri);
     }
 
+    /*
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result view(String dir, String filename, String da_uri, int offset, String stream_uri) {
+    public Result deleteData(String dir, String filename, String da_uri, int offset, String stream_uri) {
 
-        List<MessageStream> results = MessageStream.find();
-    	String clientId = "";
-    	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
-    		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, results));
+    	// retrieve stream
+    	String uri = null;
+    	try {
+    		uri = URLDecoder.decode(stream_uri, "utf-8");
+    	} catch (Exception e) {
+        	System.out.println("error decoding [" + stream_uri + "]");
+    	}
+    	MessageStream stream = MessageStream.find(uri);
+
+    	// call action
+    	if (stream != null) {
+    	}
+
+    	return ok(deleteData.render(dir, filename, da_uri, offset, stream));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postView(String dir, String filename, String da_uri, int offset, String stream_uri) {
-        return view(dir, filename, da_uri, offset, stream_uri);
+    public Result postDeleteData(String dir, String filename, String da_uri, int offset, String stream_uri) {
+        return deleteData(dir, filename, da_uri, offset, stream_uri);
     }
+    */
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri) {
@@ -224,7 +259,7 @@ public class MessageManagement extends Controller {
         List<MessageTopic> topics = null;
         topics = MessageTopic.findByStream(uri);
         
-    	return ok(topicManagement.render(dir, filename, da_uri, offset, stream, topics));
+    	return ok(topicManagement.render(dir, filename, da_uri, offset, stream, topics, routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -290,7 +325,7 @@ public class MessageManagement extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result testLabels(String dir, String filename, String da_uri, int offset, String topic_uri) {
+    public Result testLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
     	
     	String tpc_uri = null;
     	String streamLabel = "";
@@ -318,13 +353,13 @@ public class MessageManagement extends Controller {
     	} catch (Exception e) {
         	System.out.println("error decoding [" + topic_uri + "]");
     	}
-        
-    	return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamLabel, topicLabel, results, specified));
+    	return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamLabel, topicLabel, results, specified,
+    			routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postTestLabels(String dir, String filename, String da_uri, int offset, String topic_uri) {
-        return testLabels(dir, filename, da_uri, offset, topic_uri);
+    public Result postTestLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
+        return testLabels(dir, filename, da_uri, offset, stream_uri, topic_uri);
     }
 
 }

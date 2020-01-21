@@ -37,6 +37,9 @@ import play.mvc.Result;
 
 public class Downloader extends Controller {
 
+	public static final String ALIGNMENT_SUBJECT = "SUBJECT";
+	public static final String ALIGNMENT_TIME = "TIME";
+	
     @Inject
     FormFactory formFactory;
 
@@ -187,12 +190,12 @@ public class Downloader extends Controller {
         return 0;
     }
 
-    public static int generateCSVFileByAlignment(List<Measurement> measurements, 
+    public static int generateCSVFileBySubjectAlignment(List<Measurement> measurements, 
 		  String facets, String ownerEmail, String categoricalOption) {
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
-        String fileName = "alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+        String fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
         DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
@@ -202,7 +205,28 @@ public class Downloader extends Controller {
         
         File file = new File(dataFile.getAbsolutePath());
 
-        Measurement.outputAsCSVByAlignment(measurements, file, dataFile.getId(), categoricalOption);
+        Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption);
+        System.out.println("Generated CSV files ...");
+
+        return 0;
+    }
+
+    public static int generateCSVFileByTimeAlignment(List<Measurement> measurements, 
+		  String facets, String ownerEmail, String categoricalOption) {
+        System.out.println("Invoked CSV generation with timestamp alignment ...");
+        System.out.println("Categorical option: [" + categoricalOption + "]");
+        Date date = new Date();
+        String fileName = "time_alignment" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+
+        DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+        dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
+        dataFile.save();
+        System.out.println("Created download " + fileName);
+        
+        File file = new File(dataFile.getAbsolutePath());
+
+        Measurement.outputAsCSVByTimeAlignment(measurements, file, dataFile.getId(), categoricalOption);
         System.out.println("Generated CSV files ...");
 
         return 0;

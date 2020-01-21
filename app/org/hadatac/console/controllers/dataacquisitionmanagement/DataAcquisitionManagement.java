@@ -23,7 +23,7 @@ import play.mvc.Result;
 import play.data.FormFactory;
 
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataFile;
@@ -48,22 +48,22 @@ public class DataAcquisitionManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(int stateId) {
-        List<ObjectAccessSpec> results = null;
+        List<STR> results = null;
         State state = new State(stateId);
         final SysUser user = AuthApplication.getLocalUser(session());
         if (user.isDataManager()) {
-            results = ObjectAccessSpec.findAll(state);
+            results = STR.findAll(state);
         } else {
             String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-            results = ObjectAccessSpec.find(ownerUri, state);
+            results = STR.find(ownerUri, state);
         }
 
-        for (ObjectAccessSpec dataAcquisition : results) {
+        for (STR dataAcquisition : results) {
             dataAcquisition.setSchemaUri(URIUtils.replaceNameSpaceEx(dataAcquisition.getSchemaUri()));
         }
-        results.sort(new Comparator<ObjectAccessSpec>() {
+        results.sort(new Comparator<STR>() {
             @Override
-            public int compare(ObjectAccessSpec lhs, ObjectAccessSpec rhs) {
+            public int compare(STR lhs, STR rhs) {
                 return lhs.getUri().compareTo(rhs.getUri());
             }
         });
@@ -120,11 +120,11 @@ public class DataAcquisitionManagement extends Controller {
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }
-        if (null != ObjectAccessSpec.findByUri(data.getNewDataAcquisitionUri())) {
+        if (null != STR.findByUri(data.getNewDataAcquisitionUri())) {
             return badRequest("Data acquisition with this uri already exists!");
         }
 
-        ObjectAccessSpec da = new ObjectAccessSpec();
+        STR da = new STR();
         da.setUri(data.getNewDataAcquisitionUri());
         da.setNumberDataPoints(0);
         da.setSchemaUri(data.getNewSchema());
@@ -142,7 +142,7 @@ public class DataAcquisitionManagement extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result generateOASFileFromForm(String dir) {
+    public Result generateSTRFileFromForm(String dir) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
@@ -154,7 +154,7 @@ public class DataAcquisitionManagement extends Controller {
 
         String pathUnproc = ConfigProp.getPathUnproc();
 
-        String filename = "OAS-" + data.getDaName() + ".csv";
+        String filename = "STR-" + data.getDaName() + ".csv";
         DataFile dataFile = DataFile.findByNameAndStatus(filename, DataFile.UNPROCESSED);
         if (dataFile != null && dataFile.existsInFileSystem(pathUnproc)) {
             return badRequest(

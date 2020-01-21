@@ -142,7 +142,7 @@
                 <td>
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
-                    file.getFileName().startsWith("OAS-") || file.getFileName().startsWith("DA-")) {
+                    file.getFileName().startsWith("STR-") || file.getFileName().startsWith("DA-")) {
                 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.ingestDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="ingest" onclick="return confirm('Are you sure to submit it to auto-annotator?')">Ingest</a>
 				}
                 @if(file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-")) {
@@ -157,7 +157,7 @@
 				*@
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
-                    file.getFileName().startsWith("OAS-")) {
+                    file.getFileName().startsWith("STR-")) {
                 	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.verifyDataFile(file.getId())" class="btn btn-xs btn-primary" role="button" id="verify">Verify</a>
                 }
                 </td>

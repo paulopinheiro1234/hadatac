@@ -1,9 +1,10 @@
-@(dir      : String,
-  filename : String,
-  da_uri   : String,
-  page     : Integer,
-  clientId : String,
-  results  : List[org.hadatac.entity.pojo.MessageStream])
+@(dir         : String,
+  filename    : String,
+  da_uri      : String,
+  page        : Integer,
+  clientId    : String,
+  studyList   : List[String],
+  results     : List[org.hadatac.entity.pojo.MessageStream])
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.utils._
@@ -23,11 +24,12 @@
         <table class="table">
             <thead>
                  <tr>
-                    <th>Stream Name</th>
                     <th>IP</th>
                     <th>Port</th>
+                    <th>Topic</th>
                     <th>Status</th>
                     <th>Protocol</th>
+                    <th>Study</th>
                     <th>#ReceivedMsgs</th>
                     <th>#IngestedMsgs</th>
                     <th>State Operations</th>
@@ -36,7 +38,7 @@
             </thead>
             <tbody>
               @for(stream <- results){
-                  @stream_entry(dir, filename, da_uri, page, stream)
+                  @stream_entry(dir, filename, da_uri, page, studyList, stream)
               }
             </tbody>
         </table>

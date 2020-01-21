@@ -19,7 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.dataacquisitionmanagement.dataAcquisitionManagement;
 import org.hadatac.console.views.html.triplestore.*;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.MetadataContext;
@@ -31,7 +31,7 @@ import org.hadatac.utils.State;
 */
 
 
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.metadata.loader.TripleProcessing;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;

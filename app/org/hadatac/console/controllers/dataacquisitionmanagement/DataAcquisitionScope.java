@@ -15,7 +15,7 @@ import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.dataacquisitionmanagement.*;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.metadata.loader.URIUtils;
@@ -33,7 +33,7 @@ public class DataAcquisitionScope extends Controller {
                     routes.DataAcquisitionScope.create(dir, fileId, da_uri).url()));
         }
 
-        ObjectAccessSpec da = null;
+        STR da = null;
         String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
 
         // Load associated DA
@@ -44,7 +44,7 @@ public class DataAcquisitionScope extends Controller {
 
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
-            da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
+            da = STR.findByUri(URIUtils.replacePrefixEx(da_uri));
 
             if (da == null) {
                 String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;
@@ -99,7 +99,7 @@ public class DataAcquisitionScope extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result view(String dir, String fileId, String da_uri) {
 
-        ObjectAccessSpec da = null;
+        STR da = null;
         
         // Load associated DA
         String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
@@ -110,7 +110,7 @@ public class DataAcquisitionScope extends Controller {
 
         // Load associated DA
         if (da_uri != null && !da_uri.equals("")) {
-            da = ObjectAccessSpec.findByUri(URIUtils.replacePrefixEx(da_uri));
+            da = STR.findByUri(URIUtils.replacePrefixEx(da_uri));
 
             if (da == null) {
                 String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;

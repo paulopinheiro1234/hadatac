@@ -1,0 +1,79 @@
+@(dir        : String,
+  filename   : String,
+  da_uri     : String,
+  study      : org.hadatac.entity.pojo.Study,
+  oc         : org.hadatac.entity.pojo.ObjectCollection,
+  objUriList : List[String],
+  objList    : List[org.hadatac.entity.pojo.StudyObject],
+  page       : Integer,
+  total      : Integer)
+
+@import org.hadatac.console.controllers.objects.ObjectManagement
+@import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / ObjectManagement.PAGESIZE); var lastpage = (last + 1)
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import java.net.URLEncoder
+
+@main("List Object URIs") {
+
+  <div class="container-fluid">
+    <h3>URIs of Objects in Collection <i><font color="darkBlue">@oc.getLabel()</i></font> (@oc.getObjectCollectionType().getLabel())</h3>
+    
+	@if(prev >= 0) {
+    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary" 
+	       role="button">&lt;</a>
+	} else {
+    	<a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), 0)" class="btn btn-primary disabled" 
+	       role="button">&lt;&lt;</a>
+	   
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), prev)" class="btn btn-primary disabled" 
+	       role="button">&lt;</a>
+	}
+
+	@current of @lastpage   
+	   
+	@if(next < last) {
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary" 
+	       role="button">&gt;&gt;</a>
+	   
+	} else {
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), next)" class="btn btn-primary disabled" 
+	       role="button">&gt;</a>
+
+	    <a href="@org.hadatac.console.controllers.objects.routes.ObjectManagement.indexNomsg(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"), URLEncoder.encode(oc.getUri(),"UTF-8"), last)" class="btn btn-primary disabled" 
+	       role="button">&gt;&gt;</a>	   
+	}
+
+    <form class="form-horizontal" name="newObjects" method="post" 
+	  action="@org.hadatac.console.controllers.objects.routes.ObjectManagement.updateCollectionObjects(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"),URLEncoder.encode(oc.getUri(),"UTF-8"),objUriList, page, total)">
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>URI (using namespace)</th>
+              </tr>
+            </thead>
+            <tbody>
+	        @if(objList != null) {
+                 @for(obj <- objList){
+	                 @objURI_entry(oc, obj)
+                 }
+            } 
+            </tbody>
+        </table>
+
+	<a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, URLEncoder.encode(study.getUri(),"UTF-8"))" class="btn btn-primary" 
+	   role="button">Back to Object Collection  Management</a>
+	
+    </div>
+    </form>
+ 
+  </div>
+
+}

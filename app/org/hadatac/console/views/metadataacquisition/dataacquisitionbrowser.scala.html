@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
     		},
     }],
     search_sortby: [
-        {'field':'attributeUri.exact', 'display':'Object Access Specification URI'},
+        {'field':'attributeUri.exact', 'display':'Stream Specification URI'},
     	@for(daIndicator <- indicatorList){
     		{
     		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 
@@ -41,7 +41,7 @@ jQuery(document).ready(function($) {
     		},
     }],
     searchbox_fieldselect: [
-        {'field':'attributeUri.exact', 'display':'Object Access Specification URI'},
+        {'field':'attributeUri.exact', 'display':'Stream Specification URI'},
     	@for(daIndicator <- indicatorList){
     		{
     		'field': '@daIndicator.replace(" ","").replace(",","")_str.exact', 

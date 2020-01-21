@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hadatac.data.loader.MeasurementGenerator;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
@@ -37,7 +37,7 @@ public class MessageAnnotationSubscribe {
     		/* Private Instance Variables                                   */
     		/****************************************************************/
 
-    		private volatile boolean stop = false;
+    		private volatile boolean stop;
 
 
     		private MessageStream       stream;
@@ -148,6 +148,7 @@ public class MessageAnnotationSubscribe {
     		public void run() {
     	    	
     	    	boolean finished = false;
+    	    	stop = false;
    		     	while (!stop && !finished) {
    	    			try {
    	    				SubscribeWorker aClient = new SubscribeWorker(stream);
@@ -168,38 +169,9 @@ public class MessageAnnotationSubscribe {
     		/* Supporting Methods                                           */
     		/****************************************************************/
 
- 		   public void stopGracefully() {
+   		    public void stopGracefully() {
  			   stop = true;
- 		   }
-
-    	    /*
-    	    public String getPlainPayLoad() {
-    	    	return plainPayload;
-    	    }
-    	    
-    	    public String getClientId() {
-    	    	if (client == null) {
-    	    		return "";
-    	    	}
-    	    	return client.getClientId();
-    	    }
-    		
-    	    public void unsubscribe() throws MqttException {
-
-    	    	if (client != null) {
-    	    		
-    		    	log("Unsubscribing to topic \"" + topic + " with client ID " + client.getClientId());
-    		    	client.unsubscribe(topic);
-    		
-    		    	client.disconnect();
-    		    	log("Disconnected");
-
-    	    		MessageWorker.getInstance().currentClient = null;
-
-    	    	}
-    			
-    	    }
-    	    */
+ 		    }
 
     	    private void log(String message) {
     	    	if (!quietMode) {

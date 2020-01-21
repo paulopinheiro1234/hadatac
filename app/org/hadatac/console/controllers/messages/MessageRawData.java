@@ -38,16 +38,19 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class MessageRawData extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
+    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
 		MessageStream stream = null;
 		MessageTopic topic = null;
     	List<String> results = new ArrayList<String>();
     	String str_uri = null;
     	String tpc_uri = null;
     	String topic_label = null;
+    	if (postAction == null) {
+    		postAction = routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url();
+    	}
     	if (stream_uri == null) {
     		results.add("No stream URI provided");
-            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results));
+            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results, postAction));
     	}
     	try {
     		str_uri = URLDecoder.decode(stream_uri, "UTF-8");
@@ -80,12 +83,12 @@ public class MessageRawData extends Controller {
 			topic_label = topic.getLabel();
 			results.addAll(Subscribe.exec(stream, topic, Subscribe.SUBSCRIBE_BATCH));
 		}
-        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results));
+        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
-        return index(dir, filename, da_uri, offset, stream_uri, topic_uri);
+    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
+        return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction);
     }
 
 }

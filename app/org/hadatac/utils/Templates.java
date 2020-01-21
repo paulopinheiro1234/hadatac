@@ -45,17 +45,17 @@ public class Templates {
     public static String ACQ_OWNEREMAIL = iniConfig.getSection("ACQ").getString("OwnerEmail");
     public static String ACQ_PERMISSIONURI = iniConfig.getSection("ACQ").getString("PermissionURI");
     
-    // OAS Template
-    public static String DATAACQUISITIONNAME = iniConfig.getSection("OAS").getString("DataAcquisitionName");
-    public static String METHOD = iniConfig.getSection("OAS").getString("Method");
-    public static String DATADICTIONARYNAME = iniConfig.getSection("OAS").getString("DataDictionaryName");
-    public static String DASTUDYID = iniConfig.getSection("OAS").getString("DAStudyName");
-    public static String EPILAB = iniConfig.getSection("OAS").getString("Epi/Lab");
-    public static String OWNEREMAIL = iniConfig.getSection("OAS").getString("OwnerEmail");
-    public static String PERMISSIONURI = iniConfig.getSection("OAS").getString("PermissionURI");
-    public static String DEPLOYMENTURI = iniConfig.getSection("OAS").getString("DeploymentUri");
-    public static String ROWSCOPE = iniConfig.getSection("OAS").getString("RowScope");
-    public static String CELLSCOPE = iniConfig.getSection("OAS").getString("CellScope");
+    // STR Template
+    public static String DATAACQUISITIONNAME = iniConfig.getSection("STR").getString("DataAcquisitionName");
+    public static String METHOD = iniConfig.getSection("STR").getString("Method");
+    public static String DATADICTIONARYNAME = iniConfig.getSection("STR").getString("DataDictionaryName");
+    public static String DASTUDYID = iniConfig.getSection("STR").getString("DAStudyName");
+    public static String EPILAB = iniConfig.getSection("STR").getString("Epi/Lab");
+    public static String OWNEREMAIL = iniConfig.getSection("STR").getString("OwnerEmail");
+    public static String PERMISSIONURI = iniConfig.getSection("STR").getString("PermissionURI");
+    public static String DEPLOYMENTURI = iniConfig.getSection("STR").getString("DeploymentUri");
+    public static String ROWSCOPE = iniConfig.getSection("STR").getString("RowScope");
+    public static String CELLSCOPE = iniConfig.getSection("STR").getString("CellScope");
 
     // DASA, DASE, DASO Template (Part of SDD)
     public static String LABEL = iniConfig.getSection("DASA").getString("Label");     // also in PV                                                                                   

@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hadatac.data.loader.MeasurementGenerator;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
@@ -25,10 +25,12 @@ public class MessageAnnotation {
      *                            STREAM MANAGEMENT                                 *
      ********************************************************************************/
     
-    public static void initiateMessageStream(MessageStream stream) {
-    	if (!stream.getStatus().equals(MessageStream.CLOSED)) {
+    public static void initiateMessageStream(MessageStream stream, String newStudyId) {
+    	if (!stream.getStatus().equals(MessageStream.CLOSED) || newStudyId == null || newStudyId.isEmpty()) {
     		return;
     	}
+    	//System.out.println("MessageAnnotation: Initiating stream for study " + newStudyId);
+    	
     	System.out.println("Initiating message stream: " + stream.getName());
 		stream.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().resetLog();
@@ -42,8 +44,15 @@ public class MessageAnnotation {
 				startMessageTopic(topic);
 			}
 		}
-		
-		stream.setStatus(MessageStream.INITIATED);
+
+		stream.setStudyById(newStudyId);
+    	//System.out.println("MessageAnnotation: Stream study " + stream.getStudy().getId());
+		if (stream.getStudy() != null && stream.getStudy().getId() != null) {
+		    stream.setStatus(MessageStream.INITIATED);
+			stream.getLogger().println(String.format("Message stream %s is initiated.", stream.getName()));
+		} else {
+			stream.getLogger().println(String.format("Message stream %s failed to be associated with study.", stream.getName()));
+		}
 		stream.save();
 
 		// Stream Subscription refresh needs to occur after the stream is activated
@@ -129,6 +138,7 @@ public class MessageAnnotation {
 		
 		stream.setTotalMessages(0);
 		stream.setIngestedMessages(0);
+		stream.setStudyUri(null);
         stream.setStatus(MessageStream.CLOSED);
 		stream.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().println(String.format("Stopped processing of message stream: %s", stream.getName()));
@@ -153,10 +163,10 @@ public class MessageAnnotation {
 		topic.getLogger().resetLog();
 		topic.getLogger().println(String.format("Started processing of message topic: %s", topic.getLabel()));
 
-        List<ObjectAccessSpec> oasList = null;
-        ObjectAccessSpec oas = null;
+        List<STR> strList = null;
+        STR str = null;
         Deployment dpl = null;
-        String oas_uri = null;
+        String str_uri = null;
         String deployment_uri = null;
         String schema_uri = null;
         boolean isValid = true;
@@ -164,30 +174,30 @@ public class MessageAnnotation {
         if (topic != null) {
         	deployment_uri = URIUtils.replacePrefixEx(topic.getDeploymentUri());
         	dpl = Deployment.find(deployment_uri);
-            oasList = ObjectAccessSpec.find(dpl, true);
+            strList = STR.find(dpl, true);
             
-            if (oasList != null && oasList.size() > 0) {
-            	oas = oasList.get(0);
-            	oas_uri = oas.getUri();
+            if (strList != null && strList.size() > 0) {
+            	str = strList.get(0);
+            	str_uri = str.getUri();
             }
-            if (oas != null) {
-                if (!oas.isComplete()) {
-                    topic.getLogger().printWarningByIdWithArgs("DA_00003", oas_uri);
+            if (str != null) {
+                if (!str.isComplete()) {
+                    topic.getLogger().printWarningByIdWithArgs("DA_00003", str_uri);
                     isValid = false;
                 } else {
-                    topic.getLogger().println(String.format("Stream specification is complete: <%s>", oas_uri));
+                    topic.getLogger().println(String.format("Stream specification is complete: <%s>", str_uri));
                 }
-                deployment_uri = oas.getDeploymentUri();
-                schema_uri = oas.getSchemaUri();
+                deployment_uri = str.getDeploymentUri();
+                schema_uri = str.getSchemaUri();
             } else {
-                topic.getLogger().printWarningByIdWithArgs("DA_00004", oas_uri);
+                topic.getLogger().printWarningByIdWithArgs("DA_00004", str_uri);
                 isValid = false;
             }
         }
 
         if (isValid) {
 	        if (schema_uri == null || schema_uri.isEmpty()) {
-	            topic.getLogger().printExceptionByIdWithArgs("DA_00005", oas_uri);
+	            topic.getLogger().printExceptionByIdWithArgs("DA_00005", str_uri);
 	        } else {
 	            topic.getLogger().println(String.format("Schema <%s> specified for message topic: <%s>", schema_uri, topic.getLabel()));
 	        }
@@ -195,7 +205,7 @@ public class MessageAnnotation {
 
         if (isValid) {
 	        if (deployment_uri == null || deployment_uri.isEmpty()) {
-	            topic.getLogger().printExceptionByIdWithArgs("DA_00006", oas_uri);
+	            topic.getLogger().printExceptionByIdWithArgs("DA_00006", str_uri);
 	        } else {
 	            try {
 	                deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
@@ -207,8 +217,8 @@ public class MessageAnnotation {
         }
 
         if (isValid) {
-	        if (oas != null) {
-	            //topic.setStudyUri(oas.getStudyUri());
+	        if (str != null) {
+	            //topic.setStudyUri(str.getStudyUri());
 
 	        	// Learn Headers
 	        	List<String> headers = Subscribe.testLabels(topic.getStream(), topic); 
@@ -226,28 +236,28 @@ public class MessageAnnotation {
         
         DataAcquisitionSchema schema = null;
         if (isValid) {
-            schema = DataAcquisitionSchema.find(oas.getSchemaUri());
+            schema = DataAcquisitionSchema.find(str.getSchemaUri());
             if (schema == null) {
-                topic.getLogger().printExceptionByIdWithArgs("DA_00007", oas.getSchemaUri());
+                topic.getLogger().printExceptionByIdWithArgs("DA_00007", str.getSchemaUri());
                 isValid = false;
             }
         }
 
         if (isValid) {
-            if (!oas.hasCellScope()) {
+            if (!str.hasCellScope()) {
             	// Need to be fixed here by getting codeMap and codebook from sparql query
             	//DASOInstanceGenerator dasoInstanceGen = new DASOInstanceGenerator(
-            	//		stream, oas.getStudyUri(), oas.getUri(), 
+            	//		stream, str.getStudyUri(), str.getUri(), 
             	//		schema, stream.getName());
             	//chain.addGenerator(dasoInstanceGen);	
-            	//chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.MSGMODE, null, topic, oas, schema, dasoInstanceGen));
+            	//chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.MSGMODE, null, topic, str, schema, dasoInstanceGen));
                 topic.getLogger().printException(String.format("Message annotation requires cell scope"));
                 isValid = false;
             } 
         }
         
         if (isValid) {
-            MeasurementGenerator gen = new MeasurementGenerator(MeasurementGenerator.MSGMODE, null, topic, oas, schema, null);
+            MeasurementGenerator gen = new MeasurementGenerator(MeasurementGenerator.MSGMODE, null, topic, str, schema, null);
             MessageWorker.getInstance().topicsGen.put(topic.getLabel(),gen);
             if (MessageWorker.getInstance().topicsGen.get(topic.getLabel()) == null) { 
             	topic.getLogger().printException(String.format("MeasurementGenerator is null in message annotation"));
@@ -256,7 +266,7 @@ public class MessageAnnotation {
         }
         if (isValid) {
             topic.setNamedGraphUri(URIUtils.replacePrefixEx(topic.getDeploymentUri()));
-        	topic.setStreamSpecUri(oas_uri);
+        	topic.setStreamSpecUri(str_uri);
         	topic.setStatus(MessageTopic.ACTIVE);
         
         } else {

@@ -21,7 +21,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -66,9 +66,9 @@ public class AnnotationWorker {
         } else if (fileName.startsWith("DPL-")) {
             chain = annotateDPLFile(dataFile);
             
-        } else if (fileName.startsWith("OAS-")) {
-            checkOASFile(dataFile);
-            chain = annotateOASFile(dataFile);
+        } else if (fileName.startsWith("STR-")) {
+            checkSTRFile(dataFile);
+            chain = annotateSTRFile(dataFile);
             
         } else if (fileName.startsWith("SDD-")) {
             chain = annotateSDDFile(dataFile);
@@ -206,7 +206,7 @@ public class AnnotationWorker {
         file.delete();
     }
     
-    public static void checkOASFile(DataFile dataFile) {
+    public static void checkSTRFile(DataFile dataFile) {
         final String kbPrefix = ConfigProp.getKbPrefix();
         Record record = dataFile.getRecordFile().getRecords().get(0);
         String studyName = record.getValueByColumnName("Study ID");
@@ -229,7 +229,7 @@ public class AnnotationWorker {
         String das_uri = URIUtils.convertToWholeURI(ConfigProp.getKbPrefix() + "DAS-" + record.getValueByColumnName("data dict").replace("SDD-", ""));
         DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
         if (das == null) {
-            dataFile.getLogger().printExceptionByIdWithArgs("OAS_00001", record.getValueByColumnName("Study ID"));
+            dataFile.getLogger().printExceptionByIdWithArgs("STR_00001", record.getValueByColumnName("Study ID"));
         } else {
             Map<String, String> dasoPL = new HashMap<String, String>();
             List<DataAcquisitionSchemaObject> loo = new ArrayList<DataAcquisitionSchemaObject>();
@@ -250,7 +250,7 @@ public class AnnotationWorker {
                 }
 
                 if (daso.getEntityLabel() == null || daso.getEntityLabel().length() == 0) {
-                    dataFile.getLogger().printExceptionByIdWithArgs("OAS_00002", daso.getLabel());
+                    dataFile.getLogger().printExceptionByIdWithArgs("STR_00002", daso.getLabel());
                 } else if (!refList.containsKey(daso.getLabel())) {
 
                     List<String> answer = new ArrayList<String>();
@@ -272,7 +272,7 @@ public class AnnotationWorker {
                                     CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
                             if (!resultsrw.hasNext()) {
-                                System.out.println("[WARNING] OAS ingestion: Could not find triples on OCs, SSD is probably not correctly ingested.");
+                                System.out.println("[WARNING] STR ingestion: Could not find triples on OCs, SSD is probably not correctly ingested.");
                             }
 
                             while (resultsrw.hasNext()) {
@@ -440,11 +440,11 @@ public class AnnotationWorker {
         return chain;
     }
 
-    public static GeneratorChain annotateOASFile(DataFile dataFile) {
+    public static GeneratorChain annotateSTRFile(DataFile dataFile) {
         GeneratorChain chain = new GeneratorChain();
         DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String startTime = isoFormat.format(new Date());
-        chain.addGenerator(new OASGenerator(dataFile, startTime));
+        chain.addGenerator(new STRGenerator(dataFile, startTime));
 
         return chain;
     }
@@ -638,37 +638,37 @@ public class AnnotationWorker {
 
         GeneratorChain chain = new GeneratorChain();
 
-        ObjectAccessSpec oas = null;
-        String oas_uri = null;
+        STR str = null;
+        String str_uri = null;
         String deployment_uri = null;
         String schema_uri = null;
 
         if (dataFile != null) {
-            oas_uri = URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri());
-            oas = ObjectAccessSpec.findByUri(oas_uri);
-            if (oas != null) {
-                if (!oas.isComplete()) {
-                    dataFile.getLogger().printWarningByIdWithArgs("DA_00003", oas_uri);
+            str_uri = URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri());
+            str = STR.findByUri(str_uri);
+            if (str != null) {
+                if (!str.isComplete()) {
+                    dataFile.getLogger().printWarningByIdWithArgs("DA_00003", str_uri);
                     chain.setInvalid();
                 } else {
-                    dataFile.getLogger().println(String.format("Specification of associated Object Access Specification is complete: <%s>", oas_uri));
+                    dataFile.getLogger().println(String.format("Stream Specification is complete: <%s>", str_uri));
                 }
-                deployment_uri = oas.getDeploymentUri();
-                schema_uri = oas.getSchemaUri();
+                deployment_uri = str.getDeploymentUri();
+                schema_uri = str.getSchemaUri();
             } else {
-                dataFile.getLogger().printWarningByIdWithArgs("DA_00004", oas_uri);
+                dataFile.getLogger().printWarningByIdWithArgs("DA_00004", str_uri);
                 chain.setInvalid();
             }
         }
 
         if (schema_uri == null || schema_uri.isEmpty()) {
-            dataFile.getLogger().printExceptionByIdWithArgs("DA_00005", oas_uri);
+            dataFile.getLogger().printExceptionByIdWithArgs("DA_00005", str_uri);
             chain.setInvalid();
         } else {
-            dataFile.getLogger().println(String.format("Schema <%s> specified for data acquisition: <%s>", schema_uri, oas_uri));
+            dataFile.getLogger().println(String.format("Schema <%s> specified for data acquisition: <%s>", schema_uri, str_uri));
         }
         if (deployment_uri == null || deployment_uri.isEmpty()) {
-            dataFile.getLogger().printExceptionByIdWithArgs("DA_00006", oas_uri);
+            dataFile.getLogger().printExceptionByIdWithArgs("DA_00006", str_uri);
             chain.setInvalid();
         } else {
             try {
@@ -677,29 +677,29 @@ public class AnnotationWorker {
                 dataFile.getLogger().printException(String.format("URL decoding error for deployment uri <%s>", deployment_uri));
                 chain.setInvalid();
             }
-            dataFile.getLogger().println(String.format("Deployment <%s> specified for data acquisition <%s>", deployment_uri, oas_uri));
+            dataFile.getLogger().println(String.format("Deployment <%s> specified for data acquisition <%s>", deployment_uri, str_uri));
         }
 
-        if (oas != null) {
-            dataFile.setStudyUri(oas.getStudyUri());
-            dataFile.setDatasetUri(DataFactory.getNextDatasetURI(oas.getUri()));
-            oas.addDatasetUri(dataFile.getDatasetUri());
+        if (str != null) {
+            dataFile.setStudyUri(str.getStudyUri());
+            dataFile.setDatasetUri(DataFactory.getNextDatasetURI(str.getUri()));
+            str.addDatasetUri(dataFile.getDatasetUri());
 
-            DataAcquisitionSchema schema = DataAcquisitionSchema.find(oas.getSchemaUri());
+            DataAcquisitionSchema schema = DataAcquisitionSchema.find(str.getSchemaUri());
             if (schema == null) {
-                dataFile.getLogger().printExceptionByIdWithArgs("DA_00007", oas.getSchemaUri());
+                dataFile.getLogger().printExceptionByIdWithArgs("DA_00007", str.getSchemaUri());
                 chain.setInvalid();
             }
 
-            if (!oas.hasCellScope()) {
+            if (!str.hasCellScope()) {
             	// Need to be fixed here by getting codeMap and codebook from sparql query
             	DASOInstanceGenerator dasoInstanceGen = new DASOInstanceGenerator(
-            			dataFile, oas.getStudyUri(), oas.getUri(), 
+            			dataFile, str.getStudyUri(), str.getUri(), 
             			schema, dataFile.getFileName());
             	chain.addGenerator(dasoInstanceGen);	
-            	chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, oas, schema, dasoInstanceGen));
+            	chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, str, schema, dasoInstanceGen));
             } else {
-                chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, oas, schema, null));
+                chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, str, schema, null));
             }
             chain.setNamedGraphUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         }

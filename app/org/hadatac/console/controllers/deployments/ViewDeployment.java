@@ -14,7 +14,7 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.utils.State;
 
@@ -32,7 +32,7 @@ public class ViewDeployment extends Controller {
 
     	//DeploymentForm dep = new DeploymentForm();
     	Deployment deployment = null;
-    	List<ObjectAccessSpec> dataCollections = null;
+    	List<STR> dataCollections = null;
     	
     	try {
     		if (deployment_uri != null) {
@@ -46,7 +46,7 @@ public class ViewDeployment extends Controller {
 
     	if (!deployment_uri.equals("")) {
         	deployment = Deployment.find(deployment_uri);
-        	dataCollections = ObjectAccessSpec.find(deployment, false);    		
+        	dataCollections = STR.find(deployment, false);    		
     	}
 
     	String urlReturn = null;

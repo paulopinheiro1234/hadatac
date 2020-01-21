@@ -6,7 +6,8 @@
   stream_label   : String,
   topic_label    : String,
   results        : List[String],
-  specified      : List[String]
+  specified      : List[String],
+  postAction     : String
   )
     
 @import org.hadatac.console.views.html._
@@ -68,8 +69,8 @@
 			</div>
 	
 			<br>
-			<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)" class="btn btn-primary" 
-		       role="button">Back to Ingest </a>  		
+			<a href="@postAction" class="btn btn-primary" 
+		       role="button">Back to Topic </a>  		
 		</div>		
 	</div>
 

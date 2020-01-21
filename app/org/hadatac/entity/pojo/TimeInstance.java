@@ -98,6 +98,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         String param = "";
         if (minTime != null && maxTime != null) {
             gap = calculateTimeGap(minTime.toInstant(), maxTime.toInstant());
+            System.out.println("gap: " + gap);
             param = "{ "
                     + "named_time_str:{ "
                     + "type: terms, "
@@ -129,6 +130,9 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
+            for (Pivot pvt : pivot.children) {
+            	System.out.println("Value: " + pvt.getValue() + "   Field: " + pvt.getField());
+            }
             return parsePivot(pivot, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] TimeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
@@ -203,6 +207,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         }
 
         Duration duration = Duration.between(min, max);
+        System.out.println("duration in days: " + duration.toDays());
 
         long days = duration.toDays();
         long weeks = days / 7;
@@ -212,13 +217,13 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         if (years > 2) {
             return "+1YEAR";
         }
-        if (months > 4) {
+        if (months > 3) {
             return "+1MONTH";
         }
-        if (weeks > 4) {
+        if (weeks > 3) {
             return "+1WEEK";
         }
-        if (days > 4) {
+        if (days > 3) {
             return "+1DAY";
         }
 

@@ -75,6 +75,47 @@ public class ObjectManagement extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result listURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
+        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
+            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
+                    org.hadatac.console.controllers.objects.routes.ObjectManagement.listURIs(dir, filename, da_uri, std_uri, oc_uri, page).url()));
+        }
+        
+        try {
+            std_uri = URLDecoder.decode(std_uri, "utf-8");
+            oc_uri = URLDecoder.decode(oc_uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            std_uri = "";
+            oc_uri = "";
+        }
+
+        Study study = Study.find(std_uri);
+        if (study == null) {
+            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, oc_uri, page));
+        } 
+
+        ObjectCollection oc = ObjectCollection.find(oc_uri);
+        if (oc == null) {
+            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc_uri, page));
+        } 
+
+        List<String> objUriList = new ArrayList<String>(); 
+        List<StudyObject> objects = StudyObject.findByCollectionWithPages(oc, PAGESIZE, page * PAGESIZE);
+        int total = StudyObject.getNumberStudyObjectsByCollection(oc_uri);
+        
+        for (StudyObject obj : objects) {
+            objUriList.add(obj.getUri());
+        }
+
+        return ok(listURIs.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postListURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
+        return listURIs(dir, filename, da_uri, std_uri, oc_uri, page);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result updateCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, int total) {
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 

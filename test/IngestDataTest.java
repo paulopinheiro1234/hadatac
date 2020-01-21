@@ -22,7 +22,7 @@ import ingestDataTest.EmptyTest;
 import ingestDataTest.FacetedSearchTest;
 import ingestDataTest.LoadDATest;
 import ingestDataTest.LoadDPLTest;
-import ingestDataTest.LoadOASTest;
+import ingestDataTest.LoadSTRTest;
 import ingestDataTest.LoadSDDTest;
 import ingestDataTest.LoadSSDTest;
 import ingestDataTest.LoadSTDTest;
@@ -47,7 +47,7 @@ public class IngestDataTest {
 		tests.add(5, LoadSTDTest.getTest());
 		tests.add(6, LoadSSDTest.getTest());
 		tests.add(7, LoadSDDTest.getTest());
-		tests.add(8, LoadOASTest.getTest());
+		tests.add(8, LoadSTRTest.getTest());
 		tests.add(9, LoadDATest.getTest());
 		tests.add(10, FacetedSearchTest.getTest());
 		tests.add(11, DownloadTest.getTest());
@@ -81,7 +81,7 @@ public class IngestDataTest {
 		System.out.println("5: LoadSTDTest.");
 		System.out.println("6: LoadSSDTest.");
 		System.out.println("7: LoadSDDTest.");
-		System.out.println("8: LoadOASTest.");
+		System.out.println("8: LoadSTRTest.");
 		System.out.println("9: LoadDATest.");
 		System.out.println("10: FacetedSearchTest.");
 		System.out.println("11: DownloadTest.");

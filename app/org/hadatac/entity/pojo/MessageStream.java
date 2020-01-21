@@ -141,8 +141,30 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
     public String getStudyUri() {
         return studyUri;
     }
+
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
+    }
+
+    public void setStudyById(String studyId) {
+    	if (studyId == null || studyId.isEmpty()) {
+    		this.studyUri = null;
+    		return;
+    	}
+    	Study study = Study.findByName(studyId);
+        this.studyUri = study.getUri();
+    }
+
+    public Study getStudy() {
+    	if (studyUri == null || studyUri.isEmpty()) {
+    		return null;
+    	}
+    	Study study = Study.find(studyUri);
+    	return study;
+    }
+
+    public String getStudyId() {
+        return studyUri;
     }
 
     public String getDataAcquisitionUri() {
@@ -293,7 +315,7 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
 				instrument.setQuery(query);
 				instrument.setField("instrument_uri_str");
 				
-				ObjectAccessSpec da = new ObjectAccessSpec();
+				STR da = new STR();
 				da.setUri(soln.get("dataAcquisitionUri").toString());
 				da.setLabel(soln.get("dataAcquisitionLabel").toString());
 				da.setField("acquisition_uri_str");
@@ -395,6 +417,8 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
 		    	stream.setStatus(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasProtocol")) {
 		    	stream.setProtocol(object.asLiteral().getString());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasStudy")) {
+		    	stream.setStudyUri(object.asResource().getURI());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasDataFileId")) {
 		    	stream.setDataFileId(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasTotalMessages")) {
@@ -463,6 +487,9 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         }
         if (this.getProtocol() != null && !this.getProtocol().equals("")) {
         	insert += stream_uri + " hasco:hasProtocol  \"" + this.getProtocol() + "\" . ";
+        }
+        if (this.getStudyUri() != null && !this.getStudyUri().equals("")) {
+        	insert += stream_uri + " hasco:hasStudy  <" + this.getStudyUri() + "> . ";
         }
         if (this.getDataFileId() != null && !this.getDataFileId().equals("")) {
             insert += stream_uri + " hasco:hasDataFileId  \"" + this.getDataFileId() + "\" . ";

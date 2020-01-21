@@ -1,12 +1,12 @@
-@(dir      : String,
-  filename : String,
-  da_uri   : String,
-  page     : Integer,
-  stream   : org.hadatac.entity.pojo.MessageStream,
-  topic    : org.hadatac.entity.pojo.MessageTopic,
-  study    : org.hadatac.entity.pojo.Study,
-  dpl      : org.hadatac.entity.pojo.Deployment,
-  schema   : org.hadatac.entity.pojo.DataAcquisitionSchema)
+@(dir           : String,
+  filename      : String,
+  da_uri        : String,
+  page          : Integer,
+  stream        : org.hadatac.entity.pojo.MessageStream,
+  topic         : org.hadatac.entity.pojo.MessageTopic,
+  dpl           : org.hadatac.entity.pojo.Deployment,
+  schema        : org.hadatac.entity.pojo.DataAcquisitionSchema,
+  currentAction : String)
 
 @import java.net._
 @import org.hadatac.utils._
@@ -17,10 +17,6 @@
 	  <td>@if(dpl != null && dpl.getPlatform().getLabel() != null) {
 	  	     @dpl.getPlatform().getLabel()
 	      }
-	  </td>
-	  <td>@if(study != null) {
-	  	     @study.getLabel()
-	 	  }
 	  </td>
 	  <td>@if(schema != null) {
 	  	     @schema.getLabel()
@@ -37,9 +33,9 @@
             <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.checkAnnotationLog(dir, filename, da_uri, page, URLEncoder.encode(topic.getUri(), "UTF-8"))" 
                class="btn-xs btn-primary" role="button">Browse Labels</a>
          }
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testLabels(dir, filename, da_uri, page, URLEncoder.encode(topic.getUri(), "UTF-8"))" 
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testLabels(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"))" 
             class="btn-xs btn-primary" role="button">Test Labels</a>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"))"
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction)"
             class="btn-xs btn-primary" role="button">Raw Data</a>
          <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.checkAnnotationLog(dir, filename, da_uri, page, URLEncoder.encode(topic.getUri(), "UTF-8"))" 
             class="btn-xs btn-primary" role="button">Log</a>

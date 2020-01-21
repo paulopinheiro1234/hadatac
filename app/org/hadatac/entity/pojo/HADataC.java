@@ -18,7 +18,7 @@ public class HADataC {
 	private String host;
 	
 	private Dataset dataset;
-	private ObjectAccessSpec dataAcquisition;
+	private STR dataAcquisition;
 	private Deployment deployment;
 	
 	public HADataC () {
@@ -48,10 +48,10 @@ public class HADataC {
 		this.dataset = dataset;
 	}
 	
-	public ObjectAccessSpec getDataAcquisition() {
+	public STR getDataAcquisition() {
 		return dataAcquisition;
 	}
-	public void setDataAcquisition(ObjectAccessSpec dataAcquisition) {
+	public void setDataAcquisition(STR dataAcquisition) {
 		this.dataAcquisition = dataAcquisition;
 	}
 

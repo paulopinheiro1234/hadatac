@@ -1,9 +1,11 @@
-@(dir       : String,
-  filename  : String,
-  da_uri    : String,
-  page      : Integer,
-  stream    : org.hadatac.entity.pojo.MessageStream,
-  topics    : List[org.hadatac.entity.pojo.MessageTopic])
+@(dir           : String,
+  filename      : String,
+  da_uri        : String,
+  page          : Integer,
+  stream        : org.hadatac.entity.pojo.MessageStream,
+  topics        : List[org.hadatac.entity.pojo.MessageTopic],
+  currentAction : String)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
@@ -17,7 +19,6 @@
                  <tr>
                     <th>Topic Name</th>
                     <th>Deployment</th>
-                    <th>Study</th>
                     <th>Semantic Data Dictionary</th>
                     <th>#labels</th>
                     <th>Status</th>
@@ -28,9 +29,9 @@
               @for(topic <- topics) {
                   @defining(topic.getStreamSpec()) { streamSpec => 
                      @if(streamSpec != null) {
-                         @topic_entry(dir, filename, da_uri, page, stream, topic, streamSpec.getStudy(), topic.getDeployment(), streamSpec.getSchema())
+                         @topic_entry(dir, filename, da_uri, page, stream, topic, topic.getDeployment(), streamSpec.getSchema(), currentAction)
                      } else {
-                         @topic_entry(dir, filename, da_uri, page, stream, topic, null, topic.getDeployment(), null)
+                         @topic_entry(dir, filename, da_uri, page, stream, topic, topic.getDeployment(), null, currentAction)
                      }
                   }
               }

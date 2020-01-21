@@ -1,21 +1,28 @@
-@(oper : org.hadatac.utils.State, deployment : org.hadatac.entity.pojo.Deployment)
+@(oper       : org.hadatac.utils.State, 
+  deployment : org.hadatac.entity.pojo.Deployment,
+  details    : Integer)
 
 @import java.net._
 @import org.hadatac.utils._
+@import org.hadatac.metadata.loader._
 
 <tr>
-   <td>@if(deployment.getPlatform() != null && deployment.getPlatform().getLabel() != null) { @deployment.getPlatform().getLabel() }</td> 
-   <td>@if(deployment.getInstrument() != null && deployment.getInstrument().getLabel() != null) { @deployment.getInstrument().getLabel() @if(deployment.getInstrument().getSerialNumber() != null) { (SN: @deployment.getInstrument().getSerialNumber()) }}
-   </td>
-   <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
-   @if(oper.getCurrent() != State.ACTIVE) {
-       <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>
+   @if(details == 0) {
+      <td>@if(deployment.getPlatform() != null && deployment.getPlatform().getLabel() != null) { @deployment.getPlatform().getLabel() }</td> 
+      <td>@if(deployment.getInstrument() != null && deployment.getInstrument().getLabel() != null) { @deployment.getInstrument().getLabel() @if(deployment.getInstrument().getSerialNumber() != null) { (SN: @deployment.getInstrument().getSerialNumber()) }}
+      </td>
+      <td>@if(deployment.getStartedAt() != null) { @deployment.getStartedAt() }</td>
+      @if(oper.getCurrent() != State.ACTIVE) {
+         <td>@if(deployment.getEndedAt() != null) { @deployment.getEndedAt() }</td>
+      }
+      <td>
+         <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"), "")" class="btn-xs btn-primary" role="button">View</a>
+         @if(oper.getCurrent() == State.ACTIVE) {
+            <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Undeploy</a>
+         }
+         <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+      </td>
+   } else {
+      <td>@if(deployment.getUri() != null) { @URIUtils.replaceNameSpace(deployment.getUri()) }</td> 
    }
-   <td>
-       <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"), "")" class="btn-xs btn-primary" role="button">View</a>
-       @if(oper.getCurrent() == State.ACTIVE) {
-           <a href="@org.hadatac.console.controllers.deployments.routes.CloseDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Undeploy</a>
-       }
-       <a href="@org.hadatac.console.controllers.deployments.routes.DeleteDeployment.index(URLEncoder.encode(deployment.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
-   </td>
 </tr>

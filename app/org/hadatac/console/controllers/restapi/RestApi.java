@@ -17,7 +17,7 @@ import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.FieldOfView;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.utils.State;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.Pivot;
@@ -196,16 +196,16 @@ public class RestApi extends Controller {
 			       "AND study_object_uri_str:\"" + objUri + "\"" +
 			       "AND characteristic_uri_str:\"" + variableUri + "\"");
 	} else {
-	    SolrDocumentList oasResult = getSolrOASs(objUri);
-	    if (oasResult == null) {
+	    SolrDocumentList strResult = getSolrSTRs(objUri);
+	    if (strResult == null) {
 		return null;
 	    } 
-	    String oasStr = parseOASs(oasResult);
-	    if (oasStr == null || oasStr.equals("")) {
+	    String strStr = parseSTRs(strResult);
+	    if (strStr == null || strStr.equals("")) {
 		return null;
 	    }
 	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND " +  oasStr + " " + 
+			       "AND " +  strStr + " " + 
 			       "AND characteristic_uri_str:\"" + variableUri + "\"");
 	}
         solrQuery.setRows(10000);
@@ -237,16 +237,16 @@ public class RestApi extends Controller {
 			       "AND characteristic_uri_str:\"" + variableUri + "\"" + 
 			       "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
 	} else {
-	    SolrDocumentList oasResult = getSolrOASs(objUri);
-	    if (oasResult == null) {
+	    SolrDocumentList strResult = getSolrSTRs(objUri);
+	    if (strResult == null) {
 		return null;
 	    } 
-	    String oasStr = parseOASs(oasResult);
-	    if (oasStr == null || oasStr.equals("")) {
+	    String strStr = parseSTRs(strResult);
+	    if (strStr == null || strStr.equals("")) {
 		return null;
 	    }
 	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND " + oasStr  + " " + 
+			       "AND " + strStr  + " " + 
 			       "AND characteristic_uri_str:\"" + variableUri + "\"" + 
 			       "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
 	}
@@ -278,16 +278,16 @@ public class RestApi extends Controller {
 			       "AND study_object_uri_str:\"" + objUri + "\"" +
 			       "AND characteristic_uri_str:\"" + variableUri + "\"" );
 	} else {
-	    SolrDocumentList oasResult = getSolrOASs(objUri);
-	    if (oasResult == null) {
+	    SolrDocumentList strResult = getSolrSTRs(objUri);
+	    if (strResult == null) {
 		return null;
 	    } 
-	    String oasStr = parseOASs(oasResult);
-	    if (oasStr == null || oasStr.equals("")) {
+	    String strStr = parseSTRs(strResult);
+	    if (strStr == null || strStr.equals("")) {
 		return null;
 	    }
 	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND " +  oasStr + " " + 
+			       "AND " +  strStr + " " + 
 			       "AND characteristic_uri_str:\"" + variableUri + "\"");
 	}
         solrQuery.setRows(1);
@@ -329,8 +329,8 @@ public class RestApi extends Controller {
 	return "ERROR";
     }// /getSolrMeasurementsTimeRange()
 
-    // getting OASs from solr!
-    private SolrDocumentList getSolrOASs(String dplUri){
+    // getting STRs from solr!
+    private SolrDocumentList getSolrSTRs(String dplUri){
         SolrDocumentList results = null;
         // build Solr query!
         SolrQuery solrQuery = new SolrQuery();
@@ -345,10 +345,10 @@ public class RestApi extends Controller {
 
             results = queryResponse.getResults();
         } catch (Exception e) {
-            System.out.println("[RestAPI.getSolrOASs] ERROR: " + e.getMessage());
+            System.out.println("[RestAPI.getSolrSTRs] ERROR: " + e.getMessage());
         }
         return results;
-    }// /getSolrOASs()
+    }// /getSolrSTRs()
 
 //*************************
 // BLAZEGRAPH QUERY METHODS
@@ -772,13 +772,13 @@ public class RestApi extends Controller {
         return anode;
     }// /getAllOCs
 
-    private ObjectAccessSpec getOAS(String oasUri) {
-	if (oasUri == null || oasUri.equals("")) {
+    private STR getSTR(String strUri) {
+	if (strUri == null || strUri.equals("")) {
 	    return null;
 	}
-	ObjectAccessSpec oas = ObjectAccessSpec.findByUri(oasUri);
-	return oas;
-    }// /getOAS
+	STR str = STR.findByUri(strUri);
+	return str;
+    }// /getSTR
 
 // ********
 // GET ALL:
@@ -1149,7 +1149,7 @@ public class RestApi extends Controller {
     private JsonNode parseMeasurements(SolrDocumentList solrResults) {
 
         ObjectMapper mapper = new ObjectMapper();
-	Map<String, ObjectAccessSpec> oasMap = new HashMap<String, ObjectAccessSpec>();
+	Map<String, STR> strMap = new HashMap<String, STR>();
 
         // parse results
         ArrayNode anode = mapper.createArrayNode();
@@ -1157,15 +1157,15 @@ public class RestApi extends Controller {
         while (i.hasNext()) {
 
             SolrDocument doc = i.next();
-	    ObjectAccessSpec oas = null;
-	    String oasUri = SolrUtils.getFieldValue(doc, "acquisition_uri_str");
-	    if (!oasMap.containsKey(oasUri)) {
-		oas = getOAS(oasUri);
-		if (oas != null) {
-		    oasMap.put(oasUri, oas);
+	    STR str = null;
+	    String strUri = SolrUtils.getFieldValue(doc, "acquisition_uri_str");
+	    if (!strMap.containsKey(strUri)) {
+		str = getSTR(strUri);
+		if (str != null) {
+		    strMap.put(strUri, str);
 		}
 	    } else {
-		oas = oasMap.get(oasUri);
+		str = strMap.get(strUri);
 	    }
             ObjectNode temp = mapper.createObjectNode();
             temp.put("measurementuri", SolrUtils.getFieldValue(doc, "uri"));
@@ -1177,24 +1177,24 @@ public class RestApi extends Controller {
             temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
             temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
             temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
-	    if (oas == null || oas.getDeployment() == null) {
+	    if (str == null || str.getDeployment() == null) {
 		temp.put("platform", "");
 		temp.put("instrument", "");
 	    } else {
-		if (oas.getDeployment() != null && oas.getDeployment().getPlatform() != null) {
-		    if (oas.getDeployment().getPlatform().getLabel() != null) {
-			temp.put("platform", oas.getDeployment().getPlatform().getLabel());
+		if (str.getDeployment() != null && str.getDeployment().getPlatform() != null) {
+		    if (str.getDeployment().getPlatform().getLabel() != null) {
+			temp.put("platform", str.getDeployment().getPlatform().getLabel());
 		    } else {
-			temp.put("platform", oas.getDeployment().getPlatform().getUri());
+			temp.put("platform", str.getDeployment().getPlatform().getUri());
 		    }
 		} else {
 		    temp.put("platform", "");
 		}
-		if (oas.getDeployment() != null && oas.getDeployment().getInstrument() != null) {
-		    if (oas.getDeployment().getInstrument().getLabel() != null) {
-			temp.put("instrument", oas.getDeployment().getInstrument().getLabel());
+		if (str.getDeployment() != null && str.getDeployment().getInstrument() != null) {
+		    if (str.getDeployment().getInstrument().getLabel() != null) {
+			temp.put("instrument", str.getDeployment().getInstrument().getLabel());
 		    } else {
-			temp.put("instrument", oas.getDeployment().getInstrument().getUri());
+			temp.put("instrument", str.getDeployment().getInstrument().getUri());
 		    }
 		} else {
 		    temp.put("instrument", "");
@@ -1220,29 +1220,29 @@ public class RestApi extends Controller {
 	return null;
     }
 
-    private String parseOASs(SolrDocumentList solrResults) {
+    private String parseSTRs(SolrDocumentList solrResults) {
         Iterator<SolrDocument> i = solrResults.iterator();
 	List<String> uris = new ArrayList<String>();
         while (i.hasNext()) {
             SolrDocument doc = i.next();
 	    uris.add(SolrUtils.getFieldValue(doc, "uri"));
         }
-	String oas = "";
+	String str = "";
 	if (uris.size() == 1) {
-	    oas = "acquisition_uri_str:\"" + uris.get(0) + "\"";
-	    return oas;
+	    str = "acquisition_uri_str:\"" + uris.get(0) + "\"";
+	    return str;
 	} 
 
 	if (uris.size() > 0) {
-	    oas = "( ";
+	    str = "( ";
 	    for (int uri = 0; uri < uris.size(); uri++) {
-		oas += "acquisition_uri_str:\"" + uris.get(uri) + "\"";
+		str += "acquisition_uri_str:\"" + uris.get(uri) + "\"";
 		if (uri < (uris.size() - 1)) {
-		    oas += " OR ";
+		    str += " OR ";
 		}
 	    }
-	    oas += ")";
-	    return oas;
+	    str += ")";
+	    return str;
 	}
 
 	return null;
