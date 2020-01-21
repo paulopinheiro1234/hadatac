@@ -105,6 +105,17 @@ public class DataFile implements Cloneable {
     private AnnotationLogger logger = null;
     private RecordFile recordFile = null;
     private File file = null;
+    
+    // Permissible actions depending on user
+    private boolean allowViewing = false;
+    private boolean allowEditing = false;
+    private boolean allowRenaming = false;
+    private boolean allowMoving = false;
+    private boolean allowDeleting = false;
+    private boolean allowSharing = false;
+    private boolean allowDownloading = false;
+    private boolean allowIngesting = false;
+    private boolean allowVerifying = false;
 
     public DataFile(String fileName) {
         this.id = UUID.randomUUID().toString();
@@ -143,6 +154,96 @@ public class DataFile implements Cloneable {
             return fileName.equals(((DataFile) o).fileName);
         }
         return false;
+    }
+    
+    public boolean getAllowViewing() {
+        return allowViewing;
+    }
+    public void setAllowViewing(boolean allowViewing) {
+        this.allowViewing = allowViewing;
+    }
+    
+    public boolean getAllowEditing() {
+        return allowEditing;
+    }
+    public void setAllowEditing(boolean allowEditing) {
+        this.allowEditing = allowEditing;
+    }
+    
+    public boolean getAllowRenaming() {
+        return allowRenaming;
+    }
+    public void setAllowRenaming(boolean allowRenaming) {
+        this.allowRenaming = allowRenaming;
+    }
+    
+    public boolean getAllowMoving() {
+        return allowMoving;
+    }
+    public void setAllowMoving(boolean allowMoving) {
+        this.allowMoving = allowMoving;
+    }
+    
+    public boolean getAllowDeleting() {
+        return allowDeleting;
+    }
+    public void setAllowDeleting(boolean allowDeleting) {
+        this.allowDeleting = allowDeleting;
+    }
+    
+    public boolean getAllowSharing() {
+        return allowSharing;
+    }
+    public void setAllowSharing(boolean allowSharing) {
+        this.allowSharing = allowSharing;
+    }
+    
+    public boolean getAllowDownloading() {
+        return allowDownloading;
+    }
+    public void setAllowDownloading(boolean allowDownloading) {
+        this.allowDownloading = allowDownloading;
+    }
+    
+    public boolean getAllowIngesting() {
+        return allowIngesting;
+    }
+    public void setAllowIngesting(boolean allowIngesting) {
+        this.allowIngesting = allowIngesting;
+    }
+    
+    public boolean getAllowVerifying() {
+        return allowVerifying;
+    }
+    public void setAllowVerifying(boolean allowVerifying) {
+        this.allowVerifying = allowVerifying;
+    }
+    
+    public static void updatePermission(List<DataFile> dataFiles, String userEmail) {
+        for (DataFile dataFile : dataFiles) {
+            dataFile.updatePermissionByUserEmail(userEmail);
+        }
+    }
+    
+    public void updatePermissionByUserEmail(String userEmail) {
+        if (getOwnerEmail().equals(userEmail)) {
+            setAllowViewing(true);
+            setAllowEditing(true);
+            setAllowRenaming(true);
+            setAllowMoving(true);
+            setAllowDeleting(true);
+            setAllowSharing(true);
+            setAllowDownloading(true);
+            setAllowIngesting(true);
+            setAllowVerifying(true);
+        } else if (getEditorEmails().contains(userEmail)) {
+            setAllowViewing(true);
+            setAllowEditing(true);
+            setAllowDownloading(true);
+        } else if (getViewerEmails().contains(userEmail)) {
+            setAllowViewing(true);
+            setAllowDownloading(true);
+        }
     }
     
     public String getId() {
@@ -724,17 +825,15 @@ public class DataFile implements Cloneable {
         return results;
     }
 
-    public static List<DataFile> findInDir(String dir, String ownerEmail, String status) {
+    public static List<DataFile> findInDir(String dir, String userEmail, String status) {
         if (dir.startsWith("/")) {
             dir = dir.substring(1, dir.length());
         }
         
         SolrQuery query = new SolrQuery();
-        query.set("q", "dir_str:\"" + dir + "\"" + " AND ( " + 
-        "viewer_email_str_multi:\"" + ownerEmail + "\"" + 
-        " OR " +
-        "owner_email_str:\"" + ownerEmail + "\"" + 
-        " ) AND " + "status_str:\"" + status + "\"");
+        query.set("q", String.format("dir_str:\"%s\" "
+                + "AND ( owner_email_str:\"%s\" OR viewer_email_str_multi:\"%s\" OR editor_email_str_multi:\"%s\" ) "
+                + "AND status_str:\"%s\"", dir, userEmail, userEmail, userEmail, status));
         query.set("rows", "10000000");
         
         return findByQuery(query);

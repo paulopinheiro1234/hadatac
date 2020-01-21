@@ -108,7 +108,9 @@ public class WorkingFiles extends Controller {
                 return d1.getFileName().compareTo(d2.getFileName());
             }
         });
-
+        
+        DataFile.updatePermission(wkFiles, user.getEmail());
+        
         return ok(workingFiles.render(newDir, folders, wkFiles, user.isDataManager()));
     }
 
@@ -626,9 +628,12 @@ public class WorkingFiles extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
-        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        DataFile dataFile = DataFile.findById(fileId);
         
-        if (null == dataFile) {
+        if (null == dataFile || 
+                ( dataFile.getOwnerEmail() != user.getEmail() 
+                && !dataFile.getViewerEmails().contains(user.getEmail())
+                && !dataFile.getEditorEmails().contains(user.getEmail()))) {
             return badRequest("You do NOT have the permission to download this file!");
         }
         

@@ -27,45 +27,44 @@ import org.hadatac.entity.pojo.Ontology;
 
 public class SDDEditorV2 extends Controller {
     NameSpaces ns = NameSpaces.getInstance();
-        String bioportalKey="";
-        String FileID="";
-        List<String> loadedList = ns.listLoadedOntologies();
-        List<String> currentCart = new ArrayList<String>();
-        ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
-        ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
-        DataFile ddDF;
-        String headerSheetColumn;
-        String commentSheetColumn;
+    String bioportalKey="";
+    String FileID="";
+    List<String> loadedList = ns.listLoadedOntologies();
+    List<String> currentCart = new ArrayList<String>();
+    ArrayList<ArrayList<String>> storeEdits=new ArrayList<ArrayList<String>>();
+    ArrayList<ArrayList<String>> oldEdits=new ArrayList<ArrayList<String>>();
+    DataFile ddDF;
+    String headerSheetColumn;
+    String commentSheetColumn;
 
-       // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
+    // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-
-
     public Result index(String fileId, boolean bSavable, int indicator) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
 
         // bioportalKey=ConfigProp.getBioportalApiKey()
         FileID=fileId;
         Collections.sort(loadedList);
-        final SysUser user = AuthApplication.getLocalUser(session());
-        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        if (null == dataFile && indicator==1) {
-
-            return ok(sdd_editor_v2.render(dataFile, null, false,loadedList,this));
+        
+        DataFile dataFile = DataFile.findById(fileId);
+        if (null == dataFile && indicator == 1) {
+            return badRequest("Invalid data file!");
         }
+
         DataFile finalDF=new DataFile("");
-        if(indicator==1 && dataFile!=null){
+        if (indicator == 1 && dataFile != null) {
             headerSheetColumn=DDEditor.headerSheetColumn;
             System.out.println(headerSheetColumn);
             commentSheetColumn=DDEditor.commentSheetColumn;
-             System.out.println(commentSheetColumn);
+            System.out.println(commentSheetColumn);
 
             ddDF=DDEditor.dd_df;
             finalDF=ddDF;
 
-        }
-        else if(indicator==0){
+        } else if (indicator == 0) {
             List<DataFile> files = null;
             String path = ConfigProp.getPathDownload();
             files = DataFile.find(user.getEmail());
@@ -79,7 +78,13 @@ public class SDDEditorV2 extends Controller {
             }
             finalDF=dd_dataFile;
         }
-        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable,loadedList,this));
+        
+        dataFile.updatePermissionByUserEmail(user.getEmail());
+        if (!dataFile.getAllowEditing()) {
+            return ok(sdd_editor_v2.render(dataFile, finalDF, false, loadedList, this));
+        }
+        
+        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable, loadedList, this));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -126,10 +131,10 @@ public class SDDEditorV2 extends Controller {
     }
 
 
-   public Result getSDDGenAddress() {
-      String sddAddress = ConfigProp.getSDDGenAddress();
-      return ok(Json.toJson(sddAddress));
-   }
+    public Result getSDDGenAddress() {
+        String sddAddress = ConfigProp.getSDDGenAddress();
+        return ok(Json.toJson(sddAddress));
+    }
 
     public Result getOntologies() {
         return ok(Json.toJson(Ontology.find()));
@@ -152,7 +157,7 @@ public class SDDEditorV2 extends Controller {
 
     public Result removeFromCart(String item){
 
-       currentCart.remove(item);
+        currentCart.remove(item);
 
         return ok(Json.toJson(currentCart));
     }
@@ -195,8 +200,8 @@ public class SDDEditorV2 extends Controller {
     }
 
     public Result getOldEdits(){
-         ArrayList<String> recentoldEdit=oldEdits.get(0);
-         oldEdits.remove(0);
+        ArrayList<String> recentoldEdit=oldEdits.get(0);
+        oldEdits.remove(0);
         return ok(Json.toJson(recentoldEdit));
     }
     public Result getHeaderLoc(){
@@ -208,5 +213,5 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(commentSheetColumn));
     }
 
-    
+
 }
