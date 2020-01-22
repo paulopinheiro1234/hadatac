@@ -545,7 +545,7 @@ public class AutoAnnotator extends Controller {
             }
         }
         
-        System.out.println("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
+        response().setHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
         return ok(new File(dataFile.getAbsolutePath()));
     }
     

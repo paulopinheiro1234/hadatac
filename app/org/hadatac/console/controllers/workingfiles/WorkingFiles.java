@@ -637,6 +637,7 @@ public class WorkingFiles extends Controller {
             return badRequest("You do NOT have the permission to download this file!");
         }
         
+        response().setHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
         return ok(new File(dataFile.getAbsolutePath()));
     }
     
