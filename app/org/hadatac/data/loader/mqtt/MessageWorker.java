@@ -1,9 +1,11 @@
 package org.hadatac.data.loader.mqtt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.hadatac.data.loader.MeasurementGenerator;
 import org.hadatac.data.loader.Record;
 import org.hadatac.entity.pojo.MessageStream;
@@ -14,12 +16,12 @@ public class MessageWorker {
     private static MessageWorker single_instance = null; 
   
     // public variables
-    public Subscribe currentClient; 
+    public Map<String,Subscribe> clientsMap;
 	public Map<String,MessageTopic> topicsMap;
 	public Map<String,MeasurementGenerator> topicsGen;
   
     private MessageWorker() { 
-        currentClient = null; 
+    	clientsMap = new HashMap<String,Subscribe>();
     	topicsMap = new HashMap<String,MessageTopic>();
     	topicsGen = new HashMap<String,MeasurementGenerator>();
     } 
@@ -33,14 +35,56 @@ public class MessageWorker {
         return single_instance; 
     } 
     
-	public static void refreshStreamSubscription() {
+    public void initiateStream(MessageStream stream) {
+		System.out.println("MessageWorker: adding stream " + stream.getName());
+		
+		if (stream.getStatus().equals(MessageStream.INITIATED) || stream.getStatus().equals(MessageStream.ACTIVE)) {
+			List<MessageTopic> topics = MessageTopic.findActiveByStream(stream.getUri());
+			for (MessageTopic topic : topics) {
+				System.out.println("MessageWorker: adding topic " + topic.getLabel() + " of stream " + stream.getName());
+				System.out.println("Adding topic [" + topic.getLabel() + "]");
+				topicsMap.put(topic.getLabel(), topic);
+			} 
+		}	
+
+		List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
+		System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
+		for (String key : keyList) {
+			System.out.println("MessageWorker:  topicsMap's key is " + key);
+		}
+		
+    }
+    
+    public void closeStream(MessageStream stream) {
+		List<MessageTopic> topics = MessageTopic.findActiveByStream(stream.getUri());
+		for (MessageTopic topic : topics) {
+			System.out.println("MessageWorker: removing topic " + topic.getLabel() + " of stream " + stream.getName());
+			System.out.println("Removing topic [" + topic.getLabel() + "]");
+			topicsMap.remove(topic.getLabel());
+			topicsGen.remove(topic.getLabel());
+		} 
+		try {
+			if (clientsMap != null && stream != null && clientsMap.get(stream.getName()) != null) {
+				clientsMap.get(stream.getName()).unsubscribe();
+			}
+		} catch (MqttException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (clientsMap != null && stream != null && stream.getName() != null) {
+			clientsMap.remove(stream.getName());
+		}
+    }
+    
+    /*
+    public static void refreshStreamSubscription() {
         
 		System.out.println("MessageWorker: refreshing topics map ");
 		Map<String,MessageTopic> topicsMapTemp = new HashMap<String,MessageTopic>();
 		
         List<MessageStream> streams = MessageStream.find();
         for (MessageStream stream: streams) {
-        	if (stream.getStatus().equals(MessageStream.ACTIVE)) {
+        	if (stream.getStatus().equals(MessageStream.ACTIVE) && !getInstance().clientsMap.containsKey(stream.getName())) {
         		System.out.println("MessageWorker: adding " + stream.getName());
         		List<MessageTopic> topics = MessageTopic.findActiveByStream(stream.getUri());
         		for (MessageTopic topic : topics) {
@@ -55,9 +99,15 @@ public class MessageWorker {
 		System.out.println("MessageWorker: topics map refreshed");
 
 	}
+	*/
 
 	public static Record processMessage(String topicStr, String message, int currentRow) {
 		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]   0");
+		//List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
+		//System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
+		//for (String key : keyList) {
+		//	System.out.println("MessageWorker:  topicsMap's key is " + key);
+		//}
 		if (!MessageWorker.getInstance().topicsMap.containsKey(topicStr)) {
 			return null;
 		}
@@ -74,10 +124,10 @@ public class MessageWorker {
 		//	}
 		//}
 		if (record == null) {
-			//System.out.println("MessageWorker: 'record' variable is null in processMessage");
+			System.out.println("MessageWorker: 'record' variable is null in processMessage");
 		} else if (MessageWorker.getInstance().topicsGen == null || 
 				   MessageWorker.getInstance().topicsGen.get(topicStr) == null){
-			//System.out.println("MessageWorker: 'generator' object is null in processMessage");
+			System.out.println("MessageWorker: 'generator' object is null in processMessage");
 		} else {
 			try {
 				//System.out.println("Processing topicStr: [" + topicStr + "]  3");

@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -44,7 +45,8 @@ import org.hadatac.entity.pojo.MessageTopic;
 public class Subscribe implements MqttCallback {
 
 	// Private instance variables
-	private MqttClient 			client;
+	//private MqttAsyncClient     client;
+	private MqttClient          client;
 	private MessageStream       stream;
 	private String 				brokerUrl;
 	private boolean 			quietMode;
@@ -262,6 +264,7 @@ public class Subscribe implements MqttCallback {
 	
 	    		// Construct an MQTT blocking mode client
 				//client = new MqttClient(this.brokerUrl,clientId, dataStore);
+				//client = new MqttAsyncClient(this.brokerUrl,clientId);
 				client = new MqttClient(this.brokerUrl,clientId);
 	
 				// Set this wrapper as the callback handler
@@ -356,6 +359,7 @@ public class Subscribe implements MqttCallback {
     	// be downgraded to 1 when delivering to the client but messages published at 1 and 0
     	// will be received at the same level they were published at.
     	log("Subscribing to topic \"" + topicName + "\" qos " + qos);
+
     	client.subscribe(topicName, qos);
 
     	// Continue waiting for messages for the specified period of time
@@ -369,7 +373,7 @@ public class Subscribe implements MqttCallback {
     	} 
 
     	if (action == SUBSCRIBE) {
-    		MessageWorker.getInstance().currentClient = this;
+    		MessageWorker.getInstance().clientsMap.put(stream.getName(),this);
     		totalMessages = 0;
     		partialCounter = 0;
     	}
@@ -389,18 +393,15 @@ public class Subscribe implements MqttCallback {
     	return respPayload;
     }
 
-    public void unsubscribe(String topicName) throws MqttException {
+    public void unsubscribe() throws MqttException {
 
     	if (client != null) {
     		
-	    	log("Unsubscribing to topic \"" + topicName + " with client ID " + client.getClientId());
-	    	client.unsubscribe(topicName);
+	    	log("Unsubscribing to topic \"" + "#" + " with client ID " + client.getClientId());
+	    	client.unsubscribe("#");
 	
 	    	client.disconnect();
 	    	log("Disconnected");
-
-    		MessageWorker.getInstance().currentClient = null;
-
     	}
 		
     }

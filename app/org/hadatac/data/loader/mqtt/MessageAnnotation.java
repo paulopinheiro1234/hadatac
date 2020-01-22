@@ -50,13 +50,12 @@ public class MessageAnnotation {
 		if (stream.getStudy() != null && stream.getStudy().getId() != null) {
 		    stream.setStatus(MessageStream.INITIATED);
 			stream.getLogger().println(String.format("Message stream %s is initiated.", stream.getName()));
+			MessageWorker.getInstance().initiateStream(stream);
 		} else {
 			stream.getLogger().println(String.format("Message stream %s failed to be associated with study.", stream.getName()));
 		}
 		stream.save();
 
-		// Stream Subscription refresh needs to occur after the stream is activated
-		MessageWorker.refreshStreamSubscription();
     }
     
     public static void subscribeMessageStream(MessageStream stream) {
@@ -93,9 +92,6 @@ public class MessageAnnotation {
 		}
 		stream.setStatus(MessageStream.ACTIVE);
 		stream.save();
-
-		// Stream Subscription refresh needs to occur after the stream is activated
-		MessageWorker.refreshStreamSubscription();
     
     }
     
@@ -107,22 +103,14 @@ public class MessageAnnotation {
 		stream.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().resetLog();
 		stream.getLogger().println(String.format("Unsubscribing message stream: %s", stream.getName()));
-		if (MessageWorker.getInstance().currentClient == null) {
+		if (!MessageWorker.getInstance().clientsMap.containsKey(stream.getName())) {
 			stream.getLogger().println("Could not stop message stream: " + stream.getName() + ". Reason: currentClient is null");
 		} else {
-			try {
-			   MessageWorker.getInstance().currentClient.unsubscribe("#");
-			} catch (MqttException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
     	}
 
 		stream.setStatus(MessageStream.INITIATED);
 		stream.save();
-
-		// Stream Subscription refresh needs to occur after the stream is activated
-		MessageWorker.refreshStreamSubscription();
+		MessageWorker.getInstance().closeStream(stream);
     }
     
     public static void stopMessageStream(MessageStream stream) {
@@ -143,6 +131,7 @@ public class MessageAnnotation {
 		stream.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().println(String.format("Stopped processing of message stream: %s", stream.getName()));
 		stream.save();		
+		MessageWorker.getInstance().closeStream(stream);
 		/*
 		List<MessageTopic> topics = MessageTopic.findByStream(stream.getUri());
 		if (topics != null && topics.size() > 0) {
@@ -171,6 +160,7 @@ public class MessageAnnotation {
         String schema_uri = null;
         boolean isValid = true;
 
+        // Loads STR Specification
         if (topic != null) {
         	deployment_uri = URIUtils.replacePrefixEx(topic.getDeploymentUri());
         	dpl = Deployment.find(deployment_uri);
@@ -195,6 +185,7 @@ public class MessageAnnotation {
             }
         }
 
+        // Verifies if SDD's URI is valid
         if (isValid) {
 	        if (schema_uri == null || schema_uri.isEmpty()) {
 	            topic.getLogger().printExceptionByIdWithArgs("DA_00005", str_uri);
@@ -203,6 +194,7 @@ public class MessageAnnotation {
 	        }
         }
 
+        // Verifies if deployment's URI is valid
         if (isValid) {
 	        if (deployment_uri == null || deployment_uri.isEmpty()) {
 	            topic.getLogger().printExceptionByIdWithArgs("DA_00006", str_uri);
@@ -216,11 +208,9 @@ public class MessageAnnotation {
 	        }
         }
 
+        // Learns stream's labels
         if (isValid) {
 	        if (str != null) {
-	            //topic.setStudyUri(str.getStudyUri());
-
-	        	// Learn Headers
 	        	List<String> headers = Subscribe.testLabels(topic.getStream(), topic); 
 
 	        	if (headers == null || headers.size() == 0) {
@@ -234,6 +224,7 @@ public class MessageAnnotation {
 	        }
         }
         
+        // Retrieves SDD
         DataAcquisitionSchema schema = null;
         if (isValid) {
             schema = DataAcquisitionSchema.find(str.getSchemaUri());

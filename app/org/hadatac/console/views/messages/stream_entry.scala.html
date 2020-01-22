@@ -50,10 +50,12 @@
                    class="btn-xs btn-primary" role="button">Delete Data</a>
             -->
          }
+         <!-- 
          @if(stream.getStatus().equals("ACTIVE")) {
-            <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.unsubscribe(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
+            <a href=" org.hadatac.console.controllers.messages.routes.MessageManagement.unsubscribe(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
                class="btn-xs btn-primary" role="button">Unsubscribe</a>
          }
+         -->
          @if(!stream.getStatus().equals("CLOSED")) {
             <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.stop(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
                class="btn-xs btn-primary" role="button">Close</a>

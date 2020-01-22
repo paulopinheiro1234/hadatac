@@ -25,7 +25,6 @@ import play.data.FormFactory;
 import org.hadatac.console.views.html.messages.*;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.loader.mqtt.MessageAnnotation;
-import org.hadatac.data.loader.mqtt.MessageAnnotationSubscribe;
 import org.hadatac.data.loader.mqtt.MessageWorker;
 import org.hadatac.data.loader.mqtt.Subscribe;
 import org.hadatac.entity.pojo.STR;
@@ -61,15 +60,9 @@ public class MessageManagement extends Controller {
     	// get an updated list of stream
     	List<MessageStream> results = MessageStream.find();
     	
-    	// get the ID of the last connection
-    	String clientId = "";
-    	if (MessageWorker.getInstance() != null && MessageWorker.getInstance().currentClient != null) {
-    		clientId = MessageWorker.getInstance().currentClient.getClientId();
-    	}        
-    	
     	// get an updated list of studies
         List<String> studyIdList = Study.findIds();
-    	return ok(messageManagement.render(dir, filename, da_uri, offset, clientId, studyIdList, results));
+    	return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
