@@ -631,7 +631,7 @@ public class WorkingFiles extends Controller {
         DataFile dataFile = DataFile.findById(fileId);
         
         if (null == dataFile || 
-                ( dataFile.getOwnerEmail() != user.getEmail() 
+                ( !dataFile.getOwnerEmail().equals(user.getEmail()) 
                 && !dataFile.getViewerEmails().contains(user.getEmail())
                 && !dataFile.getEditorEmails().contains(user.getEmail()))) {
             return badRequest("You do NOT have the permission to download this file!");
