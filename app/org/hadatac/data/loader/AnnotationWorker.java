@@ -402,44 +402,6 @@ public class AnnotationWorker {
         return chain;
     }
 
-
-    public static GeneratorChain annotateACQFile(DataFile dataFile, boolean bGenerate) {
-        GeneratorChain chainForInstrument = new GeneratorChain();
-        GeneralGenerator generalGenerator = new GeneralGenerator(dataFile, "Instrument");
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", ConfigProp.getKbPrefix() + "INS-GENERIC-PHYSICAL-INSTRUMENT");
-        row.put("a", "vstoi:PhysicalInstrument");
-        row.put("rdfs:label", "Generic Physical Instrument");
-        generalGenerator.addRow(row);
-
-        row = new HashMap<String, Object>();
-        row.put("hasURI", ConfigProp.getKbPrefix() + "INS-GENERIC-QUESTIONNAIRE");
-        row.put("a", "hasco:Questionnaire");
-        row.put("rdfs:label", "Generic Questionnaire");
-        generalGenerator.addRow(row);
-        chainForInstrument.addGenerator(generalGenerator);
-        if (bGenerate) {
-            chainForInstrument.generate();
-        } else {
-            chainForInstrument.delete();
-        }
-
-        GeneratorChain chainForDeployment = new GeneratorChain();
-        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        String startTime = isoFormat.format(new Date());
-        chainForDeployment.addGenerator(new DeploymentGenerator(dataFile, startTime));
-        if (bGenerate) {
-            chainForDeployment.generate();
-        } else {
-            chainForDeployment.delete();
-        }
-
-        GeneratorChain chain = new GeneratorChain();
-        chain.addGenerator(new DataAcquisitionGenerator(dataFile, startTime));
-
-        return chain;
-    }
-
     public static GeneratorChain annotateSTRFile(DataFile dataFile) {
         GeneratorChain chain = new GeneratorChain();
         DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

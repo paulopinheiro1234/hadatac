@@ -47,14 +47,14 @@ public class STRGenerator extends BaseGenerator {
                 "" : rec.getValueByColumnName(Templates.DASTUDYID);
     }
 
-    private String getDataAcquisitionName(Record rec) {
+    private String getSTRName(Record rec) {
         return rec.getValueByColumnName(Templates.DATAACQUISITIONNAME);
     }
 
-    private String getDataDictionaryName(Record rec) {
-        String DDName = rec.getValueByColumnName(Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
+    private String getSDDName(Record rec) {
+        String SDDName = rec.getValueByColumnName(Templates.DATADICTIONARYNAME).equalsIgnoreCase("NULL")? 
                 "" : rec.getValueByColumnName(Templates.DATADICTIONARYNAME);
-        return DDName.replace("SDD-","");
+        return SDDName.replace("SDD-","");
     }
 
     private String getDeployment(Record rec) { 
@@ -70,7 +70,7 @@ public class STRGenerator extends BaseGenerator {
     }
 
     private String getOwnerEmail(Record rec) {
-        System.out.println("STRGenerator: owner email's label is [" + Templates.OWNEREMAIL + "]");
+        //System.out.println("STRGenerator: owner email's label is [" + Templates.OWNEREMAIL + "]");
         String ownerEmail = rec.getValueByColumnName(Templates.OWNEREMAIL);
         if(ownerEmail.equalsIgnoreCase("NULL") || ownerEmail.isEmpty()) {
             return "";
@@ -86,9 +86,9 @@ public class STRGenerator extends BaseGenerator {
     @Override
     public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", kbPrefix + "DA-" + getDataAcquisitionName(rec));
+        row.put("hasURI", kbPrefix + "DA-" + getSTRName(rec));
         row.put("a", "hasco:DataAcquisition");
-        row.put("rdfs:label", getDataAcquisitionName(rec));
+        row.put("rdfs:label", getSTRName(rec));
         row.put("hasco:hasDeployment", getDeployment(rec));
         //row.put("hasco:hasMethod", getMethod(rec));
         row.put("hasco:isDataAcquisitionOf", kbPrefix + "STD-" + getStudy(rec));
@@ -97,7 +97,7 @@ public class STRGenerator extends BaseGenerator {
         } else {
             row.put("prov:startedAtTime", startTime);
         }
-        row.put("hasco:hasSchema", kbPrefix + "DAS-" + getDataDictionaryName(rec));
+        row.put("hasco:hasSchema", kbPrefix + "DAS-" + getSDDName(rec));
 
         return row;
     }
@@ -137,10 +137,10 @@ public class STRGenerator extends BaseGenerator {
 
         String cellScopeStr = getCellScope(rec);
 
-        return createDataAcquisition(row, ownerEmail, permissionUri, deploymentUri, /*rowScopeStr,*/ cellScopeStr);
+        return createSTR(row, ownerEmail, permissionUri, deploymentUri, /*rowScopeStr,*/ cellScopeStr);
     }
 
-    private STR createDataAcquisition(
+    private STR createSTR(
             Map<String, Object> row, 
             String ownerEmail, 
             String permissionUri, 
@@ -148,15 +148,16 @@ public class STRGenerator extends BaseGenerator {
             //String rowScopeStr,
             String cellScopeStr) throws Exception {
 
-        STR da = new STR();
+        STR str = new STR();
 
-        da.setUri(URIUtils.replacePrefixEx((String)row.get("hasURI")));
-        da.setLabel(URIUtils.replacePrefixEx((String)row.get("rdfs:label")));
-        da.setDeploymentUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasDeployment")));
-        da.setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
-        da.setSchemaUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasSchema")));
-        da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
-        da.setNumberDataPoints(Measurement.getNumByDataAcquisition(da));
+        str.setUri(URIUtils.replacePrefixEx((String)row.get("hasURI")));
+        System.out.println("STRGenerator: creating STR with URI=" + str.getUri());
+        str.setLabel(URIUtils.replacePrefixEx((String)row.get("rdfs:label")));
+        str.setDeploymentUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasDeployment")));
+        str.setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
+        str.setSchemaUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasSchema")));
+        str.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
+        str.setNumberDataPoints(Measurement.getNumByDataAcquisition(str));
 
         setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
 
@@ -172,7 +173,7 @@ public class STRGenerator extends BaseGenerator {
 		} */
 
         // process cell scope
-        System.out.println("Showing returned CellScope: [" + cellScopeStr + "]");
+        System.out.println("STRGenerator: Specified CellScope: [" + cellScopeStr + "]");
         String[] cellList = null;
         String[] elementList = null;
         if (cellScopeStr != null && !cellScopeStr.equals("")) {
@@ -198,56 +199,59 @@ public class STRGenerator extends BaseGenerator {
                             System.out.println("[ERROR] STR Generator: CellScope ill-formed: cell spec " + cellSpec + " should have a name and an URI");
                             break;
                         }
-                        da.addCellScopeName(elementList[0]);
-                        da.addCellScopeUri(URIUtils.replacePrefixEx((String)elementList[1]));
+                        str.addCellScopeName(elementList[0]);
+                        str.addCellScopeUri(URIUtils.replacePrefixEx((String)elementList[1]));
                     }
                 }
             }
         }		
 
+        System.out.println("STRGenerator: Specified owner email: [" + ownerEmail + "]");
         SysUser user = SysUser.findByEmail(ownerEmail);
         if (null == user) {
             throw new Exception(String.format("The specified owner email %s is not a valid user!", ownerEmail));
         } else {
-            da.setOwnerUri(user.getUri());
-            da.setPermissionUri(permissionUri);
+            str.setOwnerUri(user.getUri());
+            str.setPermissionUri(permissionUri);
         }
 
         String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
         if (startTime.isEmpty()) {
-            da.setStartedAt(new DateTime(new Date()));
+            str.setStartedAt(new DateTime(new Date()));
         } else {
-            da.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
+            str.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
         }
 
+        System.out.println("STRGenerator: Specified deployment: [" + deploymentUri + "]");
         Deployment deployment = Deployment.find(deploymentUri);
         if (deployment != null) {
-            da.setDeploymentUri(deploymentUri);
+            str.setDeploymentUri(deploymentUri);
             if (deployment.getPlatform() != null) {
-                da.setPlatformUri(deployment.getPlatform().getUri());
-                da.setPlatformName(deployment.getPlatform().getLabel());
+                str.setPlatformUri(deployment.getPlatform().getUri());
+                str.setPlatformName(deployment.getPlatform().getLabel());
             } else {
                 throw new Exception(String.format("No platform of Deployment <%s> is specified!", deploymentUri));
             }
             if (deployment.getInstrument() != null) {
-                da.setInstrumentUri(deployment.getInstrument().getUri());
-                da.setInstrumentModel(deployment.getInstrument().getLabel());
+                str.setInstrumentUri(deployment.getInstrument().getUri());
+                str.setInstrumentModel(deployment.getInstrument().getLabel());
             } else {
                 throw new Exception(String.format("No instrument of Deployment <%s> is specified!", deploymentUri));
             }
-            da.setStartedAtXsdWithMillis(deployment.getStartedAt());
+            str.setStartedAtXsdWithMillis(deployment.getStartedAt());
         } else {
             throw new Exception(String.format("Deployment <%s> cannot be found!", deploymentUri));
         }
 
-        DataAcquisitionSchema schema = DataAcquisitionSchema.find(da.getSchemaUri());
+        System.out.println("STRGenerator: Specified SDD: [" + str.getSchemaUri() + "]");
+        DataAcquisitionSchema schema = DataAcquisitionSchema.find(str.getSchemaUri());
         if (schema != null) {
-            da.setStatus(9999);
+            str.setStatus(9999);
         } else {
-            throw new Exception(String.format("SDD <%s> cannot be found. Please ingest proper SDD file first. ", da.getSchemaUri()));
+            throw new Exception(String.format("SDD <%s> cannot be found. Please ingest proper SDD file first. ", str.getSchemaUri()));
         }
 
-        return da;
+        return str;
     }
 
     @Override
@@ -257,7 +261,7 @@ public class STRGenerator extends BaseGenerator {
 
     @Override
     public String getErrorMsg(Exception e) {
-        return "Error in DataAcquisitionGenerator: " + e.getMessage();
+        return "Error in STRGenerator: " + e.getMessage();
     }
 
 }
