@@ -67,7 +67,10 @@ public class AnnotationWorker {
             chain = annotateDPLFile(dataFile);
             
         } else if (fileName.startsWith("STR-")) {
+        	dataFile.getLogger().println("Before checkSTRFile: Number of rows [" + dataFile.getRecordFile().getNumberOfRows() + "]");
             checkSTRFile(dataFile);
+        	dataFile.getLogger().println("Before annotateSTRFile: Number of rows [" + dataFile.getRecordFile().getNumberOfRows() + "]");
+        	dataFile.getRecordFile().getNumberOfRows();
             chain = annotateSTRFile(dataFile);
             
         } else if (fileName.startsWith("SDD-")) {
