@@ -37,6 +37,7 @@ public class STRGenerator extends BaseGenerator {
     public STRGenerator(DataFile dataFile, String startTime) {
         super(dataFile);
         this.startTime = startTime;
+        dataFile.getLogger().println("STRGenerator: End of constructor -> Number of records: " + dataFile.getRecordFile().getNumberOfRows());
     }
 
     @Override
@@ -85,6 +86,7 @@ public class STRGenerator extends BaseGenerator {
 
     @Override
     public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
+        dataFile.getLogger().println("STRGenerator: At createRow. Row Number " + rowNumber + "  record size: " + rec.size());
         Map<String, Object> row = new HashMap<String, Object>();
         row.put("hasURI", kbPrefix + "DA-" + getSTRName(rec));
         row.put("a", "hasco:DataAcquisition");
