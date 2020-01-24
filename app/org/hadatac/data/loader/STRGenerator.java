@@ -151,7 +151,8 @@ public class STRGenerator extends BaseGenerator {
         STR str = new STR();
 
         str.setUri(URIUtils.replacePrefixEx((String)row.get("hasURI")));
-        System.out.println("STRGenerator: creating STR with URI=" + str.getUri());
+        String message = "createStr [1/5] - Creating STR with URI=" + str.getUri();
+        logger.println(message);
         str.setLabel(URIUtils.replacePrefixEx((String)row.get("rdfs:label")));
         str.setDeploymentUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasDeployment")));
         str.setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
@@ -173,7 +174,8 @@ public class STRGenerator extends BaseGenerator {
 		} */
 
         // process cell scope
-        System.out.println("STRGenerator: Specified CellScope: [" + cellScopeStr + "]");
+        message = "createStr [2/5] - Specified CellScope: [" + cellScopeStr + "]";
+        logger.println(message);
         String[] cellList = null;
         String[] elementList = null;
         if (cellScopeStr != null && !cellScopeStr.equals("")) {
@@ -206,7 +208,8 @@ public class STRGenerator extends BaseGenerator {
             }
         }		
 
-        System.out.println("STRGenerator: Specified owner email: [" + ownerEmail + "]");
+        message = "createStr [3/5] - Specified owner email: [" + ownerEmail + "]";
+        logger.println(message);
         SysUser user = SysUser.findByEmail(ownerEmail);
         if (null == user) {
             throw new Exception(String.format("The specified owner email %s is not a valid user!", ownerEmail));
@@ -222,7 +225,8 @@ public class STRGenerator extends BaseGenerator {
             str.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(startTime));
         }
 
-        System.out.println("STRGenerator: Specified deployment: [" + deploymentUri + "]");
+        message = "createStr [4/5] - Specified deployment: [" + deploymentUri + "]";
+        logger.println(message);
         Deployment deployment = Deployment.find(deploymentUri);
         if (deployment != null) {
             str.setDeploymentUri(deploymentUri);
@@ -243,7 +247,8 @@ public class STRGenerator extends BaseGenerator {
             throw new Exception(String.format("Deployment <%s> cannot be found!", deploymentUri));
         }
 
-        System.out.println("STRGenerator: Specified SDD: [" + str.getSchemaUri() + "]");
+        message = "createStr [5/5] - Specified SDD: [" + str.getSchemaUri() + "]";
+        logger.println(message);
         DataAcquisitionSchema schema = DataAcquisitionSchema.find(str.getSchemaUri());
         if (schema != null) {
             str.setStatus(9999);
