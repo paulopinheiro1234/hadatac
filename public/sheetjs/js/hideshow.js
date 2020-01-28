@@ -9,7 +9,7 @@ $(document).ready(
             // cdg.style.height = (window.innerHeight - 200) + "px";
             // cdg.style.width = (window.innerWidth - 400) + "px";
             _resize()
-            cdg.style.width = (window.innerWidth - 400) + "px";
+            cdg.style.width = (window.innerWidth - 400) + "px"
 
         });
         $("button.Close").click(function() {

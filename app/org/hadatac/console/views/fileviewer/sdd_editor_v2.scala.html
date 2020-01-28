@@ -24,8 +24,9 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
    <div id="rcorners" >
 
-      <h4>@dataFile.getFileName()</h4>
+      <h4>@dataFile.getFileName(),@bSavable</h4>
       @if(bSavable) {
+
          <input class="btn btn-primary" type="button" id="upload" value="Save"/>
       }
       <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
@@ -134,7 +135,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             width="36" height="33" alt=""/> Show Options</button>
             <button class="Close" id="hide"> <img src="@controllers.routes.Assets.versioned("icons/closed-eye.png")"
                width="36" height="33" alt=""/> Hide Options</button>
-
+              
                <div class="mobile-nav">
                     <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
                   <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
@@ -202,24 +203,25 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
       
                     </ul>
-
-                     <div class="text-area">
-                        Cell Value: <input type="text" style="width:450px" id="cellText" value=""/>
-
-                        <div id="suggestion-box" style="float: right;">
-                           Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
-                              <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
-                        </div>
+                    <div class="text-area">
+                     Cell Value: <input type="text" style="width:450px" id="cellText" value=""/>
+   
+                     <div id="suggestion-box" style="float: right;">
+                        Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
+                           <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
                      </div>
-
-                     <div class="text-area2">
-                        Description : <input type="text" id="varDescription" style="width:450px" value="" input disabled="disabled"/>
-
-                        <div id="suggestion-box" style="float: right;">
-                           Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
-                     </div>
-
-
+                  </div>
+                  </div>
+   
+                  <div class="text-area2">
+                     Description : <input type="text" id="varDescription" style="width:450px" value="" input disabled="disabled"/>
+   
+                     <div id="suggestion-box" style="float: right;">
+                        Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
+                  </div>
+   
+               </div>
+                    
 
                      <div><a id="error_msg"></a></div>
                      <div id="grid"></div>
@@ -245,6 +247,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                      var _upload = document.getElementById('upload');
                      var _onreponse = function() {
+                        
                         $("#error_msg").html(decodeURIComponent(this.responseText));
                         setTimeout(function() {
                            $("#error_msg").html("");

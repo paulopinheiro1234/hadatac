@@ -33,10 +33,10 @@
   position:relative;
 }
 .mobile-nav {
-  position:absolute;
+  position:relative;
   display: none;
-  top: 200px;
-  left:1000px;
+  float:right;
+  width:15%;
 
 }
 

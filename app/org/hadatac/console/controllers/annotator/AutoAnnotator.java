@@ -611,7 +611,8 @@ public class AutoAnnotator extends Controller {
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result saveDataFile() {        
+    public Result saveDataFile() {  
+        System.out.println("Reached HERE!!");      
         FilePart uploadedfile = request().body().asMultipartFormData().getFile("file");
         
         JSONParser parser = new JSONParser();
