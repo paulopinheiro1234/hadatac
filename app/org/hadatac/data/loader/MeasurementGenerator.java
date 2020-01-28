@@ -107,8 +107,12 @@ public class MeasurementGenerator extends BaseGenerator {
         }
         if (cont) {
         	//System.out.println("Measurement Generator: setting STUDY URI");
+    		// Store necessary information before hand to avoid frequent SPARQL queries
     		setStudyUri(da.getStudyUri());
     		urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
+    		possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
+    		dasoUnitUri = urisByLabels.get(schema.getUnitLabel());
+    		groupBySocAndId = new HashMap<String,SOCGroup>();
         }
     
     }
@@ -174,13 +178,6 @@ public class MeasurementGenerator extends BaseGenerator {
             posMatching = schema.tempPositionOfLabel(schema.getMatchingLabel());
             //System.out.println("posMatching: " + posMatching);
         }
-
-        // Store necessary information before hand to avoid frequent SPARQL queries
-        possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
-        urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(da.getSchemaUri());
-        //mapIDStudyObjects = StudyObject.findIdUriMappings(da.getStudyUri());
-        dasoUnitUri = urisByLabels.get(schema.getUnitLabel());
-		groupBySocAndId = new HashMap<String,SOCGroup>();
 
         //System.out.println("possibleValues: " + possibleValues);
         

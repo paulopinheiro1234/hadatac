@@ -9,9 +9,9 @@
 @import org.hadatac.utils._
 
 	<tr>
+	  <td>@stream.getName()</td>
 	  <td>@stream.getIP()</td>
 	  <td>@stream.getPort()</td> 
-	  <td>@stream.getLabel()</td>
 	  <td>@stream.getStatus()</td> 
 	  <td>@stream.getProtocol()</td>
 	  <td>@if(stream != null && stream.getStudy() != null) {

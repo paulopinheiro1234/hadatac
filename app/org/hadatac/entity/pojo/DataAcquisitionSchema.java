@@ -57,7 +57,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
             "hasco:matchesWith");
 
     private static Map<String, DataAcquisitionSchema> DASCache;
-
+    private List<DataAcquisitionSchemaAttribute> attributesCache = new ArrayList<DataAcquisitionSchemaAttribute>();
+    private List<DataAcquisitionSchemaObject> objectsCache = new ArrayList<DataAcquisitionSchemaObject>();
+    private Map<String, Map<String, String>> possibleValuesCache = new HashMap<String, Map<String, String>>();
+    
     private String uri = "";
     private String label = "";
     private String version = "";
@@ -74,8 +77,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String groupLabel = "";
     private String matchingLabel = "";
     
-    private List<DataAcquisitionSchemaAttribute> attributeObjects = new ArrayList<DataAcquisitionSchemaAttribute>();
-    
     private List<String> attributes = new ArrayList<String>();
     private List<String> objects = new ArrayList<String>();
     private List<String> events = new ArrayList<String>();
@@ -84,7 +85,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private static Map<String, DataAcquisitionSchema> getCache() {
         if (DASCache == null) {
             DASCache = new HashMap<String, DataAcquisitionSchema>(); 
-        }
+        } 
         return DASCache;
     }
 
@@ -93,6 +94,15 @@ public class DataAcquisitionSchema extends HADatAcThing {
         DataAcquisitionSchemaObject.resetCache();
         DASCache = null;
     }
+
+    public void resetAttributesCache() {
+        attributesCache = null;
+    }
+
+    public void resetObjectsCache() {
+        objectsCache = null;
+    }
+
 
     public DataAcquisitionSchema() {
         DataAcquisitionSchema.getCache();
@@ -103,6 +113,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.label = label;
         isRefreshed = false;
         DataAcquisitionSchema.getCache();
+        getAttributes();
+        getObjects();
     }
 
     public String getUri() {
@@ -251,10 +263,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaAttribute> getAttributes() {
-        if (attributeObjects == null || attributeObjects.isEmpty()) {
-            attributeObjects = DataAcquisitionSchemaAttribute.findBySchema(getUri());
+        if (attributesCache == null || attributesCache.isEmpty()) {
+            attributesCache = DataAcquisitionSchemaAttribute.findBySchema(getUri());
         }
-        return attributeObjects;
+        return attributesCache;
     }
 
     public void setAttributes(List<String> attributes) {
@@ -341,7 +353,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaObject> getObjects() {
-        return DataAcquisitionSchemaObject.findBySchema(this.getUri());
+        if (objectsCache == null || objectsCache.isEmpty()) {
+            objectsCache = DataAcquisitionSchemaObject.findBySchema(getUri());
+        }
+        return objectsCache;
     }
 
     public void setObjects(List<String> objects) {
@@ -440,7 +455,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public static DataAcquisitionSchema find(String schemaUri) {
         if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
-            return DataAcquisitionSchema.getCache().get(schemaUri);
+        	
+            DataAcquisitionSchema sdd = DataAcquisitionSchema.getCache().get(schemaUri);
+            sdd.getAttributes();
+            return sdd;
         }
 
         System.out.println("Looking for data acquisition schema " + schemaUri);
@@ -485,6 +503,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         //        schema.getObjects().size() + " objects, and " + 
         //        schema.getEvents().size() + " events.");
 
+        schema.getAttributes();
+        schema.getObjects();
         DataAcquisitionSchema.getCache().put(schemaUri,schema);
         return schema;
     }
@@ -510,8 +530,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return schemas;
     }
 
-    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
-        Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
+    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {    	
+    	Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource WHERE { \n"
                 + " ?possibleValue a hasco:PossibleValue . \n"

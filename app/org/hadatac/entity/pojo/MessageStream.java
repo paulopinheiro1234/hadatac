@@ -35,14 +35,22 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 
 public class MessageStream extends HADatAcThing implements Comparable<MessageStream> {
 
-    private String ip = "";
+	/*
+	 * Primary identification
+	 * name + "@" + ip + ":" + port
+	 */
+	private String ip = "";
 	private String port = "";
-	private String status = "";
-	private String protocol = "";
+    private String name = "";           // this is the top level topic of the stream
+
+    /*
+     * Additional Properties
+     */
+	private String status = "";         // CLOSED, INITIATED, ACTIVE
+    private String protocol = "";       // mqtt, http
     private String id;
     private String viewableId = "";
     private String editableId = "";
-    private String name = "";
     private String ownerEmail = "";
     private List<String> viewerEmails;
     private List<String> editorEmails;
@@ -54,7 +62,7 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
     private String lastProcessTime = "";
     private String dataFileId = "";
     private DataFile archive = null;
-    private String log = "";
+    private String log;
     private AnnotationLogger logger = null;
     private boolean succeed = false;
     private long totalMessages = 0;
@@ -128,12 +136,20 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         this.editableId = editableId;
     }
     
-    public String getName() {
+    public String getFullName() {
     	if (name != null && !name.isEmpty()) {
     		return name;
     	}
-    	return label + "_at_" + ip + "_" + port; 
+    	return name + "_at_" + ip + "_" + port; 
     }
+
+    public String getName() {
+    	if (name == null) {
+    		return "";
+    	}
+    	return name; 
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -405,6 +421,8 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
 		    object = statement.getObject();
 		    if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
 		    	stream.setLabel(object.asLiteral().getString());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasName")) {
+		    	stream.setName(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
                 stream.setTypeUri(object.asResource().getURI());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasId")) {
@@ -430,6 +448,10 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
 		    		stream.setLogger(new AnnotationLogger(stream, object.asLiteral().getString()));
 		    	} 
 		    }
+		}
+		
+		if (stream.getName().isEmpty() && stream.getLabel() != null && !stream.getLabel().isEmpty()) {
+			stream.setName(stream.getLabel());
 		}
 		
 		stream.setUri(uri);
@@ -469,6 +491,9 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         insert += stream_uri + " a <http://hadatac.org/ont/hasco/MessageStream> . ";
         if (this.getLabel() != null && !this.getLabel().equals("")) {
         	insert += stream_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
+        }
+        if (this.getName() != null && !this.getName().equals("")) {
+        	insert += stream_uri + " hasco:hasName  \"" + this.getName() + "\" . ";
         }
         if (this.getComment() != null && !this.getComment().equals("")) {
             insert += stream_uri + " rdfs:comment  \"" + this.getComment() + "\" . ";

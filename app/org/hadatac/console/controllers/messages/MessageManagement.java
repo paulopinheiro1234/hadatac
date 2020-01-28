@@ -264,20 +264,20 @@ public class MessageManagement extends Controller {
     public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
     	String uri = null;
-    	String streamLabel = "";
+    	String streamName = "";
         List<String> results = new ArrayList<String>();
     	try {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
             MessageStream stream = MessageStream.find(uri);
             if (stream != null) {
-            	streamLabel = stream.getName();
+            	streamName = stream.getName();
                 results = Subscribe.testConnection(stream);
             }
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         
-    	return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamLabel, results));
+    	return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamName, results));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -288,14 +288,14 @@ public class MessageManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result testTopics(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
-    	String streamLabel = "";
+    	String streamName = "";
         List<String> results = new ArrayList<String>();
         List<String> specified = new ArrayList<String>();
     	try {
     		stream_uri = URLDecoder.decode(stream_uri, "utf-8");
             MessageStream stream = MessageStream.find(stream_uri);
             if (stream != null) {
-            	streamLabel = stream.getName();
+            	streamName = stream.getName();
             	results = Subscribe.testTopics(stream);
             	Collections.sort(results);
             }
@@ -309,7 +309,7 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         
-    	return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamLabel, results, specified));
+    	return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamName, results, specified));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -321,7 +321,7 @@ public class MessageManagement extends Controller {
     public Result testLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
     	
     	String tpc_uri = null;
-    	String streamLabel = "";
+    	String streamName = "";
     	String topicLabel = "";
         List<String> results = new ArrayList<String>();
         List<String> specified = new ArrayList<String>();
@@ -332,7 +332,7 @@ public class MessageManagement extends Controller {
             	topicLabel = topic.getLabel();
             	MessageStream stream = topic.getStream();
             	if (stream != null) {
-            		streamLabel = stream.getName();
+            		streamName = stream.getName();
             		results = Subscribe.testLabels(stream,topic);
             	}
             	Collections.sort(results);
@@ -346,7 +346,7 @@ public class MessageManagement extends Controller {
     	} catch (Exception e) {
         	System.out.println("error decoding [" + topic_uri + "]");
     	}
-    	return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamLabel, topicLabel, results, specified,
+    	return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamName, topicLabel, results, specified,
     			routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url()));
     }
 

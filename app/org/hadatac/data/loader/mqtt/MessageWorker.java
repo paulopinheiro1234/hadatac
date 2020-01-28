@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.hadatac.data.loader.MeasurementGenerator;
 import org.hadatac.data.loader.Record;
 import org.hadatac.entity.pojo.MessageStream;
@@ -16,12 +17,14 @@ public class MessageWorker {
     private static MessageWorker single_instance = null; 
   
     // public variables
-    public Map<String,Subscribe> clientsMap;
+    final public Map<String,ExecutorService> executorsMap;
+    final public Map<String,MqttAsyncClient> clientsMap;
 	public Map<String,MessageTopic> topicsMap;
 	public Map<String,MeasurementGenerator> topicsGen;
   
     private MessageWorker() { 
-    	clientsMap = new HashMap<String,Subscribe>();
+    	executorsMap = new HashMap<String,ExecutorService>();
+    	clientsMap = new HashMap<String,MqttAsyncClient>();
     	topicsMap = new HashMap<String,MessageTopic>();
     	topicsGen = new HashMap<String,MeasurementGenerator>();
     } 
@@ -64,15 +67,27 @@ public class MessageWorker {
 			topicsGen.remove(topic.getLabel());
 		} 
 		try {
-			if (clientsMap != null && stream != null && clientsMap.get(stream.getName()) != null) {
-				clientsMap.get(stream.getName()).unsubscribe();
+			if (clientsMap != null && stream != null && clientsMap.get(stream.getFullName()) != null) {
+				clientsMap.get(stream.getFullName()).unsubscribe(stream.getName() + "/#");
+				clientsMap.get(stream.getFullName()).disconnectForcibly();
+				clientsMap.put(stream.getFullName(),null);
+				System.out.println("Unsubscribed stream [" + stream.getFullName() + "]");
 			}
-		} catch (MqttException e) {
+			if (executorsMap != null && stream != null && executorsMap.get(stream.getFullName()) != null) {
+				executorsMap.get(stream.getFullName()).shutdownNow();
+				executorsMap.put(stream.getFullName(),null);
+				System.out.println("Stopped stream thread [" + stream.getFullName() + "]");
+			}
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (clientsMap != null && stream != null && stream.getName() != null) {
-			clientsMap.remove(stream.getName());
+		System.out.println("Removing stream client and thread from MessageWorker [" + stream.getFullName() + "]");
+		if (executorsMap != null && stream != null && stream.getFullName() != null) {
+			executorsMap.remove(stream.getFullName());
+		}
+		if (clientsMap != null && stream != null && stream.getFullName() != null) {
+			clientsMap.remove(stream.getFullName());
 		}
     }
     
@@ -103,6 +118,8 @@ public class MessageWorker {
 
 	public static Record processMessage(String topicStr, String message, int currentRow) {
 		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]   0");
+		System.out.println("Current row: [" + currentRow + "]");
+
 		//List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
 		//System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
 		//for (String key : keyList) {
