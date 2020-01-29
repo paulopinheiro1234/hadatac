@@ -24,7 +24,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
    <div id="rcorners" >
 
-      <h4>@dataFile.getFileName(),@bSavable</h4>
+      <h4>@dataFile.getFileName()</h4>
       @if(bSavable) {
 
          <input class="btn btn-primary" type="button" id="upload" value="Save"/>
@@ -33,7 +33,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
 
 
-      <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
+      <!-- <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button> -->
 
       <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
 
@@ -222,7 +222,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
    
                </div>
                     
-
+                     
                      <div><a id="error_msg"></a></div>
                      <div id="grid"></div>
                      <div id="footnote"></div>
@@ -231,8 +231,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                   <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
-                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/xlsx.full.min.js")"></script>
-
+                  
+                  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
