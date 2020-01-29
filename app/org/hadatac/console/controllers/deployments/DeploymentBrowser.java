@@ -14,7 +14,7 @@ import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.models.DeploymentForm;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.TripleDocument;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.utils.State;

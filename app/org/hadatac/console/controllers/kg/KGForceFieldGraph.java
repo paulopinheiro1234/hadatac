@@ -18,7 +18,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.Instrument;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
@@ -33,7 +33,7 @@ public class KGForceFieldGraph {
     List<NameSpace> ontologies = null;
     List<Deployment> deployments = null;
     List<DataAcquisitionSchema> sdds = null;
-    List<ObjectAccessSpec> daspecs = null;
+    List<STR> daspecs = null;
     Map<String,OCNode> variables = null;
     boolean includeOntologies;
     boolean includeIndicators;
@@ -93,9 +93,9 @@ public class KGForceFieldGraph {
     	// DASpecs need to be added after studies
         if (includeDASpecs) {
         	//System.out.println("=========================================== DASpecs");
-        	daspecs = ObjectAccessSpec.findAll() ;
+        	daspecs = STR.findAll() ;
         	if (daspecs != null && daspecs.size() > 0) {
-        		for (ObjectAccessSpec daspec: daspecs) { 
+        		for (STR daspec: daspecs) { 
         			addDASpec(daspec);
         		}
         	}
@@ -231,7 +231,7 @@ public class KGForceFieldGraph {
     	nodes.add(ontNode);
     }
     
-    private void addDASpec(ObjectAccessSpec daspec) {
+    private void addDASpec(STR daspec) {
 		//System.out.println("Add DASpec " + daspec.getLabel());
     	if (daspec == null) {
     		return; 
@@ -328,7 +328,7 @@ public class KGForceFieldGraph {
     	return html;
     }
     
-    private String daspecHtml(ObjectAccessSpec daspec) {
+    private String daspecHtml(STR daspec) {
     	String html = "";
     	html += "<h3>Data Acquisition Specification</h3>";
 		html += "<b>URI</b>: " + daspec.getUri() + "<br>";

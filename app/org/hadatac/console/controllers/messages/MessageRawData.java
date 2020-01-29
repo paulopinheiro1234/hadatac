@@ -22,6 +22,7 @@ import play.data.FormFactory;
 import org.hadatac.console.views.html.messages.*;
 import org.hadatac.data.loader.mqtt.Subscribe;
 import org.hadatac.entity.pojo.MessageStream;
+import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.URIUtils;
@@ -36,41 +37,58 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class MessageRawData extends Controller {
 
-	Map<String, MessageStream> streamCache = new HashMap<String, MessageStream>();
-	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri) {
-    	String results = null;
-    	String uri = null;
+    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
+		MessageStream stream = null;
+		MessageTopic topic = null;
+    	List<String> results = new ArrayList<String>();
+    	String str_uri = null;
+    	String tpc_uri = null;
+    	String topic_label = null;
+    	if (postAction == null) {
+    		postAction = routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url();
+    	}
+    	if (stream_uri == null) {
+    		results.add("No stream URI provided");
+            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results, postAction));
+    	}
     	try {
-    		uri = URLDecoder.decode(stream_uri, "UTF-8");
+    		str_uri = URLDecoder.decode(stream_uri, "UTF-8");
+    		stream = MessageStream.find(str_uri);
     	} catch (Exception e) {
-    		results = "Error decoding stream uri";
+    		str_uri = "";
+    		results.add("Error decoding/loading stream uri");
     	}
-    	if (uri != null) {
-    		MessageStream stream = null;
-    		if (streamCache.containsKey(uri)) {
-    			stream = streamCache.get(uri);
-    		} else {
-    			stream = MessageStream.find(uri);
-    			if (stream != null) {
-    				streamCache.put(uri, stream);
-    			}
-    		}
-    		if (stream == null) {
-    			results = "Could not find Stream [" + uri + "]";
-    		} else {
-    			results = "Found [" + uri + "] at " + stream.getIP() + ":" + stream.getPort() + "\n";
-    			results = results + Subscribe.exec(stream);
+    	if (topic_uri == null) {
+    		tpc_uri = "";
+    	} else {
+    		try {
+    			tpc_uri = URLDecoder.decode(topic_uri, "UTF-8");
+        		topic = MessageTopic.find(tpc_uri);
+    		} catch (Exception e) {
+    			tpc_uri = "";
+    			results.add("Error decoding/loading topic uri");
     		}
     	}
-        return ok(messageRawData.render(dir, filename, da_uri, offset, stream_uri, results));
+		if (stream == null) {
+			results.add("Could not find stream");
+		} else if (topic == null) {
+			results.add("Found Stream at " + stream.getIP() + ":" + stream.getPort());
+			List<String> tempList = Subscribe.exec(stream, null, Subscribe.SUBSCRIBE_BATCH);
+			System.out.println("TEMPLIST SIZE = " + tempList.size());
+			results.addAll(tempList);
+		} else {
+			results.add("Found Stream at " + stream.getIP() + ":" + stream.getPort());
+			results.add("Found Topic " + topic.getLabel());
+			topic_label = topic.getLabel();
+			results.addAll(Subscribe.exec(stream, topic, Subscribe.SUBSCRIBE_BATCH));
+		}
+        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri) {
-        return index(dir, filename, da_uri, offset, stream_uri);
+    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
+        return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction);
     }
-
 
 }

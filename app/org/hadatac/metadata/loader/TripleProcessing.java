@@ -30,7 +30,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.TriggeringEvent;
@@ -343,9 +343,9 @@ public class TripleProcessing {
 				System.out.println(String.format("Processing data acquisition %s", uri));
 				
 				String dataAcquisitionUri = URIUtils.convertToWholeURI(uri);
-				ObjectAccessSpec dataAcquisition = ObjectAccessSpec.findByUri(dataAcquisitionUri);
+				STR dataAcquisition = STR.findByUri(dataAcquisitionUri);
 				if (null == dataAcquisition) {
-					dataAcquisition = new ObjectAccessSpec();
+					dataAcquisition = new STR();
 					dataAcquisition.setUri(dataAcquisitionUri);
 					dataAcquisition.setOwnerUri(ownerUri);
 					dataAcquisition.setPermissionUri(ownerUri);

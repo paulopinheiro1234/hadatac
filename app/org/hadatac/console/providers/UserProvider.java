@@ -23,7 +23,8 @@ public class UserProvider {
     @Nullable
     public SysUser getUser(Session session) {
         final AuthUser currentAuthUser = this.auth.getUser(session);
-        final SysUser localUser = SysUser.findByAuthUserIdentity(currentAuthUser);
+        SysUser localUser = SysUser.findByAuthUserIdentity(currentAuthUser);
+        
         return localUser;
     }
 }

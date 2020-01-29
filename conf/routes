@@ -5,8 +5,8 @@
 # Home page
 GET     /hadatac/					                   org.hadatac.console.controllers.Portal.index()
 POST    /hadatac/					                   org.hadatac.console.controllers.Portal.postIndex()
-GET	    /hadatac                                  	   org.hadatac.console.controllers.Portal.index()
-POST	/hadatac                                       org.hadatac.console.controllers.Portal.postIndex()
+GET     /hadatac					                   org.hadatac.console.controllers.Portal.index()
+POST    /hadatac					                   org.hadatac.console.controllers.Portal.postIndex()
 GET	    /hadatac/dash					               org.hadatac.console.controllers.Dashboard.index()
 POST    /hadatac/dash                                  org.hadatac.console.controllers.Dashboard.postIndex()
 GET     /hadatac/version                               org.hadatac.console.controllers.Version.index()
@@ -143,8 +143,8 @@ GET     /hadatac/login/password/forgot                 org.hadatac.console.contr
 POST    /hadatac/login/password/forgot		           org.hadatac.console.controllers.Signup.doForgotPassword
 
 # deployment management
-GET	    /hadatac/deployments/		                   org.hadatac.console.controllers.deployments.DeploymentManagement.index(oper : Int, dir : String, filename : String, da_uri : String, page : Integer)
-POST	/hadatac/deployments/     	                   org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex(oper : Int, dir : String, filename : String, da_uri : String, page : Integer)
+GET	    /hadatac/deployments/		                   org.hadatac.console.controllers.deployments.DeploymentManagement.index(oper : Int, dir : String, filename : String, da_uri : String, page : Integer, details : Integer)
+POST	/hadatac/deployments/     	                   org.hadatac.console.controllers.deployments.DeploymentManagement.postIndex(oper : Int, dir : String, filename : String, da_uri : String, page : Integer, details : Integer)
 GET	    /hadatac/deployments/new		               org.hadatac.console.controllers.deployments.NewDeployment.index(dir : String, filename : String, da_uri : String, type : String, page : Integer)
 POST	/hadatac/deployments/new	                   org.hadatac.console.controllers.deployments.NewDeployment.postIndex(dir : String, filename : String, da_uri : String, type : String, page : Integer)
 POST 	/hadatac/deployments/new/form		           org.hadatac.console.controllers.deployments.NewDeployment.processForm(dir : String, filename : String, da_uri : String, page : Integer)
@@ -160,21 +160,34 @@ GET	    /hadatac/deployments/browser		           org.hadatac.console.controllers
 POST	/hadatac/deployments/browser     	           org.hadatac.console.controllers.deployments.DeploymentBrowser.postIndex(dir : String, filename : String, da_uri : String, plat_uri : String, prev_platUri : String)
 GET	    /hadatac/deployments/resources		           org.hadatac.console.controllers.deployments.ResourceAvailability.index()
 POST	/hadatac/deployments/resources	               org.hadatac.console.controllers.deployments.ResourceAvailability.postIndex()
-GET	    /hadatac/deployments/urigenerator	           org.hadatac.console.controllers.deployments.URIGenerator.index()
-POST	/hadatac/deployments/urigenerator	           org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
-POST 	/hadatac/deployments/urigenerator/form	       org.hadatac.console.controllers.deployments.URIGenerator.processForm()
+# GET	    /hadatac/deployments/urigenerator	           org.hadatac.console.controllers.deployments.URIGenerator.index()
+# POST	/hadatac/deployments/urigenerator	           org.hadatac.console.controllers.deployments.URIGenerator.postIndex()
+# POST    /hadatac/deployments/urigenerator/form	       org.hadatac.console.controllers.deployments.URIGenerator.processForm()
 
 # message management
 GET	    /hadatac/messages/		                       org.hadatac.console.controllers.messages.MessageManagement.index(dir : String, filename : String, da_uri : String, page : Integer)
 POST	/hadatac/messages/     	                       org.hadatac.console.controllers.messages.MessageManagement.postIndex(dir : String, filename : String, da_uri : String, page : Integer)
-GET	    /hadatac/messages/start		                   org.hadatac.console.controllers.messages.MessageManagement.start(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
-POST	/hadatac/messages/start	                       org.hadatac.console.controllers.messages.MessageManagement.postStart(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
+GET	    /hadatac/messages/initiate		               org.hadatac.console.controllers.messages.MessageManagement.initiate(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/initiate	                   org.hadatac.console.controllers.messages.MessageManagement.postInitiate(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/subscribe		               org.hadatac.console.controllers.messages.MessageManagement.subscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/subscribe	                   org.hadatac.console.controllers.messages.MessageManagement.postSubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/unsubscribe	               org.hadatac.console.controllers.messages.MessageManagement.unsubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/unsubscribe                  org.hadatac.console.controllers.messages.MessageManagement.postUnsubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
 GET	    /hadatac/messages/stop		                   org.hadatac.console.controllers.messages.MessageManagement.stop(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
 POST	/hadatac/messages/stop		                   org.hadatac.console.controllers.messages.MessageManagement.postStop(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
-GET	    /hadatac/messages/view		                   org.hadatac.console.controllers.messages.MessageManagement.view(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
-POST	/hadatac/messages/view	                       org.hadatac.console.controllers.messages.MessageManagement.postView(dir : String, filename : String, da_uri : String, page : Integer, topic : String)
-GET	    /hadatac/messages/rawdata		               org.hadatac.console.controllers.messages.MessageRawData.index(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
-POST	/hadatac/messages/rawdata	                   org.hadatac.console.controllers.messages.MessageRawData.postIndex(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+# GET	    /hadatac/messages/deletedata		           org.hadatac.console.controllers.messages.MessageManagement.deleteData(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+# POST	/hadatac/messages/deletedata		           org.hadatac.console.controllers.messages.MessageManagement.postDeleteData(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/rawdata		               org.hadatac.console.controllers.messages.MessageRawData.index(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topic_uri : String, postAction : String)
+POST	/hadatac/messages/rawdata	                   org.hadatac.console.controllers.messages.MessageRawData.postIndex(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topic_uri : String, postAction : String)
+GET	    /hadatac/messages/log                          org.hadatac.console.controllers.messages.MessageManagement.checkAnnotationLog(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+GET	    /hadatac/messages/topics		               org.hadatac.console.controllers.messages.MessageManagement.listTopics(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+POST	/hadatac/messages/topics	                   org.hadatac.console.controllers.messages.MessageManagement.postListTopics(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String)
+GET	    /hadatac/messages/test/connection              org.hadatac.console.controllers.messages.MessageManagement.testConnection(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/test/connection              org.hadatac.console.controllers.messages.MessageManagement.postTestConnection(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/test/topics                  org.hadatac.console.controllers.messages.MessageManagement.testTopics(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+POST	/hadatac/messages/test/topics                  org.hadatac.console.controllers.messages.MessageManagement.postTestTopics(dir : String, filename : String, da_uri : String, page : Integer, stream : String)
+GET	    /hadatac/messages/test/labels                  org.hadatac.console.controllers.messages.MessageManagement.testLabels(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topic : String)
+POST	/hadatac/messages/test/labels                  org.hadatac.console.controllers.messages.MessageManagement.postTestLabels(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topic : String)
 
 # schema management
 GET	    /hadatac/schema/		    	               org.hadatac.console.controllers.schema.DASManagement.index()
@@ -273,6 +286,8 @@ POST	/hadatac/oc/graph	                           org.hadatac.console.controller
 # object management
 GET	    /hadatac/objects/		                       org.hadatac.console.controllers.objects.ObjectManagement.index(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer, message : String)
 POST	/hadatac/objects/		                       org.hadatac.console.controllers.objects.ObjectManagement.postIndex(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer, message : String)
+GET	    /hadatac/objects/uris		                   org.hadatac.console.controllers.objects.ObjectManagement.listURIs(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer)
+POST	/hadatac/objects/uris		                   org.hadatac.console.controllers.objects.ObjectManagement.postListURIs(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer)
 GET	    /hadatac/objects/nomsg		                   org.hadatac.console.controllers.objects.ObjectManagement.indexNomsg(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer)
 GET	    /hadatac/objects/new		                   org.hadatac.console.controllers.objects.NewObjectsFromScratch.index(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer)
 POST	/hadatac/objects/new		                   org.hadatac.console.controllers.objects.NewObjectsFromScratch.postIndex(dir : String, filename : String, da_uri : String, study_uri : String, oc_uri : String, page : Integer)
@@ -295,7 +310,7 @@ POST	/hadatac/dataacquisitions/     		           org.hadatac.console.controllers
 GET	    /hadatac/dataacquisitions/new		           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.newDataAcquisition()
 POST	/hadatac/dataacquisitions/new     	           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.postNewDataAcquisition()
 POST	/hadatac/dataacquisitions/new/form             org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.processForm()
-POST    /hadatac/dataacquisitions/new/form/oas         org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.generateOASFileFromForm(dir : String)
+POST    /hadatac/dataacquisitions/new/form/str         org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.generateSTRFileFromForm(dir : String)
 GET	    /hadatac/dataacquisitions/create	           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.create(dir : String, file_id : String, da_uri: String)
 POST	/hadatac/dataacquisitions/create     	       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.postCreate(dir : String, file_id : String, da_uri: String)
 GET	    /hadatac/dataacquisitions/view		           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.view(dir : String, file_id : String, da_uri: String)
@@ -417,8 +432,6 @@ POST	/hadatac/dd_editor/getCommentLoc   	   org.hadatac.console.controllers.file
 GET	    /hadatac/dd_editor/getCheckedSDD	       org.hadatac.console.controllers.fileviewer.DDEditor.getCheckedSDD(sddFileName : String)
 POST	/hadatac/dd_editor/getCheckedSDD	       org.hadatac.console.controllers.fileviewer.DDEditor.getCheckedSDD(sddFileName: String)
 
-
-
 GET     /hadatac/sddeditor_v2/getHeaderLoc             org.hadatac.console.controllers.fileviewer.SDDEditorV2.getHeaderLoc()
 POST    /hadatac/sddeditor_v2/getHeaderLoc             org.hadatac.console.controllers.fileviewer.SDDEditorV2.getHeaderLoc()
 GET     /hadatac/sddeditor_v2/getCommentLoc            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCommentLoc()
@@ -470,6 +483,8 @@ POST    /hadatac/working/movefiles                     org.hadatac.console.contr
 POST    /hadatac/working/movefiles/form                org.hadatac.console.controllers.workingfiles.WorkingFiles.processMoveDataFilesForm(dir : String)
 GET     /hadatac/working/sharefile                     org.hadatac.console.controllers.workingfiles.WorkingFiles.shareDataFile(dir : String, file_id : String)
 POST    /hadatac/working/sharefile                     org.hadatac.console.controllers.workingfiles.WorkingFiles.shareDataFile(dir : String, file_id : String)
+POST    /hadatac/working/sharefile/viewerform          org.hadatac.console.controllers.workingfiles.WorkingFiles.saveViewerEmails()
+POST    /hadatac/working/sharefile/editorform          org.hadatac.console.controllers.workingfiles.WorkingFiles.saveEditorEmails()
 GET     /hadatac/working/deletefile		               org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFile(dir : String, file_id : String)
 POST	/hadatac/working/deletefile    	               org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFile(dir : String, file_id : String)
 GET     /hadatac/working/deletefiles                   org.hadatac.console.controllers.workingfiles.WorkingFiles.deleteDataFiles(dir : String)
@@ -480,8 +495,6 @@ GET     /hadatac/working/ingestfile                    org.hadatac.console.contr
 POST    /hadatac/working/ingestfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.ingestDataFile(file_id : String)
 GET     /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_id : String)
 POST    /hadatac/working/verifyfile                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFile(file_id : String)
-
-
 
 GET     /hadatac/working/verifyDataFileTemp                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFileTemp(file_id : String)
 POST    /hadatac/working/verifyDataFileTemp                    org.hadatac.console.controllers.workingfiles.WorkingFiles.verifyDataFileTemp(file_id : String)

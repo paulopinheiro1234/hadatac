@@ -1,16 +1,26 @@
 package org.hadatac.data.loader.mqtt;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.MessageStream;
+import org.hadatac.entity.pojo.MessageTopic;
 
 /**
  * A sample application that demonstrates how to use the Paho MQTT v3.1 Client blocking API.
@@ -25,7 +35,7 @@ import org.hadatac.entity.pojo.MessageStream;
  *  <li>Sample (this one) which uses the API which blocks until the operation completes</li>
  *  <li>SampleAsyncWait shows how to use the asynchronous API with waiters that block until
  *  an action completes</li>
- *  <li>SampleAsyncCallBack shows how to use the asynchronous API where events are
+ *  <li>SamplecAsyncCallBack shows how to use the asynchronous API where events are
  *  used to notify the application when an action completes<li>
  *  </ol>
  *
@@ -35,27 +45,111 @@ import org.hadatac.entity.pojo.MessageStream;
 public class Subscribe implements MqttCallback {
 
 	// Private instance variables
-	private MqttClient 			client;
+	//private MqttAsyncClient     client;
+	private MqttClient          client;
+	private MessageStream       stream;
 	private String 				brokerUrl;
 	private boolean 			quietMode;
 	private MqttConnectOptions 	conOpt;
 	private boolean 			clean;
 	private String              password;
 	private String              userName;
-    private int                 maxSeconds;	
-    private String              respPayload;
+    private List<String>        respPayload;
+    private String              plainPayload;
+    private long                totalMessages;
+    private int                 ingestedMessages;
+    private int					partialCounter;
+    private File                file;
+    private int                 action;
+    private Map<String,Integer> stat;
 
-	/**
-	 * The main entry point of the sample.
-	 *
-	 * This method handles parsing of the arguments specified on the
-	 * command-line before performing the specified action.
-	 */
-	public static String exec(MessageStream stream) {
+    public static final int PUBLISH          = 0;
+    public static final int SUBSCRIBE_BATCH  = 1;
+    public static final int SUBSCRIBE        = 2;
+    public static final int TESTTOPICS       = 3;
+    public static final int TESTLABELS       = 4;
+    
+    public static List<String> testConnection(MessageStream stream) {
+
+    	boolean quietMode 	  = false;
+		int qos 			  = 0;
+		String clientId 	  = UUID.randomUUID().toString();
+		boolean ssl           = false;
+		String password       = null;
+		String userName       = null;
+		String protocol       = "tcp://";
+		String broker         = stream.getIP();
+		int port              = Integer.parseInt(stream.getPort());
+        String url            = protocol + broker + ":" + port;
+        List<String> response = new ArrayList<String>();
+
+        try {
+	    	response.add("[1/5] Initiating connection to " + url + " with client ID " + clientId);
+	    	response.add("[2/5] Creating client instance");
+			MqttClient clientTest = new MqttClient(url,clientId);
+
+	    	response.add("[3/5] Creating connection options");
+			MqttConnectOptions connTest = new MqttConnectOptions();
+	    	connTest.setCleanSession(true);
+	    	if(password != null ) {
+	    	  connTest.setPassword(password.toCharArray());
+	    	}
+	    	if(userName != null) {
+	    	  connTest.setUserName(userName);
+	    	}
+
+	    	response.add("[4/5] Creating connection");
+	    	clientTest.connect(connTest);
+	    	response.add("[5/5] Connected");
+
+		} catch(MqttException me) {
+	    	response.add("Connection failed");
+			response.add("- Reason " + me.getReasonCode());
+			response.add("- Message:  " + me.getMessage());
+			response.add("- Localized Message:  " + me.getLocalizedMessage());
+			response.add("- Cause: " + me.getCause());
+			response.add("- Exception: " + me);
+			me.printStackTrace();
+		}
+		
+		return response;
+    }
+
+    public String getPlainPayLoad() {
+    	return plainPayload;
+    }
+    
+    public String getClientId() {
+    	if (client == null) {
+    		return "";
+    	}
+    	return client.getClientId();
+    }
+    
+    public static List<String> testTopics(MessageStream stream) {
+    	return exec(stream, null, TESTTOPICS);
+    }
+
+    public static List<String> testLabels(MessageStream stream, MessageTopic topic) {
+    	return exec(stream, topic, TESTLABELS);
+    }
+
+    public static List<String> execBatch(MessageStream stream) {
+    	return exec(stream, null, SUBSCRIBE_BATCH);
+    }
+
+    public static List<String> execBatch(MessageStream stream, MessageTopic topic) {
+    	return exec(stream, topic, SUBSCRIBE_BATCH);
+    }
+
+    public static List<String> exec(MessageStream stream, MessageTopic topic) {
+    	return exec(stream, topic, SUBSCRIBE);
+    }
+
+    public static List<String> exec(MessageStream stream, MessageTopic streamTopic, int action) {
 
 		// Default settings:
 		boolean quietMode 	 = false;
-		String action 		 = "subscribe";   // "publish";
 		String topic 		 = "";
 		String message 		 = "Message from blocking Paho MQTTv3 Java client sample";
 		int qos 			 = 0;
@@ -67,16 +161,18 @@ public class Subscribe implements MqttCallback {
 		int port             = Integer.parseInt(stream.getPort());
 		String clientId 	 = null;
 		String subTopic      = "#";
-		String pubTopic      = "#";
-		//String subTopic    = "lesa/#";
-		//String pubTopic 	 = "lesa/Java/v3";
-		boolean cleanSession = true;			// Non durable subscriptions
+		String pubTopic;
+		if (streamTopic == null) {
+			pubTopic = "#";
+		} else {
+			pubTopic = streamTopic.getLabel();
+		}
+		boolean cleanSession = true;
 		boolean ssl          = false;
 		String password      = null;
 		String userName      = null;
 		
 		topic = pubTopic;
-		//topic = subTopic;
 
 		String protocol = "tcp://";
 
@@ -84,22 +180,36 @@ public class Subscribe implements MqttCallback {
 
         String url = protocol + broker + ":" + port;
 
-        String response = null;
-        
-        clientId = "rpi_lesa_"+action;
+        List<String> response = new ArrayList<String>();
 
-		// With a valid set of arguments, the real work of
-		// driving the client API can begin
+    	clientId = UUID.randomUUID().toString();
+    	        
 		try {
-			// Create an instance of this class
-			Subscribe sampleClient = new Subscribe(url, clientId, cleanSession, quietMode,userName,password);
 
+			Subscribe aClient = new Subscribe(stream, url, clientId, cleanSession, quietMode, userName, password, action);
+
+			List<String> tempResponse;
 			// Perform the requested action
-			if (action.equals("publish")) {
-				response = sampleClient.publish(topic,qos,message.getBytes());
-			} else if (action.equals("subscribe")) {
-				response = sampleClient.subscribe(topic,qos);
+			if (action == PUBLISH) {
+				tempResponse = aClient.publish(topic,qos,message.getBytes());
+				if (tempResponse != null) {
+					response.addAll(tempResponse);
+				}
+			} else {
+				tempResponse = aClient.subscribe(topic, qos, streamTopic);
+				if (action == TESTLABELS) {
+					if (aClient.getPlainPayLoad() != null) {
+						JSONRecord handler = new JSONRecord(aClient.getPlainPayLoad());
+						streamTopic.setHeaders(handler.getHeaders());
+						response.addAll(handler.getHeaders());
+					}
+				} else {
+					if (tempResponse != null) {
+						response.addAll(tempResponse);
+					}
+				}
 			}
+			
 		} catch(MqttException me) {
 			// Display full details of any exception that occurs
 			System.out.println("reason "+me.getReasonCode());
@@ -123,13 +233,15 @@ public class Subscribe implements MqttCallback {
      * @param password the password for the user
 	 * @throws MqttException
 	 */
-    public Subscribe(String brokerUrl, String clientId, boolean cleanSession, boolean quietMode, String userName, String password) throws MqttException {
+    public Subscribe(MessageStream stream, String brokerUrl, String clientId, boolean cleanSession, boolean quietMode, String userName, String password, int action) throws MqttException {
+    	this.stream = stream;
     	this.brokerUrl = brokerUrl;
     	this.quietMode = quietMode;
     	this.clean 	   = cleanSession;
     	this.password = password;
     	this.userName = userName;
-		this.maxSeconds = 2;
+    	this.action = action;
+    	stat = new HashMap<String,Integer>();
     	//This sample stores in a temporary directory... where messages temporarily
     	// stored until the message has been delivered to the server.
     	//..a real application ought to store them somewhere
@@ -137,30 +249,33 @@ public class Subscribe implements MqttCallback {
     	//String tmpDir = System.getProperty("java.io.tmpdir");
     	//MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(tmpDir);
 
-    	try {
-    		// Construct the connection options object that contains connection parameters
-    		// such as cleanSession and LWT
-	    	conOpt = new MqttConnectOptions();
-	    	conOpt.setCleanSession(clean);
-	    	if(password != null ) {
-	    	  conOpt.setPassword(this.password.toCharArray());
-	    	}
-	    	if(userName != null) {
-	    	  conOpt.setUserName(this.userName);
-	    	}
-
-    		// Construct an MQTT blocking mode client
-			//client = new MqttClient(this.brokerUrl,clientId, dataStore);
-			client = new MqttClient(this.brokerUrl,clientId);
-
-			// Set this wrapper as the callback handler
-	    	client.setCallback(this);
-
-		} catch (MqttException e) {
-			e.printStackTrace();
-			log("Unable to set up client: "+e.toString());
-			//System.exit(1);
-		}
+    	if (clientId != null && !clientId.isEmpty()) {
+	    	try {
+	    		// Construct the connection options object that contains connection parameters
+	    		// such as cleanSession and LWT
+		    	conOpt = new MqttConnectOptions();    
+		    	conOpt.setCleanSession(clean);
+		    	if(password != null ) {
+		    	  conOpt.setPassword(this.password.toCharArray());
+		    	}
+		    	if(userName != null) {
+		    	  conOpt.setUserName(this.userName);
+		    	}
+	
+	    		// Construct an MQTT blocking mode client
+				//client = new MqttClient(this.brokerUrl,clientId, dataStore);
+				//client = new MqttAsyncClient(this.brokerUrl,clientId);
+				client = new MqttClient(this.brokerUrl,clientId);
+	
+				// Set this wrapper as the callback handler
+		    	client.setCallback(this);
+		    	
+			} catch (MqttException e) {
+				e.printStackTrace();
+				log("Unable to set up client: "+e.toString());
+				//System.exit(1);
+			}
+    	}
     }
 
     /**
@@ -170,7 +285,7 @@ public class Subscribe implements MqttCallback {
      * @param payload the set of bytes to send to the MQTT server
      * @throws MqttException
      */
-    public String publish(String topicName, int qos, byte[] payload) throws MqttException {
+    public List<String> publish(String topicName, int qos, byte[] payload) throws MqttException {
 
     	// Connect to the MQTT server
     	log("Connecting to "+brokerUrl + " with client ID "+client.getClientId());
@@ -193,7 +308,7 @@ public class Subscribe implements MqttCallback {
     	client.disconnect();
     	log("Disconnected");
     	
-    	return "";
+    	return new ArrayList<String>();
     	
     }
 
@@ -206,42 +321,89 @@ public class Subscribe implements MqttCallback {
      * @param qos the maximum quality of service to receive messages at for this subscription
      * @throws MqttException
      */
-    public String subscribe(String topicName, int qos) throws MqttException {
+    public List<String> subscribe(String topicName, int qos, MessageTopic topic) throws MqttException {
 
+    	if (client == null) {
+    		System.out.println("Subscribe: client is null");
+    		return null;
+    	}
+    	
+    	if (client.getClientId() == null || client.getClientId().isEmpty()) {
+    		System.out.println("Subscribe: clientId is null or blank");
+    		return null;
+    	}
+    	
     	// Connect to the MQTT server
     	client.connect(conOpt);
-    	log("Connected to "+brokerUrl+" with client ID "+client.getClientId());
-
+    	log("Connected to " + brokerUrl + " with client ID " + client.getClientId());
+    	respPayload = new ArrayList<String>();
+    	if (topic == null) {
+    		file = null;
+    	} else {
+    		if (stream.getDataFileId() == null) {
+    	    	log("Missing data file's id in topic " + topic.getLabel());
+    		} else {
+	    		DataFile dataFile = DataFile.findById(stream.getDataFileId());
+	    		if (dataFile == null || dataFile.getAbsolutePath() == null) {
+	    	    	log("It was not possible to retrieve DataFile from data file's id in topic " + topic.getLabel());
+	    			file = null;
+	    		} else {
+	    			file = new File(dataFile.getAbsolutePath());
+	    		}
+    		}
+    	}
+    	
     	// Subscribe to the requested topic
     	// The QoS specified is the maximum level that messages will be sent to the client at.
     	// For instance if QoS 1 is specified, any messages originally published at QoS 2 will
     	// be downgraded to 1 when delivering to the client but messages published at 1 and 0
     	// will be received at the same level they were published at.
-    	log("Subscribing to topic \""+topicName+"\" qos "+qos);
+    	log("Subscribing to topic \"" + topicName + "\" qos " + qos);
+
     	client.subscribe(topicName, qos);
 
-    	// Continue waiting for messages until the Enter is pressed
-    	if (maxSeconds > 0) {
+    	// Continue waiting for messages for the specified period of time
+    	if (action == SUBSCRIBE_BATCH || action == TESTLABELS || action == TESTTOPICS) {
            try {
-			TimeUnit.SECONDS.sleep(10);
+        	   TimeUnit.SECONDS.sleep(2);
 		   } catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	} else { 
-    		log("Press <Enter> to exit");
-    		try {
-    			System.in.read();
-    		} catch (IOException e) {
-			//If we can't read we'll just exit
-    		}
+			   // TODO Auto-generated catch block
+			   e.printStackTrace();
+		   }
+    	} 
+
+    	if (action == SUBSCRIBE) {
+    		MessageWorker.getInstance().clientsMap.put(stream.getName(),this);
+    		totalMessages = 0;
+    		partialCounter = 0;
     	}
 
-		// Disconnect the client from the server
-		client.disconnect();
-		log("Disconnected");
+    	if (action == SUBSCRIBE_BATCH || action == TESTLABELS || action == TESTTOPICS) {
+    		client.disconnect();
+    		log("Disconnected");
+    	}
+    	
+    	if (action == TESTTOPICS) {
+    		respPayload = new ArrayList<String>();
+    		for (String tpc : stat.keySet()) {
+    			respPayload.add(tpc + "                (Frequency: " + stat.get(tpc) + ")");
+    		}
+    	}
+    	
+    	return respPayload;
+    }
+
+    public void unsubscribe() throws MqttException {
+
+    	if (client != null) {
+    		
+	    	log("Unsubscribing to topic \"" + "#" + " with client ID " + client.getClientId());
+	    	client.unsubscribe("#");
+	
+	    	client.disconnect();
+	    	log("Disconnected");
+    	}
 		
-		return respPayload;
     }
 
     /**
@@ -298,11 +460,56 @@ public class Subscribe implements MqttCallback {
 		// Called when a message arrives from the server that matches any
 		// subscription made by the client
 		String time = new Timestamp(System.currentTimeMillis()).toString();
+		plainPayload = new String(message.getPayload());
 		String resp = "  Time:\t" +time +
                       "  Topic:\t" + topic +
-                      "  Message:\t" + new String(message.getPayload()) +
+                      "  Message:\t" + plainPayload +
                       "  QoS:\t" + message.getQos();
-		respPayload = respPayload + resp;
+		respPayload.add(resp);
+
+		/* 
+		 * SUBSCRIBE
+		 */
+		if (action == SUBSCRIBE) {
+			totalMessages = totalMessages + 1;
+			stream.setTotalMessages(totalMessages);
+			partialCounter = partialCounter + 1;
+			if (partialCounter >= 500) {
+				partialCounter = 0;
+				System.out.println("Received " + totalMessages + " messages. Ingested " + ingestedMessages + " messages.");
+				stream.save();
+			}
+			//System.out.println("Payload: " + plainPayload);
+			//System.out.println(resp);
+			if (file != null) {
+				try {
+					FileUtils.writeStringToFile(file, resp + "\n", "utf-8", true);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				if (MessageWorker.processMessage(topic, plainPayload, ingestedMessages) != null) {
+					ingestedMessages = ingestedMessages + 1;
+					stream.setIngestedMessages(ingestedMessages);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		/* 
+		 * TESTTOPICS
+		 */
+		if (action == TESTTOPICS) {
+			if (stat.containsKey(topic)) {
+				int current = stat.get(topic);
+				stat.put(topic,current + 1);
+			} else {
+				stat.put(topic,1);
+			}
+		}
+	
 	}
 
 	/****************************************************************/

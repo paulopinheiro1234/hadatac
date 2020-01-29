@@ -12,47 +12,371 @@
 
 
 @main("Share File") {
-
-<script type="text/javascript">
-	   function checkform() {
-	      var cansubmit = true;
-	      
-	      if (document.getElementById('newName').value.length == 0) {
-	          cansubmit = false;
-	      }
-	
-	      if (cansubmit) {
-	          document.getElementById('submitbutton').disabled = false;
-	      } else {
-	          document.getElementById('submitbutton').disabled = 'disabled';
-	      }
-	   }
-	</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<style type="text/css">
+    body {
+        color: #404E67;
+        background: #F5F7FA;
+        font-family: 'Open Sans', sans-serif;
+    }
+    .table-wrapper {
+        width: 700px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 20px;  
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    }
+    .table-title {
+        padding-bottom: 10px;
+        margin: 0 0 10px;
+    }
+    .table-title h2 {
+        margin: 6px 0 0;
+        font-size: 22px;
+    }
+    .table-title .add-new-viewer {
+        float: right;
+        height: 30px;
+        font-weight: bold;
+        font-size: 12px;
+        text-shadow: none;
+        min-width: 100px;
+        border-radius: 50px;
+        line-height: 13px;
+    }
+    .table-title .add-new-editor {
+        margin-right: 4px;
+    }
+    table.table {
+        table-layout: fixed;
+    }
+    table.table tr th, table.table tr td {
+        border-color: #e9e9e9;
+    }
+    table.table th i {
+        font-size: 13px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    table.table th:last-child {
+        width: 100px;
+    }
+    table.table td a {
+        cursor: pointer;
+        display: inline-block;
+        margin: 0 5px;
+        min-width: 24px;
+    }    
+    table.table td a.add {
+        color: #27C46B;
+    }
+    table.table td a.edit {
+        color: #FFC107;
+    }
+    table.table td a.delete {
+        color: #E34724;
+    }
+    table.table td i {
+        font-size: 19px;
+    }
+    table.table td a.add i {
+        font-size: 24px;
+        margin-right: -1px;
+        position: relative;
+        top: 3px;
+    }    
+    table.table .form-control {
+        height: 32px;
+        line-height: 32px;
+        box-shadow: none;
+        border-radius: 2px;
+    }
+    table.table .form-control.error {
+        border-color: #f50000;
+    }
+    table.table td .add {
+        display: none;
+    }
+</style>
 
 	<div class="container">
 		<h3>Share File</h3>
-	
-		<form class="form-horizontal" name="newFile" method="post" 
-		action="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.processRenameDataFileForm(dir, dataFile.getId())">
-	
-			<div class="form-group">
-				<label>File Name: @dataFile.getFileName()</label>
-				<input type="text" class="form-control col-sm-6" name="newEmail" id="newEmail" value="" onchange="checkform()">
-				<select class="form-control col-sm-6" id="viewerEmails" name="viewerEmails" onchange="checkform()" >
-                    <option value=""></option>
-                    @for(email <- dataFile.getViewerEmails()) {
-                        <option value="@email">@email</option>
-                    }
-                </select>
-			</div>
-	
-			<div class="form-group" class="col-sm-6 col-offset-3">
-				<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" /> 
-				<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
-			</div>
-		</form>
+			    
+	    <div class="form-group">
+		  <label>File Name: @dataFile.getFileName()</label>
+		  <table id="viewer-table" class="table table-striped table-bordered viewer-table" style="width:100%">
+          <thead>
+            <tr>
+              <th style="width: 50px;" scope="col">#</th>
+              <th style="width: 200px;" scope="col">Viewer Emails</th>
+              <th style="width: 220px;" scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="viewer-table-body">
+          @for((email, i) <- dataFile.getViewerEmails().zipWithIndex) {
+              <tr>
+                <td style="word-break: break-all;">@(i+1)</td>
+                <td style="word-break: break-all;" axis="viewerEmail@(i+1)">@email</td>
+                <td style="word-break: break-all;">
+                    <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+                    <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                    <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                </td>
+              </tr>
+          }
+          </tbody>
+         </table>
+         
+         <div>
+            <button type="button" class="btn btn-info add-new-viewer"><i class="fa fa-plus"></i> Add New Viewer</button>
+            <button type="button" class="btn btn-danger delete-all-viewers"><i class="fa fa-remove"></i> Delete All Viewers</button>
+            <a class="btn btn-primary" role="button" id="save-viewer-changes" onclick="submitViewerTableAsForm()" disabled>Save Changes</a>
+         </div><br>
+         
+         <table id="editor-table" class="table table-striped table-bordered editor-table" style="width:100%">
+          <thead>
+            <tr>
+              <th style="width: 50px;" scope="col">#</th>
+              <th style="width: 200px;" scope="col">Editor Emails</th>
+              <th style="width: 220px;" scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="editor-table-body">
+          @for((email, i) <- dataFile.getEditorEmails().zipWithIndex) {
+              <tr>
+                <td style="word-break: break-all;">@(i+1)</td>
+                <td style="word-break: break-all;" axis="editorEmail@(i+1)">@email</td>
+                <td style="word-break: break-all;">
+                    <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+                    <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                    <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                </td>
+              </tr>
+          }
+          </tbody>
+         </table>
+         
+         <div>
+            <button type="button" class="btn btn-info add-new-editor"><i class="fa fa-plus"></i> Add New Editor</button>
+            <button type="button" class="btn btn-danger delete-all-editors"><i class="fa fa-remove"></i> Delete All Editors</button>
+            <a class="btn btn-primary" role="button" id="save-editor-changes" onclick="submitEditorTableAsForm()" disabled>Save Changes</a>
+         </div><br>
+         <div id="oper">
+           <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
+         </div>
 		
-		<a style="color:#0000FF; font-size: large;">Please copy this link for sharing: <br/><u>@sharedlink</u><br/>
-		With this link, one can preview the shared file!&#128521;</a>
+		<br>
+		<p style="color:#0000FF; font-size: large;">Please copy this link for sharing: <br/><a href="@sharedlink">@sharedlink</a><br/>
+		With this link, one can preview the shared file!&#128521;</p>
 	</div>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+    var actions = `
+        <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+        <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+        <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+    `;
+    
+    checkViewerRowCounts();
+    checkEditorRowCounts();
+    
+    // Append table with add row form on add new button click
+    $(".add-new-viewer").click(function(){
+        $(this).attr("disabled", "disabled");
+        var index = $(".viewer-table tbody tr:last-child").index();
+        var row = '<tr>' +
+            '<td>' + (index + 2) + '</td>' +
+            '<td axis="viewerEmail' + (index + 2) + '"><input type="text" class="form-control"</td>' +
+            '<td>' + actions + '</td>' +
+        '</tr>';
+        $(".viewer-table").append(row);     
+        $(".viewer-table tbody tr").eq(index + 1).find(".add, .delete").show();
+        $(".viewer-table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples-from-remote .reload-triples-from-cache").hide();
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    
+    $(".add-new-editor").click(function(){
+        $(this).attr("disabled", "disabled");
+        var index = $(".editor-table tbody tr:last-child").index();
+        var row = '<tr>' +
+            '<td>' + (index + 2) + '</td>' +
+            '<td axis="editorEmail' + (index + 2) + '"><input type="text" class="form-control"</td>' +
+            '<td>' + actions + '</td>' +
+        '</tr>';
+        $(".editor-table").append(row);     
+        $(".editor-table tbody tr").eq(index + 1).find(".add, .delete").show();
+        $(".editor-table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples-from-remote .reload-triples-from-cache").hide();
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    
+    // Delete all rows on delete all button click
+    $(".delete-all-viewers").click(function(){
+        $(this).attr("disabled", "disabled");
+        $("table").children("tbody").remove();
+        $("#save-viewer-changes").removeAttr("disabled");
+        checkViewerRowCounts();
+    });
+    
+    // Delete all rows on delete all button click
+    $(".delete-all-editors").click(function(){
+        $(this).attr("disabled", "disabled");
+        $("table").children("tbody").remove();
+        $("#save-editors-changes").removeAttr("disabled");
+        checkEditorRowCounts();
+    });
+    
+    // Add row on add button click
+    $(document).on("click", ".viewer-table .add", function(){
+        var empty = false;
+        var input = $(this).parents("tr").find('input[type="text"]');
+        $(this).parents("tr").find(".error").first().focus();
+        if(!empty){
+            input.each(function(){
+                $(this).parent("td").html($(this).val());
+            });         
+            $(this).parents("tr").find(".add, .edit").toggle();
+            $(this).parents("tr").find(".reload-triples-from-remote .reload-triples-from-cache").show();
+            $(".add-new-viewer").removeAttr("disabled");
+            $("#save-viewer-changes").removeAttr("disabled");
+        }   
+        checkViewerRowCounts();
+    });
+    
+    // Add row on add button click
+    $(document).on("click", ".editor-table .add", function(){
+        var empty = false;
+        var input = $(this).parents("tr").find('input[type="text"]');
+        $(this).parents("tr").find(".error").first().focus();
+        if(!empty){
+            input.each(function(){
+                $(this).parent("td").html($(this).val());
+            });         
+            $(this).parents("tr").find(".add, .edit").toggle();
+            $(this).parents("tr").find(".reload-triples-from-remote .reload-triples-from-cache").show();
+            $(".add-new-editor").removeAttr("disabled");
+            $("#save-editor-changes").removeAttr("disabled");
+        }   
+        checkEditorRowCounts();
+    });
+    
+    // Edit row on edit button click
+    $(document).on("click", ".viewer-table .edit", function(){        
+        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
+            $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+        });     
+        $(this).parents("tr").find(".add, .edit").toggle();
+        $(".add-new-viewer").attr("disabled", "disabled");
+    });
+    
+    // Edit row on edit button click
+    $(document).on("click", ".editor-table .edit", function(){        
+        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
+            $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+        });     
+        $(this).parents("tr").find(".add, .edit").toggle();
+        $(".add-new-editor").attr("disabled", "disabled");
+    });
+    
+    // Delete row on delete button click
+    $(document).on("click", ".viewer-table .delete", function(){
+        $(this).parents("tr").remove();
+        $(".add-new-viewer").removeAttr("disabled");
+        $("#save-viewer-changes").removeAttr("disabled");
+        checkViewerRowCounts();
+    });
+    
+    // Delete row on delete button click
+    $(document).on("click", ".editor-table .delete", function(){
+        $(this).parents("tr").remove();
+        $(".add-new-editor").removeAttr("disabled");
+        $("#save-editor-changes").removeAttr("disabled");
+        checkEditorRowCounts();
+    });
+});
+
+function submitViewerTableAsForm() {
+    var form = document.createElement("form");
+    form.method = "post";
+    form.action = "@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.saveViewerEmails()";
+    $("#viewer-table-body").find("tr").each(function() {
+       $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+           var input = document.createElement("input");
+           input.type = "hidden";
+           input.name = this.axis;
+           input.value = $(this).html();
+           form.appendChild(input);
+       });
+    });
+    
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "dir";
+    input.value = "@dir";
+    form.appendChild(input);
+    
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "fileId";
+    input.value = "@dataFile.getId()";
+    form.appendChild(input);
+    
+    document.body.appendChild(form);
+    form.submit();
+    $("#save-viewer-changes").attr("disabled", "disabled");
+}
+
+function submitEditorTableAsForm() {
+    var form = document.createElement("form");
+    form.method = "post";
+    form.action = "@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.saveEditorEmails()";
+    $("#editor-table-body").find("tr").each(function() {
+       $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+           var input = document.createElement("input");
+           input.type = "hidden";
+           input.name = this.axis;
+           input.value = $(this).html();
+           form.appendChild(input);
+       });
+    });
+    
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "dir";
+    input.value = "@dir";
+    form.appendChild(input);
+    
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "fileId";
+    input.value = "@dataFile.getId()";
+    form.appendChild(input);
+    
+    document.body.appendChild(form);
+    form.submit();
+    $("#save-editor-changes").attr("disabled", "disabled");
+}
+
+function checkViewerRowCounts() {
+    var rows = $('.viewer-table tbody tr').length;
+    if (rows == 0) {
+        $(".delete-all-viewers").attr("disabled", "disabled");
+    } else {
+        $(".delete-all-viewers").removeAttr("disabled");
+    }
+}
+
+function checkEditorRowCounts() {
+    var rows = $('.editor-table tbody tr').length;
+    if (rows == 0) {
+        $(".delete-all-editors").attr("disabled", "disabled");
+    } else {
+        $(".delete-all-editors").removeAttr("disabled");
+    }
+}
+</script>
 }

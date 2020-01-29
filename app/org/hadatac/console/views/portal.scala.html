@@ -67,11 +67,11 @@
 		<a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.index("/", filename, da_uri)" 
 		   id="infra" class="btn btn-primary btn-block" role="button">Manage Instrument Infrastructure [DPL]</a>
     	@defining(0) { page =>  
-		   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri, page)" 
+		   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri, page, 0)" 
 		      id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments [DPL]</a>
 		}
 		<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"  
-		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Streams [STR]</a>
+		   id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Stream Specs [STR]</a>
 		<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" 
 		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Semantic Data Dictionaries [SDD]</a>
 		<a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" 
@@ -92,8 +92,8 @@
 	      class="btn btn-primary btn-block" role="button">Manage Ontologies</a>
            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" 
 	      class="btn btn-primary btn-block" role="button">Upload Additional Knowledge</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "ontology")" 
-	   @*   class="btn btn-primary btn-block" role="button">Load Ontology from LabKey</a>
+       @*    <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "ontology")" 
+	      class="btn btn-primary btn-block" role="button">Load Ontology from LabKey</a>
            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadLabkeyKB("init", "knowledge")" 
 	      class="btn btn-primary btn-block" role="button">Load Knowledge from LabKey</a>  *@
            <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")" 

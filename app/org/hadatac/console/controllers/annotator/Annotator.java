@@ -21,7 +21,7 @@ import play.mvc.Result;
 import org.hadatac.console.views.html.error_page;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -116,7 +116,7 @@ public class Annotator extends Controller {
             /*
              * Add URI of active datacollection in handler
              */
-            ObjectAccessSpec dc = DataFactory.getActiveDataAcquisition(uri);
+            STR dc = DataFactory.getActiveDataAcquisition(uri);
             if (dc != null && dc.getUri() != null) {
                 handler.setDataAcquisitionUri(dc.getUri());
             }
@@ -172,7 +172,7 @@ public class Annotator extends Controller {
             /*
              * Add URI of active datacollection in handler
              */
-            ObjectAccessSpec dc = DataFactory.getActiveDataAcquisition(uri);
+            STR dc = DataFactory.getActiveDataAcquisition(uri);
             if (dc != null && dc.getUri() != null) {
                 handler.setDataAcquisitionUri(dc.getUri());
             }

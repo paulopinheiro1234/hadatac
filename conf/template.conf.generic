@@ -38,8 +38,8 @@ Epi/Lab=epi/lab
 OwnerEmail=owner email
 PermissionURI=permission uri
 
-[OAS]
-# OAS Template
+[STR]
+# STR Template
 DataAcquisitionName=da name
 Method=method
 DAStudyName=Study ID

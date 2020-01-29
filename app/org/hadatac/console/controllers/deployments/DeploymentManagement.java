@@ -20,16 +20,16 @@ public class DeploymentManagement extends Controller {
 	final static int PAGESIZE = 12;
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-     public Result index(int option, String dir, String filename, String da_uri, int offset) {
+     public Result index(int option, String dir, String filename, String da_uri, int offset, int details) {
 		State state = new State(option);
 		List<Deployment> deployments = Deployment.findWithPages(state, PAGESIZE, offset * PAGESIZE);
 		int total = Deployment.getNumberDeployments(state);
-		return ok(deploymentManagement.render(state, dir, filename, da_uri, total, PAGESIZE, offset, deployments));
+		return ok(deploymentManagement.render(state, dir, filename, da_uri, total, PAGESIZE, offset, deployments, details));
      }
 
      @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-     public Result postIndex(int option, String dir, String filename, String da_uri, int offset) {
-    	 return index(option, dir, filename, da_uri, offset);
+     public Result postIndex(int option, String dir, String filename, String da_uri, int offset, int details) {
+    	 return index(option, dir, filename, da_uri, offset, details);
      }
-
+     
 }

@@ -41,13 +41,16 @@ public class SecurityRole implements Role {
 	
 	public static void initialize() {
 		if (SecurityRole.existsSolr() == false) {
-			System.out.println("SecurityRole.existsSolr() == false");
+			System.out.println("Initializing SecurityRole table");
 			addSecurityRole(
 					org.hadatac.console.controllers.AuthApplication.DATA_OWNER_ROLE, 
 					"f4251649-751e-4190-b0ed-e824f3cdd6fc");
 			addSecurityRole(
 					org.hadatac.console.controllers.AuthApplication.DATA_MANAGER_ROLE,
-					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");			
+					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");
+			addSecurityRole(
+                    org.hadatac.console.controllers.AuthApplication.FILE_VIEWER_EDITOR_ROLE,
+                    "47adcdaf-1f93-40ba-b8d9-9bb324eac308");
 		}
 	}
 	

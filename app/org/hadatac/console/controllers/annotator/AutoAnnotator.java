@@ -38,7 +38,7 @@ import org.hadatac.data.loader.SpreadsheetRecordFile;
 import org.hadatac.console.views.html.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
@@ -51,6 +51,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.labkey.remoteapi.CommandException;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.typesafe.config.ConfigException.Null;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -223,12 +224,12 @@ public class AutoAnnotator extends Controller {
         }
         
         List<String> dataAcquisitionURIs = new ArrayList<String>();
-        ObjectAccessSpec.findAll().forEach((da) -> dataAcquisitionURIs.add(
+        STR.findAll().forEach((da) -> dataAcquisitionURIs.add(
                 URIUtils.replaceNameSpaceEx(da.getUri())));
 
         return ok(assignOption.render(dataAcquisitionURIs,
                 routes.AutoAnnotator.processDataAcquisitionForm(dir, dataAcquisitionUri, fileId),
-                "Object Access Specification",
+                "Stream Specification",
                 "Selected File",
                 dataFile.getFileName()));
     }
@@ -244,14 +245,14 @@ public class AutoAnnotator extends Controller {
         AssignOptionForm data = form.get();
 
         List<String> dataAcquisitionURIs = new ArrayList<String>();
-        ObjectAccessSpec.findAll().forEach((da) -> dataAcquisitionURIs.add(
+        STR.findAll().forEach((da) -> dataAcquisitionURIs.add(
                 URIUtils.replaceNameSpaceEx(da.getUri())));
 
         if (form.hasErrors()) {
             System.out.println("HAS ERRORS");
             return badRequest(assignOption.render(dataAcquisitionURIs,
                     routes.AutoAnnotator.processDataAcquisitionForm(dir, dataAcquisitionUri, fileId),
-                    "Object Access Specification",
+                    "Stream Specification",
                     "Selected File",
                     fileId));
         } else {
@@ -385,7 +386,8 @@ public class AutoAnnotator extends Controller {
         }
 
         if (null == dataFile) {
-            return badRequest("You do NOT have the permission to operate this file!");
+            return badRequest("You do NOT have t		        object.setLogger(new AnnotationLogger(object, SolrUtils.getFieldValue(doc, \"log_str\").toString()));\n" + 
+            		"he permission to operate this file!");
         }
 
         String pathProc = ConfigProp.getPathProc();
@@ -525,15 +527,25 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(AuthApplication.FILE_VIEWER_EDITOR_ROLE))
     public Result downloadDataFile(String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
-        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        
+        DataFile dataFile = null;
+        dataFile = DataFile.findByIdAndEmail(fileId, null);
+        
         if (null == dataFile) {
-            return badRequest("You do NOT have the permission to download this file!");
+            return badRequest("Invalid file id!");
         }
         
-        System.out.println("dataFile.getAbsolutePath(): " + dataFile.getAbsolutePath());
+        if (!user.isDataManager()) {
+            if (!dataFile.getViewerEmails().contains(user.getEmail()) 
+                    && !dataFile.getEditorEmails().contains(user.getEmail())) {
+                return badRequest("You do NOT have the permission to download this file!");
+            }
+        }
+        
+        response().setHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
         return ok(new File(dataFile.getAbsolutePath()));
     }
     

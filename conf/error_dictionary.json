@@ -156,21 +156,21 @@
         }
       ]
     },
-    "OAS": {
-      "file type": "OAS",
+    "STR": {
+      "file type": "STR",
       "content": [
         {
-          "id": "OAS_00001",
+          "id": "STR_00001",
           "detail": "The SDD of study %s can not be found. Check if it is already ingested.",
           "solution": ""
         },
         {
-          "id": "OAS_00002",
+          "id": "STR_00002",
           "detail": "The Entity Label of DASO : %s can not be found. Check SDD.",
           "solution": ""
         },
         {
-          "id": "OAS_00003",
+          "id": "STR_00003",
           "detail": "The Entity Label of DASO : %s can not be found. Check SDD.",
           "solution": ""
         }
@@ -191,12 +191,12 @@
         },
         {
           "id": "DA_00003",
-          "detail": "Specification of associated Object Access Specification is incomplete: <%s>",
+          "detail": "Specification of associated Stream Specification is incomplete: <%s>",
           "solution": ""
         },
         {
           "id": "DA_00004",
-          "detail": "Cannot find associated Object Access Specification: <%s>",
+          "detail": "Cannot find associated Stream Specification: <%s>",
           "solution": ""
         },
         {
@@ -221,7 +221,7 @@
       "content": [
         {
           "id": "GBL_00001",
-          "detail": "Unsupported file name prefix, only accept prefixes DA-, DPL-, OAS-, SDD-, SSD-, STD- ",
+          "detail": "Unsupported file name prefix, only accept prefixes DA-, DPL-, STR-, SDD-, SSD-, STD- ",
           "solution": ""
         },
         {

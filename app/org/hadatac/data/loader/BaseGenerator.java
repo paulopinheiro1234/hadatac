@@ -49,12 +49,14 @@ public abstract class BaseGenerator {
     protected AnnotationLogger logger = null;
 
     public BaseGenerator(DataFile dataFile) {
-        this.dataFile = dataFile;
-        file = dataFile.getRecordFile();
-        records = file.getRecords();
-        fileName = dataFile.getPureFileName();
-        logger = dataFile.getLogger();
-        
+    	if (dataFile != null) {
+    		this.dataFile = dataFile;
+    		file = dataFile.getRecordFile();
+    		records = file.getRecords();
+    		fileName = dataFile.getPureFileName();
+    		logger = dataFile.getLogger();
+    	}
+    	
         initMapping();
     }
 

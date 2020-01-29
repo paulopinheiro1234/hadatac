@@ -34,6 +34,7 @@ public class URIGenerator extends Controller {
 	@Inject
 	private FormFactory formFactory;
 
+	/* 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index() {
 		return ok(uriGenerator.render(formFactory.form(URIGeneratorForm.class)));
@@ -68,9 +69,7 @@ public class URIGenerator extends Controller {
 		return -1;
 	} 
 
-	/**
-	 * Handles the form submission.
-	 */
+	// Handles the form submission 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result processForm() {
 		Form<URIGeneratorForm> form = formFactory.form(URIGeneratorForm.class).bindFromRequest();
@@ -91,5 +90,6 @@ public class URIGenerator extends Controller {
 			return ok(uriGeneratorConfirm.render(data));
 		}
 	}
+	*/
 
 }

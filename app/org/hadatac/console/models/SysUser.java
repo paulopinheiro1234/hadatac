@@ -4,11 +4,14 @@ import be.objectify.deadbolt.java.models.Permission;
 import be.objectify.deadbolt.java.models.Role;
 import be.objectify.deadbolt.java.models.Subject;
 
+import com.feth.play.module.pa.providers.oauth2.BasicOAuth2AuthUser;
+import com.feth.play.module.pa.providers.oauth2.google.GoogleAuthUser;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
+import com.feth.play.module.pa.user.SessionAuthUser;
 import com.typesafe.config.ConfigFactory;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 
@@ -26,6 +29,8 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
+
+import static org.hamcrest.CoreMatchers.nullValue;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -314,9 +319,27 @@ public class SysUser implements Subject {
 		if (identity == null) {
 			return null;
 		}
+		
 		if (identity instanceof UsernamePasswordAuthUser) {
-			return findByUsernamePasswordIdentitySolr((UsernamePasswordAuthUser) identity);
-		} else {
+		    SysUser retUser = findByUsernamePasswordIdentitySolr((UsernamePasswordAuthUser) identity);
+            return retUser;
+		} else if (identity instanceof GoogleAuthUser) {
+		    SysUser retUser = findByEmailSolr(((GoogleAuthUser)identity).getEmail());
+		    return retUser;
+		} else if (identity instanceof SessionAuthUser) {
+            List<LinkedAccount> linkedAccounts = LinkedAccount.findByProviderUserIdSolr(
+                    ((SessionAuthUser)identity).getId());
+            
+            SysUser retUser = null;
+            for (LinkedAccount account : linkedAccounts) {
+                retUser = SysUser.findByUserIdSolr(account.getUserId());
+                if (null != retUser) {
+                    break;
+                }
+            }
+            
+            return retUser;
+        } else {
 			List<SysUser> users = getAuthUserFindSolr(identity); 
 			if (users.size() == 1) {
 				return users.get(0);
@@ -356,11 +379,32 @@ public class SysUser implements Subject {
 				user = convertSolrDocumentToUser(list.get(0));
 			}
 		} catch (Exception e) {
-			System.out.println("[ERROR] TokenAction.findByTokenSolr - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] SysUser.findByIdSolr - Exception message: " + e.getMessage());
 		}
 
 		return user;
 	}
+	
+	public static SysUser findByUserIdSolr(String userId) {
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
+
+        SolrQuery solrQuery = new SolrQuery("id_str:" + userId);
+        SysUser user = null;
+
+        try {
+            QueryResponse queryResponse = solrClient.query(solrQuery);
+            solrClient.close();
+            SolrDocumentList list = queryResponse.getResults();
+            if (list.size() == 1) {
+                user = convertSolrDocumentToUser(list.get(0));
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] SysUser.findByUserIdSolr - Exception message: " + e.getMessage());
+        }
+
+        return user;
+    }
 
 	private static List<SysUser> getUsernamePasswordAuthUserFindSolr(
 			final UsernamePasswordAuthUser identity) {
@@ -385,10 +429,12 @@ public class SysUser implements Subject {
 
 	public static SysUser create(final AuthUser authUser, String uri) {
 		final SysUser sys_user = new SysUser();
-		System.out.println("passedin uri: " + uri);
 
 		sys_user.roles.add(SecurityRole
 				.findByRoleNameSolr(AuthApplication.DATA_OWNER_ROLE));
+		sys_user.roles.add(SecurityRole.findByRoleNameSolr(
+                AuthApplication.FILE_VIEWER_EDITOR_ROLE));
+		
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = Instant.now().toString();
@@ -489,8 +535,9 @@ public class SysUser implements Subject {
 	public static SysUser create(final AuthUser authUser) {
 		final SysUser sys_user = new SysUser();
 
-		sys_user.roles.add(SecurityRole
-				.findByRoleNameSolr(AuthApplication.DATA_OWNER_ROLE));
+		sys_user.roles.add(SecurityRole.findByRoleNameSolr(
+                AuthApplication.FILE_VIEWER_EDITOR_ROLE));
+		
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = Instant.now().toString();
@@ -524,6 +571,13 @@ public class SysUser implements Subject {
 			if (lastName != null) {
 				sys_user.lastName = lastName;
 			}
+		}
+		
+		if (authUser instanceof BasicOAuth2AuthUser) {
+		    sys_user.emailValidated = true;
+		} else {
+		    sys_user.roles.add(SecurityRole.findByRoleNameSolr(
+	                AuthApplication.DATA_OWNER_ROLE));
 		}
 
 		sys_user.id_s = UUID.randomUUID().toString();
@@ -560,7 +614,7 @@ public class SysUser implements Subject {
 		Iterator<LinkedAccount> i = linkedAccounts.iterator();
 		while (i.hasNext()) {
 			LinkedAccount account = i.next();
-			account.user = this;
+			account.setUserId(getId());
 			account.save();
 		}
 	}
@@ -660,7 +714,7 @@ public class SysUser implements Subject {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("[ERROR] User.getEmailUserFindSolr - Exception message: " + e.getMessage());
+			System.out.println("[ERROR] SysUser.getEmailUserFindSolr - Exception message: " + e.getMessage());
 		}
 
 		return users;
@@ -706,18 +760,17 @@ public class SysUser implements Subject {
 
 	public void changePasswordSolr(final UsernamePasswordAuthUser authUser,
 			final boolean create) {
-		LinkedAccount a = this.getAccountByProviderSolr(authUser.getProvider());
-		if (a == null) {
+		LinkedAccount account = this.getAccountByProviderSolr(authUser.getProvider());
+		if (account == null) {
 			if (create) {
-				a = LinkedAccount.create(authUser);
-				a.user = this;
+			    account = LinkedAccount.create(authUser);
 			} else {
 				throw new RuntimeException(
 						"Account not enabled for password usage");
 			}
 		}
-		a.providerUserId = authUser.getHashedPassword();
-		a.save();
+		account.providerUserId = authUser.getHashedPassword();
+		account.save();
 	}
 
 	public void resetPassword(final UsernamePasswordAuthUser authUser,

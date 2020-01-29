@@ -421,21 +421,21 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                     platform.setLabel(platformLabel);
                 }
 
-                ObjectAccessSpec oas = new ObjectAccessSpec();
-                oas.setUri(soln.get("dataAcquisitionUri").toString());
-                oas.setLabel(soln.get("dataAcquisitionLabel").toString());
-                oas.setField("acquisition_uri_str");
+                STR str = new STR();
+                str.setUri(soln.get("dataAcquisitionUri").toString());
+                str.setLabel(soln.get("dataAcquisitionLabel").toString());
+                str.setField("acquisition_uri_str");
                 if (!results.containsKey(platform)) {
                     List<Facetable> facets = new ArrayList<Facetable>();
                     results.put(platform, facets);
                 }
-                if (!results.get(platform).contains(oas)) {
-                    results.get(platform).add(oas);
+                if (!results.get(platform).contains(str)) {
+                    results.get(platform).add(str);
                 }
 
                 Facet subFacet = facet.getChildById(platform.getUri());
                 subFacet.putFacet("platform_uri_str", platform.getUri());
-                subFacet.putFacet("acquisition_uri_str", oas.getUri());
+                subFacet.putFacet("acquisition_uri_str", str.getUri());
             }
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();

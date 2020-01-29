@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 
 import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.data.loader.AnnotationWorker;
+import org.hadatac.data.loader.mqtt.MessageWorker;
 import org.hadatac.workingfiles.loader.WorkingFilesWorker;
 
 import akka.actor.ActorSystem;
@@ -55,6 +56,13 @@ public class MyActorSystem {
             }
         };
         
+        //Runnable processMessages = new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        MessageWorker.exec();
+        //    }
+        //};
+        
 		system.scheduler().schedule(
 		        FiniteDuration.create(0, TimeUnit.SECONDS), 
                 FiniteDuration.create(15, TimeUnit.SECONDS),
@@ -65,6 +73,14 @@ public class MyActorSystem {
                 FiniteDuration.create(60, TimeUnit.SECONDS),
                 sandbox, system.dispatcher());
 
+		/*
+		system.scheduler().schedule(
+                FiniteDuration.create(0, TimeUnit.SECONDS), 
+                //FiniteDuration.create(15, TimeUnit.SECONDS),
+                FiniteDuration.create(150, TimeUnit.MILLISECONDS),
+                processMessages, system.dispatcher());
+        */
+		
 		/*
 		system.scheduler().schedule(
                 FiniteDuration.create(0, TimeUnit.SECONDS), 

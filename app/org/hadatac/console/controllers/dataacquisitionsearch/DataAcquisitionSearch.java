@@ -203,9 +203,18 @@ public class DataAcquisitionSearch extends Controller {
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
-        CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByAlignment(
-	        results.getDocuments(), finalFacets, email, categoricalOption), 
-        		ec.current());
+    	System.out.println("Object type inside alignment: " + objectType);
+        if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
+        	System.out.println("Selected subject alignment");
+        	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
+		        results.getDocuments(), finalFacets, email, categoricalOption), 
+	        		ec.current());
+        } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
+        	System.out.println("Selected time alignment");
+	        CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
+			        results.getDocuments(), finalFacets, email, categoricalOption), 
+		        		ec.current());
+        }
 
         try {
             Thread.sleep(2000);

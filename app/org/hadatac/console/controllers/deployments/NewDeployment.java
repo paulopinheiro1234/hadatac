@@ -16,7 +16,7 @@ import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.deployments.*;
 import org.hadatac.console.controllers.deployments.routes;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.ObjectAccessSpec;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
@@ -131,7 +131,7 @@ public class NewDeployment extends Controller {
              *
              */
 
-            ObjectAccessSpec da = ObjectAccessSpec.findByUri(da_uri);
+            STR da = STR.findByUri(da_uri);
             if (da == null) {
                 return badRequest("Data acquisition " + da_uri + " provided by unable to be loaded");
             }
@@ -168,7 +168,7 @@ public class NewDeployment extends Controller {
             dataAcquisitionUri = URIUtils.replacePrefixEx(dataAcquisitionUri);
             String param = data.getInitialParameter();
             System.out.println("NewDeployment: Creating new DA : [" + dataAcquisitionUri + "]");
-            ObjectAccessSpec dataAcquisition = DataFactory.createDataAcquisition(
+            STR dataAcquisition = DataFactory.createDataAcquisition(
                     triggeringEvent, dataAcquisitionUri, deploymentUri, 
                     param, UserManagement.getUriByEmail(user.getEmail()));
 

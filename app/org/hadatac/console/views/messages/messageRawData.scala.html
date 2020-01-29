@@ -3,7 +3,10 @@
   da_uri         : String,
   page           : Integer,
   stream_uri     : String,
-  results        : String
+  topic_uri      : String,
+  topic_label    : String,
+  results        : List[String],
+  postAction     : String
   )
     
 @import org.hadatac.console.views.html._
@@ -12,7 +15,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@maingraph("Message Raw Data") {
+@maingraph("Message Stream Raw Data") {
 	<head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
@@ -23,15 +26,24 @@
     <body>
 
     <div class="container-fluid">
-    	<h4>Raw Data View</h4>
+    	<h4>Stream Raw Data View</h4>
+    	@if(topic_uri.equals("")) {
+    	   <h4>Topic: All</h4>
+    	} else {		   	
+    	   <h4>Topic: @topic_label</h4>
+    	}
 
-		<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)" class="btn btn-primary" 
-	       role="button">Back to Ingest </a>  		
+		<a href="@postAction" class="btn btn-primary" 
+	       role="button">Back</a>  		
 	
 	    <div class="row">
         	<div class="col-lg-12">
 
-        	    <div id="content">@results</div>
+        	    <div id="content">
+        	      @for(line <- results){
+                     @line <br>
+                  }
+        	    </div>
             	<div id="docs-container">
                 	<a id="docs-close" href="#">&times;</a>
                 	<div id="docs" class="docs"></div>
@@ -46,7 +58,7 @@
     <script>
     var refreshVar
 	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri, topic_uri, postAction)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
 	}, 1000);

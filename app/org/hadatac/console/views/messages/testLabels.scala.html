@@ -1,0 +1,80 @@
+@(dir            : String,
+  filename       : String,
+  da_uri         : String,
+  page           : Integer,
+  topic_uri      : String,	
+  stream_label   : String,
+  topic_label    : String,
+  results        : List[String],
+  specified      : List[String],
+  postAction     : String
+  )
+    
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers._
+@import play.api.Play._
+@import java.net.URLEncoder
+
+@maingraph("Test Labels") {
+	<head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+        <meta charset="utf-8">
+	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+    </head>
+    <body>
+
+    <div class="container-fluid">
+        <div class="col-lg-1">
+        </div>
+        <div class="col-lg-11">
+	    	<h2>Test Labels</h2>
+			<br>
+	    	<h3>Stream: @stream_label</h3>
+	    	<h3>Topic: @topic_label</h3>
+			<br>
+		    <div class="row">
+		        <table class="table">
+		            <thead>
+		                 <tr>
+		                    <th>Received Labels</th>
+		                 </tr>
+		            </thead>
+		            <tbody>
+		        	   @for(line <- results){
+		                 <tr>
+		                     <td>@line</td>
+		                 </tr>
+		               }
+		            </tbody>
+		        </table>
+			</div>
+		    <div class="row">
+		        <table class="table">
+		            <thead>
+		                 <tr>
+		                    <th>Specified Labels (will only show in this list after topic has been prepared)</th>
+		                 </tr>
+		            </thead>
+		            <tbody>
+		        	   @for(spec <- specified){
+		                 <tr>
+		                     <td>@spec</td>
+		                 </tr>
+		               }
+		            </tbody>
+		        </table>
+			</div>
+	
+			<br>
+			<a href="@postAction" class="btn btn-primary" 
+		       role="button">Back to Topic </a>  		
+		</div>		
+	</div>
+
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+   	</body>
+} 

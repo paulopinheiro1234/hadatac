@@ -8,6 +8,7 @@ import java.util.Map;
 public class Alignment {
 
     private Map<String, StudyObject> objects;
+    //private List<String> timestamps;
     private Map<String, StudyObject> refObjects;
     private Map<String, Attribute> attributeCache;
     private Map<String, Entity> entityCache;
@@ -24,6 +25,7 @@ public class Alignment {
 
     public Alignment() {
         objects = new HashMap<String, StudyObject>();
+        //timestamps = new ArrayList<String>();
         attributeCache = new HashMap<String, Attribute>();
         entityCache = new HashMap<String, Entity>();
         unitCache = new HashMap<String, Unit>();
@@ -200,6 +202,10 @@ public class Alignment {
         return objects.containsKey(uri);
     }
 
+    //public boolean containsTimestamp(String timestamp) {
+    //    return timestamp.contains(timestamp);
+    //}
+
     public boolean containsEntity(String uri) {
         return entityCache.containsKey(uri);
     }
@@ -245,6 +251,10 @@ public class Alignment {
     public List<StudyObject> getObjects() {
         return new ArrayList<StudyObject>(objects.values());
     }
+
+    //public List<String> getTimestamps() {
+    //	return timestamps;
+    //}
 
     public List<AlignmentEntityRole> getRoles() {
         return new ArrayList<AlignmentEntityRole>(roles.values());

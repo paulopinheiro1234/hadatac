@@ -431,7 +431,7 @@ public class Study extends HADatAcThing {
                 study.setQuery(query);
                 study.setField("study_uri_str");
 
-                ObjectAccessSpec da = new ObjectAccessSpec();
+                STR da = new STR();
                 da.setUri(soln.get("dataAcquisitionUri").toString());
                 da.setLabel(soln.get("dataAcquisitionLabel").toString());
                 da.setField("acquisition_uri_str");
@@ -676,8 +676,6 @@ public class Study extends HADatAcThing {
     }// /find(studyUri)
 
 
-    // the study ID is not stored as such in the study object currently
-    // fortunately, we can use it to construct the URI
     public static Study findByName(String studyName){
         if (studyName == null || studyName.equals("")) {
             System.out.println("[ERROR] No valid StudyName provided to retrieve Study object: " + studyName);
@@ -685,73 +683,9 @@ public class Study extends HADatAcThing {
         }
         Study returnStudy = new Study();
         String queryUri = URIUtils.replacePrefixEx(kbPrefix + "STD-" + studyName);
-        if (queryUri.startsWith("http")) {
-            queryUri = "<" + queryUri + ">";
-        }
         
-        String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                " SELECT DISTINCT ?id ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
-                " WHERE {  " + 
-                "      ?studyType rdfs:subClassOf* hasco:Study . " + 
-                "      " + queryUri + " a ?studyType . " + 
-                "      OPTIONAL { " + queryUri + " hasco:hasId ?id } . " + 
-                "      OPTIONAL { " + queryUri + " rdfs:label ?studyLabel } . " + 
-                "      OPTIONAL { " + queryUri + " hasco:hasTitle ?title } . " +
-                "      OPTIONAL { " + queryUri + " hasco:hasProject ?proj } . " +
-                "      OPTIONAL { " + queryUri + " rdfs:comment ?studyComment } . " + 
-                "      OPTIONAL { " + queryUri + " hasco:hasExternalSource ?external } . " + 
-                "      OPTIONAL { " + queryUri + " hasco:hasAgent ?agentUri } .  " +
-                "      OPTIONAL { " + queryUri + " hasco:hasInstitution ?institutionUri } . " + 
-                "      OPTIONAL { " + queryUri + " hasco:hasLastId ?lastId } . " + 
-                " } " + 
-                " GROUP BY ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId ";
-
-        try {            
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
-
-            if (resultsrw.hasNext()) {
-                QuerySolution soln = resultsrw.next();
-                returnStudy.setUri(queryUri);
-
-                if (soln.contains("id")) {
-                    returnStudy.setId(soln.get("id").toString());
-                }
-                if (soln.contains("studyLabel")) {
-                    returnStudy.setLabel(soln.get("studyLabel").toString());
-                }
-                if (soln.contains("studyType")) {
-                    returnStudy.setTypeUri(soln.get("studyType").toString());
-                }
-                if (soln.contains("title")) {
-                    returnStudy.setTitle(soln.get("title").toString());
-                }
-                if (soln.contains("proj")) {
-                    returnStudy.setProject(soln.get("proj").toString());
-                }
-                if (soln.contains("studyComment")) {
-                    returnStudy.setComment(soln.get("studyComment").toString());
-                } 
-                if (soln.contains("external")) {
-                    returnStudy.setExternalSource(soln.get("external").toString());
-                } 
-                if (soln.contains("agentUri")) {
-                    returnStudy.setAgentUri(soln.get("agentUri").toString());
-                }
-                if (soln.contains("institutionUri")) {
-                    returnStudy.setInstitutionUri(soln.get("institutionUri").toString());
-                }
-                if (soln.contains("lastId")) {
-                    returnStudy.setLastId(soln.get("lastId").toString());
-                }
-                returnStudy.setDataAcquisitionUris(Study.findDataAcquisitionUris(queryUri));
-                returnStudy.setObjectCollectionUris(Study.findObjectCollectionUris(queryUri));
-            }// /if results.hasNext()
-        } catch (QueryExceptionHTTP e) {
-            e.printStackTrace();
-        }
-        return returnStudy;
-    }// /findByName
+        return find(queryUri);
+    }
 
     public static Model findModel(String study) {
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -1012,6 +946,32 @@ public class Study extends HADatAcThing {
                 //System.out.println("Study URI: " + soln.get("studyUri").toString());
             }
             studies.add(study);
+        }
+
+        return studies;
+    }
+
+    public static List<String> findIds() {
+        List<String> studies = new ArrayList<String>();
+        String queryString = "";
+        queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?studyUri ?id " + 
+                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " + 
+                "          ?studyUri a ?subUri . " +  
+                "          ?studyUri hasco:hasId ?id . " +  
+                " }";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        String studyId = null;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.get("id") != null) { 
+                studyId = soln.get("id").toString();
+                //System.out.println("Study URI: " + soln.get("studyUri").toString());
+            }
+            studies.add(studyId);
         }
 
         return studies;

@@ -203,9 +203,9 @@ public class Deployment extends HADatAcThing {
 
     public void close(String endedAt) {
         setEndedAtXsd(endedAt);
-        List<ObjectAccessSpec> list = ObjectAccessSpec.find(this, true);
+        List<STR> list = STR.find(this, true);
         if (!list.isEmpty()) {
-            ObjectAccessSpec dc = list.get(0);
+            STR dc = list.get(0);
             dc.close(endedAt);
         }
         saveEndedAtTime();
@@ -476,7 +476,7 @@ public class Deployment extends HADatAcThing {
         return -1;
     }
 
-    public static Deployment find(Model model, ObjectAccessSpec dataAcquisition) {
+    public static Deployment find(Model model, STR dataAcquisition) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
                 + "SELECT ?dp WHERE {\n"
                 + "  ?dp hasco:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
