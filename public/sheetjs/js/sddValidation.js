@@ -81,6 +81,7 @@ function searchForIri(label1,label2,label,urlStr,i,j){
             "?o ",
         "}"
         ].join(" ");
+    
     var queryUrl = url+"?query="+ encodeURIComponent(query) +"&format=json";
     $.ajax({
     
@@ -88,7 +89,7 @@ function searchForIri(label1,label2,label,urlStr,i,j){
     url: queryUrl,
     success: function( _data ) {
         var noerr="No Errors Found!"+"<br />";
-        
+        console.log(queryUrl);
         
         var location=[];
         location.push(i);

@@ -31,7 +31,7 @@ html {
 }
 #grid {
   height: 100px;
-  display: block;
+  display: none;
 }
 
 .winpt { width:98%; }

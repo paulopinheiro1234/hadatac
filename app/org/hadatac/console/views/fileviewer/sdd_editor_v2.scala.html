@@ -25,6 +25,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
    <div id="rcorners" >
 
       <h4>@dataFile.getFileName()</h4>
+      <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
       @if(bSavable) {
 
          <input class="btn btn-primary" type="button" id="upload" value="Save"/>
@@ -135,69 +136,69 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             width="36" height="33" alt=""/> Show Options</button>
             <button class="Close" id="hide"> <img src="@controllers.routes.Assets.versioned("icons/closed-eye.png")"
                width="36" height="33" alt=""/> Hide Options</button>
-              
-               <div class="mobile-nav">
-                    <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
-                  <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
-                     <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
-                     width="36" height="30" alt=""/> Recommended Terms</button>
-                     <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
-                        <option value="Choose from Below">Choose from Below</option>
-                     </select>
+         </div>    
+      <div class="mobile-nav">
+            <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
+         <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
+            <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
+            width="36" height="30" alt=""/> Recommended Terms</button>
+            <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
+               <option value="Choose from Below">Choose from Below</option>
+            </select>
 
-                     <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
-                        <img src="@controllers.routes.Assets.versioned("icons/vr-icon.png")"
-                        width="40" height="32" alt=""/>Recommended Columns</button>
-                        <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
-                           <option value="Choose from Below">Choose from Below</option>
-                        </select>
+            <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
+               <img src="@controllers.routes.Assets.versioned("icons/vr-icon.png")"
+               width="40" height="32" alt=""/>Recommended Columns</button>
+               <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
+                  <option value="Choose from Below">Choose from Below</option>
+               </select>
 
-                        <div id="editRowsAdd">
-                           <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
-                           <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
-                           <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
-                           <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
-                        </div>
-                        <div id="verifysdd" style="display: flex; align-items: center; justify-content: center; margin:0 auto;" >
-                           <button onclick="verifySDD()" style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify SDD</button>
-                           <button style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white;" onclick="external()">External Verify</button>
-                        </div>
-                        <script>
-                           function external(){
-                              var f_id="@dataFile.getId()";
-                              externalValidate(f_id);
-                           }
-                        </script>
-                        <div id="loadingmsg"></div>
-                        <div id="irifound" style="overflow-y:auto;"></div>
-                        <div id="searchForTerm" class="input-container">
-                           <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
-                           <button type="button"  role="button" id="searchOnt" class="input-button" >
-                              <span class="glyphicon glyphicon-search">   </span> 
-                          </button>
-                          </div>
+               <div id="editRowsAdd">
+                  <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
+                  <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
+                  <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
+                  <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
+               </div>
+               <div id="verifysdd" style="display: flex; align-items: center; justify-content: center; margin:0 auto;" >
+                  <button onclick="verifySDD()" style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify SDD</button>
+                  <button style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white;" onclick="external()">External Verify</button>
+               </div>
+               <script>
+                  function external(){
+                     var f_id="@dataFile.getId()";
+                     externalValidate(f_id);
+                  }
+               </script>
+               <div id="loadingmsg"></div>
+               <div id="irifound" style="overflow-y:auto;"></div>
+               <div id="searchForTerm" class="input-container">
+                  <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
+                  <button type="button"  role="button" id="searchOnt" class="input-button" >
+                     <span class="glyphicon glyphicon-search">   </span> 
+                  </button>
+                  </div>
 
-                           <select id="numToSearch" onchange="showTop()" style="font-size:20px;">
-                              <option value="5" selected="selected">5</option>
-                              <option value="10">10</option>
-                              <option value="50">50</option>
-                              <option value="All">All</option>
-                          </select>
-                           
-                          
-                        
-                        <div id="numberResults"></div>
-                        <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
-                           <a href="javascript:prevPage()" id="btn_prev">Prev</a>
-                           <a href="javascript:nextPage()" id="btn_next">Next</a>
-                           page:<span id="page"></span>
-                           </div>
-                        <div id="listingTable" style="overflow-y:scroll; width:350px; height:345px;word-wrap: break-word;
-                        word-break: keep-all;margin-bottom:5px;"></div>
-                        
-                        
+                  <select id="numToSearch" onchange="showTop()" style="font-size:20px;">
+                     <option value="5" selected="selected">5</option>
+                     <option value="10">10</option>
+                     <option value="50">50</option>
+                     <option value="All">All</option>
+                  </select>
+                  
+                  
+               
+               <div id="numberResults"></div>
+               <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
+                  <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+                  <a href="javascript:nextPage()" id="btn_next">Next</a>
+                  page:<span id="page"></span>
+                  </div>
+               <div id="listingTable" style="overflow-y:scroll; width:350px; height:345px;word-wrap: break-word;
+               word-break: keep-all;margin-bottom:5px;"></div>
+               
+               
 
-                     </div>
+            </div>
                      <ul class="custom-cm">
                         <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height="20px"/> Add to Cart</a> </li>
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->

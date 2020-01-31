@@ -71,8 +71,8 @@ function hideView(){
   $("#hide").css('display','none');
   $(".mobile-nav").fadeOut(50);
   $("#show").show();
-  cdg.style.height = (window.innerHeight - 300) + "px";
-  cdg.style.width = (window.innerWidth - 100) + "px";
+  cdg.style.height = '100%';
+  cdg.style.width = '100%';
 
 }
 
@@ -139,7 +139,9 @@ var cdg = canvasDatagrid({
   parentNode: _grid
 });
 cdg.style.height = '100%';
+
 cdg.style.width = '100%';
+
 var colNum=0;
 var rowNum=0;
 var isVirtual=0;
@@ -337,10 +339,15 @@ function removeRow(){
 
 }
 function _resize() {
+  // alert("You have resized the window!");
+  // alert(_grid.style.height);
+  // alert(_grid.style.width);
+
   _grid.style.height = (window.innerHeight - 300) + "px";
-  _grid.style.width = (window.innerWidth - 100) + "px";
+  _grid.style.width = '100%';
+ 
 }
-_resize();
+ _resize();
 
 window.addEventListener('resize', _resize);
 var click_ctr=0;

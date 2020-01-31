@@ -6,7 +6,6 @@
 .main-nav {
   float:right;
   background:rgb(173, 217, 253);
-  color:balck;
   font-family:Arial, Helvetica, sans-serif;
   font-size: 11pt;
   border-radius: 80px;
@@ -36,7 +35,7 @@
   position:relative;
   display: none;
   float:right;
-  width:15%;
+  width:28%;
 
 }
 
