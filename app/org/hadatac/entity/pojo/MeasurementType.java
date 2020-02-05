@@ -143,7 +143,7 @@ public class MeasurementType {
 					measurementTypeKb.setCharacteristicLabel(soln.getLiteral("c_label").getString()); 
 				}
 				else {
-				    measurementTypeKb.setCharacteristicLabel(measurementType.getCharacteristicUri().replace("http://hadatac.org/ont/chear#","").replace("http://semanticscience.org/resource/",""));
+				    measurementTypeKb.setCharacteristicLabel(measurementType.getCharacteristicUri().replace("http://hadatac.org/ont/hhear#","").replace("http://semanticscience.org/resource/",""));
 					//measurementTypeKb.setCharacteristicLabel("non-label characteristic");
 				}
 				measurementTypeKb.setEntityUri(measurementType.getEntityUri());
@@ -230,11 +230,11 @@ public class MeasurementType {
 			measurementType.setCharacteristicUri(soln.getResource("char").getURI());
 			measurementType.setUnitUri(soln.getResource("unit").getURI());
 			measurementType.setValueColumn(soln.getLiteral("column").getInt());
-			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("sio:TimeStamp"))){
+			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("hasco:TimeStamp"))){
 				measurementType.setTimestampColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeStampColumn: " + soln.getLiteral("column").getInt());
 			}
-			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("sio:TimeInstant"))){
+			if(measurementType.getCharacteristicUri().equals(URIUtils.replacePrefixEx("sio:SIO_000418"))){
 				measurementType.setTimeInstantColumn(soln.getLiteral("column").getInt());
 				System.out.println("TimeInstantColumn: " + soln.getLiteral("column").getInt());
 			}

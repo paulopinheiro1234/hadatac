@@ -579,7 +579,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    OPTIONAL { <" + dasa_uri + "> hasco:isAttributeOf ?hasDASO } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasSource ?hasSource } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:isPIConfirmed ?isPIConfirmed } . \n" + 
-                "    OPTIONAL { <" + dasa_uri + "> sio:Relation ?relation . <" + dasa_uri + "> ?relation ?inRelationTo . } . \n" + 
+                "    OPTIONAL { <" + dasa_uri + "> hasco:Relation ?relation . <" + dasa_uri + "> ?relation ?inRelationTo . } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> rdfs:label ?label } . \n" +
                 "}";
 

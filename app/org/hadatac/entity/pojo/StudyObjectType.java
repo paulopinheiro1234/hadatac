@@ -27,7 +27,7 @@ import org.hadatac.utils.NameSpaces;
 
 public class StudyObjectType extends HADatAcClass implements Comparable<StudyObjectType> {
 
-    static String className = "sio:StudyObject";
+    static String className = "hasco:StudyObject";
 
     public StudyObjectType () {
         super(className);

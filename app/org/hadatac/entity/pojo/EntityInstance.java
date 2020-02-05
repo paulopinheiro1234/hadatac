@@ -21,7 +21,7 @@ import org.hadatac.utils.CollectionUtil;
 
 public class EntityInstance extends HADatAcThing implements Comparable<EntityInstance> {
 
-    static String className = "sio:Object";
+    static String className = "sio:SIO_000776";
 
     public EntityInstance() {}
 

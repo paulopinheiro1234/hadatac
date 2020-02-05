@@ -71,7 +71,7 @@ public class NewObjectsFromFile extends Controller {
         File  toUse = new File(pathUnproc + filename);
         int rowCount = 0;
         String newURI = "";
-        String newType = "http://semanticscience.org/resource/Human";
+        String newType = "http://semanticscience.org/resource/SIO_000485";
         String newLabel = "";
         String newComment = "";
         String newObjectCollectionUri = URIUtils.replacePrefixEx(oc_uri);

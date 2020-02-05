@@ -24,7 +24,7 @@ import org.hadatac.utils.NameSpaces;
 
 public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
-    static String className = "sio:Object";
+    static String className = "sio:SIO_000776";
 
     public EntityRole() {}
 
@@ -85,7 +85,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 + "} UNION { \n"
                 + "?dasa hasco:isAttributeOf ?dasoSub . \n"
                 + "?dasoSub ?relation ?daso . \n"
-                + "?dasoSub sio:Relation ?relation . \n"
+                + "?dasoSub hasco:Relation ?relation . \n"
                 + "?daso hasco:hasRole ?roleUri . \n"
                 + "?dasa hasco:hasEntity ?entityUri . \n"
                 + "?dasa hasco:hasAttribute ?attributeUri . \n"
@@ -107,7 +107,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                 EntityRole role = new EntityRole();
 
                 /*
-                role.setUri(URIUtils.replacePrefixEx("sio:Sample"));
+                role.setUri(URIUtils.replacePrefixEx("sio:SIO_001050"));
                 role.setLabel("Sample");
                 role.setField("entity_role_uri_str");
                  */
@@ -163,7 +163,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     } else {
                         System.out.println("soln.get(\"roleUri\") == null");
                         /*
-                        role.setUri(URIUtils.replacePrefixEx("sio:Sample"));
+                        role.setUri(URIUtils.replacePrefixEx("sio:SIO_001050"));
                         role.setLabel("Sample");
                         role.setField("entity_role_uri_str");
                          */
@@ -199,7 +199,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
                     subFacet.putFacet("dasa_uri_str", soln.get("dasa").toString());
 
                     /*
-                    if (!role.getUri().equals(URIUtils.replacePrefixEx("sio:Sample"))) {
+                    if (!role.getUri().equals(URIUtils.replacePrefixEx("sio:SIO_001050"))) {
                         subFacet.putFacet("entity_uri_str", soln.get("entityUri").toString());
                     }
                      */

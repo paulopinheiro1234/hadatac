@@ -595,7 +595,7 @@ public class MeasurementGenerator extends BaseGenerator {
             measurement.setInRelationToUri("");
 
             DataAcquisitionSchemaObject inRelationToDaso = null;
-            String inRelationToUri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:inRelationTo"));
+            String inRelationToUri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:SIO_000668"));
             if (mapSchemaObjects.containsKey(inRelationToUri)) {
                 inRelationToDaso = mapSchemaObjects.get(inRelationToUri);
             } else {
@@ -608,6 +608,7 @@ public class MeasurementGenerator extends BaseGenerator {
                     String inRelationToDasoValue = record.getValueByColumnIndex(inRelationToDaso.getTempPositionInt());
                     if (possibleValues.containsKey(inRelationToUri)) {
                         if (possibleValues.get(inRelationToUri).containsKey(inRelationToDasoValue.toLowerCase())) {
+                        	System.out.println("in possible values");
                             measurement.setInRelationToUri(possibleValues.get(inRelationToUri).get(inRelationToDasoValue.toLowerCase()));
                         }
                     }

@@ -23,7 +23,7 @@ import org.hadatac.utils.CollectionUtil;
 
 public class AttributeInstance extends HADatAcThing implements Comparable<AttributeInstance> {
 
-    static String className = "sio:Attribute";
+    static String className = "sio:SIO_000614";
 
     public AttributeInstance () {}
 

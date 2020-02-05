@@ -300,8 +300,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
                 "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
-                "   OPTIONAL { <" + uri + "> sio:inRelationTo ?inRelationTo } . \n" +
-                "   OPTIONAL { <" + uri + "> sio:Relation ?relation } . \n" +
+                "   OPTIONAL { <" + uri + "> sio:SIO_000668 ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> hasco:Relation ?relation } . \n" +
                 "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:inRelationToLabel ?inRelationToStr } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:wasDerivedFrom ?wasDerivedFrom } . \n" +
@@ -532,8 +532,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
         row.put("hasco:hasEntity", this.getEntity());
         row.put("hasco:hasRole", this.getRole());
-        row.put("sio:inRelationTo", this.getInRelationTo());
-        row.put("sio:relation", this.getRelation());
+        row.put("sio:SIO_000668", this.getInRelationTo());
+        row.put("hasco:Relation", this.getRelation());
         row.put("hasco:isVirtual", "");
         row.put("hasco:isPIConfirmed", "false");
         rows.add(row);
@@ -605,17 +605,17 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         if (!inRelationTo.equals("")) {
             String inRelationToStr =  URIUtils.replacePrefixEx(inRelationTo);
             if (inRelationToStr.startsWith("<")) {
-                insert += this.getUri() + " sio:inRelationTo " +  inRelationToStr + " .  ";
+                insert += this.getUri() + " sio:SIO_000668 " +  inRelationToStr + " .  ";
             } else {
-                insert += this.getUri() + " sio:inRelationTo <" + inRelationToStr + "> .  ";
+                insert += this.getUri() + " sio:SIO_000668 <" + inRelationToStr + "> .  ";
             }
         }
         if (!relation.equals("")) {
             String relationStr =  URIUtils.replacePrefixEx(relation);
             if (relationStr.startsWith("<")) {
-                insert += this.getUri() + " sio:relation " +  relationStr + " .  ";
+                insert += this.getUri() + " hasco:Relation " +  relationStr + " .  ";
             } else {
-                insert += this.getUri() + " sio:relation <" + relationStr + "> .  ";
+                insert += this.getUri() + " hasco:Relation <" + relationStr + "> .  ";
             }
         }
 

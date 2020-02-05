@@ -60,8 +60,8 @@ function getOwlUrl(label1,label2,label,i,j){
     else if(label1=="hasco"){
         var urlStr="<http://hadatac.org/ont/hasco/"+label2+">";
     }
-    else if(label1=="chear"){
-        var urlStr="<http://hadatac.org/ont/chear#"+label2+">";
+    else if(label1=="hhear"){
+        var urlStr="<http://hadatac.org/ont/hhear#"+label2+">";
     }
     else if(label1=="uberon"){
         var urlStr="<http://purl.obolibrary.org/obo/UBERON_"+label2+">";

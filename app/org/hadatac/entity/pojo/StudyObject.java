@@ -41,8 +41,8 @@ import org.hadatac.annotations.PropertyValueType;
 
 public class StudyObject extends HADatAcThing {
 
-    public static String LOCATION = "http://semanticscience.org/resource/Location";
-    public static String TIME = "http://semanticscience.org/resource/TimeInterval";
+    public static String LOCATION = "http://semanticscience.org/resource/SIO_000317";
+    public static String TIME = "http://semanticscience.org/resource/SIO_000417";
 
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";

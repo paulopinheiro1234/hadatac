@@ -38,8 +38,8 @@ public class SDD {
     private static List<String> getMetaAttributes() {
         if (metaAttributes == null) {
             metaAttributes = new ArrayList<String>() {{
-                add("sio:TimeStamp");
-                add("sio:TimeInstant");
+                add("hasco:TimeStamp");
+                add("sio:SIO_000418");
                 add("hasco:namedTime");
                 add("hasco:originalID");
                 add("hasco:uriId");
@@ -49,15 +49,15 @@ public class SDD {
                 add("hasco:hasMetaAttributeURI");
                 add("hasco:hasMetaUnit");
                 add("hasco:hasMetaUnitURI");
-                add("sio:InRelationTo");
+                add("sio:SIO_000668");
                 add("hasco:hasLOD");
                 add("hasco:hasCalibration");
                 add("hasco:hasElevation");
                 add("hasco:hasLocation");
-                add("chear:AnalysisMode");
-                add("chear:LabHubAccession");
-                add("chear:LevelOfDetection");
-                add("chear:ReplicateNumber");
+                add("hasco:AnalysisMode");
+                add("hasco:LabHubAccession");
+                add("hasco:LevelOfDetection");
+                add("hasco:ReplicateNumber");
             }};
         }
         return metaAttributes;

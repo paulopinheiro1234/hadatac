@@ -23,7 +23,7 @@ import org.hadatac.utils.NameSpaces;
 
 public class Entity extends HADatAcClass implements Comparable<Entity> {
 
-    static String className = "sio:Object";
+    static String className = "sio:SIO_000776";
 
     public List<Characteristic> characteristics;
 
@@ -36,7 +36,7 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         List<Entity> entities = new ArrayList<Entity>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* sio:Object . " + 
+                " ?uri rdfs:subClassOf* sio:SIO_000776 . " + 
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(

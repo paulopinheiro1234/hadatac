@@ -104,7 +104,7 @@ chear:AdolescentPeriod a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( sio:Birthing ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromBirth,
         sio:TimeInterval ;
     skos:definition "The age span ranging from adolescence to adulthood" .
@@ -400,7 +400,7 @@ chear:ChildhoodPeriod a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( sio:Birthing ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromBirth,
         sio:TimeInterval ;
     skos:definition "The age span ranging from birth to adolescence" .
@@ -694,7 +694,7 @@ chear:CommonEra a owl:Class ;
     rdfs:subClassOf chear:RelativeTime ;
     owl:equivalentClass [ a owl:Restriction ;
             owl:hasValue <http://dbpedia.org/resource/CE_1> ;
-            owl:onProperty sio:inRelationTo ] ;
+            owl:onProperty sio:SIO_000668 ] ;
     skos:definition "Common era time measurements are referenced against (in relation to) the beginning of the common era, 1 CE (or 1 AD)." .
 
 chear:CompetitiveELISA a owl:Class ;
@@ -718,7 +718,7 @@ chear:Conception a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( chear:Conceiving ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Beginning,
         chear:FromConception,
         sio:TimeInterval ;
@@ -843,7 +843,7 @@ chear:DietTreatment a ns1:QualityValue,
 
 chear:Difference a owl:Class ;
     rdfs:label "Difference" ;
-    rdfs:subClassOf sio:Quantity ;
+    rdfs:subClassOf sio:SIO_000052 ;
     skos:definition "Variables derived from taking the difference of two other variables. For example, the first difference of a time series {yt} is defined as Dyt = yt - yt-1" .
 
 chear:DrugHistory a ns1:QualityVariable,
@@ -1010,7 +1010,7 @@ chear:FirstTrimester a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( chear:Conceiving ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromConception,
         sio:TimeInterval ;
     skos:definition "From pregnancy week 1 through 12 and includes conception. Conception is when the sperm fertilizes the egg. The fertilized egg then travels down the fallopian tube and attaches to the inside of the uterus, where it begins to form the embryo and placenta. The first trimester carries the highest risk of miscarriage (natural death of embryo or fetus)." .
@@ -1137,7 +1137,7 @@ chear:HeadOfHousehold a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( <http://purl.obolibrary.org/obo/OMRSE_00000076> ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Demographic,
         sio:Role ;
     skos:definition "Head of Household is a filing status for individual United States taxpayers. To use the Head of Household filing status, a taxpayer must: (1) Be unmarried or considered unmarried at the end of the year (2) Have paid more than half the cost of keeping up a home for the tax year (either one's own home or the home of a qualifying parent) (3) Usually have a qualifying person who lived with the head in the home for more than half of the tax year unless the qualifying person is a dependent parent.",
@@ -1174,7 +1174,7 @@ chear:IQ a ns1:QuantityVariable,
     rdfs:label "Intelligence Quotient" ;
     ns1:wasApprovedBy "chear-kb:PER-Jeanette-Stingone" ;
     rdfs:subClassOf chear:Assessment,
-        sio:Quantity ;
+        sio:SIO_000052 ;
     skos:definition "A measure of intelligence" .
 
 chear:IRMPD-MS a owl:Class ;
@@ -1400,7 +1400,7 @@ chear:Neighbor a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Demographic,
         sio:Role ;
     skos:definition "A person living near or next door to another person." ;
@@ -1604,7 +1604,7 @@ chear:PostPregnancy a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( sio:Birthing ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromBirth,
         sio:TimeInterval ;
     skos:definition "The period after birth." .
@@ -1615,7 +1615,7 @@ chear:PrePregnancy a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( chear:Conceiving ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromConception,
         sio:TimeInterval ;
     skos:definition "The time before a pregnancy." .
@@ -1634,7 +1634,7 @@ chear:Pregnancy a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( chear:Conceiving ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromConception,
         chear:PregnancyCharacteristic,
         sio:TimeInterval ;
@@ -1753,7 +1753,7 @@ chear:SecondTrimester a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( chear:Conceiving ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromConception,
         sio:TimeInterval ;
     skos:definition "From week 13 through 28. Around the middle of the second trimester, movement of the fetus may be felt. At 28 weeks, more than 90% of babies can survive outside of the uterus if provided with high-quality medical care." .
@@ -1785,7 +1785,7 @@ chear:SocioeconomicStatusIndex a ns1:QuantityVariable,
         owl:Class ;
     rdfs:label "Socioeconomic Status Index" ;
     rdfs:subClassOf chear:SocioeconomicStatus,
-        sio:Quantity ;
+        sio:SIO_000052 ;
     skos:definition "A measure of SES." ;
     skos:editorialNote "This is a specific index, derived from other variables. So, it should somehow be connected to this variables. Also, we may want to be more specific about the type of index that it is. Perhaps there should be a general SESIndex and then subclasses of specific measures?" .
 
@@ -1872,7 +1872,7 @@ chear:Subject a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( ns1:Study ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         sio:Role ;
     skos:definition "A living individual about whom a research investigator (whether a professional or a student) obtains data through 1) intervention or interaction with the individual, or 2) identifiable private information" .
 
@@ -1950,7 +1950,7 @@ chear:ThirdTrimester a owl:Class ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:allValuesFrom [ a owl:Class ;
                     owl:intersectionOf ( chear:Conceiving ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:FromConception,
         sio:TimeInterval ;
     skos:definition "From 29 weeks through 40 weeks." .
@@ -3422,7 +3422,7 @@ ns1:wasApprovedBy a owl:AnnotationProperty .
 <http://purl.obolibrary.org/obo/HsapDv_0000000> rdfs:subClassOf sio:Age .
 
 <http://purl.obolibrary.org/obo/IAO_0000027> a owl:Class ;
-    rdfs:subClassOf sio:Quantity .
+    rdfs:subClassOf sio:SIO_000052 .
 
 <http://purl.obolibrary.org/obo/MPATH_0> rdfs:subClassOf sio:BiologicalQuality .
 
@@ -3549,7 +3549,7 @@ ns1:wasApprovedBy a owl:AnnotationProperty .
     rdfs:label "Household Income" ;
     ns1:wasApprovedBy "chear-kb:PER-Jeanette-Stingone" ;
     rdfs:subClassOf chear:SocioeconomicStatus,
-        sio:Quantity ;
+        sio:SIO_000052 ;
     skos:definition "A demographic parameter indicating the amount of earnings made by a family." .
 
 <http://purl.obolibrary.org/obo/NCIT_C75560> a ns1:QualityValue,
@@ -4811,7 +4811,7 @@ ns1:wasApprovedBy a owl:AnnotationProperty .
 sio:Alive a ns1:QualityValue ;
     skos:notation "131" .
 
-sio:Attribute a owl:Class ;
+sio:SIO_000614 a owl:Class ;
     rdfs:label "Attribute" ;
     rdfs:subClassOf ns1:ScienceIndicator .
 
@@ -4868,7 +4868,7 @@ sio:Normal a ns1:QualityValue ;
 sio:Normality a owl:Class ;
     rdfs:subClassOf chear:Assessment .
 
-sio:Object a owl:Class ;
+sio:SIO_000776 a owl:Class ;
     rdfs:label "Object" ;
     rdfs:subClassOf ns1:ScienceIndicator .
 
@@ -5359,7 +5359,7 @@ chear:Sibling a owl:Class ;
                     owl:intersectionOf ( [ a owl:Restriction ;
                                 owl:allValuesFrom chear:Sibling ;
                                 owl:onProperty sio:hasRole ] sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Relative ;
     skos:definition "One of two or more individuals having one or both parents in common. A male sibling is a brother, and a female sibling is a sister. In most societies throughout the world, siblings often grow up together, thereby facilitating the development of strong emotional bonds. The emotional bond between siblings is often complicated and is influenced by factors such as parental treatment, birth order, personality, and personal experiences outside the family. However, there are cases where siblings grow up in separate homes, in different environments." ;
     skos:notation "143" .
@@ -5522,7 +5522,7 @@ sio:Length a owl:Class .
 
 sio:LineGraph a owl:Class .
 
-sio:ObjectQuality a owl:Class .
+sio:SIO_000776Quality a owl:Class .
 
 sio:Quality a owl:Class .
 
@@ -5545,7 +5545,7 @@ chear:Ancestor a owl:Class ;
                     owl:intersectionOf ( [ a owl:Restriction ;
                                 owl:allValuesFrom chear:Descendant ;
                                 owl:onProperty sio:hasRole ] sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Relative ;
     skos:definition "An ancestor or forebear is a parent or (recursively) the parent of an ancestor (i.e., a grandparent, great-grandparent, great-great-grandparent, and so forth). Ancestor is \"any person from whom one is descended. In law the person from whom an estate has been inherited.\"" .
 
@@ -5581,7 +5581,7 @@ chear:Descendant a owl:Class ;
                     owl:intersectionOf ( [ a owl:Restriction ;
                                 owl:allValuesFrom chear:Ancestor ;
                                 owl:onProperty sio:hasRole ] sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Relative ;
     skos:definition "The child of a human, or any grandchild, great-grandchild, and so on." .
 
@@ -5766,7 +5766,7 @@ chear:Child a owl:Class ;
                     owl:intersectionOf ( [ a owl:Restriction ;
                                 owl:allValuesFrom chear:Parent ;
                                 owl:onProperty sio:hasRole ] sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Descendant ;
     skos:definition "A relationship with a parent (such as sons and daughters of any age)." .
 
@@ -5782,7 +5782,7 @@ chear:DietQuantity a ns1:QuantityVariable,
     rdfs:label "Diet Quantity" ;
     ns1:wasApprovedBy "chear-kb:PER-Jeanette-Stingone" ;
     rdfs:subClassOf chear:DietAndNutrition,
-        sio:Quantity ;
+        sio:SIO_000052 ;
     skos:definition "A quantity relating to diet and nutrition." ;
     skos:editorialNote "What differentiated diet from nutrition? That is why is this needed since we have the DietAndNutrition Class" .
 
@@ -5828,7 +5828,7 @@ chear:Parent a owl:Class ;
                     owl:intersectionOf ( [ a owl:Restriction ;
                                 owl:allValuesFrom chear:Child ;
                                 owl:onProperty sio:hasRole ] sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Ancestor ;
     skos:definition "A parent is the caretaker of a child (where \"child\" refers to offspring, not necessarily age). A biological parent is a person whose gamete resulted in a child, a male through the sperm, and a female through the ovum. Parents are first-degree relatives and have 50% genetic meet. A female can also become a parent through surrogacy. Some parents may be adoptive parents, who nurture and raise an offspring, but are not actually biologically related to the child. Orphans without adoptive parents can be raised by their grandparents or other family members." .
 
@@ -5904,7 +5904,7 @@ sio:isPhenotypeOf a owl:ObjectProperty .
 chear:FromBirth a owl:Class ;
     rdfs:subClassOf chear:RelativeTime ;
     owl:equivalentClass [ a owl:Restriction ;
-            owl:onProperty sio:inRelationTo ;
+            owl:onProperty sio:SIO_000668 ;
             owl:someValuesFrom sio:Birthing ] .
 
 chear:HPLC a owl:Class ;
@@ -5977,7 +5977,7 @@ chear:CaesareanSection a ns1:QualityValue,
 chear:RelativeTime a owl:Class ;
     rdfs:subClassOf sio:TimeMeasurement ;
     owl:equivalentClass [ a owl:Restriction ;
-            owl:onProperty sio:inRelationTo ;
+            owl:onProperty sio:SIO_000668 ;
             owl:someValuesFrom sio:Process ] .
 
 chear:SocioeconomicStatus a owl:Class ;
@@ -6040,7 +6040,7 @@ chear:BodyWeightQuality a owl:Class ;
 chear:FromConception a owl:Class ;
     rdfs:subClassOf chear:RelativeTime ;
     owl:equivalentClass [ a owl:Restriction ;
-            owl:onProperty sio:inRelationTo ;
+            owl:onProperty sio:SIO_000668 ;
             owl:someValuesFrom chear:Conceiving ] .
 
 chear:HighSchoolOrLess a ns1:QualityValue,
@@ -6078,7 +6078,7 @@ ns1:MassSpectrometry a owl:Class .
                                     owl:someValuesFrom sio:Mass ] ;
                             rdf:rest () ] ] ],
         chear:Anthropometry,
-        sio:Quantity ;
+        sio:SIO_000052 ;
     skos:definition "A measurement relating body weight to height in an organism; typically calculated as the weight of an individual divided by the height of that individual squared. For quadrupeds, the square of body height is often replaced by the square of body length" ;
     skos:editorialNote "Should we note that this is derived from height and weight? JS: I think so" .
 
@@ -6128,7 +6128,7 @@ chear:Relative a owl:Class ;
                     owl:intersectionOf ( [ a owl:Restriction ;
                                 owl:allValuesFrom chear:Relative ;
                                 owl:onProperty sio:hasRole ] sio:Human ) ] ;
-            owl:onProperty sio:inRelationTo ],
+            owl:onProperty sio:SIO_000668 ],
         chear:Demographic,
         sio:Role ;
     skos:definition "Broadly, kinship patterns may be considered to include people related by both descent – i.e. social relations during development – and by marriage. Human kinship relations through marriage are commonly called \"affinity\" in contrast to the relationships that arise in one's group of origin, which may be called one's descent group. In some cultures, kinship relationships may be considered to extend out to people an individual has economic or political relationships with, or other forms of social connections. Within a culture, some descent groups may be considered to lead back to gods or animal ancestors (totems). This may be conceived of on a more or less literal basis." .
@@ -6139,7 +6139,7 @@ ns1:TandemMassSpectrometry a owl:Class .
     rdfs:label "Polychlorobiphenyl" ;
     rdfs:subClassOf <http://purl.obolibrary.org/obo/CHEBI_36683> .
 
-sio:Quantity a owl:Class .
+sio:SIO_000052 a owl:Class .
 
 sio:Race a ns1:QualityVariable,
         owl:Class ;
@@ -6168,7 +6168,7 @@ chear:HouseholdApplianceCount a ns1:QuantityVariable,
     ns1:wasApprovedBy "chear-kb:PER-Jeanette-Stingone" ;
     rdfs:subClassOf chear:Demographic,
         chear:SocioeconomicStatus,
-        sio:ObjectQuality ;
+        sio:SIO_000776Quality ;
     skos:definition "The act or process of imparting or acquiring knowledge." .
 
 sio:Assay a owl:Class ;
