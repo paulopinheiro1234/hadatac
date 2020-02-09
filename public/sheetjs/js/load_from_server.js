@@ -10,6 +10,9 @@ var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
 var _grid = document.getElementById('grid');
 
+var _gridcopy=document.getElementById("gridcopy");
+var _buttons=document.getElementById("buttons");
+var _footnote=document.getElementById("footnote");
 /** Spinner **/
 var spinner;
 
@@ -289,12 +292,65 @@ function chooseItem(data) {
   cdg.data[rowNum][colNum] = choice[1];
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
+  fromSuggestionstoLabel(choice[1],rowNum+1,colNum);
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   drawStars(rowNum,colNum);
   cdg.draw();
+  
 
 }
+cdg.addEventListener('contextmenu', function (e) {
+  e.items.push({
+      title: 'Insert Row Above',
+      click: function (ev) {
+          var intendedRow=e.cell.rowIndex;
+          cdg.insertRow([],intendedRow);
 
+      }
+  });
+  e.items.push({
+    title: 'Insert Row Below',
+    click: function (ev) {
+        var intendedRow=parseFloat(e.cell.rowIndex);
+        cdg.insertRow([],intendedRow+1);
+
+    }
+  });
+  e.items.push({
+    title: 'Delete Row',
+    click: function (ev) {
+        
+        var temp=[];
+        temp.push(e.cell.rowIndex);
+        for(var i=0;i<cdg.data[e.cell.rowIndex].length+1;i++){
+          if(cdg.data[e.cell.rowIndex][i]==null){
+            temp.push(" ");
+          }
+          else{
+            temp.push(cdg.data[e.cell.rowIndex][i]);
+          }
+        }
+        for( var i=1;i<temp.length;i++){
+          $.ajax({
+            type : 'GET',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
+            data : {
+              removedValue:temp[i]
+            },
+            success : function(data) {
+
+            }
+          });
+        }
+
+
+  storeRow.push(temp);
+  var intendedRow=parseFloat(e.cell.rowIndex);
+  cdg.deleteRow(intendedRow);
+
+    }
+  });
+});
 function insertRowAbove(){
   var intendedRow=parseFloat(rowNum);
   cdg.insertRow([],intendedRow); // The first argument splices a js array into the csv data, so to insert a blank row insert an empty array
@@ -339,28 +395,50 @@ function removeRow(){
 
 }
 function _resize() {
-  // alert("You have resized the window!");
-  // alert(_grid.style.height);
-  // alert(_grid.style.width);
-
   _grid.style.height = (window.innerHeight - 300) + "px";
   _grid.style.width = '100%';
+  
  
 }
  _resize();
 
 window.addEventListener('resize', _resize);
+
+
+var cdgcopy = canvasDatagrid({
+  parentNode: _gridcopy
+});
+cdgcopy.style.height = '100%';
+
+cdgcopy.style.width = '100%';
+
+
 var click_ctr=0;
 var copyOfL=0;
 var copyOfR=0;
 
 var headerMap = new Map();
+var json_copy;
 
+var sheetStorage=[];
+function gotothisfunction(sheetCopy){
+  for(var i=0;i<sheetCopy.length;i++){
+    var temp=[];
+    for(var j=0;j<sheetCopy[i].length;j++){
+      temp.push(sheetCopy[i][j]);
+    }
+    sheetStorage.push(temp);
+  }
+  console.log(sheetStorage);
+  
+ 
+
+}
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
-
+  
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
@@ -397,7 +475,11 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       cleanJson.push(temp)
    }
   }
-
+  
+  if(sheetName=="Dictionary Mapping"){
+    var sheetCopy=cleanJson
+    gotothisfunction(sheetCopy);
+  }
   if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
      var temp = [];
      for(var j = 0; j < L; j++){

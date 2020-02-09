@@ -119,23 +119,28 @@ $.ajax({
     //  s: str
   },
   success : function(data) {
-
+    
 
 
     var select=document.getElementById("seecart"),data;
     for(var i=0;i<data.length;i++){
         var li = document.createElement("li");
-        li.appendChild(document.createTextNode(data[i]+" "));
+        li.appendChild(document.createTextNode(data[i]));
         li.setAttribute("class","inCart");
         select.appendChild(li);
         li.addEventListener("click",function(e){
 
           var newOntology=e.target.innerHTML;
+          var part1=newOntology.split(';')[0];
+          
+          var part2=newOntology.split(';')[1];
           console.log(newOntology);
           // //addFromCart(newOntology);
           //alert(newOntology);
 
-           cdg.data[rowNum][colNum]=newOntology;
+           cdg.data[rowNum][colNum]=part1;
+           sheetStorage[rowNum+1][colNum]=part2;
+           fromCarttoLabel();
           var colNum_str=colNum.toString();
           var rowNum_str=rowNum.toString();
           storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);

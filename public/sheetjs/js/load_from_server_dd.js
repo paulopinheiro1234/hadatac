@@ -36,8 +36,8 @@ function hideView(){
   $("#hidecarry").css('display','none');
   $(".mobile-navi").fadeOut(50);
   $("#showcarry").show();
-  cdg.style.height = (window.innerHeight - 200) + "px";
-  cdg.style.width = (window.innerWidth - 100) + "px";
+  cdg.style.height = '100%';
+  cdg.style.width = '100%';
 
 }
 function changeHeader(headers,emptySheet){
@@ -92,8 +92,8 @@ cdg.style.height = '100%';
 cdg.style.width = '100%';
 
 function _resize() {
-  _grid.style.height = (window.innerHeight - 200) + "px";
-  _grid.style.width = (window.innerWidth - 100) + "px";
+  _grid.style.height = (window.innerHeight - 300) + "px";
+  _grid.style.width = '100%';
 }
 _resize();
 

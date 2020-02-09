@@ -22,3 +22,26 @@ $(document).ready(
             
         });
     });
+    $(document).ready(
+        function() {
+            $("button.changeViewLabel").click(function() {
+                $("#showThis").css('display','none');
+                
+                $("#hideThis").show();
+                // cdg.style.height = (window.innerHeight - 200) + "px";
+                // cdg.style.width = (window.innerWidth - 400) + "px";
+                showLabels();
+               
+               
+    
+            });
+            $("button.changeViewIri").click(function() {
+                $("#hideThis").css('display','none');
+                
+                $("#showThis").show();
+                // cdg.style.height = (window.innerHeight - 200) + "px";
+                backToOriginal();
+               
+                
+            });
+        });

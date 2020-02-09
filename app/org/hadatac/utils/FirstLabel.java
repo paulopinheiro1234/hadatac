@@ -8,7 +8,7 @@ import org.hadatac.utils.CollectionUtil;
 public class FirstLabel {
 
     public static String getLabel(String uri) {
-
+        System.out.println("HEY!:"+uri);
         if ((uri == null) || (uri.equals(""))) {
             return "";
         } 
@@ -24,7 +24,7 @@ public class FirstLabel {
                 "}";
 
         //System.out.println("[FirstLabel] getLabel() queryString: \n" + queryString);
-
+        System.out.println("YOOOO "+queryString);
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -33,13 +33,19 @@ public class FirstLabel {
             QuerySolution soln = resultsrw.next();
             if (soln.get("label") != null) {
                 labelStr = soln.get("label").toString();
+                
             }
+            
 
             if (!labelStr.isEmpty()) {
+                
                 break;
             }
+            else if(labelStr.isEmpty()){
+                System.out.println("RETURNED EMPTY");
+            }
         }
-
+        System.out.println(labelStr);
         return labelStr;
     }
 

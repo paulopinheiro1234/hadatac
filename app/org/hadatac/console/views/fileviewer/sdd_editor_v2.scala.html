@@ -10,6 +10,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 @import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
+@import org.hadatac.utils._
+
 
 @import java.net._
 
@@ -30,7 +32,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
          <input class="btn btn-primary" type="button" id="upload" value="Save"/>
       }
-      <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+      <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
+         <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
 
 
 
@@ -87,6 +90,11 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
       <div class="undo-edit">
          <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="reundoEdit()">
                <span class="glyphicon glyphicon-circle-arrow-right"> </span> Redo </button>
+      </div>
+      <div class="changeView" style="display:inline-block;">
+            <button class="changeViewLabel" id="showThis"> Show Labels</button>
+               <button class="changeViewIri" id="hideThis">  Show Original Sheet</button>
+
       </div>
       <div class= shopbutton>
          <button class="cart" >
@@ -153,12 +161,12 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <option value="Choose from Below">Choose from Below</option>
                </select>
 
-               <div id="editRowsAdd">
+               <!-- <div id="editRowsAdd">
                   <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
                   <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
                   <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
                   <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
-               </div>
+               </div> -->
                <div id="verifysdd" style="display: flex; align-items: center; justify-content: center; margin:0 auto;" >
                   <button onclick="verifySDD()" style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify SDD</button>
                   <button style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white;" onclick="external()">External Verify</button>
@@ -171,7 +179,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                </script>
                <div id="loadingmsg"></div>
                <div id="irifound" style="overflow-y:auto;"></div>
-               <div id="searchForTerm" class="input-container">
+               <div id="searchForTerm" class="input-container" style="width:70%;margin-left: 5px;">
                   <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
                   <button type="button"  role="button" id="searchOnt" class="input-button" >
                      <span class="glyphicon glyphicon-search">   </span> 
@@ -193,14 +201,14 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <a href="javascript:nextPage()" id="btn_next">Next</a>
                   page:<span id="page"></span>
                   </div>
-               <div id="listingTable" style="overflow-y:scroll; width:350px; height:345px;word-wrap: break-word;
-               word-break: keep-all;margin-bottom:5px;"></div>
+               <div id="listingTable" style="overflow-y:scroll; width:100%; height:100%;word-wrap: break-word;
+               word-break: keep-all;margin-bottom:5px;margin-left:5px;margin-right:5px;"></div>
                
                
 
             </div>
                      <ul class="custom-cm">
-                        <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height="20px"/> Add to Cart</a> </li>
+                        <li class="custom-cm__item" id="thisitem"><img src="@controllers.routes.Assets.versioned("icons/cartsil.png")" width="25px" height="20px"/> Add to Cart</a> </li>
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
       
                     </ul>
@@ -226,6 +234,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      
                      <div><a id="error_msg"></a></div>
                      <div id="grid"></div>
+                     
+                     <div id="gridcopy"></div>
                      <div id="footnote"></div>
                      <div id="buttons"></div>
                   </div>
@@ -238,6 +248,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/label-iri-view.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/searchTerm.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
                   <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
