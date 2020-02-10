@@ -4,6 +4,7 @@ import java.lang.String;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +15,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -209,6 +211,7 @@ public class MessageAnnotation {
         }
 
         // Learns stream's labels
+        /*
         if (isValid) {
 	        if (str != null) {
 	        	List<String> headers = Subscribe.testLabels(topic.getStream(), topic); 
@@ -223,6 +226,7 @@ public class MessageAnnotation {
 	        	}
 	        }
         }
+        */
         
         // Retrieves SDD
         DataAcquisitionSchema schema = null;
@@ -231,6 +235,14 @@ public class MessageAnnotation {
             if (schema == null) {
                 topic.getLogger().printExceptionByIdWithArgs("DA_00007", str.getSchemaUri());
                 isValid = false;
+            } else {
+            	List <String> headers = new ArrayList<String>();
+            	for (DataAcquisitionSchemaAttribute attr : schema.getAttributes()) {
+                	headers.add(attr.getLabel());
+            	}
+        		topic.setHeaders(headers);
+	            topic.getLogger().println(String.format("Message topic <%s> has labels <%s>", topic.getLabel(), headers.toString()));
+	            topic.save();
             }
         }
 

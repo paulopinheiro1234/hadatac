@@ -78,7 +78,7 @@ public class MessageRawData extends Controller {
 			System.out.println("TEMPLIST SIZE = " + tempList.size());
 			results.addAll(tempList);
 		} else {
-			results.add("Found Stream at " + stream.getIP() + ":" + stream.getPort());
+			results.add("Found Stream at " + stream.getIP() + ":" + stream.getPort() + " with topic " + stream.getName());
 			results.add("Found Topic " + topic.getLabel());
 			topic_label = topic.getLabel();
 			results.addAll(Subscribe.exec(stream, topic, Subscribe.SUBSCRIBE_BATCH));

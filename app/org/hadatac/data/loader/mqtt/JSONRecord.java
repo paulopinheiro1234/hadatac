@@ -32,7 +32,13 @@ public class JSONRecord implements Record {
 					straux = straux.replaceAll(",", ";");
 					values.add(straux);
 				} else {
-					values.add((String)keyvalue);
+					if (keyvalue instanceof String) {
+						values.add((String)keyvalue);
+					} else if (keyvalue instanceof Long) {
+						long tempLong = (long)keyvalue;
+						String tempString = Long. toString(tempLong);
+						values.add(tempString);
+					}
 				}
 			}
 		} catch (ParseException e) {
