@@ -23,7 +23,7 @@ public class JSONRecord implements Record {
 	@SuppressWarnings("unchecked")
 	public JSONRecord(String json, List<String> order) {
 		//System.out.println("JSON: {" + json + "}");
-		System.out.println("Order: {" + order + "}");
+		//System.out.println("Order: {" + order + "}");
 	    JSONParser parser = new JSONParser();
 	    JSONObject obj = new JSONObject();
 		try {
@@ -66,22 +66,24 @@ public class JSONRecord implements Record {
 	}
 	
 	private void reorder(List<String> order) {
+		/*
 		//System.out.println("before reorder");
 		Iterator itHeaders = headers.iterator(); 
 		Iterator itValues = values.iterator();
 		int auxint = 0;
-		//while (itHeaders.hasNext() && itValues.hasNext()) {
-		//	System.out.println("Pos: [" + auxint + "] Header: [" + itHeaders.next() + "]  Values: [" + itValues.next() + "]");
-		//	auxint++;
-		//}		
+		while (itHeaders.hasNext() && itValues.hasNext()) {
+			//System.out.println("Pos: [" + auxint + "] Header: [" + itHeaders.next() + "]  Values: [" + itValues.next() + "]");
+			auxint++;
+		}
+		*/		
 
 		// reorder
 		List<String> newOrder = new ArrayList<String>();
 		for (int i=0; i < order.size(); i++) {
 			newOrder.add("");
 		}
-		itHeaders = headers.iterator(); 
-		auxint = 0;
+		Iterator itHeaders = headers.iterator(); 
+		int auxint = 0;
 		while (itHeaders.hasNext()) {
 			Object obj = itHeaders.next();
 			int index = order.indexOf(obj);
@@ -94,14 +96,16 @@ public class JSONRecord implements Record {
 		headers = order;
 		values = newOrder;
 
+		/*
 		//System.out.println("after reorder");
 		itHeaders = headers.iterator(); 
-		itValues = values.iterator();
+		Iterator itValues = values.iterator();
 		auxint = 0;
 		while (itHeaders.hasNext() && itValues.hasNext()) {
 			//System.out.println("Pos: [" + auxint + "] Header: [" + itHeaders.next() + "]  Values: [" + itValues.next() + "]");
 			auxint++;
-		}		
+		}
+		*/		
 
 
 	}

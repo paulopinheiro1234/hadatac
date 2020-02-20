@@ -118,7 +118,7 @@ public class MessageWorker {
 
 	public static Record processMessage(String topicStr, String message, int currentRow) {
 		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]   0");
-		//System.out.println("Current row: [" + currentRow + "]");
+		System.out.println("Current row: [" + currentRow + "]");
 
 		//List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
 		//System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
@@ -130,11 +130,8 @@ public class MessageWorker {
 		}
 		MessageTopic tpc = MessageWorker.getInstance().topicsMap.get(topicStr);
 		//MessageTopic topic = MessageWorker.getInstance().topicsMap.get(topicStr);
-		//System.out.println("TopicStr: [" + topicStr + "]   1");
+		//System.out.println("TopicStr: [" + topicStr + "]   Headers [" + tpc.getHeaders().toString() + "]");
 		Record record = new JSONRecord(message, tpc.getHeaders());
-		//RecordMessage rec2 = handler.getRecord(message);
-		//System.out.println("labels: [" + rec2.headers + "]   2");
-		//System.out.println("values: [" + rec2.values + "]   2");
 		//System.out.println("TopicStr: [" + topicStr + "]   2");
 		//if (record != null) {
 		//	for (int i=0; i < record.size(); i++) {

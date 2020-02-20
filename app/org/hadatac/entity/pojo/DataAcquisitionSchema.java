@@ -388,6 +388,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         List<String> unknownHeaders = new ArrayList<String>(csvHeaders);
         List<DataAcquisitionSchemaAttribute> listDasa = getAttributes();
         
+        /*
         // list positions
         System.out.println("DAS Pojo: SDD Headers");
         int auxdasa = 0;
@@ -401,6 +402,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         	System.out.println("header [" + auxcsv + "] : [" + header + "]" );
         	auxcsv++;
         }
+        */
         
         // Assign DASA positions by label matching
         if (listDasa != null && listDasa.size() > 0) {
@@ -419,10 +421,12 @@ public class DataAcquisitionSchema extends HADatAcThing {
             }
         }
         
+        /*
         System.out.println("DAS Pojo: Assignments");
         for (DataAcquisitionSchemaAttribute dasa : listDasa) {
         	System.out.println("header [" + dasa.getTempPositionInt() + "] : [" + dasa.getLabel() + "]");
         }
+        */
 
         // Assign DASO positions by label matching
         List<DataAcquisitionSchemaObject> listDaso = getObjects();
