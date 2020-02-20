@@ -212,9 +212,10 @@ public class Downloader extends Controller {
     }
 
     public static int generateCSVFileByTimeAlignment(List<Measurement> measurements, 
-		  String facets, String ownerEmail, String categoricalOption) {
+		  String facets, String ownerEmail, String categoricalOption, String timeResolution) {
         System.out.println("Invoked CSV generation with timestamp alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
+        System.out.println("TimeResolution option: [" + timeResolution + "]");
         Date date = new Date();
         String fileName = "time_alignment" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
@@ -226,7 +227,7 @@ public class Downloader extends Controller {
         
         File file = new File(dataFile.getAbsolutePath());
 
-        Measurement.outputAsCSVByTimeAlignment(measurements, file, dataFile.getId(), categoricalOption);
+        Measurement.outputAsCSVByTimeAlignment(measurements, file, dataFile.getId(), categoricalOption, timeResolution);
         System.out.println("Generated CSV files ...");
 
         return 0;

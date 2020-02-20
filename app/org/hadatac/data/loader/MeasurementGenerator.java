@@ -128,6 +128,12 @@ public class MeasurementGenerator extends BaseGenerator {
         } else {
         	unknownHeaders = schema.defineTemporaryPositions(topic.getHeaders());
         }
+
+        //System.out.println("DASA after defineTemporaryPositions]");
+    	for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
+            //System.out.println("DASA URI: [" + dasa.getUri() + "]   Position: [" + dasa.getTempPositionInt() + "]");
+    	}
+        
         if (!unknownHeaders.isEmpty()) {
             logger.addLine(Feedback.println(Feedback.WEB, 
                     "[WARNING] Failed to match the following " 
@@ -187,9 +193,16 @@ public class MeasurementGenerator extends BaseGenerator {
 
     @Override
     public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
-        //System.out.println("rowNumber: " + rowNumber);
+      	//System.out.println("rowNumber: " + rowNumber);
         
-        Map<String, Map<String,String>> objList = null;
+    	//System.out.println("Position 0 : [" + record.getValueByColumnIndex(0) + "]");
+    	//System.out.println("Position 1 : [" + record.getValueByColumnIndex(1) + "]");
+    	
+    	//for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
+        //    System.out.println("DASA URI: [" + dasa.getUri() + "]   Position: [" + dasa.getTempPositionInt() + "]");
+    	//}
+    	
+    	Map<String, Map<String,String>> objList = null;
         Map<String,String> groundObj = null;
         String socUri = "";
         String objUri = "";
@@ -269,6 +282,7 @@ public class MeasurementGenerator extends BaseGenerator {
             } else {
                 originalValue = record.getValueByColumnIndex(dasa.getTempPositionInt());
                 String dasa_uri_temp = dasa.getUri();
+                //System.out.println("DASA URI: [" + dasa_uri_temp + "]   Position: [" + dasa.getTempPositionInt() + "]");
                 measurement.setOriginalValue(originalValue);
                 if (possibleValues.containsKey(dasa_uri_temp)) {
                     if (possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase())) {
@@ -317,7 +331,7 @@ public class MeasurementGenerator extends BaseGenerator {
                 String timeValue = record.getValueByColumnIndex(posTimeInstant);
                 //timeValue = timeValue.replace("-05:00","-0500");
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-                //System.out.println("Timestamp received: " + timeValue);
+                //System.out.println("Timestamp received: [" + timeValue + "]");
                 if (timeValue != null) {
                 	if (timeValue.length() > 24) {
                      	timeValue = timeValue.substring(0, 23) + timeValue.substring(timeValue.length() - 6);

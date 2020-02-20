@@ -177,7 +177,10 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
     
     public StudyObject createStudyObject(Record record) throws Exception {
-        StudyObject obj = new StudyObject(getUri(record), getType(record), 
+    	if (getOriginalID(record) == null || getOriginalID(record).isEmpty()) {
+    		return null;
+    	}
+    	StudyObject obj = new StudyObject(getUri(record), getType(record), 
 					  getOriginalID(record), getLabel(record), 
 					  getSocUri(), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));

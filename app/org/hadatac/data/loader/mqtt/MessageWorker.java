@@ -39,30 +39,30 @@ public class MessageWorker {
     } 
     
     public void initiateStream(MessageStream stream) {
-		System.out.println("MessageWorker: adding stream " + stream.getName());
+		//System.out.println("MessageWorker: adding stream " + stream.getName());
 		
 		if (stream.getStatus().equals(MessageStream.INITIATED) || stream.getStatus().equals(MessageStream.ACTIVE)) {
 			List<MessageTopic> topics = MessageTopic.findActiveByStream(stream.getUri());
 			for (MessageTopic topic : topics) {
-				System.out.println("MessageWorker: adding topic " + topic.getLabel() + " of stream " + stream.getName());
-				System.out.println("Adding topic [" + topic.getLabel() + "]");
+				//System.out.println("MessageWorker: adding topic " + topic.getLabel() + " of stream " + stream.getName());
+				//System.out.println("Adding topic [" + topic.getLabel() + "]");
 				topicsMap.put(topic.getLabel(), topic);
 			} 
 		}	
 
 		List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
-		System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
-		for (String key : keyList) {
-			System.out.println("MessageWorker:  topicsMap's key is " + key);
-		}
+		//System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
+		//for (String key : keyList) {
+		//	System.out.println("MessageWorker:  topicsMap's key is " + key);
+		//}
 		
     }
     
     public void closeStream(MessageStream stream) {
 		List<MessageTopic> topics = MessageTopic.findActiveByStream(stream.getUri());
 		for (MessageTopic topic : topics) {
-			System.out.println("MessageWorker: removing topic " + topic.getLabel() + " of stream " + stream.getName());
-			System.out.println("Removing topic [" + topic.getLabel() + "]");
+			//System.out.println("MessageWorker: removing topic " + topic.getLabel() + " of stream " + stream.getName());
+			//System.out.println("Removing topic [" + topic.getLabel() + "]");
 			topicsMap.remove(topic.getLabel());
 			topicsGen.remove(topic.getLabel());
 		} 
@@ -71,18 +71,18 @@ public class MessageWorker {
 				clientsMap.get(stream.getFullName()).unsubscribe(stream.getName() + "/#");
 				clientsMap.get(stream.getFullName()).disconnectForcibly();
 				clientsMap.put(stream.getFullName(),null);
-				System.out.println("Unsubscribed stream [" + stream.getFullName() + "]");
+				//System.out.println("Unsubscribed stream [" + stream.getFullName() + "]");
 			}
 			if (executorsMap != null && stream != null && executorsMap.get(stream.getFullName()) != null) {
 				executorsMap.get(stream.getFullName()).shutdownNow();
 				executorsMap.put(stream.getFullName(),null);
-				System.out.println("Stopped stream thread [" + stream.getFullName() + "]");
+				//System.out.println("Stopped stream thread [" + stream.getFullName() + "]");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Removing stream client and thread from MessageWorker [" + stream.getFullName() + "]");
+		//System.out.println("Removing stream client and thread from MessageWorker [" + stream.getFullName() + "]");
 		if (executorsMap != null && stream != null && stream.getFullName() != null) {
 			executorsMap.remove(stream.getFullName());
 		}
@@ -118,7 +118,7 @@ public class MessageWorker {
 
 	public static Record processMessage(String topicStr, String message, int currentRow) {
 		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]   0");
-		System.out.println("Current row: [" + currentRow + "]");
+		//System.out.println("Current row: [" + currentRow + "]");
 
 		//List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
 		//System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());
@@ -128,9 +128,10 @@ public class MessageWorker {
 		if (!MessageWorker.getInstance().topicsMap.containsKey(topicStr)) {
 			return null;
 		}
+		MessageTopic tpc = MessageWorker.getInstance().topicsMap.get(topicStr);
 		//MessageTopic topic = MessageWorker.getInstance().topicsMap.get(topicStr);
 		//System.out.println("TopicStr: [" + topicStr + "]   1");
-		Record record = new JSONRecord(message);
+		Record record = new JSONRecord(message, tpc.getHeaders());
 		//RecordMessage rec2 = handler.getRecord(message);
 		//System.out.println("labels: [" + rec2.headers + "]   2");
 		//System.out.println("values: [" + rec2.values + "]   2");
