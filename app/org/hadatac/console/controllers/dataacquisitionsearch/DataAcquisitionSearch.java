@@ -191,18 +191,21 @@ public class DataAcquisitionSearch extends Controller {
         String facets = "";
         String objectType = "";
         String categoricalValues = "";
+        String timeResolution = "";
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request().body().asFormUrlEncoded();
         if (name_map != null) {
             facets = name_map.get("facets")[0];
             objectType = name_map.get("selObjectType")[0].toString();
             categoricalValues = name_map.get("selCatValue")[0].toString();
+            timeResolution = name_map.get("selTimeRes")[0].toString();
         }
 
         AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
+        final String timeOption = timeResolution;
     	System.out.println("Object type inside alignment: " + objectType);
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
         	System.out.println("Selected subject alignment");
@@ -212,7 +215,7 @@ public class DataAcquisitionSearch extends Controller {
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
         	System.out.println("Selected time alignment");
 	        CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
-			        results.getDocuments(), finalFacets, email, categoricalOption), 
+			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption), 
 		        		ec.current());
         }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 import org.apache.jena.query.Query;
@@ -152,6 +153,15 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
         this.headers = headers;
     }
     
+    public void setHeaders(String headersStr) {
+    	this.headers = new ArrayList<String>();
+    	headersStr = headersStr.replace("[","").replace("]","");
+    	StringTokenizer str = new StringTokenizer(headersStr,","); 
+        while (str.hasMoreTokens()) {
+        	this.headers.add(str.nextToken().trim()); 
+        }
+    }
+    
     public String getLog() {
         return getLogger().getLog();
     }
@@ -270,11 +280,11 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
 		    	if (object.asLiteral().getString() != null) {
 		    		stream.setLogger(new AnnotationLogger(stream, object.asLiteral().getString()));
 		    	} 
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasHeader")) {
-		    	tmpHeaders.add(object.asLiteral().getString());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasHeaders")) {
+		    	stream.setHeaders(object.asLiteral().getString());
+		    	
 		    }
 		}		
-		stream.setHeaders(tmpHeaders);
 		stream.setUri(uri);
 		
 		return stream;
@@ -332,9 +342,7 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
         	insert += topic_uri + " hasco:hasLog  \"" + this.getLog() + "\" . ";
         }
         if (this.getHeaders() != null && this.getHeaders().size() > 0) {
-        	for (String header : this.getHeaders()) {
-        		insert += topic_uri + " hasco:hasHeader  \"" + header + "\" . ";
-        	}
+        	insert += topic_uri + " hasco:hasHeaders  \"" + this.getHeaders().toString() + "\" . ";
         }
 
         

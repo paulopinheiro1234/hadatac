@@ -386,9 +386,25 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public List<String> defineTemporaryPositions(List<String> csvHeaders) {
         List<String> unknownHeaders = new ArrayList<String>(csvHeaders);
-
-        // Assign DASA positions by label matching
         List<DataAcquisitionSchemaAttribute> listDasa = getAttributes();
+        
+        /*
+        // list positions
+        System.out.println("DAS Pojo: SDD Headers");
+        int auxdasa = 0;
+        for (DataAcquisitionSchemaAttribute dasa : listDasa) {
+        	System.out.println("header [" + auxdasa + "] : [" + dasa.getLabel() + "]");
+        	auxdasa++;
+        }
+        System.out.println("DAS Pojo: CSV Headers");
+        int auxcsv = 0;
+        for (String header : csvHeaders) {
+        	System.out.println("header [" + auxcsv + "] : [" + header + "]" );
+        	auxcsv++;
+        }
+        */
+        
+        // Assign DASA positions by label matching
         if (listDasa != null && listDasa.size() > 0) {
             // reset temporary positions
             for (DataAcquisitionSchemaAttribute dasa : listDasa) {
@@ -404,6 +420,13 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 }
             }
         }
+        
+        /*
+        System.out.println("DAS Pojo: Assignments");
+        for (DataAcquisitionSchemaAttribute dasa : listDasa) {
+        	System.out.println("header [" + dasa.getTempPositionInt() + "] : [" + dasa.getLabel() + "]");
+        }
+        */
 
         // Assign DASO positions by label matching
         List<DataAcquisitionSchemaObject> listDaso = getObjects();

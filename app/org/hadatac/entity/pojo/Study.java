@@ -937,7 +937,7 @@ public class Study extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
+        
         Study study = null;
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
