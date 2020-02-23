@@ -14,6 +14,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.routes;
 import org.hadatac.console.views.html.sandbox.*;
 import org.hadatac.entity.pojo.OperationMode;
+import org.hadatac.utils.NameSpaces;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -66,6 +67,8 @@ public class Sandbox extends Controller {
             mode.setOperationMode(OperationMode.SANDBOX);
             mode.setLastEnterTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             mode.save();
+            
+            NameSpaces.getInstance().reload();
         }
 
         return redirect(org.hadatac.console.controllers.sandbox.routes.Sandbox.index());
@@ -78,6 +81,8 @@ public class Sandbox extends Controller {
         OperationMode mode = OperationMode.findByEmail(user.getEmail());
         if (mode != null) {
             mode.delete();
+            
+            NameSpaces.getInstance().reload();
         }
 
         return redirect(org.hadatac.console.controllers.sandbox.routes.Sandbox.index());
