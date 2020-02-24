@@ -125,7 +125,7 @@
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getId())" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFileOnly(dir, file.getId())" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
                 <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFileToWorking(file.getId())" class="btn-xs btn-primary" role="button" id="move-to-working" onclick="return confirm('Are you sure to move it to working list?')">Move to Working</a>
                 @if(bAdmin) {
                     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn-xs btn-primary" role="button">Assign Owner</a>

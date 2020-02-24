@@ -511,6 +511,28 @@ public class AutoAnnotator extends Controller {
 
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
+    
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result deleteDataFileOnly(String dir, String fileId) {
+        final SysUser user = AuthApplication.getLocalUser(session());
+        
+        DataFile dataFile = null;
+        if (user.isDataManager()) {
+            dataFile = DataFile.findById(fileId);
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
+        
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to operate this file!");
+        }
+
+        File file = new File(dataFile.getAbsolutePath());
+        file.delete();
+        dataFile.delete();
+
+        return redirect(routes.AutoAnnotator.index(dir, "."));
+    }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public static void deleteAddedTriples(File file, DataFile dataFile) {

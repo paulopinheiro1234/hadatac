@@ -354,6 +354,8 @@ GET	    /hadatac/annotator/movefile		               org.hadatac.console.controll
 POST	/hadatac/annotator/movefile    		           org.hadatac.console.controllers.annotator.AutoAnnotator.moveDataFile(dir : String, file_id : String)
 GET	    /hadatac/annotator/deletefile		           org.hadatac.console.controllers.annotator.AutoAnnotator.deleteDataFile(dir : String, file_id : String)
 POST	/hadatac/annotator/deletefile    	           org.hadatac.console.controllers.annotator.AutoAnnotator.deleteDataFile(dir : String, file_id : String)
+GET     /hadatac/annotator/deletefileonly              org.hadatac.console.controllers.annotator.AutoAnnotator.deleteDataFileOnly(dir : String, file_id : String)
+POST    /hadatac/annotator/deletefileonly              org.hadatac.console.controllers.annotator.AutoAnnotator.deleteDataFileOnly(dir : String, file_id : String)
 GET     /hadatac/annotator/movefiletoworking           org.hadatac.console.controllers.annotator.AutoAnnotator.moveDataFileToWorking(file_id : String)
 POST    /hadatac/annotator/movefiletoworking           org.hadatac.console.controllers.annotator.AutoAnnotator.moveDataFileToWorking(file_id : String)
 GET	    /hadatac/annotator/downloadfile		           org.hadatac.console.controllers.annotator.AutoAnnotator.downloadDataFile(file_id : String)
