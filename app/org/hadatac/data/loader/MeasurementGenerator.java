@@ -79,6 +79,7 @@ public class MeasurementGenerator extends BaseGenerator {
         if (mode == MSGMODE) {
         	this.topic = topic;
         	this.logger = topic.getLogger();
+        	totalCount = topic.getStream().getIngestedMessages();
         }
         if (mode == FILEMODE) {
             this.dataFile = dataFile;

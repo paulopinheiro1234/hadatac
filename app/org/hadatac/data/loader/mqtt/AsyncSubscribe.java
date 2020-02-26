@@ -167,7 +167,8 @@ public class AsyncSubscribe implements MqttCallback {
 
     	client.subscribe(stream.getName() + "/#", qos);
 
-    	totalMessages = 0;
+    	totalMessages = stream.getTotalMessages();
+    	ingestedMessages = stream.getIngestedMessages();
     	partialCounter = 0;
 
     }
@@ -215,8 +216,9 @@ public class AsyncSubscribe implements MqttCallback {
 		 */
 		totalMessages = totalMessages + 1;
 		stream.setTotalMessages(totalMessages);
+		stream.setIngestedMessages(ingestedMessages);
 		partialCounter = partialCounter + 1;
-		if (partialCounter >= 200) {
+		if (partialCounter >= 50) {
 			partialCounter = 0;
 			System.out.println("Received " + totalMessages + " messages. Ingested " + ingestedMessages + " messages.");
 

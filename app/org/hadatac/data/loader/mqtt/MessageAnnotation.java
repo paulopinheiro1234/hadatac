@@ -126,8 +126,6 @@ public class MessageAnnotation {
 			}
 		}
 		
-		stream.setTotalMessages(0);
-		stream.setIngestedMessages(0);
 		stream.setStudyUri(null);
         stream.setStatus(MessageStream.CLOSED);
 		stream.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
