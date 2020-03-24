@@ -62,10 +62,6 @@ public class STRGenerator extends BaseGenerator {
         return rec.getValueByColumnName(Templates.DEPLOYMENTURI);
     }
 
-    //private String getRowScope(Record rec) {
-    //    return rec.getValueByColumnName(Templates.ROWSCOPE);
-    //}
-
     private String getCellScope(Record rec) {
         return rec.getValueByColumnName(Templates.CELLSCOPE);
     }
@@ -135,11 +131,9 @@ public class STRGenerator extends BaseGenerator {
 
         String deploymentUri = URIUtils.replacePrefixEx(getDeployment(rec));
 
-        //String rowScopeStr = getRowScope(rec);
-
         String cellScopeStr = getCellScope(rec);
 
-        return createSTR(row, ownerEmail, permissionUri, deploymentUri, /*rowScopeStr,*/ cellScopeStr);
+        return createSTR(row, ownerEmail, permissionUri, deploymentUri, cellScopeStr);
     }
 
     private STR createSTR(
@@ -147,7 +141,6 @@ public class STRGenerator extends BaseGenerator {
             String ownerEmail, 
             String permissionUri, 
             String deploymentUri,
-            //String rowScopeStr,
             String cellScopeStr) throws Exception {
 
         STR str = new STR();
@@ -236,13 +229,13 @@ public class STRGenerator extends BaseGenerator {
                 str.setPlatformUri(deployment.getPlatform().getUri());
                 str.setPlatformName(deployment.getPlatform().getLabel());
             } else {
-                throw new Exception(String.format("No platform of Deployment <%s> is specified!", deploymentUri));
+                throw new Exception(String.format("No platform is specified for deployment <%s>", deploymentUri));
             }
             if (deployment.getInstrument() != null) {
                 str.setInstrumentUri(deployment.getInstrument().getUri());
                 str.setInstrumentModel(deployment.getInstrument().getLabel());
             } else {
-                throw new Exception(String.format("No instrument of Deployment <%s> is specified!", deploymentUri));
+                throw new Exception(String.format("No instrument is speficied for deployment <%s>", deploymentUri));
             }
             str.setStartedAtXsdWithMillis(deployment.getStartedAt());
         } else {

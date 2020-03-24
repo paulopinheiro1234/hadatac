@@ -23,6 +23,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.DOI;
 import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
@@ -75,6 +76,9 @@ public class AnnotationWorker {
             
         } else if (fileName.startsWith("SSD-")) {
             chain = annotateSSDFile(dataFile);
+            
+        } else if (fileName.startsWith("DOI-")) {
+            chain = annotateDOIFile(dataFile);
             
         } else {
             dataFile.getLogger().printExceptionById("GBL_00001");
@@ -371,6 +375,66 @@ public class AnnotationWorker {
         return chain;
     }
 
+    public static GeneratorChain annotateDOIFile(DataFile dataFile) {
+        System.out.println("Processing DOI file ...");
+        RecordFile recordFile = new SpreadsheetRecordFile(dataFile.getFile(), "InfoSheet");
+        if (!recordFile.isValid()) {
+            dataFile.getLogger().printExceptionById("DOI_00001");
+            return null;
+        } else {
+            dataFile.setRecordFile(recordFile);
+        }
+        
+        DOI doi = new DOI(dataFile);
+        Map<String, String> mapCatalog = doi.getCatalog();
+        GeneratorChain chain = new GeneratorChain();
+
+        String studyId = doi.getStudyId();
+        if (studyId == null || studyId.isEmpty()) {
+            dataFile.getLogger().printExceptionByIdWithArgs("DOI_00002", studyId);
+            return null;
+        } else {
+            Study study = Study.findById(studyId);
+            if (study != null) {
+                chain.setStudyUri(study.getUri());
+                dataFile.getLogger().println("DOI ingestion: Found study id [" + studyId + "]");
+            } else {
+                dataFile.getLogger().printExceptionByIdWithArgs("DOI_00003", studyId);
+                return null;
+            }
+        }
+
+        chain.setDataFile(dataFile);
+        
+        String doiVersion = doi.getVersion();
+        if (doiVersion != null && !doiVersion.isEmpty()) {
+            dataFile.getLogger().println("DOI ingestion: version is [" + doiVersion + "]");
+        } else {
+            dataFile.getLogger().printExceptionById("DOI_00004");
+            return null;
+        }
+
+        if (mapCatalog.get("Filenames") == null) {
+            dataFile.getLogger().printExceptionById("DOI_00005");
+            return null;
+        }
+
+        String sheetName = mapCatalog.get("Filenames").replace("#", "");
+        RecordFile sheet = new SpreadsheetRecordFile(dataFile.getFile(), sheetName);
+                
+        try {
+        	DataFile dataFileForSheet = (DataFile)dataFile.clone();
+        	dataFileForSheet.setRecordFile(sheet);
+        	chain.addGenerator(new DOIGenerator(dataFileForSheet));
+        } catch (CloneNotSupportedException e) {
+        	e.printStackTrace();
+            dataFile.getLogger().printExceptionById("DOI_00006");
+            return null;
+        }
+
+        return chain;
+    }
+
     public static GeneratorChain annotateDPLFile(DataFile dataFile) {
         RecordFile recordFile = new SpreadsheetRecordFile(dataFile.getFile(), "InfoSheet");
         if (!recordFile.isValid()) {
@@ -428,9 +492,11 @@ public class AnnotationWorker {
         String sddVersion = sdd.getVersion();
         if (sddName == "") {
             dataFile.getLogger().printExceptionById("SDD_00003");
+            return null;
         }
         if (sddVersion == "") {
             dataFile.getLogger().printExceptionById("SDD_00018");
+            return null;
         }
         Map<String, String> mapCatalog = sdd.getCatalog();
 
@@ -554,7 +620,7 @@ public class AnnotationWorker {
             //System.out.println("added SSDGenerator for " + dataFile.getAbsolutePath());
 
             String studyUri = socgen.getStudyUri();
-            if (studyUri == null || studyUri == "") {
+            if (studyUri == null || studyUri.isEmpty()) {
                 return null;
             } else {
                 chain.setStudyUri(studyUri);

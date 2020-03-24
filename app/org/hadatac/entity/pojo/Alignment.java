@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.STR;
+
 public class Alignment {
 
     private Map<String, StudyObject> objects;
@@ -17,6 +20,7 @@ public class Alignment {
     private Map<String, Variable> variables;
     private Map<String, List<String>> hCodeBook;
     private Map<String, String> studyId;  // key=socUri;  value=studyId
+    private Map<String, STR> dataAcquisitions;
 
     Attribute ID = new Attribute();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
@@ -33,7 +37,8 @@ public class Alignment {
         variables = new HashMap<String, Variable>();
 	    hCodeBook = new HashMap<String, List<String>>();
 	    studyId = new HashMap<String,String>();
-        ID.setLabel("ID");
+	    dataAcquisitions = new HashMap<String,STR>();
+	    ID.setLabel("ID");
         GROUPID.setLabel("GROUPID");
     }
 
@@ -123,6 +128,12 @@ public class Alignment {
             }
         } 
 
+        if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
+            System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
+        	STR da = STR.findByUri(m.getAcquisitionUri());
+        	dataAcquisitions.put(m.getAcquisitionUri(), da);
+        }
+        
 	    String mRole = m.getRole().replace(" ","");
 
         String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
@@ -268,6 +279,23 @@ public class Alignment {
         return new ArrayList<List<String>>(hCodeBook.values());
     }
 
+    public List<String> getDOIs() {
+    	List<String> resp = new ArrayList<String>();
+    	if (dataAcquisitions.size() == 0) {
+    		return resp;
+    	}
+        System.out.println("getDOI(): da size is " + dataAcquisitions.size());
+    	for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
+            org.hadatac.entity.pojo.STR da = entry.getValue();
+            System.out.println("getDOI(): da is " + da.getUri());
+            for (String doi : da.getDOIs()) { 
+                System.out.println("getDOI(): doi is " + doi);
+            	resp.add(doi);
+            }
+    	}
+    	return resp;
+    }
+    
     /* ADD METHODS
      */
 

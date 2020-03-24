@@ -1268,7 +1268,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             	if (categoricalOption.equals(WITH_CODE_BOOK)) {
             		outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
             	}
-		
+
+            	outputProvenance(alignment, file, dataFile.getOwnerEmail());
+            	
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
                     return;
@@ -1286,7 +1288,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public static void outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
 	try {
 	    //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
-	    String fileName = "download_" + file.getName().substring(10, file.getName().lastIndexOf("_")) + "_codebook.csv";
+	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
 	    Date date = new Date();
 	    //String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + "_codebook.csv";
 	    //DataFile dataFile = new DataFile(codeBookFile.getName());
@@ -1335,6 +1337,38 @@ public class Measurement extends HADatAcThing implements Runnable {
         });
 	    for (CodeBookEntry cbe : codeBook) {
 	    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
+	    }
+	    	
+    	dataFile.setCompletionPercentage(100);
+	    dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+	    dataFile.setStatus(DataFile.CREATED);
+	    dataFile.save();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void outputProvenance(Alignment alignment, File file, String ownerEmail) {        
+	try {
+	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
+	    Date date = new Date();
+	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+	    dataFile.save();
+
+	    // Write empty string to create the file
+        File provenanceFile = new File(dataFile.getAbsolutePath());
+        FileUtils.writeStringToFile(provenanceFile, "", "utf-8", true);
+	    
+	    System.out.println("Sources file  [" + provenanceFile.getName() + "]");
+	    
+	    FileUtils.writeStringToFile(provenanceFile, "used_DOI\n", "utf-8", true);
+	    // Write provenance file
+	    List<String> provenance = alignment.getDOIs();
+        provenance.sort(Comparator.comparing( String::toString));
+	    for (String prov : provenance) {
+	    	FileUtils.writeStringToFile(provenanceFile, prov + "\n", "utf-8", true);
 	    }
 	    	
     	dataFile.setCompletionPercentage(100);

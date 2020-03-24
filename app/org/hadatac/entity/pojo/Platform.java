@@ -445,7 +445,10 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     }
 
     public static Platform find(String uri) {
-        Platform platform = null;
+ 
+    	System.out.println("Platform.find <" + uri + ">");
+    	
+    	Platform platform = null;
         Statement statement;
         RDFNode object;
 
@@ -511,6 +514,8 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         }
 
         platform.setUri(uri);
+
+    	System.out.println("AFTER Platform.find <" + platform + ">");
 
         return platform;
     }
