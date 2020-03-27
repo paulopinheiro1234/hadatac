@@ -118,7 +118,7 @@ public class MessageWorker {
 
 	public static Record processMessage(String topicStr, String message, int currentRow) {
 		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]   0");
-		System.out.println("Current row: [" + currentRow + "]");
+		//System.out.println("Current row: [" + currentRow + "]");
 
 		//List<String> keyList = new ArrayList<String>(MessageWorker.getInstance().topicsMap.keySet());
 		//System.out.println("MessageWorker:  topicsMap's keyset size is " + keyList.size());

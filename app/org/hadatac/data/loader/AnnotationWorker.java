@@ -609,6 +609,8 @@ public class AnnotationWorker {
 
         SSDGeneratorChain chain = new SSDGeneratorChain();
 
+        Study study = null;
+
         if (SSDsheet.isValid()) {
 
             VirtualColumnGenerator vcgen = new VirtualColumnGenerator(dataFile);
@@ -624,7 +626,7 @@ public class AnnotationWorker {
                 return null;
             } else {
                 chain.setStudyUri(studyUri);
-                Study study = Study.find(studyUri);
+                study = Study.find(studyUri);
                 if (study != null) {
                     dataFile.getLogger().println("SSD ingestion: The study uri :" + studyUri + " is in the TS.");
                 } else {
@@ -640,6 +642,8 @@ public class AnnotationWorker {
             dataFile.getLogger().printException("Cannot locate SSD's sheet ");
         }
 
+        System.out.println("AnnotationWork: pre-processing StudyObjectGenerator. Study Id is  " + study.getId());
+        
         String study_uri = chain.getStudyUri();
         for (String i : mapCatalog.keySet()) {
             if (mapCatalog.get(i) != null && mapCatalog.get(i).length() > 0) {
@@ -650,7 +654,7 @@ public class AnnotationWorker {
                     if (mapContent == null || mapContent.get(i) == null) {
                         dataFile.getLogger().printException("No value for MapContent with index [" + i + "]");
                     } else {
-                    	chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri));
+                    	chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri, study.getId()));
                     }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
