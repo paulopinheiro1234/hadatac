@@ -132,15 +132,26 @@
 }
 /*===========================================================================*/
 .cart{
-  margin-top: 1px;
-  border:1px solid black;
-  border-radius: 80px;
-  height:35px;
-  width: 160px;
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  font-size: 11pt;
-  background-color: rgb(173, 217, 253);
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
 }
 
 .shopbutton{
@@ -198,18 +209,72 @@ ul {
   margin: 0;
 }
 /*-----------------------------------------------------*/
-.addtocart{
-  margin-top: 1px;
-  border:1px solid black;
-  border-radius:80px;
-  height:34px;
-  margin-bottom: 2px;
-  width: 160px;
+#vsdd{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  font-size: 11pt;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
   text-align: center;
-  background-color: rgb(173, 217, 253);
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+}
+#everify{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+}
+/*-----------------------------------------------------*/
+.addtocart{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
   }
 
 .cartbutton{

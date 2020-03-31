@@ -166,6 +166,15 @@ cellEntry.addEventListener('keyup', function (e){
    }
 });
 
+
+// cdg.addEventListener('rendercell', function (e) {
+//   // cdg.editCellColor="red";
+//   // if (cdg.schema[0].title == 'Column' && /CHEARPID/.test(e.cell.value)) {
+//   //     // e.ctx.fillStyle = '#AEEDCF';
+//   //     cdg.editCellColor="red";
+//   // }
+  
+// });
 cdg.addEventListener('click', function (e) {
   returnToView();
   colNum=e.cell.columnIndex;
@@ -227,6 +236,7 @@ cdg.addEventListener('click', function (e) {
 });
 
 cdg.addEventListener('endedit',function(e){
+
   if (!e.cell) { return; }
 
 
@@ -249,12 +259,14 @@ cdg.addEventListener('endedit',function(e){
   storeThisEdit(rowNum_str,colNum_str,e.value);
   var menuoptns=[];
   starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
+  
+  
 })
 
 cdg.addEventListener('click', function (e) {
   returnToView();
   if (!e.cell) { return; }
-  if(e.cell.value==null){console.log("non");return;}
+  if(e.cell.value==null){;return;}
   else{
     colNum=e.cell.columnIndex;
     rowNum=e.cell.rowIndex;
@@ -289,13 +301,35 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 
 function chooseItem(data) {
   var choice=data.value.split(",");
-  cdg.data[rowNum][colNum] = choice[1];
+  var namespace;
+  if(choice[1].startsWith("http")){
+    namespace=choice[1].split("/").pop();
+  }
+  namespace=namespace.replace("_",":");
+  cdg.data[rowNum][colNum] = namespace;
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   fromSuggestionstoLabel(choice[1],rowNum+1,colNum);
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   drawStars(rowNum,colNum);
   cdg.draw();
+  if(namespace in approvalList){
+    if(rowNum+1==approvalList[namespace][0] && colNum==approvalList[namespace][1] ){
+
+    }
+    else{
+      approvalList[namespace]=[rowNum+1,colNum,0]
+      indicateApproval();
+    }
+  }
+  else if(!(namespace in approvalList)){
+    console.log("here");
+    approvalList[namespace]=[rowNum+1,colNum,0]
+    indicateApproval();
+    
+    
+  }
+  
   
 
 }
@@ -350,6 +384,20 @@ cdg.addEventListener('contextmenu', function (e) {
 
     }
   });
+    e.items.push({
+      title: 'Accept Value as Optimal Value',
+      click: function (ev) {
+        console.log(approvalList);
+        console.log(e.cell.value);
+        var originalVal=e.cell.value;
+        var stripped=originalVal.replace(" + ","")
+          approvalList[stripped][2]=1;
+          
+          acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
+          
+
+      }
+    });
 });
 function insertRowAbove(){
   var intendedRow=parseFloat(rowNum);
@@ -421,19 +469,56 @@ var headerMap = new Map();
 var json_copy;
 
 var sheetStorage=[];
+var approvalList={};
 function gotothisfunction(sheetCopy){
+  //sheetStorage=[];
+  console.log(sheetCopy.length)
   for(var i=0;i<sheetCopy.length;i++){
     var temp=[];
     for(var j=0;j<sheetCopy[i].length;j++){
       temp.push(sheetCopy[i][j]);
     }
     sheetStorage.push(temp);
+    
   }
   console.log(sheetStorage);
-  
+}
+function approvalFunction(sheetCopy){
+  for(var i=1;i<sheetCopy.length;i++){
+    
+    for(var j=1;j<sheetCopy[i].length;j++){
+      var temp2=[];
+      if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
+
+      }
+      else if(sheetCopy[i][j].includes("+")==true){
+        var keys=sheetCopy[i][j];
+        temp2.push(i);
+        temp2.push(j);
+        temp2.push(1);
+        approvalList[keys]=temp2;
+      }
+      else{
+        //temp2.push(sheetCopy[i][j]);
+        var keys=sheetCopy[i][j];
+        temp2.push(i);
+        temp2.push(j);
+        temp2.push(0);
+        approvalList[keys]=temp2;
+       
+      }
+     
+    }
+    
+  }
+
+  //console.log(approvalList)
+  indicateApproval();
+ 
  
 
 }
+
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
@@ -476,9 +561,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
    }
   }
   
-  if(sheetName=="Dictionary Mapping"){
+  if(sheetName=="Dictionary Mapping" ){
     var sheetCopy=cleanJson
     gotothisfunction(sheetCopy);
+   
   }
   if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
      var temp = [];
@@ -489,6 +575,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   }
 
   json = cleanJson;
+  
   var emptySheet;
   /* set up table headers */
   if(headerMap.has(sheetName)){
@@ -517,7 +604,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     changeHeader(json[0], emptySheet);
   }
-
+  if(sheetName=="Dictionary Mapping"){
+    var sheetCopy=cleanJson
+    approvalFunction(sheetCopy)
+  }
   checkRecs(L, cdg.data.length, 1);
   cdg.draw();
 };

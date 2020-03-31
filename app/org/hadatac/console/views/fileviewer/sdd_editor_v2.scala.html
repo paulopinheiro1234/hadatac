@@ -32,14 +32,15 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
          <input class="btn btn-primary" type="button" id="upload" value="Save"/>
       }
-      <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
+      <a  href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
          <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
 
 
 
       <!-- <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button> -->
 
-      <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
+      <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">
+         <span class="glyphicon glyphicon-pencil"> </span> Populate</button>
 
       <script>
 
@@ -92,14 +93,15 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                <span class="glyphicon glyphicon-circle-arrow-right"> </span> Redo </button>
       </div>
       <div class="changeView" style="display:inline-block;">
-            <button class="changeViewLabel" id="showThis"> Show Labels</button>
+            <button class="changeViewLabel" id="showThis"> <span class="glyphicon glyphicon-list-alt"> </span> Show Labels</button>
                <button class="changeViewIri" id="hideThis">  Show Original Sheet</button>
 
       </div>
+     
       <div class= shopbutton>
          <button class="cart" >
 
-               <img src="@controllers.routes.Assets.versioned("icons/shop.png")" width="40" height="32" alt=""/> Shop Terms</button>
+            <span class="glyphicon glyphicon-gift"> </span> Shop Terms</button>
 
             <ul id="myDropdown" class="ontologydrop-content">
 
@@ -129,16 +131,19 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
            
          </script>
          <div class="cartbutton" id="f">
-            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; position: relative;"  >
+            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; "  >
 
-               <img src="@controllers.routes.Assets.versioned("icons/shopping-cart.png")" width="38" height="30" alt=""/>
+               <span class="glyphicon glyphicon-shopping-cart"> </span>
                View Cart
             </button>
             <ul id="seecart" class="cart-content">
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
-         
+         <div id="verifysdd" style="display:inline-block;" >
+            <button id="vsdd" onclick="verifySDD()" >Verify SDD</button>
+            <button id="everify" onclick="external()">External Verify</button>
+         </div>
          
          <button class="main-nav" id="show"> <img src="@controllers.routes.Assets.versioned("icons/open-eye.png")"
             width="36" height="33" alt=""/> Show Options</button>
@@ -167,10 +172,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
                   <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
                </div> -->
-               <div id="verifysdd" style="display: flex; align-items: center; justify-content: center; margin:0 auto;" >
-                  <button onclick="verifySDD()" style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify SDD</button>
-                  <button style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white;" onclick="external()">External Verify</button>
-               </div>
+               
                <script>
                   function external(){
                      var f_id="@dataFile.getId()";

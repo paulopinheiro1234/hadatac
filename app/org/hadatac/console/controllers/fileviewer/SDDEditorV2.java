@@ -23,9 +23,11 @@ import org.hadatac.console.controllers.fileviewer.DDEditor;
 import org.hadatac.console.controllers.workingfiles.WorkingFiles;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.entity.pojo.Ontology;
+import org.hadatac.metadata.loader.URIUtils;
 
 
 public class SDDEditorV2 extends Controller {
+    URIUtils aURI;
     NameSpaces ns = NameSpaces.getInstance();
     String bioportalKey="";
     String FileID="";
@@ -220,6 +222,15 @@ public class SDDEditorV2 extends Controller {
         String returnLabel=fL.getLabel(iricode);
         
         return ok(Json.toJson(returnLabel));
+
+    }
+
+    public Result validateIRI(String s){
+
+        
+        boolean isValid=aURI.isValidURI(s);
+        
+        return ok(Json.toJson(isValid));
 
     }
 
