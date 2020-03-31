@@ -7,16 +7,23 @@
 
 @import java.net._
 @import org.hadatac.utils._
+@import org.hadatac.console.controllers.metadata._
+@import org.hadatac.console.controllers.metadata.DynamicFunctions
+@import org.hadatac.utils._
+@import play.Play
+@import com.typesafe.config.ConfigFactory
 
 	<tr>
+	  <td>@stream.getName()</td>
 	  <td>@stream.getIP()</td>
 	  <td>@stream.getPort()</td> 
-	  <td>@stream.getLabel()</td>
 	  <td>@stream.getStatus()</td> 
 	  <td>@stream.getProtocol()</td>
 	  <td>@if(stream != null && stream.getStudy() != null) {
+          <a href="@ConfigFactory.load().getString("hadatac.console.host_deploy")/hadatac/studies/view?study_uri=@DynamicFunctions.replaceURLWithPrefix(stream.getStudy().getUri())"> 
 	          @stream.getStudy().getId()
-	      }
+	      </a>
+	  }
 	  </td> 
 	  <td>@stream.getTotalMessages()</td> 
 	  <td>@stream.getIngestedMessages()</td> 
@@ -69,7 +76,7 @@
          <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testTopics(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))"
             class="btn-xs btn-primary" role="button">Test Topics</a>
          <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), null, null)"
-            class="btn-xs btn-primary" role="button">Raw Data</a>
+            class="btn-xs btn-primary" role="button">Live Raw Data</a>
          <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.checkAnnotationLog(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"))" 
             class="btn-xs btn-primary" role="button">Logs</a>
       </td>

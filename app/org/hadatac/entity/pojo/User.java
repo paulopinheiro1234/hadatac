@@ -154,7 +154,7 @@ public class User implements Comparable<User> {
         insert += "<" + this.getUri() + ">  ";
         insert += " foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "<" + this.getUri() + ">  ";
-        insert += " sio:isMemberOf " + "\"Public\" . ";
+        insert += " sio:SIO_000095 " + "\"Public\" . ";
         insert += "}  ";
         System.out.println("!!!! INSERT USER");
 
@@ -271,7 +271,7 @@ public class User implements Comparable<User> {
             if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
                 user.setComment(object.asLiteral().getString());
             }
-            else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:isMemberOf"))) {
+            else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:SIO_000095"))) {
                 if(object.toString().equals("Public") || object.toString().equals("")){
                     user.setImmediateGroupUri("Public");
                 }
@@ -338,13 +338,13 @@ public class User implements Comparable<User> {
 
         String command = NameSpaces.getInstance().printSparqlNameSpaceList();
         if(group_uri.equals("Public")){
-            command += "DELETE { <" + uri + "> sio:isMemberOf \"" + group_uri + "\" .  } \n"
-                    + "INSERT { <" + uri + "> sio:isMemberOf \"" + group_uri + "\" . } \n "
+            command += "DELETE { <" + uri + "> sio:SIO_000095 \"" + group_uri + "\" .  } \n"
+                    + "INSERT { <" + uri + "> sio:SIO_000095 \"" + group_uri + "\" . } \n "
                     + "WHERE { } \n";
         }
         else{
-            command += "DELETE { <" + uri + "> sio:isMemberOf <" + group_uri + "> .  } \n"
-                    + "INSERT { <" + uri + "> sio:isMemberOf <" + group_uri + "> . } \n "
+            command += "DELETE { <" + uri + "> sio:SIO_000095 <" + group_uri + "> .  } \n"
+                    + "INSERT { <" + uri + "> sio:SIO_000095 <" + group_uri + "> . } \n "
                     + "WHERE { } \n";
         }
 

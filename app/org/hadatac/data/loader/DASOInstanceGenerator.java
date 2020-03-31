@@ -28,8 +28,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
 	private final boolean DEBUG_MODE = false;
 	private final int ID_LENGTH = 5;
 	
-	private final String SIO_OBJECT = "sio:Object";
-    private final String SIO_SAMPLE = "sio:Sample";;
+	private final String SIO_OBJECT = "sio:SIO_000776";
+    private final String SIO_SAMPLE = "sio:SIO_001050";;
     private final String kbPrefix = ConfigProp.getKbPrefix();
     private String studyUri;
     private String strUri;

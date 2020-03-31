@@ -675,6 +675,34 @@ public class Study extends HADatAcThing {
         return returnStudy;
     }// /find(studyUri)
 
+    public static Study findById(String id) {
+    	if (id == null || id.isEmpty()) {
+    		return null;
+    	}
+    	String queryString = "";
+        queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri " + 
+                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " + 
+                "          ?uri a ?subUri . " +  
+                "          ?uri hasco:hasId ?id .  " +
+                "        FILTER (?id=\"" + id + "\"^^xsd:string)  . " +  
+                " }";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        String uri = null;
+        Study study = null;
+        if (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.get("uri") != null) { 
+                uri = soln.get("uri").toString();
+            }
+            study = Study.find(uri);
+        }
+
+        return study;
+    }
 
     public static Study findByName(String studyName){
         if (studyName == null || studyName.equals("")) {
@@ -937,7 +965,7 @@ public class Study extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
+        
         Study study = null;
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();

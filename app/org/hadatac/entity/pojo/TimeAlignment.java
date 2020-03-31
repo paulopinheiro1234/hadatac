@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.STR;
-
-public class Alignment {
+public class TimeAlignment {
 
     private Map<String, StudyObject> objects;
     //private List<String> timestamps;
@@ -17,59 +14,37 @@ public class Alignment {
     private Map<String, Entity> entityCache;
     private Map<String, Unit> unitCache;
     private Map<String, AlignmentEntityRole> roles;
-    private Map<String, Variable> variables;
+    private Map<String, TimeVariable> variables;
     private Map<String, List<String>> hCodeBook;
     private Map<String, String> studyId;  // key=socUri;  value=studyId
-    private Map<String, STR> dataAcquisitions;
 
-    Attribute ID = new Attribute();
-    AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
-    Attribute GROUPID = new Attribute();
-    AttributeInRelationTo GROUPID_IRT = new AttributeInRelationTo(GROUPID, null);
+    //AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID, null);
 
-    public Alignment() {
+    public TimeAlignment() {
         objects = new HashMap<String, StudyObject>();
-        //timestamps = new ArrayList<String>();
         attributeCache = new HashMap<String, Attribute>();
         entityCache = new HashMap<String, Entity>();
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
-        variables = new HashMap<String, Variable>();
+        variables = new HashMap<String, TimeVariable>();
 	    hCodeBook = new HashMap<String, List<String>>();
 	    studyId = new HashMap<String,String>();
-	    dataAcquisitions = new HashMap<String,STR>();
-	    ID.setLabel("ID");
-        GROUPID.setLabel("GROUPID");
     }
 
     public void printAlignment() {
         System.out.println("Alignment Content: ");
         if (variables != null && variables.size() > 0) {
-            for (Variable aa : variables.values()) {
+            for (TimeVariable aa : variables.values()) {
                 System.out.println("Label: " + aa);
             }
         }
     }
 
-    /* objectKey adds a new object identifier into variables
-     */
-    public String objectKey(AlignmentEntityRole entRole) {
-        Variable aa = new Variable(entRole, ID_IRT);
-        return aa.toString();
-    }
-
-    /* groupKey adds a new group identifier into variables
-     */
-    public String groupKey(AlignmentEntityRole entRole) {
-        Variable aa = new Variable(entRole, GROUPID_IRT);
-        return aa.toString();
-    }
-
     /* returns a key to retrieve variables. if needed, measuremtnKey adds new variables 
      */
-    public String measurementKey(Measurement m) {
+    public String timeMeasurementKey(Measurement m) {
         if (variables == null) {
-            System.out.println("[ERROR] alignment attribute list not initialized ");
+            System.out.println("[ERROR] tiime alignment attribute list not initialized ");
             return null;
         }
 
@@ -77,7 +52,24 @@ public class Alignment {
          * Look for existing variables
          */
         
-        //System.out.println("Align-Debug: Measurement Key");
+        //System.out.println("Align-Debug: Time Measurement Key");
+
+        StudyObject obj = null; 
+        String mObj = "";
+        if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
+            obj = objects.get(m.getObjectUri());
+            if (obj != null) {
+                mObj = obj.getOriginalId();
+            } else {
+                obj = StudyObject.find(m.getObjectUri());
+                if (obj == null) {
+                    System.out.println("[ERROR] could not retrieve object [" + m.getObjectUri() + "]. Ignoring Object.");
+                } else {
+                    objects.put(obj.getUri(),obj);
+                    mObj = obj.getOriginalId(); 
+                }
+            }
+        } 
 
         Entity irt = null;
         String mInRelationTo = "";
@@ -111,32 +103,10 @@ public class Alignment {
                 }
             }
         } 
-        Attribute timeAttr = null; 
-        String mAbstractTime = "";
-        if (m.getAbstractTime() != null && !m.getAbstractTime().equals("")) {
-            timeAttr = attributeCache.get(m.getAbstractTime());
-            if (timeAttr != null && timeAttr.getUri().equals(m.getAbstractTime())) {
-                mAbstractTime = timeAttr.getUri();
-            } else {
-                timeAttr = Attribute.find(m.getAbstractTime());
-                if (timeAttr == null) {
-                    System.out.println("[ERROR] could not retrieve abstract time [" + m.getAbstractTime() + "]. Ignoring abstract time.");
-                } else {
-                    attributeCache.put(timeAttr.getUri(),timeAttr);
-                    mAbstractTime = m.getAbstractTime(); 
-                }
-            }
-        } 
 
-        if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
-            System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
-        	STR da = STR.findByUri(m.getAcquisitionUri());
-        	dataAcquisitions.put(m.getAcquisitionUri(), da);
-        }
-        
 	    String mRole = m.getRole().replace(" ","");
 
-        String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
+        String mKey =  mObj + mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit;
 
         //System.out.println("Align-Debug: Measurement: " + mKey);
         //System.out.println("Align-Debug: Vector: " + alignAttrs); 
@@ -149,7 +119,7 @@ public class Alignment {
          * create new variable
          */
 
-        Variable newVar;
+        TimeVariable newVar;
 
         Entity entity = entityCache.get(m.getEntityUri());
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
@@ -180,21 +150,17 @@ public class Alignment {
 
         //System.out.println("Align-Debug: new alignment attribute 2"); 
 
-        if (!mInRelationTo.equals("")) {
-            System.out.println("Adding the following inRelationTo " + mInRelationTo);
-        }
+        //if (!mInRelationTo.equals("")) {
+        //    System.out.println("Adding the following inRelationTo " + mInRelationTo);
+        //}
 
         AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attribute, irt); 
 
-        if (!mUnit.equals("")) {
-            System.out.println("Adding the following unit " + mUnit);
-        }
+        //if (!mUnit.equals("")) {
+        //    System.out.println("Adding the following unit " + mUnit);
+        //}
 
-        if (!mAbstractTime.equals("")) {
-            System.out.println("Adding the following time " + mAbstractTime);
-        }
-
-        newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
+        newVar = new TimeVariable(obj, newRole, newAttrInRel, unit);
         //System.out.println("Align-Debug: new alignment attribute 3"); 
 
         if (!variables.containsKey(newVar.getKey())) {
@@ -221,8 +187,9 @@ public class Alignment {
         return entityCache.containsKey(uri);
     }
 
-    public boolean containsRole(String key) {
-        return roles.containsKey(key);
+    public boolean containsRole(StudyObject obj, String entKey) {
+    	String roleKey = obj.getOriginalId() + entKey;
+        return roles.containsKey(roleKey);
     }
 
     public boolean containsCode(String uri) {
@@ -240,8 +207,8 @@ public class Alignment {
         return entityCache.get(uri);
     }
 
-    public AlignmentEntityRole getRole(String key) {
-        return roles.get(key);
+    public AlignmentEntityRole getRole(StudyObject obj, String entKey) {
+        return roles.get(obj.getUri() + entKey);
     }
 
     public List<String> getCode(String key) {
@@ -263,39 +230,18 @@ public class Alignment {
         return new ArrayList<StudyObject>(objects.values());
     }
 
-    //public List<String> getTimestamps() {
-    //	return timestamps;
-    //}
-
     public List<AlignmentEntityRole> getRoles() {
         return new ArrayList<AlignmentEntityRole>(roles.values());
     }
 
-    public List<Variable> getAlignmentAttributes() {
-        return new ArrayList<Variable>(variables.values());
+    public List<TimeVariable> getAlignmentAttributes() {
+        return new ArrayList<TimeVariable>(variables.values());
     }
 
     public List<List<String>> getCodes() {
         return new ArrayList<List<String>>(hCodeBook.values());
     }
 
-    public List<String> getDOIs() {
-    	List<String> resp = new ArrayList<String>();
-    	if (dataAcquisitions.size() == 0) {
-    		return resp;
-    	}
-        System.out.println("getDOI(): da size is " + dataAcquisitions.size());
-    	for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
-            org.hadatac.entity.pojo.STR da = entry.getValue();
-            System.out.println("getDOI(): da is " + da.getUri());
-            for (String doi : da.getDOIs()) { 
-                System.out.println("getDOI(): doi is " + doi);
-            	resp.add(doi);
-            }
-    	}
-    	return resp;
-    }
-    
     /* ADD METHODS
      */
 
@@ -316,13 +262,12 @@ public class Alignment {
         entityCache.put(ent.getUri(), ent);
     }
 
-    public void addRole(AlignmentEntityRole entRole) {
-        roles.put(entRole.getKey(), entRole);
+    public void addRole(StudyObject obj, AlignmentEntityRole entRole) {
+    	String roleKey = obj.getOriginalId() + entRole.getKey();
+        roles.put(roleKey, entRole);
         //System.out.println("Adding NEW ROLE: " + entRole);
-        Variable newVar = new Variable(entRole,ID_IRT);
-        variables.put(newVar.getKey(),newVar);
-        Variable newGroupVar = new Variable(entRole,GROUPID_IRT);
-        variables.put(newVar.getKey() + "GROUP",newGroupVar);
+        //TimeVariable newVar = new TimeVariable(obj, entRole,ID_IRT);
+        //variables.put(newVar.getKey(),newVar);
     }
 
     public void addCode(String attrUri, List<String> code) {

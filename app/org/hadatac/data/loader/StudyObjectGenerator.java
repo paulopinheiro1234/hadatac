@@ -30,7 +30,7 @@ public class StudyObjectGenerator extends BaseGenerator {
     private Map<String, List<String>> mapContent = new HashMap<String, List<String>>();
 
     public StudyObjectGenerator(DataFile dataFile, List<String> listContent, 
-            Map<String, List<String>> mapContent, String study_uri) {
+            Map<String, List<String>> mapContent, String study_uri, String study_id) {
         super(dataFile);
         //this.study_id = study_id; 
         //file_name = file.getFile().getName();
@@ -39,8 +39,9 @@ public class StudyObjectGenerator extends BaseGenerator {
         //System.out.println("Study URI: " + study_uri);
         
         //study_id = file.getFile().getName().replaceAll("SSD-", "").replaceAll(".xlsx", "");
-        study_id = file_name.replaceAll("SSD-", "").replaceAll(".xlsx", "");
-
+        //study_id = file_name.replaceAll("SSD-", "").replaceAll(".xlsx", "");
+        this.study_id = study_id;
+        
         setStudyUri(study_uri);       
         this.listCache = listContent;
         //System.out.println(listContent);
@@ -78,7 +79,7 @@ public class StudyObjectGenerator extends BaseGenerator {
             return URIUtils.replaceNameSpaceEx(originalID);
         }
 
-        //System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
+        System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
         return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
     }
 
@@ -177,7 +178,10 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
     
     public StudyObject createStudyObject(Record record) throws Exception {
-        StudyObject obj = new StudyObject(getUri(record), getType(record), 
+    	if (getOriginalID(record) == null || getOriginalID(record).isEmpty()) {
+    		return null;
+    	}
+    	StudyObject obj = new StudyObject(getUri(record), getType(record), 
 					  getOriginalID(record), getLabel(record), 
 					  getSocUri(), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));

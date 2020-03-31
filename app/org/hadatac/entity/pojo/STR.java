@@ -26,6 +26,7 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.State;
@@ -696,6 +697,19 @@ public class STR extends HADatAcThing {
         numberDataPoints += number;
     }
 
+    public List<String> getDOIs() {
+    	List<String> resp = new ArrayList<String>();
+    	List<DataFile> dfs = DataFile.findByDataAcquisition(uri);
+    	System.out.println("STR da's uri is [" + uri + "]  and dfs's size is [" + dfs.size() + "]");
+    	for (DataFile df : dfs) {
+        	System.out.println("STR df's wasDerivedFrom size is [" + df.getWasDerivedFrom().size() + "]");
+    		for (String doi : df.getWasDerivedFrom()) {
+    			resp.add(doi);
+    		}
+    	}
+    	return resp;
+    }
+    
     public boolean isFinished() {
         if (endedAt == null) {
             return false;

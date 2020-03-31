@@ -579,7 +579,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    OPTIONAL { <" + dasa_uri + "> hasco:isAttributeOf ?hasDASO } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasSource ?hasSource } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:isPIConfirmed ?isPIConfirmed } . \n" + 
-                "    OPTIONAL { <" + dasa_uri + "> sio:Relation ?relation . <" + dasa_uri + "> ?relation ?inRelationTo . } . \n" + 
+                "    OPTIONAL { <" + dasa_uri + "> hasco:Relation ?relation . <" + dasa_uri + "> ?relation ?inRelationTo . } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> rdfs:label ?label } . \n" +
                 "}";
 
@@ -606,9 +606,15 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String inRelationToUri = "";
         String relationUri = "";
 
-        while (resultsrw.hasNext()) {
+        while (resultsrw.hasNext()) {        	
             QuerySolution soln = resultsrw.next();
-            labelStr = FirstLabel.getPrettyLabel(dasa_uri);
+
+            /*
+             *  The label should be the exact value in the SDD, e.g., cannot be altered be something like
+             *  FirstLabel.getPrettyLabel(dasa_uri) since that would prevent the matching of the label with 
+             *  the column header of the data acquisition file/message
+             */
+            labelStr = soln.get("label").toString();
 
             if (soln.get("partOfSchema") != null) {
                 partOfSchemaStr = soln.get("partOfSchema").toString();

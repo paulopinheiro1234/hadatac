@@ -1,7 +1,9 @@
 package org.hadatac.utils;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hadatac.console.controllers.sandbox.Sandbox;
 import org.hadatac.entity.pojo.OperationMode;
@@ -10,6 +12,31 @@ import com.typesafe.config.ConfigFactory;
 
 public class CollectionUtil {
  
+    // private variables
+    private static CollectionUtil single_instance = null; 
+	private static Map<String, String> configCache = null;
+
+	private CollectionUtil() { 
+    	configCache = new HashMap<String,String>();
+		initConfigCache();
+    } 
+  
+    // static method to create instance of Singleton class 
+    public static CollectionUtil getInstance() { 
+        if (single_instance == null) {
+            single_instance = new CollectionUtil(); 
+        }
+        return single_instance; 
+    } 
+    
+    public Map<String, String> getInstanceConfigCache() {
+    	return configCache;
+    }
+    
+	public static Map<String, String> getConfigCache() {
+		return CollectionUtil.getInstance().getInstanceConfigCache();
+	}
+	
     public enum Collection {
         // data and auxiliary data 
         DATA_COLLECTION ("/sdc"), 
@@ -87,6 +114,14 @@ public class CollectionUtil {
         return collection;
     }
     
+    public void initConfigCache() {
+    	configCache = new HashMap<String, String>();
+    	configCache.put("hadatac.solr.triplestore", ConfigFactory.load().getString("hadatac.solr.triplestore"));
+    	configCache.put("hadatac.solr.users",ConfigFactory.load().getString("hadatac.solr.users"));
+    	configCache.put("hadatac.solr.permissions",ConfigFactory.load().getString("hadatac.solr.permissions"));
+    	configCache.put("hadatac.solr.data", ConfigFactory.load().getString("hadatac.solr.data"));
+    }
+    
     public static boolean isSandboxMode() {
         List<OperationMode> modes = OperationMode.findAll();
         if (modes.size() > 0) {
@@ -105,19 +140,19 @@ public class CollectionUtil {
         case METADATA_SPARQL:
         case METADATA_UPDATE:
         case METADATA_GRAPH :          
-            collectionName = ConfigFactory.load().getString("hadatac.solr.triplestore") + getCollectionName(collection.get());
+            collectionName = getConfigCache().get("hadatac.solr.triplestore") + getCollectionName(collection.get());
         break;
         case AUTHENTICATE_USERS:
         case AUTHENTICATE_ACCOUNTS: 
         case AUTHENTICATE_ROLES: 
         case AUTHENTICATE_TOKENS:
         case AUTHENTICATE_PERMISSIONS: 
-            collectionName = ConfigFactory.load().getString("hadatac.solr.users") + collection.get();
+            collectionName = getConfigCache().get("hadatac.solr.users") + collection.get();
         break;
         case PERMISSIONS_SPARQL:
         case PERMISSIONS_UPDATE:
         case PERMISSIONS_GRAPH :       
-            collectionName = ConfigFactory.load().getString("hadatac.solr.permissions") + collection.get();
+            collectionName = getConfigCache().get("hadatac.solr.permissions") + collection.get();
         break;
         case DATA_COLLECTION:
         case DATA_ACQUISITION:
@@ -136,7 +171,7 @@ public class CollectionUtil {
         case METADATA_DA:
         case ANALYTES_ACQUISITION:
         case SCHEMA_ATTRIBUTES:        
-            collectionName = ConfigFactory.load().getString("hadatac.solr.data") + getCollectionName(collection.get());
+            collectionName = getConfigCache().get("hadatac.solr.data") + getCollectionName(collection.get());
         break;
         }
         

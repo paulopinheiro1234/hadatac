@@ -27,7 +27,7 @@ import com.typesafe.config.ConfigFactory;
 
 public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
-    static String className = "sio:Attribute";
+    static String className = "sio:SIO_000614";
 
     public Attribute () {
         super(className);
@@ -37,7 +37,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         List<Attribute> attributes = new ArrayList<Attribute>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* sio:Attribute . " + 
+                " ?uri rdfs:subClassOf* sio:SIO_000614 . " + 
                 "} ";
 
         //System.out.println("Query: " + queryString);

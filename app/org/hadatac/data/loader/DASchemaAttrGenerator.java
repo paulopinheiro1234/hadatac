@@ -113,8 +113,8 @@ public class DASchemaAttrGenerator extends BaseGenerator {
     private String getEntity(Record rec) {
         String daso = rec.getValueByColumnName(mapCol.get("AttributeOf"));
         if (daso.equals("")) {
-            currentHasEntity.put(getLabel(rec), "chear:unknownEntity");
-            return "chear:unknownEntity";
+            currentHasEntity.put(getLabel(rec), "hasco:unknownEntity");
+            return "hasco:unknownEntity";
         } else {
             if (codeMap.containsKey(hasEntityMap.get(daso))) {
                 currentHasEntity.put(getLabel(rec), codeMap.get(hasEntityMap.get(daso)));
@@ -128,8 +128,8 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                     currentHasEntity.put(getLabel(rec), hasEntityMap.get(daso).get(1));
                     return hasEntityMap.get(daso).get(1);
                 }
-                currentHasEntity.put(getLabel(rec), "chear:unknownEntity");
-                return "chear:unknownEntity";
+                currentHasEntity.put(getLabel(rec), "hasco:unknownEntity");
+                return "hasco:unknownEntity";
             }
         }
     }
@@ -298,13 +298,13 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             if (getRelation(rec).length() > 0) {
                 row.put(getRelation(rec), getInRelationTo(rec));
             } else {
-                row.put("sio:inRelationTo", getInRelationTo(rec));
+                row.put("sio:SIO_000668", getInRelationTo(rec));
             }
             if (getInRelationTo(rec).length() > 0) {
                 if (getRelation(rec).length() > 0) {
-                    row.put("sio:Relation", getRelation(rec));
+                    row.put("hasco:Relation", getRelation(rec));
                 } else {
-                    row.put("sio:Relation", "sio:inRelationTo");
+                    row.put("hasco:Relation", "sio:SIO_000668");
                 }
             }
             row.put("hasco:hasAttribute", getAttribute(rec));
@@ -341,13 +341,13 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             if (getRelation(rec).length() > 0) {
                 row.put(getRelation(rec), getInRelationTo(rec));
             } else {
-                row.put("sio:inRelationTo", getInRelationTo(rec));
+                row.put("sio:SIO_000668", getInRelationTo(rec));
             }
             if (getInRelationTo(rec).length() > 0) {
                 if (getRelation(rec).length() > 0) {
-                    row.put("sio:Relation", getRelation(rec));
+                    row.put("hasco:Relation", getRelation(rec));
                 } else {
-                    row.put("sio:Relation", "sio:inRelationTo");
+                    row.put("hasco:Relation", "sio:SIO_000668");
                 }
             }
             row.put("hasco:hasUnit", getUnit(rec));
@@ -371,13 +371,13 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         if (getRelation(rec).length() > 0) {
             row.put(getRelation(rec), getInRelationTo(rec));
         } else {
-            row.put("sio:inRelationTo", getInRelationTo(rec));
+            row.put("sio:SIO_000668", getInRelationTo(rec));
         }
         if (getInRelationTo(rec).length() > 0) {
             if (getRelation(rec).length() > 0) {
-                row.put("sio:Relation", getRelation(rec));
+                row.put("hasco:Relation", getRelation(rec));
             } else {
-                row.put("sio:Relation", "sio:inRelationTo");
+                row.put("hasco:Relation", "sio:SIO_000668");
             }
         }
 

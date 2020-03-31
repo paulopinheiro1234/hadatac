@@ -48,6 +48,15 @@ public class DataContext {
 		return data.totalDataAcquisitions();
 	}
 	
+	public static Long playTotalDataFiles() {
+		DataContext data = new DataContext( "user", 
+				"password",
+				ConfigFactory.load().getString("hadatac.solr.data"), 
+				false);
+		
+		return data.totalDataFiles();
+	}
+	
 	private Long totalDocuments(String solrCoreName) {
 		SolrClient solr = new HttpSolrClient.Builder(kbURL + solrCoreName).build();
 		SolrQuery parameters = new SolrQuery();
@@ -77,6 +86,10 @@ public class DataContext {
 	
 	public Long totalDataAcquisitions() {
 		return totalDocuments(CollectionUtil.getCollectionName(Collection.DATA_COLLECTION.get()));
+	}
+	
+	public Long totalDataFiles() {
+		return totalDocuments(CollectionUtil.getCollectionName(Collection.CSV_DATASET.get()));
 	}
 	
 	private String cleanAllDocuments(int mode, Collection solrCoreName) {
@@ -136,6 +149,7 @@ public class DataContext {
 	    
 	    String url1;
 	    String url2;
+	    
 		try {
 		    url1 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
 		    url2 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
@@ -182,6 +196,10 @@ public class DataContext {
 	
 	public String cleanAcquisitionData(int mode) {
 		return cleanAllDocuments(mode, Collection.DATA_ACQUISITION);
+	}
+	
+	public String cleanDataFiles(int mode) {
+		return cleanAllDocuments(mode, Collection.CSV_DATASET);
 	}
 	
 	public String cleanStudy(int mode, String studyURI) {

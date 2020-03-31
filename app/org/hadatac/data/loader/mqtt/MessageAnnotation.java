@@ -4,8 +4,10 @@ import java.lang.String;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.hadatac.data.loader.MeasurementGenerator;
 import org.hadatac.entity.pojo.STR;
@@ -13,6 +15,7 @@ import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.metadata.loader.URIUtils;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -31,10 +34,10 @@ public class MessageAnnotation {
     	}
     	//System.out.println("MessageAnnotation: Initiating stream for study " + newStudyId);
     	
-    	System.out.println("Initiating message stream: " + stream.getName());
+    	System.out.println("Initiating message stream: " + stream.getFullName());
 		stream.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().resetLog();
-		stream.getLogger().println(String.format("Initiating message stream: %s", stream.getName()));
+		stream.getLogger().println(String.format("Initiating message stream: %s", stream.getFullName()));
 
 		List<MessageTopic> topics = MessageTopic.findByStream(stream.getUri());
 
@@ -49,10 +52,10 @@ public class MessageAnnotation {
     	//System.out.println("MessageAnnotation: Stream study " + stream.getStudy().getId());
 		if (stream.getStudy() != null && stream.getStudy().getId() != null) {
 		    stream.setStatus(MessageStream.INITIATED);
-			stream.getLogger().println(String.format("Message stream %s is initiated.", stream.getName()));
+			stream.getLogger().println(String.format("Message stream %s is initiated.", stream.getFullName()));
 			MessageWorker.getInstance().initiateStream(stream);
 		} else {
-			stream.getLogger().println(String.format("Message stream %s failed to be associated with study.", stream.getName()));
+			stream.getLogger().println(String.format("Message stream %s failed to be associated with study.", stream.getFullName()));
 		}
 		stream.save();
 
@@ -62,10 +65,10 @@ public class MessageAnnotation {
     	if (!stream.getStatus().equals(MessageStream.INITIATED)) {
     		return;
     	}
-    	System.out.println("Subscribing message stream: " + stream.getName());
+    	System.out.println("Subscribing message stream: " + stream.getFullName());
 		stream.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().resetLog();
-		stream.getLogger().println(String.format("Subscribing message stream: %s", stream.getName()));
+		stream.getLogger().println(String.format("Subscribing message stream: %s", stream.getFullName()));
 
     	DataFile archive;
     	if (stream.getDataFileId() == null || stream.getDataFileId().isEmpty()) {
@@ -83,13 +86,12 @@ public class MessageAnnotation {
     	}
             
 		try {
-			//Thread t = new Thread(new SubscribeWorkerOld(stream));
-			//t.start();
-			Subscribe.exec(stream, null, Subscribe.SUBSCRIBE);
+			System.out.println("MessageAnnotation : calling AsyncSubscribe");
+			CompletableFuture.runAsync(() -> AsyncSubscribe.exec(stream));
 		} catch (Exception e) {
 			stream.getLogger().println("MessageAnnotation: Error executing 'subscribe' inside startMessageStream.");
 			e.printStackTrace();
-		}
+		} 
 		stream.setStatus(MessageStream.ACTIVE);
 		stream.save();
     
@@ -99,12 +101,12 @@ public class MessageAnnotation {
     	if (!stream.getStatus().equals(MessageStream.ACTIVE)) {
     		return;
     	}
-    	System.out.println("Unsubscribing message stream: " + stream.getName());
+    	System.out.println("Unsubscribing message stream: " + stream.getFullName());
 		stream.setLastProcessTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		stream.getLogger().resetLog();
-		stream.getLogger().println(String.format("Unsubscribing message stream: %s", stream.getName()));
-		if (!MessageWorker.getInstance().clientsMap.containsKey(stream.getName())) {
-			stream.getLogger().println("Could not stop message stream: " + stream.getName() + ". Reason: currentClient is null");
+		stream.getLogger().println(String.format("Unsubscribing message stream: %s", stream.getFullName()));
+		if (!MessageWorker.getInstance().executorsMap.containsKey(stream.getFullName())) {
+			stream.getLogger().println("Could not stop message stream: " + stream.getFullName() + ". Reason: currentClient is null");
 		} else {
     	}
 
@@ -114,7 +116,7 @@ public class MessageAnnotation {
     }
     
     public static void stopMessageStream(MessageStream stream) {
-    	stream.getLogger().println("Stopping message stream: " + stream.getName());
+    	stream.getLogger().println("Stopping message stream: " + stream.getFullName());
 		List<MessageTopic> topics = MessageTopic.findByStream(stream.getUri());
 
 		if (topics != null && topics.size() > 0) {
@@ -124,12 +126,10 @@ public class MessageAnnotation {
 			}
 		}
 		
-		stream.setTotalMessages(0);
-		stream.setIngestedMessages(0);
 		stream.setStudyUri(null);
         stream.setStatus(MessageStream.CLOSED);
 		stream.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-		stream.getLogger().println(String.format("Stopped processing of message stream: %s", stream.getName()));
+		stream.getLogger().println(String.format("Stopped processing of message stream: %s", stream.getFullName()));
 		stream.save();		
 		MessageWorker.getInstance().closeStream(stream);
 		/*
@@ -209,6 +209,7 @@ public class MessageAnnotation {
         }
 
         // Learns stream's labels
+        /*
         if (isValid) {
 	        if (str != null) {
 	        	List<String> headers = Subscribe.testLabels(topic.getStream(), topic); 
@@ -223,6 +224,7 @@ public class MessageAnnotation {
 	        	}
 	        }
         }
+        */
         
         // Retrieves SDD
         DataAcquisitionSchema schema = null;
@@ -231,6 +233,14 @@ public class MessageAnnotation {
             if (schema == null) {
                 topic.getLogger().printExceptionByIdWithArgs("DA_00007", str.getSchemaUri());
                 isValid = false;
+            } else {
+            	List <String> headers = new ArrayList<String>();
+            	for (DataAcquisitionSchemaAttribute attr : schema.getAttributes()) {
+                	headers.add(attr.getLabel());
+            	}
+        		topic.setHeaders(headers);
+	            topic.getLogger().println(String.format("Message topic <%s> has labels <%s>", topic.getLabel(), headers.toString()));
+	            topic.save();
             }
         }
 

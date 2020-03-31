@@ -97,7 +97,7 @@ public class GetSparqlQuery {
                 break;
             case "Entities" : 
                 q = "SELECT ?id ?superId ?label ?chara WHERE { " + 
-                    "   ?id rdfs:subClassOf* sio:Object . " + 
+                    "   ?id rdfs:subClassOf* sio:SIO_000776 . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label . } " + 
                     "   OPTIONAL { ?id rdfs:comment ?chara . } " +
@@ -115,7 +115,7 @@ public class GetSparqlQuery {
             		"  ?agent a foaf:Group . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:homepage ?page . } " + 
-            		"  OPTIONAL { ?agent sio:isMemberOf ?group . } " + 
+            		"  OPTIONAL { ?agent sio:SIO_000095 ?group . } " + 
             		"}";
                 break;
             case "PeopleH" : 
@@ -123,7 +123,7 @@ public class GetSparqlQuery {
             		"  ?agent a foaf:Person . " + 
             		"  OPTIONAL { ?agent foaf:name ?name . } " + 
             		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"  OPTIONAL { ?agent sio:isMemberOf ?group . } " + 
+            		"  OPTIONAL { ?agent sio:SIO_000095 ?group . } " + 
             		"}";
                 break;
             case "DetectorModels" : 
@@ -141,7 +141,7 @@ public class GetSparqlQuery {
                 break;
             case "Characteristics" : 
                 q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* sio:Attribute . " +
+                    "   ?modelName rdfs:subClassOf* sio:SIO_000614 . " +
                     "   ?modelName rdfs:subClassOf ?superModelName .  " + 
                     "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +
@@ -202,7 +202,7 @@ public class GetSparqlQuery {
                 break;
             case "Demographics" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:Demographic . " + 
+                    "   ?id rdfs:subClassOf* hhear:Demographic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -211,7 +211,7 @@ public class GetSparqlQuery {
                 break;
             case "BirthOutcomes" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:BirthOutcome . " + 
+                    "   ?id rdfs:subClassOf* hhear:BirthOutcome . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -220,7 +220,7 @@ public class GetSparqlQuery {
                 break;
             case "HousingCharacteristic" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:HousingCharacteristic . " + 
+                    "   ?id rdfs:subClassOf* hhear:HousingCharacteristic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -229,7 +229,7 @@ public class GetSparqlQuery {
                 break;
             case "ATIDU" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:ATIDU . " + 
+                    "   ?id rdfs:subClassOf* hhear:ATIDU . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -238,7 +238,7 @@ public class GetSparqlQuery {
                 break;
             case "Anthropometry" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:Anthropometry . " + 
+                    "   ?id rdfs:subClassOf* hhear:Anthropometry . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -247,7 +247,7 @@ public class GetSparqlQuery {
                 break;
             case "PregnancyCharacteristic" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:PregnancyCharacteristic . " + 
+                    "   ?id rdfs:subClassOf* hhear:PregnancyCharacteristic . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -256,7 +256,7 @@ public class GetSparqlQuery {
                 break;
             case "Analytes" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:Analyte . " + 
+                    "   ?id rdfs:subClassOf* hhear:Analyte . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -264,7 +264,7 @@ public class GetSparqlQuery {
                 break;
             case "Alkaloids" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:AlkylPhosphatePesticideMetabolite . " + 
+                    "   ?id rdfs:subClassOf* hhear:AlkylPhosphatePesticideMetabolite . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -272,7 +272,7 @@ public class GetSparqlQuery {
                 break;
             case "Arsenic" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:ArsenicSpecies . " + 
+                    "   ?id rdfs:subClassOf* hhear:ArsenicSpecies . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -280,7 +280,7 @@ public class GetSparqlQuery {
                 break;
             case "Elements" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:Element . " + 
+                    "   ?id rdfs:subClassOf* hhear:Element . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +
@@ -288,7 +288,7 @@ public class GetSparqlQuery {
                 break;
             case "OrganicAromatic" :
             	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* chear:OrganicAromaticCompound . " + 
+                    "   ?id rdfs:subClassOf* hhear:OrganicAromaticCompound . " + 
                     "   ?id rdfs:subClassOf ?superId .  " + 
                     "   OPTIONAL { ?id rdfs:label ?label } . " + 
                     " 	OPTIONAL { ?id skos:definition ?comment } . " +

@@ -39,13 +39,13 @@ public class SSDSampleMapper extends BaseGenerator {
     public void initMapping() {
         mapCol.clear();
         mapCol.put("type", "rdf:type");
-        mapCol.put("originalPID", "CHEAR PID");
+        mapCol.put("originalPID", "HHEAR PID");
         mapCol.put("originalSID", "originalID");
         try{
-            mapCol.put("pilotNum", "CHEAR_Project_ID");
+            mapCol.put("pilotNum", "HHEAR_Project_ID");
         } catch (QueryExceptionHTTP e) {
             e.printStackTrace();
-            System.out.println("This sheet or MAP file contains no CHEAR_Project_ID column");
+            System.out.println("This sheet or MAP file contains no HHEAR_Project_ID column");
         }
         try{
             mapCol.put("timeScopeID", "timeScopeID");
@@ -88,7 +88,7 @@ public class SSDSampleMapper extends BaseGenerator {
     	if (file_name.startsWith("SSD-")){
     		return rec.getValueByColumnName(mapCol.get("type"));
     	}
-    	return "sio:Sample";
+    	return "sio:SIO_001050";
     }
 
     private String getLabel(Record rec) {

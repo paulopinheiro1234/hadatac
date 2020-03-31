@@ -19,7 +19,7 @@ import org.hadatac.utils.CollectionUtil;
 
 public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObjectRole> {
 
-	static String className = "sio:Object";
+	static String className = "sio:SIO_000776";
 
 	public StudyObjectRole() {}
 	

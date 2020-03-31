@@ -37,8 +37,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DAS-";
     public static List<String> METADASA = Arrays.asList(
-            "sio:TimeStamp", 
-            "sio:TimeInstant", 
+            "hasco:TimeStamp", 
+            "sio:SIO_000418", 
             "hasco:namedTime", 
             "hasco:originalID", 
             "hasco:uriId", 
@@ -48,7 +48,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             "hasco:hasMetaAttributeURI", 
             "hasco:hasMetaUnit", 
             "hasco:hasMetaUnitURI", 
-            "sio:InRelationTo",
+            "sio:SIO_000668",
             "hasco:hasLOD",
             "hasco:hasCalibration",
             "hasco:hasElevation",
@@ -57,7 +57,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
             "hasco:matchesWith");
 
     private static Map<String, DataAcquisitionSchema> DASCache;
-
+    private List<DataAcquisitionSchemaAttribute> attributesCache = new ArrayList<DataAcquisitionSchemaAttribute>();
+    private List<DataAcquisitionSchemaObject> objectsCache = new ArrayList<DataAcquisitionSchemaObject>();
+    private Map<String, Map<String, String>> possibleValuesCache = new HashMap<String, Map<String, String>>();
+    
     private String uri = "";
     private String label = "";
     private String version = "";
@@ -74,8 +77,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String groupLabel = "";
     private String matchingLabel = "";
     
-    private List<DataAcquisitionSchemaAttribute> attributeObjects = new ArrayList<DataAcquisitionSchemaAttribute>();
-    
     private List<String> attributes = new ArrayList<String>();
     private List<String> objects = new ArrayList<String>();
     private List<String> events = new ArrayList<String>();
@@ -84,7 +85,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private static Map<String, DataAcquisitionSchema> getCache() {
         if (DASCache == null) {
             DASCache = new HashMap<String, DataAcquisitionSchema>(); 
-        }
+        } 
         return DASCache;
     }
 
@@ -93,6 +94,15 @@ public class DataAcquisitionSchema extends HADatAcThing {
         DataAcquisitionSchemaObject.resetCache();
         DASCache = null;
     }
+
+    public void resetAttributesCache() {
+        attributesCache = null;
+    }
+
+    public void resetObjectsCache() {
+        objectsCache = null;
+    }
+
 
     public DataAcquisitionSchema() {
         DataAcquisitionSchema.getCache();
@@ -103,6 +113,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.label = label;
         isRefreshed = false;
         DataAcquisitionSchema.getCache();
+        getAttributes();
+        getObjects();
     }
 
     public String getUri() {
@@ -251,10 +263,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaAttribute> getAttributes() {
-        if (attributeObjects == null || attributeObjects.isEmpty()) {
-            attributeObjects = DataAcquisitionSchemaAttribute.findBySchema(getUri());
+        if (attributesCache == null || attributesCache.isEmpty()) {
+            attributesCache = DataAcquisitionSchemaAttribute.findBySchema(getUri());
         }
-        return attributeObjects;
+        return attributesCache;
     }
 
     public void setAttributes(List<String> attributes) {
@@ -276,11 +288,11 @@ public class DataAcquisitionSchema extends HADatAcThing {
             for (DataAcquisitionSchemaAttribute dasa : attributeList) {
                 dasa.setDataAcquisitionSchema(this);
 
-                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:TimeStamp"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:TimeStamp"))) {
                     setTimestampLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema TimeStampLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:TimeInstant"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:SIO_000418"))) {
                     setTimeInstantLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema TimeInstantLabel: " + dasa.getLabel());
                 }
@@ -292,7 +304,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     setIdLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("chear:LevelOfDetection"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:LevelOfDetection"))) {
                     setLODLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema LODLabel: " + dasa.getLabel());
                 }
@@ -305,7 +317,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     //System.out.println("[OK] DataAcquisitionSchema MatchingLabel: " + dasa.getLabel());
                 }
                 if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:originalID")) 
-                        || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:Identifier")) 
+                        || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:SIO_000115")) 
                         || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttributes())) { 
                     setOriginalIdLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
@@ -314,8 +326,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     setEntityLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema EntityLabel: " + dasa.getLabel());
                 }
-                if (!dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:hasUnit")).isEmpty()) {
-                    String uri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:hasUnit"));
+                if (!dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:SIO_000221")).isEmpty()) {
+                    String uri = dasa.getInRelationToUri(URIUtils.replacePrefixEx("sio:SIO_000221"));
                     //System.out.println("uri: " + uri);
                     DataAcquisitionSchemaObject dasoUnit = DataAcquisitionSchemaObject.find(uri);
                     if (dasoUnit != null) {
@@ -328,7 +340,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     }
                     //System.out.println("[OK] DataAcquisitionSchema UnitLabel: " + getUnitLabel());
                 }
-                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:InRelationTo"))) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("sio:SIO_000668"))) {
                     setInRelationToLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema InRelationToLabel: " + dasa.getLabel());
                 }
@@ -341,7 +353,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
     }
 
     public List<DataAcquisitionSchemaObject> getObjects() {
-        return DataAcquisitionSchemaObject.findBySchema(this.getUri());
+        if (objectsCache == null || objectsCache.isEmpty()) {
+            objectsCache = DataAcquisitionSchemaObject.findBySchema(getUri());
+        }
+        return objectsCache;
     }
 
     public void setObjects(List<String> objects) {
@@ -371,9 +386,25 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public List<String> defineTemporaryPositions(List<String> csvHeaders) {
         List<String> unknownHeaders = new ArrayList<String>(csvHeaders);
-
-        // Assign DASA positions by label matching
         List<DataAcquisitionSchemaAttribute> listDasa = getAttributes();
+        
+        /*
+        // list positions
+        System.out.println("DAS Pojo: SDD Headers");
+        int auxdasa = 0;
+        for (DataAcquisitionSchemaAttribute dasa : listDasa) {
+        	System.out.println("header [" + auxdasa + "] : [" + dasa.getLabel() + "]");
+        	auxdasa++;
+        }
+        System.out.println("DAS Pojo: CSV Headers");
+        int auxcsv = 0;
+        for (String header : csvHeaders) {
+        	System.out.println("header [" + auxcsv + "] : [" + header + "]" );
+        	auxcsv++;
+        }
+        */
+        
+        // Assign DASA positions by label matching
         if (listDasa != null && listDasa.size() > 0) {
             // reset temporary positions
             for (DataAcquisitionSchemaAttribute dasa : listDasa) {
@@ -389,6 +420,13 @@ public class DataAcquisitionSchema extends HADatAcThing {
                 }
             }
         }
+        
+        /*
+        System.out.println("DAS Pojo: Assignments");
+        for (DataAcquisitionSchemaAttribute dasa : listDasa) {
+        	System.out.println("header [" + dasa.getTempPositionInt() + "] : [" + dasa.getLabel() + "]");
+        }
+        */
 
         // Assign DASO positions by label matching
         List<DataAcquisitionSchemaObject> listDaso = getObjects();
@@ -440,7 +478,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public static DataAcquisitionSchema find(String schemaUri) {
         if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
-            return DataAcquisitionSchema.getCache().get(schemaUri);
+        	
+            DataAcquisitionSchema sdd = DataAcquisitionSchema.getCache().get(schemaUri);
+            sdd.getAttributes();
+            return sdd;
         }
 
         System.out.println("Looking for data acquisition schema " + schemaUri);
@@ -485,6 +526,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         //        schema.getObjects().size() + " objects, and " + 
         //        schema.getEvents().size() + " events.");
 
+        schema.getAttributes();
+        schema.getObjects();
         DataAcquisitionSchema.getCache().put(schemaUri,schema);
         return schema;
     }
@@ -510,8 +553,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return schemas;
     }
 
-    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
-        Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
+    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {    	
+    	Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource WHERE { \n"
                 + " ?possibleValue a hasco:PossibleValue . \n"

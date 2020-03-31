@@ -37,13 +37,13 @@ public class DASVirtualObject {
 		} else {
 			this.objRelations.put("hasco:hasRole", dasoRow.get("hasco:hasRole").toString());
 		}
-		if(dasoRow.get("sio:inRelationTo") == null || dasoRow.get("sio:inRelationTo").equals("")){
+		if(dasoRow.get("sio:SIO_000668") == null || dasoRow.get("sio:SIO_000668").equals("")){
 			//handle an error
 		} else {
-			if(dasoRow.get("sio:Relation") == null || dasoRow.get("sio:Relation").equals("")){
-				this.objRelations.put("sio:isRelatedTo", dasoRow.get("sio:inRelationTo").toString());
+			if(dasoRow.get("hasco:Relation") == null || dasoRow.get("hasco:Relation").equals("")){
+				this.objRelations.put("sio:SIO_000001", dasoRow.get("sio:SIO_000668").toString());
 			} else {
-				this.objRelations.put(dasoRow.get("sio:Relation").toString(), dasoRow.get("sio:inRelationTo").toString());
+				this.objRelations.put(dasoRow.get("hasco:Relation").toString(), dasoRow.get("sio:SIO_000668").toString());
 			}
 		}
 		if(dasoRow.get("dcterms:alternativeName") == null || dasoRow.get("dcterms:alternativeName").equals("")){

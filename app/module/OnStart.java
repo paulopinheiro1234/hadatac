@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 import org.hadatac.console.models.SecurityRole;
 import org.hadatac.data.loader.mqtt.MessageWorker;
+import org.hadatac.utils.CollectionUtil;
 
 @Singleton
 public class OnStart {
@@ -18,6 +19,8 @@ public class OnStart {
     	
     	// check existence/availability of security role
     	SecurityRole.initialize();
+    	
+    	CollectionUtil.getInstance();
 
 		// check if default user still have default password. If so, ask to change.
 		// TODO: implement this code

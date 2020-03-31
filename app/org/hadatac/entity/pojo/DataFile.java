@@ -99,6 +99,8 @@ public class DataFile implements Cloneable {
     private String completionTime = "";
     @Field("last_processed_time_str")
     private String lastProcessTime = "";
+    @Field("was_derived_from_str_multi")
+    private List<String> wasDerivedFrom;
     @Field("log_str")
     private String log = "";
     
@@ -459,6 +461,23 @@ public class DataFile implements Cloneable {
         this.lastProcessTime = lastProcessTime;
     }
     
+    public List<String> getWasDerivedFrom() {
+        return wasDerivedFrom;
+    }
+    public void setWasDerivedFrom(List<String> wasDerivedFromList) {
+        this.wasDerivedFrom = wasDerivedFromList;
+    }
+    public void addWasDerivedFrom(String wasDerivedFromInd) {
+        if (!wasDerivedFrom.contains(wasDerivedFromInd)) {
+            wasDerivedFrom.add(wasDerivedFromInd);
+        }
+    }
+    public void removeWasDerivedFrom(String wasDerivedFromInd) {
+        if (wasDerivedFrom.contains(wasDerivedFromInd)) {
+            wasDerivedFrom.remove(wasDerivedFromInd);
+        }
+    }
+    
     public String getLog() {
         return getLogger().getLog();
     }
@@ -569,6 +588,7 @@ public class DataFile implements Cloneable {
         object.setSubmissionTime(SolrUtils.getFieldValue(doc, "submission_time_str").toString());
         object.setCompletionTime(SolrUtils.getFieldValue(doc, "completion_time_str").toString());
         object.setLastProcessTime(SolrUtils.getFieldValue(doc, "last_processed_time_str").toString());
+        object.setWasDerivedFrom(SolrUtils.getFieldValues(doc, "was_derived_from_str_multi"));
         object.setLogger(new AnnotationLogger(object, SolrUtils.getFieldValue(doc, "log_str").toString()));
 
         return object;
@@ -604,6 +624,24 @@ public class DataFile implements Cloneable {
         return list;
     }
 
+    public static int totalByQuery(SolrQuery query) {
+    	int total = 0;
+
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
+
+        try {
+            QueryResponse response = solr.query(query);
+            solr.close();
+            total = response.getResults().size();
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] DataFile.totalByQuery(SolrQuery) - Exception message: " + e.getMessage());
+        }
+
+        return total;
+    }
+
     public static List<DataFile> find(String ownerEmail) {
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_email_str:\"" + ownerEmail + "\"");
@@ -635,6 +673,13 @@ public class DataFile implements Cloneable {
         return findByQuery(query);
     }
     
+    public static int totalByStatus(String status) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "status_str:\"" + status + "\"");
+        query.set("rows", "10000000");
+        return totalByQuery(query);
+    }
+    
     public static List<DataFile> findByMultiStatus(List<String> status) {
         SolrQuery query = new SolrQuery();
         query.set("q", String.join(" OR ", status.stream()
@@ -642,6 +687,26 @@ public class DataFile implements Cloneable {
                 .collect(Collectors.toList())));
         query.set("rows", "10000000");
         return findByQuery(query);
+    }
+    
+    public static List<DataFile> findByDataAcquisition(String dataAcquisitionUri) {
+    	/*
+    	 * this is a hack. acquisition_uri_str is supposed to be the full uri
+    	 */
+    	String ns_dataAcquisition = URIUtils.replaceNameSpaceEx(dataAcquisitionUri);
+        SolrQuery query = new SolrQuery();
+        query.set("q", "acquisition_uri_str:\"" + ns_dataAcquisition + "\"");
+        query.set("rows", "10000000");
+        return findByQuery(query);
+    }
+    
+    public static int totalByMultiStatus(List<String> status) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", String.join(" OR ", status.stream()
+                .map(s -> "status_str:\"" + s + "\"")
+                .collect(Collectors.toList())));
+        query.set("rows", "10000000");
+        return totalByQuery(query);
     }
     
     public static DataFile findByIdAndEmail(String id, String ownerEmail) {        

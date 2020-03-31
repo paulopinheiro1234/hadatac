@@ -59,8 +59,36 @@ function verifySDD(){
       displayVerify(copyTracker);
     
     }
+<<<<<<< HEAD
     var trackofLabelValidity=[];
     function verifyLabel(label,i,j){
+=======
+var notFound=[];
+var numLabels=0
+function getOwlUrl(label1,label2,label,i,j){
+     console.log(label);
+     numLabels+=1;
+    if(label1=="sio"){
+        var urlStr="<http://semanticscience.org/resource/"+label2+">";
+    }
+    else if(label1=="hasco"){
+        var urlStr="<http://hadatac.org/ont/hasco/"+label2+">";
+    }
+    else if(label1=="hhear"){
+        var urlStr="<http://hadatac.org/ont/hhear#"+label2+">";
+    }
+    else if(label1=="uberon"){
+        var urlStr="<http://purl.obolibrary.org/obo/UBERON_"+label2+">";
+    }
+    searchForIri(label1,label2,label,urlStr,i,j);
+
+}
+var wrongterm;
+var listOfTotalTerms=[];
+var sheetdict=new Map();
+function searchForIri(label1,label2,label,urlStr,i,j){
+    var url = "http://localhost:8080/blazegraph/namespace/store/sparql";
+>>>>>>> f98f770e187009f76fd1db10df30203e13021e4b
         
         $.ajax({
                 type : 'GET',

@@ -32,7 +32,7 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		List<Unit> units = new ArrayList<Unit>();
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				" SELECT ?uri WHERE { " +
-				" ?uri rdfs:subClassOf* sio:Quantity . " + 
+				" ?uri rdfs:subClassOf* sio:SIO_000052 . " + 
 				"} ";
 
 		ResultSetRewindable resultsrw = SPARQLUtils.select(

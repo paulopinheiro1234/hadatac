@@ -27,10 +27,10 @@
 	  <table class="table">
 	    <thead>
 	      <tr>
-		<th>Select Fields</th>
-		  <th>
-		      <label><input type="checkbox" id="select_all" onchange="toggleAll(this)" checked> Select All</label>
-		  </th>
+     	      <th>Select Fields</th>
+	    	  <th>
+		         <label><input type="checkbox" id="select_all" onchange="toggleAll(this)" checked> Select All</label>
+		      </th>
 	      </tr>
 	    </thead>
 	    <tbody>
@@ -98,16 +98,23 @@
 	    <option value="timestamp">Timestamp</option>
 	    <option value="object">Object</option>
 	  </select-->
-	  <label for="selOC">Object type:</label>
+	  <label for="selOC">Alignment type:</label>
 	  <select class="form-control" name="selObjectType" id="selObjectType">
-	    <option value="@Downloader.ALIGNMENT_SUBJECT">SUBJECT</option>
-	    <option value="@Downloader.ALIGNMENT_TIME">TIME</option>
+	    <option value="@Downloader.ALIGNMENT_SUBJECT">BY SUBJECT</option>
+	    <option value="@Downloader.ALIGNMENT_TIME">BY TIME</option>
 	  </select>
 	  <label for="selCatVal">Categorical Values:</label>
 	  <select class="form-control" name="selCatValue" id="selCatValue">
 	    <option value="withCodeBook">Use Codes and Generate Code Book</option>
 	    <option value="withCodes">Use Codes Without Generating Code Book</option>
 	    <option value="withValues">Use Values</option>
+	  </select>
+	  <label for="selTimeRes">Time Resolution (for time alignment):</label>
+	  <select class="form-control" name="selTimeRes" id="selTimeRes">
+	    <option value="yyyy-MM-dd HH:mm:ss.SSS">yyyy-MM-dd HH:mm:ss.SSS</option>
+	    <option value="yyyy-MM-dd HH:mm:ss.SS">yyyy-MM-dd HH:mm:ss.SS</option>
+	    <option value="yyyy-MM-dd HH:mm:ss.S">yyyy-MM-dd HH:mm:ss.S</option>
+	    <option value="yyyy-MM-dd HH:mm:ss">yyyy-MM-dd HH:mm:ss</option>
 	  </select>
           <br>
 	  <input class="btn btn-info" type="submit" id="submitAlignment" value="Confirm" />
@@ -138,7 +145,7 @@
       </div>
       <div class="modal-body">
 	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalDownload" data-dismiss="modal">One Value per Row</button>
-	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Alignment of Multiple Values per Row</button>
+	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Multiple Values per Row</button>
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -148,7 +155,7 @@
 </div>
 
 <script type="text/javascript">
-       function checkform() {
+    function checkform() {
 		var cansubmit = true;
 
 		if (cansubmit) {

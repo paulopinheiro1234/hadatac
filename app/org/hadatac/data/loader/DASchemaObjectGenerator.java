@@ -188,13 +188,13 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 			if (getInRelationTo(rec).length() > 0) {
 				row.put(getRelation(rec), getInRelationTo(rec));
 				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
-				row.put("sio:Relation", getRelation(rec));
+				row.put("hasco:Relation", getRelation(rec));
 			}
 		} else {
 			if (getInRelationTo(rec).length() > 0) {
-				row.put("sio:inRelationTo", getInRelationTo(rec));
+				row.put("sio:SIO_000668", getInRelationTo(rec));
 				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
-				row.put("sio:Relation", "sio:inRelationTo");
+				row.put("hasco:Relation", "sio:SIO_000668");
 			}
 		}
 		row.put("hasco:hasUnit", getUnit(rec));
@@ -206,7 +206,7 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 		if(checkVirtual(rec)) {
 			row.put("dcterms:alternativeName", getLabel(rec).trim().replace(" ",""));
 			//System.out.println("[DASOGen] getTime = " + getTime(rec));
-			row.put("sio:existsAt", getTime(rec));
+			row.put("sio:SIO_000687", getTime(rec));
 			DASVirtualObject toAdd = new DASVirtualObject(getLabel(rec).trim().replace(" ",""), row);
 			templateList.add(toAdd);
 			//System.out.println("[DASOGenerator] created template: \n" + toAdd);
@@ -222,13 +222,13 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 			if (getInRelationTo(rec).length() > 0) {
 				row.put(getRelation(rec), getInRelationTo(rec));
 				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
-				row.put("sio:Relation", getRelation(rec));
+				row.put("hasco:Relation", getRelation(rec));
 			}
 		} else {
 			if (getInRelationTo(rec).length() > 0) {
-				row.put("sio:inRelationTo", getInRelationTo(rec));
+				row.put("sio:SIO_000668", getInRelationTo(rec));
 				row.put("hasco:inRelationToLabel", getInRelationToString(rec));
-				row.put("sio:Relation", "sio:inRelationTo");
+				row.put("hasco:Relation", "sio:SIO_000668");
 			}
 		}
 		return row;

@@ -216,23 +216,64 @@
         }
       ]
     },
+    "DOI": {
+      "file type": "DOI",
+      "content": [
+        {
+          "id": "DOI_00001",
+          "detail": "Missing InfoSheet. ",
+          "solution": "Use Excel to open this file and see if it has a sheet called 'InfoSheet'. If not, create such sheet."
+        },
+        {
+          "id": "DOI_00002",
+          "detail": "Missing Study_ID property in InfoSheet. ",
+          "solution": "Include a valid Study_ID property into InfoSheet."
+        },
+        {
+          "id": "DOI_00003",
+          "detail": "Study_ID property <%s> in InfoSheet is invalid. ",
+          "solution": "Study_ID property in InfoSheet is not of a valid study. Replace the property with a valid study id."
+        },
+        {
+          "id": "DOI_00004",
+          "detail": "Invalid/missing Version property in InfoSheet. ",
+          "solution": "Correct/include a valid Version property into InfoSheet."
+        },
+        {
+          "id": "DOI_00005",
+          "detail": "Missing Filenames Sheet. ",
+          "solution": "Include a 'Filenames' sheet into the DOI file."
+        },
+        {
+          "id": "DOI_00006",
+          "detail": "Error processing DOI Generator. ",
+          "solution": ""
+        },
+        {
+          "id": "DOI_00007",
+          "detail": "Failed to retrieve DA <%s> ",
+          "solution": "DA file was not ingested prior the execution of this DOI file."
+        }
+        
+      ]
+    },
     "GLOBAL": {
       "file type": "GLOBAL",
       "content": [
         {
           "id": "GBL_00001",
-          "detail": "Unsupported file name prefix, only accept prefixes DA-, DPL-, STR-, SDD-, SSD-, STD- ",
-          "solution": ""
+          "detail": "Unsupported file name prefix, only accept prefixes DA-, DOI-, DPL-, STR-, SDD-, SSD-, STD- ",
+          "solution": "Rename the current file to have a valid prefix. Please note that the prefixes end with an hyphen, not an underscore"
         },
         {
           "id": "GBL_00002",
-          "detail": "Already processed a file with the same name %s . Please delete the old file before moving forward. ",
-          "solution": ""
+          "detail": "Already processed a file with the same name %s . ",
+          "solution": "Either remove this file or the old file before moving forward. "
         },
         {
           "id": "GBL_00003",
           "detail": "Unknown file format: %s",
-          "solution": ""
+          "solution": "Known formats are .csv or .xlsx"
         }
       ]
     }

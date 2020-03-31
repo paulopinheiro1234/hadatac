@@ -63,7 +63,9 @@ public class ObjectManagement extends Controller {
         int total = StudyObject.getNumberStudyObjectsByCollection(oc_uri);
         
         for (StudyObject obj : objects) {
-            objUriList.add(obj.getUri());
+        	if (obj != null && obj.getUri() != null) {
+        		objUriList.add(obj.getUri());
+        	}
         }
 
         return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total, message));

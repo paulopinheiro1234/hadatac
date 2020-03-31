@@ -45,7 +45,7 @@ public class UserGroup extends User {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 				user.setComment(object.asLiteral().getString());
-		    } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:isMemberOf"))) {
+		    } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:SIO_000095"))) {
 				if(object.toString().equals("Public") || object.toString().equals("")) {
 					user.setImmediateGroupUri("Public");
 				} else {
@@ -124,7 +124,7 @@ public class UserGroup extends User {
         		"PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " + 
 				"SELECT ?uri WHERE { " +
 				"  ?uri a foaf:Person . " +
-				"  ?uri sio:isMemberOf <" + group_uri + "> . " +
+				"  ?uri sio:SIO_000095 <" + group_uri + "> . " +
 				"} ";
 		
 		ResultSetRewindable resultsrw = SPARQLUtils.select(

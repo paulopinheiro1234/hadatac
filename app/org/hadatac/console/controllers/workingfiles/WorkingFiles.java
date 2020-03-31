@@ -82,6 +82,7 @@ public class WorkingFiles extends Controller {
         String pathWorking = ConfigProp.getPathWorking();
         
         List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString(), false);
+        Collections.sort(folders);
         if (!"/".equals(newDir)) {
             folders.add(0, "..");
         }

@@ -104,7 +104,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
         List<VirtualColumn> vcs = new ArrayList<VirtualColumn>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* sio:VirtualColumn . " + 
+                " ?uri rdfs:subClassOf* hasco:VisrtualColumn . " + 
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
