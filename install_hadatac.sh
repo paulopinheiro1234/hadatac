@@ -16,17 +16,17 @@ echo "     300Mbytes of data. Make sure you have a decent connection and"
 echo "     this data availability."
 echo ""
 
-dpkg -s zip &> /dev/null  
+#dpkg -s zip &> /dev/null
+zipDir=$(command -v zip)
 
-if [ $? -ne 0 ]
+if [ -z $zipDir ]
 
   then
-    echo "  2) Program missing: 'zip' is required for installation"  
+    echo "  2) Program missing: 'zip' is required for installation"
     echo "     Please install zip before proceeding"
     echo ""
-    exit 
+    exit
 fi
-
 
 if [ "$#" -gt 0 ]; then
   case $1 in
