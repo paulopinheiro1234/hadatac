@@ -140,10 +140,10 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
-         <div id="verifysdd" style="display:inline-block;" >
+        
             <button id="vsdd" onclick="verifySDD()" >Verify SDD</button>
             <button id="everify" onclick="external()">External Verify</button>
-         </div>
+         
          
          <button class="main-nav" id="show"> <img src="@controllers.routes.Assets.versioned("icons/open-eye.png")"
             width="36" height="33" alt=""/> Show Options</button>
@@ -154,12 +154,12 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
          <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
             <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
-            width="36" height="30" alt=""/> Recommended Terms</button>
+            width="36" height="30" alt=""/> Recommended Terms </button> 
             <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
                <option value="Choose from Below">Choose from Below</option>
             </select>
 
-            <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
+            <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;" >
                <img src="@controllers.routes.Assets.versioned("icons/vr-icon.png")"
                width="40" height="32" alt=""/>Recommended Columns</button>
                <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
@@ -214,9 +214,10 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
       
                     </ul>
-                    <div class="text-area">
-                     Cell Value: <input type="text" style="width:450px" id="cellText" value=""/>
-   
+                    <div class="text-area" >
+                     Cell Value: <input type="text" style="width:35%" id="cellText" value=""/>
+                     Cell Description: <input type="text" style="width:35%" id="cellDes" value="" input disabled="disabled"/>
+                     
                      <div id="suggestion-box" style="float: right;">
                         Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
                            <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
@@ -225,8 +226,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   </div>
    
                   <div class="text-area2">
-                     Description : <input type="text" id="varDescription" style="width:450px" value="" input disabled="disabled"/>
-   
+                     Column Description : <input type="text" id="varDescription" style="width:35%" value="" input disabled="disabled"/>
+                     Link : <input type="text" id="cellLink" style="width:35%" value="" input disabled="disabled"/>
                      <div id="suggestion-box" style="float: right;">
                         Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
                   </div>

@@ -1,4 +1,5 @@
-
+var cellDescription = document.getElementById('cellDes');
+var cellLink=document.getElementById('cellLink');
 function checkRecs (L,R,checker){
     copyOfL=L;
     copyOfR=R;
@@ -81,7 +82,7 @@ function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R
 
             if(menuoptns.length>0){
               isSuggestion=1
-               drawStars(rowIndex,colIndex,isSuggestion);
+               drawStars(rowIndex,colIndex,isSuggestion,menuoptns);
             }
             break; // leave for loop early
          }
@@ -89,7 +90,7 @@ function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R
    }
 }
 
-function drawStars(rowIndex,colIndex,isSuggestion){
+function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
     if(isSuggestion==0){
 
     }
@@ -98,11 +99,34 @@ function drawStars(rowIndex,colIndex,isSuggestion){
       //cdg.draw();
       if(sheetName=="Dictionary Mapping"){
         drawCheck(rowIndex,colIndex);
+        autoPopulateSDD(menuoptns,rowIndex,colIndex);
       }
     }
 
 
 
+}
+function autoPopulateSDD(menuoptns,rowIndex,colIndex){
+  menuoptns=menuoptns.sort(sortByStar);
+  var topchoice=menuoptns[0][1];
+  
+  var namespace;
+  if(topchoice.startsWith("http")){
+    namespace=topchoice.split("/").pop();
+  }
+  namespace=namespace.replace("_",":");
+  cdg.data[rowIndex][colIndex]=namespace;
+  storeAutoVal(topchoice,rowIndex,colIndex)
+  cdg.draw();
+}
+function storeAutoVal(topchoice,rowIndex,colIndex){
+  sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
+  console.log(topchoice);
+  
+  sheetStorageCopy[rowIndex][colIndex]=topchoice;
+  console.log(sheetStorageCopy[rowIndex][colIndex])
+  fromSuggestionstoLabel(topchoice,rowIndex,colIndex);
+  
 }
 
 function stripStars(){
@@ -110,8 +134,29 @@ function stripStars(){
   //str.replace('a', '');
   checkRecs(copyOfL,copyOfR,0);
 }
-
-
+function getLink(link){
+  if(link.startsWith("http")){
+    cellLink.value=link;
+  }
+  else{
+    cellLink.value="No link to show";
+  }
+  
+}
+function getDescription(cval){
+  var cellVal=cval;
+      $.ajax({
+        type : 'GET',
+        url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
+        data : {
+          iricode:cellVal
+        },
+        success : function(data) {
+         cellDescription.value=data;
+          console.log(data);
+        }
+      });
+}
 function drawCheck(rowIndex,colIndex){
   
   var imgs={};

@@ -7,11 +7,7 @@ function fromSuggestionstoLabel(val,r,c){
  
    
   
-  var labelStr = val.split("/").pop();
-  
-  var label1 = labelStr.split('_')[0];
-  var label2 = labelStr.split('_')[1];
-  
+
   $.ajax({
     type : 'GET',
     url : 'http://localhost:9000/hadatac/sddeditor_v2/getLabelFromIri',
@@ -27,11 +23,41 @@ function fromSuggestionstoLabel(val,r,c){
       cdgcopy.data = sheetStorage;
     }
   });
+  
+
 }
+function convertOriginal(labelsCopy){
+  
+  for(var i=0;i<sheetStorage.length;i++){
+    for(var j=0;j<sheetStorage[i].length;j++){
+      if(sheetStorage[i][j]=="" || sheetStorage[i][j].startsWith("??")){
 
+      }
+      else if(sheetStorage[i][j].startsWith("http")){
+      var labSheet=fromSuggestionstoLabel(sheetStorage[i][j],i,j,labelsCopy);
+      }
+      
+    }
+  }
+  
+  return labSheet
+}
 function showLabels(){
-
+  
   hideView();
+  emptySheet=[];
+  labelsCopy=[];
+  for(var i=0;i<sheetStorage.length;i++){
+    emptySheet.push([])
+    for(var j=0;j<sheetStorage[i].length;j++){
+      emptySheet[i].push("")
+      
+    }
+  }
+  
+  
+  cdgcopy.data=emptySheet;
+  
   _grid.style.display="none";
   _buttons.style.display="none";
   _footnote.style.display="none";
@@ -40,6 +66,7 @@ function showLabels(){
   _gridcopy.style.width = '100%';
 
   cdgcopy.data = sheetStorage;
+  
   
   
 

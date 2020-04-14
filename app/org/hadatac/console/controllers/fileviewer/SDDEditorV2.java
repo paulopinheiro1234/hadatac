@@ -39,6 +39,10 @@ public class SDDEditorV2 extends Controller {
     String headerSheetColumn;
     String commentSheetColumn;
     FirstLabel fL;
+    FirstLabel fL_des;
+    
+    
+
     
 
     // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
@@ -57,7 +61,7 @@ public class SDDEditorV2 extends Controller {
         if (null == dataFile && indicator == 1) {
             return badRequest("Invalid data file!");
         }
-
+        
         DataFile finalDF=new DataFile("");
         if (indicator == 1 && dataFile != null) {
             headerSheetColumn=DDEditor.headerSheetColumn;
@@ -220,8 +224,20 @@ public class SDDEditorV2 extends Controller {
 
         
         String returnLabel=fL.getLabel(iricode);
-        
+        System.out.println(fL_des.getLabelDescription(iricode));
         return ok(Json.toJson(returnLabel));
+
+    }
+    public Result getDescriptionFromIri(String iricode){
+
+        
+        String returnDescription=fL_des.getLabelDescription(iricode);
+        if(returnDescription==""){
+            returnDescription="No Description Available: See link for more info";
+        }
+        
+        System.out.println(fL_des.getLabelDescription(iricode));
+        return ok(Json.toJson(returnDescription));
 
     }
 

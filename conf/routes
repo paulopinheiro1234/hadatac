@@ -467,6 +467,9 @@ POST    /hadatac/sddeditor_v2/getOldEdits              org.hadatac.console.contr
 GET     /hadatac/sddeditor_v2/getLabelFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getLabelFromIri(iricode:String)
 POST    /hadatac/sddeditor_v2/getLabelFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getLabelFromIri(iricode:String)
 
+GET     /hadatac/sddeditor_v2/getDescriptionFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getDescriptionFromIri(iricode:String)
+POST    /hadatac/sddeditor_v2/getDescriptionFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getDescriptionFromIri(iricode:String)
+
 GET     /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.controllers.fileviewer.SDDEditorV2.validateIRI(s:String)
 POST    /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.controllers.fileviewer.SDDEditorV2.validateIRI(s:String)
 

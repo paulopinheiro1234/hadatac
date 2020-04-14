@@ -4,7 +4,7 @@
 var demo_enabled = false;
 var sdd_suggestions;
 var sddgenAdress;
-
+var globalMenu;
 /** drop target **/
 var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
@@ -78,7 +78,10 @@ function hideView(){
   cdg.style.width = '100%';
 
 }
-
+function removeHeadings(json){
+  json.splice(0,1);
+  return json
+}
 function changeHeader(headers,emptySheet){
   if(emptySheet==0){
       for(var i = 0; i < headers.length; i++){
@@ -150,12 +153,14 @@ var rowNum=0;
 var isVirtual=0;
 
 var cellEntry = document.getElementById('cellText');
+var cellDescription = document.getElementById('cellDes');
 var textCell = null;
 cellEntry.value = "";
 
 cellEntry.addEventListener('input', function (evt){
    if(textCell != null){
       cdg.data[textCell.rowIndex][textCell.columnIndex] = cellEntry.value;
+      
    }
 });
 
@@ -167,14 +172,7 @@ cellEntry.addEventListener('keyup', function (e){
 });
 
 
-// cdg.addEventListener('rendercell', function (e) {
-//   // cdg.editCellColor="red";
-//   // if (cdg.schema[0].title == 'Column' && /CHEARPID/.test(e.cell.value)) {
-//   //     // e.ctx.fillStyle = '#AEEDCF';
-//   //     cdg.editCellColor="red";
-//   // }
-  
-// });
+
 cdg.addEventListener('click', function (e) {
   returnToView();
   colNum=e.cell.columnIndex;
@@ -193,7 +191,9 @@ cdg.addEventListener('click', function (e) {
   }
 
   cellEntry.value = cdg.data[rowNum][colNum];
-
+  
+  getLink(sheetStorageCopy[rowNum][colNum]);
+  getDescription(sheetStorageCopy[rowNum][colNum]);
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
@@ -239,11 +239,11 @@ cdg.addEventListener('endedit',function(e){
 
   if (!e.cell) { return; }
 
-
+  var rowval=cdg.data[e.cell.rowIndex][0];
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
-  var rowval=cdg.data[e.cell.rowIndex][0];
-
+  getEditValue(rowNum,colNum,1);
+  
   if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
     isVirtual=0;
   }
@@ -262,7 +262,17 @@ cdg.addEventListener('endedit',function(e){
   
   
 })
-
+function getEditValue(rowNum,colNum,ind,cellvalue){
+  if(ind==1){
+    sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+  }
+  else if(ind==0){
+    sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+  }
+  //fromSuggestionstoLabel()
+  
+  
+}
 cdg.addEventListener('click', function (e) {
   returnToView();
   if (!e.cell) { return; }
@@ -309,7 +319,7 @@ function chooseItem(data) {
   cdg.data[rowNum][colNum] = namespace;
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
-  fromSuggestionstoLabel(choice[1],rowNum+1,colNum);
+  //fromSuggestionstoLabel(choice[1],rowNum+1,colNum);
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   drawStars(rowNum,colNum);
   cdg.draw();
@@ -469,10 +479,27 @@ var headerMap = new Map();
 var json_copy;
 
 var sheetStorage=[];
+var sheetStorageCopy=[];
 var approvalList={};
+function gotothisfunction2(sheetCopy){
+  //console.log(sheetCopy)
+  sheetStorageCopy=[];
+  
+  for(var i=0;i<sheetCopy.length;i++){
+    var temp=[];
+    for(var j=0;j<sheetCopy[i].length;j++){
+      temp.push(sheetCopy[i][j]);
+    }
+    sheetStorageCopy.push(temp);
+    
+    
+  }
+  console.log(sheetStorageCopy)
+}
 function gotothisfunction(sheetCopy){
-  //sheetStorage=[];
-  console.log(sheetCopy.length)
+  //console.log(sheetCopy)
+  sheetStorage=[];
+  
   for(var i=0;i<sheetCopy.length;i++){
     var temp=[];
     for(var j=0;j<sheetCopy[i].length;j++){
@@ -480,8 +507,9 @@ function gotothisfunction(sheetCopy){
     }
     sheetStorage.push(temp);
     
+    
   }
-  console.log(sheetStorage);
+  
 }
 function approvalFunction(sheetCopy){
   for(var i=1;i<sheetCopy.length;i++){
@@ -562,8 +590,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   }
   
   if(sheetName=="Dictionary Mapping" ){
-    var sheetCopy=cleanJson
-    gotothisfunction(sheetCopy);
+  
    
   }
   if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
@@ -579,17 +606,36 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   var emptySheet;
   /* set up table headers */
   if(headerMap.has(sheetName)){
+    
+    
     cdg.data = json;
 
     changeHeader(headerMap.get(sheetName),1);
     for(var i=0;i<cdg.data.length;i++){
       R++;
       checkRecs(L,R,1);
+      
     }
+    if(sheetName=="Dictionary Mapping"){
+      var sheetCopy=json;
+      gotothisfunction(sheetCopy);
+      gotothisfunction2(sheetCopy);
+    }
+   
   }
   else{
     headerMap.set(sheetName, json[0]);
-
+    // if(sheetName=="InfoSheet"){
+    //   var temp=[]
+    //   for(var i=0;i<json.length;i++){
+    //     if(json[i][0]!="Data Dictionary Link"){
+    //       temp.push("Data Dictionary Link");
+    //       temp.push(dd_url);
+    //     }
+    //   }
+    //   json.push(temp);
+    // }
+    
     if(json.length==1){
       cdg.data = json;
       emptySheet=0;
@@ -599,10 +645,17 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       for(var i=0;i<cdg.data.length;i++){
         R++;
         checkRecs(L,R,1);
+        
 
       }
+      
     }
     changeHeader(json[0], emptySheet);
+    if(sheetName=="Dictionary Mapping"){
+      var sheetCopy=removeHeadings(json);
+      gotothisfunction(sheetCopy);
+      gotothisfunction2(sheetCopy);
+    }
   }
   if(sheetName=="Dictionary Mapping"){
     var sheetCopy=cleanJson
@@ -862,7 +915,10 @@ function addOptionsToMenu(menuoptns,select){
     }
 }
 }
+
 function createNewMenu(menuoptns,colval,isVirtual){
+  globalMenu=menuoptns;
+
   if(isVirtual==0){
     var select=document.getElementById("menulist"),menuoptns;
     addOptionsToMenu(menuoptns,select);
@@ -946,6 +1002,7 @@ function clearMenu(isVirtual){
     }
   }
 
+  
 
 function clearTextbox(){
   document.getElementById("varDescription").value="";
