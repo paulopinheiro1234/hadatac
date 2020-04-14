@@ -218,7 +218,7 @@ public class NameSpace {
 
 	public int save() {
         if (priority == -1) {
-           System.out.println("Warning priority was never initalized through the Namespace file");
+           System.out.println("Warning priority was never initialized through the NameSpace file");
         }
         try {
             SolrClient client = new HttpSolrClient.Builder(
