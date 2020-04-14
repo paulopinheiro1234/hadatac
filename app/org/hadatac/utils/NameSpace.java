@@ -37,23 +37,31 @@ public class NameSpace {
 
 	@Field("abbreviation")
 	private String nsAbbrev = "";
+
 	@Field("name_str")
 	private String nsName = "";
+
 	@Field("mime_type_str")
 	private String nsType = "";
+
 	@Field("url_str")
 	private String nsURL = "";
+
 	@Field("number_of_loaded_triples_int")
-    private int numberOfLoadedTriples = 0;
+	private int numberOfLoadedTriples = 0;
+
+	@Field("priority_int")
+	private int priority = -1;
 
 	public NameSpace () {
 	}
 
-	public NameSpace (String abbrev, String name, String type, String url) {
+	public NameSpace (String abbrev, String name, String type, String url, int priority) {
 		nsAbbrev = abbrev;
 		nsName = name;
 		nsType = type;
 		nsURL = url;
+		this.priority = priority;
 	}
 
 	public String getAbbreviation() {
@@ -79,6 +87,14 @@ public class NameSpace {
 	public void setType(String type) {
 		nsType = type;
 	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+   public int getPriority() {
+	    return priority;
+    }
 
 	public String getURL() {
 		return nsURL;
@@ -124,6 +140,29 @@ public class NameSpace {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<String> getOntologyURIs() {
+        List<String> uris = new ArrayList<String>();
+        try {
+           String queryString = "SELECT ?uri \n"
+                   + "FROM <" + getName() + "> \n"
+                   + "WHERE { \n"
+                   + " ?ont <http://www.w3.org/2000/01/rdf-schema#subClassOf>* <http://www.w3.org/2002/07/owl#Ontology> . \n"
+                   + " ?uri a ?ont . \n"
+                   + "} ";
+
+            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                    CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+            while(resultsrw.hasNext()){
+               QuerySolution soln = resultsrw.next();
+               uris.add(soln.getResource("uri").getURI());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+        return uris;
     }
 
 	public void loadTriples(String address, boolean fromRemote) {
@@ -178,6 +217,9 @@ public class NameSpace {
 	}
 
 	public int save() {
+        if (priority == -1) {
+           System.out.println("Warning priority was never initalized through the Namespace file");
+        }
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.NAMESPACE)).build();
@@ -237,7 +279,7 @@ public class NameSpace {
         object.setType(doc.getFieldValue("mime_type_str").toString());
         object.setURL(doc.getFieldValue("url_str").toString());
         object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
-
+        object.setPriority(Integer.valueOf(doc.getFieldValue("priority_int").toString()).intValue());
         return object;
     }
 

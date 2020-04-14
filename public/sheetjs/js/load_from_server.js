@@ -533,7 +533,7 @@ function getSuggestion(){
          }
 
          // cdg.data[rowNum][colNum]
-
+         // MATT HERE
          // Get the ontologies for the Suggestion Request
          var ontRequest = new XMLHttpRequest();
          ontRequest.open('GET', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies', true);
@@ -542,11 +542,12 @@ function getSuggestion(){
          ontRequest.onload = function(e) {
 
             // Get the ontologies for the Suggestion Request
-            var ontologyList = [];
-            var ontologies = ontRequest.response;
-            ontologies.forEach(function (item, index) {
-              ontologyList.push(item['uri'])
-           });
+            // var ontologyList = [];
+           //  var ontologies = ontRequest.response;
+           //  ontologies.forEach(function (item, index) {
+           //    ontologyList.push(item['uri'])
+           // });
+           var ontologyList = ontRequest.response;
            console.log(ontologyList)
 
 
