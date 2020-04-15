@@ -1,5 +1,4 @@
-var cellDescription = document.getElementById('cellDes');
-var cellLink=document.getElementById('cellLink');
+
 function checkRecs (L,R,checker){
     copyOfL=L;
     copyOfR=R;
@@ -121,10 +120,10 @@ function autoPopulateSDD(menuoptns,rowIndex,colIndex){
 }
 function storeAutoVal(topchoice,rowIndex,colIndex){
   sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
-  console.log(topchoice);
+  
   
   sheetStorageCopy[rowIndex][colIndex]=topchoice;
-  console.log(sheetStorageCopy[rowIndex][colIndex])
+  
   fromSuggestionstoLabel(topchoice,rowIndex,colIndex);
   
 }
@@ -135,27 +134,31 @@ function stripStars(){
   checkRecs(copyOfL,copyOfR,0);
 }
 function getLink(link){
+  var ret;
   if(link.startsWith("http")){
-    cellLink.value=link;
+    ret=link;
   }
   else{
-    cellLink.value="No link to show";
+    ret="No link to show";
   }
-  
+  return ret;
 }
 function getDescription(cval){
+  console.log(cval)
   var cellVal=cval;
+  var ret;
       $.ajax({
         type : 'GET',
         url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
         data : {
           iricode:cellVal
         },
-        success : function(data) {
-         cellDescription.value=data;
-          console.log(data);
+        async: false,
+        success : function(data) {  
+         ret=data
         }
       });
+      return ret;
 }
 function drawCheck(rowIndex,colIndex){
   

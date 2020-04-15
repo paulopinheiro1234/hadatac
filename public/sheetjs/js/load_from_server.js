@@ -153,7 +153,7 @@ var rowNum=0;
 var isVirtual=0;
 
 var cellEntry = document.getElementById('cellText');
-var cellDescription = document.getElementById('cellDes');
+
 var textCell = null;
 cellEntry.value = "";
 
@@ -172,7 +172,30 @@ cellEntry.addEventListener('keyup', function (e){
 });
 
 
+cdg.addEventListener('contextmenu', function (e) {
+  if (!e.cell) { return; }
+  
 
+    var input = document.createElement("textarea");
+    input.style.width="100%";
+    if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"){
+      colNum=e.cell.columnIndex;
+      rowNum=e.cell.rowIndex;
+      var des=getDescription(sheetStorageCopy[rowNum][colNum]);
+      input.innerHTML=des;
+      
+      e.items.push({
+          title: input,
+          click: function () {
+            var link=getLink(sheetStorageCopy[rowNum][colNum]);
+            var win = window.open(link, '_blank');
+            win.focus();
+          }
+      });
+
+      }
+
+});
 cdg.addEventListener('click', function (e) {
   returnToView();
   colNum=e.cell.columnIndex;
@@ -192,8 +215,8 @@ cdg.addEventListener('click', function (e) {
 
   cellEntry.value = cdg.data[rowNum][colNum];
   
-  getLink(sheetStorageCopy[rowNum][colNum]);
-  getDescription(sheetStorageCopy[rowNum][colNum]);
+  
+  
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
@@ -344,6 +367,7 @@ function chooseItem(data) {
 
 }
 cdg.addEventListener('contextmenu', function (e) {
+ 
   e.items.push({
       title: 'Insert Row Above',
       click: function (ev) {
@@ -481,7 +505,7 @@ var json_copy;
 var sheetStorage=[];
 var sheetStorageCopy=[];
 var approvalList={};
-function gotothisfunction2(sheetCopy){
+function createIriStorage(sheetCopy){
   //console.log(sheetCopy)
   sheetStorageCopy=[];
   
@@ -496,7 +520,7 @@ function gotothisfunction2(sheetCopy){
   }
   console.log(sheetStorageCopy)
 }
-function gotothisfunction(sheetCopy){
+function createCopySheet(sheetCopy){
   //console.log(sheetCopy)
   sheetStorage=[];
   
@@ -618,23 +642,24 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=json;
-      gotothisfunction(sheetCopy);
-      gotothisfunction2(sheetCopy);
+      createCopySheet(sheetCopy);
+      createIriStorage(sheetCopy);
     }
    
   }
   else{
     headerMap.set(sheetName, json[0]);
-    // if(sheetName=="InfoSheet"){
-    //   var temp=[]
-    //   for(var i=0;i<json.length;i++){
-    //     if(json[i][0]!="Data Dictionary Link"){
-    //       temp.push("Data Dictionary Link");
-    //       temp.push(dd_url);
-    //     }
-    //   }
-    //   json.push(temp);
-    // }
+    if(sheetName=="InfoSheet"){
+      var temp=[]
+      for(var i=0;i<json.length;i++){
+        if(json[i][0]!="Data Dictionary Link"){
+          temp.push("Data Dictionary Link");
+          temp.push(dd_url);
+          break;
+        }
+      }
+      json.push(temp);
+    }
     
     if(json.length==1){
       cdg.data = json;
@@ -645,16 +670,15 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       for(var i=0;i<cdg.data.length;i++){
         R++;
         checkRecs(L,R,1);
-        
-
-      }
+       }
+       
       
     }
     changeHeader(json[0], emptySheet);
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=removeHeadings(json);
-      gotothisfunction(sheetCopy);
-      gotothisfunction2(sheetCopy);
+      createCopySheet(sheetCopy);
+      createIriStorage(sheetCopy);
     }
   }
   if(sheetName=="Dictionary Mapping"){
@@ -779,7 +803,7 @@ function getSuggestion(){
             ontologies.forEach(function (item, index) {
               ontologyList.push(item['uri'])
            });
-           console.log(ontologyList)
+          
 
 
            // Generating Suggestion Request
@@ -788,7 +812,7 @@ function getSuggestion(){
           // request["source-urls"] = ["http://semanticscience.org/resource/"];
           request["N"] = 4;
           request["data-dictionary"] = dataDictionary
-          console.log(request);
+        
 
           var xhr = new XMLHttpRequest();
           xhr.open("POST", url);

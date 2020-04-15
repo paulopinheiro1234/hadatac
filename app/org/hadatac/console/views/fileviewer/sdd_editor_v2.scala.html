@@ -145,10 +145,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
             <button id="everify" onclick="external()">External Verify</button>
          
          
-         <button class="main-nav" id="show"> <img src="@controllers.routes.Assets.versioned("icons/open-eye.png")"
-            width="36" height="33" alt=""/> Show Options</button>
-            <button class="Close" id="hide"> <img src="@controllers.routes.Assets.versioned("icons/closed-eye.png")"
-               width="36" height="33" alt=""/> Hide Options</button>
+         <button class="main-nav" id="show"> <span class="glyphicon glyphicon-eye-open"> </span> </button>
+            <button class="Close" id="hide"> <span class="glyphicon glyphicon-eye-close"> </span> </button>
          </div>    
       <div class="mobile-nav">
             <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
@@ -216,7 +214,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                     </ul>
                     <div class="text-area" >
                      Cell Value: <input type="text" style="width:35%" id="cellText" value=""/>
-                     Cell Description: <input type="text" style="width:35%" id="cellDes" value="" input disabled="disabled"/>
+                    
                      
                      <div id="suggestion-box" style="float: right;">
                         Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
@@ -227,7 +225,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
    
                   <div class="text-area2">
                      Column Description : <input type="text" id="varDescription" style="width:35%" value="" input disabled="disabled"/>
-                     Link : <input type="text" id="cellLink" style="width:35%" value="" input disabled="disabled"/>
+                     
                      <div id="suggestion-box" style="float: right;">
                         Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
                   </div>

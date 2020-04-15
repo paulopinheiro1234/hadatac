@@ -32,17 +32,13 @@ function verifySDD(){
     for (var i=1;i<copyOfR;i++){
       for(var j=1;j<copyOfL;j++){
           
-          if(cdg.data[i][j]==null ||cdg.data[i][j].startsWith("??")||cdg.data[i][j]==''||cdg.data[i][j]==' * '){
+          if(sheetStorageCopy[i][j]!=null &&(!sheetStorageCopy[i][j].startsWith("??"))&&sheetStorageCopy[i][j]!=''&&
+          sheetName=="Dictionary Mapping"){
             
-          }
-          else{
+          
             
-            var cellItem=cdg.data[i][j];
-            if(cellItem.endsWith(" * ")){
-                
-                cellItem=cellItem.replace(" * ",'');
-                
-            }
+            var cellItem=sheetStorageCopy[i][j];
+            
             
            
             var label= cellItem;
@@ -61,7 +57,7 @@ function verifySDD(){
     }
     var trackofLabelValidity=[];
     function verifyLabel(label,i,j){
-        
+        console.log(sheetStorageCopy[i][j])
         $.ajax({
                 type : 'GET',
                 url : 'http://localhost:9000/hadatac/sddeditor_v2/validateIRI',
@@ -177,7 +173,16 @@ function errorsFoundDisplay(errorsFound){
         b1.innerHTML=errorsFound[i][0];
         document.getElementById('irifound').appendChild(b1);
         if (document.addEventListener) { // IE >= 9; other browsers
-            b1.addEventListener('
+            b1.addEventListener('click', function(e) {
+
+                for(var j=0;j<errorsFound.length;j++){
+
+                    if(errorsFound[j][0]==this.innerHTML){
+
+                        cdg.gotoCell(errorsFound[j][1], errorsFound[j][2])
+                    }
+                }
+                }, false);
         }
         
     }
