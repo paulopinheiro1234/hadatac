@@ -160,7 +160,7 @@ cellEntry.value = "";
 cellEntry.addEventListener('input', function (evt){
    if(textCell != null){
       cdg.data[textCell.rowIndex][textCell.columnIndex] = cellEntry.value;
-      
+
    }
 });
 
@@ -174,7 +174,7 @@ cellEntry.addEventListener('keyup', function (e){
 
 cdg.addEventListener('contextmenu', function (e) {
   if (!e.cell) { return; }
-  
+
 
     var input = document.createElement("textarea");
     input.style.width="100%";
@@ -183,7 +183,7 @@ cdg.addEventListener('contextmenu', function (e) {
       rowNum=e.cell.rowIndex;
       var des=getDescription(sheetStorageCopy[rowNum][colNum]);
       input.innerHTML=des;
-      
+
       e.items.push({
           title: input,
           click: function () {
@@ -214,9 +214,9 @@ cdg.addEventListener('click', function (e) {
   }
 
   cellEntry.value = cdg.data[rowNum][colNum];
-  
-  
-  
+
+
+
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
@@ -266,7 +266,7 @@ cdg.addEventListener('endedit',function(e){
   var colval=cdg.schema[e.cell.columnIndex].title;
   colval=colval.charAt(0).toLowerCase() + colval.slice(1);
   getEditValue(rowNum,colNum,1);
-  
+
   if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
     isVirtual=0;
   }
@@ -282,8 +282,8 @@ cdg.addEventListener('endedit',function(e){
   storeThisEdit(rowNum_str,colNum_str,e.value);
   var menuoptns=[];
   starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
-  
-  
+
+
 })
 function getEditValue(rowNum,colNum,ind,cellvalue){
   if(ind==1){
@@ -293,8 +293,8 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
     sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
   }
   //fromSuggestionstoLabel()
-  
-  
+
+
 }
 cdg.addEventListener('click', function (e) {
   returnToView();
@@ -359,15 +359,15 @@ function chooseItem(data) {
     console.log("here");
     approvalList[namespace]=[rowNum+1,colNum,0]
     indicateApproval();
-    
-    
+
+
   }
-  
-  
+
+
 
 }
 cdg.addEventListener('contextmenu', function (e) {
- 
+
   e.items.push({
       title: 'Insert Row Above',
       click: function (ev) {
@@ -387,7 +387,7 @@ cdg.addEventListener('contextmenu', function (e) {
   e.items.push({
     title: 'Delete Row',
     click: function (ev) {
-        
+
         var temp=[];
         temp.push(e.cell.rowIndex);
         for(var i=0;i<cdg.data[e.cell.rowIndex].length+1;i++){
@@ -426,9 +426,9 @@ cdg.addEventListener('contextmenu', function (e) {
         var originalVal=e.cell.value;
         var stripped=originalVal.replace(" + ","")
           approvalList[stripped][2]=1;
-          
+
           acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
-          
+
 
       }
     });
@@ -479,8 +479,8 @@ function removeRow(){
 function _resize() {
   _grid.style.height = (window.innerHeight - 300) + "px";
   _grid.style.width = '100%';
-  
- 
+
+
 }
  _resize();
 
@@ -508,36 +508,36 @@ var approvalList={};
 function createIriStorage(sheetCopy){
   //console.log(sheetCopy)
   sheetStorageCopy=[];
-  
+
   for(var i=0;i<sheetCopy.length;i++){
     var temp=[];
     for(var j=0;j<sheetCopy[i].length;j++){
       temp.push(sheetCopy[i][j]);
     }
     sheetStorageCopy.push(temp);
-    
-    
+
+
   }
   console.log(sheetStorageCopy)
 }
 function createCopySheet(sheetCopy){
   //console.log(sheetCopy)
   sheetStorage=[];
-  
+
   for(var i=0;i<sheetCopy.length;i++){
     var temp=[];
     for(var j=0;j<sheetCopy[i].length;j++){
       temp.push(sheetCopy[i][j]);
     }
     sheetStorage.push(temp);
-    
-    
+
+
   }
-  
+
 }
 function approvalFunction(sheetCopy){
   for(var i=1;i<sheetCopy.length;i++){
-    
+
     for(var j=1;j<sheetCopy[i].length;j++){
       var temp2=[];
       if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
@@ -557,17 +557,17 @@ function approvalFunction(sheetCopy){
         temp2.push(j);
         temp2.push(0);
         approvalList[keys]=temp2;
-       
+
       }
-     
+
     }
-    
+
   }
 
   //console.log(approvalList)
   indicateApproval();
- 
- 
+
+
 
 }
 
@@ -575,7 +575,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
   click_ctr++;
-  
+
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
@@ -612,10 +612,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       cleanJson.push(temp)
    }
   }
-  
+
   if(sheetName=="Dictionary Mapping" ){
-  
-   
+
+
   }
   if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
      var temp = [];
@@ -626,26 +626,26 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   }
 
   json = cleanJson;
-  
+
   var emptySheet;
   /* set up table headers */
   if(headerMap.has(sheetName)){
-    
-    
+
+
     cdg.data = json;
 
     changeHeader(headerMap.get(sheetName),1);
     for(var i=0;i<cdg.data.length;i++){
       R++;
       checkRecs(L,R,1);
-      
+
     }
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=json;
       createCopySheet(sheetCopy);
       createIriStorage(sheetCopy);
     }
-   
+
   }
   else{
     headerMap.set(sheetName, json[0]);
@@ -660,7 +660,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       }
       json.push(temp);
     }
-    
+
     if(json.length==1){
       cdg.data = json;
       emptySheet=0;
@@ -671,8 +671,8 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
         R++;
         checkRecs(L,R,1);
        }
-       
-      
+
+
     }
     changeHeader(json[0], emptySheet);
     if(sheetName=="Dictionary Mapping"){
@@ -789,7 +789,7 @@ function getSuggestion(){
          }
 
          // cdg.data[rowNum][colNum]
-
+         // MATT HERE
          // Get the ontologies for the Suggestion Request
          var ontRequest = new XMLHttpRequest();
          ontRequest.open('GET', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies', true);
@@ -798,12 +798,13 @@ function getSuggestion(){
          ontRequest.onload = function(e) {
 
             // Get the ontologies for the Suggestion Request
-            var ontologyList = [];
-            var ontologies = ontRequest.response;
-            ontologies.forEach(function (item, index) {
-              ontologyList.push(item['uri'])
-           });
-          
+            // var ontologyList = [];
+           //  var ontologies = ontRequest.response;
+           //  ontologies.forEach(function (item, index) {
+           //    ontologyList.push(item['uri'])
+           // });
+           var ontologyList = ontRequest.response;
+           console.log(ontologyList)
 
 
            // Generating Suggestion Request
@@ -812,7 +813,7 @@ function getSuggestion(){
           // request["source-urls"] = ["http://semanticscience.org/resource/"];
           request["N"] = 4;
           request["data-dictionary"] = dataDictionary
-        
+
 
           var xhr = new XMLHttpRequest();
           xhr.open("POST", url);
@@ -1026,7 +1027,7 @@ function clearMenu(isVirtual){
     }
   }
 
-  
+
 
 function clearTextbox(){
   document.getElementById("varDescription").value="";
