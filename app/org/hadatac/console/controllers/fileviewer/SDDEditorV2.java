@@ -49,14 +49,14 @@ public class SDDEditorV2 extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String fileId, boolean bSavable, int indicator) {
         final SysUser user = AuthApplication.getLocalUser(session());
-        
+
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
 
         // bioportalKey=ConfigProp.getBioportalApiKey()
         FileID=fileId;
         Collections.sort(loadedList);
-        
+
         DataFile dataFile = DataFile.findById(fileId);
         if (null == dataFile && indicator == 1) {
             return badRequest("Invalid data file!");
@@ -86,12 +86,12 @@ public class SDDEditorV2 extends Controller {
             }
             finalDF=dd_dataFile;
         }
-        
+
         dataFile.updatePermissionByUserEmail(user.getEmail());
         if (!dataFile.getAllowEditing()) {
             return ok(sdd_editor_v2.render(dataFile, finalDF, false, loadedList, this));
         }
-        
+
         return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable, loadedList, this));
     }
 
@@ -145,7 +145,11 @@ public class SDDEditorV2 extends Controller {
     }
 
     public Result getOntologies() {
-        return ok(Json.toJson(Ontology.find()));
+         List<String> onts = ns.getOrderedPriorityLoadedOntologyList();
+         return ok(Json.toJson(onts));
+
+      // old
+        // return ok(Json.toJson(Ontology.find()));
     }
 
     public Result getCart(){
