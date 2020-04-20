@@ -62,9 +62,12 @@ var _failed = function(e) {
 };
 
 var dd_url;
+var sdd_url
+function getSDDUrl(url){
+  sdd_url=url;
+}
 function getURL(url){
   dd_url = url;
-  // Get suggestions
   getSuggestion();
 }
 
@@ -178,16 +181,15 @@ cdg.addEventListener('contextmenu', function (e) {
 
     var input = document.createElement("textarea");
     input.style.width="100%";
-    if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"){
-      colNum=e.cell.columnIndex;
-      rowNum=e.cell.rowIndex;
-      var des=getDescription(sheetStorageCopy[rowNum][colNum]);
+    if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
+      var link=convertshortToIri(e.cell.value)
+      var des=getDescription(link);
       input.innerHTML=des;
 
       e.items.push({
           title: input,
           click: function () {
-            var link=getLink(sheetStorageCopy[rowNum][colNum]);
+            
             var win = window.open(link, '_blank');
             win.focus();
           }
@@ -249,7 +251,7 @@ cdg.addEventListener('click', function (e) {
       if (typeof sdd_suggestions == 'undefined') {
          // Get suggestions
          // getSuggestion();
-         // alert('Requesting Suggestions');
+
       }
       else{
          applySuggestion(colval,rowval,menuoptns,isVirtual);
@@ -292,9 +294,7 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
   else if(ind==0){
     sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
   }
-  //fromSuggestionstoLabel()
-
-
+  
 }
 cdg.addEventListener('click', function (e) {
   returnToView();
@@ -334,30 +334,26 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 
 function chooseItem(data) {
   var choice=data.value.split(",");
-  var namespace;
-  if(choice[1].startsWith("http")){
-    namespace=choice[1].split("/").pop();
-  }
-  namespace=namespace.replace("_",":");
-  cdg.data[rowNum][colNum] = namespace;
+  var ret=getUri(choice[1]);
+ 
+  cdg.data[rowNum][colNum] = ret;
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
-  //fromSuggestionstoLabel(choice[1],rowNum+1,colNum);
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   drawStars(rowNum,colNum);
   cdg.draw();
-  if(namespace in approvalList){
-    if(rowNum+1==approvalList[namespace][0] && colNum==approvalList[namespace][1] ){
+  if(ret in approvalList){
+    if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
 
     }
     else{
-      approvalList[namespace]=[rowNum+1,colNum,0]
+      approvalList[ret]=[rowNum+1,colNum,0]
       indicateApproval();
     }
   }
-  else if(!(namespace in approvalList)){
+  else if(!(ret in approvalList)){
     console.log("here");
-    approvalList[namespace]=[rowNum+1,colNum,0]
+    approvalList[ret]=[rowNum+1,colNum,0]
     indicateApproval();
 
 
@@ -500,26 +496,30 @@ var copyOfL=0;
 var copyOfR=0;
 
 var headerMap = new Map();
+
 var json_copy;
 
 var sheetStorage=[];
-var sheetStorageCopy=[];
+// var sheetStorageCopy=[];
 var approvalList={};
-function createIriStorage(sheetCopy){
-  //console.log(sheetCopy)
-  sheetStorageCopy=[];
+// function createIriStorage(sheetCopy){
+//   //console.log(sheetCopy)
+//   sheetStorageCopy=[];
 
-  for(var i=0;i<sheetCopy.length;i++){
-    var temp=[];
-    for(var j=0;j<sheetCopy[i].length;j++){
-      temp.push(sheetCopy[i][j]);
-    }
-    sheetStorageCopy.push(temp);
+//   for(var i=0;i<sheetCopy.length;i++){
+//     var temp=[];
+//     for(var j=0;j<sheetCopy[i].length;j++){
+//       if(sheetCopy[i][j]!=""&&!sheetCopy[i][j].startsWith("??")&&sheetCopy[i][j].includes(":")){
+//         var lab=convertshortToIri(sheetCopy[i][j])
+//         temp.push(lab);
+//       }
+//     }
+//     sheetStorageCopy.push(temp);
 
 
-  }
-  console.log(sheetStorageCopy)
-}
+//   }
+  
+// }
 function createCopySheet(sheetCopy){
   //console.log(sheetCopy)
   sheetStorage=[];
@@ -527,13 +527,20 @@ function createCopySheet(sheetCopy){
   for(var i=0;i<sheetCopy.length;i++){
     var temp=[];
     for(var j=0;j<sheetCopy[i].length;j++){
-      temp.push(sheetCopy[i][j]);
+      if(sheetCopy[i][j]!=""&&!sheetCopy[i][j].startsWith("??")&&sheetCopy[i][j].includes(":")){
+        var lab=convertshortToIri(sheetCopy[i][j]);
+        var finalLab=convertToLabel(lab)
+        temp.push(finalLab);
+      }
+      else{
+        temp.push(sheetCopy[i][j])
+      }
     }
     sheetStorage.push(temp);
 
 
   }
-
+console.log(sheetStorage)
 }
 function approvalFunction(sheetCopy){
   for(var i=1;i<sheetCopy.length;i++){
@@ -613,10 +620,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
    }
   }
 
-  if(sheetName=="Dictionary Mapping" ){
-
-
-  }
+  
   if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
      var temp = [];
      for(var j = 0; j < L; j++){
@@ -660,6 +664,12 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       }
       json.push(temp);
     }
+    if(sheetName=="Prefixes"){
+      for(var i=0;i<newPrefix.length;i++){
+        json.push(newPrefix[i])
+      }
+    }
+    
 
     if(json.length==1){
       cdg.data = json;
@@ -678,13 +688,15 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=removeHeadings(json);
       createCopySheet(sheetCopy);
-      createIriStorage(sheetCopy);
+      // createIriStorage(sheetCopy);
     }
   }
   if(sheetName=="Dictionary Mapping"){
     var sheetCopy=cleanJson
     approvalFunction(sheetCopy)
   }
+  
+  // SDDPrefixtoJSON();
   checkRecs(L, cdg.data.length, 1);
   cdg.draw();
 };
@@ -721,6 +733,8 @@ function parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual){
      createNewMenu(menuoptns,colval,isVirtual);
 }
 
+var labelsList=[];
+var ontsList=[];
 function getSuggestion(){
    spinnerStatus.stop()
 
@@ -755,6 +769,8 @@ function getSuggestion(){
              raw: true
          });
 
+         
+         
          // Generate data dictionary
          columnsAdded = []
          for(var i=0; i<xlarray.length; i++){
@@ -787,7 +803,15 @@ function getSuggestion(){
          else{
             console.log('Full Suggestions only work on the dictionary mapping page currently')
          }
+         var labelRequest = new XMLHttpRequest();
+         labelRequest.open('GET', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys', true);
+         labelRequest.responseType = 'json';
 
+         labelRequest.onload=function(e){
+           labelsList=labelRequest.response;
+           //console.log(labelsList)
+         }
+         labelRequest.send();
          // cdg.data[rowNum][colNum]
          // MATT HERE
          // Get the ontologies for the Suggestion Request
@@ -804,8 +828,10 @@ function getSuggestion(){
            //    ontologyList.push(item['uri'])
            // });
            var ontologyList = ontRequest.response;
-           console.log(ontologyList)
-
+           ontsList=ontologyList;
+           //console.log(ontologyList)
+           
+           SDDPrefixtoJSON();
 
            // Generating Suggestion Request
           var request = {}
@@ -841,6 +867,7 @@ function getSuggestion(){
          ontRequest.send();
       }
       oReq.send();
+      
    };
 
    var sddGenFunction = function(err, data) {
@@ -1148,7 +1175,8 @@ function populateThis(headersCol){
   for(var i=0;i<headersCol.length;i++){
     cdg.insertRow([],i);
     ct++;
-    console.log(headersCol[i]);
+    
     cdg.data[ct][0]=headersCol[i];
   }
+  // getSuggestion();
 }

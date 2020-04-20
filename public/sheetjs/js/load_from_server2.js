@@ -105,16 +105,47 @@ function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
 
 
 }
+function getUri(link){
+  var uri;
+  var prefix="";
+  var namespace;
+  if(!link.includes("#")){
+    namespace=link.split("/").pop();
+    uri=link.slice(0, link.lastIndexOf('/'));
+    uri+="/"
+    if(prefixD[uri]!="undefined"){
+      prefix=prefixD[uri];
+      namespace=prefix+":"+namespace
+    } 
+  }
+  else if(link.includes("#")){
+    namespace=link.split("#").pop();
+    uri=link.slice(0, link.lastIndexOf('#'));
+    console.log(uri)
+    if(uri in prefixD){
+      prefix=prefixD[uri];
+      namespace=prefix+":"+namespace
+    }
+    else {
+      alert("No prefix found!");
+      namespace="";
+    }
+  }
+  return namespace;
+}
 function autoPopulateSDD(menuoptns,rowIndex,colIndex){
   menuoptns=menuoptns.sort(sortByStar);
   var topchoice=menuoptns[0][1];
   
-  var namespace;
+  
+  var uri;
+  var prefix="";
   if(topchoice.startsWith("http")){
-    namespace=topchoice.split("/").pop();
+    var ret=getUri(topchoice)
+    
   }
-  namespace=namespace.replace("_",":");
-  cdg.data[rowIndex][colIndex]=namespace;
+  
+  cdg.data[rowIndex][colIndex]=ret;
   storeAutoVal(topchoice,rowIndex,colIndex)
   cdg.draw();
 }
@@ -122,12 +153,32 @@ function storeAutoVal(topchoice,rowIndex,colIndex){
   sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
   
   
-  sheetStorageCopy[rowIndex][colIndex]=topchoice;
+  // sheetStorageCopy[rowIndex][colIndex]=topchoice;
   
-  fromSuggestionstoLabel(topchoice,rowIndex,colIndex);
+  var finalLab=convertToLabel(topchoice);
+  sheetStorage[rowIndex][colIndex]=finalLab
   
 }
-
+function convertshortToIri(Uri){
+  var prefix;
+  var suffix;
+  var ret;
+  if(Uri.includes(":")){
+    suffix=Uri.split(":").pop();
+    prefix=Uri.slice(0, Uri.lastIndexOf(':'));
+    for(var propName in prefixD) {
+      if(prefixD.hasOwnProperty(propName)) {
+          var propValue = prefixD[propName];
+          if(propValue==prefix){
+            ret=propName;
+          }
+      }
+    }
+    
+}
+ret=ret+suffix;
+return ret;
+}
 function stripStars(){
   
   //str.replace('a', '');
@@ -144,8 +195,9 @@ function getLink(link){
   return ret;
 }
 function getDescription(cval){
+
   console.log(cval)
-  var cellVal=cval;
+  var cellVal=cval.trim();
   var ret;
       $.ajax({
         type : 'GET',
@@ -154,7 +206,8 @@ function getDescription(cval){
           iricode:cellVal
         },
         async: false,
-        success : function(data) {  
+        success : function(data) { 
+          console.log(data); 
          ret=data
         }
       });

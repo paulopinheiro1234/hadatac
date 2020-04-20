@@ -53,7 +53,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                },
                success : function(data) {
-                  console.log(data);
+                  
                   getHeaderData(data);
                }
             });
@@ -64,20 +64,19 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                },
                success : function(data) {
-                  console.log(data);
+                  
                   comments_data= data;
 
-                  // var commentsheet=comments_data.split('-')[0];
-                  // var commentcol=comments_data.split('-')[1];
                }
+               
             });
+           
 
          }
          function getHeaderData(data){
             var headersheet=data.split('-')[0];
             var headercol=data.split('-')[1];
-            console.log(headersheet);
-            console.log(headercol);
+            
             var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
             DDforPopulate(durl,headersheet,headercol)
          }
@@ -246,6 +245,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   
                   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/prefixesHandler.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
@@ -304,6 +304,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      req.send();
                   </script>
                   <script>
+                     var sdd_url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
+                     getSDDUrl(sdd_url);
                      if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
                         alert("Please upload a valid Data Dictionary")
                      }
@@ -313,6 +315,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         }
                         else{
                            var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+                           
+                           //getSDDURL()
                            getURL(url);
                         }
                      }

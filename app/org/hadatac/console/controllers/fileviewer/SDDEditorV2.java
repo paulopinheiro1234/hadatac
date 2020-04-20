@@ -29,6 +29,7 @@ import org.hadatac.metadata.loader.URIUtils;
 public class SDDEditorV2 extends Controller {
     URIUtils aURI;
     NameSpaces ns = NameSpaces.getInstance();
+    NameSpaces ns2 = NameSpaces.getInstance();
     String bioportalKey="";
     String FileID="";
     List<String> loadedList = ns.listLoadedOntologies();
@@ -146,10 +147,13 @@ public class SDDEditorV2 extends Controller {
 
     public Result getOntologies() {
          List<String> onts = ns.getOrderedPriorityLoadedOntologyList();
+         
          return ok(Json.toJson(onts));
-
-      // old
-        // return ok(Json.toJson(Ontology.find()));
+    }
+    public Result getOntologiesKeys() {
+         List<String> keys = ns2.getOrderedPriorityLoadedOntologyKeyList();
+         
+         return ok(Json.toJson(keys));
     }
 
     public Result getCart(){
@@ -225,22 +229,25 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(commentSheetColumn));
     }
     public Result getLabelFromIri(String iricode){
-
-        
         String returnLabel=fL.getLabel(iricode);
-        System.out.println(fL_des.getLabelDescription(iricode));
         return ok(Json.toJson(returnLabel));
 
     }
     public Result getDescriptionFromIri(String iricode){
-
+        String returnDescription;
+        if(iricode.contains("SIO")){
+            returnDescription=fL_des.getSioLabelDescription(iricode);
+        }
+        else{
+            returnDescription=fL_des.getLabelDescription(iricode);
         
-        String returnDescription=fL_des.getLabelDescription(iricode);
+        }
         if(returnDescription==""){
             returnDescription="No Description Available: See link for more info";
         }
+
         
-        System.out.println(fL_des.getLabelDescription(iricode));
+        
         return ok(Json.toJson(returnDescription));
 
     }
