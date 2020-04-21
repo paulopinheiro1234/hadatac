@@ -33,7 +33,7 @@ function SDDPrefixtoJSON(){
             //prefixD[ontsList[i].URI]=labelsList[i].Prefix
             for(var i=0;i<ontsList.length;i++){
                 //row returns to the original state
-                cell_address.r = sr;
+                
                 XLSX.utils.sheet_add_aoa(worksheet, [[labelsList[i],ontsList[i]]], {origin: -1});
                
               }
@@ -41,7 +41,7 @@ function SDDPrefixtoJSON(){
             var xlarray=XLSX.utils.sheet_to_json(worksheet, {
                 raw: true
             });
-            console.log(xlarray)
+            //console.log(xlarray)
             
             for(var i=0;i<xlarray.length;i++){
                 var temp=[];
@@ -50,8 +50,8 @@ function SDDPrefixtoJSON(){
                 temp.push(xlarray[i].URI);
                 newPrefix.push(temp)
             }
-            console.log(labelsList);
-            console.log(ontsList);
+            //console.log(labelsList);
+            //console.log(ontsList);
        }
        else{
         for(var i=0;i<xlarray.length;i++){

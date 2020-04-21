@@ -540,7 +540,7 @@ function createCopySheet(sheetCopy){
 
 
   }
-console.log(sheetStorage)
+
 }
 function approvalFunction(sheetCopy){
   for(var i=1;i<sheetCopy.length;i++){
@@ -647,7 +647,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=json;
       createCopySheet(sheetCopy);
-      createIriStorage(sheetCopy);
+     
     }
 
   }
@@ -784,7 +784,7 @@ function getSuggestion(){
          }
 
          if("Dictionary Mapping"==sheetName){
-            console.log(cdg.data)
+            
             for (i = 0; i < cdg.data.length; i++) {
                if(!columnsAdded.includes(cdg.data[i][0])){
                   // console.log(cdg.data[i][0])
@@ -1178,5 +1178,6 @@ function populateThis(headersCol){
     
     cdg.data[ct][0]=headersCol[i];
   }
-  // getSuggestion();
+   getSuggestion();
+   checkRecs(L, cdg.data.length, 1);
 }
