@@ -106,28 +106,38 @@ function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
 
 }
 function getUri(link){
+  //console.log(prefixD)
   var uri;
   var prefix="";
   var namespace;
   if(!link.includes("#")){
     namespace=link.split("/").pop();
     uri=link.slice(0, link.lastIndexOf('/'));
-    uri+="/"
-    if(prefixD[uri]!="undefined"){
+    uri+="/";   
+    if(prefixD[uri]!=undefined){
       prefix=prefixD[uri];
       namespace=prefix+":"+namespace
     } 
+    else{
+      if(link.includes("semanticscience")){
+        namespace="sio:"+namespace
+      }
+      else{
+        //alert("No prefix found!");
+        namespace="";
+      }
+      
+    }
   }
   else if(link.includes("#")){
     namespace=link.split("#").pop();
     uri=link.slice(0, link.lastIndexOf('#'));
-    console.log(uri)
     if(uri in prefixD){
       prefix=prefixD[uri];
       namespace=prefix+":"+namespace
     }
     else {
-      alert("No prefix found!");
+      //alert("No prefix found!");
       namespace="";
     }
   }
@@ -140,9 +150,12 @@ function autoPopulateSDD(menuoptns,rowIndex,colIndex){
   
   var uri;
   var prefix="";
+  var ret;
   if(topchoice.startsWith("http")){
-    var ret=getUri(topchoice)
-    
+    ret=getUri(topchoice)
+  }
+  else{
+    ret=topchoice;
   }
   
   cdg.data[rowIndex][colIndex]=ret;
@@ -150,13 +163,18 @@ function autoPopulateSDD(menuoptns,rowIndex,colIndex){
   cdg.draw();
 }
 function storeAutoVal(topchoice,rowIndex,colIndex){
-  sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
+  
+    
+    sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
+    var finalLab=convertToLabel(topchoice);
+  sheetStorage[rowIndex][colIndex]=finalLab
+  
+  
   
   
   // sheetStorageCopy[rowIndex][colIndex]=topchoice;
   
-  var finalLab=convertToLabel(topchoice);
-  sheetStorage[rowIndex][colIndex]=finalLab
+  
   
 }
 function convertshortToIri(Uri){

@@ -46,7 +46,7 @@ function showLabels(){
   _gridcopy.style.display="block";
   _gridcopy.style.height = (window.innerHeight - 300) + "px";
   _gridcopy.style.width = '100%';
-
+  
   cdgcopy.data = sheetStorage;
   
   
