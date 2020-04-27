@@ -340,24 +340,27 @@ function chooseItem(data) {
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
-  drawStars(rowNum,colNum);
+  var lab=convertshortToIri(ret);
+  var finalLab=convertToLabel(lab)
+  sheetStorage[rowNum][colNum]=finalLab;
+  //drawStars(rowNum,colNum);
   cdg.draw();
-  if(ret in approvalList){
-    if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
+  // if(ret in approvalList){
+  //   if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
 
-    }
-    else{
-      approvalList[ret]=[rowNum+1,colNum,0]
-      indicateApproval();
-    }
-  }
-  else if(!(ret in approvalList)){
-    console.log("here");
-    approvalList[ret]=[rowNum+1,colNum,0]
-    indicateApproval();
+  //   }
+  //   else{
+  //     approvalList[ret]=[rowNum+1,colNum,0]
+  //     indicateApproval();
+  //   }
+  // }
+  // else if(!(ret in approvalList)){
+  //   console.log("here");
+  //   approvalList[ret]=[rowNum+1,colNum,0]
+  //   indicateApproval();
 
 
-  }
+  // }
 
 
 
@@ -731,7 +734,7 @@ function getSuggestion(){
       var oReq = new XMLHttpRequest();
       oReq.open("GET", dd_url, true);
       oReq.responseType = "arraybuffer";
-
+    console.log(dd_url)
       oReq.onload = function(e) {
          var arraybuffer = oReq.response;
 

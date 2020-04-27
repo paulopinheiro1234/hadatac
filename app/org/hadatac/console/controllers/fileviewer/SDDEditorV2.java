@@ -41,6 +41,7 @@ public class SDDEditorV2 extends Controller {
     String commentSheetColumn;
     FirstLabel fL;
     FirstLabel fL_des;
+    String dd_file_id="";
     
     
 
@@ -133,6 +134,12 @@ public class SDDEditorV2 extends Controller {
         return fromEditableLink(editableId);
     }
 
+    public Result getddFileKey(String fID) {
+        bioportalKey=ConfigProp.getBioportalApiKey();
+        System.out.println("bioportalKey = " + bioportalKey);
+        return ok(Json.toJson(bioportalKey));
+    }
+
     public Result getBioportalKey() {
         bioportalKey=ConfigProp.getBioportalApiKey();
         System.out.println("bioportalKey = " + bioportalKey);
@@ -163,6 +170,7 @@ public class SDDEditorV2 extends Controller {
     public Result addToCart(String ontology){
         if(currentCart.contains(ontology)){
             System.out.println("This item already exists");
+            return badRequest("This item already exists");
         }
         else{
             currentCart.add(ontology);

@@ -27,37 +27,26 @@ function verifySDD(){
      document.getElementById("irifound").innerHTML = "";
     // document.getElementById("irinotfound").innerHTML = "";
     
-    
-    
-    for (var i=1;i<copyOfR;i++){
-      for(var j=1;j<copyOfL;j++){
-          
-          if(sheetStorageCopy[i][j]!=null &&(!sheetStorageCopy[i][j].startsWith("??"))&&sheetStorageCopy[i][j]!=''&&
-          sheetName=="Dictionary Mapping"){
-            
-          
-            
-            var cellItem=sheetStorageCopy[i][j];
-            
-            
-           
-            var label= cellItem;
-
-            copyTracker=verifyLabel(label,i,j);
-            // var label1 = label.split(":")[0];
-            // var label2 = label.split(":")[1];
-            // getOwlUrl(label1,label2,label,i,j);
-          }
-        
-        
+    for(var i=0;i<cdg.data.length;i++){
+        for(var j =0; j<cdg.data[i].length;j++){
+            if(cdg.data[i][j]!=null && !cdg.data[i][j].startsWith("??")&&cdg.data[i][j]!=""&&sheetName=="Dictionary Mapping"&&cdg.data[i][j].includes(":")){
+               
+                var label=convertshortToIri(cdg.data[i][j]);
+                if(label!=NaN){
+                
+                copyTracker=verifyLabel(label,i,j);
+                }
+            }
         }
-      }
+    }
+    
+
       displayVerify(copyTracker);
     
     }
     var trackofLabelValidity=[];
     function verifyLabel(label,i,j){
-        console.log(sheetStorageCopy[i][j])
+        
         $.ajax({
                 type : 'GET',
                 url : 'http://localhost:9000/hadatac/sddeditor_v2/validateIRI',
@@ -111,7 +100,7 @@ function displayVerify(copyTracker){
            
         }
     }
-    // console.log(bool)
+    
     if((bool_.every(item => item === 0))==true){
         noErrorsFunction();
     }
@@ -159,6 +148,7 @@ function errorsFoundDisplay(errorsFound){
         b.innerHTML=errorsFound.length+" Error(s) found! "+"<br />";
         document.getElementById('irifound').appendChild(b);
     for(var i=0;i<errorsFound.length;i++){
+        //var shortForm=getUri(errorsFound[i][0]);
         var b1 = document.createElement("button");
         b1.style.backgroundColor="lavender";
         b1.style.fontWeight="bold";
@@ -229,13 +219,13 @@ function externalValidate(f_id){
          file_id:fid
        },
        success : function(data) {
-          console.log(data);
+          
           var annotationLogs = decodeURIComponent(data);
           annotationLogs=annotationLogs.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;');
           var arrayt= annotationLogs.split('&lt;br&gt;');
           
           
-          console.log(arrayt);   
+          
           if(arrayt.length==0){
             var buttn = document.createElement("button");
             buttn.style.backgroundColor="#c9f4b8";

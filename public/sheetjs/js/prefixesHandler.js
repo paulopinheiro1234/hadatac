@@ -53,7 +53,7 @@ function SDDPrefixtoJSON(){
             //console.log(labelsList);
             //console.log(ontsList);
        }
-       else{
+       else if(xlarray.length>1){
         for(var i=0;i<xlarray.length;i++){
                 prefixD[xlarray[i].URI]=xlarray[i].Prefix;
         }

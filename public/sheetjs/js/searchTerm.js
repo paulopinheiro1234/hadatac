@@ -334,7 +334,7 @@ function changePage(page,objJson){
         des.style.wordBreak="keep-all";
         des.style.padding="0px";
         var shortenedDes=returnWordCt(objJson[i].description);
-        des.innerHTML="-Decription: "+shortenedDes;
+        des.innerHTML="-Description: "+shortenedDes;
 
 
         var ont = document.createElement("button");
@@ -424,14 +424,14 @@ function numPages(objJson)
 var additem=document.getElementById("thisitem");
     additem.addEventListener('click', function(e) {
        
-        var localLabel;
-        for(vari=0;i<listOfLabelAndIRI.length;i++){
-            if(listOfLabelAndIRI[i][1]==termChosen){
-                localLabel=listOfLabelAndIRI[i][0]
-            }
-        }
-        console.log(localLabel);
-        stringToPass=termChosen+";"+localLabel;
+        // var localLabel;
+        // for(vari=0;i<listOfLabelAndIRI.length;i++){
+        //     if(listOfLabelAndIRI[i][1]==termChosen){
+        //         localLabel=listOfLabelAndIRI[i][0]
+        //     }
+        // }
+        // console.log(localLabel);
+        stringToPass=termChosen;
         $.ajax({
             type : 'GET',
 

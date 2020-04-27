@@ -278,15 +278,16 @@ function drawCheck(rowIndex,colIndex){
 addcartlocal()
 function addcartlocal(){
   clearCart();
-$.ajax({
-  type : 'GET',
-  url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
-  data : {
-    //  s: str
-  },
-  success : function(data) {
+    $.ajax({
+      type : 'GET',
+      url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+      data : {
+        //  s: str
+        
+      },
+      success : function(data) {
     
-
+        //console.log(data)
 
     var select=document.getElementById("seecart"),data;
     for(var i=0;i<data.length;i++){
@@ -297,23 +298,24 @@ $.ajax({
         li.addEventListener("click",function(e){
 
           var newOntology=e.target.innerHTML;
-          var part1=newOntology.split(';')[0];
-          var part1copy=newOntology.split(';')[0];
-          if(part1.startsWith("http")&&(part1.includes("#")==false)){
-            part1=part1.split("/").pop();
+          var ret=getUri(newOntology);
+ 
+          
+          if(ret!=""){
+            cdg.data[rowNum][colNum] = ret;
+            sheetStorage[rowNum+1][colNum]=ret;
           }
-          else if(part1.startsWith("http")&&(part1.includes("#")==true)){
-            part1=part1.split("#").pop();
+          else{
+            
+              ret=newOntology;
+              
+              cdg.data[rowNum][colNum] = ret;
+              sheetStorage[rowNum+1][colNum]=ret;
+            
           }
-          part1=part1.replace("_",":");
-          var part2=newOntology.split(';')[1];
-          part2=part2.split(":")[1];
-          console.log(part1copy);
-          // //Cart(newOntology);
-          //alert(newOntology);
 
-           cdg.data[rowNum][colNum]=part1;
-           sheetStorage[rowNum+1][colNum]=part2;
+           //cdg.data[rowNum][colNum]=part1;
+           
            //fromCarttoLabel();
           
           var colNum_str=colNum.toString();
