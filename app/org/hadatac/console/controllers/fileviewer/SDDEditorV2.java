@@ -24,7 +24,7 @@ import org.hadatac.console.controllers.workingfiles.WorkingFiles;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.entity.pojo.Ontology;
 import org.hadatac.metadata.loader.URIUtils;
-
+import org.apache.jena.query.QueryParseException;
 
 public class SDDEditorV2 extends Controller {
     URIUtils aURI;
@@ -45,7 +45,9 @@ public class SDDEditorV2 extends Controller {
     
     
 
-    
+
+
+
 
     // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -63,7 +65,7 @@ public class SDDEditorV2 extends Controller {
         if (null == dataFile && indicator == 1) {
             return badRequest("Invalid data file!");
         }
-        
+
         DataFile finalDF=new DataFile("");
         if (indicator == 1 && dataFile != null) {
             headerSheetColumn=DDEditor.headerSheetColumn;
@@ -154,12 +156,12 @@ public class SDDEditorV2 extends Controller {
 
     public Result getOntologies() {
          List<String> onts = ns.getOrderedPriorityLoadedOntologyList();
-         
+
          return ok(Json.toJson(onts));
     }
     public Result getOntologiesKeys() {
          List<String> keys = ns2.getOrderedPriorityLoadedOntologyKeyList();
-         
+
          return ok(Json.toJson(keys));
     }
 
@@ -237,7 +239,14 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(commentSheetColumn));
     }
     public Result getLabelFromIri(String iricode){
-        String returnLabel=fL.getLabel(iricode);
+        String returnLabel = "Unknown Label";
+        try{
+           returnLabel = fL.getLabel(iricode);
+        }
+        catch(QueryParseException e){
+           System.out.println("Unknown Label:" + iricode);
+        }
+
         return ok(Json.toJson(returnLabel));
 
     }
@@ -248,23 +257,23 @@ public class SDDEditorV2 extends Controller {
         }
         else{
             returnDescription=fL_des.getLabelDescription(iricode);
-        
+
         }
         if(returnDescription==""){
             returnDescription="No Description Available: See link for more info";
         }
 
-        
-        
+
+
         return ok(Json.toJson(returnDescription));
 
     }
 
     public Result validateIRI(String s){
 
-        
+
         boolean isValid=aURI.isValidURI(s);
-        
+
         return ok(Json.toJson(isValid));
 
     }
