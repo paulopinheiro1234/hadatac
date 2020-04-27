@@ -510,24 +510,7 @@ var json_copy;
 var sheetStorage=[];
 // var sheetStorageCopy=[];
 var approvalList={};
-// function createIriStorage(sheetCopy){
-//   //console.log(sheetCopy)
-//   sheetStorageCopy=[];
 
-//   for(var i=0;i<sheetCopy.length;i++){
-//     var temp=[];
-//     for(var j=0;j<sheetCopy[i].length;j++){
-//       if(sheetCopy[i][j]!=""&&!sheetCopy[i][j].startsWith("??")&&sheetCopy[i][j].includes(":")){
-//         var lab=convertshortToIri(sheetCopy[i][j])
-//         temp.push(lab);
-//       }
-//     }
-//     sheetStorageCopy.push(temp);
-
-
-//   }
-
-// }
 function createCopySheet(sheetCopy){
   //console.log(sheetCopy)
   sheetStorage=[];
@@ -593,7 +576,7 @@ function approvalFunction(sheetCopy){
 
 
 }
-
+var globalL;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
@@ -712,7 +695,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     approvalFunction(sheetCopy)
   }
 
-  // SDDPrefixtoJSON();
+  globalL=L;
   checkRecs(L, cdg.data.length, 1);
   cdg.draw();
 };
@@ -921,6 +904,8 @@ function getSuggestion(){
    else{
       getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
    }
+   //console.log(globalL,globalR)
+   checkRecs(globalL, globalR, 1);
 }
 
 function jsonparser(colval,rowval,menuoptns,isVirtual){
@@ -1185,7 +1170,7 @@ function DDforPopulate(durl,headersheet,headercol){
   oReq.send();
 
 }
-
+var globalR;
 function populateThis(headersCol){
   var ct=-1;
   for(var i=0;i<headersCol.length;i++){
@@ -1194,6 +1179,9 @@ function populateThis(headersCol){
 
     cdg.data[ct][0]=headersCol[i];
   }
+  globalR= cdg.data.length;
+  createCopySheet(cdg.data);
    getSuggestion();
-   checkRecs(L, cdg.data.length, 1);
+
+
 }
