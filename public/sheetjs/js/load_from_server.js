@@ -183,13 +183,21 @@ cdg.addEventListener('contextmenu', function (e) {
     input.style.width="100%";
     if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
       var link=convertshortToIri(e.cell.value)
-      var des=getDescription(link);
+
+      var des;
+      if("unknown" === link){
+         des = "unknown ontology" ;
+      }
+      else{
+         des = getDescription(link);
+      }
+
       input.innerHTML=des;
 
       e.items.push({
           title: input,
           click: function () {
-            
+
             var win = window.open(link, '_blank');
             win.focus();
           }
@@ -294,7 +302,7 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
   else if(ind==0){
     sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
   }
-  
+
 }
 cdg.addEventListener('click', function (e) {
   returnToView();
@@ -335,7 +343,7 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 function chooseItem(data) {
   var choice=data.value.split(",");
   var ret=getUri(choice[1]);
- 
+
   cdg.data[rowNum][colNum] = ret;
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
@@ -518,7 +526,7 @@ var approvalList={};
 
 
 //   }
-  
+
 // }
 function createCopySheet(sheetCopy){
   //console.log(sheetCopy)
@@ -528,8 +536,16 @@ function createCopySheet(sheetCopy){
     var temp=[];
     for(var j=0;j<sheetCopy[i].length;j++){
       if(sheetCopy[i][j]!=""&&!sheetCopy[i][j].startsWith("??")&&sheetCopy[i][j].includes(":")){
-        var lab=convertshortToIri(sheetCopy[i][j]);
-        var finalLab=convertToLabel(lab)
+        var lab = convertshortToIri(sheetCopy[i][j]);
+
+        var finalLab;
+        if("unknown" === lab){
+           finalLab = "Unknown Ontology"
+        }
+        else{
+           finalLab = convertToLabel(lab);
+        }
+
         temp.push(finalLab);
       }
       else{
@@ -620,7 +636,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
    }
   }
 
-  
+
   if(cleanJson.length == 1){ // We only have a header we need to add one blank row to avoid errors
      var temp = [];
      for(var j = 0; j < L; j++){
@@ -647,7 +663,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=json;
       createCopySheet(sheetCopy);
-     
+
     }
 
   }
@@ -669,7 +685,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
         json.push(newPrefix[i])
       }
     }
-    
+
 
     if(json.length==1){
       cdg.data = json;
@@ -695,7 +711,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     var sheetCopy=cleanJson
     approvalFunction(sheetCopy)
   }
-  
+
   // SDDPrefixtoJSON();
   checkRecs(L, cdg.data.length, 1);
   cdg.draw();
@@ -769,8 +785,8 @@ function getSuggestion(){
              raw: true
          });
 
-         
-         
+
+
          // Generate data dictionary
          columnsAdded = []
          for(var i=0; i<xlarray.length; i++){
@@ -784,7 +800,7 @@ function getSuggestion(){
          }
 
          if("Dictionary Mapping"==sheetName){
-            
+
             for (i = 0; i < cdg.data.length; i++) {
                if(!columnsAdded.includes(cdg.data[i][0])){
                   // console.log(cdg.data[i][0])
@@ -830,7 +846,7 @@ function getSuggestion(){
            var ontologyList = ontRequest.response;
            ontsList=ontologyList;
            //console.log(ontologyList)
-           
+
            SDDPrefixtoJSON();
 
            // Generating Suggestion Request
@@ -867,7 +883,7 @@ function getSuggestion(){
          ontRequest.send();
       }
       oReq.send();
-      
+
    };
 
    var sddGenFunction = function(err, data) {
@@ -1175,7 +1191,7 @@ function populateThis(headersCol){
   for(var i=0;i<headersCol.length;i++){
     cdg.insertRow([],i);
     ct++;
-    
+
     cdg.data[ct][0]=headersCol[i];
   }
    getSuggestion();

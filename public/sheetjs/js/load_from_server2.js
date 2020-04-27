@@ -53,7 +53,7 @@ function starRec(colval, rowval, menuoptns, isVirtual, L, R, rowIndex, colIndex)
    }
 }
 
-    
+
 var isSuggestion=0;
 function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R, rowIndex, colIndex){
    var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
@@ -116,7 +116,7 @@ function getUri(link){
     if(prefixD[uri]!="undefined"){
       prefix=prefixD[uri];
       namespace=prefix+":"+namespace
-    } 
+    }
   }
   else if(link.includes("#")){
     namespace=link.split("#").pop();
@@ -136,33 +136,33 @@ function getUri(link){
 function autoPopulateSDD(menuoptns,rowIndex,colIndex){
   menuoptns=menuoptns.sort(sortByStar);
   var topchoice=menuoptns[0][1];
-  
-  
+
+
   var uri;
   var prefix="";
   if(topchoice.startsWith("http")){
     var ret=getUri(topchoice)
-    
+
   }
-  
+
   cdg.data[rowIndex][colIndex]=ret;
   storeAutoVal(topchoice,rowIndex,colIndex)
   cdg.draw();
 }
 function storeAutoVal(topchoice,rowIndex,colIndex){
   sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
-  
-  
+
+
   // sheetStorageCopy[rowIndex][colIndex]=topchoice;
-  
+
   var finalLab=convertToLabel(topchoice);
   sheetStorage[rowIndex][colIndex]=finalLab
-  
+
 }
 function convertshortToIri(Uri){
   var prefix;
   var suffix;
-  var ret;
+  var ret = 0;
   if(Uri.includes(":")){
     suffix=Uri.split(":").pop();
     prefix=Uri.slice(0, Uri.lastIndexOf(':'));
@@ -174,13 +174,22 @@ function convertshortToIri(Uri){
           }
       }
     }
-    
+
 }
-ret=ret+suffix;
+
+if(ret == 0){
+   return "unknown";
+}
+else{
+   ret=ret+suffix;
+}
+
 return ret;
 }
+
+
 function stripStars(){
-  
+
   //str.replace('a', '');
   checkRecs(copyOfL,copyOfR,0);
 }
@@ -206,15 +215,15 @@ function getDescription(cval){
           iricode:cellVal
         },
         async: false,
-        success : function(data) { 
-          console.log(data); 
+        success : function(data) {
+          console.log(data);
          ret=data
         }
       });
       return ret;
 }
 function drawCheck(rowIndex,colIndex){
-  
+
   var imgs={};
   cdg.addEventListener('rendertext', function (e) {
     if (e.cell.rowIndex > -1 && sheetName==="Dictionary Mapping") {
@@ -225,7 +234,7 @@ function drawCheck(rowIndex,colIndex){
   });
   var d='https://www.starfall.com/h/_images/green-corner-triangle.png'
   cdg.addEventListener('afterrendercell', function (e) {
-    
+
     var i, contextGrid = this;
     if (sheetName==="Dictionary Mapping"&& e.cell.rowIndex === rowIndex && e.cell.columnIndex===colIndex
              && e.cell.rowIndex > -1) {
@@ -247,7 +256,7 @@ function drawCheck(rowIndex,colIndex){
         if (i.width !== 0) {
             i.targetHeight = e.cell.height/2;
             i.targetWidth = (e.cell.height * (i.width / i.height))/2;
-          
+
             e.ctx.drawImage(i, e.cell.x, e.cell.y, i.targetWidth, i.targetHeight);
         }
     }
@@ -267,7 +276,7 @@ $.ajax({
     //  s: str
   },
   success : function(data) {
-    
+
 
 
     var select=document.getElementById("seecart"),data;
@@ -297,7 +306,7 @@ $.ajax({
            cdg.data[rowNum][colNum]=part1;
            sheetStorage[rowNum+1][colNum]=part2;
            //fromCarttoLabel();
-          
+
           var colNum_str=colNum.toString();
           var rowNum_str=rowNum.toString();
           storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
@@ -393,24 +402,24 @@ function indicateApproval(){
   for(var prop in approvalList){
     var r= approvalList[prop][0];
     var c= approvalList[prop][1];
-   
+
     if(approvalList[prop][2]==0 && prop == cdg.data[r-1][c]){
-     
+
       cdg.data[r-1][c]+=" + ";
       cdg.draw();
-     
+
     }
   }
 
 }
 function acceptApproval(val,r,c){
- 
+
   for(var prop in approvalList){
-    
+
     if(approvalList[prop][2]==1){
-      
+
       cdg.data[r][c]=val;
-     
+
     }
   }
 
