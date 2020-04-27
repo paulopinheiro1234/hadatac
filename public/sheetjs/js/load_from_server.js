@@ -348,6 +348,7 @@ function chooseItem(data) {
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
+  console.log('Here');
   drawStars(rowNum,colNum);
   cdg.draw();
   if(ret in approvalList){
@@ -962,7 +963,36 @@ function addOptionsToMenu(menuoptns,select){
     if(menuoptns[i]!=','){
       var opt=menuoptns[i];
       var optns=document.createElement("option")
-      optns.textContent=opt;
+
+      // Making the suggestions pretty
+      var suggBegin  = opt[0].toFixed(2) + "\xa0\xa0\xa0";
+
+      // Check to see if we have a prefix for this suggestion
+      var prefixedIRI = getUri(opt[1]);
+      if(prefixedIRI === ""){
+         // No prefix found so we don't have this ontology return IRI
+         optns.textContent = suggBegin + opt[1];
+      }
+      else{
+         // Check to see if we have a label for this suggestion
+         var label = convertToLabel(opt[1]);
+         if(label == null){
+            // No label found so we don't have this label return prefix IRI
+            optns.textContent = suggBegin + prefixedIRI;
+         }
+         else{
+            // We have the label and prefix
+            // Remove the language tags
+            if(label.includes("@")){
+               label = label.split("@")[0];
+            }
+
+            // Get the ontolgoy prefix
+            prefix = prefixedIRI.split(":")[0];
+            optns.textContent = suggBegin + label + " (" + prefix + ")";
+         }
+      }
+
       optns.value=opt;
       select.appendChild(optns);
     }
