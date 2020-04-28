@@ -46,8 +46,15 @@ function showLabels(){
   _gridcopy.style.display="block";
   _gridcopy.style.height = (window.innerHeight - 300) + "px";
   _gridcopy.style.width = '100%';
+  //console.log(cdgcopy.getSchemaFromData())
   
+  console.log(sheetStorage)
   cdgcopy.data = sheetStorage;
+  for(var i=0;i<cdgcopy.schema.length;i++){
+    cdgcopy.schema[i].title=globalHeaders[i];
+  }
+  //cdgcopy.schema[0].title = 'food';
+  cdgcopy.draw();
   
   
   

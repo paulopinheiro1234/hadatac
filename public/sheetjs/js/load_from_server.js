@@ -5,6 +5,7 @@ var demo_enabled = false;
 var sdd_suggestions;
 var sddgenAdress;
 var globalMenu;
+var globalHeaders=[];
 /** drop target **/
 var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
@@ -86,6 +87,7 @@ function removeHeadings(json){
   return json
 }
 function changeHeader(headers,emptySheet){
+  globalHeaders=headers;
   if(emptySheet==0){
       for(var i = 0; i < headers.length; i++){
         cdg.schema[i].title = headers[i];
@@ -125,13 +127,8 @@ var make_buttons = function(sheetnames, cb) {
     var width = ctx.measureText(s).width;
     width+=10;
     btn.style.width=width;
-    // if(s=="Dictionary Mapping Summary"){
-    //   btn.style.width='120px';
-    // }
     btn.innerHTML = s;
-    // var txt = document.createElement('h6');
-    // txt.innerText = s;
-    // btn.appendChild(txt);
+    
 
     btn.addEventListener('click', function() {
       sheetName=s;
@@ -438,13 +435,13 @@ cdg.addEventListener('contextmenu', function (e) {
     e.items.push({
       title: 'Accept Value as Optimal Value',
       click: function (ev) {
-        console.log(approvalList);
-        console.log(e.cell.value);
-        var originalVal=e.cell.value;
-        var stripped=originalVal.replace(" + ","")
-          approvalList[stripped][2]=1;
+        // console.log(approvalList);
+        // console.log(e.cell.value);
+        // var originalVal=e.cell.value;
+        // var stripped=originalVal.replace(" + ","")
+        //   approvalList[stripped][2]=1;
 
-          acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
+        //   acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
 
 
       }
@@ -554,41 +551,41 @@ function createCopySheet(sheetCopy){
   }
 
 }
-function approvalFunction(sheetCopy){
-  for(var i=1;i<sheetCopy.length;i++){
+// function approvalFunction(sheetCopy){
+//   for(var i=1;i<sheetCopy.length;i++){
 
-    for(var j=1;j<sheetCopy[i].length;j++){
-      var temp2=[];
-      if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
+//     for(var j=1;j<sheetCopy[i].length;j++){
+//       var temp2=[];
+//       if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
 
-      }
-      else if(sheetCopy[i][j].includes("+")==true){
-        var keys=sheetCopy[i][j];
-        temp2.push(i);
-        temp2.push(j);
-        temp2.push(1);
-        approvalList[keys]=temp2;
-      }
-      else{
-        //temp2.push(sheetCopy[i][j]);
-        var keys=sheetCopy[i][j];
-        temp2.push(i);
-        temp2.push(j);
-        temp2.push(0);
-        approvalList[keys]=temp2;
+//       }
+//       else if(sheetCopy[i][j].includes("+")==true){
+//         var keys=sheetCopy[i][j];
+//         temp2.push(i);
+//         temp2.push(j);
+//         temp2.push(1);
+//         approvalList[keys]=temp2;
+//       }
+//       else{
+//         //temp2.push(sheetCopy[i][j]);
+//         var keys=sheetCopy[i][j];
+//         temp2.push(i);
+//         temp2.push(j);
+//         temp2.push(0);
+//         approvalList[keys]=temp2;
 
-      }
+//       }
 
-    }
+//     }
 
-  }
+//   }
 
-  //console.log(approvalList)
-  indicateApproval();
+//   //console.log(approvalList)
+//   indicateApproval();
 
 
 
-}
+// }
 var globalL;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
@@ -707,10 +704,9 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       // createIriStorage(sheetCopy);
     }
   }
-  if(sheetName=="Dictionary Mapping"){
-    var sheetCopy=cleanJson
-    approvalFunction(sheetCopy)
-  }
+  // if(sheetName=="Dictionary Mapping"){
+  //   var sheetCopy=cleanJson
+  // }
 
   globalL=L;
   checkRecs(L, cdg.data.length, 1);
