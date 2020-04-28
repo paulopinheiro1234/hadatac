@@ -105,45 +105,79 @@ function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
 
 
 }
-function getUri(link){
-  //console.log(prefixD)
-  var uri;
-  var prefix="";
-  var namespace;
-  if(!link.includes("#")){
-    namespace=link.split("/").pop();
-    uri=link.slice(0, link.lastIndexOf('/'));
-    uri+="/";
-    if(prefixD[uri]!=undefined){
-      prefix=prefixD[uri];
-      namespace=prefix+":"+namespace
-    }
-    else{
-      if(link.includes("semanticscience")){
-        namespace="sio:"+namespace
+
+
+function convertIRItoPrefix(link){
+   // Check to see if we have a defined prefix
+   var finalPrefix = "";
+   var finalIriSub = "";
+   for(var iriSub in prefixD) {
+      // Check for matches
+      if(link.includes(iriSub)){
+         // Check to see if theres a better match
+         if(iriSub.length > finalIriSub.length){
+            finalIriSub = iriSub;
+            finalPrefix = prefixD[iriSub];
+         }
       }
-      else{
-        //alert("No prefix found!");
-        namespace="";
-      }
-      
-    }
-  }
-  else if(link.includes("#")){
-    namespace=link.split("#").pop();
-    uri=link.slice(0, link.lastIndexOf('#'));
-    if(uri in prefixD){
-      prefix=prefixD[uri];
-      namespace=prefix+":"+namespace
-    }
-    else {
-      //alert("No prefix found!");
-      namespace="";
-    }
-  }
-  return namespace;
+   }
+
+   // No matches so return empty string, is this the best idea?
+   if(finalIriSub.length == 0){
+      return finalIriSub;
+   }
+
+   // We have a match so convert to prefix form
+   return link.replace(finalIriSub, finalPrefix + ":");
 }
+
+
+// This function is depricated try to use convertIRItoPrefix instead
+// old code expects prefix to end with # or /
+// While this is good practice as the HHEAR ontology proves people can choose others
+// In addition it doesn't prefer the larger substitutions which would better for users
+function getUri(link){
+   return convertIRItoPrefix(link);
+  // //console.log(prefixD)
+  // var uri;
+  // var prefix="";
+  // var namespace;
+  // if(!link.includes("#")){
+  //   namespace=link.split("/").pop();
+  //   uri=link.slice(0, link.lastIndexOf('/'));
+  //   uri+="/";
+  //   if(prefixD[uri]!=undefined){
+  //     prefix=prefixD[uri];
+  //     namespace=prefix+":"+namespace
+  //   }
+  //   else{
+  //     if(link.includes("semanticscience")){
+  //       namespace="sio:"+namespace
+  //     }
+  //     else{
+  //       //alert("No prefix found!");
+  //       namespace="";
+  //     }
+  //
+  //   }
+  // }
+  // else if(link.includes("#")){
+  //   namespace=link.split("#").pop();
+  //   uri=link.slice(0, link.lastIndexOf('#'));
+  //   if(uri in prefixD){
+  //     prefix=prefixD[uri];
+  //     namespace=prefix+":"+namespace
+  //   }
+  //   else {
+  //     //alert("No prefix found!");
+  //     namespace="";
+  //   }
+  // }
+  // return namespace;
+}
+
 function autoPopulateSDD(menuoptns,rowIndex,colIndex){
+   console.log(menuoptns);
   menuoptns=menuoptns.sort(sortByStar);
   var topchoice=menuoptns[0][1];
 
@@ -162,6 +196,7 @@ function autoPopulateSDD(menuoptns,rowIndex,colIndex){
   storeAutoVal(topchoice,rowIndex,colIndex)
   cdg.draw();
 }
+
 function storeAutoVal(topchoice,rowIndex,colIndex){
 
 
