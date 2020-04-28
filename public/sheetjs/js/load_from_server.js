@@ -341,32 +341,44 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 
 
 function chooseItem(data) {
-  var choice=data.value.split(",");
-  var ret=getUri(choice[1]);
+  console.log(data.value[1]);
+  var chosen=data.value.split(",")
+  var prefixedIRI = getUri(chosen[1]);
+  if(prefixedIRI===""){
+    if(!chosen[1].includes("#")){
+      var replacement=chosen[1].split("/").pop();
+      replacement = replacement.replace(/\_/g, ':');
+      cdg.data[rowNum][colNum] = replacement;
+    }
+  }
+  else{
+    cdg.data[rowNum][colNum] = prefixedIRI;
+  }
 
-  cdg.data[rowNum][colNum] = ret;
+  
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
-  console.log('Here');
-  drawStars(rowNum,colNum);
   cdg.draw();
-  if(ret in approvalList){
-    if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
-
-    }
-    else{
-      approvalList[ret]=[rowNum+1,colNum,0]
-      indicateApproval();
-    }
-  }
-  else if(!(ret in approvalList)){
-    console.log("here");
-    approvalList[ret]=[rowNum+1,colNum,0]
-    indicateApproval();
 
 
-  }
+
+  // if(ret in approvalList){
+  //   if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
+
+  //   }
+  //   else{
+  //     approvalList[ret]=[rowNum+1,colNum,0]
+  //     indicateApproval();
+  //   }
+  // }
+  // else if(!(ret in approvalList)){
+  //   console.log("here");
+  //   approvalList[ret]=[rowNum+1,colNum,0]
+  //   indicateApproval();
+
+
+  // }
 
 
 
@@ -666,6 +678,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     if(sheetName=="Prefixes"){
       for(var i=0;i<newPrefix.length;i++){
+        console.log(json)
+        if(json[1][0]==""){
+          json.splice(1,1)
+        }
         json.push(newPrefix[i])
       }
     }
@@ -957,7 +973,7 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
   }
   });
 }
-
+var menuOptionsPrefixedIRI=[]
 function addOptionsToMenu(menuoptns,select){
   for(var i=0;i<menuoptns.length;i++){
     if(menuoptns[i]!=','){
@@ -971,6 +987,7 @@ function addOptionsToMenu(menuoptns,select){
       var prefixedIRI = getUri(opt[1]);
       if(prefixedIRI === ""){
          // No prefix found so we don't have this ontology return IRI
+         //ex HHEAR
          optns.textContent = suggBegin + opt[1];
       }
       else{
@@ -990,6 +1007,10 @@ function addOptionsToMenu(menuoptns,select){
             // Get the ontolgoy prefix
             prefix = prefixedIRI.split(":")[0];
             optns.textContent = suggBegin + label + " (" + prefix + ")";
+            // var temp=[]
+            // temp.push(label);
+            // temp.push(prefixedIRI);
+            // menuOptionsPrefixedIRI.push(temp);
          }
       }
 

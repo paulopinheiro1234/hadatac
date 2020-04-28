@@ -3,45 +3,36 @@ var records_per_page = 3;
 var numToPage;
 var listOfLabelAndIRI=[]
 function showTop(){
-    //numToPage=document.getElementById('numToSearch').value;
     var e = document.getElementById("numToSearch");
-   
     numToPage = e.value;
 }
-    //$('#searchOnt').prop('disabled', false);
 
 function returnToView(){
     document.getElementById("irifound").innerHTML = "";
     document.getElementById("recommendedterms").style.display="block";
     document.getElementById("recommendedcolumn").style.display="block";
-    //document.getElementById("editRowsAdd").style.display="block";
-    // document.getElementById("verifysdd").style.display="flex";
-    // document.getElementById("verifysdd").style.justifyContent="center";
-    // document.getElementById("verifysdd").style.margin="0 auto";
     document.getElementById("returnView").style.display="none";
     document.getElementById("menulist").style.display="none";
     document.getElementById("virtuallist").style.display="none";
     document.getElementById("irifound").style.display="none";
-    // document.getElementById("listingTable").innerHTML="";
     document.getElementById("listingTable").style.display="none";
     document.getElementById("termToSearch").value="";
     document.getElementById("numberResults").innerHTML="";
     document.getElementById("pagekey").style.display="none";
     document.getElementById("numToSearch").style.display="block";
     document.getElementById("searchForTerm").style.display="block";
-    //document.getElementById("btn_prev").style.display="none";
+
 }
 var searchItem=document.getElementById("searchOnt");
 searchItem.addEventListener('click', function(e) {
-    // document.getElementById("listingTable").innerHTML="";
     if(document.getElementById("numberResults").innerHTML!=""){
         document.getElementById("numberResults").innerHTML="";
     }
-   
+    document.getElementById("btn_next").style.visibility = "hidden";
+    document.getElementById("btn_prev").style.visibility = "hidden";
+    var btn_prev = document.getElementById("btn_prev");
     document.getElementById("recommendedterms").style.display="none";
     document.getElementById("recommendedcolumn").style.display="none";
-    // document.getElementById("editRowsAdd").style.display="none";
-    // document.getElementById("verifysdd").style.display="none";
     document.getElementById("returnView").style.display="block";
     var termToSearch=document.getElementById("termToSearch").value;
     console.log(termToSearch);
@@ -86,16 +77,16 @@ function prehttp(termToSearch){
              theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key;
          }
          else if(numToPage==null){
-           console.log(bioportal_key)
+           
              numToPage=5;
              theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key+"&pagesize="+numToPage
          }
          else{
-           console.log(bioportal_key)
+           
              theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key+"&pagesize="+numToPage;
          }
 
-     console.log(theUrl);
+     
          //var theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey=3b6101b1-fc1a-45c2-a8a6-136a04f228c5&pagesize=5";
          client.get(theUrl, function(response) {
 
@@ -175,7 +166,7 @@ function createDisplay(resultsArray,numResults){
     numRes(numResults);
      var pgekey = document.getElementById("pagekey");
     pgekey.style.display="block";
-    console.log(objJson);
+
     changePage(1,objJson);
 
 
@@ -195,6 +186,7 @@ function nextPage()
 {
     listOfLabelAndIRI=[];
     if (current_page < numPages(copyObjJson)) {
+        console.log("here")
         current_page++;
         changePage(current_page,copyObjJson);
     }
@@ -277,7 +269,7 @@ var termdict=new Map();
 
 
 function changePage(page,objJson){
-
+    console.log("reched")
     var btn_next = document.getElementById("btn_next");
     var btn_prev = document.getElementById("btn_prev");
     var listing_table = document.getElementById("listingTable");
@@ -399,7 +391,7 @@ function changePage(page,objJson){
 
       
     }
-    console.log(listOfLabelAndIRI)
+    
     page_span.innerHTML = page + "/" + numPages(objJson);
 
     if (page == 1) {
@@ -424,13 +416,6 @@ function numPages(objJson)
 var additem=document.getElementById("thisitem");
     additem.addEventListener('click', function(e) {
        
-        // var localLabel;
-        // for(vari=0;i<listOfLabelAndIRI.length;i++){
-        //     if(listOfLabelAndIRI[i][1]==termChosen){
-        //         localLabel=listOfLabelAndIRI[i][0]
-        //     }
-        // }
-        // console.log(localLabel);
         stringToPass=termChosen;
         $.ajax({
             type : 'GET',
