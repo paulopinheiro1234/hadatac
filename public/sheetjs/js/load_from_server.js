@@ -1217,19 +1217,19 @@ function DDforPopulate(durl,headersheet,headercol){
         }
       });
     });
+    populateThis(headersCol)
 
+    // if("Dictionary Mapping"==sheetName){
 
-    if("Dictionary Mapping"==sheetName){
-
-      var popElement=document.getElementById("populatesdd");
-      popElement.removeAttribute("disabled");
-       populateThis(headersCol);
-      popElement.setAttribute("disabled", "disabled");
-    }
-    else if(sheetName!="Dictionary Mapping"){
-      var popElement=document.getElementById("populatesdd");
-      popElement.setAttribute("disabled", "disabled");
-    }
+    //   var popElement=document.getElementById("populatesdd");
+    //   popElement.removeAttribute("disabled");
+    //    populateThis(headersCol);
+    //   popElement.setAttribute("disabled", "disabled");
+    // }
+    // else if(sheetName!="Dictionary Mapping"){
+    //   var popElement=document.getElementById("populatesdd");
+    //   popElement.setAttribute("disabled", "disabled");
+    // }
   }
 
   oReq.send();
