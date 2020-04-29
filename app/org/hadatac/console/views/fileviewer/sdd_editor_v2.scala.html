@@ -35,52 +35,13 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
       <a  href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
          <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
 
-
-
-      <!-- <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button> -->
-
-      <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">
-         <span class="glyphicon glyphicon-pencil"> </span> Populate</button>
+      <!-- <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">
+         <span class="glyphicon glyphicon-pencil"> </span> Populate</button> -->
 
       <script>
 
-         function populateSDD(){
-
-            $.ajax({
-               type : 'GET',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
-               data : {
-
-               },
-               success : function(data) {
-                  
-                  getHeaderData(data);
-               }
-            });
-            $.ajax({
-               type : 'GET',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
-               data : {
-
-               },
-               success : function(data) {
-                  
-                  comments_data= data;
-
-               }
-               
-            });
-           
-
-         }
-         function getHeaderData(data){
-            var headersheet=data.split('-')[0];
-            var headercol=data.split('-')[1];
-            
-            var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-            DDforPopulate(durl,headersheet,headercol)
-         }
-
+         var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+         durl_=durl;
       </script>
       <div class="undo-edit">
 

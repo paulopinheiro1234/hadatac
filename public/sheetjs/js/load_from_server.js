@@ -6,6 +6,7 @@ var sdd_suggestions;
 var sddgenAdress;
 var globalMenu;
 var globalHeaders=[];
+var popIndicator=0;
 /** drop target **/
 var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
@@ -73,6 +74,20 @@ function getURL(url){
 }
 
 
+$.ajax({
+  type : 'GET',
+  url : 'http://localhost:9000/hadatac/sddeditor_v2/getIndicator',
+  data : {
+    
+  },
+  async: false,
+  success : function(data) {
+    if(data==1){
+      popIndicator=1;
+    }
+
+  }
+});
 
 function hideView(){
   $("#hide").css('display','none');
@@ -701,7 +716,10 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=removeHeadings(json);
       createCopySheet(sheetCopy);
-      // createIriStorage(sheetCopy);
+      if(popIndicator==1 && cdg.data.length<=1){
+        console.log(cdg.data.length)
+        populateSDD();
+      }
     }
   }
   // if(sheetName=="Dictionary Mapping"){
@@ -1231,4 +1249,39 @@ function populateThis(headersCol){
    getSuggestion();
 
 
+}
+var durl_;
+function populateSDD(){
+
+  $.ajax({
+     type : 'GET',
+     url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
+     data : {
+
+     },
+     success : function(data) {
+        
+        getHeaderData(data);
+     }
+  });
+  $.ajax({
+     type : 'GET',
+     url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
+     data : {
+
+     },
+     success : function(data) {
+        
+        comments_data= data;
+
+     }
+     
+  });
+ 
+
+}
+function getHeaderData(data){
+  var headersheet=data.split('-')[0];
+  var headercol=data.split('-')[1];
+  DDforPopulate(durl_,headersheet,headercol)
 }
