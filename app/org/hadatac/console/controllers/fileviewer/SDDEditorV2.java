@@ -41,6 +41,9 @@ public class SDDEditorV2 extends Controller {
     String commentSheetColumn;
     FirstLabel fL;
     FirstLabel fL_des;
+    String dd_file_id="";
+    int indicatorVal;
+    
 
 
 
@@ -57,7 +60,7 @@ public class SDDEditorV2 extends Controller {
         // bioportalKey=ConfigProp.getBioportalApiKey()
         FileID=fileId;
         Collections.sort(loadedList);
-
+        indicatorVal=indicator;
         DataFile dataFile = DataFile.findById(fileId);
         if (null == dataFile && indicator == 1) {
             return badRequest("Invalid data file!");
@@ -132,6 +135,14 @@ public class SDDEditorV2 extends Controller {
     public Result postFromEditableLink(String editableId) {
         return fromEditableLink(editableId);
     }
+    public Result getIndicator(){
+        return ok(Json.toJson(indicatorVal));
+    }
+    public Result getddFileKey(String fID) {
+        bioportalKey=ConfigProp.getBioportalApiKey();
+        System.out.println("bioportalKey = " + bioportalKey);
+        return ok(Json.toJson(bioportalKey));
+    }
 
     public Result getBioportalKey() {
         bioportalKey=ConfigProp.getBioportalApiKey();
@@ -163,6 +174,7 @@ public class SDDEditorV2 extends Controller {
     public Result addToCart(String ontology){
         if(currentCart.contains(ontology)){
             System.out.println("This item already exists");
+            return badRequest("This item already exists");
         }
         else{
             currentCart.add(ontology);

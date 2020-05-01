@@ -27,37 +27,26 @@ function verifySDD(){
      document.getElementById("irifound").innerHTML = "";
     // document.getElementById("irinotfound").innerHTML = "";
     
-    
-    
-    for (var i=1;i<copyOfR;i++){
-      for(var j=1;j<copyOfL;j++){
-          
-          if(sheetStorageCopy[i][j]!=null &&(!sheetStorageCopy[i][j].startsWith("??"))&&sheetStorageCopy[i][j]!=''&&
-          sheetName=="Dictionary Mapping"){
-            
-          
-            
-            var cellItem=sheetStorageCopy[i][j];
-            
-            
-           
-            var label= cellItem;
-
-            copyTracker=verifyLabel(label,i,j);
-            // var label1 = label.split(":")[0];
-            // var label2 = label.split(":")[1];
-            // getOwlUrl(label1,label2,label,i,j);
-          }
-        
-        
+    for(var i=0;i<cdg.data.length;i++){
+        for(var j =0; j<cdg.data[i].length;j++){
+            if(cdg.data[i][j]!=null && !cdg.data[i][j].startsWith("??")&&cdg.data[i][j]!=""&&sheetName=="Dictionary Mapping"&&cdg.data[i][j].includes(":")){
+               
+                var label=convertshortToIri(cdg.data[i][j]);
+                if(label!=NaN){
+                
+                copyTracker=verifyLabel(label,i,j);
+                }
+            }
         }
-      }
+    }
+    
+
       displayVerify(copyTracker);
     
     }
     var trackofLabelValidity=[];
     function verifyLabel(label,i,j){
-        console.log(sheetStorageCopy[i][j])
+        
         $.ajax({
                 type : 'GET',
                 url : 'http://localhost:9000/hadatac/sddeditor_v2/validateIRI',
@@ -111,7 +100,7 @@ function displayVerify(copyTracker){
            
         }
     }
-    // console.log(bool)
+    
     if((bool_.every(item => item === 0))==true){
         noErrorsFunction();
     }
@@ -159,6 +148,7 @@ function errorsFoundDisplay(errorsFound){
         b.innerHTML=errorsFound.length+" Error(s) found! "+"<br />";
         document.getElementById('irifound').appendChild(b);
     for(var i=0;i<errorsFound.length;i++){
+        //var shortForm=getUri(errorsFound[i][0]);
         var b1 = document.createElement("button");
         b1.style.backgroundColor="lavender";
         b1.style.fontWeight="bold";
@@ -209,10 +199,6 @@ function externalValidate(f_id){
     }
     document.getElementById("recommendedterms").style.display="none";
     document.getElementById("recommendedcolumn").style.display="none";
-    
-    // document.getElementById("verifysdd").style.display="flex";
-    // document.getElementById("verifysdd").style.justifyContent="center";
-    // document.getElementById("verifysdd").style.margin="0 auto";
     document.getElementById("listingTable").style.display="none";
     document.getElementById("returnView").style.display="block";
     document.getElementById("searchForTerm").style.display="none";
@@ -229,13 +215,13 @@ function externalValidate(f_id){
          file_id:fid
        },
        success : function(data) {
-          console.log(data);
+          
           var annotationLogs = decodeURIComponent(data);
           annotationLogs=annotationLogs.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;');
           var arrayt= annotationLogs.split('&lt;br&gt;');
           
           
-          console.log(arrayt);   
+          
           if(arrayt.length==0){
             var buttn = document.createElement("button");
             buttn.style.backgroundColor="#c9f4b8";
@@ -252,14 +238,21 @@ function externalValidate(f_id){
           }
             
          else{
+           
           for(var i=0;i<arrayt.length;i++){
-            var timeType= arrayt[i].split('[WARNING]')[0];
-            var errorTypeDescription= arrayt[i].split('[WARNING]')[1];
-            var logType= arrayt[i].split('[LOG]')[0];
-            var logErrorTypeDescription= arrayt[i].split('[LOG]')[1];
-            var errorType= arrayt[i].split('[ERROR]')[0];
-            var errorTypeDescription= arrayt[i].split('[ERROR]')[1];
+            var timeType;
+            var warningDes
+            var errtimeType;
+            var errDes;
+            
+            // var logType= arrayt[i].split('[LOG]')[0];
+            // var logErrorTypeDescription= arrayt[i].split('[LOG]')[1];
+           
+
             if(arrayt[i].includes('[WARNING]')){
+                timeType= arrayt[i].split('[WARNING]')[0];
+                warningDes= arrayt[i].split('[WARNING]')[1];
+
                 var buttn = document.createElement("button");
                 buttn.style.backgroundColor="Moccasin";
                 buttn.style.color="black";
@@ -282,60 +275,20 @@ function externalValidate(f_id){
                 buttn2.style.fontFamily="Optima, sans-serif";
                 buttn2.style.fontsize="11pt";
                 buttn2.style.textAlign="center";
-                buttn2.innerHTML=errorTypeDescription;
+                buttn2.innerHTML=warningDes;
                 document.getElementById('irifound').appendChild(buttn2);
                 document.getElementById('irifound').style.height="350px";
                 if(document.getElementById('irifound').innerHTML!=""){
                     document.getElementById('loadingmsg').innerHTML="";
                 }
-                if (document.addEventListener) { // IE >= 9; other browsers
-                    buttn.addEventListener('click', function(e) {
-                        wrongterm= sheetdict.get(this.innerHTML);
-                        var errRow=location[0];
-                        var errCol=location[1];
-                        cdg.gotoCell(errRow, errCol)
-                        //alert(wrongterm,errRow,errCol);
-                      
-                   
-                        
-             
-                    }, false);
-                    
-                 } 
+                
 
             }
-            else if(arrayt[i].includes('[LOG]')){
-                var buttn = document.createElement("button");
-                buttn.style.backgroundColor="lavender";
-                buttn.style.color="black";
-                buttn.style.fontWeight="bold";
-                buttn.style.border="transparent";
-                buttn.style.border="0";
-                buttn.style.width="350px";
-                buttn.style.fontFamily="Optima, sans-serif";
-                buttn.style.fontsize="11pt";
-                buttn.style.textAlign="center";
-                buttn.innerHTML=logType+" [LOG]";
-                //document.getElementById('irifound').appendChild(buttn);
-
-                var buttn2 = document.createElement("button");
-                buttn2.style.backgroundColor="aliceblue";
-                buttn2.style.color="black";
-                buttn2.style.border="transparent";
-                buttn2.style.border="0";
-                buttn2.style.width="350px";
-                buttn2.style.fontFamily="Optima, sans-serif";
-                buttn2.style.fontsize="11pt";
-                buttn2.style.textAlign="center";
-                buttn2.innerHTML=logErrorTypeDescription;
-                //document.getElementById('irifound').appendChild(buttn2);
-                // if(document.getElementById('irifound').innerHTML!=""){
-                //     document.getElementById('loadingmsg').innerHTML="";
-                // }
-            }
-
-
+         
             else if(arrayt[i].includes('[ERROR]')){
+                errtimeType= arrayt[i].split('[ERROR]')[0];
+                errDes= arrayt[i].split('[ERROR]')[1];
+
                 var buttn = document.createElement("button");
                 buttn.style.backgroundColor="#eb8686";
                 buttn.style.color="black";
@@ -346,7 +299,7 @@ function externalValidate(f_id){
                 buttn.style.fontFamily="Optima, sans-serif";
                 buttn.style.fontsize="11pt";
                 buttn.style.textAlign="center";
-                buttn.innerHTML=errorType+" [ERROR]";
+                buttn.innerHTML=errortimeType+" [ERROR]";
                 document.getElementById('irifound').appendChild(buttn);
 
                 var buttn2 = document.createElement("button");
@@ -358,7 +311,7 @@ function externalValidate(f_id){
                 buttn2.style.fontFamily="Optima, sans-serif";
                 buttn2.style.fontsize="11pt";
                 buttn2.style.textAlign="center";
-                buttn2.innerHTML=errorTypeDescription;
+                buttn2.innerHTML=errDes;
                 document.getElementById('irifound').appendChild(buttn2);
                 if(document.getElementById('irifound').innerHTML!=""){
                     document.getElementById('loadingmsg').innerHTML="";

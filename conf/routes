@@ -448,6 +448,9 @@ POST    /hadatac/sddeditor_v2/getfile_ID               org.hadatac.console.contr
 #POST   /hadatac/sddeditor_v2/getdd_ID                 org.hadatac.console.controllers.fileviewer.SDDEditorV2.getdd_ID()
 GET     /hadatac/sddeditor_v2/getCart                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
 POST    /hadatac/sddeditor_v2/getCart                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
+GET     /hadatac/sddeditor_v2/getIndicator          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getIndicator()
+POST    /hadatac/sddeditor_v2/getIndicator          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getIndicator()
+
 GET     /hadatac/sddeditor_v2/getBioportalKey          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
 POST    /hadatac/sddeditor_v2/getBioportalKey          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
 GET     /hadatac/sddeditor_v2/getSDDGenAddress          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()

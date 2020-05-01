@@ -107,7 +107,7 @@ function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
 }
 
 
-function convertIRItoPrefix(link){
+function getUri(link){
    // Check to see if we have a defined prefix
    var finalPrefix = "";
    var finalIriSub = "";
@@ -136,64 +136,24 @@ function convertIRItoPrefix(link){
 // old code expects prefix to end with # or /
 // While this is good practice as the HHEAR ontology proves people can choose others
 // In addition it doesn't prefer the larger substitutions which would better for users
-function getUri(link){
-   return convertIRItoPrefix(link);
-  // //console.log(prefixD)
-  // var uri;
-  // var prefix="";
-  // var namespace;
-  // if(!link.includes("#")){
-  //   namespace=link.split("/").pop();
-  //   uri=link.slice(0, link.lastIndexOf('/'));
-  //   uri+="/";
-  //   if(prefixD[uri]!=undefined){
-  //     prefix=prefixD[uri];
-  //     namespace=prefix+":"+namespace
-  //   }
-  //   else{
-  //     if(link.includes("semanticscience")){
-  //       namespace="sio:"+namespace
-  //     }
-  //     else{
-  //       //alert("No prefix found!");
-  //       namespace="";
-  //     }
-  //
-  //   }
-  // }
-  // else if(link.includes("#")){
-  //   namespace=link.split("#").pop();
-  //   uri=link.slice(0, link.lastIndexOf('#'));
-  //   if(uri in prefixD){
-  //     prefix=prefixD[uri];
-  //     namespace=prefix+":"+namespace
-  //   }
-  //   else {
-  //     //alert("No prefix found!");
-  //     namespace="";
-  //   }
-  // }
-  // return namespace;
-}
+
 
 function autoPopulateSDD(menuoptns,rowIndex,colIndex){
   menuoptns=menuoptns.sort(sortByStar);
   var topchoice=menuoptns[0][1];
-
-
-  var uri;
-  var prefix="";
-  var ret;
-  if(topchoice.startsWith("http")){
-    ret=getUri(topchoice)
+  var prefixedIRI = getUri(topchoice);
+  if(prefixedIRI===""){
+    if(!topchoice.includes("#")){
+      var replacement=topchoice.split("/").pop();
+      replacement = replacement.replace(/\_/g, ':');
+      cdg.data[rowIndex][colIndex] = replacement;
+    }
   }
   else{
-    ret=topchoice;
+    cdg.data[rowIndex][colIndex] = prefixedIRI;
   }
-
-  cdg.data[rowIndex][colIndex]=ret;
-  storeAutoVal(topchoice,rowIndex,colIndex)
   cdg.draw();
+  storeAutoVal(topchoice,rowIndex,colIndex)
 }
 
 function storeAutoVal(topchoice,rowIndex,colIndex){
@@ -321,15 +281,16 @@ function drawCheck(rowIndex,colIndex){
 addcartlocal()
 function addcartlocal(){
   clearCart();
-$.ajax({
-  type : 'GET',
-  url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
-  data : {
-    //  s: str
-  },
-  success : function(data) {
-
-
+    $.ajax({
+      type : 'GET',
+      url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+      data : {
+        //  s: str
+        
+      },
+      success : function(data) {
+    
+        //console.log(data)
 
     var select=document.getElementById("seecart"),data;
     for(var i=0;i<data.length;i++){
@@ -340,23 +301,25 @@ $.ajax({
         li.addEventListener("click",function(e){
 
           var newOntology=e.target.innerHTML;
-          var part1=newOntology.split(';')[0];
-          var part1copy=newOntology.split(';')[0];
-          if(part1.startsWith("http")&&(part1.includes("#")==false)){
-            part1=part1.split("/").pop();
+          var ret=getUri(newOntology);
+ 
+          
+          if(ret!=""){
+            cdg.data[rowNum][colNum] = ret;
+            sheetStorage[rowNum+1][colNum]=ret;
           }
-          else if(part1.startsWith("http")&&(part1.includes("#")==true)){
-            part1=part1.split("#").pop();
+          else{
+            
+              ret=newOntology;
+              
+              cdg.data[rowNum][colNum] = ret;
+              sheetStorage[rowNum][colNum]=ret;
+            
           }
-          part1=part1.replace("_",":");
-          var part2=newOntology.split(';')[1];
-          part2=part2.split(":")[1];
-          console.log(part1copy);
-          // //Cart(newOntology);
-          //alert(newOntology);
+          
 
-           cdg.data[rowNum][colNum]=part1;
-           sheetStorage[rowNum+1][colNum]=part2;
+           //cdg.data[rowNum][colNum]=part1;
+           
            //fromCarttoLabel();
 
           var colNum_str=colNum.toString();

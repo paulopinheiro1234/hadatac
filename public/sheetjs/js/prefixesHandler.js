@@ -28,8 +28,11 @@ function SDDPrefixtoJSON(){
        var xlarray=XLSX.utils.sheet_to_json(worksheet, {
            raw: true
        });
-       
+     
        if(xlarray.length==0){
+        console.log(xlarray.length);
+        newPrefix=[];
+        newPrefix.push(["obo","http://purl.obolibrary.org/obo/"])
             //prefixD[ontsList[i].URI]=labelsList[i].Prefix
             for(var i=0;i<ontsList.length;i++){
                 //row returns to the original state
@@ -42,6 +45,9 @@ function SDDPrefixtoJSON(){
                 raw: true
             });
             //console.log(xlarray)
+            if(prefixD["http://purl.obolibrary.org/obo/"]==undefined){
+                prefixD["http://purl.obolibrary.org/obo/"]="obo";
+            }
             
             for(var i=0;i<xlarray.length;i++){
                 var temp=[];
@@ -51,9 +57,10 @@ function SDDPrefixtoJSON(){
                 newPrefix.push(temp)
             }
             //console.log(labelsList);
-            //console.log(ontsList);
+            console.log(xlarray.length);
        }
-       else{
+       else if(xlarray.length>1){
+          // console.log(xlarray.length)
         for(var i=0;i<xlarray.length;i++){
                 prefixD[xlarray[i].URI]=xlarray[i].Prefix;
         }
