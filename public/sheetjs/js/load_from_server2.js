@@ -177,7 +177,6 @@ function getUri(link){
 }
 
 function autoPopulateSDD(menuoptns,rowIndex,colIndex){
-   console.log(menuoptns);
   menuoptns=menuoptns.sort(sortByStar);
   var topchoice=menuoptns[0][1];
 

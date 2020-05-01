@@ -348,7 +348,6 @@ function chooseItem(data) {
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
-  console.log('Here');
   drawStars(rowNum,colNum);
   cdg.draw();
   if(ret in approvalList){
@@ -361,7 +360,6 @@ function chooseItem(data) {
     }
   }
   else if(!(ret in approvalList)){
-    console.log("here");
     approvalList[ret]=[rowNum+1,colNum,0]
     indicateApproval();
 
@@ -511,6 +509,67 @@ var json_copy;
 var sheetStorage=[];
 // var sheetStorageCopy=[];
 var approvalList={};
+
+// Adapted from to_json in dropsheet.js
+function to_json(workbook) {
+   var useworker = typeof Worker !== 'undefined';
+   if(useworker && workbook.SSF) XLSX.SSF.load_table(workbook.SSF);
+   var result = {};
+   workbook.SheetNames.forEach(function(sheetName) {
+      var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header:1});
+      if(roa.length > 0) result[sheetName] = roa;
+   });
+   return result;
+}
+
+// Adapted from function handleFileUpload(e) in dropsheet.js
+function saveFile(e){
+   // Save the current view back to the workbook
+   workbook.Sheets[sheetName] = XLSX.utils.aoa_to_sheet(cdg.data);
+
+   // Generate json version of data
+   var json = to_json(workbook);
+
+   // iterate over workbook add headers in if we stripped them away
+   for (let [sn, header] of headerMap) {
+     // Add Header back in
+     json[sn].unshift(header);
+
+     // Convert back to workbook
+     workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
+   }
+
+   // Save the file
+   var wbout = XLSX.write(workbook, { bookType: _filetype, bookSST: false, type: 'array', compression:true});
+   var formdata = new FormData();
+   if (_formData) {
+     formdata.append('file', new File([wbout], _formData));
+   }
+   else {
+     formdata.append('file', new File([wbout], 'sheetjs.' + filetype));
+   }
+
+   var xhr = new XMLHttpRequest();
+   xhr.open("POST", _upload_url, true);
+   xhr.onreadystatechange = _onreponse;
+   xhr.send(formdata);
+
+   // iterate over workbook remove headers
+   for (let [sn, header] of headerMap) {
+     // Add Header back in
+     json[sn].shift();
+
+     // Convert back to workbook
+     workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
+   }
+}
+
+
+document.getElementById('upload').addEventListener('click', saveFile, false);
+
+
+
+
 
 function createCopySheet(sheetCopy){
   //console.log(sheetCopy)

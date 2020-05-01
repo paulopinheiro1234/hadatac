@@ -53,7 +53,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                },
                success : function(data) {
-                  
+
                   getHeaderData(data);
                }
             });
@@ -64,19 +64,19 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                },
                success : function(data) {
-                  
+
                   comments_data= data;
 
                }
-               
+
             });
-           
+
 
          }
          function getHeaderData(data){
             var headersheet=data.split('-')[0];
             var headercol=data.split('-')[1];
-            
+
             var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
             DDforPopulate(durl,headersheet,headercol)
          }
@@ -96,7 +96,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                <button class="changeViewIri" id="hideThis">  Show Original Sheet</button>
 
       </div>
-     
+
       <div class= shopbutton>
          <button class="cart" >
 
@@ -127,7 +127,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                }
             });
-           
+
          </script>
          <div class="cartbutton" id="f">
             <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; "  >
@@ -139,19 +139,19 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
-        
+
             <button id="vsdd" onclick="verifySDD()" >Verify SDD</button>
             <button id="everify" onclick="external()">External Verify</button>
-         
-         
+
+
          <button class="main-nav" id="show"> <span class="glyphicon glyphicon-eye-open"> </span> </button>
             <button class="Close" id="hide"> <span class="glyphicon glyphicon-eye-close"> </span> </button>
-         </div>    
+         </div>
       <div class="mobile-nav">
             <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
          <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
             <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
-            width="36" height="30" alt=""/> Recommended Terms </button> 
+            width="36" height="30" alt=""/> Recommended Terms </button>
             <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
                <option value="Choose from Below">Choose from Below</option>
             </select>
@@ -169,7 +169,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
                   <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
                </div> -->
-               
+
                <script>
                   function external(){
                      var f_id="@dataFile.getId()";
@@ -181,7 +181,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                <div id="searchForTerm" class="input-container" style="width:70%;margin-left: 5px;">
                   <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
                   <button type="button"  role="button" id="searchOnt" class="input-button" >
-                     <span class="glyphicon glyphicon-search">   </span> 
+                     <span class="glyphicon glyphicon-search">   </span>
                   </button>
                   </div>
 
@@ -191,9 +191,9 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      <option value="50">50</option>
                      <option value="All">All</option>
                   </select>
-                  
-                  
-               
+
+
+
                <div id="numberResults"></div>
                <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
                   <a href="javascript:prevPage()" id="btn_prev">Prev</a>
@@ -202,39 +202,39 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                   </div>
                <div id="listingTable" style="overflow-y:scroll; width:100%; height:100%;word-wrap: break-word;
                word-break: keep-all;margin-bottom:5px;margin-left:5px;margin-right:5px;"></div>
-               
-               
+
+
 
             </div>
                      <ul class="custom-cm">
                         <li class="custom-cm__item" id="thisitem"><img src="@controllers.routes.Assets.versioned("icons/cartsil.png")" width="25px" height="20px"/> Add to Cart</a> </li>
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
-      
+
                     </ul>
                     <div class="text-area" >
                      Cell Value: <input type="text" style="width:35%" id="cellText" value=""/>
-                    
-                     
+
+
                      <div id="suggestion-box" style="float: right;">
                         Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
                            <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
                      </div>
                   </div>
                   </div>
-   
+
                   <div class="text-area2">
                      Column Description : <input type="text" id="varDescription" style="width:35%" value="" input disabled="disabled"/>
-                     
+
                      <div id="suggestion-box" style="float: right;">
                         Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
                   </div>
-   
+
                </div>
-                    
-                     
+
+
                      <div><a id="error_msg"></a></div>
                      <div id="grid"></div>
-                     
+
                      <div id="gridcopy"></div>
                      <div id="footnote"></div>
                      <div id="buttons"></div>
@@ -242,7 +242,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                   <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
-                  
+
                   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/prefixesHandler.js")"></script>
@@ -258,9 +258,17 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      /* set up async GET request */
                      var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
 
-                     var _upload = document.getElementById('upload');
+                     var workbook;
+                     var _formData = JSON.stringify({"fileId": "@dataFile.getId()"});
+                     var _upload_url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()";
+                     var _filetype = "@dataFile.getFileExtention()";
+                     var _onWb = function(wb, sheet){
+                        workbook = wb;
+                     };
+
+                     // var _upload = document.getElementById('upload');
                      var _onreponse = function() {
-                        
+
                         $("#error_msg").html(decodeURIComponent(this.responseText));
                         setTimeout(function() {
                            $("#error_msg").html("");
@@ -280,17 +288,18 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         DropSheet({
                            data: data,
                            file: _file,
-                           filetype: "@dataFile.getFileExtention()",
+                           filetype: _filetype,
                            drop: _target,
-                           upload: _upload,
-                           upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",
-                           formdata: JSON.stringify({"fileId": "@dataFile.getId()"}),
+                           // upload: _upload,
+                           upload_url: _upload_url,
+                           formdata: _formData,
                            reponse_action: _onreponse,
                            on: {
                               workstart: _workstart,
                               workend: _workend,
                               sheet: _onsheet,
-                              foo: 'bar'
+                              foo: 'bar',
+                              wb: _onWb
                            },
                            errors: {
                               badfile: _badfile,
@@ -315,7 +324,7 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         }
                         else{
                            var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-                           
+
                            //getSDDURL()
                            getURL(url);
                         }
