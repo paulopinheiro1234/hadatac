@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
@@ -43,7 +46,7 @@ public class SDDEditorV2 extends Controller {
     FirstLabel fL_des;
     String dd_file_id="";
     int indicatorVal;
-    
+
 
 
 
@@ -154,6 +157,17 @@ public class SDDEditorV2 extends Controller {
     public Result getSDDGenAddress() {
         String sddAddress = ConfigProp.getSDDGenAddress();
         return ok(Json.toJson(sddAddress));
+    }
+
+    public Result getPrefixes() {
+        ConcurrentHashMap<String, NameSpace> pmap = ns.getNamespaces();
+
+        Map<String, String> finalmap = new  ConcurrentHashMap<String, String>();
+        for (Map.Entry<String, NameSpace> entry : pmap.entrySet()){
+           finalmap.put(entry.getValue().getName(), entry.getKey());
+        }
+
+        return ok(Json.toJson(finalmap));
     }
 
     public Result getOntologies() {

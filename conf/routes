@@ -453,8 +453,12 @@ POST    /hadatac/sddeditor_v2/getIndicator          org.hadatac.console.controll
 
 GET     /hadatac/sddeditor_v2/getBioportalKey          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
 POST    /hadatac/sddeditor_v2/getBioportalKey          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
-GET     /hadatac/sddeditor_v2/getSDDGenAddress          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
-POST    /hadatac/sddeditor_v2/getSDDGenAddress          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
+GET     /hadatac/sddeditor_v2/getSDDGenAddress         org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
+POST    /hadatac/sddeditor_v2/getSDDGenAddress         org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
+GET     /hadatac/sddeditor_v2/getPrefixes              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getPrefixes()
+
+
+
 GET     /hadatac/sddeditor_v2/getOntologies            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologies()
 POST    /hadatac/sddeditor_v2/getOntologies            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologies()
 GET     /hadatac/sddeditor_v2/getOntologiesKeys            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologiesKeys()
