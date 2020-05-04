@@ -306,7 +306,8 @@ function addcartlocal(){
           
           if(ret!=""){
             cdg.data[rowNum][colNum] = ret;
-            sheetStorage[rowNum+1][colNum]=ret;
+            var label=convertToLabel(ret);
+            sheetStorage[rowNum][colNum]=label;
           }
           else{
             
