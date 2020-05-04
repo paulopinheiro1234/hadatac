@@ -100,7 +100,7 @@ function displayVerify(copyTracker){
            
         }
     }
-    
+    console.log(bool_)
     if((bool_.every(item => item === 0))==true){
         noErrorsFunction();
     }
@@ -118,6 +118,14 @@ function displayVerify(copyTracker){
     }
 }
 function noErrorsFunction(){
+    
+    // if(document.getElementById('irifound').innerHTML==""){
+    //     console.log(document.getElementById('irifound').innerHTML)
+    //     document.getElementById('irifound').innerHTML+="NO ERRORS!"; 
+    //     document.getElementById('irifound').innerHTML+="NO ERRORS!";
+    //     console.log(document.getElementById('irifound').innerHTML)
+    // }
+    
     document.getElementById('irifound').innerHTML="";
     var b1 = document.createElement("button");
     b1.style.backgroundColor="lavender";
@@ -131,6 +139,8 @@ function noErrorsFunction(){
     b1.style.textAlign="center";
     b1.innerHTML="No Errors Found!"+"<br />";
     document.getElementById('irifound').appendChild(b1);
+    document.getElementById('irifound').style.display="block";
+    
 }
 function errorsFoundDisplay(errorsFound){
     
