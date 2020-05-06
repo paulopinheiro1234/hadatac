@@ -33,6 +33,10 @@ html {
   height: 100px;
   display: none;
 }
+#gridcopy {
+  height: 100px;
+  display: none;
+}
 
 .winpt { width:98%; }
 .success { color: #468847; }

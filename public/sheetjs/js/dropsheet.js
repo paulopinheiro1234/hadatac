@@ -176,7 +176,7 @@ var DropSheet = function DropSheet(opts) {
 		  opts.on.upload();
 	  }
 	  
-	  var wopts = { bookType: opts.filetype, bookSST: false, type: 'array' };
+	  var wopts = { bookType: opts.filetype, bookSST: false, type: 'array',compression:true};
 	  if (typeof last_sheetidx !== 'undefined') {
 		  last_wb.Sheets[last_wb.SheetNames[last_sheetidx]] = XLSX.utils.aoa_to_sheet(cdg.data);
 	  }

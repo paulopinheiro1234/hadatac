@@ -448,12 +448,21 @@ POST    /hadatac/sddeditor_v2/getfile_ID               org.hadatac.console.contr
 #POST   /hadatac/sddeditor_v2/getdd_ID                 org.hadatac.console.controllers.fileviewer.SDDEditorV2.getdd_ID()
 GET     /hadatac/sddeditor_v2/getCart                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
 POST    /hadatac/sddeditor_v2/getCart                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getCart()
+GET     /hadatac/sddeditor_v2/getIndicator          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getIndicator()
+POST    /hadatac/sddeditor_v2/getIndicator          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getIndicator()
+
 GET     /hadatac/sddeditor_v2/getBioportalKey          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
 POST    /hadatac/sddeditor_v2/getBioportalKey          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getBioportalKey()
-GET     /hadatac/sddeditor_v2/getSDDGenAddress          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
-POST    /hadatac/sddeditor_v2/getSDDGenAddress          org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
+GET     /hadatac/sddeditor_v2/getSDDGenAddress         org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
+POST    /hadatac/sddeditor_v2/getSDDGenAddress         org.hadatac.console.controllers.fileviewer.SDDEditorV2.getSDDGenAddress()
+GET     /hadatac/sddeditor_v2/getPrefixes              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getPrefixes()
+
+
+
 GET     /hadatac/sddeditor_v2/getOntologies            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologies()
 POST    /hadatac/sddeditor_v2/getOntologies            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologies()
+GET     /hadatac/sddeditor_v2/getOntologiesKeys            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologiesKeys()
+POST    /hadatac/sddeditor_v2/getOntologiesKeys            org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOntologiesKeys()
 GET     /hadatac/sddeditor_v2/removeFromCart           org.hadatac.console.controllers.fileviewer.SDDEditorV2.removeFromCart(item: String)
 POST    /hadatac/sddeditor_v2/removeFromCart           org.hadatac.console.controllers.fileviewer.SDDEditorV2.removeFromCart(item: String)
 GET     /hadatac/sddeditor_v2/addToEdits               org.hadatac.console.controllers.fileviewer.SDDEditorV2.addToEdits(row:String, col:String, editValue: String)
@@ -464,6 +473,14 @@ GET     /hadatac/sddeditor_v2/removingRow              org.hadatac.console.contr
 POST    /hadatac/sddeditor_v2/removingRow              org.hadatac.console.controllers.fileviewer.SDDEditorV2.removingRow(removedValue:String)
 GET     /hadatac/sddeditor_v2/getOldEdits              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOldEdits()
 POST    /hadatac/sddeditor_v2/getOldEdits              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOldEdits()
+GET     /hadatac/sddeditor_v2/getLabelFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getLabelFromIri(iricode:String)
+POST    /hadatac/sddeditor_v2/getLabelFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getLabelFromIri(iricode:String)
+
+GET     /hadatac/sddeditor_v2/getDescriptionFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getDescriptionFromIri(iricode:String)
+POST    /hadatac/sddeditor_v2/getDescriptionFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getDescriptionFromIri(iricode:String)
+
+GET     /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.controllers.fileviewer.SDDEditorV2.validateIRI(s:String)
+POST    /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.controllers.fileviewer.SDDEditorV2.validateIRI(s:String)
 
 # working files
 GET	    /hadatac/working	        	               org.hadatac.console.controllers.workingfiles.WorkingFiles.index(dir : String, dest: String)

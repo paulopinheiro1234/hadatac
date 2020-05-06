@@ -16,10 +16,10 @@
   display:block;
 }
 .mobile-navi {
-  position:absolute;
+  position:relative;
   display: none;
-  top: 160px;
-  left:1000px;
+  float:right;
+  width:28%;
   word-wrap: break-word;
   
 

@@ -227,7 +227,32 @@ public class NameSpaces {
         }
         return loadedList;
     }
+    public List<String> getOrderedPriorityLoadedOntologyKeyList() {
+        // generate a list of all loaded ontolgies
+        List<NameSpace> namespaceList = new ArrayList<NameSpace>();
+        for(Map.Entry<String, NameSpace> entry : table.entrySet()) {
+            if(entry.getValue().getNumberOfLoadedTriples() >= 1)
+                namespaceList.add(entry.getValue());
+        }
 
+        // sort by priority
+        namespaceList.sort(new Comparator<NameSpace>() {
+            @Override
+            public int compare(NameSpace o1, NameSpace o2) {
+                return o1.getPriority() - o2.getPriority();
+            }
+        });
+
+        // Get URIs
+        List<String> loadedList = new ArrayList<String>();
+        
+        for(NameSpace n: namespaceList){
+            loadedList.add(n.getAbbreviation().toString());
+           
+           
+        }
+        return loadedList;
+    }
     public List<String> getOrderedPriorityLoadedOntologyList() {
         // generate a list of all loaded ontolgies
         List<NameSpace> namespaceList = new ArrayList<NameSpace>();
@@ -247,8 +272,11 @@ public class NameSpaces {
         // Get URIs
         List<String> loadedList = new ArrayList<String>();
         for(NameSpace n: namespaceList){
+            
            loadedList.addAll(n.getOntologyURIs());
+           
         }
+        
         return loadedList;
     }
 
