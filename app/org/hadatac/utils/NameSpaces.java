@@ -35,15 +35,15 @@ public class NameSpaces {
         }
         return instance;
     }
-    
-    private NameSpaces() {        
+
+    private NameSpaces() {
         List<NameSpace> namespaces = NameSpace.findAll();
         if (namespaces.isEmpty()) {
             InputStream inputStream = getClass().getClassLoader()
                     .getResourceAsStream("namespaces.properties");
             namespaces = loadFromFile(inputStream);
         }
-        
+
         for (NameSpace ns : namespaces) {
             ns.updateLoadedTripleSize();
             table.put(ns.getAbbreviation(), ns);
@@ -58,7 +58,7 @@ public class NameSpaces {
             return ns.getName();
         }
     }
-    
+
     public Map<String, Integer> getLoadedOntologies() {
         Map<String, Integer> loadedOntologies = new HashMap<String, Integer>();
         List<NameSpace> list = new ArrayList<NameSpace>(table.values());
@@ -77,19 +77,22 @@ public class NameSpaces {
             ns.updateLoadedTripleSize();
             table.put(ns.getAbbreviation(), ns);
         }
-        
+
         sparqlNameSpaceList = getSparqlNameSpaceList();
         turtleNameSpaceList = getTurtleNameSpaceList();
     }
-    
+
     public static List<NameSpace> loadFromFile(InputStream inputStream) {
         List<NameSpace> namespaces = new ArrayList<NameSpace>();
-        
+
         try {
             Properties prop = new Properties();
             prop.load(inputStream);
             for (Map.Entry<Object, Object> nsEntry : prop.entrySet()) {
                 String nsAbbrev = ((String)nsEntry.getKey());
+
+                System.out.println("nsAbbrev = " + nsAbbrev);
+
                 if (nsAbbrev != null) {
                     String[] tmpList = prop.getProperty(nsAbbrev).split(",");
                     NameSpace tmpNS = null;
@@ -103,6 +106,15 @@ public class NameSpaces {
                         if (tmpList.length >= 3 && tmpList[2] != null && !tmpList[2].equals("")) {
                             tmpNS.setURL(tmpList[2]);
                         }
+                        if (tmpList.length >= 4 && tmpList[3] != null && !tmpList[3].equals("")) {
+                            try{
+                                int priority = Integer.parseInt(tmpList[3]);
+                                tmpNS.setPriority(priority);
+                            }
+                            catch(NumberFormatException e){
+                               System.err.println("Bad priority value for " + nsAbbrev + ". Expected an integer and got " + tmpList[3]);
+                            }
+                        }
                     }
                     if (tmpNS != null) {
                         namespaces.add(tmpNS);
@@ -115,17 +127,17 @@ public class NameSpaces {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         return namespaces;
     }
-    
+
     public ConcurrentHashMap<String, NameSpace> getNamespaces() {
         return table;
     }
-    
+
     public List<NameSpace> getOrderedNamespacesAsList() {
         List<NameSpace> nameSpaces = new ArrayList<NameSpace>(table.values());
-        
+
         nameSpaces.sort(new Comparator<NameSpace>() {
             @Override
             public int compare(NameSpace o1, NameSpace o2) {
@@ -133,10 +145,10 @@ public class NameSpaces {
                         o2.getAbbreviation().toLowerCase());
             }
         });
-        
+
         return nameSpaces;
     }
-    
+
     private String getTurtleNameSpaceList() {
         String namespaces = "";
         for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
@@ -144,10 +156,10 @@ public class NameSpaces {
             NameSpace ns = entry.getValue();
             namespaces = namespaces + "@prefix " + abbrev + ": <" + ns.getName() + "> . \n";
         }
-        
+
         return namespaces;
     }
-    
+
     private String getSparqlNameSpaceList() {
         String namespaces = "";
         for (Map.Entry<String, NameSpace> entry : table.entrySet()) {
@@ -155,7 +167,7 @@ public class NameSpaces {
             NameSpace ns = entry.getValue();
             namespaces = namespaces + "PREFIX " + abbrev + ": <" + ns.getName() + "> \n";
         }
-        
+
         return namespaces;
     }
 
@@ -163,7 +175,7 @@ public class NameSpaces {
         if (!"".equals(turtleNameSpaceList)) {
             return turtleNameSpaceList;
         }
-        
+
         return getTurtleNameSpaceList();
     }
 
@@ -171,22 +183,22 @@ public class NameSpaces {
         if (!"".equals(sparqlNameSpaceList)) {
             return sparqlNameSpaceList;
         }
-        
+
         return getSparqlNameSpaceList();
     }
 
     public int getNumOfNameSpaces() {
-        if (table == null) {  
+        if (table == null) {
             return 0;
         }
-        
+
         return table.size();
     }
 
     public String jsonLoadedOntologies() {
         String json = "";
         boolean first = true;
-        List<Map.Entry<String,Integer>> entries = 
+        List<Map.Entry<String,Integer>> entries =
                 new ArrayList<Map.Entry<String,Integer>>(getLoadedOntologies().entrySet());
         Collections.sort(entries, new Comparator<Map.Entry<String,Integer>>() {
             public int compare(Map.Entry<String,Integer> a, Map.Entry<String,Integer> b) {
@@ -203,7 +215,7 @@ public class NameSpaces {
             int triples = entry.getValue();
             json = json + " [\"" + abbrev + "\"," + triples +"]";
         }
-        
+
         return json;
     }
 
@@ -215,6 +227,58 @@ public class NameSpaces {
         }
         return loadedList;
     }
+    public List<String> getOrderedPriorityLoadedOntologyKeyList() {
+        // generate a list of all loaded ontolgies
+        List<NameSpace> namespaceList = new ArrayList<NameSpace>();
+        for(Map.Entry<String, NameSpace> entry : table.entrySet()) {
+            if(entry.getValue().getNumberOfLoadedTriples() >= 1)
+                namespaceList.add(entry.getValue());
+        }
+
+        // sort by priority
+        namespaceList.sort(new Comparator<NameSpace>() {
+            @Override
+            public int compare(NameSpace o1, NameSpace o2) {
+                return o1.getPriority() - o2.getPriority();
+            }
+        });
+
+        // Get URIs
+        List<String> loadedList = new ArrayList<String>();
+        
+        for(NameSpace n: namespaceList){
+            loadedList.add(n.getAbbreviation().toString());
+           
+           
+        }
+        return loadedList;
+    }
+    public List<String> getOrderedPriorityLoadedOntologyList() {
+        // generate a list of all loaded ontolgies
+        List<NameSpace> namespaceList = new ArrayList<NameSpace>();
+        for(Map.Entry<String, NameSpace> entry : table.entrySet()) {
+            if(entry.getValue().getNumberOfLoadedTriples() >= 1)
+                namespaceList.add(entry.getValue());
+        }
+
+        // sort by priority
+        namespaceList.sort(new Comparator<NameSpace>() {
+            @Override
+            public int compare(NameSpace o1, NameSpace o2) {
+                return o1.getPriority() - o2.getPriority();
+            }
+        });
+
+        // Get URIs
+        List<String> loadedList = new ArrayList<String>();
+        for(NameSpace n: namespaceList){
+            
+           loadedList.addAll(n.getOntologyURIs());
+           
+        }
+        
+        return loadedList;
+    }
 
     public String copyNameSpacesLocally(int mode) {
         // copy supporting ontologies locally
@@ -224,7 +288,7 @@ public class NameSpaces {
             String nsURL = entry.getValue().getURL();
             if (nsURL != null && !nsURL.equals("") && !nsURL.equals(":")) {
                 String filePath = CACHE_PATH + CACHE_PREFIX + abbrev.replace(":","");
-                message += Feedback.print(mode, "   Creating local copy of " + abbrev + ". ");		
+                message += Feedback.print(mode, "   Creating local copy of " + abbrev + ". ");
                 for (int i = abbrev.length(); i < 36; i++) {
                     message += Feedback.print(mode, ".");
                 }
@@ -239,11 +303,11 @@ public class NameSpaces {
                 }
             }
 
-        }	
+        }
         message += Feedback.println(mode," ");
-        
+
         return message;
-    }	
+    }
 
     public static void main(String[] args) {
         NameSpaces ns = new NameSpaces();

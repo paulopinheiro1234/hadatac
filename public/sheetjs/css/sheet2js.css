@@ -4,15 +4,26 @@
     top:200px;
 }  */
 .main-nav {
+  background-color: #357ebd;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: white;
   float:right;
-  background:rgb(173, 217, 253);
-  color:balck;
-  font-family:Arial, Helvetica, sans-serif;
-  font-size: 11pt;
-  border-radius: 80px;
-  font-weight: bold;
-  height:35px;
-  border:1px solid black;
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
 }
 #effect{
   top:200px;
@@ -25,7 +36,12 @@
 #show{
   display:block;
 }
-
+#hideThis{
+  display:none;
+}
+#showThis{
+  display:block;
+}
 #text-area{
   position:relative;
 }
@@ -33,46 +49,58 @@
   position:relative;
 }
 .mobile-nav {
-  position:absolute;
+  position:relative;
   display: none;
-  top: 200px;
-  left:1000px;
+  float:right;
+  width:28%;
 
 }
 
 .Close {
-  color:black;
-  background-color: cornflowerblue;
+  background-color: #357ebd;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: white;
   float:right;
-  border-radius: 80px;
-  margin-left:5px;
-  font-family:Arial, Helvetica, sans-serif;
-  font-size: 11pt;
-  font-weight: bold;
-  height:35px;
-  border:1px solid black;
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
 }
 .menuoptions{
-  max-width: 100%;
-  font-size: 15pt;
+  width: 100%;
+  font-size: 11pt;
   font-family: Arial, Helvetica, sans-serif;
   margin-top: 4px;
   display:none;
   overflow: hidden;
 }
 .virtualoptions{
-  max-width: 100%;
-  font-size: 15pt;
+  width: 100%;
+  font-size: 11pt;
   font-family: Arial, Helvetica, sans-serif;
   margin-top: 4px;
   display:none;
   overflow: hidden;
 }
 #menulist{
-  margin-left:85px;
+  margin-left:5px;
+  margin-right:5px;
 }
 #virtuallist{
-  margin-left:85px;
+  margin-left:5px;
+  margin-right:5px;
 }
 /*=========================================*/
 /* #editRowsAdd{
@@ -126,15 +154,26 @@
 }
 /*===========================================================================*/
 .cart{
-  margin-top: 1px;
-  border:1px solid black;
-  border-radius: 80px;
-  height:35px;
-  width: 160px;
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  font-size: 11pt;
-  background-color: rgb(173, 217, 253);
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
 }
 
 .shopbutton{
@@ -192,18 +231,72 @@ ul {
   margin: 0;
 }
 /*-----------------------------------------------------*/
-.addtocart{
-  margin-top: 1px;
-  border:1px solid black;
-  border-radius:80px;
-  height:34px;
-  margin-bottom: 2px;
-  width: 160px;
+#vsdd{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  font-size: 11pt;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
   text-align: center;
-  background-color: rgb(173, 217, 253);
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+}
+#everify{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+}
+/*-----------------------------------------------------*/
+.addtocart{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
   }
 
 .cartbutton{
@@ -401,3 +494,53 @@ ul li {
 display: block;
 position: relative;
 }
+/*===========================*/
+.changeViewLabel{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+
+
+
+}
+.changeViewIri{
+  background-color: #428bca;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  line-height: 1.42857143;
+  border-color: #357ebd;
+  color: #fff;
+  
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+}
+
+

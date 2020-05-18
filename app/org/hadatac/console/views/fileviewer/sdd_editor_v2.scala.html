@@ -10,6 +10,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 @import org.hadatac.console.views.html.annotator._
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
+@import org.hadatac.utils._
+
 
 @import java.net._
 
@@ -25,57 +27,21 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
    <div id="rcorners" >
 
       <h4>@dataFile.getFileName()</h4>
+      <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
       @if(bSavable) {
+
          <input class="btn btn-primary" type="button" id="upload" value="Save"/>
       }
-      <a onclick="stripStars()" href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+      <a  href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
+         <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
 
-
-
-      <button class="btn btn-primary" style="margin-left:5px">Consider SSD</button>
-
-      <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">Populate</button>
+      <!-- <button class="btn btn-primary" type="button" role="button" id="populatesdd" style="display: inline-block" onclick="populateSDD()">
+         <span class="glyphicon glyphicon-pencil"> </span> Populate</button> -->
 
       <script>
 
-         function populateSDD(){
-
-            $.ajax({
-               type : 'GET',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
-               data : {
-
-               },
-               success : function(data) {
-                  console.log(data);
-                  getHeaderData(data);
-               }
-            });
-            $.ajax({
-               type : 'GET',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
-               data : {
-
-               },
-               success : function(data) {
-                  console.log(data);
-                  comments_data= data;
-
-                  // var commentsheet=comments_data.split('-')[0];
-                  // var commentcol=comments_data.split('-')[1];
-               }
-            });
-
-         }
-         function getHeaderData(data){
-            var headersheet=data.split('-')[0];
-            var headercol=data.split('-')[1];
-            console.log(headersheet);
-            console.log(headercol);
-            var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
-            DDforPopulate(durl,headersheet,headercol)
-         }
-
+         var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+         durl_=durl;
       </script>
       <div class="undo-edit">
 
@@ -86,10 +52,16 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
          <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="reundoEdit()">
                <span class="glyphicon glyphicon-circle-arrow-right"> </span> Redo </button>
       </div>
+      <div class="changeView" style="display:inline-block;">
+            <button class="changeViewLabel" id="showThis"> <span class="glyphicon glyphicon-list-alt"> </span> Show Labels</button>
+               <button class="changeViewIri" id="hideThis">  Show Original Sheet</button>
+
+      </div>
+
       <div class= shopbutton>
          <button class="cart" >
 
-               <img src="@controllers.routes.Assets.versioned("icons/shop.png")" width="40" height="32" alt=""/> Shop Terms</button>
+            <span class="glyphicon glyphicon-globe"> </span> Browse Ontologies</button>
 
             <ul id="myDropdown" class="ontologydrop-content">
 
@@ -116,125 +88,129 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
 
                }
             });
-           
+
          </script>
          <div class="cartbutton" id="f">
-            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; position: relative;"  >
+            <button type="button" class="addtocart" role="button" id="add_to_cart" style="display: inline-block; "  >
 
-               <img src="@controllers.routes.Assets.versioned("icons/shopping-cart.png")" width="38" height="30" alt=""/>
-               View Cart
+               <span class="glyphicon glyphicon-picture"> </span>
+               View Terms
             </button>
             <ul id="seecart" class="cart-content">
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
-         
-         
-         <button class="main-nav" id="show"> <img src="@controllers.routes.Assets.versioned("icons/open-eye.png")"
-            width="36" height="33" alt=""/> Show Options</button>
-            <button class="Close" id="hide"> <img src="@controllers.routes.Assets.versioned("icons/closed-eye.png")"
-               width="36" height="33" alt=""/> Hide Options</button>
 
-               <div class="mobile-nav">
-                    <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
-                  <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
-                     <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
-                     width="36" height="30" alt=""/> Recommended Terms</button>
-                     <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
-                        <option value="Choose from Below">Choose from Below</option>
-                     </select>
+            <button id="vsdd" onclick="verifySDD()" > <span class="glyphicon glyphicon-check"> </span> Verify SDD</button>
+            <button id="everify" onclick="external()"><span class="glyphicon glyphicon-transfer"> </span> External Verify</button>
 
-                     <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;">
-                        <img src="@controllers.routes.Assets.versioned("icons/vr-icon.png")"
-                        width="40" height="32" alt=""/>Recommended Columns</button>
-                        <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
-                           <option value="Choose from Below">Choose from Below</option>
-                        </select>
 
-                        <div id="editRowsAdd">
-                           <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
-                           <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
-                           <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
-                           <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
-                        </div>
-                        <div id="verifysdd" style="display: flex; align-items: center; justify-content: center; margin:0 auto;" >
-                           <button onclick="verifySDD()" style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white" >Verify SDD</button>
-                           <button style="display: inline-block; margin-top: 3pt;background-color: cornflowerblue; color:white;" onclick="external()">External Verify</button>
-                        </div>
-                        <script>
-                           function external(){
-                              var f_id="@dataFile.getId()";
-                              externalValidate(f_id);
-                           }
-                        </script>
-                        <div id="loadingmsg"></div>
-                        <div id="irifound" style="overflow-y:auto;"></div>
-                        <div id="searchForTerm" class="input-container">
-                           <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
-                           <button type="button"  role="button" id="searchOnt" class="input-button" >
-                              <span class="glyphicon glyphicon-search">   </span> 
-                          </button>
-                          </div>
+         <button class="main-nav" id="show"> <span class="glyphicon glyphicon-eye-open"> </span> </button>
+            <button class="Close" id="hide"> <span class="glyphicon glyphicon-eye-close"> </span> </button>
+         </div>
+      <div class="mobile-nav">
+            <button id="returnView" onclick="returnToView()" style="justify-content:center; margin:0 auto; margin-bottom:2px">Return To View</button>
+         <button type="button" class="recommended" role="button" id="recommendedterms" style="display: block;">
+            <img src="@controllers.routes.Assets.versioned("icons/light-bulb.png")"
+            width="36" height="30" alt=""/> Recommended Terms </button>
+            <select class="menuoptions" id="menulist" size=5 onchange="chooseItem(this)">
+               <option value="Choose from Below">Choose from Below</option>
+            </select>
 
-                           <select id="numToSearch" onchange="showTop()" style="font-size:20px;">
-                              <option value="5" selected="selected">5</option>
-                              <option value="10">10</option>
-                              <option value="50">50</option>
-                              <option value="All">All</option>
-                          </select>
-                           
-                          
-                        
-                        <div id="numberResults"></div>
-                        <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
-                           <a href="javascript:prevPage()" id="btn_prev">Prev</a>
-                           <a href="javascript:nextPage()" id="btn_next">Next</a>
-                           page:<span id="page"></span>
-                           </div>
-                        <div id="listingTable" style="overflow-y:scroll; width:350px; height:345px;word-wrap: break-word;
-                        word-break: keep-all;margin-bottom:5px;"></div>
-                        
-                        
+            <button type="button" class="recommendedcol" role="button" id="recommendedcolumn" style="display: block;" >
+               <img src="@controllers.routes.Assets.versioned("icons/vr-icon.png")"
+               width="40" height="32" alt=""/>Recommended Columns</button>
+               <select class="virtualoptions" id="virtuallist" size=5 onchange="chooseItem(this)">
+                  <option value="Choose from Below">Choose from Below</option>
+               </select>
 
-                     </div>
+               <!-- <div id="editRowsAdd">
+                  <button class="insertrowbtn" onclick="insertRowAbove()">Insert Row Above</button>
+                  <button class="insertrowbtn" onclick="insertRowBelow()">Insert Row Below</button>
+                  <button class="removerowbtn" onclick="removeRow()">Remove Row</button>
+                  <button class="undo-remove-row" onclick="revertRow()"><img src="@controllers.routes.Assets.versioned("icons/undo-back.png")" width="15" height="18" alt=""/> </button>
+               </div> -->
+
+               <script>
+                  function external(){
+                     var f_id="@dataFile.getId()";
+                     externalValidate(f_id);
+                  }
+               </script>
+               <div id="loadingmsg"></div>
+               <div id="irifound" style="overflow-y:auto;"></div>
+               <div id="searchForTerm" class="input-container" style="width:70%;margin-left: 5px;">
+                  <input type="text" id="termToSearch" class="input-field" placeholder="Search For Term        " />
+                  <button type="button"  role="button" id="searchOnt" class="input-button" >
+                     <span class="glyphicon glyphicon-search">   </span>
+                  </button>
+                  </div>
+
+                  <select id="numToSearch" onchange="showTop()" style="font-size:20px;">
+                     <option value="5" selected="selected">5</option>
+                     <option value="10">10</option>
+                     <option value="50">50</option>
+                     <option value="All">All</option>
+                  </select>
+
+
+
+               <div id="numberResults"></div>
+               <div id="pagekey" style=" margin:0 auto; left:150px; text-align: center">
+                  <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+                  <a href="javascript:nextPage()" id="btn_next">Next</a>
+                  page:<span id="page"></span>
+                  </div>
+               <div id="listingTable" style="overflow-y:scroll; width:100%; height:100%;word-wrap: break-word;
+               word-break: keep-all;margin-bottom:5px;margin-left:5px;margin-right:5px;"></div>
+
+
+
+            </div>
                      <ul class="custom-cm">
-                        <li class="custom-cm__item" id="thisitem"><img src="https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png" width="25px" height="20px"/> Add to Cart</a> </li>
+                        <li class="custom-cm__item" id="thisitem"><img src="@controllers.routes.Assets.versioned("icons/cartsil.png")" width="25px" height="20px"/> Add to Cart</a> </li>
                         <!-- <div class="custom-cm__item" style="background-image: https://www.shareicon.net/data/512x512/2015/12/12/686440_tool_512x512.png">Add to Cart</div> -->
-      
+
                     </ul>
+                    <div class="text-area" >
+                     Cell Value: <input type="text" style="width:35%" id="cellText" value=""/>
 
-                     <div class="text-area">
-                        Cell Value: <input type="text" style="width:450px" id="cellText" value=""/>
 
-                        <div id="suggestion-box" style="float: right;">
-                           Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
-                              <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
-                        </div>
+                     <div id="suggestion-box" style="float: right;">
+                        Suggestion Service: <div id="spinnerContainer" class="spinner" style="width:20px; height:20px; display: inline-block;">
+                           <img src="@controllers.routes.Assets.versioned("sheetjs/img/success.png")" id="imageStatus" style="width:20px; height:20px;"/>
                      </div>
+                  </div>
+                  </div>
 
-                     <div class="text-area2">
-                        Description : <input type="text" id="varDescription" style="width:450px" value="" input disabled="disabled"/>
+                  <div class="text-area2">
+                     Column Description : <input type="text" id="varDescription" style="width:35%" value="" input disabled="disabled"/>
 
-                        <div id="suggestion-box" style="float: right;">
-                           Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
-                     </div>
+                     <div id="suggestion-box" style="float: right;">
+                        Refresh Suggestion: <button class="refresh-suggest" onclick="getSuggestion()"><img src="@controllers.routes.Assets.versioned("icons/undo-forward.png")" width="15" height="18" alt=""/> </button>
+                  </div>
 
+               </div>
 
 
                      <div><a id="error_msg"></a></div>
                      <div id="grid"></div>
+
+                     <div id="gridcopy"></div>
                      <div id="footnote"></div>
                      <div id="buttons"></div>
                   </div>
 
                   <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/shim.js")"></script>
-                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/xlsx.full.min.js")"></script>
 
+                  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/prefixesHandler.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/label-iri-view.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/searchTerm.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/hideshow.js")"></script>
                   <script src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
@@ -243,8 +219,17 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      /* set up async GET request */
                      var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
 
-                     var _upload = document.getElementById('upload');
+                     var workbook;
+                     var _formData = JSON.stringify({"fileId": "@dataFile.getId()"});
+                     var _upload_url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()";
+                     var _filetype = "@dataFile.getFileExtention()";
+                     var _onWb = function(wb, sheet){
+                        workbook = wb;
+                     };
+
+                     // var _upload = document.getElementById('upload');
                      var _onreponse = function() {
+
                         $("#error_msg").html(decodeURIComponent(this.responseText));
                         setTimeout(function() {
                            $("#error_msg").html("");
@@ -264,17 +249,18 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         DropSheet({
                            data: data,
                            file: _file,
-                           filetype: "@dataFile.getFileExtention()",
+                           filetype: _filetype,
                            drop: _target,
-                           upload: _upload,
-                           upload_url: "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()",
-                           formdata: JSON.stringify({"fileId": "@dataFile.getId()"}),
+                           // upload: _upload,
+                           upload_url: _upload_url,
+                           formdata: _formData,
                            reponse_action: _onreponse,
                            on: {
                               workstart: _workstart,
                               workend: _workend,
                               sheet: _onsheet,
-                              foo: 'bar'
+                              foo: 'bar',
+                              wb: _onWb
                            },
                            errors: {
                               badfile: _badfile,
@@ -288,6 +274,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                      req.send();
                   </script>
                   <script>
+                     var sdd_url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
+                     getSDDUrl(sdd_url);
                      if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
                         alert("Please upload a valid Data Dictionary")
                      }
@@ -297,6 +285,8 @@ testClass: org.hadatac.console.controllers.fileviewer.SDDEditorV2
                         }
                         else{
                            var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+
+                           //getSDDURL()
                            getURL(url);
                         }
                      }
