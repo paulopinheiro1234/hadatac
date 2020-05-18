@@ -1,4 +1,4 @@
-package org.hadatac.data.loader.mqtt;
+package org.hadatac.data.loader.http;
 
 import java.lang.String;
 import java.text.DateFormat;
@@ -10,10 +10,14 @@ import org.hadatac.data.loader.MeasurementGenerator;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
 
-public class MessageAnnotation {
+public class HttpMessageAnnotation {
 	
-	public MessageAnnotation() {}
+	public HttpMessageAnnotation() {}
 
+    /********************************************************************************
+     *                            STREAM MANAGEMENT                                 *
+     ********************************************************************************/
+    
     public static void subscribeMessageStream(STR stream) {
     	if (stream == null || !stream.getMessageStatus().equals(STR.SUSPENDED)) {
     		return;
@@ -46,16 +50,9 @@ public class MessageAnnotation {
 		} catch (Exception e1) {
 			stream.getMessageLogger().println("Error with MeasurementGenerator inside MessageAnnotation: " + e1.toString());
 		}
-        MessageWorker.getInstance().addStreamGenerator(stream.getUri(), gen);
-        
-        try {
-			System.out.println("MessageAnnotation : calling AsyncSubscribe");
-			CompletableFuture.runAsync(() -> AsyncSubscribe.exec(stream, gen));
-		} catch (Exception e) {
-			stream.getMessageLogger().println("MessageAnnotation: Error executing 'subscribe' inside startMessageStream.");
-			e.printStackTrace();
-		} 
-
+		HttpMessageWorker.getInstance().addStream(stream);
+        HttpMessageWorker.getInstance().addStreamGenerator(stream.getUri(), gen);
+        HTTPSubscribe.exec(stream, gen);
         stream.setMessageStatus(STR.ACTIVE);
 		stream.getMessageLogger().println(String.format("Message stream %s is active.", stream.getMessageName()));
 		stream.save();
@@ -69,7 +66,7 @@ public class MessageAnnotation {
     	System.out.println("Unsubscribing message stream: " + stream.getMessageName());
 		stream.getMessageLogger().resetLog();
 		stream.getMessageLogger().println(String.format("Unsubscribing message stream: %s", stream.getMessageName()));
-		if (!MessageWorker.getInstance().executorsMap.containsKey(stream.getMessageName())) {
+		if (!HttpMessageWorker.getInstance().executorsMap.containsKey(stream.getMessageName())) {
 			stream.getMessageLogger().println("Could not stop message stream: " + stream.getMessageName() + ". Reason: currentClient is null");
 		} else {
 	        stream.setMessageStatus(STR.SUSPENDED);        
@@ -77,8 +74,8 @@ public class MessageAnnotation {
 	        String endTime = isoFormat.format(new Date());
 	        stream.setEndedAtXsdWithMillis(endTime);
 			stream.getMessageLogger().println(String.format("Stopped processing of message stream: %s", stream.getMessageName()));
-			MessageWorker.getInstance().removeStream(stream.getUri());
-			MessageWorker.getInstance().removeStreamGenerator(stream.getUri());
+			HttpMessageWorker.getInstance().removeStream(stream.getUri());
+			HttpMessageWorker.getInstance().removeStreamGenerator(stream.getUri());
     	}
 		stream.save();
     }

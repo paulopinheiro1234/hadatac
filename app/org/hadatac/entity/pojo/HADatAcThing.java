@@ -136,6 +136,17 @@ public abstract class HADatAcThing implements Facetable {
         return typeUri;
     }
 
+    public String getTypeLabel() {
+    	if (typeUri == null) {
+    		return "";
+    	}
+    	Entity ent = Entity.find(typeUri);
+    	if (ent == null || ent.getLabel() == null) {
+    		return "";
+    	}
+    	return ent.getLabel();
+    }
+    
     public void setTypeUri(String typeUri) {
         this.typeUri = typeUri;
     }
@@ -473,6 +484,8 @@ public abstract class HADatAcThing implements Facetable {
         query += " ?p ?o . \n";
         query += " } ";
 
+        //System.out.println("Delete from triplestore query: " + query);
+        
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));

@@ -50,12 +50,19 @@ public class Templates {
     public static String METHOD = iniConfig.getSection("STR").getString("Method");
     public static String DATADICTIONARYNAME = iniConfig.getSection("STR").getString("DataDictionaryName");
     public static String DASTUDYID = iniConfig.getSection("STR").getString("DAStudyName");
+    public static String TOPICNAME = iniConfig.getSection("STR").getString("TopicName");
     public static String EPILAB = iniConfig.getSection("STR").getString("Epi/Lab");
     public static String OWNEREMAIL = iniConfig.getSection("STR").getString("OwnerEmail");
     public static String PERMISSIONURI = iniConfig.getSection("STR").getString("PermissionURI");
     public static String DEPLOYMENTURI = iniConfig.getSection("STR").getString("DeploymentUri");
     public static String ROWSCOPE = iniConfig.getSection("STR").getString("RowScope");
     public static String CELLSCOPE = iniConfig.getSection("STR").getString("CellScope");
+    public static String MESSAGESTREAMURI = iniConfig.getSection("STR").getString("StreamURI");
+    public static String MESSAGEURI = iniConfig.getSection("STR").getString("hasURI");
+    public static String MESSAGEPROTOCOL = iniConfig.getSection("STR").getString("MessageProtocol");
+    public static String MESSAGEIP = iniConfig.getSection("STR").getString("MessageIP");
+    public static String MESSAGEPORT = iniConfig.getSection("STR").getString("MessagePort");
+    public static String MESSAGENAME = iniConfig.getSection("STR").getString("MessageName");
 
     // DASA, DASE, DASO Template (Part of SDD)
     public static String LABEL = iniConfig.getSection("DASA").getString("Label");     // also in PV                                                                                   

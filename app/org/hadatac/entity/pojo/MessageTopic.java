@@ -24,6 +24,8 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.beans.Field;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
@@ -32,42 +34,46 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.data.loader.GeneratorChain;
 import org.hadatac.data.loader.MeasurementGenerator;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
 public class MessageTopic extends HADatAcThing implements Comparable<MessageTopic> {
 
+    @PropertyField(uri="hasco:isMemberOf", valueType=PropertyValueType.URI)
     private String streamUri = "";
-    private String streamSpecUri = "";
-    private String namedGraphUri = "";
-	private String status = "";
-    private String deploymentUri = "";
-    private String submissionTime = "";
-    private String completionTime = "";
-    private String lastProcessTime = "";
-    private List<String> headers = new ArrayList<String>();
-    
-    private String log = "";
-    private AnnotationLogger logger = null;
 
-    public static final String ACTIVE = "PREP";
-    public static final String INACTIVE = "UNPREP";
-    public static final String FAIL = "FAILED PREP";
+    @PropertyField(uri="hasco:hasDeployment", valueType=PropertyValueType.URI)
+    private String deploymentUri = "";
+    
+    @PropertyField(uri="hasco:hasStudyObject", valueType=PropertyValueType.URI)
+    private String objUri = "";
+    
+    @PropertyField(uri="hasco:hasSOC", valueType=PropertyValueType.URI)
+    private String socUri = "";
+    
+    @PropertyField(uri="hasco:hasCellScope")
+    private String cellScope = "";
+    
+    private StudyObject obj = null;
+ 
+    private ObjectCollection soc = null;
+    
+    private Deployment dpl = null;
     
     public MessageTopic() {
     	super();
-        logger = new AnnotationLogger(this);
     }
     
 	public String getStreamUri() {
 		return streamUri;
 	}
 
-	public MessageStream getStream() {
+	public STR getStream() {
 		if (streamUri == null || streamUri.equals("")) {
 			return null;
 		}
-		MessageStream stream = MessageStream.find(streamUri);
+		STR stream = STR.findByUri(streamUri);
 		return stream;
 	}
 
@@ -75,108 +81,90 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
 		this.streamUri = streamUri;
 	}
 	
-	public String getStreamSpecUri() {
-		return streamSpecUri;
-	}
-	
-	public void setNamedGraphUri(String namedGraphUri) {
-		this.namedGraphUri = namedGraphUri;
-	}
-	
-	public String getNamedGraphUri() {
-		return namedGraphUri;
-	}
-	
-	public STR getStreamSpec() {
-		if (streamSpecUri == null || streamSpecUri.equals("")) {
-			return null;
-		}
-		STR str = STR.findByUri(streamSpecUri);
-		return str;
-	}
-
-	public void setStreamSpecUri(String streamSpecUri) {
-		this.streamSpecUri = streamSpecUri;
-	}
-	
-    public String getStatus() {
-    	if (status == null || status.isEmpty()) {
-    		status = "off";
-    	}
-    	return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
     public String getDeploymentUri() {
         return deploymentUri;
     }
 
     public Deployment getDeployment() {
+    	if (dpl != null) {
+    		return dpl;
+    	}
     	if (deploymentUri == null || deploymentUri.equals("")) {
     		return null;
     	}
-    	return Deployment.find(deploymentUri);
+    	dpl = Deployment.find(deploymentUri);
+    	return dpl;
     }
     
     public void setDeploymentUri(String deploymentUri) {
         this.deploymentUri = deploymentUri;
+        getDeployment();
     }
 
-    public String getSubmissionTime() {
-        return submissionTime;
-    }
-    public void setSubmissionTime(String submissionTime) {
-        this.submissionTime = submissionTime;
+    public String getStudyObjectUri() {
+        return objUri;
     }
 
-    public String getCompletionTime() {
-        return completionTime;
-    }
-    public void setCompletionTime(String completionTime) {
-        this.completionTime = completionTime;
-    }
-
-    public String getLastProcessTime() {
-        return lastProcessTime;
-    }
-    public void setLastProcessTime(String lastProcessTime) {
-        this.lastProcessTime = lastProcessTime;
+    public StudyObject getStudyObject() {
+    	if (obj != null) {
+    		return obj;
+    	}
+    	if (objUri == null || objUri.equals("")) {
+    		return null;
+    	}
+    	obj = StudyObject.find(objUri);
+    	return obj;
     }
     
-    public List<String> getHeaders() {
-        return headers;
-    }
-    public void setHeaders(List<String> headers) {
-        this.headers = headers;
-    }
-    
-    public void setHeaders(String headersStr) {
-    	this.headers = new ArrayList<String>();
-    	headersStr = headersStr.replace("[","").replace("]","");
-    	StringTokenizer str = new StringTokenizer(headersStr,","); 
-        while (str.hasMoreTokens()) {
-        	this.headers.add(str.nextToken().trim()); 
-        }
-    }
-    
-    public String getLog() {
-        return getLogger().getLog();
-    }
-    public void setLog(String log) {
-        getLogger().setLog(log);
-        this.log = log;
+    public void setStudyObjectUri(String objUri) {
+    	if (objUri == null || objUri.isEmpty()) {
+    		this.obj = null;
+    		this.objUri = null;
+    		this.soc = null;
+    		this.socUri = null;
+    		return;
+    	}
+    	obj = StudyObject.find(URIUtils.replacePrefixEx(objUri.trim()));
+    	if (obj == null) {
+    		System.out.println("No scope object");
+    		this.obj = null;
+    		this.objUri = null;
+    		this.soc = null;
+    		this.socUri = null;
+    		return;
+    	} 
+    	this.objUri = objUri;
+    	setSOC(obj.getIsMemberOf());
     }
 
-    public AnnotationLogger getLogger() {
-        return logger;
+    public ObjectCollection getSOC() {
+    	return soc;
     }
-    public void setLogger(AnnotationLogger logger) {
-        this.logger = logger;
+    
+    public String getSOCUri() {
+        return socUri;
     }
-        
+    public void setSOC(String socUri) {
+    	if (socUri == null || socUri.isEmpty()) {
+    		this.soc = null;
+    		this.socUri = null;
+    		return;
+    	}
+    	soc = ObjectCollection.find(socUri);
+    	if (soc != null) {
+    		this.socUri = socUri;
+    	} else {
+    		this.socUri = null;
+    	}
+    }
+
+    public String getCellScope() {
+        return cellScope;
+    }
+    public void setCellScope(String cellScope) {
+        this.cellScope = cellScope;
+    }
+    
 	@Override
 	public boolean equals(Object o) {
 		if((o instanceof MessageTopic) && (((MessageTopic)o).getUri().equals(this.getUri()))) {
@@ -194,7 +182,7 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
 	public static String INDENT1 = "   ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
-    public static String LINE3 = INDENT1 + "a         hasco:ObjectCollection;  ";
+    public static String LINE3 = INDENT1 + "a         hasco:MessageTopic;  ";
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String DELETE_LINE4 = "  hasco:hasLastCounter ?o . ";
     public static String LINE_LAST = "}  ";
@@ -226,23 +214,13 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
 		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 		    " SELECT ?uri WHERE { " +
 		    " ?uri a hasco:MessageTopic ." + 
-            " ?uri hasco:hasMessageStream <" + streamUri + "> . " +
-		    "} ";
-		return execFindQuery(queryString);
-	}
-	
-	public static List<MessageTopic> findActiveByStream(String streamUri) {
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-		    " SELECT ?uri WHERE { " +
-		    " ?uri a hasco:MessageTopic ." + 
-            " ?uri hasco:hasMessageStream <" + streamUri + "> . " +
-		    " ?uri hasco:hasStatus \"" + ACTIVE + "\" . " +
+            " ?uri hasco:isMemberOf <" + streamUri + "> . " +
 		    "} ";
 		return execFindQuery(queryString);
 	}
 	
 	public static MessageTopic find(String uri) {
-	    MessageTopic stream = null;
+	    MessageTopic topic = null;
 	    Statement statement;
 	    RDFNode object;
 	    RDFNode subject;
@@ -251,43 +229,37 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
 	    Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
                 CollectionUtil.Collection.METADATA_SPARQL), queryString);
 		
-		stream = new MessageTopic();
+		topic = new MessageTopic();
 		StmtIterator stmtIterator = model.listStatements();
 		
 		if (!stmtIterator.hasNext()) {
 			return null;
 		}
 		
-		List<String> tmpHeaders = new ArrayList<String>();
-		
 		while (stmtIterator.hasNext()) {
 		    statement = stmtIterator.next();
 		    object = statement.getObject();
 		    subject = statement.getSubject();
 		    if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-		    	stream.setLabel(object.asLiteral().getString());
+		    	topic.setLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-                stream.setTypeUri(object.asResource().getURI());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasMessageTopic")) {
-		    	stream.setDeploymentUri(subject.asResource().getURI());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasMessageStream")) {
-		    	stream.setStreamUri(object.asResource().getURI());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasStreamSpec")) {
-		    	stream.setStreamSpecUri(object.asResource().getURI());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasStatus")) {
-		    	stream.setStatus(object.asLiteral().getString());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLog")) {
-		    	if (object.asLiteral().getString() != null) {
-		    		stream.setLogger(new AnnotationLogger(stream, object.asLiteral().getString()));
-		    	} 
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasHeaders")) {
-		    	stream.setHeaders(object.asLiteral().getString());
-		    	
-		    }
+                topic.setTypeUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasDeployment")) {
+                topic.setDeploymentUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasStudyObject")) {
+                topic.setStudyObjectUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSOC")) {
+                topic.setSOC(object.asResource().getURI());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/isMemberOf")) {
+		    	topic.setStreamUri(object.asResource().getURI());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCellScope")) {
+		    	topic.setCellScope(object.asLiteral().getString());
+		    } 
+		    
 		}		
-		stream.setUri(uri);
+		topic.setUri(uri);
 		
-		return stream;
+		return topic;
 	}
 	
     @Override
@@ -298,81 +270,6 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
     @Override
     public void save() {
         saveToTripleStore();
-    }
-
-    @Override
-    public boolean saveToTripleStore() {
-    	deleteFromTripleStore();
-        String insert = "";
-
-        String topic_uri = "";
-        if (this.getUri().startsWith("<")) {
-            topic_uri = this.getUri();
-        } else {
-            topic_uri = "<" + this.getUri() + ">";
-        }
-
-        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
-        insert += INSERT_LINE1;
-
-        if (!getNamedGraph().isEmpty()) {
-            insert += " GRAPH <" + getNamedGraph() + "> { ";
-        }
-
-        insert += topic_uri + " a <http://hadatac.org/ont/hasco/MessageTopic> . ";
-        if (this.getLabel() != null && !this.getLabel().equals("")) {
-        	insert += topic_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
-        }
-        if (this.getComment() != null && !this.getComment().equals("")) {
-            insert += topic_uri + " rdfs:comment  \"" + this.getComment() + "\" . ";
-        }
-    	if (this.getStreamUri() != null && !this.getStreamUri().equals("")) {
-        	insert += topic_uri + " hasco:hasMessageStream  <" + this.getStreamUri() + "> . ";
-        }
-    	if (this.getStreamSpecUri() != null && !this.getStreamSpecUri().equals("")) {
-        	insert += topic_uri + " hasco:hasStreamSpec  <" + this.getStreamSpecUri() + "> . ";
-        }
-    	if (this.getDeploymentUri() != null && !this.getDeploymentUri().equals("")) {
-        	insert += " <" + this.getDeploymentUri() + ">  hasco:hasMessageTopic  " + topic_uri+ " . ";
-        }
-        if (this.getStatus() != null && !this.getStatus().equals("")) {
-            insert += topic_uri + " hasco:hasStatus  \"" + this.getStatus() + "\" . ";
-        }
-        if (this.getLog() != null && !this.getLog().equals("")) {
-        	insert += topic_uri + " hasco:hasLog  \"" + this.getLog() + "\" . ";
-        }
-        if (this.getHeaders() != null && this.getHeaders().size() > 0) {
-        	insert += topic_uri + " hasco:hasHeaders  \"" + this.getHeaders().toString() + "\" . ";
-        }
-
-        
-        if (!getNamedGraph().isEmpty()) {
-            insert += " } ";
-        }
-
-        insert += LINE_LAST;
-
-        try {
-            UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            processor.execute();
-        } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
-            throw e;
-        }
-
-        return true;
-    }
-    
-    @Override
-    public void delete() {
-        deleteFromTripleStore();
-    }
-
-    @Override
-    public void deleteFromTripleStore() {
-    	super.deleteFromTripleStore();
     }
 
     @Override

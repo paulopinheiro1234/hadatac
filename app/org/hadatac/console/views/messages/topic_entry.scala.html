@@ -2,11 +2,10 @@
   filename      : String,
   da_uri        : String,
   page          : Integer,
-  stream        : org.hadatac.entity.pojo.MessageStream,
+  stream        : org.hadatac.entity.pojo.STR,
   topic         : org.hadatac.entity.pojo.MessageTopic,
-  dpl           : org.hadatac.entity.pojo.Deployment,
-  schema        : org.hadatac.entity.pojo.DataAcquisitionSchema,
-  currentAction : String)
+  currentAction : String,
+  show          : Boolean)
 
 @import java.net._
 @import org.hadatac.utils._
@@ -14,30 +13,22 @@
 
 	<tr>
 	  <td>@topic.getLabel()</td>
-	  <td>@if(dpl != null && dpl.getPlatform().getLabel() != null) {
-     	  <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(dpl.getUri(),"UTF-8"), "")" >
-	  	     @dpl.getPlatform().getLabel()
+	  <td>@if(topic.getDeployment() != null && topic.getDeployment().getPlatform().getLabel() != null) {
+     	  <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(topic.getDeployment().getUri(),"UTF-8"), "")" >
+	  	     @topic.getDeployment().getPlatform().getLabel()
 	      </a>	  
-	  }
-	  </td>
-	  <td>@if(schema != null) {
-             <a href="@org.hadatac.console.controllers.schema.routes.ViewDAS.index(URLEncoder.encode(schema.getUri(),"UTF-8"))" >
-	  	        @schema.getLabel()
-	  	     </a>
-	  }
-	  </td>
-      <td>@if(topic.getHeaders() == null) {
-            0 
-          } else {
-            @topic.getHeaders().size()
-          }
-	  <td>@topic.getStatus()</td> 
+	  } </td>
+	  <td>@if(topic.getStudyObject() != null && topic.getStudyObject().getOriginalId() != null) {
+	         @if(topic.getStudyObject().getTypeLabel() != null) {
+	         	@topic.getStudyObject().getTypeLabel() 
+	         }
+	  	     @topic.getStudyObject().getOriginalId()
+	  } </td>
+	  <td>@if(topic.getSOC() != null && topic.getSOC().getLabel() != null) {
+	         @topic.getSOC().getLabel()
+	  } </td>
       <td>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testLabels(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"))" 
-            class="btn-xs btn-primary" role="button">Test Labels</a>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction)"
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction, show)"
             class="btn-xs btn-primary" role="button">Live Raw Data</a>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.checkAnnotationLog(dir, filename, da_uri, page, URLEncoder.encode(topic.getUri(), "UTF-8"))" 
-            class="btn-xs btn-primary" role="button">Log</a>
       </td>
 	</tr>

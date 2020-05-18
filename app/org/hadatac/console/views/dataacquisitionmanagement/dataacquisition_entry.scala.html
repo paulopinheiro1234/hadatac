@@ -9,9 +9,15 @@
 	  <td>@if(str.getStudy() != null && str.getStudy().getLabel() != null) {
 	     @str.getStudy().getId() 
 	  } </td>
-	  <td>@str.getUri().substring(str.getUri().indexOf("DA"))</td>
-	  <td>@str.getPlatformName()</td> 
-	  <td>@str.getInstrumentModel()</td>
+	  <td>@if(str.getUri() != null && str.getUri().indexOf("DA") > 0) {
+	        @str.getUri().substring(str.getUri().indexOf("DA"))
+	  } </td>
+	  <td>@if(str.getPlatformName() != null) {
+	        @str.getPlatformName()
+	  } </td> 
+	  <td>@if(str.getInstrumentModel() != null) {
+	        @str.getInstrumentModel()
+	  } </td>
 	  <td>@str.getStartedAt()</td>
 	  @if(state.getCurrent() != State.ACTIVE) {
 	   @if(str.getEndedAt().startsWith("9999")){

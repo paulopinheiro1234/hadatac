@@ -3,7 +3,9 @@
   da_uri      : String,
   page        : Integer,
   studyList   : List[String],
-  results     : List[org.hadatac.entity.pojo.MessageStream])
+  results     : List[org.hadatac.entity.pojo.STR],
+  show        : Boolean)
+  
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.utils._
@@ -18,6 +20,13 @@
 
         <h3>Stream Status</h3>
 
+        @if(show) {
+        	<a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, false)">Hide Topics</a>
+        } else { 
+            <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, true)">Show Topics</a>
+        }
+        <a class="btn btn-primary" role="button" data-toggle="collapse" href="">Refresh Cache</a>
+
         <table class="table">
             <thead>
                  <tr>
@@ -27,6 +36,8 @@
                     <th>Status</th>
                     <th>Protocol</th>
                     <th>Study</th>
+                    <th>Semantic Data Dictionary</th>
+                    <th>#labels</th>
                     <th>#ReceivedMsgs</th>
                     <th>#IngestedMsgs</th>
                     <th>State Operations</th>
@@ -35,7 +46,7 @@
             </thead>
             <tbody>
               @for(stream <- results){
-                  @stream_entry(dir, filename, da_uri, page, studyList, stream)
+                  @stream_entry(dir, filename, da_uri, page, studyList, stream, show)
               }
             </tbody>
         </table>
@@ -51,18 +62,16 @@
             </thead>
             <tbody>
                  <tr>
-                    <td>CLOSED</td>
-                    <td>Stream is inactive. Stream's topics are unprepared for data ingestion</td>
-                 </tr>
-                 <tr>
-                    <td>INITIATED</td>
-                    <td>A stream is initiated when each one of its topics has been triggered to be prepared for data ingestion. 
-                        An initiated stream does not assure that all topics were successfully prepared for data ingestion.</td>
+                    <td>SUSPENDED</td>
+                    <td>A stream is available to acquire data although no data is being acquired. A suspended stream can be activated or closed.</td>
                  </tr>
                  <tr>
                     <td>ACTIVE</td>
-                    <td>Streamed data for prepared topics is being ingested. Raw data for all topics, prepared or not, is being 
-                        archived.</td>
+                    <td>A stream is available and its data is being acquired and ingested into the knowledge graph. An active stream can be suspended or closed.</td>
+                 </tr>
+                 <tr>
+                    <td>CLOSED</td>
+                    <td>A closed stream is no longer available to collect data. Once a message stream is closed it can no longer be used to acquire data.</td>
                  </tr>
             </tbody>
         </table>
@@ -75,7 +84,7 @@
     <script>
     var refreshVar
 	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
 	}, 2000);

@@ -226,68 +226,6 @@ public class Deployment extends HADatAcThing {
         return deployment;
     }
 
-    public static Deployment findFromDataAcquisition(HADataC hadatac) {
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
-                + "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> a vstoi:Deployment .\n"
-                + "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
-                + "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
-                + "  <" + hadatac.getDataAcquisition().getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
-                + "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> hasco:hasDetector ?detector . }\n"
-                + "  OPTIONAL { <" + hadatac.getDataAcquisition().getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
-                + "}";
-        
-        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
-
-        if (resultsrw.size() >= 1) {
-            QuerySolution soln = resultsrw.next();
-            Deployment deployment = new Deployment();
-            Resource resource = ResourceFactory.createResource(hadatac.getDataAcquisition().getDeploymentUri());
-            deployment.setLocalName(resource.getLocalName());
-            deployment.setUri(hadatac.getDataAcquisition().getDeploymentUri());
-            deployment.setStartedAtXsdWithMillis(soln.getLiteral("startedAt").getString());
-            if (soln.getLiteral("endedAt") != null) { 
-                deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString());
-            }
-            hadatac.setDeployment(deployment);
-            deployment.platform = Platform.find(hadatac);
-            deployment.instrument = Instrument.find(hadatac);
-
-            return deployment;
-        }
-
-        return null;
-    }
-
-    public static Deployment findFromPreamble(HADataC hadatac) {
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-                + "SELECT ?startedAt ?endedAt ?detector ?instrument ?platform WHERE {\n"
-                + "  <" + hadatac.getDeploymentUri() + "> a vstoi:Deployment .\n"
-                + "  <" + hadatac.getDeploymentUri() + "> prov:startedAtTime ?startedAt .\n"
-                + "  <" + hadatac.getDeploymentUri() + "> hasco:hasDetector ?detector .\n"
-                + "  <" + hadatac.getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
-                + "  <" + hadatac.getDeploymentUri() + "> vstoi:hasPlatform ?platform .\n"
-                + "  OPTIONAL { <" + hadatac.getDeploymentUri() + "> prov:endedAtTime ?endedAt . }\n"
-                + "}";
-        
-        ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
-
-        if (resultsrw.size() >= 1) {
-            QuerySolution soln = resultsrw.next();
-            Deployment deployment = new Deployment();
-            deployment.setLocalName(hadatac.getDeployment().getLocalName());
-            deployment.setUri(hadatac.getDeploymentUri());
-            deployment.setStartedAtXsd(soln.getLiteral("startedAt").getString());
-            if (soln.getLiteral("endedAt") != null) { deployment.setEndedAtXsd(soln.getLiteral("endedAt").getString()); }
-            deployment.platform = Platform.find(hadatac);
-            deployment.instrument = Instrument.find(hadatac);
-
-            return deployment;
-        }
-
-        return null;
-    }
-
     public static Deployment find(String deployment_uri) {
         if (Deployment.getCache().get(deployment_uri) != null) {
             return Deployment.getCache().get(deployment_uri);
@@ -326,7 +264,7 @@ public class Deployment extends HADatAcThing {
                 deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
             }
         }
-
+        
         Deployment.getCache().put(deployment_uri, deployment);
         return deployment;
     }
@@ -474,29 +412,6 @@ public class Deployment extends HADatAcThing {
             e.printStackTrace();
         }
         return -1;
-    }
-
-    public static Deployment find(Model model, STR dataAcquisition) {
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-                + "SELECT ?dp WHERE {\n"
-                + "  ?dp hasco:hasDataAcquisition <" + dataAcquisition.getCcsvUri() + "> .\n"
-                + "}";
-
-        Query query = QueryFactory.create(queryString);
-
-        QueryExecution qexec = QueryExecutionFactory.create(query, model);
-        ResultSet results = qexec.execSelect();
-        ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
-
-        if (resultsrw.size() >= 1) {
-            QuerySolution soln = resultsrw.next();
-            Deployment deployment = new Deployment();
-            deployment.setLocalName(soln.getResource("dp").getLocalName());
-            deployment.setCcsvUri(soln.getResource("dp").getURI());
-            return deployment;
-        }
-
-        return null;
     }
 
     public static List<Deployment> findWithGeoReference() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 import org.apache.jena.query.Query;
@@ -23,63 +24,76 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.solr.client.solrj.beans.Field;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 
-public class MessageStream extends HADatAcThing implements Comparable<MessageStream> {
+public class MessageStream /* extends HADatAcThing implements Comparable<MessageStream>*/ {
 
 	/*
 	 * Primary identification
 	 * name + "@" + ip + ":" + port
 	 */
+	/*
 	private String ip = "";
 	private String port = "";
     private String name = "";           // this is the top level topic of the stream
-
+    */
     /*
      * Additional Properties
      */
+	/*
 	private String status = "";         // CLOSED, INITIATED, ACTIVE
     private String protocol = "";       // mqtt, http
     private String id;
     private String viewableId = "";
     private String editableId = "";
-    private String ownerEmail = "";
-    private List<String> viewerEmails;
-    private List<String> editorEmails;
-    private String studyUri = "";
+    private String studyUri = "";    
+    private String sddUri = "";
+    private String namedGraphUri = "";
     private String dataAcquisitionUri = "";
     private String datasetUri = "";
     private String submissionTime = "";
     private String completionTime = "";
     private String lastProcessTime = "";
     private String dataFileId = "";
+    private String ownerEmail = "";
+    private String permissionUri = "";
     private DataFile archive = null;
     private String log;
     private AnnotationLogger logger = null;
     private boolean succeed = false;
     private long totalMessages = 0;
     private int ingestedMessages = 0;
+    private List<String> headers = new ArrayList<String>();
+	private Map<String,MessageTopic> topicsMap;
 
-    public static final String INITIATED = "INITIATED";
     public static final String ACTIVE = "ACTIVE";
     public static final String CLOSED = "CLOSED";
-    
+    */
+	
     public MessageStream() {
     	super();
+    	/*
         this.id = UUID.randomUUID().toString();
         logger = new AnnotationLogger(this);
         totalMessages = 0;
         ingestedMessages = 0;
+        topicsMap = null;
+        */
     }
     
+    /*
 	public String getIP() {
 		return ip;
 	}
@@ -115,6 +129,30 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         this.protocol = protocol;
     }
 
+	public String getSddUri() {
+		return sddUri;
+	}
+	
+	public DataAcquisitionSchema getSdd() {
+		if (sddUri == null || sddUri.equals("")) {
+			return null;
+		}
+		DataAcquisitionSchema sdd = DataAcquisitionSchema.find(sddUri);
+		return sdd;
+	}
+
+	public void setSddUri(String sddUri) {
+		this.sddUri = sddUri;
+	}
+	
+	public void setNamedGraphUri(String namedGraphUri) {
+		this.namedGraphUri = namedGraphUri;
+	}
+	
+	public String getNamedGraphUri() {
+		return namedGraphUri;
+	}
+	
     public String getId() {
         return id;
     }
@@ -122,23 +160,12 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         this.id = id;
     }
     
-    public String getViewableId() {
-        return viewableId;
-    }
-    public void setViewableId(String viewableId) {
-        this.viewableId = viewableId;
-    }
-    
-    public String getEditableId() {
-        return editableId;
-    }
-    public void setEditableId(String editableId) {
-        this.editableId = editableId;
-    }
-    
     public String getFullName() {
     	if (name != null && !name.isEmpty()) {
     		return name;
+    	}
+    	if (port == null || port.isEmpty()) {
+        	return name + "_at_" + ip; 
     	}
     	return name + "_at_" + ip + "_" + port; 
     }
@@ -197,6 +224,54 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         this.datasetUri = datasetUri;
     }
 
+    public String getOwnerEmail() {
+        return ownerEmail;
+    }
+    public void setOwnerEmail(String ownerEmail) {
+        this.ownerEmail = ownerEmail;
+    }
+    
+    public String getPermissionUri() {
+        return permissionUri;
+    }
+    public void setPermissionUri(String permissionUri) {
+        this.permissionUri = permissionUri;
+    }
+    
+	public Map<String,MessageTopic> getTopicsMap() {
+		if (topicsMap == null) {
+			List<MessageTopic> topics = MessageTopic.findByStream(uri);
+			if (topics == null) {
+				return null;
+			}
+			topicsMap = new HashMap<String, MessageTopic>(); 
+			for (MessageTopic topic : topics) {
+				topicsMap.put(topic.getLabel(), topic);
+			}
+		}
+		return topicsMap; 
+	};
+	
+	public void resetTopicsMap() {
+		topicsMap = null;
+	}
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+    public void setHeaders(List<String> headers) {
+        this.headers = headers;
+    }
+    
+    public void setHeaders(String headersStr) {
+    	this.headers = new ArrayList<String>();
+    	headersStr = headersStr.replace("[","").replace("]","");
+    	StringTokenizer str = new StringTokenizer(headersStr,","); 
+        while (str.hasMoreTokens()) {
+        	this.headers.add(str.nextToken().trim()); 
+        }
+    }
+    
     public String getSubmissionTime() {
         return submissionTime;
     }
@@ -400,6 +475,39 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
 		return deployments;
 	}
 	
+	public static MessageStream findByName(String name, String ip, String port) {
+		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+		    " SELECT ?uri WHERE { " +
+		    " ?uri a hasco:MessageStream ." +
+		    " ?uri hasco:hasName \"" + name + "\"" + 
+		    " ?uri hasco:hasIP \"" + ip + "\"" + 
+		    " ?uri hasco:hasPort \"" + port + "\"" + 
+		    "} ";
+		
+		ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+			
+		if (resultsrw.hasNext()) {
+		    QuerySolution soln = resultsrw.next();
+		    MessageStream stream = find(soln.getResource("uri").getURI());
+		    return stream;
+		}			
+		
+		return null;	
+	}
+	
+	public String getUri() {
+		if (uri != null && !uri.isEmpty()) {
+			return uri;
+		}
+		if (name != null && ip != null && port != null && !name.isEmpty() && !ip.isEmpty()) {
+			String prefixuri = name + ip + port;
+			prefixuri = ConfigProp.getKbPrefix() + "MS-" + prefixuri.replace(".", "").replace("/","");
+			return URIUtils.replacePrefixEx(prefixuri);
+		}
+		return "";
+	}
+	
 	public static MessageStream find(String uri) {
 	    MessageStream stream = null;
 	    Statement statement;
@@ -435,14 +543,20 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
 		    	stream.setStatus(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasProtocol")) {
 		    	stream.setProtocol(object.asLiteral().getString());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasStudy")) {
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/isDataAcquisitionOf")) {
 		    	stream.setStudyUri(object.asResource().getURI());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasNamedGraph")) {
+		    	stream.setNamedGraph(object.asLiteral().getString());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSchemaSpec")) {
+		    	stream.setSddUri(object.asResource().getURI());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasDataFileId")) {
 		    	stream.setDataFileId(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasTotalMessages")) {
 		    	stream.setTotalMessages(object.asLiteral().getLong());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasIngestedMessages")) {
 		    	stream.setIngestedMessages(object.asLiteral().getInt());
+		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasHeaders")) {
+		    	stream.setHeaders(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLog")) {
 		    	if (object.asLiteral().getString() != null) {
 		    		stream.setLogger(new AnnotationLogger(stream, object.asLiteral().getString()));
@@ -514,13 +628,22 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
         	insert += stream_uri + " hasco:hasProtocol  \"" + this.getProtocol() + "\" . ";
         }
         if (this.getStudyUri() != null && !this.getStudyUri().equals("")) {
-        	insert += stream_uri + " hasco:hasStudy  <" + this.getStudyUri() + "> . ";
+        	insert += stream_uri + " hasco:isDataAcquisitionOf  <" + this.getStudyUri() + "> . ";
+        }
+        if (this.getNamedGraph() != null && !this.getNamedGraph().equals("")) {
+        	insert += stream_uri + " hasco:hasNamedGraph  \"" + this.getNamedGraph() + "\" . ";
+        }
+        if (this.getSddUri() != null && !this.getSddUri().equals("")) {
+        	insert += stream_uri + " hasco:hasSchemaSpec  <" + this.getSddUri() + "> . ";
         }
         if (this.getDataFileId() != null && !this.getDataFileId().equals("")) {
             insert += stream_uri + " hasco:hasDataFileId  \"" + this.getDataFileId() + "\" . ";
         }
         insert += stream_uri + " hasco:hasTotalMessages  \"" + this.getTotalMessages() + "\" . ";
         insert += stream_uri + " hasco:hasIngestedMessages  \"" + this.getIngestedMessages() + "\" . ";
+        if (this.getHeaders() != null && !this.getHeaders().equals("")) {
+        	insert += stream_uri + " hasco:hasHeaders  \"" + this.getLog() + "\" . ";
+        }
         if (this.getLog() != null && !this.getLog().equals("")) {
         	insert += stream_uri + " hasco:hasLog  \"" + this.getLog() + "\" . ";
         }
@@ -573,5 +696,6 @@ public class MessageStream extends HADatAcThing implements Comparable<MessageStr
     public int deleteFromLabKey(String userName, String password) {
         return 0;
     }
+    */
 
 }

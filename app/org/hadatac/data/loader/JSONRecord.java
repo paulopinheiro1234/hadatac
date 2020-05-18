@@ -1,11 +1,10 @@
-package org.hadatac.data.loader.mqtt;
+package org.hadatac.data.loader;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.hadatac.data.loader.Record;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -40,24 +39,6 @@ public class JSONRecord implements Record {
 					values.add(straux);
 					//System.out.println("found keyvalue: {" + straux + "}");
 				}
-				
-				/*
-				if (keyvalue == null) {
-					values.add("");
-				} else if (keyvalue instanceof JSONArray) {
-					String straux = keyvalue.toString();
-					straux = straux.replaceAll(",", ";");
-					values.add(straux);
-				} else {
-					if (keyvalue instanceof String) {
-						values.add((String)keyvalue);
-					} else if (keyvalue instanceof Long) {
-						long tempLong = (long)keyvalue;
-						String tempString = Long. toString(tempLong);
-						values.add(tempString);
-					}
-				}
-				*/
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -66,17 +47,6 @@ public class JSONRecord implements Record {
 	}
 	
 	private void reorder(List<String> order) {
-		/*
-		//System.out.println("before reorder");
-		Iterator itHeaders = headers.iterator(); 
-		Iterator itValues = values.iterator();
-		int auxint = 0;
-		while (itHeaders.hasNext() && itValues.hasNext()) {
-			//System.out.println("Pos: [" + auxint + "] Header: [" + itHeaders.next() + "]  Values: [" + itValues.next() + "]");
-			auxint++;
-		}
-		*/		
-
 		// reorder
 		List<String> newOrder = new ArrayList<String>();
 		for (int i=0; i < order.size(); i++) {
@@ -95,19 +65,6 @@ public class JSONRecord implements Record {
 		}
 		headers = order;
 		values = newOrder;
-
-		/*
-		//System.out.println("after reorder");
-		itHeaders = headers.iterator(); 
-		Iterator itValues = values.iterator();
-		auxint = 0;
-		while (itHeaders.hasNext() && itValues.hasNext()) {
-			//System.out.println("Pos: [" + auxint + "] Header: [" + itHeaders.next() + "]  Values: [" + itValues.next() + "]");
-			auxint++;
-		}
-		*/		
-
-
 	}
 	
 	public static <T> List<T> convertSetToList(Set<T> set) { 

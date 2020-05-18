@@ -200,7 +200,7 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber, String selector) throws Exception {
         return createStudyObject(rec);
     }
 

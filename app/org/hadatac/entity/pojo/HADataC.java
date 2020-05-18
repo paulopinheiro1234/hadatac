@@ -14,19 +14,22 @@ import org.hadatac.utils.NameSpaces;
 
 public class HADataC {
 	
-	private String localName;
-	private String host;
+	/* THIS CLASS I DEPRECATED */
 	
-	private Dataset dataset;
-	private STR dataAcquisition;
-	private Deployment deployment;
+	//private String localName;
+	//private String host;
+	
+	//private Dataset dataset;
+	//private STR dataAcquisition;
+	//private Deployment deployment;
 	
 	public HADataC () {
-		dataset = null;
-		dataAcquisition = null;
-		deployment = null;
+		//dataset = null;
+		//dataAcquisition = null;
+		//deployment = null;
 	}
 	
+	/*
 	public String getLocalName() {
 		return localName;
 	}
@@ -136,4 +139,6 @@ public class HADataC {
 	public String getMeasurementURL() {
 		return host + ":8983/solr/measurement";
 	}
+	*/
+	
 }

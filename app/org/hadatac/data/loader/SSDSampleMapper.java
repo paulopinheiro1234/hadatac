@@ -199,7 +199,7 @@ public class SSDSampleMapper extends BaseGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber, String selector) throws Exception {
         System.out.println("counter: " + counter);
         counter++;
         return createStudyObject(rec);

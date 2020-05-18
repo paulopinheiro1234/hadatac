@@ -49,6 +49,13 @@ public abstract class BaseGenerator {
     protected AnnotationLogger logger = null;
 
     public BaseGenerator(DataFile dataFile) {
+    	this(dataFile, null);
+    }
+    
+    public BaseGenerator(DataFile dataFile, String studyUri) {
+    	if (studyUri != null) {
+    		this.studyUri = studyUri;
+    	}
     	if (dataFile != null) {
     		this.dataFile = dataFile;
     		file = dataFile.getRecordFile();
@@ -124,7 +131,7 @@ public abstract class BaseGenerator {
 
     public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception { return null; }
 
-    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception { return null; }
+    public HADatAcThing createObject(Record rec, int rowNumber, String selector) throws Exception { return null; }
 
     public List<Map<String, Object>> getRows() {
         return rows;
@@ -176,7 +183,7 @@ public abstract class BaseGenerator {
 
         int rowNumber = 0;
         for (Record record : records) {
-            HADatAcThing obj = createObject(record, ++rowNumber);
+            HADatAcThing obj = createObject(record, ++rowNumber, null);
             if (obj != null) {
                 objects.add(obj);
             }

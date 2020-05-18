@@ -23,6 +23,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.DOI;
 import org.hadatac.entity.pojo.DPL;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -68,7 +69,7 @@ public class AnnotationWorker {
             chain = annotateDPLFile(dataFile);
             
         } else if (fileName.startsWith("STR-")) {
-            checkSTRFile(dataFile);
+            //checkSTRFile(dataFile);
             chain = annotateSTRFile(dataFile);
             
         } else if (fileName.startsWith("SDD-")) {
@@ -209,7 +210,8 @@ public class AnnotationWorker {
         file.renameTo(new File(destFolder + "/" + dataFile.getStorageFileName()));
         file.delete();
     }
-    
+
+    /*
     public static void checkSTRFile(DataFile dataFile) {
         final String kbPrefix = ConfigProp.getKbPrefix();
         Record record = dataFile.getRecordFile().getRecords().get(0);
@@ -366,6 +368,7 @@ public class AnnotationWorker {
             }
         } 
     }
+    */
 
     public static GeneratorChain annotateStudyIdFile(DataFile dataFile) {
         GeneratorChain chain = new GeneratorChain();
@@ -467,11 +470,100 @@ public class AnnotationWorker {
     }
 
     public static GeneratorChain annotateSTRFile(DataFile dataFile) {
+        System.out.println("Processing STR file ...");
+        
+        // verifies if data file is an Excel spreadsheet
+        String fileName = dataFile.getFileName();
+        if (!fileName.endsWith(".xlsx")) {
+            dataFile.getLogger().printExceptionById("STR_00004");
+            return null;
+        } 
+
+        // verifies if data file contains an InfoSheet sheet
+        RecordFile recordFile = new SpreadsheetRecordFile(dataFile.getFile(), "InfoSheet");
+        if (!recordFile.isValid()) {
+            dataFile.getLogger().printExceptionById("STR_00001");
+            return null;
+        } else {
+            dataFile.setRecordFile(recordFile);
+        }
+
+        STRInfoGenerator strInfo = new STRInfoGenerator(dataFile);        
+        Study strStudy = strInfo.getStudy();
+        String strVersion = strInfo.getVersion();
+                
+        // verifies if study is specified
+        if (strStudy == null) {
+            dataFile.getLogger().printExceptionByIdWithArgs("STR_00002", strInfo.getStudyId());
+            return null;
+        }
+        // verifies if version is specified
+        if (strVersion == "") {
+            dataFile.getLogger().printExceptionById("STR_00003");
+            return null;
+        }
+        Map<String, String> mapCatalog = strInfo.getCatalog();
+
+        RecordFile fileStreamRecordFile = null;
+        RecordFile messageStreamRecordFile = null;
+        RecordFile messageTopicRecordFile = null;
+
+        // verifies if filestream sheet is available, even if no file stream is specified
+        if (mapCatalog.get(STRInfoGenerator.FILESTREAM) == null) { 
+        	dataFile.getLogger().printExceptionById("STR_00005");
+        	return null;
+        }
+        fileStreamRecordFile = new SpreadsheetRecordFile(dataFile.getFile(), mapCatalog.get(STRInfoGenerator.FILESTREAM).replace("#", ""));
+        
+        // verifies if messagestream sheet is available, even if no message stream is specified
+        if (mapCatalog.get(STRInfoGenerator.MESSAGESTREAM) == null) {
+    		dataFile.getLogger().printExceptionById("STR_00006");
+    		return null;
+        }
+        messageStreamRecordFile = new SpreadsheetRecordFile(dataFile.getFile(), mapCatalog.get(STRInfoGenerator.MESSAGESTREAM).replace("#", ""));
+        
+        // verifies if messagetopic sheet is available, even if no message topic is specified
+        if (mapCatalog.get(STRInfoGenerator.MESSAGETOPIC) == null) {
+    		dataFile.getLogger().printExceptionById("STR_00016");
+    		return null;
+        }
+        messageTopicRecordFile = new SpreadsheetRecordFile(dataFile.getFile(), mapCatalog.get(STRInfoGenerator.MESSAGETOPIC).replace("#", ""));
+        
+        // verifies if not both fileStream sheet and messageStream sheet are empty
+        if (fileStreamRecordFile.getNumberOfRows() <= 0 && messageStreamRecordFile.getNumberOfRows() <= 0) {
+    		dataFile.getLogger().printExceptionById("STR_00007");
+    		return null;        	
+        }
+        // verifies that there is info in messageTopics in case messageStream is not empty
+        if ((messageStreamRecordFile.getNumberOfRows() <= 0 && messageTopicRecordFile.getNumberOfRows() > 0) ||
+            (messageStreamRecordFile.getNumberOfRows() > 0 && messageTopicRecordFile.getNumberOfRows() <= 0)) {
+    		dataFile.getLogger().printExceptionById("STR_00010");
+    		return null;
+        }
+
         GeneratorChain chain = new GeneratorChain();
+        chain.setStudyUri(strStudy.getUri());
         DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String startTime = isoFormat.format(new Date());
-        chain.addGenerator(new STRGenerator(dataFile, startTime));
-
+        if (fileStreamRecordFile.getNumberOfRows() > 1 && fileStreamRecordFile.getRecords().size() > 0) {
+        	chain.addGenerator(new STRFileGenerator(dataFile, strStudy, fileStreamRecordFile, startTime));
+        }
+        if (messageStreamRecordFile.getNumberOfRows() > 1 && messageStreamRecordFile.getRecords().size() > 0) {
+        	STRMessageGenerator messageGen = new STRMessageGenerator(dataFile, strStudy, messageStreamRecordFile, startTime);
+        	if (!messageGen.isValid()) {
+        		dataFile.getLogger().printExceptionByIdWithArgs(messageGen.getErrorMessage(),messageGen.getErrorArgument());
+            	return null;
+        	}
+        	chain.addGenerator(messageGen);
+        }
+        if (messageTopicRecordFile.getNumberOfRows() > 1 && messageTopicRecordFile.getRecords().size() > 0) {
+        	STRTopicGenerator topicGen = new STRTopicGenerator(dataFile, messageTopicRecordFile, startTime);
+        	if (!topicGen.isValid()) {
+        		dataFile.getLogger().printExceptionByIdWithArgs(topicGen.getErrorMessage(),topicGen.getErrorArgument());
+            	return null;
+        	}
+        	chain.addGenerator(topicGen);
+        }
         return chain;
     }
 
@@ -674,6 +766,7 @@ public class AnnotationWorker {
         String str_uri = null;
         String deployment_uri = null;
         String schema_uri = null;
+        String study_uri = null;
 
         if (dataFile != null) {
             str_uri = URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri());
@@ -682,38 +775,60 @@ public class AnnotationWorker {
                 if (!str.isComplete()) {
                     dataFile.getLogger().printWarningByIdWithArgs("DA_00003", str_uri);
                     chain.setInvalid();
+                    return chain;
                 } else {
-                    dataFile.getLogger().println(String.format("Stream Specification is complete: <%s>", str_uri));
+                    dataFile.getLogger().println(String.format("STR <%s> has been located", str_uri));
                 }
+                study_uri = str.getStudy().getUri();
                 deployment_uri = str.getDeploymentUri();
                 schema_uri = str.getSchemaUri();
             } else {
                 dataFile.getLogger().printWarningByIdWithArgs("DA_00004", str_uri);
                 chain.setInvalid();
+                return chain;
             }
+        }
+
+        if (study_uri == null || study_uri.isEmpty()) {
+            dataFile.getLogger().printExceptionByIdWithArgs("DA_00008", str_uri);
+            chain.setInvalid();
+            return chain;
+        } else {
+            try {
+                study_uri = URLDecoder.decode(study_uri, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                dataFile.getLogger().printException(String.format("URL decoding error for study uri <%s>", study_uri));
+                chain.setInvalid();
+                return chain;
+            }
+            dataFile.getLogger().println(String.format("Study <%s> specified for data acquisition <%s>", study_uri, str_uri));
         }
 
         if (schema_uri == null || schema_uri.isEmpty()) {
             dataFile.getLogger().printExceptionByIdWithArgs("DA_00005", str_uri);
             chain.setInvalid();
+            return chain;
         } else {
             dataFile.getLogger().println(String.format("Schema <%s> specified for data acquisition: <%s>", schema_uri, str_uri));
         }
+        
         if (deployment_uri == null || deployment_uri.isEmpty()) {
             dataFile.getLogger().printExceptionByIdWithArgs("DA_00006", str_uri);
             chain.setInvalid();
+            return chain;
         } else {
             try {
                 deployment_uri = URLDecoder.decode(deployment_uri, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 dataFile.getLogger().printException(String.format("URL decoding error for deployment uri <%s>", deployment_uri));
                 chain.setInvalid();
+                return chain;
             }
             dataFile.getLogger().println(String.format("Deployment <%s> specified for data acquisition <%s>", deployment_uri, str_uri));
         }
 
         if (str != null) {
-            dataFile.setStudyUri(str.getStudyUri());
+            dataFile.setStudyUri(str.getStudy().getUri());
             dataFile.setDatasetUri(DataFactory.getNextDatasetURI(str.getUri()));
             str.addDatasetUri(dataFile.getDatasetUri());
 
@@ -721,17 +836,17 @@ public class AnnotationWorker {
             if (schema == null) {
                 dataFile.getLogger().printExceptionByIdWithArgs("DA_00007", str.getSchemaUri());
                 chain.setInvalid();
+                return chain;
             }
 
             if (!str.hasCellScope()) {
             	// Need to be fixed here by getting codeMap and codebook from sparql query
             	DASOInstanceGenerator dasoInstanceGen = new DASOInstanceGenerator(
-            			dataFile, str.getStudyUri(), str.getUri(), 
-            			schema, dataFile.getFileName());
+            			dataFile, str, dataFile.getFileName());
             	chain.addGenerator(dasoInstanceGen);	
-            	chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, str, schema, dasoInstanceGen));
+            	chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, str, schema, dasoInstanceGen));
             } else {
-                chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, null, str, schema, null));
+                chain.addGenerator(new MeasurementGenerator(MeasurementGenerator.FILEMODE, dataFile, str, schema, null));
             }
             chain.setNamedGraphUri(URIUtils.replacePrefixEx(dataFile.getDataAcquisitionUri()));
         }

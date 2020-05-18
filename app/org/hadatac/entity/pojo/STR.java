@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.WordUtils;
@@ -20,11 +21,14 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
+import org.hadatac.data.loader.Record;
+import org.hadatac.data.loader.RecordFile;
+//import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.StudyObject;
@@ -34,11 +38,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.labkey.remoteapi.CommandException;
+//import org.labkey.remoteapi.CommandException;
 
 import io.ebeaninternal.server.lib.util.Str;
 
-public class STR extends HADatAcThing {
+public class STR extends HADatAcThing implements Comparable<STR> {
     private static final String className = "hasco:DataAcquisition";
 
     @Field("uri")
@@ -47,14 +51,16 @@ public class STR extends HADatAcThing {
     private String label;
     @Field("comment_str")
     private String comment;
-    @Field("used_uri_str_multi")
-    private String used_uri;
+    //@Field("used_uri_str_multi")
+    //private String used_uri;
 
     private DateTime startedAt;
     private DateTime endedAt;
 
     @Field("owner_uri_str")
     private String ownerUri;
+    @Field("version_str")
+    private String version;
     @Field("permission_uri_str")
     private String permissionUri;
     @Field("parameter_str")
@@ -63,22 +69,22 @@ public class STR extends HADatAcThing {
     private int triggeringEvent;
     @Field("nr_data_points_long")
     private long numberDataPoints;
-    @Field("unit_str_multi")
-    private List<String> unit;
-    @Field("unit_uri_str_multi")
-    private List<String> unitUri;
-    @Field("entity_str_multi")
-    private List<String> entity;
-    @Field("entity_uri_str_multi")
-    private List<String> entityUri;
-    @Field("type_uri_str_multi")
-    private List<String> typeURIs;
-    @Field("associated_uri_str_multi")
-    private List<String> associatedURIs;
-    @Field("characteristic_str_multi")
-    private List<String> characteristic;
-    @Field("characteristic_uri_str_multi")
-    private List<String> characteristicUri;
+    
+    @Field("total_messages_long")
+    private long totalMessages;
+    @Field("ingested_messages_long")
+    private long ingestedMessages;
+    @Field("message_protocol_str")
+    private String messageProtocol;
+    @Field("message_ip_str")
+    private String messageIP;
+    @Field("message_port_str")
+    private String messagePort;
+    @Field("message_headers_str")
+    private String messageHeaders;
+    @Field("message_archive_id_str")
+    private String messageArchiveId;
+
     @Field("study_uri_str")
     private String studyUri;
     @Field("method_uri_str")
@@ -101,16 +107,21 @@ public class STR extends HADatAcThing {
     private String elevation;
     @Field("dataset_uri_str_multi")
     private List<String> datasetURIs;
-    // @Field("globalscope_uri_str")
-    // private String rowScopeUri;
-    // @Field("globalscope_name_str")
-    // private String rowScopeName;
     @Field("localscope_uri_str_multi")
     private List<String> cellScopeUri;
     @Field("localscope_name_str_multi")
     private List<String> cellScopeName;
-    @Field("status_int")
-    private int status;
+
+    /*
+     * Possible values for message status:
+     * ACTIVE:     It is not closed and it is collecting data
+     * SUSPENDED:  It is not closed but it is not collecting data
+     * CLOSED:     It is not collecting data. It is no longer available 
+     *             for data collection 
+     */
+    @Field("message_status_str")
+    private String messageStatus;
+
     /*
      * 0 - DataAcquisition is a new one, its details on the preamble It should
      * not exist inside the KB Preamble must contain deployment link and
@@ -124,11 +135,24 @@ public class STR extends HADatAcThing {
      * than 9999 is considered incomplete
      *
      */
-
+    @Field("status_int")
+    private int status;
+    
     private boolean isComplete;
-    private String ccsvUri;
     private String localName;
+    private Study study;
     private Deployment deployment;
+    private DataAcquisitionSchema sdd;
+    private Map<String,MessageTopic> topicsMap;
+	private List<String> headers;
+
+    private DataFile archive = null;
+    private String log;
+    private AnnotationLogger logger = null;
+
+    public static final String ACTIVE = "ACTIVE";
+    public static final String SUSPENDED = "SUSPENDED";
+    public static final String CLOSED = "CLOSED";
 
     public STR() {
         startedAt = null;
@@ -136,19 +160,19 @@ public class STR extends HADatAcThing {
         numberDataPoints = 0;
         isComplete = false;
         datasetURIs = new ArrayList<String>();
-        unit = new ArrayList<String>();
-        unitUri = new ArrayList<String>();
-        characteristic = new ArrayList<String>();
-        characteristicUri = new ArrayList<String>();
-        entity = new ArrayList<String>();
-        entityUri = new ArrayList<String>();
-        typeURIs = new ArrayList<String>();
-        associatedURIs = new ArrayList<String>();
+        totalMessages = 0;
+        ingestedMessages = 0;
+        messageProtocol = null;
+        messageIP = null;
+        messagePort = null;
+        topicsMap = null;
+        study = null;
+        sdd = null;
         deployment = null;
-        // rowScopeUri = null;
-        // rowScopeName = null;
+        headers = new ArrayList<String>();
         cellScopeUri = new ArrayList<String>();
         cellScopeName = new ArrayList<String>();
+        logger = new AnnotationLogger(this);
     }
 
     @Override
@@ -165,6 +189,7 @@ public class STR extends HADatAcThing {
         return getUri().hashCode();
     }
 
+    @Override
     public int compareTo(STR another) {
         if (this.getLabel() != null && another.getLabel() != null) {
             return this.getLabel().compareTo(another.getLabel());
@@ -180,20 +205,78 @@ public class STR extends HADatAcThing {
         this.elevation = elevation;
     }
 
-    public String getCcsvUri() {
-        return ccsvUri;
-    }
-
-    public void setCcsvUri(String ccsvUri) {
-        this.ccsvUri = ccsvUri;
-    }
-
     public long getNumberDataPoints() {
         return numberDataPoints;
     }
 
     public void setNumberDataPoints(long numberDataPoints) {
         this.numberDataPoints = numberDataPoints;
+    }
+
+    public long getTotalMessages() {
+        return totalMessages;
+    }
+
+    public void setTotalMessages(long totalMessages) {
+        this.totalMessages = totalMessages;
+    }
+
+    public long getIngestedMessages() {
+        return totalMessages;
+    }
+
+    public void setIngestedMessages(long totalMessages) {
+        this.totalMessages = totalMessages;
+    }
+
+    public String getMessageProtocol() {
+        return messageProtocol;
+    }
+
+    public void setMessageProtocol(String messageProtocol) {
+        this.messageProtocol = messageProtocol;
+    }
+
+    public String getMessageIP() {
+        return messageIP;
+    }
+
+    public void setMessageIP(String messageIP) {
+        this.messageIP = messageIP;
+    }
+
+    public String getMessagePort() {
+        return messagePort;
+    }
+
+    public void setMessagePort(String messagePort) {
+        this.messagePort = messagePort;
+    }
+
+    public String getMessageName() {
+    	if (label == null && label.isEmpty()) {
+    		return "";
+    	}
+    	if (messagePort == null || messagePort.isEmpty()) {
+        	return label + "_at_" + messageIP; 
+    	}
+    	return label + "_at_" + messageIP + "_" + messagePort; 
+    }
+
+    public String getMessageArchiveId() {
+        return messageArchiveId;
+    }
+
+    public void setMessageArchiveId(String messageArchiveId) {
+        this.messageArchiveId = messageArchiveId;
+    }
+
+    public String getMessageStatus() {
+        return messageStatus;
+    }
+
+    public void setMessageStatus(String messageStatus) {
+        this.messageStatus = messageStatus;
     }
 
     public String getLocalName() {
@@ -252,6 +335,22 @@ public class STR extends HADatAcThing {
         this.comment = comment;
     }
 
+    public String getLog() {
+        return getMessageLogger().getLog();
+    }
+    public void setLog(String log) {
+        getMessageLogger().setLog(log);
+        this.log = log;
+    }
+
+    public AnnotationLogger getMessageLogger() {
+        return logger;
+    }
+    public void setMessageLogger(AnnotationLogger logger) {
+        this.logger = logger;
+    }
+    
+    /*
     public String getUsedUri() {
         return used_uri;
     }
@@ -259,6 +358,7 @@ public class STR extends HADatAcThing {
     public void setUsedUri(String used_uri) {
         this.used_uri = used_uri;
     }
+	*/
 
     public String getStudyUri() {
         return studyUri;
@@ -267,20 +367,28 @@ public class STR extends HADatAcThing {
     public Study getStudy() {
         if (studyUri == null || studyUri.equals(""))
             return null;
-        Study study = Study.find(studyUri);
+        study = Study.find(studyUri);
         return study;
     }
 
     public void setStudyUri(String study_uri) {
         this.studyUri = study_uri;
     }
-
+    
     public String getOwnerUri() {
         return ownerUri;
     }
 
     public void setOwnerUri(String ownerUri) {
         this.ownerUri = ownerUri;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getPermissionUri() {
@@ -397,91 +505,7 @@ public class STR extends HADatAcThing {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
         this.endedAt = formatter.parseDateTime(endedAt);
     }
-
-    public List<String> getUnit() {
-        return unit;
-    }
-
-    public void setUnit(List<String> unit) {
-        this.unit = unit;
-    }
-
-    public void addUnit(String unit) {
-        if (this.unit.contains(unit) == false) {
-            this.unit.add(unit);
-        }
-    }
-
-    public List<String> getUnitUri() {
-        return unitUri;
-    }
-
-    public void setUnitUri(List<String> unitUri) {
-        this.unitUri = unitUri;
-    }
-
-    public void addUnitUri(String unitUri) {
-        if (this.unitUri.contains(unitUri) == false) {
-            this.unitUri.add(unitUri);
-        }
-    }
-
-    public List<String> getEntity() {
-        return entity;
-    }
-
-    public void setEntity(List<String> entity) {
-        this.entity = entity;
-    }
-
-    public void addEntity(String entity) {
-        if (this.entity.contains(entity) == false) {
-            this.entity.add(entity);
-        }
-    }
-
-    public List<String> getEntityUri() {
-        return entityUri;
-    }
-
-    public void setEntityUri(List<String> entityUri) {
-        this.entityUri = entityUri;
-    }
-
-    public void addEntityUri(String entityUri) {
-        if (this.entityUri.contains(entityUri) == false) {
-            this.entityUri.add(entityUri);
-        }
-    }
-
-    public List<String> getCharacteristic() {
-        return characteristic;
-    }
-
-    public void setCharacteristic(List<String> characteristic) {
-        this.characteristic = characteristic;
-    }
-
-    public void addCharacteristic(String characteristic) {
-        if (this.characteristic.contains(characteristic) == false) {
-            this.characteristic.add(characteristic);
-        }
-    }
-
-    public List<String> getCharacteristicUri() {
-        return characteristicUri;
-    }
-
-    public void setCharacteristicUri(List<String> characteristicUri) {
-        this.characteristicUri = characteristicUri;
-    }
-
-    public void addCharacteristicUri(String characteristicUri) {
-        if (this.characteristicUri.contains(characteristicUri) == false) {
-            this.characteristicUri.add(characteristicUri);
-        }
-    }
-
+    
     public String getMethodUri() {
         return methodUri;
     }
@@ -495,16 +519,28 @@ public class STR extends HADatAcThing {
     }
 
     public DataAcquisitionSchema getSchema() {
-    	if (schemaUri == null || schemaUri.equals(""))
+    	if (sdd != null) {
+    		return sdd;
+    	}
+    	if (schemaUri == null || schemaUri.equals("")) {
     		return null;
+    	}
     	DataAcquisitionSchema schema = DataAcquisitionSchema.find(schemaUri);
+        headers = new ArrayList<String>();
+        if (schema != null && schema.getAttributes() != null) {
+        	for (DataAcquisitionSchemaAttribute attr : schema.getAttributes()) {
+        		headers.add(attr.getLabel());
+        	}
+        }
+        setHeaders(headers.toString());
     	return schema;
     }
     
     public void setSchemaUri(String schemaUri) {
         this.schemaUri = schemaUri;
+        getSchema();
     }
-
+   
     public String getDeploymentUri() {
         return deploymentUri;
     }
@@ -525,6 +561,60 @@ public class STR extends HADatAcThing {
         this.deploymentUri = deploymentUri;
     }
 
+    private void loadTopicsMap() {
+		List<MessageTopic> topics = MessageTopic.findByStream(uri);
+		if (topics != null) {
+			topicsMap = new HashMap<String, MessageTopic>(); 
+			for (MessageTopic topic : topics) {
+				topicsMap.put(topic.getLabel(), topic);
+			}
+		}    	
+    }
+    
+    public Map<String,MessageTopic> getTopicsMap() {
+		if (topicsMap != null) {
+			return topicsMap;
+		}
+		loadTopicsMap();
+		return topicsMap; 
+	};
+	
+	public List<MessageTopic> getTopicsList() {
+		if (topicsMap != null) {
+			return new ArrayList<MessageTopic>(topicsMap.values());
+		}
+		loadTopicsMap();
+		if (topicsMap != null) {
+			return new ArrayList<MessageTopic>(topicsMap.values());			
+		}
+		return new ArrayList<MessageTopic>();
+	}
+	
+	public void resetTopicsMap() {
+		topicsMap = null;
+	}
+
+    public List<String> getHeaders() {
+    	if (headers != null) {
+    		return headers;
+    	}
+    	List<String> headers = new ArrayList<String>();
+    	if (messageHeaders == null || messageHeaders.isEmpty()) {
+    		return headers;
+    	}
+    	String auxstr = messageHeaders.replace("[","").replace("]","");
+    	StringTokenizer str = new StringTokenizer(auxstr,","); 
+        while (str.hasMoreTokens()) {
+        	headers.add(str.nextToken().trim()); 
+        }
+        return headers;
+    }
+    
+    private void setHeaders(String headersStr) {
+        this.messageHeaders = headersStr;
+        getHeaders();
+    }
+    
     public String getInstrumentModel() {
         return instrumentModel;
     }
@@ -567,12 +657,7 @@ public class STR extends HADatAcThing {
 
     public boolean hasScope() {
         return (hasCellScope());
-        // return (hasRowScope() || hasCellScope());
     }
-
-    // public boolean hasRowScope() {
-    // return (rowScopeUri != null && !rowScopeUri.equals(""));
-    // }
 
     public boolean hasCellScope() {
         if (cellScopeUri != null && cellScopeUri.size() > 0) {
@@ -584,19 +669,6 @@ public class STR extends HADatAcThing {
         }
         return false;
     }
-
-    /*
-     * public String getRowScopeUri() { return rowScopeUri; } public void
-     * setRowScopeUri(String rowScopeUri) { this.rowScopeUri = rowScopeUri; if
-     * (rowScopeUri == null || rowScopeUri.equals("")) { return; }
-     * ObjectCollection oc = ObjectCollection.find(rowScopeUri); if (oc != null)
-     * { if (oc.getUri().equals(rowScopeUri)) { rowScopeName = oc.getLabel();
-     * return; } } else { StudyObject obj = StudyObject.find(rowScopeUri); if
-     * (obj != null && obj.getUri().equals(rowScopeUri)) { rowScopeName =
-     * obj.getLabel(); return; } } } public String getRowScopeName() { return
-     * rowScopeName; } public void setRowScopeName(String rowScopeName) {
-     * this.rowScopeName = rowScopeName; }
-     */
 
     public List<String> getCellScopeUri() {
         return cellScopeUri;
@@ -663,34 +735,6 @@ public class STR extends HADatAcThing {
 
     public boolean containsDataset(String uri) {
         return datasetURIs.contains(uri);
-    }
-
-    public List<String> getTypeURIs() {
-        return typeURIs;
-    }
-
-    public void setTypeURIs(List<String> typeURIs) {
-        this.typeURIs = typeURIs;
-    }
-
-    public void addTypeUri(String type_uri) {
-        if (!typeURIs.contains(type_uri)) {
-            typeURIs.add(type_uri);
-        }
-    }
-
-    public List<String> getAssociatedURIs() {
-        return associatedURIs;
-    }
-
-    public void setAssociatedURIs(List<String> associatedURIs) {
-        this.associatedURIs = associatedURIs;
-    }
-
-    public void addAssociatedUri(String associated_uri) {
-        if (!associatedURIs.contains(associated_uri)) {
-            associatedURIs.add(associated_uri);
-        }
     }
 
     public void addNumberDataPoints(long number) {
@@ -862,6 +906,9 @@ public class STR extends HADatAcThing {
             if (doc.getFieldValue("owner_uri_str") != null) {
                 dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri_str").toString());
             }
+            if (doc.getFieldValue("version_str") != null) {
+                dataAcquisition.setVersion(doc.getFieldValue("version_str").toString());
+            }
             if (doc.getFieldValue("permission_uri_str") != null) {
                 dataAcquisition.setPermissionUri(doc.getFieldValue("permission_uri_str").toString());
             }
@@ -878,6 +925,32 @@ public class STR extends HADatAcThing {
             if (doc.getFieldValue("nr_data_points_long") != null) {
                 dataAcquisition
                         .setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points_long").toString()));
+            }
+            if (doc.getFieldValue("total_messages_long") != null) {
+                dataAcquisition
+                        .setTotalMessages(Long.parseLong(doc.getFieldValue("total_messages_long").toString()));
+            }
+            if (doc.getFieldValue("ingested_messages_long") != null) {
+                dataAcquisition
+                        .setIngestedMessages(Long.parseLong(doc.getFieldValue("ingested_messages_long").toString()));
+            }
+            if (doc.getFieldValue("message_protocol_str") != null) {
+                dataAcquisition.setMessageProtocol(doc.getFieldValue("message_protocol_str").toString());
+            }
+            if (doc.getFieldValue("message_ip_str") != null) {
+                dataAcquisition.setMessageIP(doc.getFieldValue("message_ip_str").toString());
+            }
+            if (doc.getFieldValue("message_port_str") != null) {
+                dataAcquisition.setMessagePort(doc.getFieldValue("message_port_str").toString());
+            }
+            if (doc.getFieldValue("message_headers_str") != null) {
+                dataAcquisition.setHeaders(doc.getFieldValue("message_headers_str").toString());
+            }
+            if (doc.getFieldValue("message_status_str") != null) {
+                dataAcquisition.setMessageStatus(doc.getFieldValue("message_status_str").toString());
+            }
+            if (doc.getFieldValue("message_archive_id_str") != null) {
+                dataAcquisition.setMessageArchiveId(doc.getFieldValue("message_archive_id_str").toString());
             }
             if (doc.getFieldValue("started_at_date") != null) {
                 date = new DateTime((Date) doc.getFieldValue("started_at_date"));
@@ -899,54 +972,6 @@ public class STR extends HADatAcThing {
             if (doc.getFieldValue("comment_str") != null) {
                 dataAcquisition.setComment(doc.getFieldValue("comment_str").toString());
             }
-            if (doc.getFieldValues("associated_uri_str_multi") != null) {
-                i = doc.getFieldValues("associated_uri_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addAssociatedUri(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("type_uri_str_multi") != null) {
-                i = doc.getFieldValues("type_uri_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addTypeUri(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("unit_str_multi") != null) {
-                i = doc.getFieldValues("unit_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addUnit(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("unit_uri_str_multi") != null) {
-                i = doc.getFieldValues("unit_uri_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addUnitUri(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("entity_str_multi") != null) {
-                i = doc.getFieldValues("entity_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addEntity(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("entity_uri_str_multi") != null) {
-                i = doc.getFieldValues("entity_uri_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addEntityUri(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("characteristic_str_multi") != null) {
-                i = doc.getFieldValues("characteristic_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addCharacteristic(i.next().toString());
-                }
-            }
-            if (doc.getFieldValues("characteristic_uri_str_multi") != null) {
-                i = doc.getFieldValues("characteristic_uri_str_multi").iterator();
-                while (i.hasNext()) {
-                    dataAcquisition.addCharacteristicUri(i.next().toString());
-                }
-            }
             if (doc.getFieldValue("deployment_uri_str") != null) {
                 dataAcquisition.setDeploymentUri(doc.getFieldValue("deployment_uri_str").toString());
             }
@@ -962,18 +987,18 @@ public class STR extends HADatAcThing {
             if (doc.getFieldValue("platform_uri_str") != null) {
                 dataAcquisition.setPlatformUri(doc.getFieldValue("platform_uri_str").toString());
             }
+            if (doc.getFieldValue("location_latlong") != null) {
+                dataAcquisition.setLocation(doc.getFieldValue("location_latlong").toString());
+            }
+            if (doc.getFieldValue("elevation_str") != null) {
+                dataAcquisition.setElevation(doc.getFieldValue("elevation_str").toString());
+            }
             if (doc.getFieldValues("dataset_uri_str_multi") != null) {
                 i = doc.getFieldValues("dataset_uri_str_multi").iterator();
                 while (i.hasNext()) {
                     dataAcquisition.addDatasetUri(i.next().toString());
                 }
             }
-            // if (doc.getFieldValue("globalscope_uri_str") != null) {
-            // dataAcquisition.setRowScopeUri(doc.getFieldValue("globalscope_uri_str").toString());
-            // }
-            // if (doc.getFieldValue("globalscope_name_str") != null) {
-            // dataAcquisition.setRowScopeName(doc.getFieldValue("globalscope_name_str").toString());
-            // }
             if (doc.getFieldValues("localscope_uri_str_multi") != null) {
                 i = doc.getFieldValues("localscope_uri_str_multi").iterator();
                 while (i.hasNext()) {
@@ -1033,16 +1058,27 @@ public class STR extends HADatAcThing {
             user.getGroupNames(accessLevels);
         }
 
-        for (STR acquisition : findAll()) {
-            if (acquisition.getPermissionUri().equals("Public") || acquisition.getPermissionUri().equals(user_uri)
-                    || acquisition.getOwnerUri().equals(user_uri)) {
-                results.add(acquisition.getUri());
+        for (STR str : findAll()) {
+        	if (str == null || str.getUri() == null) {
+        		continue;
+        	}
+        	if (str.getPermissionUri() == null) {
+        		System.out.println("[ERROR] PermissionUri for STR " + str.getUri() + "is missing");
+        		continue;
+        	}
+        	if (str.getOwnerUri() == null) {
+        		System.out.println("[ERROR] OwnerUri for STR " + str.getUri() + "is missing");
+        		continue;
+        	}
+            if (str.getPermissionUri().equals("Public") || str.getPermissionUri().equals(user_uri)
+                    || str.getOwnerUri().equals(user_uri)) {
+                results.add(str.getUri());
                 continue;
             }
 
             for (String level : accessLevels) {
-                if (acquisition.getPermissionUri().equals(level)) {
-                    results.add(acquisition.getUri());
+                if (str.getPermissionUri().equals(level)) {
+                    results.add(str.getUri());
                 }
             }
         }
@@ -1067,6 +1103,23 @@ public class STR extends HADatAcThing {
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_uri_str:\"" + ownerUri + "\"");
         query.set("sort", "started_at_date asc");
+        query.set("rows", "10000000");
+
+        return findByQuery(query);
+    }
+
+    public static List<STR> findStreams() {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "message_ip_str:*");
+        query.set("rows", "10000000");
+
+        return findByQuery(query);
+    }
+
+    /* Open streams are those with ended_at_date =  9999-12-31T23:59:59.999Z */
+    public static List<STR> findOpenStreams() {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "message_ip_str:* AND ended_at_date:\"9999-12-31T23:59:59.999Z\" AND -message_status_str:\"CLOSED\"");
         query.set("rows", "10000000");
 
         return findByQuery(query);
@@ -1165,48 +1218,6 @@ public class STR extends HADatAcThing {
         return listDA;
     }
 
-    public static STR find(HADataC hadatac) {
-        SolrQuery query = new SolrQuery("uri:\"" + hadatac.getDataAcquisitionKbUri() + "\"");
-        return findDataAcquisition(query);
-    }
-
-    public static STR create(HADataC hadatacCcsv, HADataC hadatacKb) {
-        STR dataAcquisition = new STR();
-        DataAcquisitionSchema schema = DataAcquisitionSchema.find(hadatacKb.getDataAcquisitionKbUri());
-
-        dataAcquisition.setLocalName(hadatacCcsv.getDataAcquisition().getLocalName());
-        dataAcquisition.setUri(hadatacCcsv.getDataAcquisitionKbUri());
-        dataAcquisition.setStudyUri(hadatacCcsv.getDataAcquisition().getStudyUri());
-        dataAcquisition.setStartedAtXsd(hadatacCcsv.getDataAcquisition().getStartedAtXsd());
-        dataAcquisition.setEndedAtXsd(hadatacCcsv.getDataAcquisition().getEndedAtXsd());
-        if (schema != null && schema.getAttributes() != null) {
-            Iterator<DataAcquisitionSchemaAttribute> i = schema.getAttributes().iterator();
-            while (i.hasNext()) {
-                DataAcquisitionSchemaAttribute dasa = i.next();
-                for (String attr : dasa.getAttributeLabels()) {
-                    dataAcquisition.addCharacteristic(attr);
-                }
-                for (String attr : dasa.getAttributes()) {
-                    dataAcquisition.addCharacteristicUri(attr);
-                }
-                dataAcquisition.addEntity(dasa.getEntityLabel());
-                dataAcquisition.addEntityUri(dasa.getEntity());
-                dataAcquisition.addUnit(dasa.getUnitLabel());
-                dataAcquisition.addUnitUri(dasa.getUnit());
-            }
-        }
-        dataAcquisition.setDeploymentUri(hadatacKb.getDeploymentUri());
-        dataAcquisition.setInstrumentModel(hadatacKb.getDeployment().getInstrument().getLabel());
-        dataAcquisition.setInstrumentUri(hadatacKb.getDeployment().getInstrument().getUri());
-        dataAcquisition.setPlatformName(hadatacKb.getDeployment().getPlatform().getLabel());
-        dataAcquisition.setPlatformUri(hadatacKb.getDeployment().getPlatform().getUri());
-        dataAcquisition.setLocation(hadatacKb.getDeployment().getPlatform().getLocation());
-        dataAcquisition.setElevation(hadatacKb.getDeployment().getPlatform().getElevation());
-        dataAcquisition.addDatasetUri(hadatacCcsv.getDatasetKbUri());
-
-        return dataAcquisition;
-    }
-
     public static String getProperDataAcquisitionUri(String fileName) {
         String base_name = FilenameUtils.getBaseName(fileName);
         List<STR> da_list = findAll();
@@ -1234,31 +1245,6 @@ public class STR extends HADatAcThing {
 
     public void merge(STR dataCollection) {
         Iterator<String> i;
-
-        i = dataCollection.unit.iterator();
-        while (i.hasNext()) {
-            addUnit(i.next());
-        }
-        i = dataCollection.unitUri.iterator();
-        while (i.hasNext()) {
-            addUnitUri(i.next());
-        }
-        i = dataCollection.entity.iterator();
-        while (i.hasNext()) {
-            addEntity(i.next());
-        }
-        i = dataCollection.entityUri.iterator();
-        while (i.hasNext()) {
-            addEntityUri(i.next());
-        }
-        i = dataCollection.characteristic.iterator();
-        while (i.hasNext()) {
-            addCharacteristic(i.next());
-        }
-        i = dataCollection.characteristicUri.iterator();
-        while (i.hasNext()) {
-            addCharacteristicUri(i.next());
-        }
         i = dataCollection.datasetURIs.iterator();
         while (i.hasNext()) {
             addDatasetUri(i.next());
@@ -1272,30 +1258,6 @@ public class STR extends HADatAcThing {
         builder.append("uri: " + this.getUri() + "\n");
         builder.append("started_at: " + this.getStartedAt() + "\n");
         builder.append("ended_at: " + this.getEndedAt() + "\n");
-        i = unit.iterator();
-        while (i.hasNext()) {
-            builder.append("unit: " + i.next() + "\n");
-        }
-        i = unitUri.iterator();
-        while (i.hasNext()) {
-            builder.append("unit_uri: " + i.next() + "\n");
-        }
-        i = characteristic.iterator();
-        while (i.hasNext()) {
-            builder.append("characteristic: " + i.next() + "\n");
-        }
-        i = characteristicUri.iterator();
-        while (i.hasNext()) {
-            builder.append("characteristic_uri: " + i.next() + "\n");
-        }
-        i = entity.iterator();
-        while (i.hasNext()) {
-            builder.append("entity: " + i.next() + "\n");
-        }
-        i = entityUri.iterator();
-        while (i.hasNext()) {
-            builder.append("entity_uri: " + i.next() + "\n");
-        }
         builder.append("deployment_uri: " + this.deploymentUri + "\n");
         builder.append("instrument_model: " + this.instrumentModel + "\n");
         builder.append("instrument_uri: " + this.instrumentUri + "\n");
@@ -1303,8 +1265,6 @@ public class STR extends HADatAcThing {
         builder.append("platform_uri: " + this.platformUri + "\n");
         builder.append("location: " + this.location + "\n");
         builder.append("elevation: " + this.elevation + "\n");
-        // builder.append("rowScopeUri: " + this.rowScopeUri + "\n");
-        // builder.append("rowScopeName: " + this.rowScopeName + "\n");
         for (String cellUri : cellScopeUri) {
             builder.append("cellScopeUri: " + cellUri + "\n");
         }
@@ -1321,74 +1281,12 @@ public class STR extends HADatAcThing {
 
     @Override
     public int saveToLabKey(String userName, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(userName, password);
-
-        List<String> abbrevTypeURIs = new ArrayList<String>();
-        for (String uri : getTypeURIs()) {
-            abbrevTypeURIs.add(URIUtils.replaceNameSpaceEx(uri));
-        }
-        List<String> abbrevAssociatedURIs = new ArrayList<String>();
-        for (String uri : getAssociatedURIs()) {
-            abbrevAssociatedURIs.add(URIUtils.replaceNameSpaceEx(uri));
-        }
-
-        String cellUri = "";
-        int totalChanged = 0;
-        Iterator<String> i = getCellScopeUri().iterator();
-        while (i.hasNext()) {
-            cellUri += URIUtils.replaceNameSpaceEx(i.next());
-            if (i.hasNext()) {
-                cellUri += " , ";
-            }
-        }
-        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("a", String.join(", ", abbrevTypeURIs));
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getComment());
-        row.put("prov:startedAtTime", getStartedAt());
-        row.put("prov:used", getParameter());
-        row.put("prov:wasAssociatedWith", String.join(", ", abbrevAssociatedURIs));
-        row.put("hasco:hasDeployment", URIUtils.replaceNameSpaceEx(getDeploymentUri()));
-        row.put("hasco:isDataAcquisitionOf", URIUtils.replaceNameSpaceEx(getStudyUri()));
-        row.put("hasco:hasSchema", URIUtils.replaceNameSpaceEx(getSchemaUri()));
-        // row.put("hasco:hasRowScope",
-        // URIUtils.replaceNameSpaceEx(getRowScopeUri()));
-        row.put("hasco:hasCellScope", cellUri);
-        row.put("hasco:hasTriggeringEvent", getTriggeringEventName());
-        row.put("prov:endedAtTime", getEndedAt().startsWith("9999") ? "" : getEndedAt());
-        rows.add(row);
-
-        try {
-            totalChanged = loader.insertRows("DataAcquisition", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("DataAcquisition", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update Stream Specification");
-            }
-        }
-
-        return totalChanged;
+    	return 0;
     }
-
+    
     @Override
     public int deleteFromLabKey(String userName, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(userName, password);
-
-        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("DataAcquisition", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Could not delete Stream Specification(s)");
-            e.printStackTrace();
-            return 0;
-        }
+    	return 0;
     }
 
     @Override
@@ -1399,4 +1297,5 @@ public class STR extends HADatAcThing {
     @Override
     public void deleteFromTripleStore() {
     }
+        
 }

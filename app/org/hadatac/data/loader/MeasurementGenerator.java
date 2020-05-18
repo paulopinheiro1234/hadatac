@@ -25,7 +25,6 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
@@ -36,9 +35,8 @@ public class MeasurementGenerator extends BaseGenerator {
 	public static final int MSGMODE = 1;
 	
     private int mode;
-    private STR da;
+    private STR str;
     private DataFile dataFile;
-    private MessageTopic topic;
 
     private DataAcquisitionSchema schema = null;
     private Map<String, DataAcquisitionSchemaObject> mapSchemaObjects = new HashMap<String, DataAcquisitionSchemaObject>();
@@ -57,7 +55,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private int posGroup = -1;
     private int posMatching = -1;
 
-    private int totalCount = 0;
+    private long totalCount = 0;
 
     private Map<String, Map<String, String>> possibleValues = null;
     private Map<String, String> urisByLabels = null;
@@ -72,26 +70,25 @@ public class MeasurementGenerator extends BaseGenerator {
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
     private DASOInstanceGenerator dasoiGen = null; 
 
-    public MeasurementGenerator(int mode, DataFile dataFile, MessageTopic topic, STR da, 
+    public MeasurementGenerator(int mode, DataFile dataFile, STR str, 
             DataAcquisitionSchema schema, DASOInstanceGenerator dasoiGen) {
         super(dataFile);
         this.mode = mode;
         if (mode == MSGMODE) {
-        	this.topic = topic;
-        	this.logger = topic.getLogger();
-        	totalCount = topic.getStream().getIngestedMessages();
+        	this.logger = str.getMessageLogger();
+        	this.totalCount = str.getIngestedMessages();
         }
         if (mode == FILEMODE) {
             this.dataFile = dataFile;
         }
-        this.da = da;
+        this.str = str;
         this.schema = schema;
     	this.dasoiGen = dasoiGen;
     	
     	boolean cont = true;
-        if (da.hasCellScope()) {
+        if (str.hasCellScope()) {
         	//System.out.println("Measurement Generator: hasCellScope is TRUE");
-        	cellScopeObject = StudyObject.find(URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()));
+        	cellScopeObject = StudyObject.find(URIUtils.replacePrefixEx(str.getCellScopeUri().get(0).trim()));
         	//System.out.println("StudyObject's URI: [" + URIUtils.replacePrefixEx(da.getCellScopeUri().get(0).trim()) + "]");
         	if (cellScopeObject == null) {
         		System.out.println("No scope object");
@@ -100,18 +97,18 @@ public class MeasurementGenerator extends BaseGenerator {
         	}
         } else {
         	//System.out.println("Measurement Generator: hasCellScope is FALSE");
-        	if (!dasoiGen.initiateCache(da.getStudyUri())) {
-        		logger.printExceptionById("DA_00001");
-        		cont = false;
-        	}
+        	//if (!dasoiGen.initiateCache(str.getStudyUri())) {
+        	//	logger.printExceptionById("DA_00001");
+        	//	cont = false;
+        	//}
         	matchingSOCs = dasoiGen.getMatchingSOCs();
         }
         if (cont) {
         	//System.out.println("Measurement Generator: setting STUDY URI");
     		// Store necessary information before hand to avoid frequent SPARQL queries
-    		setStudyUri(da.getStudyUri());
+    		setStudyUri(str.getStudyUri());
     		urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
-    		possibleValues = DataAcquisitionSchema.findPossibleValues(da.getSchemaUri());
+    		possibleValues = DataAcquisitionSchema.findPossibleValues(str.getSchemaUri());
     		dasoUnitUri = urisByLabels.get(schema.getUnitLabel());
     		groupBySocAndId = new HashMap<String,SOCGroup>();
         }
@@ -127,7 +124,7 @@ public class MeasurementGenerator extends BaseGenerator {
         if (mode == FILEMODE) {
         	unknownHeaders = schema.defineTemporaryPositions(file.getHeaders());
         } else {
-        	unknownHeaders = schema.defineTemporaryPositions(topic.getHeaders());
+        	unknownHeaders = schema.defineTemporaryPositions(str.getHeaders());
         }
 
         //System.out.println("DASA after defineTemporaryPositions]");
@@ -193,7 +190,7 @@ public class MeasurementGenerator extends BaseGenerator {
     }
 
     @Override
-    public HADatAcThing createObject(Record record, int rowNumber) throws Exception {
+    public HADatAcThing createObject(Record record, int rowNumber, String selector) throws Exception {
       	//System.out.println("rowNumber: " + rowNumber);
         
     	//System.out.println("Position 0 : [" + record.getValueByColumnIndex(0) + "]");
@@ -209,7 +206,7 @@ public class MeasurementGenerator extends BaseGenerator {
         String objUri = "";
         boolean doMatching = false;
         boolean doGroup = false;
-        if (da.hasCellScope()) {
+        if (str.hasCellScope()) {
             socUri = cellScopeSOC.getUri();
             objUri = cellScopeObject.getUri();
         } else {
@@ -383,7 +380,7 @@ public class MeasurementGenerator extends BaseGenerator {
              *   SET STUDY                       *
              *                                   *
              *===================================*/
-            measurement.setStudyUri(da.getStudyUri());
+            measurement.setStudyUri(str.getStudyUri());
 
             /*===================================*
              *                                   *
@@ -400,10 +397,10 @@ public class MeasurementGenerator extends BaseGenerator {
             measurement.setEntityUri("");
 
             String reference = null;
-            if (da.hasCellScope()) {
+            if (str.hasCellScope()) {
 
                 // Objects defined by Cell Scope
-                if (da.getCellScopeName().get(0).equals("*")) {
+                if (str.getCellScopeName().get(0).equals("*")) {
                     measurement.setStudyObjectUri(cellScopeObject.getUri());
                     measurement.setStudyObjectTypeUri(cellScopeObject.getTypeUri());
                     measurement.setObjectUri(cellScopeObject.getUri());
@@ -549,17 +546,17 @@ public class MeasurementGenerator extends BaseGenerator {
 
             if (mode == FILEMODE) {
             	measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-            			URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+            			URIUtils.replaceNameSpaceEx(str.getUri()).split(":")[1] + "/" +
             			dasa.getLabel() + "/" + 
             			dataFile.getFileName() + "-" + totalCount++);
             } else {
                 measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
-                        URIUtils.replaceNameSpaceEx(da.getUri()).split(":")[1] + "/" +
+                        URIUtils.replaceNameSpaceEx(str.getUri()).split(":")[1] + "/" +
                         dasa.getLabel() + "/" + 
-                        topic.getLabel() + "-" + totalCount++);
+                        str.getLabel() + "-" + totalCount++);
             }
-            measurement.setOwnerUri(da.getOwnerUri());
-            measurement.setAcquisitionUri(da.getUri());
+            measurement.setOwnerUri(str.getOwnerUri());
+            measurement.setAcquisitionUri(str.getUri());
 
             /*======================================*
              *                                      *
@@ -670,7 +667,7 @@ public class MeasurementGenerator extends BaseGenerator {
             if (mode == FILEMODE) {
             	measurement.setDatasetUri(dataFile.getDatasetUri());
             } else {
-            	measurement.setDatasetUri(topic.getUri());
+            	measurement.setDatasetUri(str.getUri());
             }
 
             objects.add(measurement);
@@ -703,8 +700,8 @@ public class MeasurementGenerator extends BaseGenerator {
         // FINAL COMMIT
         commitToSolr(solr, count % batchSize);
 
-        da.addNumberDataPoints(totalCount);
-        da.saveToSolr();
+        str.addNumberDataPoints(totalCount);
+        str.saveToSolr();
 
         logger.addLine(Feedback.println(Feedback.WEB, String.format(
                 "[OK] %d object(s) have been committed to solr", count)));

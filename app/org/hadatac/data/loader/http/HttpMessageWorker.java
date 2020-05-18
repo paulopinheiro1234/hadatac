@@ -1,4 +1,4 @@
-package org.hadatac.data.loader.mqtt;
+package org.hadatac.data.loader.http;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,28 +10,28 @@ import org.hadatac.data.loader.MeasurementGenerator;
 import org.hadatac.data.loader.Record;
 import org.hadatac.entity.pojo.STR;
 
-public class MessageWorker {
+import play.mvc.Http.RequestBody;
+
+public class HttpMessageWorker {
 	
-    private static MessageWorker single_instance = null; 
+    private static HttpMessageWorker single_instance = null; 
     
     // public variables
     final public Map<String,ExecutorService> executorsMap;
-    final public Map<String,MqttAsyncClient> clientsMap;
 	private Map<String,STR> streamMap;
 	private Map<String,MeasurementGenerator> streamGenMap;
   
-    private MessageWorker() { 
+    private HttpMessageWorker() { 
     	executorsMap = new HashMap<String,ExecutorService>();
-    	clientsMap = new HashMap<String,MqttAsyncClient>();
     	streamGenMap = new HashMap<String,MeasurementGenerator>();
     	streamMap = new HashMap<String,STR>();
     } 
   
     // static method to create instance of Singleton class 
-    public static MessageWorker getInstance() 
+    public static HttpMessageWorker getInstance() 
     { 
         if (single_instance == null) 
-            single_instance = new MessageWorker(); 
+            single_instance = new HttpMessageWorker(); 
   
         return single_instance; 
     } 
@@ -63,8 +63,8 @@ public class MessageWorker {
 	public static Record processMessage(String streamUri, String topicStr, String message, int currentRow) {
 		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]");
 
-		STR stream = MessageWorker.getInstance().getStream(streamUri);
-		MeasurementGenerator generator = MessageWorker.getInstance().getStreamGenerator(streamUri);
+		STR stream = HttpMessageWorker.getInstance().getStream(streamUri);
+		MeasurementGenerator generator = HttpMessageWorker.getInstance().getStreamGenerator(streamUri);
 		Record record = new JSONRecord(message, stream.getHeaders());
 		if (generator == null) { 
 			System.out.println("MessageWorker: stream generator is null in processMessage");

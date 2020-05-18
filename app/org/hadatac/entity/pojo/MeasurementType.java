@@ -109,6 +109,7 @@ public class MeasurementType {
 		this.localName = localName;
 	}
 	
+	/*
 	public static List<MeasurementType> find(HADataC hadatac) {
 		List<MeasurementType> results = new ArrayList<MeasurementType>();
 		MeasurementType measurementTypeKb;
@@ -188,6 +189,7 @@ public class MeasurementType {
 		
 		return results;
 	}
+	*/
 	
 	public String getCharacteristicLabel() {
 		return characteristicLabel;

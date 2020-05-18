@@ -6,6 +6,7 @@ import java.util.Date;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.utils.Feedback;
 
 
@@ -13,14 +14,14 @@ public class AnnotationLogger {
 
     private String log = "";
     private DataFile parent = null;
-    private MessageStream stream = null;
+    private STR stream = null;
     private MessageTopic topic = null;
     
     public AnnotationLogger(DataFile parent) {
         this.parent = parent;
     }
     
-    public AnnotationLogger(MessageStream stream) {
+    public AnnotationLogger(STR stream) {
         this.stream = stream;
     }
     
@@ -33,7 +34,7 @@ public class AnnotationLogger {
 	    this.log = log;
 	}
 	
-	public AnnotationLogger(MessageStream stream, String log) {
+	public AnnotationLogger(STR stream, String log) {
 	    this.stream = stream;
 	    this.log = log;
 	}

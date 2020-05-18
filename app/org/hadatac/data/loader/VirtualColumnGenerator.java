@@ -84,7 +84,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
     public void preprocess() throws Exception {}
 
     @Override
-    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber, String selector) throws Exception {
         return createVirtualColumn(rec);
     }
 

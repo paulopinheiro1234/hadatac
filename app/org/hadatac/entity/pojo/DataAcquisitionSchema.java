@@ -484,7 +484,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             return sdd;
         }
 
-        System.out.println("Looking for data acquisition schema " + schemaUri);
+        //System.out.println("Looking for data acquisition schema " + schemaUri);
 
         if (schemaUri == null || schemaUri.equals("")) {
             System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");
@@ -512,6 +512,9 @@ public class DataAcquisitionSchema extends HADatAcThing {
             if (soln.get("version") != null) {
                 schema.setVersion(soln.get("version").toString());
             }
+        } else {
+            System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
+        	return null;
         }
 
         //schema.setVersion("1.0");

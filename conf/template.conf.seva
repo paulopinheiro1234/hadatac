@@ -44,6 +44,13 @@ PermissionURI=permission uri
 # STR Template
 DeploymentUri=deployment uri
 CellScope=cell scope
+TopicName=topic
+StreamURI=streamURI
+hasURI=hasURI
+MessageProtocol=protocol
+MessageIP=IP
+MessagePort=port
+MessageName=name
 
 [DASA]
 # DASA, DASE, DASO Template (Part of SDD)

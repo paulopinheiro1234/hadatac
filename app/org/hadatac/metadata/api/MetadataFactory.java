@@ -31,41 +31,45 @@ public class MetadataFactory {
         }
 
         for (Map<String, Object> row : rows) {
-            IRI sub = factory.createIRI(URIUtils.replacePrefixEx((String)row.get("hasURI")));
-            for (String key : row.keySet()) {
-                if (!"hasURI".equals(key)) {
-                    IRI pred = null;
-                    if ("a".equals(key)) {
-                        pred = factory.createIRI(URIUtils.replacePrefixEx("rdf:type"));
-                    } else {
-                        pred = factory.createIRI(URIUtils.replacePrefixEx(key));
-                    }
-
-                    String cellValue = (String)row.get(key);
-                    if (URIUtils.isValidURI(cellValue)) {
-                        IRI obj = factory.createIRI(URIUtils.replacePrefixEx(cellValue));
-
-                        if (namedGraph == null) {
-                            model.add(sub, pred, obj);
-                        } else {
-                            model.add(sub, pred, obj, (Resource)namedGraph);
-                        }
-                    } else {
-                        if (cellValue == null) {
-                            cellValue = "NULL";
-                        }
-                        
-                        Literal obj = factory.createLiteral(
-                                cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
-
-                        if (namedGraph == null) {
-                            model.add(sub, pred, obj);
-                        } else {
-                            model.add(sub, pred, obj, (Resource)namedGraph);
-                        }
-                    }
-                }
-            }
+        	if (row == null || row.get("hasURI") == null) {
+        		System.out.println("[ERROR] MetadataFactory.createModel() failed because the 'hasURI' row is missing");
+        	} else {
+	            IRI sub = factory.createIRI(URIUtils.replacePrefixEx((String)row.get("hasURI")));
+	            for (String key : row.keySet()) {
+	                if (!"hasURI".equals(key)) {
+	                    IRI pred = null;
+	                    if ("a".equals(key)) {
+	                        pred = factory.createIRI(URIUtils.replacePrefixEx("rdf:type"));
+	                    } else {
+	                        pred = factory.createIRI(URIUtils.replacePrefixEx(key));
+	                    }
+	
+	                    String cellValue = (String)row.get(key);
+	                    if (URIUtils.isValidURI(cellValue)) {
+	                        IRI obj = factory.createIRI(URIUtils.replacePrefixEx(cellValue));
+	
+	                        if (namedGraph == null) {
+	                            model.add(sub, pred, obj);
+	                        } else {
+	                            model.add(sub, pred, obj, (Resource)namedGraph);
+	                        }
+	                    } else {
+	                        if (cellValue == null) {
+	                            cellValue = "NULL";
+	                        }
+	                        
+	                        Literal obj = factory.createLiteral(
+	                                cellValue.replace("\n", " ").replace("\r", " ").replace("\"", "''"));
+	
+	                        if (namedGraph == null) {
+	                            model.add(sub, pred, obj);
+	                        } else {
+	                            model.add(sub, pred, obj, (Resource)namedGraph);
+	                        }
+	                    }
+	                }
+	            }
+        	}
         }
 
         return model;

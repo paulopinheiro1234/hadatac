@@ -270,32 +270,6 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		return instrument;
 	}
 	
-	public static Instrument find(HADataC hadatac) {
-		Instrument instrument = null;
-		
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
-		    + "SELECT ?instrument ?label WHERE {\n"
-		    + "  <" + hadatac.getDeploymentUri() + "> hasco:hasInstrument ?instrument .\n"
-		    + "  OPTIONAL { ?instrument rdfs:label ?label . }\n"
-		    + "  OPTIONAL { ?instrument rdfs:comment ?comment . }\n"
-		    + "}";
-		
-		ResultSetRewindable resultsrw = SPARQLUtils.select(hadatac.getStaticMetadataSparqlURL(), queryString);
-		
-		if (resultsrw.size() >= 1) {
-		    QuerySolution soln = resultsrw.next();
-		    instrument = new Instrument();
-		    instrument.setUri(soln.getResource("instrument").getURI());
-		    if (soln.getLiteral("label") != null) { 
-			instrument.setLabel(soln.getLiteral("label").getString()); 
-		    } else if (soln.getLiteral("comment") != null) { 
-			instrument.setComment(soln.getLiteral("comment").getString()); 
-		    } 
-		}
-		
-		return instrument;
-	}
-
     @Override
     public int compareTo(Instrument another) {
         return this.getLabel().compareTo(another.getLabel());

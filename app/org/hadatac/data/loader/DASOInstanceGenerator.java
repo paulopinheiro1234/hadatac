@@ -5,6 +5,7 @@ import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.VirtualColumn;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.StudyObjectMatching;
@@ -31,9 +32,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
 	private final String SIO_OBJECT = "sio:SIO_000776";
     private final String SIO_SAMPLE = "sio:SIO_001050";;
     private final String kbPrefix = ConfigProp.getKbPrefix();
-    private String studyUri;
-    private String strUri;
-    private DataAcquisitionSchema das;
+    private STR str;
+    private DataAcquisitionSchema sdd;
     private String mainLabel;
     private DataAcquisitionSchemaObject mainDaso;
     private String mainDasoUri;
@@ -52,12 +52,16 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private Map<String, ObjectCollection> socMatchingSOCs = new ConcurrentHashMap<String, ObjectCollection>();
 //    private Map<String, String > groundingIds = new ArrayList<String>();
     
-    public DASOInstanceGenerator(DataFile dataFile, String studyUri, String strUri, DataAcquisitionSchema das, String fileName) {
-        super(dataFile);
+    public DASOInstanceGenerator(DataFile dataFile, STR str, String fileName) {
+        super(dataFile, str.getStudyUri());
 
-        this.studyUri = studyUri;
-        this.strUri = strUri;
-        this.das = das;
+        this.str = str;
+        this.sdd = str.getSchema();
+        logger.println("Initiating cache for study " + str.getStudyUri());        
+        if (!initiateCache(str.getStudyUri())) {
+            logger.printExceptionById("DA_00001");
+        	return;
+        }
         socPaths.clear();
         socLabels.clear();
 
@@ -68,8 +72,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
          ****************************************************************************************/
 
         mainLabel = "";
-        String origId = das.getOriginalIdLabel(); 
-        String id = das.getIdLabel(); 
+        String origId = sdd.getOriginalIdLabel(); 
+        String id = sdd.getIdLabel(); 
         if (origId != null && !origId.equals("")) {
             mainLabel = origId;
         } else if (id != null && !id.equals("")) {
@@ -150,7 +154,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         mainDasoUri = "";
-        Iterator<DataAcquisitionSchemaAttribute> iterAttributes = das.getAttributes().iterator();
+        Iterator<DataAcquisitionSchemaAttribute> iterAttributes = sdd.getAttributes().iterator();
         while (iterAttributes.hasNext()) {
             DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
             String dasoUri = dasa.getObjectUri(); 
@@ -172,7 +176,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         mainSoc = socFromDaso(mainDaso, socsList);
         if (mainSoc == null) {
-            logger.printException("DASOInstanceGenerator: FAILED TO LOAD MAIN SOC. The virtual column for the file identifier (the row with attribute hasco:originalID) is not one of the firtual columns in the SSD for this study.");
+            logger.printException("DASOInstanceGenerator: FAILED TO LOAD MAIN SOC. The virtual column for the file identifier (the row with attribute hasco:originalID) is not one of the virtual columns in the SSD for this study.");
             return false;
         }
         mainSocUri = mainSoc.getUri();
@@ -269,6 +273,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             String key = entry.getKey();
             ObjectCollection soc = entry.getValue();
             ObjectCollection currentSoc = soc;
+            
             while (currentSoc.getHasScopeUri() != null && !currentSoc.getHasScopeUri().equals("") && 
                     !requiredSocs.containsKey(currentSoc.getHasScopeUri()) && !containsUri(currentSoc.getHasScopeUri(),groundingPath)) {
 
@@ -438,9 +443,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 if (label == null) {
                     label = "";
                 }
-                while (!nextTarget.getUri().equals(mainSocUri) && label.equals("")) {
+                if (nextTarget.getUri().equals(mainSocUri)) {
                     String nextTargetUri = nextTarget.getHasScopeUri();
-                    nextTarget =  requiredSocs.get(nextTargetUri);
+                    nextTarget = null;
+                    for (ObjectCollection gsoc : groundingPath) {
+                    	if (gsoc.getUri().equals(nextTargetUri)) {
+                    		nextTarget = gsoc;
+                    	}
+                    }
                     if (nextTarget == null) {
                         logger.printException("DASOInstanceGenerator: Could not complete path for " + toUri);
                         return false;
@@ -453,7 +463,25 @@ public class DASOInstanceGenerator extends BaseGenerator {
                         fullLabel = getPrettyLabel(nextTarget.getLabel()) + " " + fullLabel;
                     } else {
                         fullLabel = label + " " + fullLabel;
-                    }
+                   }                	
+                } else {
+	                while (!nextTarget.getUri().equals(mainSocUri) && label.equals("")) {
+	                    String nextTargetUri = nextTarget.getHasScopeUri();
+	                    nextTarget =  requiredSocs.get(nextTargetUri);
+	                    if (nextTarget == null) {
+	                        logger.printException("DASOInstanceGenerator: Could not complete path for " + toUri);
+	                        return false;
+	                    }
+	                    label = nextTarget.getGroundingLabel();
+	                    if (label == null) {
+	                        label = "";
+	                    }
+	                    if (label.equals("")) {
+	                        fullLabel = getPrettyLabel(nextTarget.getLabel()) + " " + fullLabel;
+	                    } else {
+	                        fullLabel = label + " " + fullLabel;
+	                   }
+	                }
                 }
                 logger.println("DASOInstanceGenerator: Computed label [" + fullLabel + "]");       
                 if (soc.getRoleLabel() == null || soc.getRoleLabel().equals("")) {
@@ -531,7 +559,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private String targetUri(DataAcquisitionSchemaObject daso) {
         if (!daso.getWasDerivedFrom().equals("")) {
             String toLabel = daso.getWasDerivedFrom();
-            DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.findByLabelInSchema(das.getUri(), toLabel);
+            DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.findByLabelInSchema(sdd.getUri(), toLabel);
             if (tmpDaso == null) {
                 return "";
             } else {
@@ -547,7 +575,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     private boolean isSample(DataAcquisitionSchemaObject daso) {
         if (!daso.getWasDerivedFrom().equals("")) {
             String toLabel = daso.getWasDerivedFrom();
-            DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.findByLabelInSchema(das.getUri(), toLabel);
+            DataAcquisitionSchemaObject tmpDaso = DataAcquisitionSchemaObject.findByLabelInSchema(sdd.getUri(), toLabel);
             if (tmpDaso == null) {
                 return false;
             } else {
@@ -647,13 +675,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
             if (newVc == null) {
                 newVc = new VirtualColumn(studyUri, "", daso.getLabel());
-                newVc.setNamedGraph(strUri);
+                newVc.setNamedGraph(str.getUri());
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
             ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
             		newVc.getUri(), "", scopeUri, null, null, null, "0");
-            newSoc.setNamedGraph(strUri);
+            newSoc.setNamedGraph(str.getUri());
             newSoc.saveToTripleStore();
             // addObject(newSoc);
 
@@ -850,7 +878,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         StudyObject newObj = new StudyObject(newUri, newTypeUri, newOriginalId, newLabel, nextSoc.getUri(), "Automatically generated",
                 newScopeUris, newTimeScopeUris, newSpaceScopeUris);
-        newObj.setNamedGraph(strUri);
+        newObj.setNamedGraph(str.getUri());
         newObj.setDeletable(false);
         addObjectToCache(newObj, currentObjUri);
 
@@ -925,7 +953,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     		return false;
     	}
     	Study study = Study.find(study_uri);
-    	if (mainSoc != null) {
+    	//if (mainSoc != null) {
     		System.out.println("INITIATE CACHE BEING CALLED!");
     		addCache(new Cache<String, StudyObject>("cacheObject", true, study.getObjectsMapInBatch()));
     		addCache(new Cache<String, String>("cacheObjectBySocAndScopeUri", false, StudyObject.buildCachedObjectBySocAndScopeUri()));
@@ -933,8 +961,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
     		addCache(new Cache<String, String>("cacheScopeBySocAndObjectUri", false, StudyObject.buildCachedScopeBySocAndObjectUri()));
     	    
     		return true;
-    	}
-    	return false;
+    	//}
+    	//return false;
     }
     
     @SuppressWarnings("unchecked")

@@ -35,6 +35,7 @@ DataAcquisitionName=name
 Method=method
 DAStudyName=study
 DataDictionaryName=data dict
+TopicName=topic
 Epi/Lab=epi/lab
 OwnerEmail=owner email
 PermissionURI=permission uri
@@ -50,6 +51,12 @@ OwnerEmail=owner email
 PermissionURI=permission uri
 DeploymentUri=deployment uri
 CellScope=cell scope
+StreamURI=streamURI
+hasURI=hasURI
+MessageProtocol=protocol
+MessageIP=IP
+MessagePort=port
+MessageName=name
 
 [DASA]
 # DASA, DASE, DASO Template (Part of SDD)

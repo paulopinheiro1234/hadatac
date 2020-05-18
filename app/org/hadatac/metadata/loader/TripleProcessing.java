@@ -367,10 +367,12 @@ public class TripleProcessing {
 						else{
 							st = new StringTokenizer(cellValue, ",");
 						}
+						/*
 						while (st.hasMoreTokens()) {
 							dataAcquisition.addTypeUri(
 									URIUtils.convertToWholeURI(st.nextToken().trim()));
 						}
+						*/
 					}
 					else if (predicate.equals("prov:wasAssociatedWith")) {
 						StringTokenizer st;
@@ -380,10 +382,12 @@ public class TripleProcessing {
 						else{
 							st = new StringTokenizer(cellValue, ",");
 						}
+						/*
 						while (st.hasMoreTokens()) {
 							dataAcquisition.addAssociatedUri(
 									URIUtils.convertToWholeURI(st.nextToken().trim()));
 						}
+						*/
 					}
 					else if (predicate.equals("rdfs:label")) {
 						dataAcquisition.setLabel(cellValue);

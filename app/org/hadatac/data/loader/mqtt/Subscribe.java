@@ -18,9 +18,11 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.hadatac.data.loader.JSONRecord;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
+import org.hadatac.entity.pojo.STR;
 
 /**
  * A sample application that demonstrates how to use the Paho MQTT v3.1 Client blocking API.
@@ -47,7 +49,7 @@ public class Subscribe implements MqttCallback {
 	// Private instance variables
 	//private MqttAsyncClient     client;
 	private MqttClient          client;
-	private MessageStream       stream;
+	private STR                 stream;
 	private String 				brokerUrl;
 	private boolean 			quietMode;
 	private MqttConnectOptions 	conOpt;
@@ -68,7 +70,7 @@ public class Subscribe implements MqttCallback {
     public static final int TESTTOPICS       = 2;
     public static final int TESTLABELS       = 3;
     
-    public static List<String> testConnection(MessageStream stream) {
+    public static List<String> testConnection(STR stream) {
 
     	boolean quietMode 	  = false;
 		int qos 			  = 0;
@@ -77,8 +79,8 @@ public class Subscribe implements MqttCallback {
 		String password       = null;
 		String userName       = null;
 		String protocol       = "tcp://";
-		String broker         = stream.getIP();
-		int port              = Integer.parseInt(stream.getPort());
+		String broker         = stream.getMessageIP();
+		int port              = Integer.parseInt(stream.getMessagePort());
         String url            = protocol + broker + ":" + port;
         List<String> response = new ArrayList<String>();
 
@@ -125,34 +127,34 @@ public class Subscribe implements MqttCallback {
     	return client.getClientId();
     }
     
-    public static List<String> testTopics(MessageStream stream) {
+    public static List<String> testTopics(STR stream) {
     	return exec(stream, null, TESTTOPICS);
     }
 
-    public static List<String> testLabels(MessageStream stream, MessageTopic topic) {
+    public static List<String> testLabels(STR stream, MessageTopic topic) {
     	return exec(stream, topic, TESTLABELS);
     }
 
-    public static List<String> execBatch(MessageStream stream) {
+    public static List<String> execBatch(STR stream) {
     	return exec(stream, null, SUBSCRIBE_BATCH);
     }
 
-    public static List<String> execBatch(MessageStream stream, MessageTopic topic) {
+    public static List<String> execBatch(STR stream, MessageTopic topic) {
     	return exec(stream, topic, SUBSCRIBE_BATCH);
     }
 
-    public static List<String> exec(MessageStream stream, MessageTopic streamTopic, int action) {
+    public static List<String> exec(STR stream, MessageTopic streamTopic, int action) {
 
 		// Default settings:
 		boolean quietMode 	 = false;
 		String topic 		 = "";
 		String message 		 = "Message from blocking Paho MQTTv3 Java client sample";
 		int qos 			 = 0;
-		String broker        = stream.getIP();
-		int port             = Integer.parseInt(stream.getPort());
+		String broker        = stream.getMessageIP();
+		int port             = Integer.parseInt(stream.getMessagePort());
 		String clientId 	 = null;
 		if (streamTopic == null) {
-			topic = stream.getName() + "/#";
+			topic = stream.getLabel() + "/#";
 		} else {
 			topic = streamTopic.getLabel();
 		}
@@ -187,7 +189,6 @@ public class Subscribe implements MqttCallback {
 				if (action == TESTLABELS) {
 					if (aClient.getPlainPayLoad() != null) {
 						JSONRecord handler = new JSONRecord(aClient.getPlainPayLoad());
-						streamTopic.setHeaders(handler.getHeaders());
 						response.addAll(handler.getHeaders());
 					}
 				} else {
@@ -220,7 +221,7 @@ public class Subscribe implements MqttCallback {
      * @param password the password for the user
 	 * @throws MqttException
 	 */
-    public Subscribe(MessageStream stream, String brokerUrl, String clientId, boolean cleanSession, boolean quietMode, String userName, String password, int action) throws MqttException {
+    public Subscribe(STR stream, String brokerUrl, String clientId, boolean cleanSession, boolean quietMode, String userName, String password, int action) throws MqttException {
     	this.stream = stream;
     	this.brokerUrl = brokerUrl;
     	this.quietMode = quietMode;
@@ -319,10 +320,10 @@ public class Subscribe implements MqttCallback {
     	if (topic == null) {
     		file = null;
     	} else {
-    		if (stream.getDataFileId() == null) {
+    		if (stream.getMessageArchiveId() == null) {
     	    	log("Missing data file's id in topic " + topic.getLabel());
     		} else {
-	    		DataFile dataFile = DataFile.findById(stream.getDataFileId());
+	    		DataFile dataFile = DataFile.findById(stream.getMessageArchiveId());
 	    		if (dataFile == null || dataFile.getAbsolutePath() == null) {
 	    	    	log("It was not possible to retrieve DataFile from data file's id in topic " + topic.getLabel());
 	    			file = null;

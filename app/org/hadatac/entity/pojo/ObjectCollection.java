@@ -818,7 +818,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
 
-        System.out.println("queryString: " + queryString);
+        //System.out.println("queryString: " + queryString);
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 

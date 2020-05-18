@@ -446,7 +446,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
     public static Platform find(String uri) {
  
-    	System.out.println("Platform.find <" + uri + ">");
+    	//System.out.println("Platform.find <" + uri + ">");
     	
     	Platform platform = null;
         Statement statement;
@@ -515,7 +515,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
         platform.setUri(uri);
 
-    	System.out.println("AFTER Platform.find <" + platform + ">");
+    	//System.out.println("AFTER Platform.find <" + platform + ">");
 
         return platform;
     }
@@ -612,6 +612,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         return platforms;
     }
 
+    /*
     public static Platform find(HADataC hadatac) {
         Platform platform = null;
 
@@ -656,8 +657,16 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
         return platform;
     }
+    */
 
+    
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public int saveToLabKey(String user_name, String password) {
+    	return 0;
+    }
+    
+    /*
+    _at_Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public int saveToLabKey(String user_name, String password) {
         LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
         List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
@@ -680,6 +689,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         }
         return totalChanged;
     }
+    */
 
     @Override
     public int compareTo(Platform another) {

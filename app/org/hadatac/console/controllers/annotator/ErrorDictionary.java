@@ -68,6 +68,7 @@ public class ErrorDictionary {
     }
     
     private ErrorDictionary() {        
+    	System.out.println("Loading ErrorDictionary...");
         InputStream inputStream = getClass().getClassLoader()
                 .getResourceAsStream("error_dictionary.json");
         
@@ -84,6 +85,7 @@ public class ErrorDictionary {
                     String detail = (String)jsonObj.get("detail");
                     String solution = (String)jsonObj.get("solution");
                     
+                	//System.out.println("ErrorDictionary: constructor() id=[" + id + "]");
                     Error error = new Error(id, detail, solution);
                     table.put(id, error);
                 }
@@ -98,11 +100,13 @@ public class ErrorDictionary {
     }
     
     public static String getDetailById(String id) {
+ 
+    	//System.out.println("ErrorDictionary: getDetailById() id=[" + id + "]");
         Map<String, Error> table = getInstance().getTable();
         if (!table.containsKey(id)) {
             return "";
         }
-        
+    	//System.out.println("ErrorDictionary: detail=[" + table.get(id).getDetail() + "]");
         return table.get(id).getDetail();
     }
     

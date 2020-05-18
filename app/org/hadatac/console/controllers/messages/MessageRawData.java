@@ -21,8 +21,8 @@ import play.data.FormFactory;
 
 import org.hadatac.console.views.html.messages.*;
 import org.hadatac.data.loader.mqtt.Subscribe;
-import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
+import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.URIUtils;
@@ -38,23 +38,23 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class MessageRawData extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
-		MessageStream stream = null;
+    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction, boolean show) {
+		STR stream = null;
 		MessageTopic topic = null;
     	List<String> results = new ArrayList<String>();
     	String str_uri = null;
     	String tpc_uri = null;
     	String topic_label = null;
     	if (postAction == null) {
-    		postAction = routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url();
+    		postAction = routes.MessageManagement.index(dir, filename, da_uri, offset, show).url();
     	}
     	if (stream_uri == null) {
     		results.add("No stream URI provided");
-            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results, postAction));
+            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results, postAction, show));
     	}
     	try {
     		str_uri = URLDecoder.decode(stream_uri, "UTF-8");
-    		stream = MessageStream.find(str_uri);
+    		stream = STR.findByUri(str_uri);
     	} catch (Exception e) {
     		str_uri = "";
     		results.add("Error decoding/loading stream uri");
@@ -73,22 +73,22 @@ public class MessageRawData extends Controller {
 		if (stream == null) {
 			results.add("Could not find stream");
 		} else if (topic == null) {
-			results.add("Found Stream at " + stream.getIP() + ":" + stream.getPort());
+			results.add("Found Stream at " + stream.getMessageIP() + ":" + stream.getMessagePort());
 			List<String> tempList = Subscribe.exec(stream, null, Subscribe.SUBSCRIBE_BATCH);
 			System.out.println("TEMPLIST SIZE = " + tempList.size());
 			results.addAll(tempList);
 		} else {
-			results.add("Found Stream at " + stream.getIP() + ":" + stream.getPort() + " with topic " + stream.getName());
+			results.add("Found Stream at " + stream.getMessageIP() + ":" + stream.getMessagePort() + " with topic " + stream.getLabel());
 			results.add("Found Topic " + topic.getLabel());
 			topic_label = topic.getLabel();
 			results.addAll(Subscribe.exec(stream, topic, Subscribe.SUBSCRIBE_BATCH));
 		}
-        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction));
+        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction, show));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
-        return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction);
+    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction, boolean show) {
+        return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction, show);
     }
 
 }

@@ -176,7 +176,7 @@ public class SSDGenerator extends BaseGenerator {
     public void preprocess() throws Exception {}
 
     @Override
-    public HADatAcThing createObject(Record rec, int rowNumber) throws Exception {
+    public HADatAcThing createObject(Record rec, int rowNumber, String selector) throws Exception {
         if (!URIUtils.replacePrefixEx(getUri(rec)).equals(studyUri)) {
             return createObjectCollection(rec);
         }

@@ -35,6 +35,7 @@ externalSource=kikm ID
 DataAcquisitionName=da name
 Method=method
 DAStudyName=Study ID
+TopicName=topic
 DataDictionaryName=data dict
 Epi/Lab=epi/lab
 OwnerEmail=owner email
@@ -44,6 +45,12 @@ PermissionURI=permission uri
 # STR Template
 DeploymentUri=deployment uri
 CellScope=cell scope
+StreamURI=streamURI
+hasURI=hasURI
+MessageProtocol=protocol
+MessageIP=IP
+MessagePort=port
+MessageName=name
 
 [DASA]
 # DASA, DASE, DASO Template (Part of SDD)

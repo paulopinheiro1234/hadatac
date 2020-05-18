@@ -1,18 +1,13 @@
 package org.hadatac.data.loader.mqtt;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -21,28 +16,28 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.MessageStream;
-import org.hadatac.entity.pojo.MessageTopic;
+import org.hadatac.data.loader.MeasurementGenerator;
+import org.hadatac.entity.pojo.STR;
 
 public class AsyncSubscribe implements MqttCallback {
 
-	private MqttAsyncClient     client;
-	private MessageStream       stream;
-	private String 				brokerUrl;
-	private boolean 			quietMode;
-	private MqttConnectOptions 	conOpt;
-	private boolean 			clean;
-	private int                 qos;
-	private String              password;
-	private String              userName;
-    private List<String>        respPayload;
-    private String              plainPayload;
-    private long                totalMessages;
-    private int                 ingestedMessages;
-    private int					partialCounter;
-    private File                file;
-
+	private MqttAsyncClient      client;
+	private STR                  stream;
+	private String 				 brokerUrl;
+	private boolean 			 quietMode;
+	private MqttConnectOptions 	 conOpt;
+	private boolean 			 clean;
+	private int                  qos;
+	private String               password;
+	private String               userName;
+    private List<String>         respPayload;
+    private String               plainPayload;
+    private long                 totalMessages;
+    private int                  ingestedMessages;
+    private int					 partialCounter;
+    private File                 file;
+    private MeasurementGenerator gen;
+    
     public String getPlainPayLoad() {
     	return plainPayload;
     }
@@ -54,11 +49,11 @@ public class AsyncSubscribe implements MqttCallback {
     	return client.getClientId();
     }
     
-    public static void exec(MessageStream stream) {
+    public static void exec(STR stream, MeasurementGenerator generator) {
 
 		// Default settings:
-		String broker        = stream.getIP();
-		int port             = Integer.parseInt(stream.getPort());
+		String broker        = stream.getMessageIP();
+		int port             = Integer.parseInt(stream.getMessagePort());
 		boolean ssl          = false;
 		String password      = null;
 		String userName      = null;
@@ -73,7 +68,7 @@ public class AsyncSubscribe implements MqttCallback {
         executor.submit((Runnable) () -> {
         
         	try {
-        		new AsyncSubscribe(stream, url, userName, password);
+        		new AsyncSubscribe(stream, generator, url, userName, password);
         	    TimeUnit.MILLISECONDS.sleep(300);
         	} catch(MqttException me) {
         		// Display full details of any exception that occurs
@@ -90,11 +85,11 @@ public class AsyncSubscribe implements MqttCallback {
 
         }); 
         
-        MessageWorker.getInstance().executorsMap.put(stream.getName(), executor);
+        MessageWorker.getInstance().executorsMap.put(stream.getLabel(), executor);
         
     }
 
-    public AsyncSubscribe(MessageStream stream, String brokerUrl, String userName, String password) throws MqttException {
+    public AsyncSubscribe(STR stream, MeasurementGenerator generator, String brokerUrl, String userName, String password) throws MqttException {
     	this.stream    = stream;
     	this.brokerUrl = brokerUrl;
     	this.quietMode = false;
@@ -130,7 +125,7 @@ public class AsyncSubscribe implements MqttCallback {
 				// Set this wrapper as the callback handler
 		    	client.setCallback(this);
 
-		    	MessageWorker.getInstance().clientsMap.put(stream.getName(), client);		    	
+		    	MessageWorker.getInstance().clientsMap.put(stream.getLabel(), client);		    	
 		    	
 			} catch (MqttException e) {
 				e.printStackTrace();
@@ -138,37 +133,21 @@ public class AsyncSubscribe implements MqttCallback {
 				//System.exit(1);
 			}
     	}
-
-    	//public void subscribe(String topicName, int qos, MessageTopic topic) throws MqttException {
     	
-    	//log("Async 1");
-
+    	MessageWorker.getInstance().addStreamGenerator(stream.getUri(), generator);
+    	this.gen = generator;
+    	
     	// Connect to the MQTT server
     	IMqttToken token = client.connect(conOpt);
     	token.waitForCompletion();
     	log("Connected to " + brokerUrl + " with client ID " + client.getClientId());
  
-    	/*	
-    	respPayload = new ArrayList<String>();
-    	if (stream.getDataFileId() == null) {
-    		log("Missing data file's id in topic " + stream.getLabel());
-    	} else {
-    		DataFile dataFile = DataFile.findById(stream.getDataFileId());
-    		if (dataFile == null || dataFile.getAbsolutePath() == null) {
-    			log("It was not possible to retrieve DataFile from data file's id in topic " + stream.getLabel());
-    			file = null;
-    		} else {
-    			file = new File(dataFile.getAbsolutePath());
-    		}
-    	}
-    	*/
-    	
-    	log("Subscribing to topic \"" + stream.getName() + "\" qos " + qos);
+    	log("Subscribing to topic \"" + stream.getLabel() + "\" qos " + qos);
 
-    	client.subscribe(stream.getName() + "/#", qos);
+    	client.subscribe(stream.getLabel() + "/#", qos);
 
     	totalMessages = stream.getTotalMessages();
-    	ingestedMessages = stream.getIngestedMessages();
+    	ingestedMessages = Math.toIntExact(stream.getIngestedMessages());
     	partialCounter = 0;
 
     }
@@ -218,20 +197,17 @@ public class AsyncSubscribe implements MqttCallback {
 		stream.setTotalMessages(totalMessages);
 		stream.setIngestedMessages(ingestedMessages);
 		partialCounter = partialCounter + 1;
-		if (partialCounter >= 50) {
+		if (partialCounter >= 75) {
 			partialCounter = 0;
 			System.out.println("Received " + totalMessages + " messages. Ingested " + ingestedMessages + " messages.");
 
-			/*
-			try {
-				Thread.currentThread();
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			*/
-			
+            try {
+                gen.commitObjectsToSolr(gen.getObjects());
+            } catch (Exception e) {
+                e.printStackTrace();                
+                gen.getLogger().printException(gen.getErrorMsg(e));
+            }
+
 			stream.save();
 		}
 
@@ -251,7 +227,7 @@ public class AsyncSubscribe implements MqttCallback {
 		 *   Ingest message content
 		 */
 		try {
-			if (MessageWorker.processMessage(topic, plainPayload, ingestedMessages) != null) {
+			if (MessageWorker.processMessage(stream.getUri(), topic, plainPayload, ingestedMessages) != null) {
 				ingestedMessages = ingestedMessages + 1;
 				stream.setIngestedMessages(ingestedMessages);
 			}
@@ -259,10 +235,10 @@ public class AsyncSubscribe implements MqttCallback {
 			e.printStackTrace();
 		}
 		
-		if(Thread.currentThread().isInterrupted()) {
+		if (Thread.currentThread().isInterrupted()) {
 			//System.out.println("Thread INTERRUPTED");
-			MqttAsyncClient client = MessageWorker.getInstance().clientsMap.get(stream.getFullName());
-			IMqttToken token1 = client.unsubscribe(stream.getName());
+			MqttAsyncClient client = MessageWorker.getInstance().clientsMap.get(stream.getMessageName());
+			IMqttToken token1 = client.unsubscribe(stream.getLabel());
 			token1.waitForCompletion();				
 			IMqttToken token2 = client.disconnect();
 			token2.waitForCompletion();			

@@ -47,7 +47,7 @@ public class SpreadsheetRecordFile implements RecordFile {
         init();
     }
     
-    private void init() {        
+    private boolean init() {
         if (fileName.isEmpty()) {
             fileName = file.getName();
         }
@@ -64,7 +64,7 @@ public class SpreadsheetRecordFile implements RecordFile {
             }
             
             if (sheet == null) {
-                return;
+                return false;
             }
             
             numberOfRows = sheet.getLastRowNum() + 1;
@@ -78,14 +78,19 @@ public class SpreadsheetRecordFile implements RecordFile {
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            return false;
         } catch (EncryptedDocumentException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            return false;
         } catch (InvalidFormatException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -162,7 +167,7 @@ public class SpreadsheetRecordFile implements RecordFile {
         try {
             workbook = WorkbookFactory.create(new FileInputStream(file));
         } catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
 

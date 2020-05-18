@@ -161,18 +161,173 @@
       "content": [
         {
           "id": "STR_00001",
-          "detail": "The SDD of study %s can not be found. Check if it is already ingested.",
-          "solution": ""
+          "detail": "The Info sheet is missing in this SDD file. ",
+          "solution": "Make sure the STR spreadsheet includes a sheet called InfoSheet. The InfoSheet for STR needs to have all the fields listed in the STR specification. See User Guide."
         },
         {
           "id": "STR_00002",
-          "detail": "The Entity Label of DASO : %s can not be found. Check SDD.",
-          "solution": ""
+          "detail": "The study id [%s] specified in the STR InfoSheet is not of a valid study.",
+          "solution": "Fix the value under Study_Id in the InfoSheet. Go to Manage Studies to see a list of valid studies."
         },
         {
-          "id": "STR_00003",
-          "detail": "The Entity Label of DASO : %s can not be found. Check SDD.",
-          "solution": ""
+          "id": "STR_00004",
+          "detail": "The STR file needs to be in Excel (*.xlsx) format.",
+          "solution": "If the STR file is in a format like *.csv, it must be loaded into Excel and saved using the *.xlsx format."
+        },
+        {
+          "id": "STR_00005",
+          "detail": "The FileStream sheet is missing.",
+          "solution": "The FileStream sheet is required even if the sheet is empty. Add a FileStream sheet to the STR"
+        },
+        {
+          "id": "STR_00006",
+          "detail": "The MessageStream sheet is missing.",
+          "solution": "The MessageStream sheet is required even if the sheet is empty. Add a MessageStream sheet to the STR"
+        },
+        {
+          "id": "STR_00007",
+          "detail": "The STR file cannot have both the FileStream sheet and the MessageStream sheet empty.",
+          "solution": "Fill out the FileStream sheet or the MessageStream sheet"
+        },
+        {
+          "id": "STR_00008",
+          "detail": "In FILESTREAM sheet, the data dictionary ID <%s> is not of a valid SDD.",
+          "solution": "Fix the 'data dict' field with the ID of a valid SDD"
+        },
+        {
+          "id": "STR_00009",
+          "detail": "In FILESTREAM sheet, could not find triples about specified object collections, SSD is probably incorrectly ingested.",
+          "solution": "Delete and reingest the associated SSD"
+        },
+        {
+          "id": "STR_00010",
+          "detail": "MESSAGESTREAM sheet and MESSAGETOPIC sheet need both to be empty or to be filled out completely.",
+          "solution": "Either add content to both sheets or completely remove their content."
+        },
+        {
+          "id": "STR_00011",
+          "detail": "In MESSAGESTREAM sheet, the hasURI field cannot be empty or null.",
+          "solution": "Assign an URI value to the hasURI field"
+        },
+        {
+          "id": "STR_00012",
+          "detail": "In MESSAGESTREAM sheet, the data dictionary ID cannot be empty or null.",
+          "solution": "Assign an ID to the 'data dict' field"
+        },
+        {
+          "id": "STR_00013",
+          "detail": "In MESSAGESTREAM sheet, the data dictionary ID <%s> is not of a valid SDD.",
+          "solution": "Fix the 'data dict' field with the ID of a valid SDD"
+        },
+        {
+          "id": "STR_00014",
+          "detail": "In MESSAGESTREAM, deployment [%s] could not be found. Check if DPL was ingested and is correct",
+          "solution": "Check if the missing deployment is specified in a DPL file."
+        },
+        {
+          "id": "STR_00015",
+          "detail": "In MESSAGESTREAM, study object with URI [%s], which is specified in a cell scope, could not be found. Checke if SSD was ingested and is correct.",
+          "solution": "Check if the SSD for the study has been load. If the SSD was loaded, check if the study object is specified in the SSD."
+        },
+        {
+          "id": "STR_00016",
+          "detail": "The MESSAGETOPIC sheet is missing.",
+          "solution": "The MessageTopic sheet is required even if the sheet is empty. Add a MessageTopic sheet to the STR"
+        },
+        {
+          "id": "STR_00017",
+          "detail": "In MESSAGESTREAM sheet, the protocol value cannot be empty or null.",
+          "solution": "Assign a value to the protocol field"
+        },
+        {
+          "id": "STR_00018",
+          "detail": "In MESSAGESTREAM sheet, the IP value cannot be empty or null.",
+          "solution": "Assign a value to the IP field"
+        },
+        {
+          "id": "STR_00019",
+          "detail": "In MESSAGESTREAM sheet, the stream's name cannot be empty or null.",
+          "solution": "Assign a value to the stream's name"
+        },
+        {
+          "id": "STR_00020",
+          "detail": "In FILESTREAM sheet, the stream's 'DA NAME' cannot be empty or null.",
+          "solution": "Assign a value to the stream's 'DA NAME'"
+        },
+        {
+          "id": "STR_00021",
+          "detail": "In FILESTREAM sheet, the stream's data dictionary cannot be empty or null.",
+          "solution": "Assign a value to the stream's data dictionary"
+        },
+        {
+          "id": "STR_00022",
+          "detail": "In FILESTREAM sheet, the stream's deployment cannot be empty or null.",
+          "solution": "Assign a value to the stream's deployment"
+        },
+        {
+          "id": "STR_00023",
+          "detail": "In FILESTREAM sheet, CellScope ill-formed: should start with '<'.",
+          "solution": "Start the cellscope (the entire value of cell scope) with '<'"
+        },
+        {
+          "id": "STR_00024",
+          "detail": "In FILESTREAM sheet, CellScope ill-formed: should end with >.",
+          "solution": "End the cellscope (the entire value of cell scope) with '>'"
+        },
+        {
+          "id": "STR_00025",
+          "detail": "In FILESTREAM sheet, CellScope ill-formed: cell spec <%s> should start with '<'",
+          "solution": "Start the identified cell spec with '<'"
+        },
+        {
+          "id": "STR_00026",
+          "detail": "In FILESTREAM sheet, CellScope ill-formed: cell spec <%s> should end with '>'",
+          "solution": "End the identified cell spec with a '>'"
+        },
+        {
+          "id": "STR_00027",
+          "detail": "In FILESTREAM sheet, CellScope ill-formed: cell spec <%s> should have a name and an URI",
+          "solution": "A cell spec should have a pair of values"
+        },
+        {
+          "id": "STR_00028",
+          "detail": "In FILESTREAM sheet, the specified owner email <%s> is not a valid user",
+          "solution": "Provide a valid owner email"
+        },
+        {
+          "id": "STR_00029",
+          "detail": "In FILESTREAM sheet, owner email is missing",
+          "solution": "Provide the email of a valid user as owner email"
+        },
+        {
+          "id": "STR_00030",
+          "detail": "In FILESTREAM sheet, Owner Email is not specified for Row <%s>",
+          "solution": "For the given row, provide the email of a valid user as owner email"
+        },
+        {
+          "id": "STR_00031",
+          "detail": "In FILESTREAM sheet, could not retrieve user with owner email <%s>",
+          "solution": "For the given row, provide the email of a valid user as owner email"
+        },
+        {
+          "id": "STR_00032",
+          "detail": "In FILESTREAM sheet, permission URI is not specified for Row <%s>",
+          "solution": "For the given row, provide a valid permission URI for identified row"
+        },
+        {
+          "id": "STR_00033",
+          "detail": "In FILESTREAM sheet, no platform is specified for deployment <%s>",
+          "solution": "In DPL file, verify if a platform is specified for the identified deployment"
+        },
+        {
+          "id": "STR_00034",
+          "detail": "In FILESTREAM sheet, no instrument is specified for deployment <%s>",
+          "solution": "In DPL file, verify if an instrument is specified for the identified deoployment"
+        },
+        {
+          "id": "STR_00035",
+          "detail": "In FILESTREAM sheet, SDD <%s> cannot be retrieved. ",
+          "solution": "For the identified SDD, make sure the SDD file is properly ingested. "
         }
       ]
     },
@@ -191,28 +346,33 @@
         },
         {
           "id": "DA_00003",
-          "detail": "Specification of associated Stream Specification is incomplete: <%s>",
+          "detail": "STR for the uri <%s> is incomplete",
           "solution": ""
         },
         {
           "id": "DA_00004",
-          "detail": "Cannot find associated Stream Specification: <%s>",
+          "detail": "Cannot find STR with following URI: <%s>",
           "solution": ""
         },
         {
           "id": "DA_00005",
-          "detail": "Cannot load schema specified for data acquisition: <%s>",
+          "detail": "Cannot load SDD specified for the following STR: <%s>",
           "solution": ""
         },
         {
           "id": "DA_00006",
-          "detail": "Cannot load deployment specified for data acquisition: <%s>",
+          "detail": "Cannot load deployment specified for the following STR: <%s>",
           "solution": ""
         },
         {
           "id": "DA_00007",
-          "detail": "Schema <%s> cannot be found",
-          "solution": ""
+          "detail": "SDD <%s> cannot be found",
+          "solution": "Make sure the identified SDD has been ingested prior to the ingestion of this DA file"
+        },
+        {
+          "id": "DA_00008",
+          "detail": "Study is missing for the following STR: <%s>",
+          "solution": "Add a valid study id to the STR for of this file stream"
         }
       ]
     },
@@ -262,7 +422,7 @@
       "content": [
         {
           "id": "GBL_00001",
-          "detail": "Unsupported file name prefix, only accept prefixes DA-, DOI-, DPL-, STR-, SDD-, SSD-, STD- ",
+          "detail": "Unsupported file name prefix, acceptable prefixes are DA-, DOI-, DPL-, STR-, SDD-, SSD-, STD- ",
           "solution": "Rename the current file to have a valid prefix. Please note that the prefixes end with an hyphen, not an underscore"
         },
         {
