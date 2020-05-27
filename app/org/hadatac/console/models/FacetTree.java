@@ -35,7 +35,7 @@ public class FacetTree {
             FacetHandler facetHandler, 
             Pivot curPivot) {
         System.out.println("\n\n\nlevel " + level);
-        System.out.println("facetName: " + facet.getFacetName());
+        System.out.println("facetName: " + facet.getFacetName() + "   facetsSize: " + facets.size());
 
         try {
             Facetable object = null;

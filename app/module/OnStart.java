@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.hadatac.console.models.SecurityRole;
-import org.hadatac.data.loader.mqtt.MessageWorker;
+import org.hadatac.data.loader.mqtt.MqttMessageWorker;
 import org.hadatac.utils.CollectionUtil;
 
 @Singleton
@@ -35,7 +35,7 @@ public class OnStart {
 		//       If not, show how to upload some default instances  
 		// TODO: implement this code
 
-    	MessageWorker.getInstance();
+    	MqttMessageWorker.getInstance();
     
     }
     

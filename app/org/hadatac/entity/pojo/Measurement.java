@@ -709,6 +709,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotEC = getFacetStats(fTreeEC, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
                 facetHandler);
+        System.out.println("getAllFacetStats: printing fTreeEC: ");
+        fTreeEC.print();
+        System.out.println("getAllFacetStats: end printing fTreeEC");
 
         FacetTree fTreeU = new FacetTree();
         fTreeU.setTargetFacet(UnitInstance.class);

@@ -19,7 +19,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.hadatac.data.loader.MeasurementGenerator;
 import org.hadatac.entity.pojo.STR;
 
-public class AsyncSubscribe implements MqttCallback {
+public class MqttAsyncSubscribe implements MqttCallback {
 
 	private MqttAsyncClient      client;
 	private STR                  stream;
@@ -68,15 +68,15 @@ public class AsyncSubscribe implements MqttCallback {
         executor.submit((Runnable) () -> {
         
         	try {
-        		new AsyncSubscribe(stream, generator, url, userName, password);
+        		new MqttAsyncSubscribe(stream, generator, url, userName, password);
         	    TimeUnit.MILLISECONDS.sleep(300);
         	} catch(MqttException me) {
         		// Display full details of any exception that occurs
-        		System.out.println("reason " + me.getReasonCode());
-        		System.out.println("msg " + me.getMessage());
-        		System.out.println("loc " + me.getLocalizedMessage());
-        		System.out.println("cause " + me.getCause());
-        		System.out.println("excep " + me);
+        		stream.getMessageLogger().printException("MQTT Exception: reason : [" + me.getReasonCode() + "]");
+        		stream.getMessageLogger().printException("MQTT Exception: msg    : [" + me.getMessage() + "]");
+        		stream.getMessageLogger().printException("MQTT Exception: loc    : [" + me.getLocalizedMessage() + "]");
+        		stream.getMessageLogger().printException("MQTT Exception: cause  : [" + me.getCause() + "]");
+        		stream.getMessageLogger().printException("MQTT Exception: excep  : [" + me + "]");
         		me.printStackTrace();
         	} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -85,11 +85,11 @@ public class AsyncSubscribe implements MqttCallback {
 
         }); 
         
-        MessageWorker.getInstance().executorsMap.put(stream.getLabel(), executor);
+        MqttMessageWorker.getInstance().addExecutor(stream, executor);
         
     }
 
-    public AsyncSubscribe(STR stream, MeasurementGenerator generator, String brokerUrl, String userName, String password) throws MqttException {
+    public MqttAsyncSubscribe(STR stream, MeasurementGenerator generator, String brokerUrl, String userName, String password) throws MqttException {
     	this.stream    = stream;
     	this.brokerUrl = brokerUrl;
     	this.quietMode = false;
@@ -101,7 +101,7 @@ public class AsyncSubscribe implements MqttCallback {
     	String clientId = UUID.randomUUID().toString();
         
     	if (clientId == null || clientId.isEmpty()) {
-    		System.out.println("AsyncSubscribe: client is null");
+    		stream.getMessageLogger().printException("AsyncSubscribe: client is null");
     		return;
     	}
     	if (clientId != null && !clientId.isEmpty()) {
@@ -125,16 +125,16 @@ public class AsyncSubscribe implements MqttCallback {
 				// Set this wrapper as the callback handler
 		    	client.setCallback(this);
 
-		    	MessageWorker.getInstance().clientsMap.put(stream.getLabel(), client);		    	
+		    	MqttMessageWorker.getInstance().addClient(stream, client);		    	
 		    	
 			} catch (MqttException e) {
 				e.printStackTrace();
-				log("Unable to set up client: "+e.toString());
+				stream.getMessageLogger().printException("Unable to set up client: "+e.toString());
 				//System.exit(1);
 			}
     	}
     	
-    	MessageWorker.getInstance().addStreamGenerator(stream.getUri(), generator);
+    	MqttMessageWorker.getInstance().addStreamGenerator(stream.getUri(), generator);
     	this.gen = generator;
     	
     	// Connect to the MQTT server
@@ -197,7 +197,7 @@ public class AsyncSubscribe implements MqttCallback {
 		stream.setTotalMessages(totalMessages);
 		stream.setIngestedMessages(ingestedMessages);
 		partialCounter = partialCounter + 1;
-		if (partialCounter >= 75) {
+		if (partialCounter >= 300) {
 			partialCounter = 0;
 			System.out.println("Received " + totalMessages + " messages. Ingested " + ingestedMessages + " messages.");
 
@@ -227,7 +227,7 @@ public class AsyncSubscribe implements MqttCallback {
 		 *   Ingest message content
 		 */
 		try {
-			if (MessageWorker.processMessage(stream.getUri(), topic, plainPayload, ingestedMessages) != null) {
+			if (MqttMessageWorker.processMessage(stream.getUri(), topic, plainPayload, ingestedMessages) != null) {
 				ingestedMessages = ingestedMessages + 1;
 				stream.setIngestedMessages(ingestedMessages);
 			}
@@ -237,7 +237,7 @@ public class AsyncSubscribe implements MqttCallback {
 		
 		if (Thread.currentThread().isInterrupted()) {
 			//System.out.println("Thread INTERRUPTED");
-			MqttAsyncClient client = MessageWorker.getInstance().clientsMap.get(stream.getMessageName());
+			MqttAsyncClient client = MqttMessageWorker.getInstance().getClient(stream.getMessageName());
 			IMqttToken token1 = client.unsubscribe(stream.getLabel());
 			token1.waitForCompletion();				
 			IMqttToken token2 = client.disconnect();

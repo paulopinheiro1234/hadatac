@@ -44,7 +44,7 @@ import org.hadatac.entity.pojo.STR;
  *  If the application is run with the -h parameter then info is displayed that
  *  describes all of the options / parameters.
  */
-public class Subscribe implements MqttCallback {
+public class MqttSubscribe implements MqttCallback {
 
 	// Private instance variables
 	//private MqttAsyncClient     client;
@@ -175,7 +175,7 @@ public class Subscribe implements MqttCallback {
     	        
 		try {
 
-			Subscribe aClient = new Subscribe(stream, url, clientId, cleanSession, quietMode, userName, password, action);
+			MqttSubscribe aClient = new MqttSubscribe(stream, url, clientId, cleanSession, quietMode, userName, password, action);
 
 			List<String> tempResponse;
 			// Perform the requested action
@@ -221,7 +221,7 @@ public class Subscribe implements MqttCallback {
      * @param password the password for the user
 	 * @throws MqttException
 	 */
-    public Subscribe(STR stream, String brokerUrl, String clientId, boolean cleanSession, boolean quietMode, String userName, String password, int action) throws MqttException {
+    public MqttSubscribe(STR stream, String brokerUrl, String clientId, boolean cleanSession, boolean quietMode, String userName, String password, int action) throws MqttException {
     	this.stream = stream;
     	this.brokerUrl = brokerUrl;
     	this.quietMode = quietMode;

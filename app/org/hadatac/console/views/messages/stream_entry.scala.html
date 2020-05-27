@@ -41,26 +41,20 @@
 	  <td>@stream.getTotalMessages()</td> 
 	  <td>@stream.getIngestedMessages()</td> 
       <td>
-         @if(stream.getStatus().equals(STR.ACTIVE)) {
+         @if(stream.getMessageStatus().equals(STR.ACTIVE)) {
 		    <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.unsubscribe(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
                class="btn-xs btn-primary" role="button">Suspend</a>
          }  
-         @if(stream.getStatus().equals(STR.SUSPENDED)) {
+         @if(stream.getMessageStatus().equals(STR.SUSPENDED)) {
 		    <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.subscribe(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
                class="btn-xs btn-primary" role="button">Activate</a>
          }  
-         <!-- 
-   		 <a href="_at_org.hadatac.console.controllers.messages.routes.MessageManagement.close(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
+	     <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.close(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
             class="btn-xs btn-primary" role="button">Close</a>
-         -->
       </td>
       <td>
          <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testConnection(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
             class="btn-xs btn-primary" role="button">Test Connection</a>
-         <!--
-         <a href="_at_org.hadatac.console.controllers.messages.routes.MessageManagement.listTopics(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
-            class="btn-xs btn-primary" role="button">Browse Topics</a>
-         -->
          <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.testTopics(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), show)"
             class="btn-xs btn-primary" role="button">Test Topics</a>
          <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), null, null, show)"

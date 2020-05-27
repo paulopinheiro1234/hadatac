@@ -25,9 +25,12 @@ import play.data.FormFactory;
 import org.hadatac.console.views.html.messages.*;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.STRStore;
-import org.hadatac.data.loader.mqtt.MessageAnnotation;
-import org.hadatac.data.loader.mqtt.MessageWorker;
-import org.hadatac.data.loader.mqtt.Subscribe;
+import org.hadatac.data.loader.mqtt.MqttMessageAnnotation;
+import org.hadatac.data.loader.mqtt.MqttMessageWorker;
+import org.hadatac.data.loader.mqtt.MqttSubscribe;
+import org.hadatac.data.loader.http.HttpMessageAnnotation;
+import org.hadatac.data.loader.http.HttpMessageWorker;
+import org.hadatac.data.loader.http.HttpSubscribe;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
@@ -39,6 +42,7 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.ApiUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.State;
@@ -59,7 +63,6 @@ public class MessageManagement extends Controller {
 
     	// get an updated list of stream
     	List<STR> results = STRStore.getInstance().findCachedOpenStreams();
-    	//List<STR> results = STR.findOpenStreams();
     	
     	// get an updated list of studies
         List<String> studyIdList = Study.findIds();
@@ -69,6 +72,20 @@ public class MessageManagement extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics) {
         return index(dir, filename, da_uri, offset, topics);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
+
+    	// get an updated list of stream
+    	STRStore.getInstance().refreshStore();
+        return index(dir, filename, da_uri, offset, topics);
+    	
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
+        return refreshCache(dir, filename, da_uri, offset, topics);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -82,11 +99,16 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
     	STR stream = STRStore.getInstance().findCachedByUri(uri);
-        //STR stream = STR.findByUri(uri);
 
         // call operation
         if (stream != null) {
-            MessageAnnotation.subscribeMessageStream(stream);
+        	if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
+        		MqttMessageAnnotation.subscribeMessageStream(stream);
+        	} else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
+        		HttpMessageAnnotation.subscribeMessageStream(stream);
+        	} else {
+                return badRequest("Message Protocol is neither MQTT or HTTP");
+        	}
         	//MessageAnnotationSubscribe subscription = new MessageAnnotationSubscribe();
         	//subscription.exec(stream);
         }
@@ -110,11 +132,16 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
     	STR stream = STRStore.getInstance().findCachedByUri(uri);
-        //STR stream = STR.findByUri(uri);
 
         // call action
         if (stream != null) {
-            MessageAnnotation.unsubscribeMessageStream(stream);
+        	if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
+        		MqttMessageAnnotation.unsubscribeMessageStream(stream);
+        	} else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
+        		HttpMessageAnnotation.unsubscribeMessageStream(stream);
+        	} else {
+                return badRequest("Message Protocol is neither MQTT or HTTP");
+        	}
         }
         
         return index(dir, filename, da_uri, offset, topics);
@@ -125,17 +152,8 @@ public class MessageManagement extends Controller {
         return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics);
     }
 
-    /*
-    public static void stopStream(MessageStream stream) {
-        if (stream != null) {
-            MessageAnnotation.unsubscribeMessageStream(stream);
-        }
-    }
-    */
-    
-    /*
-    Restrict(Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result stop(String dir, String filename, String da_uri, int offset, String stream_uri) {
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
 
     	// retrieve stream
     	String uri = null;
@@ -144,23 +162,26 @@ public class MessageManagement extends Controller {
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
-    	MessageStream stream = MessageStream.find(uri);
+    	STR stream = STRStore.getInstance().findCachedByUri(uri);
 
     	// call action
-    	if (stream != null) {
-    		stopStream(stream);
-    	}
+        if (stream != null) {
+        	if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
+        		MqttMessageAnnotation.closeMessageStream(stream);
+        	} else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
+        		HttpMessageAnnotation.closeMessageStream(stream);
+        	} else {
+                return badRequest("Message Protocol is neither MQTT or HTTP");
+        	}
+        }
 
-        return index(dir, filename, da_uri, offset);
+        return index(dir, filename, da_uri, offset, topics);
     }
-    */
 
-    /*
-    Restrict(Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postStop(String dir, String filename, String da_uri, int offset, String stream_uri) {
-        return stop(dir, filename, da_uri, offset, stream_uri);
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+        return close(dir, filename, da_uri, offset, stream_uri, topics);
     }
-    */
 
     /*
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -199,7 +220,6 @@ public class MessageManagement extends Controller {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
         	System.out.println("looking log for [" + uri + "]");
         	stream = STRStore.getInstance().findCachedByUri(uri);
-            //stream = STR.findByUri(uri);
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
@@ -212,30 +232,6 @@ public class MessageManagement extends Controller {
                 routes.MessageManagement.index(dir, filename, da_uri, offset, topics ).url()));
     }
  
-    /*
-    _at_Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result listTopics(String dir, String filename, String da_uri, int offset, String stream_uri) {
-    	
-    	String uri = null;
-    	try {
-    		uri = URLDecoder.decode(stream_uri, "utf-8");
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-        MessageStream stream = MessageStream.find(uri);
-        
-        List<MessageTopic> topics = null;
-        topics = MessageTopic.findByStream(uri);
-        
-    	return ok(topicManagement.render(dir, filename, da_uri, offset, stream, topics, routes.MessageManagement.listTopics(dir, filename, da_uri, offset, stream_uri).url()));
-    }
-
-    _at_Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postListTopics(String dir, String filename, String da_uri, int offset, String stream_uri) {
-        return listTopics(dir, filename, da_uri, offset, stream_uri);
-    }
-    */
-
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
     	
@@ -248,7 +244,7 @@ public class MessageManagement extends Controller {
             //STR stream = STR.findByUri(uri);
             if (stream != null) {
             	streamName = stream.getLabel();
-                results = Subscribe.testConnection(stream);
+                results = MqttSubscribe.testConnection(stream);
             }
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
@@ -274,7 +270,7 @@ public class MessageManagement extends Controller {
         	STR stream = STRStore.getInstance().findCachedByUri(stream_uri);
             if (stream != null) {
             	streamName = stream.getLabel();
-            	results = Subscribe.testTopics(stream);
+            	results = MqttSubscribe.testTopics(stream);
             	Collections.sort(results);
             }
             List<MessageTopic> topics = stream.getTopicsList();
@@ -311,7 +307,7 @@ public class MessageManagement extends Controller {
             	STR stream = topic.getStream();
             	if (stream != null) {
             		streamName = stream.getLabel();
-            		results = Subscribe.testLabels(stream,topic);
+            		results = MqttSubscribe.testLabels(stream,topic);
             	}
             	Collections.sort(results);
             	if (stream != null && stream.getSchema() != null) {

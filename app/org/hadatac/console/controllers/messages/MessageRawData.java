@@ -20,7 +20,7 @@ import play.mvc.Result;
 import play.data.FormFactory;
 
 import org.hadatac.console.views.html.messages.*;
-import org.hadatac.data.loader.mqtt.Subscribe;
+import org.hadatac.data.loader.mqtt.MqttSubscribe;
 import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.User;
@@ -74,14 +74,14 @@ public class MessageRawData extends Controller {
 			results.add("Could not find stream");
 		} else if (topic == null) {
 			results.add("Found Stream at " + stream.getMessageIP() + ":" + stream.getMessagePort());
-			List<String> tempList = Subscribe.exec(stream, null, Subscribe.SUBSCRIBE_BATCH);
+			List<String> tempList = MqttSubscribe.exec(stream, null, MqttSubscribe.SUBSCRIBE_BATCH);
 			System.out.println("TEMPLIST SIZE = " + tempList.size());
 			results.addAll(tempList);
 		} else {
 			results.add("Found Stream at " + stream.getMessageIP() + ":" + stream.getMessagePort() + " with topic " + stream.getLabel());
 			results.add("Found Topic " + topic.getLabel());
 			topic_label = topic.getLabel();
-			results.addAll(Subscribe.exec(stream, topic, Subscribe.SUBSCRIBE_BATCH));
+			results.addAll(MqttSubscribe.exec(stream, topic, MqttSubscribe.SUBSCRIBE_BATCH));
 		}
         return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction, show));
     }

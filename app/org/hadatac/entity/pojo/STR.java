@@ -154,6 +154,9 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     public static final String SUSPENDED = "SUSPENDED";
     public static final String CLOSED = "CLOSED";
 
+    public static final String MQTT = "mqtt";
+    public static final String HTTP = "http";
+
     public STR() {
         startedAt = null;
         endedAt = null;
@@ -566,6 +569,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 		if (topics != null) {
 			topicsMap = new HashMap<String, MessageTopic>(); 
 			for (MessageTopic topic : topics) {
+				topic.cacheTopic();
 				topicsMap.put(topic.getLabel(), topic);
 			}
 		}    	

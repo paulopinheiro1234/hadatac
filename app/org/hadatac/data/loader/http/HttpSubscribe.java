@@ -17,7 +17,7 @@ import org.hadatac.data.loader.http.HttpMessageWorker;
 import org.hadatac.utils.ApiUtil;
 
 
-public class HTTPSubscribe extends Controller {
+public class HttpSubscribe extends Controller {
     
     private STR                  stream;
 	private boolean 			 quietMode;
@@ -33,7 +33,7 @@ public class HTTPSubscribe extends Controller {
         executor.submit((Runnable) () -> {
         
         	try {
-        		new HTTPSubscribe(stream, generator);
+        		new HttpSubscribe(stream, generator);
         	    TimeUnit.MILLISECONDS.sleep(300);
         	} catch(Exception e) {
         		System.out.println("excep " + e);
@@ -42,11 +42,11 @@ public class HTTPSubscribe extends Controller {
 
         }); 
         
-        HttpMessageWorker.getInstance().executorsMap.put(stream.getLabel(), executor);
+        HttpMessageWorker.getInstance().addExecutor(stream.getLabel(), executor);
         
     }
 
-    public HTTPSubscribe() {
+    public HttpSubscribe() {
     	this.quietMode = false;
     }
     
@@ -67,7 +67,7 @@ public class HTTPSubscribe extends Controller {
     	return 0;
     }
     
-    public HTTPSubscribe(STR stream, MeasurementGenerator generator) {
+    public HttpSubscribe(STR stream, MeasurementGenerator generator) {
     	this.stream    = stream;
     	this.quietMode = false;
 
