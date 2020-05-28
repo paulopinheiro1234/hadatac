@@ -10,7 +10,6 @@ import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
-import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Templates;
 

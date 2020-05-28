@@ -9,7 +9,6 @@ import org.hadatac.data.loader.RecordFile;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
-import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
