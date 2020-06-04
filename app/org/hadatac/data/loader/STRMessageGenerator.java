@@ -15,7 +15,6 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;

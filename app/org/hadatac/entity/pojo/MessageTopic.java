@@ -187,6 +187,12 @@ public class MessageTopic extends HADatAcThing implements Comparable<MessageTopi
     public static String DELETE_LINE4 = "  hasco:hasLastCounter ?o . ";
     public static String LINE_LAST = "}  ";
 
+    public void cacheTopic() {
+    	this.getSOC();
+    	this.getDeployment();
+    	this.getStudyObject();
+    }
+    
 	private static List<MessageTopic> execFindQuery(String query) {
 		List<MessageTopic> topics = new ArrayList<MessageTopic>();
 		ResultSetRewindable resultsrw = SPARQLUtils.select(

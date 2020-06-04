@@ -206,9 +206,24 @@ public class MeasurementGenerator extends BaseGenerator {
         String objUri = "";
         boolean doMatching = false;
         boolean doGroup = false;
+        StudyObject cellObject = null;
+        ObjectCollection cellSoc = null;
         if (str.hasCellScope()) {
-            socUri = cellScopeSOC.getUri();
-            objUri = cellScopeObject.getUri();
+        	if (selector == null) {
+        		return null;
+        	}
+        	cellObject = str.getTopicsMap().get(selector).getStudyObject();
+        	objUri = cellObject.getUri();
+        	if (objUri == null) {
+        		return null;
+        	}
+        	cellSoc = str.getTopicsMap().get(selector).getSOC();
+        	socUri = cellSoc.getUri();
+        	if (socUri == null) {
+        		return null;
+        	}
+            //socUri = cellScopeSOC.getUri();
+            //objUri = cellScopeObject.getUri();
         } else {
             // Objects defined by Row Scope
             String id = "";
@@ -400,7 +415,13 @@ public class MeasurementGenerator extends BaseGenerator {
             if (str.hasCellScope()) {
 
                 // Objects defined by Cell Scope
-                if (str.getCellScopeName().get(0).equals("*")) {
+            	if (objUri != null && socUri != null) {
+                    measurement.setStudyObjectUri(objUri);
+                    measurement.setStudyObjectTypeUri(cellObject.getTypeUri());
+                    measurement.setObjectUri(objUri);
+                    measurement.setObjectCollectionType(cellSoc.getTypeUri());
+                    measurement.setRole(cellSoc.getRoleLabel());
+            	} else if (str.getCellScopeName().get(0).equals("*")) {
                     measurement.setStudyObjectUri(cellScopeObject.getUri());
                     measurement.setStudyObjectTypeUri(cellScopeObject.getTypeUri());
                     measurement.setObjectUri(cellScopeObject.getUri());

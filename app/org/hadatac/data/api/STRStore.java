@@ -13,7 +13,7 @@ public class STRStore {
     private static STRStore store = null; 
     
     // public variables
-    final public Map<String,STR> cache;
+    final private Map<String,STR> cache;
   
     private STRStore() { 
     	cache = new HashMap<String,STR>();

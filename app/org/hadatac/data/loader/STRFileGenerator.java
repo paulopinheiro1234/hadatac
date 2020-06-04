@@ -26,7 +26,6 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.MessageStream;
 import org.hadatac.entity.pojo.MessageTopic;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.TriggeringEvent;

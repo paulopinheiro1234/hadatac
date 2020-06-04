@@ -167,10 +167,14 @@ POST	/hadatac/deployments/resources	               org.hadatac.console.controlle
 # message management
 GET	    /hadatac/messages/		                       org.hadatac.console.controllers.messages.MessageManagement.index(dir : String, filename : String, da_uri : String, page : Integer, topics : Boolean)
 POST	/hadatac/messages/     	                       org.hadatac.console.controllers.messages.MessageManagement.postIndex(dir : String, filename : String, da_uri : String, page : Integer, topics : Boolean)
+GET	    /hadatac/messages/refresh		               org.hadatac.console.controllers.messages.MessageManagement.refreshCache(dir : String, filename : String, da_uri : String, page : Integer, topics : Boolean)
+POST	/hadatac/messages/refresh     	               org.hadatac.console.controllers.messages.MessageManagement.postRefreshCache(dir : String, filename : String, da_uri : String, page : Integer, topics : Boolean)
 GET	    /hadatac/messages/subscribe		               org.hadatac.console.controllers.messages.MessageManagement.subscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topics : Boolean)
 POST	/hadatac/messages/subscribe	                   org.hadatac.console.controllers.messages.MessageManagement.postSubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topics : Boolean)
 GET	    /hadatac/messages/unsubscribe	               org.hadatac.console.controllers.messages.MessageManagement.unsubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topics : Boolean)
 POST	/hadatac/messages/unsubscribe                  org.hadatac.console.controllers.messages.MessageManagement.postUnsubscribe(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topics : Boolean)
+GET	    /hadatac/messages/close	                       org.hadatac.console.controllers.messages.MessageManagement.close(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topics : Boolean)
+POST	/hadatac/messages/close                        org.hadatac.console.controllers.messages.MessageManagement.postClose(dir : String, filename : String, da_uri : String, page : Integer, stream : String, topics : Boolean)
 GET	    /hadatac/messages/rawdata		               org.hadatac.console.controllers.messages.MessageRawData.index(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topic_uri : String, postAction : String, topics : Boolean)
 POST	/hadatac/messages/rawdata	                   org.hadatac.console.controllers.messages.MessageRawData.postIndex(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topic_uri : String, postAction : String, topics : Boolean)
 GET	    /hadatac/messages/log                          org.hadatac.console.controllers.messages.MessageManagement.checkAnnotationLog(dir : String, filename : String, da_uri : String, page : Integer, stream_uri : String, topics : Boolean)
@@ -632,7 +636,7 @@ GET     /hadatac/api/measurements/dpl/:studyuri/:variableuri/:dpluri/:fromdateti
 GET     /hadatac/api/measurements/:studyuri/:variableuri                                        org.hadatac.console.controllers.restapi.RestApi.getMeasurements(studyuri: String, variableuri: String)
 
 # REST API (message stream)
-POST    /hadatac/api/stream/:streamuri/:topic          org.hadatac.data.loader.http.HTTPSubscribe.messageArrived(topic : String, streamuri: String)
+POST    /hadatac/api/stream/:streamuri/:topic          org.hadatac.data.loader.http.HttpSubscribe.messageArrived(topic : String, streamuri: String)
 
 # JavaScript Routing
 GET     /hadatac/assets/javascript/routesMain.js       org.hadatac.console.controllers.JS.jsRoutesMain()

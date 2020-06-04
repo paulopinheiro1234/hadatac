@@ -1,4 +1,4 @@
-package org.hadatac.data.loader.http;
+package org.hadatac.data.loader.mqtt;
 
 import java.lang.String;
 import java.text.DateFormat;
@@ -8,18 +8,13 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hadatac.data.api.STRStore;
 import org.hadatac.data.loader.MeasurementGenerator;
-import org.hadatac.data.loader.mqtt.MqttMessageWorker;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.DataFile;
 
-public class HttpMessageAnnotation {
+public class MqttMessageAnnotation {
 	
-	public HttpMessageAnnotation() {}
+	public MqttMessageAnnotation() {}
 
-    /********************************************************************************
-     *                            STREAM MANAGEMENT                                 *
-     ********************************************************************************/
-    
     public static void subscribeMessageStream(STR stream) {
     	if (stream == null || !stream.getMessageStatus().equals(STR.SUSPENDED)) {
     		return;
@@ -49,43 +44,54 @@ public class HttpMessageAnnotation {
         }        
 		try {
 			gen.preprocess();
+        	stream.getMessageLogger().println("MessageAnnotation : message generator pre-processing completed.");
 		} catch (Exception e1) {
-			stream.getMessageLogger().println("Error with MeasurementGenerator inside MessageAnnotation: " + e1.toString());
+			stream.getMessageLogger().printException("Error with MeasurementGenerator inside MessageAnnotation: " + e1.toString());
+			return;
 		}
-        HttpMessageWorker.getInstance().addStreamGenerator(stream.getUri(), gen);
-        HttpSubscribe.exec(stream, gen);
+        MqttMessageWorker.getInstance().addStreamGenerator(stream.getUri(), gen);
+        
+        try {
+        	stream.getMessageLogger().println("MessageAnnotation : calling AsyncSubscribe");
+			CompletableFuture.runAsync(() -> MqttAsyncSubscribe.exec(stream, gen));
+		} catch (Exception e) {
+			stream.getMessageLogger().printException("MessageAnnotation: Error executing 'subscribe' inside startMessageStream.");
+			e.printStackTrace();
+			return;
+		} 
+
         stream.setMessageStatus(STR.ACTIVE);
-		stream.getMessageLogger().println(String.format("Message stream %s is active.", stream.getMessageName()));
+		stream.getMessageLogger().println(String.format("Message stream [%s] is active.", stream.getMessageName()));
 		stream.save();
 
     }
     
     public static void unsubscribeMessageStream(STR stream) {
-    	if (!stream.getMessageStatus().equals(STR.ACTIVE)) {
+    	if (stream == null || !stream.getMessageStatus().equals(STR.ACTIVE)) {
     		return;
     	}
     	System.out.println("Unsubscribing message stream: " + stream.getMessageName());
 		stream.getMessageLogger().resetLog();
-		stream.getMessageLogger().println(String.format("Unsubscribing message stream: %s", stream.getMessageName()));
-		if (!HttpMessageWorker.getInstance().containsExecutor(stream)) {
-			stream.getMessageLogger().println("Could not stop message stream: " + stream.getMessageName() + ". Reason: currentClient is null");
+		stream.getMessageLogger().println(String.format("Unsubscribing message stream [%s]", stream.getMessageName()));
+		if (!MqttMessageWorker.getInstance().containsExecutor(stream)) {
+			stream.getMessageLogger().printWarning("CurrentClient for the following stream is missing [" + stream.getUri() + "]");
 		} else {
-	        stream.setMessageStatus(STR.SUSPENDED);        
-			HttpMessageWorker.getInstance().stopStream(stream.getUri());
-			stream.getMessageLogger().println(String.format("Stopped processing of message stream: %s", stream.getMessageName()));
-    	}
+			MqttMessageWorker.getInstance().stopStream(stream.getUri());
+		}
+		stream.setMessageStatus(STR.SUSPENDED);        
+		stream.getMessageLogger().println(String.format("Suspended processing of message stream [%s]", stream.getUri()));
 		stream.save();
     }
-        
+            
     public static void closeMessageStream(STR stream) {
-    	if (stream == null || !stream.getMessageStatus().equals(STR.CLOSED)) {
+    	if (stream == null || stream.getMessageStatus().equals(STR.CLOSED)) {
     		return;
     	}
     	System.out.println("closing message stream: " + stream.getMessageName());
 		stream.getMessageLogger().resetLog();
 		stream.getMessageLogger().println(String.format("Closing message stream [%s]", stream.getMessageName()));
 		if (!MqttMessageWorker.getInstance().containsExecutor(stream)) {
-			stream.getMessageLogger().printWarning("Executor service for stream [" + stream.getUri() + "] is missing.");
+			stream.getMessageLogger().printWarning("CurrentClient for the following stream is missing [" + stream.getUri() + "]");
 		} else {
 			MqttMessageWorker.getInstance().stopStream(stream.getUri());
 		}
@@ -97,5 +103,5 @@ public class HttpMessageAnnotation {
 		stream.save();
 		STRStore.getInstance().refreshStore();
     }
-    
+            
 }
