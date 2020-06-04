@@ -314,14 +314,21 @@ cdg.addEventListener('endedit',function(e){
 
 })
 
-function getEditValue(rowNum,colNum,ind,cellvalue){
-  if(ind==1){
-    sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+function getEditValue(rowNum, colNum, ind){
+   // sheetStorage was never intialized so were going to ignore because
+   // it is used for label to iri operations
+   if(sheetStorage.length == 0) {
+      // console.log('sheetStorage was never intialized');
+   }
+   else{
+      // MJ: I'm not sure what this is for, but I'm leaving as is for now
+     if(ind==1){
+       sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+     }
+     else if(ind==0){
+       sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+     }
   }
-  else if(ind==0){
-    sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
-  }
-
 }
 
 //retrieves JSON format of the DD file
@@ -622,7 +629,6 @@ document.getElementById('upload').addEventListener('click', saveFile, false);
 
 
 function createCopySheet(sheetCopy){
-  console.log(sheetCopy)
   sheetStorage=[];
 
   for(var i=0;i<sheetCopy.length;i++){
@@ -630,8 +636,6 @@ function createCopySheet(sheetCopy){
     for(var j=0;j<sheetCopy[i].length;j++){
       if(sheetCopy[i][j]!=""&&!sheetCopy[i][j].startsWith("??")&&sheetCopy[i][j].includes(":")){
         var lab = convertshortToIri(sheetCopy[i][j]);
-        console.log(sheetCopy[i][j]);
-        console.log(lab);
         var finalLab;
         if("unknown" === lab){
            finalLab = "Unknown Ontology"
@@ -647,8 +651,6 @@ function createCopySheet(sheetCopy){
       }
     }
     sheetStorage.push(temp);
-
-    console.log(sheetStorage);
   }
 
 }
@@ -945,22 +947,23 @@ function getSuggestion(){
             url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies',
             dataType: 'json',
             success : function(ontRequest) {
-              var ontologyList = ontRequest.response;
-              ontsList=ontologyList;
+              var ontologyList = ontRequest;
+              ontsList = ontologyList;
               SDDPrefixtoJSON();
+
                // Generating Suggestion Request
               var request = {}
               request["source-urls"] = ontologyList
               // request["source-urls"] = ["http://semanticscience.org/resource/"];
               request["N"] = 4;
               request["data-dictionary"] = dataDictionary
+
               $.ajax({
                 type : 'POST',
                 url : url,
                 data : JSON.stringify(request),
                 dataType: 'json',
                 contentType: "application/json",
-                cache: false,
                 success : function(data, stat, xhr) {
                   var status = xhr.status;
                   if (status == 200) {
@@ -969,8 +972,11 @@ function getSuggestion(){
                       callback(status, xhr.response);
                   }
                 },
-                error : function() {
+                error : function(xhr, textStatus, errorThrown) {
                   console.log('Couldnt connect to SDDgen');
+                  console.log("FAIL: " + xhr + " " + textStatus + " " + errorThrown);
+                  console.log(xhr);
+
                   spinnerStatus.stop();
                   imageStatus.style.visibility = 'visible';
                   imageStatus.src = imgPath + 'fail.png'
@@ -981,7 +987,7 @@ function getSuggestion(){
          /*var ontRequest = new XMLHttpRequest();
          ontRequest.open('POST', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies', true);
          ontRequest.responseType = 'json';
-         
+
          ontRequest.onload = function(e) {
 
             // Get the ontologies for the Suggestion Request
@@ -1003,7 +1009,7 @@ function getSuggestion(){
           request["N"] = 4;
           request["data-dictionary"] = dataDictionary
 
-          
+
           var xhr = new XMLHttpRequest();
           xhr.open("POST", url);
           xhr.setRequestHeader("Content-Type", "application/json")
@@ -1060,9 +1066,8 @@ function getSuggestion(){
         url : 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress',
         dataType: 'json',
         success : function(getSDDGenRequest) {
-        sddgenAdress = getSDDGenRequest;
-         console.log(sddgenAdress)
-         getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+           sddgenAdress = getSDDGenRequest;
+           getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
         }
       });
       /*var getSDDGenRequest = new XMLHttpRequest();

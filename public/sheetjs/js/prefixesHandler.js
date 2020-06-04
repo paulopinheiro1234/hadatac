@@ -2,15 +2,11 @@
 var prefixD = {};
 var newPrefix=[]
 function SDDPrefixtoJSON(){
-
-
-   console.log('Matt Here!');
    var prefixMapRequest = new XMLHttpRequest();
    prefixMapRequest.open("GET", 'http://localhost:9000/hadatac/sddeditor_v2/getPrefixes', true);
    prefixMapRequest.responseType = 'json';
    prefixMapRequest.onload = function(e) {
       prefixD = prefixMapRequest.response;
-      console.log(prefixD)
    }
    prefixMapRequest.send();
 
