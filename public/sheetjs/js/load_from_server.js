@@ -7,6 +7,7 @@ var sddgenAdress;
 var globalMenu;
 var globalHeaders=[];
 var popIndicator=0;
+
 /** drop target **/
 var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
@@ -15,6 +16,7 @@ var _grid = document.getElementById('grid');
 var _gridcopy=document.getElementById("gridcopy");
 var _buttons=document.getElementById("buttons");
 var _footnote=document.getElementById("footnote");
+
 /** Spinner **/
 var spinner;
 
@@ -73,9 +75,9 @@ function getURL(url){
   getSuggestion();
 }
 
-
+//retrieves indicator for whether the files have been downloaded already
 $.ajax({
-  type : 'GET',
+  type : 'POST',
   url : 'http://localhost:9000/hadatac/sddeditor_v2/getIndicator',
   data : {
 
@@ -97,6 +99,8 @@ function hideView(){
   cdg.style.width = '100%';
 
 }
+
+/* header editing */
 function removeHeadings(json){
   json.splice(0,1);
   return json
@@ -156,6 +160,7 @@ var make_buttons = function(sheetnames, cb) {
   buttons.appendChild(document.createElement('br'));
 };
 
+// Creates the datagrid
 var cdg = canvasDatagrid({
   parentNode: _grid
 });
@@ -171,7 +176,7 @@ var cellEntry = document.getElementById('cellText');
 
 var textCell = null;
 cellEntry.value = "";
-
+//event listeners to edit and navigate the datagrid cells
 cellEntry.addEventListener('input', function (evt){
    if(textCell != null){
       cdg.data[textCell.rowIndex][textCell.columnIndex] = cellEntry.value;
@@ -186,7 +191,7 @@ cellEntry.addEventListener('keyup', function (e){
    }
 });
 
-
+//event listeners to navigate the datagrid
 cdg.addEventListener('contextmenu', function (e) {
   if (!e.cell) { return; }
 
@@ -194,8 +199,8 @@ cdg.addEventListener('contextmenu', function (e) {
     var input = document.createElement("textarea");
     input.style.width="100%";
     if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
-      var link=convertshortToIri(e.cell.value)
-
+      var link=convertshortToIri(e.cell.value);
+      console.log(e.cell.value);
       var des;
       if("unknown" === link){
          des = "unknown ontology" ;
@@ -280,6 +285,7 @@ cdg.addEventListener('click', function (e) {
   }
 });
 
+//stores the edit to the datagrid
 cdg.addEventListener('endedit',function(e){
 
   if (!e.cell) { return; }
@@ -307,6 +313,7 @@ cdg.addEventListener('endedit',function(e){
 
 
 })
+
 function getEditValue(rowNum,colNum,ind,cellvalue){
   if(ind==1){
     sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
@@ -316,10 +323,12 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
   }
 
 }
+
+//retrieves JSON format of the DD file
 cdg.addEventListener('click', function (e) {
   returnToView();
   if (!e.cell) { return; }
-  if(e.cell.value==null){;return;}
+  if(e.cell.value==null){ return; }
   else{
     colNum=e.cell.columnIndex;
     rowNum=e.cell.rowIndex;
@@ -351,7 +360,7 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 }
 
 
-
+//displays and formats prefixedIRI for the chosen data
 function chooseItem(data) {
   console.log(data.value[1]);
   var chosen=data.value.split(",")
@@ -395,6 +404,7 @@ function chooseItem(data) {
 
 
 }
+//event listener for the context menu options
 cdg.addEventListener('contextmenu', function (e) {
 
   e.items.push({
@@ -429,7 +439,7 @@ cdg.addEventListener('contextmenu', function (e) {
         }
         for( var i=1;i<temp.length;i++){
           $.ajax({
-            type : 'GET',
+            type : 'POST',
             url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
             data : {
               removedValue:temp[i]
@@ -462,6 +472,8 @@ cdg.addEventListener('contextmenu', function (e) {
       }
     });
 });
+
+/* functions for context menu */
 function insertRowAbove(){
   var intendedRow=parseFloat(rowNum);
   cdg.insertRow([],intendedRow); // The first argument splices a js array into the csv data, so to insert a blank row insert an empty array
@@ -487,7 +499,7 @@ function removeRow(){
   }
   for( var i=1;i<temp.length;i++){
     $.ajax({
-      type : 'GET',
+      type : 'POST',
       url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
       data : {
         removedValue:temp[i]
@@ -505,6 +517,8 @@ function removeRow(){
 
 
 }
+
+//resize
 function _resize() {
   _grid.style.height = (window.innerHeight - 300) + "px";
   _grid.style.width = '100%';
@@ -515,7 +529,7 @@ function _resize() {
 
 window.addEventListener('resize', _resize);
 
-
+// variable declaration for data copying
 var cdgcopy = canvasDatagrid({
   parentNode: _gridcopy
 });
@@ -575,10 +589,20 @@ function saveFile(e){
      formdata.append('file', new File([wbout], 'sheetjs.' + filetype));
    }
 
-   var xhr = new XMLHttpRequest();
+    $.ajax({
+      type : 'POST',
+      url : _upload_url,
+      data : formdata,
+      contentType : false,
+      processData : false,
+      beforeSend : function() {
+        _onreponse
+      }
+    });
+   /*var xhr = new XMLHttpRequest();
    xhr.open("POST", _upload_url, true);
    xhr.onreadystatechange = _onreponse;
-   xhr.send(formdata);
+   xhr.send(formdata);*/
 
    // iterate over workbook remove headers
    for (let [sn, header] of headerMap) {
@@ -598,7 +622,7 @@ document.getElementById('upload').addEventListener('click', saveFile, false);
 
 
 function createCopySheet(sheetCopy){
-  //console.log(sheetCopy)
+  console.log(sheetCopy)
   sheetStorage=[];
 
   for(var i=0;i<sheetCopy.length;i++){
@@ -606,7 +630,8 @@ function createCopySheet(sheetCopy){
     for(var j=0;j<sheetCopy[i].length;j++){
       if(sheetCopy[i][j]!=""&&!sheetCopy[i][j].startsWith("??")&&sheetCopy[i][j].includes(":")){
         var lab = convertshortToIri(sheetCopy[i][j]);
-
+        console.log(sheetCopy[i][j]);
+        console.log(lab);
         var finalLab;
         if("unknown" === lab){
            finalLab = "Unknown Ontology"
@@ -623,7 +648,7 @@ function createCopySheet(sheetCopy){
     }
     sheetStorage.push(temp);
 
-
+    console.log(sheetStorage);
   }
 
 }
@@ -837,7 +862,7 @@ function getSuggestion(){
       // Generate data dictionary map be reading DD in
       var dataDictionary = []
       var oReq = new XMLHttpRequest();
-      oReq.open("GET", dd_url, true);
+      oReq.open("POST", dd_url, true);
       oReq.responseType = "arraybuffer";
 
       oReq.onload = function(e) {
@@ -894,22 +919,69 @@ function getSuggestion(){
          else{
             console.log('Full Suggestions only work on the dictionary mapping page currently')
          }
-         var labelRequest = new XMLHttpRequest();
-         labelRequest.open('GET', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys', true);
+         /*var labelRequest = new XMLHttpRequest();
+         labelRequest.open('POST', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys', true);
          labelRequest.responseType = 'json';
 
          labelRequest.onload=function(e){
            labelsList=labelRequest.response;
            //console.log(labelsList)
          }
-         labelRequest.send();
+         labelRequest.send();*/
+
+         $.ajax({
+            type : 'POST',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys',
+            dataType: 'json',
+            success : function(labelRequest) {
+              labelsList = labelRequest
+            }
+          });
          // cdg.data[rowNum][colNum]
          // MATT HERE
          // Get the ontologies for the Suggestion Request
-         var ontRequest = new XMLHttpRequest();
-         ontRequest.open('GET', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies', true);
+         $.ajax({
+            type : 'POST',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies',
+            dataType: 'json',
+            success : function(ontRequest) {
+              var ontologyList = ontRequest.response;
+              ontsList=ontologyList;
+              SDDPrefixtoJSON();
+               // Generating Suggestion Request
+              var request = {}
+              request["source-urls"] = ontologyList
+              // request["source-urls"] = ["http://semanticscience.org/resource/"];
+              request["N"] = 4;
+              request["data-dictionary"] = dataDictionary
+              $.ajax({
+                type : 'POST',
+                url : url,
+                data : JSON.stringify(request),
+                dataType: 'json',
+                contentType: "application/json",
+                cache: false,
+                success : function(data, stat, xhr) {
+                  var status = xhr.status;
+                  if (status == 200) {
+                      callback(null, xhr.response);
+                  } else {
+                      callback(status, xhr.response);
+                  }
+                },
+                error : function() {
+                  console.log('Couldnt connect to SDDgen');
+                  spinnerStatus.stop();
+                  imageStatus.style.visibility = 'visible';
+                  imageStatus.src = imgPath + 'fail.png'
+                }
+              });
+            }
+          });
+         /*var ontRequest = new XMLHttpRequest();
+         ontRequest.open('POST', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies', true);
          ontRequest.responseType = 'json';
-
+         
          ontRequest.onload = function(e) {
 
             // Get the ontologies for the Suggestion Request
@@ -931,7 +1003,7 @@ function getSuggestion(){
           request["N"] = 4;
           request["data-dictionary"] = dataDictionary
 
-
+          
           var xhr = new XMLHttpRequest();
           xhr.open("POST", url);
           xhr.setRequestHeader("Content-Type", "application/json")
@@ -955,7 +1027,7 @@ function getSuggestion(){
 
           xhr.send(JSON.stringify(request));
          }
-         ontRequest.send();
+         ontRequest.send();*/
       }
       oReq.send();
 
@@ -983,15 +1055,25 @@ function getSuggestion(){
    };
 
    if(sddgenAdress == null){
-      var getSDDGenRequest = new XMLHttpRequest();
-      getSDDGenRequest.open("GET", 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress', true);
+     $.ajax({
+        type : 'POST',
+        url : 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress',
+        dataType: 'json',
+        success : function(getSDDGenRequest) {
+        sddgenAdress = getSDDGenRequest;
+         console.log(sddgenAdress)
+         getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+        }
+      });
+      /*var getSDDGenRequest = new XMLHttpRequest();
+      getSDDGenRequest.open("POST", 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress', true);
       getSDDGenRequest.responseType = 'json';
       getSDDGenRequest.onload = function(e) {
          sddgenAdress = getSDDGenRequest.response;
          console.log(sddgenAdress)
          getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
       }
-      getSDDGenRequest.send();
+      getSDDGenRequest.send();*/
    }
    else{
       getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
@@ -1002,8 +1084,31 @@ function getSuggestion(){
 
 function jsonparser(colval,rowval,menuoptns,isVirtual){
   var getJSON = function(url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
+     $.ajax({
+      type : 'POST',
+      url : url,
+      contentType : "application/json",
+      success : function(callbackData, status, xhr) {
+        if (xhr.status == 200) {
+          spinnerStatus.stop();
+          imageStatus.style.visibility = 'visible';
+          imageStatus.src = imgPath + 'success.png';
+            callback(null, xhr.response);
+        } else {
+            callback(xhr.status);
+            spinnerStatus.stop();
+            imageStatus.style.visibility = 'visible';
+            imageStatus.src = imgPath + 'fail.png';
+        }
+      },
+      error : function() {
+        spinnerStatus.stop();
+        imageStatus.style.visibility = 'visible';
+        imageStatus.src = imgPath + 'fail.png'
+      }
+    });
+  /*var xhr = new XMLHttpRequest();
+  xhr.open('POST', url, true);
   xhr.responseType = 'json';
   xhr.onload = function() {
       var status = xhr.status;
@@ -1026,26 +1131,26 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
       imageStatus.src = imgPath + 'fail.png'
   };
 
-  xhr.send();
+  xhr.send();*/
   };
 
 
   // getJSON('http://128.113.106.57:5000/get-sdd/',  function(err, data) {
   getJSON('http://localhost:5000/populate-sdd/',  function(err, data) {
-  if (err != null) {
-      console.error(err);
-  }
+    if (err != null) {
+        console.error(err);
+    }
 
-  else {
-    if(rowval.startsWith("??")){
-      var keyword="virtual-columns";
-      parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual);
-  }
-    else{
-      var keyword="columns";
-      parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual);
-      }
-  }
+    else {
+      if(rowval.startsWith("??")){
+        var keyword="virtual-columns";
+        parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual);
+    }
+      else{
+        var keyword="columns";
+        parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual);
+        }
+    }
   });
 }
 var menuOptionsPrefixedIRI=[]
@@ -1108,7 +1213,7 @@ function createNewMenu(menuoptns,colval,isVirtual){
     addOptionsToMenu(menuoptns,select);
     displayMenu(menuoptns.length,isVirtual);
   }
-  }
+}
 
 
 
@@ -1182,15 +1287,15 @@ function clearMenu(isVirtual){
   }
 
 
-
 function clearTextbox(){
   document.getElementById("varDescription").value="";
 }
+
+
 function DDExceltoJSON(dd_url,varnameElement){
 
-
    var oReq = new XMLHttpRequest();
-   oReq.open("GET", dd_url, true);
+   oReq.open("POST", dd_url, true);
    oReq.responseType = "arraybuffer";
 
   oReq.onload = function(e) {
@@ -1228,7 +1333,6 @@ function DDExceltoJSON(dd_url,varnameElement){
 
   oReq.send();
 
-
 }
 
 
@@ -1245,7 +1349,7 @@ var closebtns = document.getElementsByClassName("remove");
 function DDforPopulate(durl,headersheet,headercol){
 
   var oReq = new XMLHttpRequest();
-   oReq.open("GET", durl, true);
+   oReq.open("POST", durl, true);
    oReq.responseType = "arraybuffer";
 
   oReq.onload = function(e) {
@@ -1315,7 +1419,7 @@ var durl_;
 function populateSDD(){
 
   $.ajax({
-     type : 'GET',
+     type : 'POST',
      url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
      data : {
 
@@ -1326,7 +1430,7 @@ function populateSDD(){
      }
   });
   $.ajax({
-     type : 'GET',
+     type : 'POST',
      url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
      data : {
 
@@ -1341,6 +1445,7 @@ function populateSDD(){
 
 
 }
+
 function getHeaderData(data){
   var headersheet=data.split('-')[0];
   var headercol=data.split('-')[1];

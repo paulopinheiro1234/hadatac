@@ -221,7 +221,7 @@ function getDescription(cval){
   var cellVal=cval.trim();
   var ret;
       $.ajax({
-        type : 'GET',
+        type : 'POST',
         url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
         data : {
           iricode:cellVal
@@ -282,7 +282,7 @@ addcartlocal()
 function addcartlocal(){
   clearCart();
     $.ajax({
-      type : 'GET',
+      type : 'POST',
       url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
       data : {
         //  s: str
@@ -349,6 +349,7 @@ function clearCart(){
     ul.removeChild(ul.children[0]);
   }
 }
+
 function storeThisEdit(rowNum_str,colNum_str,changeValue){
   $.ajax({
     type : 'GET',
@@ -366,7 +367,7 @@ function storeThisEdit(rowNum_str,colNum_str,changeValue){
 
 function undoEdit(){
   $.ajax({
-    type : 'GET',
+    type : 'POST',
     url : 'http://localhost:9000/hadatac/sddeditor_v2/getEdit',
     data : {
        //editValue: changeValue
@@ -383,7 +384,7 @@ function undoEdit(){
 
 function reundoEdit(){
   $.ajax({
-    type : 'GET',
+    type : 'POST',
     url : 'http://localhost:9000/hadatac/sddeditor_v2/getOldEdits',
     data : {
        //editValue: changeValue
