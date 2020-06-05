@@ -565,7 +565,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 	    return DataAcquisitionSchemaAttribute.getCache().get(dasa_uri);
 	}
         DataAcquisitionSchemaAttribute dasa = null;
-        System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
+        //System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?partOfSchema ?hasEntity ?hasAttribute " + 
@@ -662,7 +662,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static List<DataAcquisitionSchemaAttribute> findByAttribute(String attributeUri) {
-        System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
+        //System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
         if (attributeUri.startsWith("http")) {
             attributeUri = "<" + attributeUri + ">";
         }
@@ -674,7 +674,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    ?uri hasco:hasAttribute " + attributeUri + ". " +
                 "    ?uri hasco:partOfSchema ?schemaUri .  " + 
                 "} ";
-        System.out.println("[DASA] query string = \n" + queryString);
+        //System.out.println("[DASA] query string = \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -710,7 +710,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     // returns a list of DASA's
     // (we need to go study -> data acqusition(s) -> data acqusition schema(s) -> data acquisition schema attributes)
     public static List<DataAcquisitionSchemaAttribute> findByStudy(String studyUri){
-        System.out.println("Looking for data acquisition schema attributes from study " + studyUri);
+        //System.out.println("Looking for data acquisition schema attributes from study " + studyUri);
         if (studyUri.startsWith("http")) {
             studyUri = "<" + studyUri + ">";
         }
@@ -724,7 +724,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    ?uri a hasco:DASchemaAttribute . " + 
                 "    ?uri hasco:hasAttribute ?attrUri . " +
                 "} ";
-        System.out.println("[DASA] query string = \n" + queryString);
+        //System.out.println("[DASA] query string = \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -790,7 +790,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
-        System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
+        //System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
 
         List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -955,7 +955,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                     request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
+            System.out.println("[ERROR] QueryParseException due to update query: " + insert);
             throw e;
         }
 

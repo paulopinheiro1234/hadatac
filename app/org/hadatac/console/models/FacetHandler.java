@@ -20,6 +20,7 @@ public class FacetHandler {
     public Map<String, Facet> facetCatalog = new HashMap<String, Facet>();
 
     public static final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
+    public static final String ENTITY_CHARACTERISTIC_FACET2 = "facetsEC2";
     public static final String STUDY_FACET = "facetsS";
     public static final String OBJECT_COLLECTION_FACET = "facetsOC";
     public static final String UNIT_FACET = "facetsU";
@@ -28,6 +29,7 @@ public class FacetHandler {
 
     public FacetHandler() {
         facetCatalog.put(ENTITY_CHARACTERISTIC_FACET, new Facet());
+        facetCatalog.put(ENTITY_CHARACTERISTIC_FACET2, new Facet());
         facetCatalog.put(STUDY_FACET, new Facet());
         facetCatalog.put(OBJECT_COLLECTION_FACET, new Facet());
         facetCatalog.put(UNIT_FACET, new Facet());
@@ -88,13 +90,16 @@ public class FacetHandler {
     public void loadFacetsFromString(String str) {
         if (str == null || str.equals("")) {
             // Default facets
-            str = "{\"facetsEC\":[],\"facetsS\":[],\"facetsOC\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
+            str = "{\"facetsEC\":[],\"facetsEC2\":[],\"facetsS\":[],\"facetsOC\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
         }
 
         try {
             JSONObject obj = (JSONObject)(new JSONParser().parse(str));
             Facet facet = Facet.loadFacet(obj.get(ENTITY_CHARACTERISTIC_FACET), ENTITY_CHARACTERISTIC_FACET);
             facetCatalog.put(ENTITY_CHARACTERISTIC_FACET, facet);
+
+            facet = Facet.loadFacet(obj.get(ENTITY_CHARACTERISTIC_FACET2), ENTITY_CHARACTERISTIC_FACET2);
+            facetCatalog.put(ENTITY_CHARACTERISTIC_FACET2, facet);
 
             facet = Facet.loadFacet(obj.get(STUDY_FACET), STUDY_FACET);
             facetCatalog.put(STUDY_FACET, facet);
@@ -125,7 +130,7 @@ public class FacetHandler {
      * @return String An executable Solr query
      */
     public String getTempSolrQuery(Facet facet) {
-        System.out.println("getTempSolrQuery() facet.getFacetName(): " + facet.getFacetName());
+        //System.out.println("getTempSolrQuery() facet.getFacetName(): " + facet.getFacetName());
 
         List<String> facetQueries = new ArrayList<String>();
         Iterator<Map.Entry<String, Facet>> iter = facetCatalog.entrySet().iterator();

@@ -626,7 +626,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         //String q = buildQuery(ownedDAs, retFacetHandler);
         String q = buildQuery(ownedDAs, facetHandler);
 
-        System.out.println("measurement solr query: " + q);
+        //System.out.println("measurement solr query: " + q);
 
         SolrQuery query = new SolrQuery();
         query.setQuery(q);
@@ -646,7 +646,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             solr.close();
             SolrDocumentList docs = queryResponse.getResults();
             docSize = docs.getNumFound();
-            System.out.println("Num of results: " + docSize);
+            //System.out.println("Num of results: " + docSize);
 
             Set<String> uri_set = new HashSet<String>();
             Map<String, STR> cachedDA = new HashMap<String, STR>();
@@ -693,13 +693,16 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         FacetTree fTreeOC = new FacetTree();
-        fTreeOC.setTargetFacet(StudyObjectRole.class);
+        fTreeOC.setTargetFacet(StudyObjectType.class);
         //fTreeOC.addUpperFacet(ObjectCollectionType.class);
-        fTreeOC.addUpperFacet(StudyObjectType.class);
+        fTreeOC.addUpperFacet(StudyObjectRole.class);
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
 
+        /*
+         *  The facet tree EC computes the entity-attribute indicators for indicators based on property's main attribute 
+         */
         FacetTree fTreeEC = new FacetTree();
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
@@ -709,10 +712,45 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotEC = getFacetStats(fTreeEC, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
                 facetHandler);
-        System.out.println("getAllFacetStats: printing fTreeEC: ");
-        fTreeEC.print();
-        System.out.println("getAllFacetStats: end printing fTreeEC");
 
+        /*
+         *  The facet tree EC computes the entity-attribute indicators for indicators based on property's in-relation-to attribute 
+         */
+        FacetTree fTreeEC2 = new FacetTree();
+        fTreeEC2.setTargetFacet(AttributeInstance.class);
+        fTreeEC2.addUpperFacet(Indicator.class);
+        fTreeEC2.addUpperFacet(EntityRole.class);
+        fTreeEC2.addUpperFacet(InRelationToInstance.class);
+        fTreeEC2.addUpperFacet(EntityInstance.class);
+        Pivot pivotEC2 = getFacetStats(fTreeEC2, 
+                retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2), 
+                facetHandler);
+
+        /*
+    	System.out.println("measurement - >>>>>>>>>>> EC2 Content");
+        for (Pivot pivot1 : pivotEC2.children) {
+        	System.out.println("measurement - EC2_1: field: " + pivot1.getField() + "  value: " + pivot1.getValue() + "   count: " + pivot1.getCount() + "    tooltip: " + pivot1.getTooltip());
+            for (Pivot pivot2 : pivot1.children) {
+            	System.out.println("  measurement - EC2_2: field: " + pivot2.getField() + "   value: " + pivot2.getValue() + "  count: " + pivot2.getCount() + "    tooltip: " + pivot2.getTooltip());
+                for (Pivot pivot3 : pivot2.children) {
+                	System.out.println("  measurement - EC2_3: field: " + pivot2.getField() + "   value: " + pivot3.getValue() + "  count: " + pivot3.getCount() + "    tooltip: " + pivot3.getTooltip());
+                	for (Pivot pivot4 : pivot3.children) {
+                    	System.out.println("      measurement - EC2_4: field: " + pivot4.getField() + "   value: " + pivot4.getValue() + "  count: " + pivot4.getCount() + "    tooltip: " + pivot4.getTooltip());
+                        for (Pivot pivot5 : pivot4.children) {
+                        	System.out.println("        measurement - EC2_5: field: " + pivot5.getField() + "   value: " + pivot5.getValue() + "  count: " + pivot5.getCount() + "    tooltip: " + pivot5.getTooltip());
+                        }
+                    }
+                }
+            }
+        }
+    	System.out.println("measurement - <<<<<<<<<<<< EC2 Content");
+		*/
+
+        /*
+         *  Merging the computation result of pivotEC2 into pivotEC
+         */
+        pivotEC.addChildrenFromPivot(pivotEC2);
+        
         FacetTree fTreeU = new FacetTree();
         fTreeU.setTargetFacet(UnitInstance.class);
         Pivot pivotU = getFacetStats(fTreeU, 
@@ -742,6 +780,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
             result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
         }
+               
     }
 
     private static Pivot getFacetStats(

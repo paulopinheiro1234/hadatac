@@ -113,7 +113,7 @@ public class DataAcquisitionSearch extends Controller {
             facets = request().body().asFormUrlEncoded().get("facets")[0];
         }
 
-        System.out.println("\n\n\n\n\nfacets: " + facets);
+        //System.out.println("\n\n\n\n\nfacets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacetsFromString(facets);
@@ -130,7 +130,7 @@ public class DataAcquisitionSearch extends Controller {
                 ownerUri = "Public";
             }
         }
-        System.out.println("OwnerURI: " + ownerUri);
+        //System.out.println("OwnerURI: " + ownerUri);
 
         results = Measurement.find(ownerUri, page, rows, facets);
 
@@ -165,7 +165,7 @@ public class DataAcquisitionSearch extends Controller {
 
             selectedFields.addAll(keys);
         }
-        System.out.println("selectedFields: " + selectedFields);
+        //System.out.println("selectedFields: " + selectedFields);
 
         AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
 
@@ -206,14 +206,14 @@ public class DataAcquisitionSearch extends Controller {
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
-    	System.out.println("Object type inside alignment: " + objectType);
+    	//System.out.println("Object type inside alignment: " + objectType);
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
-        	System.out.println("Selected subject alignment");
+        	//System.out.println("Selected subject alignment");
         	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
 		        results.getDocuments(), finalFacets, email, categoricalOption), 
 	        		ec.current());
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
-        	System.out.println("Selected time alignment");
+        	//System.out.println("Selected time alignment");
 	        CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
 			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption), 
 		        		ec.current());

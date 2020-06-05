@@ -76,7 +76,7 @@ public class StudyObjectRole extends HADatAcThing implements Comparable<StudyObj
 	@Override
 	public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
-	    System.out.println("getTargetFacetsFromSolr() is called");
+	    //System.out.println("getTargetFacetsFromSolr() is called");
 	    
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);

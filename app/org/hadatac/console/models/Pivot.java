@@ -68,6 +68,15 @@ public class Pivot {
         .add(child);
     }
 
+    public void addChildrenFromPivot(Pivot otherPivot) {
+    	if (otherPivot == null || otherPivot.children.size() <- 0) {
+    		return;
+    	}
+    	for (Pivot newChild : otherPivot.children) {
+    		children.add(newChild);
+    	}
+    }
+    
     public int recomputeStats() {
         if (children.isEmpty()) {
             return count;
@@ -137,9 +146,10 @@ public class Pivot {
 
         return pivot;
     }
-
+    
     @Override
     public String toString() {
         return Json.toJson(this).toString();
     }
+   
 }

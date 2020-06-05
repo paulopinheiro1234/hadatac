@@ -399,7 +399,7 @@ public class Study extends HADatAcThing {
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
-        System.out.println("\nStudy facet: " + facet.toSolrQuery());
+        //System.out.println("\nStudy facet: " + facet.toSolrQuery());
 
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("study_uri_str").isEmpty()) {

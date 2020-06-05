@@ -79,7 +79,9 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             Facet facet, FacetHandler facetHandler) {
         
         SolrQuery query = new SolrQuery();
+        QueryResponse queryResponse = null;
         String strQuery = facetHandler.getTempSolrQuery(facet);
+
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);
@@ -93,15 +95,16 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
-            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
-            Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
-            return parsePivot(pivot, facet, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] AttributeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
+            return null;
         }
 
-        return null;
+        Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
+        return parsePivot(pivot, facet, query.toString());
+
     }
 
     private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {

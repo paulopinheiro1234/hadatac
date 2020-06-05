@@ -76,7 +76,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
-    	System.out.println("TimeInstance: INSIDE getTargetFacets");
+    	//System.out.println("TimeInstance: INSIDE getTargetFacets");
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
@@ -90,15 +90,15 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         sdfDate.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Date minTime = findMinTime("timestamp_date", queryString);
-        System.out.println("minTime: " + minTime);
+        //System.out.println("minTime: " + minTime);
         Date maxTime = findMaxTime("timestamp_date", queryString);
-        System.out.println("maxTime: " + maxTime);
+        //System.out.println("maxTime: " + maxTime);
 
         String gap = null;
         String param = "";
         if (minTime != null && maxTime != null) {
             gap = calculateTimeGap(minTime.toInstant(), maxTime.toInstant());
-            System.out.println("gap: " + gap);
+            //System.out.println("gap: " + gap);
             param = "{ "
                     + "named_time_str:{ "
                     + "type: terms, "
@@ -130,9 +130,9 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
             Pivot pivot = Pivot.parseQueryResponse(queryResponse);
-            for (Pivot pvt : pivot.children) {
-            	System.out.println("Value: " + pvt.getValue() + "   Field: " + pvt.getField());
-            }
+            //for (Pivot pvt : pivot.children) {
+            //	System.out.println("Value: " + pvt.getValue() + "   Field: " + pvt.getField());
+            //}
             return parsePivot(pivot, query.toString());
         } catch (Exception e) {
             System.out.println("[ERROR] TimeInstance.getTargetFacetsFromSolr() - Exception message: " + e.getMessage());
@@ -207,7 +207,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         }
 
         Duration duration = Duration.between(min, max);
-        System.out.println("duration in days: " + duration.toDays());
+        //System.out.println("duration in days: " + duration.toDays());
 
         long days = duration.toDays();
         long weeks = days / 7;

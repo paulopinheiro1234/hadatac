@@ -291,7 +291,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             return DataAcquisitionSchemaObject.getCache().get(uri);
         }
         
-        System.out.println("Looking for data acquisition schema object with uri: " + uri);
+        //System.out.println("Looking for data acquisition schema object with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 

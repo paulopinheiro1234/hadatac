@@ -27,6 +27,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
+import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
@@ -194,6 +195,41 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         return indicators;		
     }
 
+    /* 
+     * Argument can be proper attribute or inRelationTo-Attribute
+     */    
+    public static List<Indicator> findForAttribute(String attributeUri) {
+        List<Indicator> indicators = new ArrayList<Indicator>();
+        if (attributeUri == null || attributeUri.isEmpty()) {
+        	return indicators;
+        }
+        if (attributeUri.startsWith("http")) {
+        	attributeUri = "<" + attributeUri + ">";
+        }
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?super1 WHERE { " +
+                "     " + attributeUri + " rdfs:subClassOf* ?super . " +
+                "     { ?super1 rdfs:subClassOf <http://hadatac.org/ont/hasco/StudyIndicator> } UNION { ?super1 rdfs:subClassOf <http://hadatac.org/ont/hasco/SampleIndicator>} . " +
+                "     ?super rdfs:subClassOf ?super1 . " +
+                "} ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("super1") != null) {
+            	Indicator indicator = find(soln.getResource("super1").getURI());
+            	indicators.add(indicator);
+            } else {
+            	System.out.println("[WARNING] Retrieved null result from SOLR");
+            }
+        }			
+
+        java.util.Collections.sort((List<Indicator>) indicators);
+        return indicators;		
+    }
+
     public static Map<String, Map<String,String>> getValuesAndLabels(Map<String, String> indicatorMap) {
         Map<String, Map<String,String>> indicatorValueMap = new HashMap<String, Map<String,String>>();
         Map<String,String> values = new HashMap<String, String>();
@@ -220,7 +256,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                         indicatorValueLabel = soln.get("label").toString();
                     }
                     else {
-                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+                        //System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
                     }
                     if (soln.contains("indicator")){
                         indicatorValue = URIUtils.replaceNameSpaceEx(soln.get("indicator").toString());
@@ -261,7 +297,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                         indicatorValueLabel = soln.get("label").toString();
                     }
                     else {
-                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+                        //System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
                     }
                     if (soln.contains("indicator")){
                         values.add(indicatorValueLabel);
@@ -283,6 +319,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         for(Map.Entry<String, String> entry : indicatorMap.entrySet()){
             values = new ArrayList<String>();
             String indicatorType = entry.getKey().toString();
+            //System.out.println("Indicator (inside getValues()): indicatorType is [" + indicatorType + "]");
             String indvIndicatorQuery = NameSpaces.getInstance().printSparqlNameSpaceList() + 
             		" SELECT DISTINCT ?indicator " +
                     "(MIN(?label_) AS ?label)" +
@@ -298,9 +335,10 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                     if (soln.contains("label")){
                         indicatorValueLabel = URIUtils.replaceNameSpaceEx(soln.get("indicator").toString());
                         values.add(indicatorValueLabel);
+                        //System.out.println("Indicator (inside getValues()): indicator value label is [" + indicatorValueLabel + "]");
                     }
                     else {
-                        System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
+                        //System.out.println("getIndicatorValues() No Label: " + soln.toString() + "\n");
                     }
                 }
                 indicatorValueMap.put(indicatorType,values);
@@ -320,7 +358,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + " ?dataAcq hasco:isDataAcquisitionOf ?studyUri ."
                 + " ?dataAcq hasco:hasSchema ?schemaUri ."
                 + " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
-                + " ?schemaAttribute hasco:hasAttribute ?attribute . "
+                + " ?schemaAttribute ?x ?attribute . "
                 + " {  { ?indicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?indicator rdfs:subClassOf hasco:SampleIndicator } } . "
                 + " ?indicator rdfs:label ?indicatorLabel . " 
                 + " OPTIONAL { ?indicator rdfs:comment ?indicatorComment } . "
@@ -347,6 +385,144 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         return indicators; 
     }
     
+    public Map<Facetable, List<Facetable>> getTargetFacetsForInRelationTo(Facet facet, FacetHandler facetHandler) {
+        Map<Facetable, List<Facetable>> irtList = new HashMap<Facetable, List<Facetable>>();
+        Map<Facetable, List<Facetable>> mapIndicatorToIrtList = new HashMap<Facetable, List<Facetable>>();
+        
+        InRelationToInstance irt = new InRelationToInstance();
+    	String listIrt = "";
+        irtList = irt.getTargetFacetsFromSolr(facet, facetHandler);
+        for (Facetable obj : irtList.keySet()) {
+        	//System.out.println("New Indicator's TARGET FACETS: " + obj.getField() + "  [" + obj.getUri() + "]  Count: [" + obj.getCount() + "]");
+        	listIrt = listIrt + "<" + obj.getUri() + "> ";
+        }
+        
+        String query = NameSpaces.getInstance().printSparqlNameSpaceList() +
+            	" SELECT DISTINCT ?indicator ?indicatorLabel ?inRelationToUri ?inRelationToLabel WHERE { " +
+            	"   VALUES ?inRelationToUri { " + listIrt + " } " +
+            	"   ?inRelationToUri rdfs:subClassOf* ?indicator . " + 
+            	"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . " + 
+            	"   ?indicator rdfs:label ?indicatorLabel . " +
+            	"   ?inRelationToUri rdfs:label ?inRelationToLabel . " +
+            	" }";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            //System.out.println("Indicator.getValuesForInRelationTo --   Uri: " + soln.getResource("indicator").getURI() + 
+            //                   "  label: " + soln.get("indicatorLabel").toString() +             
+            //                   "  inRelationToUri: " + soln.getResource("inRelationToUri").toString());
+            String indUri = soln.getResource("indicator").getURI();
+            String irtUri = soln.getResource("inRelationToUri").toString();
+
+            Indicator indicator = new Indicator();
+            indicator.setUri(indUri);
+            //System.out.println("Indicator.getTargetFacets(): identified indicator [" + indicator.getUri() + "]  label: [" + indicator.getLabel() + "]");
+            indicator.setLabel(soln.get("indicatorLabel").toString());
+            indicator.setField("indicator_uri_str");
+            indicator.setQuery(query);
+
+            //System.out.println("Indicator.getTargetFacets(): identified attribute/inrelationto [" + soln.get("attributeUri").toString() + "]  label: [" + WordUtils.capitalize(soln.get("attributeLabel").toString()) + "]");
+            InRelationToInstance irtInst = new InRelationToInstance();
+            irtInst.setUri(irtUri);
+            irtInst.setLabel(soln.get("inRelationToLabel").toString());
+            irtInst.setField("in_relation_to_uri_str");
+
+            for (Facetable obj : irtList.keySet()) {
+            	if (irtUri.equals(obj.getUri())) {
+            		irtInst.setCount(obj.getCount());
+            		int updatedCount = indicator.getCount() + obj.getCount();
+            		indicator.setCount(updatedCount);
+            	}
+            }
+
+            if (!mapIndicatorToIrtList.containsKey(indicator)) {
+                List<Facetable> irts = new ArrayList<Facetable>();
+                mapIndicatorToIrtList.put(indicator, irts);
+            }
+            if (!mapIndicatorToIrtList.get(indicator).contains(irtInst)) {
+                mapIndicatorToIrtList.get(indicator).add(irtInst);
+            } 
+
+            Facet subFacet = facet.getChildById(indicator.getUri());
+            subFacet.putFacet("indicator_uri_str", indicator.getUri());
+            subFacet.putFacet("in_relation_to_uri_str", irtInst.getUri());
+        }
+        return mapIndicatorToIrtList;
+	}
+
+    /*
+    public static Pivot getValuesForInRelationTo(Pivot pivot) {
+
+    	Pivot newPivot = new Pivot();
+        newPivot.setField(pivot.getField());
+        newPivot.setValue(pivot.getValue());
+        newPivot.setTooltip(pivot.getTooltip());
+        newPivot.setQuery(pivot.getQuery());
+        newPivot.setCount(pivot.getCount());
+
+    	String listIrt = "";
+    	//System.out.println("Indicator.getValuesForInRelationTo - pivotEC2_0: field: " + pivot.getField() + "  value: " + pivot.getValue() + "   count: " + pivot.getCount());
+        for (Pivot pivot1 : pivot.children) {
+        	//System.out.println("Indicator.getValuesForInRelationTo - pivotEC2_1: field: " + pivot1.getField() + "  value: " + pivot1.getValue() + "   count: " + pivot1.getCount());
+        	listIrt = listIrt + "<" + pivot1.getValue() + "> ";
+        }
+    	
+        String query = NameSpaces.getInstance().printSparqlNameSpaceList() +
+        	" SELECT DISTINCT ?indicator ?indicatorLabel ?inRelationToUri WHERE { " +
+        	"   VALUES ?inRelationToUri { " + listIrt + " } " +
+        	"   ?inRelationToUri rdfs:subClassOf* ?indicator . " + 
+        	"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . " + 
+        	"   ?indicator rdfs:label ?indicatorLabel . " +
+        	" }";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            //System.out.println("Indicator.getValuesForInRelationTo --   Uri: " + soln.getResource("indicator").getURI() + 
+            //                   "  label: " + soln.get("indicatorLabel").toString() +             
+            //                   "  inRelationToUri: " + soln.getResource("inRelationToUri").toString());
+            String indUri = soln.getResource("indicator").getURI();
+            String irtUri = soln.getResource("inRelationToUri").toString();
+            if (irtUri != null && !irtUri.isEmpty()) {
+	            Pivot indicatorPivot = null;
+	            for (Pivot auxPivot : newPivot.children) {
+	            	if (auxPivot.getTooltip().equals(indUri)) {
+	            		indicatorPivot = auxPivot;
+	            		break;
+	            	}
+	            }
+	            if (indicatorPivot == null) {
+	            	indicatorPivot = new Pivot();
+	            	indicatorPivot.setField("indicator_uri_str");
+	            	//indicatorPivot.setValue(soln.getResource("indicator").getURI());
+	            	indicatorPivot.setValue(soln.get("indicatorLabel").toString());
+	            	indicatorPivot.setTooltip(soln.getResource("indicator").getURI());
+	            	indicatorPivot.setQuery("");
+	            	indicatorPivot.setCount(0);
+	            	newPivot.addChild(indicatorPivot);
+                    //System.out.println("Indicator.getValuesForInRelationTo --  created indicator pivot for  " + indicatorPivot.getTooltip()); 
+	            }
+	            for (Pivot irtPivot : pivot.children) {
+	            	if (irtPivot != null && irtPivot.getValue() != null) {
+		            	if (irtPivot.getValue().equals(irtUri)) {
+		            		indicatorPivot.addChild(irtPivot);
+		                    //System.out.println("Indicator.getValuesForInRelationTo --  added " + irtPivot.getValue() + " to " + indicatorPivot.getTooltip()); 
+		            		break;
+		            	}
+	            	}
+	            }
+            }
+        }
+
+    	return newPivot;
+    }
+    */
+    
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
@@ -357,6 +533,10 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
     public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
 
+    	if (facet.getFacetName().equals("facetsEC2")) {
+    		return this.getTargetFacetsForInRelationTo(facet, facetHandler);
+    	}
+    	
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("indicator_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?indicator { " + stringify(
@@ -382,14 +562,14 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + "?dataAcq hasco:isDataAcquisitionOf ?studyUri . \n"
                 + "?dataAcq hasco:hasSchema ?schemaUri . \n"
                 + "?schemaAttribute hasco:partOfSchema ?schemaUri . \n"
-                + "?schemaAttribute hasco:hasAttribute ?attributeUri . \n" 
+                + "?schemaAttribute ?x ?attributeUri . \n" 
                 + "?attributeUri rdfs:subClassOf* ?indicator . \n"
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
                 + " { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n"
                 + "}";
 
         // System.out.println("Indicator query: \n" + query);
-
+        
         Map<Facetable, List<Facetable>> mapIndicatorToCharList = new HashMap<Facetable, List<Facetable>>();
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -399,10 +579,12 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 QuerySolution soln = resultsrw.next();
                 Indicator indicator = new Indicator();
                 indicator.setUri(soln.get("indicator").toString());
+                //System.out.println("Indicator.getTargetFacets(): identified indicator [" + indicator.getUri() + "]  label: [" + indicator.getLabel() + "]");
                 indicator.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("indicator").toString())));
                 indicator.setField("indicator_uri_str");
                 indicator.setQuery(query);
 
+                //System.out.println("Indicator.getTargetFacets(): identified attribute/inrelationto [" + soln.get("attributeUri").toString() + "]  label: [" + WordUtils.capitalize(soln.get("attributeLabel").toString()) + "]");
                 AttributeInstance attrib = new AttributeInstance();
                 attrib.setUri(soln.get("attributeUri").toString());
                 attrib.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
@@ -414,7 +596,19 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 }
                 if (!mapIndicatorToCharList.get(indicator).contains(attrib)) {
                     mapIndicatorToCharList.get(indicator).add(attrib);
-                }
+                    //System.out.println("ADDED ATTRIBUTE");
+                } 
+                /*
+                else {
+                    InRelationToInstance irt = new InRelationToInstance();
+                    irt.setUri(soln.get("attributeUri").toString());
+                    irt.setLabel(WordUtils.capitalize(soln.get("attributeLabel").toString()));
+                    irt.setField("in_relation_to_uri_str");
+                    if (!mapIndicatorToCharList.get(indicator).contains(irt)) {
+                        mapIndicatorToCharList.get(indicator).add(irt);
+                        System.out.println("ADDED INRELATIONTO");
+                    }
+                } */
 
                 Facet subFacet = facet.getChildById(indicator.getUri());
                 subFacet.putFacet("indicator_uri_str", indicator.getUri());
@@ -429,46 +623,13 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
     @Override
     public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("rdfs:subClassOf", "hasco:Indicator");
-        row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getComment());
-        rows.add(row);
-
         int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("IndicatorType", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("IndicatorType", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update Indicator(s)");
-            }
-        }
         return totalChanged;
     }
 
     @Override
     public int deleteFromLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-        rows.add(row);
-        for (Map<String,Object> r : rows) {
-            System.out.println("deleting Indicator " + r.get("hasURI"));
-        }
-
-        try {
-            return loader.deleteRows("IndicatorType", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Could not delete Indicator(s)");
-            e.printStackTrace();
-            return 0;
-        }
+    	return 0;
     }
 
     @Override
@@ -490,7 +651,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         String insert = "";
         String ind_uri = "";
 
-        System.out.println("Indicator.save(): Checking URI");
+        //System.out.println("Indicator.save(): Checking URI");
         if (this.getUri().startsWith("<")) {
             ind_uri = this.getUri();
         } else {
@@ -525,7 +686,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                     request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
+            System.out.println("[ERROR] QueryParseException due to update query: " + insert);
             throw e;
         }
 

@@ -34,9 +34,15 @@ public class FacetTree {
     public void retrieveFacetData(int level, Facet facet, 
             FacetHandler facetHandler, 
             Pivot curPivot) {
-        System.out.println("\n\n\nlevel " + level);
-        System.out.println("facetName: " + facet.getFacetName() + "   facetsSize: " + facets.size());
-
+        //System.out.println("\n\n\nlevel " + level);
+    	/*
+    	System.out.println("FacetTree:  level: " + level + 
+        		"  facetName: " + facet.getFacetName() + 
+        		"  facetsSize: " + facets.size() + 
+        		"  curPivotField: " + curPivot.getField() +
+        		"  curPivotUri: " + curPivot.getTooltip());
+    	*/
+    	
         try {
             Facetable object = null;
             if (facets.isEmpty()) {
@@ -50,37 +56,55 @@ public class FacetTree {
             }
 
             Map<Facetable, List<Facetable>> dict = object.getTargetFacets(facet, facetHandler);
-            for (Facetable key : dict.keySet()) {
-                if (facets.isEmpty()) {
-                    Pivot pivot = new Pivot();
-                    pivot.setField(key.getField());
-                    pivot.setValue(key.getLabel());
-                    pivot.setTooltip(key.getUri());
-                    pivot.setQuery(key.getQuery());
-                    pivot.setCount(key.getCount());
-
-                    if (pivot.getCount() > 0) {
-                        curPivot.addChild(pivot);
-                    }
-                } else {
-                    Pivot pivot = new Pivot();
-                    pivot.setField(key.getField());
-                    pivot.setValue(key.getLabel());
-                    pivot.setTooltip(key.getUri());
-                    pivot.setQuery(key.getQuery());
-                    if (key.getCount() == 0) {
-                        pivot.setCount((int)dict.get(key).get(0).getNumber(
-                                facet.getChildById(key.getUri()), facetHandler));
-                    } else {
-                        pivot.setCount(key.getCount());
-                    }
-                    System.out.println("pivot.count: " + pivot.getCount());
-                    if (pivot.getCount() > 0) {
-                        curPivot.addChild(pivot);
-                        System.out.println("retrieveFacetData for " + key.getUri());
-                        retrieveFacetData(level + 1, facet.getChildById(key.getUri()), facetHandler, pivot);
-                    }
-                }
+            if (dict == null) {
+    	        System.out.println("[ERROR] FacetTree: retrieving object for level: " + level + 
+    	        		"  facetName: " + facet.getFacetName() + 
+    	        		"  facetsSize: " + facets.size() + 
+    	        		"  curPivotField: " + curPivot.getField() +
+    	        		"  curPivotUri: " + curPivot.getTooltip());
+            } else {
+	            for (Facetable key : dict.keySet()) {
+	            	/*
+	            	if (facet.getFacetName().contentEquals("facetsEC2")) {
+	            		System.out.println("Facetable: level=[" + level + "]  key.Field=[" + key.getField() + " key.uri=[" + key.getUri() + "]");
+	            		System.out.println("Facets size: " + facets.size());
+	            	}
+	            	*/
+	                if (facets.isEmpty()) {
+	                    Pivot pivot = new Pivot();
+	                    pivot.setField(key.getField());
+	                    pivot.setValue(key.getLabel());
+	                    pivot.setTooltip(key.getUri());
+	                    pivot.setQuery(key.getQuery());
+	                    pivot.setCount(key.getCount());
+	
+	                    if (pivot.getCount() > 0) {
+	                        curPivot.addChild(pivot);
+	                    }
+	                } else {
+	                    Pivot pivot = new Pivot();
+	                    pivot.setField(key.getField());
+	                    pivot.setValue(key.getLabel());
+	                    pivot.setTooltip(key.getUri());
+	                    pivot.setQuery(key.getQuery());
+	                    if (key.getCount() == 0) {
+	                        pivot.setCount((int)dict.get(key).get(0).getNumber(
+	                                facet.getChildById(key.getUri()), facetHandler));
+	                    } else {
+	                        pivot.setCount(key.getCount());
+	                    }
+		            	//if (facet.getFacetName().contentEquals("facetsEC2")) {
+		            	//	System.out.println("pivot.count: " + pivot.getCount());
+		            	//}
+	                    if (pivot.getCount() > 0) {
+	                        curPivot.addChild(pivot);
+	    	            	//if (facet.getFacetName().contentEquals("facetsEC2")) {
+	    	            	//	System.out.println("retrieveFacetData for " + key.getUri());
+	    	            	//}
+	                        retrieveFacetData(level + 1, facet.getChildById(key.getUri()), facetHandler, pivot);
+	                    }
+	                }
+	            }
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
