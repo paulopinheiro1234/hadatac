@@ -360,7 +360,7 @@ function storeThisEdit(rowNum_str,colNum_str,changeValue){
       editValue: changeValue
     },
     success : function(data) {
-
+      getEditValue(parseInt(rowNum_str), parseInt(colNum_str), 1, changeValue);
     }
   });
 }
@@ -377,6 +377,7 @@ function undoEdit(){
       var cnum=Number(data[1]);
       var valueRevert=data[2];
       cdg.data[rnum][cnum]=valueRevert;
+      getEditValue(rnum, cnum, 1, valueRevert);
       cdg.draw();
     }
   });
@@ -394,6 +395,7 @@ function reundoEdit(){
       var cnum=Number(data[1]);
       var valueRevert=data[2];
       cdg.data[rnum][cnum]=valueRevert;
+      getEditValue(rnum, cnum, 1, valueRevert);
       cdg.draw();
 
     }

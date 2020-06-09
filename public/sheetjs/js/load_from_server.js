@@ -314,20 +314,46 @@ cdg.addEventListener('endedit',function(e){
 
 })
 
-function getEditValue(rowNum, colNum, ind){
-   // sheetStorage was never intialized so were going to ignore because
-   // it is used for label to iri operations
-   if(sheetStorage.length == 0) {
-      // console.log('sheetStorage was never intialized');
-   }
-   else{
-      // MJ: I'm not sure what this is for, but I'm leaving as is for now
-     if(ind==1){
-       sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
-     }
-     else if(ind==0){
-       sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
-     }
+//set sheetStorage when Dictionary Mapping page is edited
+function getEditValue(rowNum,colNum,ind,cellvalue){
+  var temp=[];
+  if(ind==1){
+    //sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+    if(cdg.data[rowNum][colNum]!=""&&!cdg.data[rowNum][colNum].startsWith("??")&&cdg.data[rowNum][colNum].includes(":")){
+        var lab = convertshortToIri(cdg.data[rowNum][colNum]);
+        var finalLab;
+        if("unknown" === lab){
+           finalLab = "Unknown Ontology"
+        }
+        else{
+           finalLab = convertToLabel(lab);
+        }
+
+        temp.push(finalLab);
+      }
+      else{
+        temp.push(cdg.data[rowNum][colNum])
+      }
+    sheetStorage[rowNum][colNum] = temp;
+  }
+  else if(ind==0){
+    //sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
+    if(cdg.data[rowNum][colNum]!=""&&!cdg.data[rowNum][colNum].startsWith("??")&&cdg.data[rowNum][colNum].includes(":")){
+        var lab = convertshortToIri(cdg.data[rowNum][colNum]);
+        var finalLab;
+        if("unknown" === lab){
+           finalLab = "Unknown Ontology"
+        }
+        else{
+           finalLab = convertToLabel(lab);
+        }
+
+        temp.push(finalLab);
+      }
+      else{
+        temp.push(cdg.data[rowNum][colNum])
+      }
+    sheetStorage[rowNum][colNum] = temp;
   }
 }
 
@@ -765,16 +791,20 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   }
   else{
     headerMap.set(sheetName, json[0]);
+    //Add Data Dictionary Link if it doesn't already exist
     if(sheetName=="InfoSheet"){
       var temp=[]
       for(var i=0;i<json.length;i++){
-        if(json[i][0]!="Data Dictionary Link"){
+        if(json[i][0]=="Data Dictionary Link"){
+          break;
+        }
+        if(i == json.length-1){
           temp.push("Data Dictionary Link");
           temp.push(dd_url);
+          json.push(temp);
           break;
         }
       }
-      json.push(temp);
     }
     if(sheetName=="Prefixes"){
       for(var i=0;i<newPrefix.length;i++){
@@ -984,56 +1014,6 @@ function getSuggestion(){
               });
             }
           });
-         /*var ontRequest = new XMLHttpRequest();
-         ontRequest.open('POST', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies', true);
-         ontRequest.responseType = 'json';
-
-         ontRequest.onload = function(e) {
-
-            // Get the ontologies for the Suggestion Request
-            // var ontologyList = [];
-           //  var ontologies = ontRequest.response;
-           //  ontologies.forEach(function (item, index) {
-           //    ontologyList.push(item['uri'])
-           // });
-           var ontologyList = ontRequest.response;
-           ontsList=ontologyList;
-           //console.log(ontologyList)
-
-           SDDPrefixtoJSON();
-
-           // Generating Suggestion Request
-          var request = {}
-          request["source-urls"] = ontologyList
-          // request["source-urls"] = ["http://semanticscience.org/resource/"];
-          request["N"] = 4;
-          request["data-dictionary"] = dataDictionary
-
-
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", url);
-          xhr.setRequestHeader("Content-Type", "application/json")
-          xhr.setRequestHeader("cache-control", "no-cache");
-          xhr.responseType = 'json';
-          xhr.onload = function() {
-              var status = xhr.status;
-              if (status == 200) {
-                  callback(null, xhr.response);
-              } else {
-                  callback(status, xhr.response);
-              }
-          };
-
-          xhr.addEventListener("error", function() {
-            console.log('Couldnt connect to SDDgen');
-            spinnerStatus.stop();
-            imageStatus.style.visibility = 'visible';
-            imageStatus.src = imgPath + 'fail.png'
-          });
-
-          xhr.send(JSON.stringify(request));
-         }
-         ontRequest.send();*/
       }
       oReq.send();
 
@@ -1070,20 +1050,10 @@ function getSuggestion(){
            getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
         }
       });
-      /*var getSDDGenRequest = new XMLHttpRequest();
-      getSDDGenRequest.open("POST", 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress', true);
-      getSDDGenRequest.responseType = 'json';
-      getSDDGenRequest.onload = function(e) {
-         sddgenAdress = getSDDGenRequest.response;
-         console.log(sddgenAdress)
-         getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
-      }
-      getSDDGenRequest.send();*/
    }
    else{
       getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
    }
-   //console.log(globalL,globalR)
    checkRecs(globalL, globalR, 1);
 }
 
@@ -1112,31 +1082,7 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
         imageStatus.src = imgPath + 'fail.png'
       }
     });
-  /*var xhr = new XMLHttpRequest();
-  xhr.open('POST', url, true);
-  xhr.responseType = 'json';
-  xhr.onload = function() {
-      var status = xhr.status;
-      if (status == 200) {
-          spinnerStatus.stop();
-          imageStatus.style.visibility = 'visible';
-          imageStatus.src = imgPath + 'success.png';
-          callback(null, xhr.response);
-      } else {
-          callback(status);
-          spinnerStatus.stop();
-          imageStatus.style.visibility = 'visible';
-          imageStatus.src = imgPath + 'fail.png';
-      }
-  };
 
-  xhr.onerror = function() {
-      spinnerStatus.stop();
-      imageStatus.style.visibility = 'visible';
-      imageStatus.src = imgPath + 'fail.png'
-  };
-
-  xhr.send();*/
   };
 
 
