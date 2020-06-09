@@ -328,7 +328,9 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
         else{
            finalLab = convertToLabel(lab);
         }
-
+        if(finalLab.includes("@")){
+          finalLab = finalLab.slice(0, finalLab.indexOf("@"));
+        }
         temp.push(finalLab);
       }
       else{
@@ -347,7 +349,9 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
         else{
            finalLab = convertToLabel(lab);
         }
-
+        if(finalLab.includes("@")){
+          finalLab = finalLab.slice(0, finalLab.indexOf("@"));
+        }
         temp.push(finalLab);
       }
       else{
@@ -669,7 +673,9 @@ function createCopySheet(sheetCopy){
         else{
            finalLab = convertToLabel(lab);
         }
-
+        if(finalLab.includes("@")){
+          finalLab = finalLab.slice(0, finalLab.indexOf("@"));
+        }
         temp.push(finalLab);
       }
       else{
