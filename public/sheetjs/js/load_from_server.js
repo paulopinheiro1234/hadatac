@@ -316,6 +316,9 @@ cdg.addEventListener('endedit',function(e){
 
 //set sheetStorage when Dictionary Mapping page is edited
 function getEditValue(rowNum,colNum,ind,cellvalue){
+  if(sheetStorage[rowNum][colNum] == null){
+	  sheetStorage[rowNum][colNum] = [];
+  }
   var temp=[];
   if(ind==1){
     //sheetStorage[rowNum][colNum]=cdg.data[rowNum][colNum]
@@ -636,10 +639,6 @@ function saveFile(e){
         _onreponse
       }
     });
-   /*var xhr = new XMLHttpRequest();
-   xhr.open("POST", _upload_url, true);
-   xhr.onreadystatechange = _onreponse;
-   xhr.send(formdata);*/
 
    // iterate over workbook remove headers
    for (let [sn, header] of headerMap) {
@@ -740,7 +739,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   /* clean json */
   var L = 0;
-  var R=0;
+  var R = 0;
   json.forEach(function(r) { if(L < r.length) L = r.length; }); // Gets the max width row
 
   var cleanJson = [];
@@ -786,7 +785,6 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     for(var i=0;i<cdg.data.length;i++){
       R++;
       checkRecs(L,R,1);
-
     }
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=json;
@@ -957,15 +955,6 @@ function getSuggestion(){
          else{
             console.log('Full Suggestions only work on the dictionary mapping page currently')
          }
-         /*var labelRequest = new XMLHttpRequest();
-         labelRequest.open('POST', 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys', true);
-         labelRequest.responseType = 'json';
-
-         labelRequest.onload=function(e){
-           labelsList=labelRequest.response;
-           //console.log(labelsList)
-         }
-         labelRequest.send();*/
 
          $.ajax({
             type : 'POST',
@@ -975,7 +964,6 @@ function getSuggestion(){
               labelsList = labelRequest
             }
           });
-         // cdg.data[rowNum][colNum]
          // MATT HERE
          // Get the ontologies for the Suggestion Request
          $.ajax({
@@ -998,14 +986,15 @@ function getSuggestion(){
                 type : 'POST',
                 url : url,
                 data : JSON.stringify(request),
-                dataType: 'json',
-                contentType: "application/json",
+                dataType : 'json',
+                contentType : "application/json",
+                cache : false,
                 success : function(data, stat, xhr) {
                   var status = xhr.status;
                   if (status == 200) {
-                      callback(null, xhr.response);
+                      callback(null, data);
                   } else {
-                      callback(status, xhr.response);
+                      callback(status, data);
                   }
                 },
                 error : function(xhr, textStatus, errorThrown) {
@@ -1039,7 +1028,7 @@ function getSuggestion(){
 
       }
       else {
-         sdd_suggestions = data
+         sdd_suggestions = data;
          spinnerStatus.stop();
          imageStatus.style.visibility = 'visible';
          imageStatus.src = imgPath + 'success.png'
@@ -1068,13 +1057,13 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
      $.ajax({
       type : 'POST',
       url : url,
-      contentType : "application/json",
+      dataType : "json",
       success : function(callbackData, status, xhr) {
         if (xhr.status == 200) {
           spinnerStatus.stop();
           imageStatus.style.visibility = 'visible';
           imageStatus.src = imgPath + 'success.png';
-            callback(null, xhr.response);
+          callback(null, callbackData);
         } else {
             callback(xhr.status);
             spinnerStatus.stop();

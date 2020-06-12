@@ -41,7 +41,7 @@ function checkRecs (L,R,checker){
 }
 
 function starRec(colval, rowval, menuoptns, isVirtual, L, R, rowIndex, colIndex){
-   if (typeof sdd_suggestions != 'undefined') {
+	if (typeof sdd_suggestions != 'undefined') {
       if(rowval.startsWith("??")){
          var keyword="virtual-columns";
          helperStarRec(keyword, rowval, colval, sdd_suggestions, menuoptns, isVirtual, L, R, rowIndex, colIndex);
@@ -81,7 +81,7 @@ function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R
 
             if(menuoptns.length>0){
               isSuggestion=1
-               drawStars(rowIndex,colIndex,isSuggestion,menuoptns);
+              drawStars(rowIndex,colIndex,isSuggestion,menuoptns);
             }
             break; // leave for loop early
          }
@@ -360,7 +360,9 @@ function storeThisEdit(rowNum_str,colNum_str,changeValue){
       editValue: changeValue
     },
     success : function(data) {
-      getEditValue(parseInt(rowNum_str), parseInt(colNum_str), 1, changeValue);
+    	if(sheetName == "Dictionary Mapping") { 
+    		getEditValue(parseInt(rowNum_str), parseInt(colNum_str), 1, changeValue);
+    	}
     }
   });
 }
@@ -377,7 +379,9 @@ function undoEdit(){
       var cnum=Number(data[1]);
       var valueRevert=data[2];
       cdg.data[rnum][cnum]=valueRevert;
-      getEditValue(rnum, cnum, 1, valueRevert);
+      if(sheetName == "Dictionary Mapping") { 
+    	  getEditValue(rnum, cnum, 1, valueRevert);
+  	  }
       cdg.draw();
     }
   });
@@ -395,7 +399,9 @@ function reundoEdit(){
       var cnum=Number(data[1]);
       var valueRevert=data[2];
       cdg.data[rnum][cnum]=valueRevert;
-      getEditValue(rnum, cnum, 1, valueRevert);
+      if(sheetName == "Dictionary Mapping") { 
+    	  getEditValue(rnum, cnum, 1, valueRevert);
+  	  }
       cdg.draw();
 
     }
