@@ -61,7 +61,7 @@ function create_item(data, selected_elems) {
 	}
 	
 	items.sort(function(a, b) {
-		return a.text.localeCompare(b.text);
+		return a.label.localeCompare(b.label);
 	});
 	
 	return items;
@@ -203,7 +203,7 @@ function create_merged_item(data, selected_elems, curLevel,
 	}
 	
 	items.sort(function(a, b) {
-		return a.text.localeCompare(b.text);
+		return a.label.localeCompare(b.label);
 	});
 	
 	return items;

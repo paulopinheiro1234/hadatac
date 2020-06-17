@@ -1,6 +1,8 @@
 package org.hadatac.console.models;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -73,8 +75,46 @@ public class Pivot {
     		return;
     	}
     	for (Pivot newChild : otherPivot.children) {
-    		children.add(newChild);
+    		if (newChild != null) {
+	    		boolean found = false;
+	    		for (Pivot child : children) {
+	    			if (child.getValue() == null && newChild.getValue() == null) {
+	    				child.addChildrenFromPivot(newChild);
+	    				found = true;
+	    				break;
+	    			} else if (child.getValue() != null && child.getValue().equals(newChild.getValue())) {
+	    				child.addChildrenFromPivot(newChild);
+	    				found = true;
+	    				break;
+	    			}
+	    		}
+	    		if (!found) {
+	    			children.add(newChild);
+	    		}
+    		}
     	}
+    	sort();
+    }
+    
+    public void sort() {
+    	
+    	if (!children.isEmpty()) {
+    		Collections.sort(children, new Comparator<Pivot>() {
+    			@Override
+    			public int compare(Pivot p1, Pivot p2) {
+    				if (p1.getValue() == null || p2.getValue() == null) {
+    					return 0;
+    				}
+    				return p1.getValue().compareTo(p2.getValue());
+    			}
+    		});
+            for (Pivot child : children) {
+            	child.sort();
+            }
+        }
+
+        return;
+     	
     }
     
     public int recomputeStats() {
