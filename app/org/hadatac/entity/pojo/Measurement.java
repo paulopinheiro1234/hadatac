@@ -1694,16 +1694,6 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     @Override
-    public int saveToLabKey(String userName, String password) {
-        return 0;
-    }
-
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-        return 0;
-    }
-
-    @Override
     public void run() {
 
     }

@@ -305,13 +305,4 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
         return 0;
     }
 
-    @Override
-    public int saveToLabKey(String userName, String password) {
-        return 0;
-    }
-
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-        return 0;
-    }
 }

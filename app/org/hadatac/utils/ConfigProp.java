@@ -21,8 +21,6 @@ public class ConfigProp {
 
 	public static final String GUI_CONFIG_FILE = "gui.config";
 
-	public static final String LABKEY_CONFIG_FILE = "labkey.config";
-
 	public static final String MEDIA_FOLDER = "media";
 
 	private static Properties getProperties(String confFileName) {
@@ -133,24 +131,6 @@ public class ConfigProp {
 
 	public static String getFacetedDataPlatform() {
         return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_platform");
-    }
-
-	public static String getLabKeySite() {
-        return getPropertyValue(LABKEY_CONFIG_FILE, "site");
-    }
-
-	public static String getLabKeyProjectPath() {
-        return "/" + getPropertyValue(LABKEY_CONFIG_FILE, "folder");
-    }
-
-	public static boolean getLabKeyLoginRequired() {
-        String flag = getPropertyValue(LABKEY_CONFIG_FILE, "login_required");
-
-        if (flag.equalsIgnoreCase("true")) {
-            return true;
-        }
-
-        return false;
     }
 
     public static String getBioportalApiKey() {

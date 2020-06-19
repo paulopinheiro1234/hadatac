@@ -20,13 +20,11 @@ import javax.inject.Inject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpStatus;
 
-import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
-import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.NewFileForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.*;
@@ -42,12 +40,10 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpace;
-import org.labkey.remoteapi.CommandException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

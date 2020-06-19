@@ -116,14 +116,6 @@ public class NewObjectsFromFile extends Controller {
 
                 // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
                 obj.saveToTripleStore();
-
-                // update/create new OBJ in LabKey
-                if (ConfigProp.getLabKeyLoginRequired()) {
-                    int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                    if (nRowsAffected <= 0) {
-                        System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-                    }
-                }
                 
                 oc.getObjectUris().add(obj.getUri());
 

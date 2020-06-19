@@ -19,10 +19,6 @@ public class EditDAS extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String das_uri) {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.EditDAS.index(das_uri).url()));
-		}
 
 		DataAcquisitionSchema das = null;
 		try {

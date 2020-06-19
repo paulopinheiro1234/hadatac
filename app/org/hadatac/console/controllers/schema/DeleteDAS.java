@@ -27,10 +27,6 @@ public class DeleteDAS extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String das_uri) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.DeleteDAS.index(das_uri).url()));
-        }
 
         DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
         DataAcquisitionSchema das = null;
@@ -63,12 +59,8 @@ public class DeleteDAS extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processForm(String das_uri) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.DeleteDAS.processForm(das_uri).url()));
-        }
 
-        DataAcquisitionSchema das = null;
+    	DataAcquisitionSchema das = null;
 
         try {
             if (das_uri != null) {
@@ -89,11 +81,6 @@ public class DeleteDAS extends Controller {
         data.setLabel(das.getLabel());
 
         if (das != null) {
-            System.out.println("calling das.deleteFromLabKey() from DeleteDAS");
-            if (ConfigProp.getLabKeyLoginRequired() && das.deleteFromLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) <= 0) {
-                return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from das.deleteFromLabKey()", data.getLabel()));
-            }
-            //das.delete();
             NameSpace.deleteTriplesByNamedGraph(das_uri);
         }
 

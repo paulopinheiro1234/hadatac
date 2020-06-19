@@ -126,16 +126,4 @@ public class Ontology extends HADatAcThing {
 		return 0;
 	}
 
-	@Override
-	public int saveToLabKey(String userName, String password) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int deleteFromLabKey(String userName, String password) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

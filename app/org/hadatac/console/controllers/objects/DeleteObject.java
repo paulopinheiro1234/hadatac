@@ -18,10 +18,6 @@ public class DeleteObject extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, String obj_id, int page) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.objects.routes.DeleteObject.index(dir, filename, da_uri, std_uri, oc_uri, obj_id, page).url()));
-        }
         
         try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");

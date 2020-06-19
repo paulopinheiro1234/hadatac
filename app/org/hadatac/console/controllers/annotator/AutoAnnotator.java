@@ -21,12 +21,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
-import org.hadatac.entity.pojo.Credential;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
-import org.hadatac.console.models.LabKeyLoginForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.console.views.html.triplestore.*;
@@ -41,7 +39,6 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
@@ -49,7 +46,6 @@ import org.hadatac.utils.FileManager;
 import org.hadatac.utils.NameSpace;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.labkey.remoteapi.CommandException;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.typesafe.config.ConfigException.Null;
@@ -291,35 +287,6 @@ public class AutoAnnotator extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDownloadTemplates(String dir) {
         return postDownloadTemplates(dir);
-    }
-
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result setLabKeyCredentials() {
-        return ok(syncLabkey.render("init", routes.AutoAnnotator.
-                postSetLabKeyCredentials().url(), ""));
-    }
-
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postSetLabKeyCredentials() {
-        Form<LabKeyLoginForm> form = formFactory.form(LabKeyLoginForm.class).bindFromRequest();
-        String user_name = form.get().getUserName();
-        String password = form.get().getPassword();
-        LabkeyDataHandler loader = new LabkeyDataHandler(
-                ConfigProp.getLabKeySite(), "/", user_name, password);
-        try {
-            loader.checkAuthentication();
-            Credential cred = new Credential();
-            cred.setUserName(user_name);
-            cred.setPassword(password);
-            cred.save();
-        } catch(CommandException e) {
-            if("Unauthorized".equals(e.getMessage())){
-                return ok(syncLabkey.render("login_failed", "", ""));
-            }
-        }
-
-        return ok(main.render("Results", "", 
-                new Html("<h3>Your provided credentials are valid and saved!</h3>")));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

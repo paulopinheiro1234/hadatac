@@ -16,17 +16,10 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
-import org.hadatac.console.controllers.sandbox.Sandbox;
-import org.hadatac.entity.pojo.Credential;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.metadata.api.MetadataFactory;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.LabKeyException;
-import org.labkey.remoteapi.CommandException;
-
 
 public abstract class BaseGenerator {
 
@@ -248,52 +241,6 @@ public abstract class BaseGenerator {
         }
     }
 
-    public boolean commitRowsToLabKey(List<Map<String, Object>> rows) {
-        if (rows.isEmpty()) {
-            return true;
-        }
-        
-        String tableName = getTableName();
-        if (null == tableName) {
-            logger.printException("No LabKey table name is specified");
-            return false;
-        }
-
-        try {
-            checkRows(rows, "hasURI");
-        } catch (Exception e) {
-            logger.printException(String.format(
-                    "Trying to commit invalid rows to LabKey Table %s: ", tableName)
-                    + e.getMessage());
-            return false;
-        }
-
-        Credential cred = Credential.find();
-        if (null == cred) {
-            logger.printException("No LabKey credentials are provided!");
-            return false;
-        }
-
-        LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
-                cred.getUserName(), cred.getPassword());
-        try {
-            int nRows = labkeyDataHandler.insertRows(tableName, rows);
-            logger.println(String.format(
-                    "%d row(s) have been inserted into Table %s ", nRows, tableName));
-        } catch (CommandException e1) {
-            try {
-                labkeyDataHandler.deleteRows(tableName, rows);
-                int nRows = labkeyDataHandler.insertRows(tableName, rows);
-                logger.println(String.format("%d row(s) have been updated into Table %s ", nRows, tableName));
-            } catch (CommandException e) {
-                logger.printException("CommitRows inside AutoAnnotator: " + e);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
         Model model = MetadataFactory.createModel(rows, getNamedGraphUri());
         int numCommitted = MetadataFactory.commitModelToTripleStore(
@@ -305,22 +252,6 @@ public abstract class BaseGenerator {
         }
 
         return true;
-    }
-
-    public void commitObjectsToLabKey(List<HADatAcThing> objects) throws Exception {
-        Credential cred = Credential.find();
-        if (null == cred) {
-            throw new Exception("[ERROR] No LabKey credentials are provided!");
-        }
-
-        int count = 0;
-        for (HADatAcThing obj : objects) {
-            count += obj.saveToLabKey(cred.getUserName(), cred.getPassword());
-        }
-
-        if (count > 0) {
-            logger.println(String.format("%d object(s) have been committed to LabKey", count));
-        }
     }
 
     public boolean commitObjectsToTripleStore(List<HADatAcThing> objects) {
@@ -378,44 +309,6 @@ public abstract class BaseGenerator {
 
         RepositoryConnection con = repo.getConnection();
         con.remove(model);
-    }
-
-    public void deleteRowsFromLabKey(List<Map<String, Object>> rows) throws Exception {
-        if (rows.isEmpty()) {
-            return;
-        }
-
-        checkRows(rows, "hasURI");
-
-        Credential cred = Credential.find();
-        if (null == cred) {
-            throw new LabKeyException("[ERROR] No LabKey credentials are provided!");
-        }
-
-        LabkeyDataHandler labkeyDataHandler = LabkeyDataHandler.createDefault(
-                cred.getUserName(), cred.getPassword());
-        
-        try {
-            String tableName = getTableName();
-            if (null == tableName) {
-                logger.printException("No LabKey table name is specified");
-            }
-            labkeyDataHandler.deleteRows(tableName, rows);
-        } catch (CommandException e) {
-            logger.printException("Delete rows from LabKey: " + e);
-            throw new LabKeyException("[ERROR] Delete rows from LabKey: " + e);
-        }
-    }
-
-    public void deleteObjectsFromLabKey(List<HADatAcThing> objects) throws Exception {
-        Credential cred = Credential.find();
-        if (null == cred) {
-            throw new LabKeyException("[ERROR] No LabKey credentials are provided!");
-        }
-
-        for (HADatAcThing obj : objects) {
-            obj.deleteFromLabKey(cred.getUserName(), cred.getPassword());
-        }
     }
 
     public boolean deleteObjectsFromTripleStore(List<HADatAcThing> objects) {

@@ -22,14 +22,13 @@
     <div class="container-fluid">
 	
 	@if(bAdmin) {
-	@if(bStarted){
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
-	}else{
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Start Auto-Annotator</a>
-		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
-	}
-	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.setLabKeyCredentials()" class="btn btn-primary" role="button">Set LabKey Credentials for Background Process</a>
+		@if(bStarted){
+			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
+			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
+		}else{
+			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Start Auto-Annotator</a>
+			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
+		}
 	}
 	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteFolder(dir)" class="btn btn-primary" role="button">Delete Current Folder</a>
 	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>

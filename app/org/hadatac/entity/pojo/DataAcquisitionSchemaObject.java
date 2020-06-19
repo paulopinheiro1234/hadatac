@@ -16,10 +16,7 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.labkey.remoteapi.CommandException;
-
 
 public class DataAcquisitionSchemaObject extends HADatAcThing {
 
@@ -518,54 +515,6 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             }
         } 
         return "";
-    }
-
-    @Override
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", "hasco:DASchemaObject");
-        row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getLabel());
-        row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
-        row.put("hasco:hasEntity", this.getEntity());
-        row.put("hasco:hasRole", this.getRole());
-        row.put("sio:SIO_000668", this.getInRelationTo());
-        row.put("hasco:Relation", this.getRelation());
-        row.put("hasco:isVirtual", "");
-        row.put("hasco:isPIConfirmed", "false");
-        rows.add(row);
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("DASchemaObject", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("DASchemaObject", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update DASO(s)");
-            }
-        }
-
-        return totalChanged;
-    }
-
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("DASchemaObject", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Could not delete DASO(s)");
-            e.printStackTrace();
-            return 0;
-        }
     }
 
     @Override

@@ -50,7 +50,6 @@ public class CollectionUtil {
         CSV_DATASET ("/csv"),
         OPERATION_MODE ("/operation_mode"),
         NAMESPACE ("/namespace"),
-        LABKEY_CREDENTIAL ("/labkey"),
         URI_GENERATOR ("/uri_generator"),
         STUDY_ACQUISITION ("/studies"),
         METADATA_DA ("/data_acquisitions"),
@@ -165,7 +164,6 @@ public class CollectionUtil {
         case OPERATION_MODE:
         case NAMESPACE:
         case CSV_DATASET:
-        case LABKEY_CREDENTIAL:
         case URI_GENERATOR :
         case STUDY_ACQUISITION:
         case METADATA_DA:

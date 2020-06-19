@@ -78,11 +78,6 @@ public class DataAcquisitionManagement extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result newDataAcquisition() {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null
-                && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB
-                    .logInLabkey(routes.DataAcquisitionManagement.newDataAcquisition().url()));
-        }
 
         final SysUser sysUser = AuthApplication.getLocalUser(session());
 

@@ -497,6 +497,4 @@ public abstract class HADatAcThing implements Facetable {
     public abstract boolean saveToSolr();
     public abstract int deleteFromSolr();
 
-    public abstract int saveToLabKey(String userName, String password);
-    public abstract int deleteFromLabKey(String userName, String password);
 }

@@ -135,8 +135,6 @@ public class AuthApplication extends Controller {
 	}
 	
 	public Result doSignout() {
-		session().remove("LabKeyUserName");
-		session().remove("LabKeyPassword");
 		return this.authenticate.logout();
 	}
 }

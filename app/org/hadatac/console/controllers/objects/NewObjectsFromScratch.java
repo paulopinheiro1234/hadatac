@@ -36,10 +36,6 @@ public class NewObjectsFromScratch extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.objects.routes.NewObjectsFromScratch.index(dir, filename, da_uri, std_uri, oc_uri, page).url()));
-        }
 
         try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");
@@ -139,14 +135,6 @@ public class NewObjectsFromScratch extends Controller {
 
                 // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
                 obj.saveToTripleStore();
-
-                // update/create new OBJ in LabKey
-                if (ConfigProp.getLabKeyLoginRequired()) {
-                    int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                    if (nRowsAffected <= 0) {
-                        return badRequest("Failed to insert new OBJ to LabKey!\n");
-                    }
-                }
 
                 oc.getObjectUris().add(obj.getUri());
                 nextId++;
@@ -335,14 +323,6 @@ public class NewObjectsFromScratch extends Controller {
                     // insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
                     obj.saveToTripleStore();
 
-                    // update/create new OBJ in LabKey
-                    if (ConfigProp.getLabKeyLoginRequired()) {
-                        int nRowsAffected = obj.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                        if (nRowsAffected <= 0) {
-                            System.out.println("[ERROR] Failed to insert new OBJ to LabKey!");
-                        }
-                    }
-                    
                     oc.getObjectUris().add(obj.getUri());
 
                     nextId++;

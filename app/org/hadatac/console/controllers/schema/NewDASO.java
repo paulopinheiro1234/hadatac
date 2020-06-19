@@ -26,11 +26,6 @@ public class NewDASO extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String das_uri) {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					org.hadatac.console.controllers.schema.routes.NewDASO.index(das_uri).url()));
-		}
-
 		if (das_uri == null || das_uri.equals("")) {
 			return badRequest("Empty of null URI for DAS inside NewDASO.");
 		} 
@@ -97,14 +92,6 @@ public class NewDASO extends Controller {
 		// insert the new DASO content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		daso.save();
 
-		// update/create new DASO in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = daso.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new DASO to LabKey!\n");
-		    }
-		}
-		
 		return ok(newDASOConfirm.render(daso));
 	}
 

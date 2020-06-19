@@ -9,16 +9,6 @@
 @main("Load Facts into Metadata Store") {
  
      <script type="text/javascript">
-        function checkform1() {
-            if(document.getElementById('upload1').value != "") {
-                 document.getElementById('submitMessage1').style.display = 'inline';
-		    }
-	    }
-        function checkform2() {
-            if(document.getElementById('upload2').value != "") {
-                 document.getElementById('submitMessage2').style.display = 'inline';
-		    }
-	    }
         function checkform3() {
             if(document.getElementById('upload3').value != "") {
                  document.getElementById('submitMessage3').style.display = 'inline';
@@ -33,29 +23,7 @@
         <div class="col-md-8 col-md-offset-1">
 
          @if(oper=="init") {
-	         <h4>Load facts into metadata store...</h4>
 
-             <div id="rcorners">
-                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
-
-                 <form name="fileUploadForm" id='upload1' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.uploadFile("load")" onchange="checkform1()">
-                     <input type="file" class="btn btn-info" name="pic"> 
-                     <div id='submitMessage1'  style="display:none;" >
-                        <br>Press <input type="submit" class="btn-sm btn-success" value="Parse and Load"> to add knowledge into the knowledge base. 
-	                 </div>
-                 </form>
-             </div>
-
-	         <h4>Parse facts...</h4>
-             <div id="rcorners">
-                 <form name="fileUploadForm" id='upload2' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.uploadFile("parse")" onchange="checkform2()">
-                     <input type="file" class="btn btn-info" name="pic"> 
-                     <div id='submitMessage2'  style="display:none;" >
-                         <br>Press <input type="submit" class="btn-sm btn-success" value="Parse"> to see if there is any error with a spreadsheet. 
-                     </div>
-                 </form>
-             </div>
-             
              <h4>Load facts into metadata store from turtle...</h4>
              <div id="rcorners">
                  The metadata store has @MetadataContext.playTotalTriples() triples. <br>
@@ -69,24 +37,6 @@
              </div>
          }
 
-     	 @if(oper=="load" || oper=="parse") {
-         
-             <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-         
-             <div id="end-process-box" style="display:none;">
-                  <h4>Operation [@oper] complete -- check the results above to see if the parsing of the facts was successful.</h4>
-	         </div>
-
-             <script> 
-                var msg = "@LoadKB.playLoadKB(oper)";
-                var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
-                $('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
-                document.getElementById('end-process-box').style.display = 'inline';
-             </script> 
-
-             <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" class="btn btn-warning" role="button">Back to Load KB</a>
-         }
-         
          @if(oper=="turtle") {
          
              <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
@@ -106,23 +56,7 @@
          }
 
          @if(oper=="init") {
-            <h4>Spreadsheet Templates:</h4>
-
-            Use the templates below to create metadata for your scientific activities. A single spreadsheet may be used to record needed metadata.
-
-            <ul>
-               <li><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Full.xlsx")'>Full Spreadsheet</a></li>
-            </ul> 
-
-            Alternatively, the three complementary spreadsheets listed below may be used to record needed metadata. It is recommended that the 
-            these spreadsheets are used and populated into HADataC following the order in the list below.
-
-            <ul>
-               <li><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Agents.xlsx")'>Agent Spreadsheet</a> - Used to create agents (including users) and organizations (see example Agent spreadsheet)</li>
-               <li><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Classes.xlsx")'>Classes Spreadsheet</a> - Used to specialize classes of the family of Human-Aware Science Ontologies (see example Class spreadsheet)</li>
-               <li><a href='@controllers.routes.Assets.versioned("example/metadata/templates/HASNetO-Template-Instances.xlsx")'>Instances Spreadsheet</a> - Used to create instances of registered classes (see example Instance spreadsheet)</li>
-            </ul>
-
+	        <br>
             <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Page</a>
          }
 

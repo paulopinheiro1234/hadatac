@@ -31,13 +31,11 @@ import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
-import org.labkey.remoteapi.CommandException;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 
 public class ObjectCollection extends HADatAcThing implements Comparable<ObjectCollection> {
 
@@ -1094,47 +1092,6 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
         processor.execute();
-    }
-
-    @Override
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
-        row.put("rdfs:label", getLabel());
-        row.put("hasco:isMemberOf", getStudyUri());
-        rows.add(row);
-
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("ObjectCollection", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("ObjectCollection", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update ObjectCollection(s)");
-            }
-        }
-        return totalChanged;
-    }
-
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("ObjectCollection", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Failed to delete Object Collections From LabKey!");
-            e.printStackTrace();
-            return 0;
-        }
     }
 
     @Override

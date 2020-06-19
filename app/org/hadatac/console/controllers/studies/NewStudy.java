@@ -32,10 +32,6 @@ public class NewStudy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.NewStudy.index().url()));
-        }
         return indexFromFile("/", "");
     }
 
@@ -46,11 +42,6 @@ public class NewStudy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result indexFromFile(String dir, String fileId) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.NewStudy.indexFromFile(dir, fileId).url()));
-        }
-
         List<Agent> organizations = Agent.findOrganizations();
         List<Agent> persons = Agent.findPersons();
         StudyType studyType = new StudyType();
@@ -116,14 +107,6 @@ public class NewStudy extends Controller {
         // insert the new STD content inside of the triplestore regardless of any change -- the previous content has already been deleted
         std.save();
 
-        // update/create new STD in LabKey
-        if (ConfigProp.getLabKeyLoginRequired()) {
-            int nRowsAffected = std.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            if (nRowsAffected <= 0) {
-                return badRequest("Failed to insert new STD to LabKey!\n");
-            }
-        }
-
         System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
         System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
         
@@ -134,11 +117,7 @@ public class NewStudy extends Controller {
                 da.setStudyUri(std.getUri());
                 
                 System.out.println("Inserting new Study from file. Found DA");
-                if (!ConfigProp.getLabKeyLoginRequired() || da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
-                    da.save();
-                } else {
-                    System.out.println("[WARNING] Could not update DA from associated DataFile when creating a new study");
-                }
+                da.save();
             } else {
                 System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
             }

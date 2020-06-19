@@ -123,17 +123,25 @@ public class MetadataContext implements RDFContext {
                 repo.init();
                 RepositoryConnection con = repo.getConnection();
                 ValueFactory factory = repo.getValueFactory();
-                con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
+                if (graphUri.isEmpty()) {
+                	con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createBNode());
+                } else {
+                	con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
+                }
             }
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: file " + filePath);
             System.out.println("NotFoundException: " + e.getMessage());
+            e.printStackTrace();
         } catch (RiotNotFoundException e) {
             System.out.println("RiotNotFoundException: file " + filePath);
             System.out.println("RiotNotFoundException: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
+            System.out.println("Exception: graphUri [" + graphUri + "]");
             System.out.println("Exception: file " + filePath);
             System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
         }
 
         Long newTotal = totalTriples();

@@ -30,11 +30,6 @@ public class EditDASO extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String daso_uri, String das_uri) {
 
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.EditDASO.index(daso_uri, das_uri).url()));
-		}
-
 		DataAcquisitionSchemaObject daso = null;
 		try {
 			if (daso_uri != null) {
@@ -155,14 +150,6 @@ public class EditDASO extends Controller {
 		// insert the new DASO content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		olddaso.save();
 
-		// update/create new DASO in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = olddaso.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new DASO to LabKey!\n");
-		    }
-		}
-		
 		return ok(editDASOConfirm.render(olddaso, changedInfos));
 	}
 

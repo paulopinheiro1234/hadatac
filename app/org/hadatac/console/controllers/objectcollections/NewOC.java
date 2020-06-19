@@ -28,10 +28,6 @@ public class NewOC extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String dir, String filename, String da_uri, String std_uri) {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					org.hadatac.console.controllers.objectcollections.routes.NewOC.index(dir, filename, da_uri, std_uri).url()));
-		}
 		Study study = Study.find(std_uri);
 		List<ObjectCollectionType> typeList = ObjectCollectionType.find();
 
@@ -110,14 +106,6 @@ public class NewOC extends Controller {
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		oc.save();
 
-		// update/create new OC in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = oc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new OC to LabKey!\n");
-		    }
-		}
-		
 		return ok(objectCollectionConfirm.render("New Object Collection has been Generated", dir, filename, da_uri, std_uri, oc));
 	}
 

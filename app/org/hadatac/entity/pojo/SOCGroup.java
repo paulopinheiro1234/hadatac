@@ -337,16 +337,6 @@ public class SOCGroup extends HADatAcThing {
     }
 
     @Override
-    public int saveToLabKey(String user_name, String password) {
-    	return 0;
-    }
-    
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-    	return 0;
-    }
-
-    @Override
     public boolean saveToSolr() {
         return false;
     }

@@ -70,14 +70,6 @@ public class NewFunction extends Controller {
 		// insert the new indicator content inside of the triplestore
 		ind.save();
 		
-		// update/create new indicator in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = ind.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new indicator to LabKey!\n");
-		    }
-		}
-		
 		return ok(newFunctionConfirm.render(ind));
     }
 }

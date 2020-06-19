@@ -28,7 +28,6 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
-//import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.StudyObject;
@@ -38,7 +37,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-//import org.labkey.remoteapi.CommandException;
 
 import io.ebeaninternal.server.lib.util.Str;
 
@@ -1281,16 +1279,6 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         }
 
         return builder.toString();
-    }
-
-    @Override
-    public int saveToLabKey(String userName, String password) {
-    	return 0;
-    }
-    
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-    	return 0;
     }
 
     @Override

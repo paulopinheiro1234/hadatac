@@ -30,10 +30,6 @@ public class EditIndicator extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String ind_uri) {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.EditIndicator.index(ind_uri).url()));
-		}
 
 		Indicator indicator = null;
 
@@ -111,13 +107,6 @@ public class EditIndicator extends Controller {
 		// insert the new Indicator content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		oldIndicator.save();
 		
-		// update/create new Indicator in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = oldIndicator.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert edited Indicator to LabKey!\n");
-		    }
-		}
 
 		return ok(indicatorConfirm.render("Edit Indicator", oldIndicator));
 	}

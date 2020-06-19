@@ -24,7 +24,6 @@ import org.hadatac.entity.pojo.Platform;
 import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -57,10 +56,6 @@ public class NewDeployment extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String type, String dir, String filename, String da_uri, Integer page) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.NewDeployment.index(type, dir, filename, da_uri, page).url()));
-        }
 
         if (type.equalsIgnoreCase("regular")) {
             return ok(newDeployment.render(
@@ -137,16 +132,8 @@ public class NewDeployment extends Controller {
             }
             System.out.println("NewDeployment: Loading existing DA : [" + da_uri + "]");
             da.setDeploymentUri(deployment.getUri());
-            String user_name = session().get("LabKeyUserName");
-            String password = session().get("LabKeyPassword");
-            if (user_name != null && password != null) {
-                if (ConfigProp.getLabKeyLoginRequired()) {
-                    nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                    nRowsOfDA = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                }
-                deployment.saveToTripleStore();
-                da.save();
-            }
+            deployment.saveToTripleStore();
+            da.save();
         } else {
             /* 
              *
@@ -173,16 +160,8 @@ public class NewDeployment extends Controller {
                     param, UserManagement.getUriByEmail(user.getEmail()));
 
             System.out.println("NewDeployment: Showing DA: " + dataAcquisition);
-            String user_name = session().get("LabKeyUserName");
-            String password = session().get("LabKeyPassword");
-            if (user_name != null && password != null) {
-                if (ConfigProp.getLabKeyLoginRequired()) {
-                    nRowsOfDeployment = deployment.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                    nRowsOfDA = dataAcquisition.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                }
-                deployment.saveToTripleStore();
-                dataAcquisition.save();
-            }
+            deployment.saveToTripleStore();
+            dataAcquisition.save();
         }
         
         return ok(deploymentConfirm.render("New Deployment created.", data, dir, filename, da_uri, page));

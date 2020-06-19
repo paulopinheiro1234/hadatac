@@ -27,9 +27,7 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.labkey.remoteapi.CommandException;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
@@ -660,37 +658,6 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
     */
 
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) {
-    	return 0;
-    }
-    
-    /*
-    _at_Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", URIUtils.replaceNameSpaceEx(typeUri));
-        row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getComment());
-        rows.add(row);
-
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("Platform", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("Platform", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update Platform(ies)");
-            }
-        }
-        return totalChanged;
-    }
-    */
-
     @Override
     public int compareTo(Platform another) {
         return this.getLabel().compareTo(another.getLabel());
@@ -706,8 +673,4 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         return 0;
     }
 
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-        return 0;
-    }
 }

@@ -27,10 +27,6 @@ public class NewIndicator extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index() {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.NewIndicator.index().url()));
-		}
 		// may need addressing
 		Indicator indicator = new Indicator();
 		
@@ -68,14 +64,6 @@ public class NewIndicator extends Controller {
 
 		// insert the new indicator content inside of the triplestore
 		ind.save();
-
-		// update/create new indicator in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = ind.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new indicator to LabKey!\n");
-		    }
-		}
 
 		return ok(newIndicatorConfirm.render(ind));
 	}

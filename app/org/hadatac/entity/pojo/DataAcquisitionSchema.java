@@ -24,9 +24,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.labkey.remoteapi.CommandException;
-
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 
 public class DataAcquisitionSchema extends HADatAcThing {
     public static String INDENT1 = "     ";
@@ -657,54 +654,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
         DataAcquisitionSchema das = new DataAcquisitionSchema();
         das.setUri(uri);
         return das;
-    }
-
-    @Override
-    public int saveToLabKey(String user_name, String password) {
-        // SAVING DAS's DASAs
-        for (DataAcquisitionSchemaAttribute dasa : DataAcquisitionSchemaAttribute.findBySchema(this.getUri())) {
-            dasa.saveToLabKey(user_name, password);
-        }
-
-        // SAVING DAS ITSELF
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", "hasco:DataAcquisitionSchema");
-        row.put("rdfs:label", getLabel());
-        rows.add(row);
-
-        try {
-            return loader.insertRows("DASchema", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Failed to insert DA Schemas to LabKey!");
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-        // DELETING DAS's DASAs
-        for (DataAcquisitionSchemaAttribute dasa : DataAcquisitionSchemaAttribute.findBySchema(this.getUri())) {
-            dasa.deleteFromLabKey(user_name, password);
-        }
-
-        // DELETING DAS ITSELF
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("DASchema", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Failed to delete DA Schemas from LabKey!");
-            e.printStackTrace();
-            return 0;
-        }
     }
 
     @Override

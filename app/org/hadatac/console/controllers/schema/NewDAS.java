@@ -12,7 +12,6 @@ import org.hadatac.console.views.html.schema.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -47,10 +46,6 @@ public class NewDAS extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    org.hadatac.console.controllers.schema.routes.NewDAS.index().url()));
-        }
         
         return ok(newDAS.render());
     }
@@ -72,79 +67,16 @@ public class NewDAS extends Controller {
         String label = data.getLabel();
         DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
 
-        String user_name = session().get("LabKeyUserName");
-        String password = session().get("LabKeyPassword");
-        if (user_name != null && password != null) {
-            int nRowsOfSchema = 0;
-            
-            if (ConfigProp.getLabKeyLoginRequired()) {
-                nRowsOfSchema = das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            }
-            
-            if (!ConfigProp.getLabKeyLoginRequired() || nRowsOfSchema > 0) {
-                das.save();
-                return ok(DASConfirm.render("New Data Acquisition Schema", 
-                        String.format("%d row(s) have been inserted in Table \"DataAcquisitionSchema\" \n", 
-                                nRowsOfSchema),data.getLabel()));
-            } else {
-                return badRequest("Failed to insert Deployment to LabKey!\n");
-            }
-        }
-
-        return ok(DASConfirm.render("New Data Acquisition Schema", "no content added to labkey", data.getLabel()));
-    }
+        das.save();
+        return ok(DASConfirm.render("New Data Acquisition Schema", 
+                String.format("Rows have been inserted in Table \"DataAcquisitionSchema\" \n"),data.getLabel()));
+     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processFormFromFile(String attributes) {
     	
-    	/*
-        System.out.println("Inside processFormFromFile()");
-
-        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
-        if (form.hasErrors()) {
-            return badRequest("The submitted form has errors!");
-        }
-
-        DataAcquisitionSchemaForm data = form.get();
-        String[] fields;
-
-        String label = data.getLabel().replace("DA-","").replace(".csv","").replace(".","").replace("+","-");
-        DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
-		*/
-    	
         DataAcquisitionSchema das = new DataAcquisitionSchema();
 
-        /*
-        System.out.println("File Processing: [" + attributes + "]");
-        if (attributes == null || attributes.equals("")) {
-            return ok(editDAS.render(das));	
-        }
-        fields = FileProcessing.extractFields(attributes);
-        System.out.println("# of fields: " + fields.length);
-        int pos = 0;
-        for (String attribute: fields) {
-            //attribute = URLEncoder.encode(attribute);
-            String finalAttribute = attribute.replace(".","").replace("+","-").replace(" ","-").replace("?","").replace("(","").replace(")","").replace("\"","");
-            System.out.println("Label: " + finalAttribute + "  Pos: " + pos);
-            DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(kbPrefix + "DASA-" + label + "-" + finalAttribute, das.getUri());
-            dasa.setLabel(finalAttribute);
-            dasa.setPosition(Integer.toString(pos));
-            das.getAttributes().add(dasa);
-            pos++;
-        }
-        
-        String user_name = session().get("LabKeyUserName");
-        String password = session().get("LabKeyPassword");
-        if (user_name != null && password != null) {
-            System.out.println("Saving DAS in Labkey");
-            if (!ConfigProp.getLabKeyLoginRequired() || das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
-                das.save();
-            } else {
-                return badRequest("Failed to insert DA Schema to LabKey!\n");
-            }
-        }
-		*/
-       
         return ok(editDAS.render(das));
        
     }
@@ -152,53 +84,8 @@ public class NewDAS extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processFormFromFileLabels(String attributes) {
 
-    	/*
-    	System.out.println("Inside processFormFromFileLabels()");
-        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
-        if (form.hasErrors()) {
-            return badRequest("The submitted form has errors!");
-        }
-
-        DataAcquisitionSchemaForm data = form.get();
-        String[] fields;
-
-        String label = data.getLabel().replace("DA-","").replace(".csv","").replace(".","").replace("+","-");
-        DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
-        */
-
     	DataAcquisitionSchema das = new DataAcquisitionSchema();
-    	
-    	/*
-        System.out.println("File Processing: [" + attributes + "]");
-        if (attributes == null || attributes.equals("")) {
-            return ok(editDAS.render(das));	
-        }
-        fields = FileProcessing.extractFields(attributes);
-        System.out.println("# of fields: " + fields.length);
-        int pos = 0;
-        for (String attribute: fields) {
-            //attribute = URLEncoder.encode(attribute);
-            String finalAttribute = attribute.replace(".","").replace("+","-").replace(" ","-").replace("?","").replace("(","").replace(")","").replace("\"","");
-            System.out.println("Label: " + finalAttribute + "  Pos: " + pos);
-            DataAcquisitionSchemaAttribute dasa = new DataAcquisitionSchemaAttribute(kbPrefix + "DASA-" + label + "-" + finalAttribute, das.getUri());
-            dasa.setLabel(finalAttribute);
-            dasa.setPosition(Integer.toString(-1));
-            das.getAttributes().add(dasa);
-            pos++;
-        }
-
-        String user_name = session().get("LabKeyUserName");
-        String password = session().get("LabKeyPassword");
-        if (user_name != null && password != null) {
-            System.out.println("Saving DAS in Labkey");
-            if (!ConfigProp.getLabKeyLoginRequired() || das.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword")) > 0) {
-                das.save();
-            } else {
-                return badRequest("Failed to insert DA Schema to LabKey!\n");
-            }
-        }
-		*/
-    	
+    	    	
         return ok(editDAS.render(das));
     }
 }

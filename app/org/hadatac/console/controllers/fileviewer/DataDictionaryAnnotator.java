@@ -32,7 +32,6 @@ import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.labkey.remoteapi.assay.Run;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;

@@ -17,12 +17,10 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 //import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.metadata.loader.URIUtils;
-import org.labkey.remoteapi.CommandException;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -830,56 +828,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     @Override
     public void save() {
         saveToTripleStore();
-    }
-
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", "hasco:DASchemaAttribute");
-        row.put("rdfs:label", getLabel());
-        row.put("rdfs:comment", getLabel());
-        row.put("hasco:partOfSchema", URIUtils.replaceNameSpaceEx(getPartOfSchema()));
-        row.put("hasco:hasEntity", this.getEntity());
-        row.put("hasco:hasAttribute", this.getAttributes());
-        row.put("hasco:hasUnit", this.getUnit());
-        row.put("hasco:hasEvent", URIUtils.replaceNameSpaceEx(daseUri));
-        row.put("hasco:hasSource", "");
-        row.put("hasco:isAttributeOf", URIUtils.replaceNameSpaceEx(dasoUri));
-        row.put("hasco:isVirtual", "");
-        row.put("hasco:isPIConfirmed", "false");
-        rows.add(row);
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("DASchemaAttribute", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("DASchemaAttribute", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update DASA(s)");
-            }
-        }
-        return totalChanged;
-    }
-
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("DASchemaAttribute", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Could not delete DASA(s)");
-            e.printStackTrace();
-            return 0;
-        }
     }
 
     @Override

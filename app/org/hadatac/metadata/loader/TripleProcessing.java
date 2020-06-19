@@ -34,12 +34,10 @@ import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.TriggeringEvent;
-import org.hadatac.metadata.loader.LabkeyDataHandler.PlainTriple;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
 import org.joda.time.format.DateTimeFormat;
-import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.data.model.ParsingResult;
 import play.mvc.Controller;
@@ -70,7 +68,8 @@ public class TripleProcessing {
         }
         return str;
 	}
-	
+
+	/*
 	public static SpreadsheetParsingResult generateTTL(int mode, 
 			Map< String, List<PlainTriple> > sheet, List<String> predicates) {
 		String shttl = "";
@@ -98,7 +97,9 @@ public class TripleProcessing {
 		SpreadsheetParsingResult result = new SpreadsheetParsingResult(message, shttl);
 		return result;
 	}
-	
+	*/
+
+	/*
 	public static String processTriplesOfRow(List<PlainTriple> triples, List<String> predicates) {
 		String clttl = "";
 		
@@ -144,52 +145,9 @@ public class TripleProcessing {
 				
 		return clttl;
 	}
-	
-    public static List<String> getLabKeyMetadataLists(String labkey_site, String user_name, 
-    		String password, String path) throws CommandException {
-    	
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
-		try {
-			List<String> queryNames = loader.getMetadataQueryNames(false);
-			return queryNames;
-		} catch (CommandException e) {
-			if(e.getMessage().equals("Unauthorized")){
-				throw e;
-			}
-		}
-		return null;
-	}
-    
-    public static List<String> getLabKeyInstanceDataLists(String labkey_site, String user_name, 
-    		String password, String path) throws CommandException {
-    	
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
-		try {
-			List<String> queryNames = loader.getInstanceDataQueryNames();
-			return queryNames;
-		} catch (CommandException e) {
-			if(e.getMessage().equals("Unauthorized")){
-				throw e;
-			}
-		}
-		return null;
-	}
-    
-    public static List<String> getLabKeyFolders(String labkey_site, String user_name, 
-    		String password, String path) throws CommandException {
-    	
-    	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
-		try {
-			List<String> folders = loader.getSubfolders();
-			return folders;
-		} catch (CommandException e) {
-			if(e.getMessage().equals("Unauthorized")){
-				throw e;
-			}
-		}
-		return null;
-	}
-    
+	*/
+
+	/*
     private static String loadTriples(
     		LabkeyDataHandler loader, 
     		List<String> list_names, 
@@ -225,8 +183,10 @@ public class TripleProcessing {
 		
 		return message;
     }
+    */
     
-    public static Model importStudy(String labkey_site, String path, 
+	/*
+	public static Model importStudy(String labkey_site, String path, 
             String user_name, String password, String studyUri) throws CommandException {
     	
 		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
@@ -273,6 +233,7 @@ public class TripleProcessing {
 		
 		return targetModel;
     }
+    */
     
     private static void forwardTraverseGraph(Resource node, HashSet<String> visitedNodes, 
     		Model refModel, Model targetModel) {
@@ -308,6 +269,7 @@ public class TripleProcessing {
     	}
     }
     
+    /*
     public static ParsingResult importDataAcquisition(String labkey_site, String path, 
             String user_name, String password, String target_study_uri) throws CommandException {
     	
@@ -367,12 +329,12 @@ public class TripleProcessing {
 						else{
 							st = new StringTokenizer(cellValue, ",");
 						}
-						/*
-						while (st.hasMoreTokens()) {
-							dataAcquisition.addTypeUri(
-									URIUtils.convertToWholeURI(st.nextToken().trim()));
-						}
-						*/
+						//
+						//while (st.hasMoreTokens()) {
+						//	dataAcquisition.addTypeUri(
+						//			URIUtils.convertToWholeURI(st.nextToken().trim()));
+						//}
+						//
 					}
 					else if (predicate.equals("prov:wasAssociatedWith")) {
 						StringTokenizer st;
@@ -382,12 +344,12 @@ public class TripleProcessing {
 						else{
 							st = new StringTokenizer(cellValue, ",");
 						}
-						/*
-						while (st.hasMoreTokens()) {
-							dataAcquisition.addAssociatedUri(
-									URIUtils.convertToWholeURI(st.nextToken().trim()));
-						}
-						*/
+						//
+						//while (st.hasMoreTokens()) {
+						//	dataAcquisition.addAssociatedUri(
+						//			URIUtils.convertToWholeURI(st.nextToken().trim()));
+						//}
+						//
 					}
 					else if (predicate.equals("rdfs:label")) {
 						dataAcquisition.setLabel(cellValue);
@@ -465,6 +427,7 @@ public class TripleProcessing {
 		
 		return new ParsingResult(0, message);
     }
+    */
     
     private static ParsingResult verifyTTL(int mode, String filePath) {
 		String listing = "";
@@ -499,6 +462,7 @@ public class TripleProcessing {
 		return new ParsingResult(0, message);
     }
     
+    /*
     private static String parseTriplesToTTL(int mode, String filePath, 
     		Map< String, Map< String, List<PlainTriple> > > mapSheets, 
     		Map< String, List<String> > mapPreds) {
@@ -523,12 +487,15 @@ public class TripleProcessing {
 			FileUtils.writeStringToFile(new File(filePath), ttl, "utf-8");
 		} catch (IOException e) {
 			message += e.getMessage();
+			e.printStackTrace();
 			return message;
 		}
 		
 		return message;
     }
+    */
 
+    /*
     public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site, 
     		String user_name, String password, String path, List<String> list_names) throws CommandException {
 
@@ -563,6 +530,7 @@ public class TripleProcessing {
 
 	    return message;
 	}
+	*/
     
     public static String processTTL(int mode, String oper, RDFContext rdf, String fileName) {
 		String message = "";

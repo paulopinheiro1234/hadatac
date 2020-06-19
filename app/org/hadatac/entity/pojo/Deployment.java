@@ -26,7 +26,6 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -36,7 +35,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.labkey.remoteapi.CommandException;
 
 
 public class Deployment extends HADatAcThing {
@@ -560,40 +558,6 @@ public class Deployment extends HADatAcThing {
         return deployments;
     }
 
-    @Override
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-
-        List<String> detectorURIs = new ArrayList<String>();
-        for (Detector detector : getDetectors()) {
-            detectorURIs.add(URIUtils.replaceNameSpaceEx(detector.getUri()));
-        }
-        String detectors = String.join(", ", detectorURIs);
-
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", "vstoi:Deployment");
-        row.put("vstoi:hasPlatform", URIUtils.replaceNameSpaceEx(getPlatform().getUri()));
-        row.put("hasco:hasInstrument", URIUtils.replaceNameSpaceEx(getInstrument().getUri()));
-        row.put("hasco:hasDetector", detectors);
-        row.put("prov:startedAtTime", getStartedAt());
-        row.put("prov:endedAtTime", getEndedAt());
-        rows.add(row);
-
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("Deployment", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("Deployment", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update Deployment(s)");
-            }
-        }
-
-        return totalChanged;
-    }
 
     @Override
     public boolean saveToTripleStore() {
@@ -651,8 +615,4 @@ public class Deployment extends HADatAcThing {
         return 0;
     }
 
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-        return 0;
-    }
 }

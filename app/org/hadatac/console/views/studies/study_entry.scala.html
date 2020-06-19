@@ -23,7 +23,6 @@
          <a href="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, filename, da_uri, URLEncoder.encode(study.getUri(), "UTF-8"))" 
             class="btn-xs btn-primary" role="button">Objects</a>
     }}
-    <a href="@org.hadatac.console.controllers.studies.routes.RefreshStudy.index(URLEncoder.encode(study.getUri(), "UTF-8"))" class="btn-xs btn-primary" role="button">Refresh</a>
     @* @if(study.getDataAcquisitionUris() != null && study.getObjectCollectionUris() != null) {
        @if(study.getDataAcquisitionUris().size() == 0 && study.getObjectCollectionUris().size() == 0) { *@
           <a href="@org.hadatac.console.controllers.studies.routes.DeleteStudy.index(URLEncoder.encode(study.getUri(), "UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>

@@ -21,17 +21,13 @@ import javax.inject.Inject;
 
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.studies.*;
-import org.hadatac.console.views.html.triplestore.syncLabkey;
 import org.hadatac.console.controllers.studies.routes;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.Agent;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.StudyType;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -49,12 +45,8 @@ public class EditStudy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.EditStudy.index(dir, filename, da_uri, std_uri).url()));
-        }
 
-        Study std = null;
+    	Study std = null;
         StudyType stdType = null;
         List<Agent> organizations = null;
         List<Agent> persons = null;
@@ -183,14 +175,6 @@ public class EditStudy extends Controller {
 	
         // insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
         oldStudy.save();
-	
-        // update/create new Study in LabKey
-        if (ConfigProp.getLabKeyLoginRequired()) {
-            int nRowsAffected = oldStudy.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            if (nRowsAffected <= 0) {
-                return badRequest("Failed to insert edited Study to LabKey!\n");
-            }
-        }
 	
         return ok(studyConfirm.render("Edit Study", oldStudy));
     }

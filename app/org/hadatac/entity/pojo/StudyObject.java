@@ -32,9 +32,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
-import org.labkey.remoteapi.CommandException;
 
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
@@ -990,62 +988,6 @@ public class StudyObject extends HADatAcThing {
     }
 
     @Override
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
-        row.put("hasco:hasRole", URIUtils.replaceNameSpaceEx(getRoleUri()));
-        row.put("hasco:originalID", getOriginalId());
-        row.put("rdfs:label", getLabel());
-        row.put("hasco:isMemberOf", URIUtils.replaceNameSpaceEx(getIsMemberOf()));
-        row.put("rdfs:comment", getComment());
-        String scopeStr = "";
-        for (int i=0; i <  scopeUris.size(); i++) {
-            String scope = scopeUris.get(i);
-            scopeStr += URIUtils.replaceNameSpaceEx(scope);
-            if (i < scopeUris.size() - 1) {
-                scopeStr += " , ";
-            }
-        }
-        row.put("hasco:hasObjectScope",scopeStr);
-        String timeScopeStr = "";
-        for (int i=0; i <  timeScopeUris.size(); i++) {
-            String timeScope = timeScopeUris.get(i);
-            scopeStr += URIUtils.replaceNameSpaceEx(timeScope);
-            if (i < timeScopeUris.size() - 1) {
-                timeScopeStr += " , ";
-            }
-        }
-        row.put("hasco:hasTimeObjectScope",timeScopeStr);
-        String spaceScopeStr = "";
-        for (int i=0; i <  spaceScopeUris.size(); i++) {
-            String spaceScope = spaceScopeUris.get(i);
-            scopeStr += URIUtils.replaceNameSpaceEx(spaceScope);
-            if (i < spaceScopeUris.size() - 1) {
-                spaceScopeStr += " , ";
-            }
-        }
-        row.put("hasco:hasSpaceObjectScope",spaceScopeStr);
-        rows.add(row);
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("StudyObject", rows);
-        } catch (CommandException e) {
-            System.out.println(e);
-            try {
-                totalChanged = loader.updateRows("StudyObject", rows);
-            } catch (CommandException e2) {
-                System.out.println(e2);
-                System.out.println("[ERROR] Could not insert or update Study Object(s)");
-            }
-        }
-
-        return totalChanged;
-    }
-
-    @Override
     public void deleteFromTripleStore() {
         super.deleteFromTripleStore();
     }
@@ -1074,23 +1016,6 @@ public class StudyObject extends HADatAcThing {
     }
     */
     
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("StudyObject", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Could not delete Study Object(s)");
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
     @Override
     public boolean saveToSolr() {
         return false;

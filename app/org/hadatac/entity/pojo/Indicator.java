@@ -28,12 +28,9 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
-import org.labkey.remoteapi.CommandException;
-
 
 public class Indicator extends HADatAcThing implements Comparable<Indicator> {
 
@@ -619,17 +616,6 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         }
 
         return mapIndicatorToCharList;
-    }
-
-    @Override
-    public int saveToLabKey(String user_name, String password) {
-        int totalChanged = 0;
-        return totalChanged;
-    }
-
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-    	return 0;
     }
 
     @Override

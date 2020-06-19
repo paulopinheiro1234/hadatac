@@ -97,10 +97,7 @@ public class GeneratorChain {
             
             try {
                 generator.commitRowsToTripleStore(generator.getRows());
-                //generator.commitRowsToLabKey(generator.getRows());
-
                 generator.commitObjectsToTripleStore(generator.getObjects());
-                //generator.commitObjectsToLabKey(generator.getObjects());
                 generator.commitObjectsToSolr(generator.getObjects());
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
@@ -131,10 +128,8 @@ public class GeneratorChain {
                 generator.postprocess();
 
                 generator.deleteRowsFromTripleStore(generator.getRows());
-                //generator.deleteRowsFromLabKey(generator.getRows());
 
                 generator.deleteObjectsFromTripleStore(generator.getObjects());
-                //generator.deleteObjectsFromLabKey(generator.getObjects());
                 generator.deleteObjectsFromSolr(generator.getObjects());
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));

@@ -29,10 +29,6 @@ public class NewPlatform extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String dir, String fileId, String da_uri) {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.NewPlatform.index(dir, fileId, da_uri).url()));
-		}
 
 		PlatformType platformType = new PlatformType();
 
@@ -72,14 +68,6 @@ public class NewPlatform extends Controller {
 
 		// insert the new PLT content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		plt.save();
-
-		// update/create new PLT in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = plt.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new PLT to LabKey!\n");
-		    }
-		}
 
 		System.out.println("Inserting new Platform from file. da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
 		System.out.println("Inserting new Platform from file. Study URI : [" + plt.getUri() + "]");

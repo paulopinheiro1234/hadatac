@@ -284,12 +284,6 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
         return fovs;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) {
-        int totalChanged = 0;
-        return totalChanged;
-    }
-
     @Override
     public int compareTo(FieldOfView another) {
         return this.getLabel().compareTo(another.getLabel());
@@ -305,8 +299,4 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
         return 0;
     }
 
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-        return 0;
-    }
 }

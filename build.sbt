@@ -39,7 +39,7 @@ val appDependencies = Seq(
   "args4j" % "args4j" % "2.33",
   "joda-time" % "joda-time" % "2.9.2",
   "org.jasypt" % "jasypt" % "1.9.2",
-  "org.labkey" % "labkey-client-api" % "16.2.0",
+  //"org.labkey" % "labkey-client-api" % "16.2.0",
   "com.typesafe.play" %% "play-json" % "2.6.0",
   "com.typesafe.play" %% "play-iteratees" % "2.6.1",
   "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",

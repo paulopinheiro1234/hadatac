@@ -162,11 +162,6 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
         return instances;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public int saveToLabKey(String user_name, String password) {
-        return 0;
-    }
-
     @Override
     public int compareTo(GenericInstance another) {
         return this.getLabel().compareTo(another.getLabel());
@@ -182,8 +177,4 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
         return 0;
     }
 
-    @Override
-    public int deleteFromLabKey(String userName, String password) {
-        return 0;
-    }
 }

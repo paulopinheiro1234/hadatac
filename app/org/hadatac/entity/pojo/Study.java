@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.labkey.remoteapi.CommandException;
-
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -32,7 +30,6 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.metadata.loader.LabkeyDataHandler;
 import org.hadatac.metadata.loader.URIUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -1029,36 +1026,6 @@ public class Study extends HADatAcThing {
         }
     }
 
-    @Override
-    public int saveToLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri()));
-        row.put("a", URIUtils.replaceNameSpaceEx(getTypeUri()));
-        row.put("rdfs:label", getLabel());
-        row.put("hasco:hasTitle", getTitle());
-        row.put("hasco:hasProject", URIUtils.replaceNameSpaceEx(getProject()));
-        row.put("rdfs:comment", getComment());
-        row.put("hasco:hasExternalSource", getExternalSource());
-        row.put("skos:definition", "");
-        row.put("hasco:hasAgent", URIUtils.replaceNameSpaceEx(this.getAgentUri()));
-        row.put("hasco:hasLastId", getLastId());
-        row.put("hasco:hasInstitution", URIUtils.replaceNameSpaceEx(this.getInstitutionUri()));
-        rows.add(row);
-
-        int totalChanged = 0;
-        try {
-            totalChanged = loader.insertRows("Study", rows);
-        } catch (CommandException e) {
-            try {
-                totalChanged = loader.updateRows("Study", rows);
-            } catch (CommandException e2) {
-                System.out.println("[ERROR] Could not insert or update Study(ies)");
-            }
-        }
-        return totalChanged;
-    }
 
     @Override
     public void delete() {
@@ -1106,22 +1073,6 @@ public class Study extends HADatAcThing {
         return -1;
     }
 
-    @Override
-    public int deleteFromLabKey(String user_name, String password) {
-        LabkeyDataHandler loader = LabkeyDataHandler.createDefault(user_name, password);
-        List< Map<String, Object> > rows = new ArrayList< Map<String, Object> >();
-        Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", URIUtils.replaceNameSpaceEx(getUri().replace("<","").replace(">","")));
-        rows.add(row);
-
-        try {
-            return loader.deleteRows("Study", rows);
-        } catch (CommandException e) {
-            System.out.println("[ERROR] Failed to delete Studies to LabKey!");
-            e.printStackTrace();
-            return 0;
-        }
-    }
 
     public int deleteDataAcquisitions() {
         SolrClient study_solr = new HttpSolrClient.Builder(

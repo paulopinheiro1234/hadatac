@@ -66,11 +66,6 @@ public class PrepareIngestion extends Controller {
 
         // OR create a new DA if the file is not associated with any existing DA
         
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.create(dir, fileId, da_uri).url()));
-        }
-
         String da_label = "";
         String new_da_uri = "";
 
@@ -96,9 +91,6 @@ public class PrepareIngestion extends Controller {
         }
 
         da.saveToSolr();
-        if (ConfigProp.getLabKeyLoginRequired()) {
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-        }
 
         dataFile.setDataAcquisitionUri(da.getUri());
         dataFile.save();
@@ -145,10 +137,6 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectStudy(String dir, String fileId, String da_uri) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.selectStudy(dir, fileId, da_uri).url()));
-        }
 
         List<Study> studies = Study.find();
 
@@ -157,10 +145,6 @@ public class PrepareIngestion extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectScope(String dir, String fileId, String da_uri, String std_uri) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.PrepareIngestion.selectScope(dir, fileId, da_uri, std_uri).url()));
-        }
 
         String[] fields = null;
         String rowScope = null;
@@ -248,9 +232,6 @@ public class PrepareIngestion extends Controller {
             da.setStudyUri(std_uri);
 
             da.saveToSolr();
-            if (ConfigProp.getLabKeyLoginRequired()) {
-                da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            }
 
             return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
         }
@@ -290,9 +271,6 @@ public class PrepareIngestion extends Controller {
         da.setCellScopeUri(cellScopeUriList);
 
         da.saveToSolr();
-        if (ConfigProp.getLabKeyLoginRequired()) {
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-        }
 
         return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with scope information"));
     }
@@ -322,9 +300,6 @@ public class PrepareIngestion extends Controller {
             da.setDeploymentUri(dep_uri);
 
             da.saveToSolr();
-            if (ConfigProp.getLabKeyLoginRequired()) {
-                da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            }
             
             return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
         }
@@ -358,9 +333,6 @@ public class PrepareIngestion extends Controller {
             da.setSchemaUri(das_uri);
 
             da.saveToSolr();
-            if (ConfigProp.getLabKeyLoginRequired()) {
-                da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-            }
             
             return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with data acquisition schema information"));
         }
@@ -406,9 +378,6 @@ public class PrepareIngestion extends Controller {
         }
 
         da.saveToSolr();
-        if (ConfigProp.getLabKeyLoginRequired()) {
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-        }
             
         message = "Association with " + daComponent + " removed from the Stream Specification.";
         return ok(prepareIngestion.render(dir, fileId, da, message));
@@ -426,9 +395,6 @@ public class PrepareIngestion extends Controller {
         da.setStatus(9999);
         
         da.saveToSolr();
-        if (ConfigProp.getLabKeyLoginRequired()) {
-            da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-        }
         
         message = "Stream Specification set as complete";
         return ok(prepareIngestion.render(dir, fileId, da, message));

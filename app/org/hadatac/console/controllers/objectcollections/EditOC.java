@@ -32,10 +32,6 @@ public class EditOC extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri) {
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					org.hadatac.console.controllers.objectcollections.routes.EditOC.index(dir, filename, da_uri, std_uri, oc_uri).url()));
-		}
 		
 		try {
 			std_uri = URLDecoder.decode(std_uri, "UTF-8");
@@ -179,14 +175,6 @@ public class EditOC extends Controller {
 		oldOc.delete();
 		newOc.save();
 
-		// update/create new OC in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = newOc.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to edit OC into LabKey!\n");
-		    }
-		}
-		
 		return ok(objectCollectionConfirm.render("New Object Collection has been Edited", dir, filename, da_uri, std_uri, newOc));
 	}
 

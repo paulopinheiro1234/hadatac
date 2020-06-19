@@ -29,7 +29,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.labkey.remoteapi.CommandException;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -41,12 +40,6 @@ public class EditDataAcquisition extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String uri, boolean bChangeParam) {
-        if (ConfigProp.getLabKeyLoginRequired() && 
-                (session().get("LabKeyUserName") == null || session().get("LabKeyPassword") == null)
-                && bChangeParam) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.EditDataAcquisition.index(dir, filename, uri, bChangeParam).url()));
-        }
 
         final SysUser sysUser = AuthApplication.getLocalUser(session());
         try {
@@ -129,13 +122,9 @@ public class EditDataAcquisition extends Controller {
                 }  
 
                 da.saveToSolr();
-                int nRowsAffected = 0;
-                if (ConfigProp.getLabKeyLoginRequired()) {
-                    nRowsAffected = da.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-                }
 
                 return ok(main.render("Results,", "", new Html("<h3>" 
-                        + String.format("%d row(s) have been inserted in Table \"DataAcquisition\"", nRowsAffected) 
+                        + String.format("Content have been inserted in Table \"DataAcquisition\"") 
                         + "</h3>")));
             }
         }

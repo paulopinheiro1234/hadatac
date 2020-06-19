@@ -31,11 +31,6 @@ public class EditDASA extends Controller {
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index(String dasa_uri) {
 
-		if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-			return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-					routes.EditDASA.index(dasa_uri).url()));
-		}
-
 		DataAcquisitionSchema das = null;
 		DataAcquisitionSchemaAttribute dasa = null;
 		try {
@@ -146,14 +141,6 @@ public class EditDASA extends Controller {
 
 		// insert the new DASA content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		olddasa.save();
-
-		// update/create new DASA in LabKey
-		if (ConfigProp.getLabKeyLoginRequired()) {
-		    int nRowsAffected = olddasa.saveToLabKey(session().get("LabKeyUserName"), session().get("LabKeyPassword"));
-		    if (nRowsAffected <= 0) {
-		        return badRequest("Failed to insert new DASA to LabKey!\n");
-		    }
-		}
 		
 		return ok(editDASAConfirm.render(olddasa, changedInfos));
 	}

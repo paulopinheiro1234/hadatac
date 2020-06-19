@@ -28,10 +28,6 @@ public class DataAcquisitionScope extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result create(String dir, String fileId, String da_uri) {
-        if (ConfigProp.getLabKeyLoginRequired() && session().get("LabKeyUserName") == null && session().get("LabKeyPassword") == null) {
-            return redirect(org.hadatac.console.controllers.triplestore.routes.LoadKB.logInLabkey(
-                    routes.DataAcquisitionScope.create(dir, fileId, da_uri).url()));
-        }
 
         STR da = null;
         String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
