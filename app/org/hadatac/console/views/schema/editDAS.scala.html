@@ -1,0 +1,80 @@
+@(das : org.hadatac.entity.pojo.DataAcquisitionSchema)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.schema._
+
+@main("Edit Data Acquisition Schema") {
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
+    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
+
+    <div class="row">
+        <div class="col-md-1">
+	</div>
+        <div class="col-md-9">
+            
+            <h3>Edit Data Acquisition Schema @das.getUriNamespace()</h3>
+
+	    <div id="rcorners">
+            <table class="table">
+                 <thead>
+                 <tr>
+                    <th>Label</th>
+		    <th>Position</th>
+                    <th>IsAttributeOf</th>
+		    <th>Entity</th>
+                    <th>Attribute</th>
+                    <th>Unit</th>
+                    <th>Time</th>
+                    <th>Operations</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+		   @if(das.getAttributes() != null) {
+                       @for(dasa <- das.getAttributes()){
+                          @DASA_entry("edit", dasa)
+                       }
+		   }
+                 </tbody>
+            </table>
+	    </div>
+
+
+            <h4>Associated Objects 
+            </h4>
+
+	    <div id="rcorners">
+            <table class="table">
+                 <thead>
+                 <tr>
+                    <th>Label</th>
+                    <!-- <th>URI</th>  -->
+		    <th>Entity</th>
+		    <th>Role</th>
+                    <th>InRelationTo</th>
+                    <th>Relation</th>
+                    <th>Operations</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+		   @if(das.getObjects() != null) {
+                       @for(daso <- das.getObjects()){
+                           @DASO_entry("edit", daso)
+                       }
+                   }
+                 </tbody>
+            </table>
+            </div>
+
+	    <div>
+	      <br>
+	      <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to DA Schema Management</a>
+            </div>
+
+        </div>
+
+    </div>
+
+
+}

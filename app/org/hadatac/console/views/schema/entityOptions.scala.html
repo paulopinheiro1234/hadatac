@@ -1,0 +1,36 @@
+@(entities   : org.hadatac.console.models.OtMSparqlQueryResults)
+
+@import java.net._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+
+@main("Entities") {
+   <script type="text/javascript" src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
+   <style>
+
+     .node rect {
+         cursor: pointer;
+         fill: #fff;
+         fill-opacity: .5;
+         stroke: #3182bd;
+         stroke-width: 1.5px;
+      }
+
+      .node text {
+         font: 10px sans-serif;
+          pointer-events: none;
+      }
+
+      path.link {
+          fill: none;
+          stroke: #9ecae1;
+          stroke-width: 1.5px;
+      }
+
+   </style>
+   <div id="entityTree" class="hidden-print tab-pane fade in active">
+     <div id="query" data-results="@entities.treeResults"></div>
+     <div id="bodyEntity"></div>
+     <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
+   </div>
+}  
