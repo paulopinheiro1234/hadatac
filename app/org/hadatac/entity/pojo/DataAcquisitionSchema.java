@@ -553,55 +553,6 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return schemas;
     }
 
-    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {    	
-    	Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource WHERE { \n"
-                + " ?possibleValue a hasco:PossibleValue . \n"
-                + " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . \n"
-                + " ?possibleValue hasco:hasCode ?code . \n"
-                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
-                + " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . \n"
-                + " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . \n"
-                + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
-                + " }";
-
-        //System.out.println("findPossibleValues query: \n" + queryString);
-
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
-        try {
-            while (resultsrw.hasNext()) {
-                String classUri = "";
-                QuerySolution soln = resultsrw.next();
-                if (soln.get("codeClass") != null && !soln.get("codeClass").toString().isEmpty()) {
-                    classUri = soln.get("codeClass").toString();
-                } else if (soln.get("resource") != null && !soln.get("resource").toString().isEmpty()) {
-                    classUri = soln.get("resource").toString();
-                } else if (soln.get("codeLabel") != null && !soln.get("codeLabel").toString().isEmpty()) {
-                    // No code class is given, use code label instead
-                    classUri = soln.get("codeLabel").toString();
-                }
-
-                String daso_or_dasa = soln.getResource("daso_or_dasa").toString();
-                String code = soln.getLiteral("code").toString();
-                if (mapPossibleValues.containsKey(daso_or_dasa)) {
-                    mapPossibleValues.get(daso_or_dasa).put(code.toLowerCase(), classUri);
-                } else {
-                    Map<String, String> indvMapPossibleValues = new HashMap<String, String>();
-                    indvMapPossibleValues.put(code.toLowerCase(), classUri);
-                    mapPossibleValues.put(daso_or_dasa, indvMapPossibleValues);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("DataAcquisitionSchema.findPossibleValues() Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return mapPossibleValues;
-    }
-
     public static Map<String, String> findAllUrisByLabel(String schemaUri) {
         Map<String, String> resp = new HashMap<String, String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()

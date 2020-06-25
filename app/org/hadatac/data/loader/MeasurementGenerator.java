@@ -16,6 +16,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.PossibleValue;
 import org.hadatac.entity.pojo.SOCGroup;
 import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.entity.pojo.StudyObjectMatching;
@@ -108,7 +109,7 @@ public class MeasurementGenerator extends BaseGenerator {
     		// Store necessary information before hand to avoid frequent SPARQL queries
     		setStudyUri(str.getStudyUri());
     		urisByLabels = DataAcquisitionSchema.findAllUrisByLabel(schema.getUri());
-    		possibleValues = DataAcquisitionSchema.findPossibleValues(str.getSchemaUri());
+    		possibleValues = PossibleValue.findPossibleValues(str.getSchemaUri());
     		dasoUnitUri = urisByLabels.get(schema.getUnitLabel());
     		groupBySocAndId = new HashMap<String,SOCGroup>();
         }
@@ -287,6 +288,7 @@ public class MeasurementGenerator extends BaseGenerator {
              *                   *
              *===================*/
 
+            String codeClass = "";
             String originalValue = "";
             if (dasa.getTempPositionInt() < 0 || dasa.getTempPositionInt() >= record.size()) {
                 continue;
@@ -300,6 +302,9 @@ public class MeasurementGenerator extends BaseGenerator {
                 if (possibleValues.containsKey(dasa_uri_temp)) {
                     if (possibleValues.get(dasa_uri_temp).containsKey(originalValue.toLowerCase())) {
                         measurement.setValue(possibleValues.get(dasa_uri_temp).get(originalValue.toLowerCase()));
+                        if (measurement.getValue().startsWith("http")) {
+                        	codeClass = measurement.getValue();
+                        }
                     } else {
                         measurement.setValue(originalValue);
                     }
@@ -618,7 +623,13 @@ public class MeasurementGenerator extends BaseGenerator {
                 }
             }
 
-            measurement.setCharacteristicUris(Arrays.asList(dasa.getReversedAttributeString()));
+            if (!codeClass.isEmpty()) {
+            	measurement.setCharacteristicUris(Arrays.asList(codeClass));
+            	System.out.println(">>> POSSIBLE CLASS VALUE: Obj: [" + dasa.getObjectUri() + "]  code: [" + originalValue + "]   class: [" + codeClass + "]");
+            	//System.out.println(">>> POSSIBLE CLASS VALUE: Current Attr: [" + dasa.getReversedAttributeString() + "]");
+            } else {
+            	measurement.setCharacteristicUris(Arrays.asList(dasa.getReversedAttributeString()));
+            }
 
             /*======================================*
              *                                      *
@@ -636,6 +647,7 @@ public class MeasurementGenerator extends BaseGenerator {
                 mapSchemaObjects.put(inRelationToUri, inRelationToDaso);
             }
 
+            codeClass = "";
             if (null != inRelationToDaso) {
                 if (inRelationToDaso.getTempPositionInt() > 0) {
                     String inRelationToDasoValue = record.getValueByColumnIndex(inRelationToDaso.getTempPositionInt());

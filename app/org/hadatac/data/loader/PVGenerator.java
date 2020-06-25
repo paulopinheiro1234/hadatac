@@ -112,6 +112,7 @@ public class PVGenerator extends BaseGenerator {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", (kbPrefix + "PV-" + getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-") + ("-" + SDDName + "-" + getCode(rec)).replaceAll("--", "-")).replace(" ","").replaceAll("[^A-Za-z0-9:-]", "") + "-" + rowNumber);
 		row.put("a", "hasco:PossibleValue");
+		row.put("hasco:hasVariable", getLabel(rec).replaceAll("[^a-zA-Z0-9:-]", "-"));
 		row.put("hasco:hasCode", getCode(rec));
 		row.put("hasco:hasCodeLabel", getCodeLabel(rec));
 		row.put("hasco:hasClass", getClass(rec));

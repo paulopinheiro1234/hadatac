@@ -28,9 +28,5 @@
    <td>@if(dasa != null && dasa.getInRelationToLabel() != null) { @dasa.getInRelationToLabel() }</td> 
    <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td> 
    <td>@if(dasa != null && dasa.getEventViewLabel() != null) { <a href="#@dasa.getEventViewLabel()">@dasa.getEventViewLabel()</a> }</td> 
-   @if(mode == "edit") {
-      <td><a href="@org.hadatac.console.controllers.schema.routes.EditDASA.index(dasa.getUri())" class="btn-xs btn-primary" role="button">Edit</a>
-          <a href="@org.hadatac.console.controllers.schema.routes.DeleteDASA.index(dasa.getUri())" class="btn-xs btn-primary" role="button">Delete</a></td>
-   }
  
 </tr>

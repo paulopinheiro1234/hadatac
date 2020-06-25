@@ -12,8 +12,4 @@
    <td>@if(daso != null && daso.getRelationLabel() != null) { @daso.getRelationLabel() }</td> 
    <td>@if(daso != null && daso.getInRelationToLabel() != null) { <a href="#@daso.getInRelationToLabel()">@daso.getInRelationToLabel()</a> }</td> 
    <td>@if(daso != null && daso.getWasDerivedFrom() != null) { @daso.getWasDerivedFrom() }</td> 
-   @if(mode == "edit") {
-      <td><a href="@org.hadatac.console.controllers.schema.routes.EditDASO.index(daso.getUri(),daso.getPartOfSchema())" class="btn-sm btn-primary" role="button">Edit</a>
-          <a href="" class="btn-sm btn-primary" role="button">Delete</a></td>
-   }
 </tr>

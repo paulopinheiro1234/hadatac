@@ -11,7 +11,7 @@
 
     <div class="row">
         <div class="col-md-1">
-	</div>
+	    </div>
         <div class="col-md-12">
             
             <h3>View Semantic Data Dictionary</h3>
@@ -23,79 +23,60 @@
                     <li><b>Name</b>: @das.getLabel()</li>
                 </ul>
 
+            <a href="@org.hadatac.console.controllers.schema.routes.ViewDAS.codebook(das.getUri())" class="btn btn-primary" role="button">View Code Book</a>
+
             <h4>Attributes</h4>
 
-	    <div id="rcorners">
-            <table class="table">
-                 <thead>
-                 <tr>
-                    <th>Label</th>
-		    <th>Position</th>
-                    <th>IsAttributeOf</th>
-		    <th>Entity</th>
-                    <th>Attribute</th>
-                    <th>inRelationTo</th>
-                    <th>Unit</th>
-                    <th>Time</th>
-                 </tr>
-                 </thead>
-                 <tbody>
-                   @for(dasa <- das.getAttributes()){
-                       @DASA_entry("view", dasa)
-                   }
-                 </tbody>
-            </table>
-	    </div>
+			    <div id="rcorners">
+		            <table class="table">
+		                 <thead>
+		                 <tr>
+		                    <th>Label</th>
+				            <th>Position</th>
+		                    <th>IsAttributeOf</th>
+				            <th>Entity</th>
+		                    <th>Attribute</th>
+		                    <th>inRelationTo</th>
+		                    <th>Unit</th>
+		                    <th>Time</th>
+		                 </tr>
+		                 </thead>
+		                 <tbody>
+		                   @for(dasa <- das.getAttributes()){
+		                       @DASA_entry("view", dasa)
+		                   }
+		                 </tbody>
+		            </table>
+			    </div>
 
-	    @*
-            <h4>Abstract times</h4>
+	     <h4>Associated Objects</h4>
 
-	    <div id="rcorners">
-            <table class="table">
-                 <thead>
-                 <tr>
-                    <th>Label</th>
-		    <th>Entity</th>
-		    <th>Unit</th>
-                 </tr>
-                 </thead>
-                 <tbody>
-                   @for(dase <- das.getEvents()){
-                       @DASE_entry("view", dase)
-                   }
-                 </tbody>
-            </table>
-	    </div> *@
-
-            <h4>Associated Objects</h4>
-
-	    <div id="rcorners">
-            <table class="table">
-                 <thead>
-                 <tr>
-                    <th>Label</th>
-                    <!-- <th>URI</th>  -->
-		    <th>Entity</th>
-		    <th>Role</th>
-		    <th>Relation</th>
-                    <th>InRelationTo</th>
-                    <th>WasDerivedFrom</th>
-                 </tr>
-                 </thead>
-                 <tbody>
-                   @for(daso <- das.getObjects()){
-                       @DASO_entry("view", daso)
-                   }
-                 </tbody>
-            </table>
-            </div>
+			    <div id="rcorners">
+		            <table class="table">
+		                 <thead>
+		                 <tr>
+		                    <th>Label</th>
+   				            <th>Entity</th>
+				            <th>Role</th>
+				            <th>Relation</th>
+		                    <th>InRelationTo</th>
+		                    <th>WasDerivedFrom</th>
+		                 </tr>
+		                 </thead>
+		                 <tbody>
+		                   @for(daso <- das.getObjects()){
+		                       @DASO_entry("view", daso)
+		                   }
+		                 </tbody>
+		            </table>
+		            </div>
 
 	    <div>
-	      <br>
-	      <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to SSD Management</a>
-            </div>
-
+      <br>
+      <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to SSD Management</a>
         </div>
+
+    </div>
 
     </div>
 
