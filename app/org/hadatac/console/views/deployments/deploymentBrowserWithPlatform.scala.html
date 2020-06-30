@@ -22,7 +22,6 @@
 @main("Deployment Browser") {
 	<head>
         <style>
-        
 			body { font: 12px Arial;}
 
 			path { 
@@ -59,6 +58,51 @@
 				height: 20px;
 				padding: 0 30px;
 			}
+
+
+			*:before,*:after{
+				box-sizing:border-box;
+			}
+			.range{
+				position: relative;
+				margin-top: 3px;
+				padding: 0 0.9375rem;
+			}
+			[type="range"]{
+				width: 100%;
+				margin: 0;
+				padding: 0;
+				display: block;
+			}
+			output { 
+				position: absolute;
+				width: 40px;
+				height: 26px;
+				text-align: center;
+				color: #FFF;
+				border-radius: 10px;
+				display: none;
+				font-size: 15px;
+				bottom: 150%;
+				left: 0px;
+				background: #999;
+				font-weight: bold;
+			}
+			output:after { 
+				content: " ";
+				position: absolute;
+				width: 0;
+				height: 0;
+				border-top: 10px solid #999999;
+				border-left: 5px solid transparent;
+				border-right: 5px solid transparent;
+				top: 100%;
+				left: 50%;
+				margin-left: -5px;
+				margin-top: -1px;
+			}
+
+
 		</style>	
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<!-- Latest compiled and minified CSS -->
@@ -73,369 +117,433 @@
 	</head>
     <body>
 
-  
-
-	<div class="row">
-   		<div class="col-md-1">
-   		</div>
-   		<div class="col-md-11">
-        	<h3>Deployment Browser</h3>
-        </div>
-	</div>
-
-    <div class="container-fluid">
-       <div class="row">
-    	 <div class="col-md-1">
-   		 </div>
-    	 <div class="col-md-11">
-            <div class="navbar-collapse collapse navbar-secondary">
-			  <a href="/hadatac/deployments/browser?dir=%2F&amp;filename=&amp;da_uri=&amp;plat_uri=&amp;prev_platUri=" class="btn-sm btn-primary" role="button">Back</a>
-			  <!-- <a href="" class="btn-sm btn-primary" role="button">Filter By Instrument Model</a> -->
-			  <button id = "ShowSelected">Filter by Instrument Model </button>
-			  <button id="ShowFOV">Visualize Field of View</button>
-			  <!-- this scale max and value is abitrary, exact value read from data later -->
-			  <div class="btn-group mx-sm-3 mb-2 text-center">
-					<input min="0.01" max="2.86" type="range" id="scale" value="2.86" step = "0.01" type = "text">
-			  </div>
-
-			  <button id="change">Show Real-Time Data</button>
-			  <a href="" class="btn-sm btn-primary" role="button">Visualize Platform Data</a>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-1">
 			</div>
-         </div>
-       </div>
+			<div class="col-md-11">
+				<div>
+					<h3>Multiple Deployments Browser</h3>
+				</div>
+				<h4>Reference Platform: @platform.getLabel()</h4>
+				<p>Dimensions: <b>Width:</b> @platform.getWidth() @platform.getWidthUnitLabel()<b>Depth:</b> @platform.getDepth() @platform.getDepthUnitLabel()</p>
+				<div class="navbar-collapse collapse navbar-secondary">
+					<a href="/hadatac/deployments/browser?dir=%2F&amp;filename=&amp;da_uri=&amp;plat_uri=&amp;prev_platUri=" class="btn-sm btn-primary" role="button">Back</a>
+					<button id = "ShowSensors" onclick = "ShowSensorSpots()">Show Sensors</button>
+					<button id="ShowFOV">Show All Fields of View</button>
+					<button id= "ShowData">Show Data</button>
+					<input type="checkbox" name="2D" checked> 2D
+					<!--before 3d model is actually implemented this stay disable-->
+					<input type="checkbox" name="3D" disabled = "disabled"> 3D
+				</div>
+				<div class="navbar-collapse collapse navbar-secondary">
+						Instrument Models: <input type ="checkbox" id="TOF" onclick = "visualizeTOF()"> Time of Flight Sensor
+						<input type ="checkbox" id="COS" onclick = "visualizeCOS()"> Color Sensor
+						<input type ="checkbox" id="Temp" onclick = "visualizeTemp()"> Temperature Sensor
+				</div>   
+				<div class="navbar-collapse collapse navbar-secondary">
+					Height: <div class ="btn-group mx-sm-3 mb-2 text-center">
+						<input type = "range" id = "HeightSlider" min = "0.01" max = "2.86" value = "2.86" step = "any">
+					</div>
+					Time: <div class ="btn-group mx-sm-3 mb-2 text-center">
+							<input type = "range" name = "TimeSlider" min = "0.01" max = "2.86" value = "0" step = "any">
+					</div>
+					<button id ="ShowChange"> Continuous change over time</button>
+				</div>
+				
+				<div class="navbar-collapse collapse navbar-secondary">
+					Start time: <input type = "datetime-local" name = "stDownload">
+					End time: <input type = "datetime-local" name = "edDownload">
+					<button id = "Download">Download</button>
+				</div>
+				<br></br>
+				<div class="row text-center">
+				<svg width="1150" height="500">
+					<defs>
+						<pattern id="Img" width="1100" height="500" patternUnits="userSpaceOnUse">
+						</pattern>
+					</defs>
+				</svg>
+		</div>
 	</div>
+
+
+<script type="text/javascript" >
+	var browser_url = '@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "XXXX", previous_platUri)';
+	var coordinates = '@coordinates';
+	var coordinatesStr = coordinates.replace(/&#x27;/g,"'");
+	var coords = eval(coordinatesStr);
+	var dimensions = '@dimensions';
+	var dimensionsStr = dimensions.replace(/&#x27;/g,"'");
+	var dims = eval(dimensionsStr);
+	var pltNames = '@platformNames';
+	var namesStr = pltNames.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
+	var names = eval(namesStr);
+	var pltUris = '@platformUris';
+	var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'").replace(/%23/g,"#");
+	var uris = eval(uriStr);
+
+
+	var svg = d3.select("svg");
+	var imgPattern = d3.select("pattern");
+
+	// create an svg element
+
+	var widthLayout = dims[0];
+	var heightLayout = dims[1];
+
+	//imporve: wideth pixels should be read in from the data(same as the picture width)
+	var widthPixels = 725;
+	var widthOffset = 50;
+	var heightPixels = (heightLayout * widthPixels) /widthLayout;
+
+	var widthScale = widthPixels / widthLayout;
+	var heightScale = heightPixels / heightLayout;
+	let scale=$("#HeightSlider");
+
+	imgPattern.append("image")
+		.attr("x", "0")
+		.attr("y", "0")
+		.attr("width", "850")
+		.attr("height", heightPixels)
+		.attr("xlink:href", function(d) {
+				return "@DataFile.getMediaUrl(platform.getLayout())";
+		});
+
+	// Define the div for the tooltip
+	var div = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);    			
+				
+	// Define a box that has the background image 
+	svg.selectAll("rect").data([0])
+			.enter().append("rect")
+			.attr("x", "0")
+				.attr("y", "0")
+			.attr("width", "850")
+			.attr("height", heightPixels)
+			.style("stroke", "blue")
+			.style("stroke-width", "3")   
+			.style("fill", "url(#Img)");   
+
 	
 
 
-	<div class="row">
-   		<div class="col-md-1">
-   		</div>
-   		<div class="col-md-11">
-            <h4>Reference Platform: @platform.getLabel()</h4>
-			<ul>
-			  	<p>Dimensions: <b>Width:</b> @platform.getWidth() @platform.getWidthUnitLabel()<b>Depth:</b> @platform.getDepth() @platform.getDepthUnitLabel()</p>
-			</ul>
-       		<div class="row text-center">
-			<svg width="1150" height="500">
-  				<defs>
-    				<pattern id="Img" width="1100" height="500" patternUnits="userSpaceOnUse">
-				    </pattern>
-  				</defs>
-			</svg>
-			<script type="text/javascript">
-				let scale=$("#scale");
-				scale.hide();
-                var browser_url = '@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "XXXX", previous_platUri)';
-		        var coordinates = '@coordinates';
-        		var coordinatesStr = coordinates.replace(/&#x27;/g,"'");
-	    		var coords = eval(coordinatesStr);
-		        var dimensions = '@dimensions';
-        		var dimensionsStr = dimensions.replace(/&#x27;/g,"'");
-	    		var dims = eval(dimensionsStr);
-		        var pltNames = '@platformNames';
-        		var namesStr = pltNames.replace(/&#x27;/g,"'").replace(/&quot;/g,"'");
-	    		var names = eval(namesStr);
-		        var pltUris = '@platformUris';
-        		var uriStr = pltUris.replace(/&#x27;/g,"'").replace(/&quot;/g,"'").replace(/%23/g,"#");
-	    		var uris = eval(uriStr);
+	d3.select("#HeightSlider")
+		.on("onmousemove", function(d,i) { return "showTooltip(evt, '" + this.value + "');"; })
+		.on("onmouseout", onmouseout="hideTooltip();")
+	//improve: type of geometry should be read form data(tho the total number of types should be all included as hard code)
+	var conedata = [];
+	var cuboiddata = [];
+	var piramiddata = [];
+	var geometryAll = [];
+	//improve: SensorAll should be read from the data, but current link reading is really slow so cant afford wait
+	// also, given the current fov file, figuring out the types are not avaliable
+	var SensorAll = ["None", "TOF", "COS", "Wall Sensor"];
+	//record the max height point of the room
+	var maxheight = 0;
 
-				
-				var svg = d3.select("svg");
-    			var imgPattern = d3.select("pattern");
-        
-			    // create an svg element
-			    
-			    var widthLayout = dims[0];
-			    var heightLayout = dims[1];
-				
-				//imporve: wideth pixels should be read in from the data(same as the picture width)
-			    var widthPixels = 725;
-			    var widthOffset = 50;
-			    var heightPixels = (heightLayout * widthPixels) /widthLayout;
-			    
-			    var widthScale = widthPixels / widthLayout;
-			    var heightScale = heightPixels / heightLayout;
+	//currently gives all Field of view, need to be for specific room in future
+	var FovUri = {"isSuccessful":true,"body":[{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_001","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_001","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_002","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_002","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_003","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_003","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_004","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_004","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_005","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_005","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_006","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_006","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_007","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_007","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_008","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_008","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_009","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_009","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_010","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_010","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_011","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_011","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},
+	{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_012","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_012","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_013","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_013","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_014","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_014","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_015","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_015","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_016","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_016","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_017","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_017","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_018","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_018","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_019","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_019","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_020","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_020","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_021","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_021","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_022","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_022","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_023","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_023","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_024","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_024","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},
+	{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_025","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_025","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_026","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_026","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_027","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_027","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_028","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_028","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_029","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_029","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_030","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_030","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},
+	{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_031","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_031","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_032","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_032","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_033","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_033","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_034","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_034","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_035","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_035","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_036","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_036","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_037","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_037","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_038","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_038","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_039","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_039","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_040","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_040","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_041","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_041","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_042",
+	"label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_042","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_043","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_043","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_044","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_044","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_045","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_045","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_046","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_046","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_047","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_047","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_048","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_048","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_049","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_049","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_050","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_050","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_051","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_051","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_052","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_052","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_053","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_053","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_001","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_001","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"1.71","param3":"5.1"},
+	{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_002","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_002","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"1.71","param3":"5.1"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_003","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_003","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"3.42","param3":"3.4"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_004","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_004","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"3.42","param3":"3.4"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_005","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_005","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"3.42","param3":"3.4"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_054","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_054","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_055","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_055","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_056","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_056","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_057","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_057","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_058","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_058","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_059","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_059","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_060","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_060","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_061","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_061","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},
+	{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_062","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_062","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_063","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_063","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_064","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_064","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_065","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_065","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_066","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_066","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_067","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_067","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_068","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_068","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_069","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_069","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_070","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_070","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_071","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_071","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"}]}
 
-    			imgPattern.append("image")
-    				.attr("x", "0")
-    				.attr("y", "0")
-    				.attr("width", "850")
-    				.attr("height", heightPixels)
-        			.attr("xlink:href", function(d) {
-          				return "@DataFile.getMediaUrl(platform.getLayout())";
-        			});
+	// var FovUri = "http://localhost:9000/hadatac/api/fieldsofview/all";
+	// console.log(FovUri);
+	//var FovUri = '@org.hadatac.console.controllers.restapi.routes.RestApi.getAllFieldsOfView()';
 
-				// Define the div for the tooltip
-				var div = d3.select("body").append("div")	
-    						.attr("class", "tooltip")				
-    						.style("opacity", 0);    			
-    						
-				// Define a box that has the background image 
-    			svg.selectAll("rect").data([0])
-      				.enter().append("rect")
-        				.attr("x", "0")
-      					.attr("y", "0")
-        				.attr("width", "850")
-        				.attr("height", heightPixels)
-        				.style("stroke", "blue")
-        				.style("stroke-width", "3")   
-        				.style("fill", "url(#Img)");   
-        	   
-    			svg.selectAll("circle").data(names)
-      				.enter().append("circle")
-        				.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
-      					.attr("cy", function(d,i) { return heightPixels - (coords[i * 2 + 1] * heightScale); })
-      					.attr("r", 4)
-      					.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
-      					.attr("onmouseout", onmouseout="hideTooltip();")
-                        .attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
-                        .attr("title", function(d,i) { return names[i]; })
-        				.style("fill", "red")
-				//improve: type of geometry should be read form data(tho the total number of types should be all included as hard code)
-				var conedata = [];
-				var cuboiddata = [];
-				var piramiddata = [];
-				var geometryAll = [];
-				//improve: SensorAll should be read from the data, but current link reading is really slow so cant afford wait
-				// also, given the current fov file, figuring out the types are not avaliable
-				var SensorAll = ["None", "TOF", "COS", "Wall Sensor"];
-				//record the max height point of the room
-				var maxheight = 0;
-				
-				//currently gives all Field of view, need to be for specific room in future
-				// var FovUri = {"isSuccessful":true,"body":[{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_001","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_001","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_002","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_002","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_003","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_003","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_004","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_004","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_005","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_005","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_006","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_006","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_007","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_007","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_008","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_008","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_009","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_009","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_010","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_010","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_011","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_011","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_012","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_012","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_013","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_013","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_014","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_014","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_015","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_015","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_016","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_016","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_017","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_017","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_018","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_018","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_019","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_019","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_020","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_020","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_021","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_021","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_022","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_022","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_023","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_023","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_024","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_024","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_025","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_025","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_026","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_026","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_027","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_027","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_028","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_028","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_029","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_029","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_030","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_030","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},
-				// {"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_031","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_031","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_032","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_032","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_033","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_033","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_034","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_034","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_035","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_035","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_036","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_036","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_037","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_037","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_038","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_038","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_039","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_039","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_040","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_040","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_041","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_041","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_042",
-				// "label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_042","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_043","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_043","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_044","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_044","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_045","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_045","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_046","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_046","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_047","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_047","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_048","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_048","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_049","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_049","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_050","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_050","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_051","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_051","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_052","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_052","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_053","label":"C001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_053","geometry":"http://hadatac.org/ont/lesa#Cone","param1":"2.86","param2":"0.45"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_001","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_001","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"1.71","param3":"5.1"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_002","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_002","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"1.71","param3":"5.1"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_003","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_003","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"3.42","param3":"3.4"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_004","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_004","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"3.42","param3":"3.4"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Wall_spot_005","label":"T001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Wall_spot_005","geometry":"http://hadatac.org/ont/lesa#REtangularCuboid","param1":"2.86","param2":"3.42","param3":"3.4"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_054","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_054","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_055","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_055","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_056","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_056","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_057","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_057","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_058","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_058","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_059","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_059","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_060","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_060","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_061","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_061","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_062","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_062","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_063","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_063","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_064","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_064","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_065","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_065","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_066","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_066","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_067","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_067","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_068","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_068","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_069","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_069","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_070","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_070","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"},{"uri":"http://hadatac.org/kb/lesa#fov-SCR_Ceiling_spot_071","label":"TOF001's Field of View","platform_uri":"http://hadatac.org/kb/lesa#plt-SCR_Ceiling_spot_071","geometry":"http://hadatac.org/ont/lesa#Piramid","param1":"2.86","param2":"1.33","param3":"1.66"}]}
-				var FovUri = "http://localhost:9000/hadatac/api/fieldsofview/all"
-
-				$.getJSON(FovUri, function(dataset) {
-					//var data = FovUri.body;
-					var data = dataset.body;
-					
-					//console.log(data.body);
-					//Improve: How should I know what type of Sensor it is?
-					data.forEach(function(item){	
-						for (var i=0; i<uris.length; i++){
-							//uri is the link between FOV and DPL files
-							if (uris[i] == item.platform_uri){
-								//here we need to add different geometry 
-								if(item.geometry == "http://hadatac.org/ont/lesa#Cone"){													
-									//need location on map, radius
-									if(geometryAll.indexOf("Cone") == -1) geometryAll.push("Cone");
-									if(SensorAll.indexOf("COS") == -1) SensorAll.push("COS");
-									if(parseFloat(item.param1) > maxheight) maxheight = parseFloat(item.param1);
-									//x coord, ycoord, height, radius
-									conedata.push([coords[i*2],coords[i*2+1],parseFloat(item.param1), parseFloat(item.param2)]);
-								}else if(item.geometry == "http://hadatac.org/ont/lesa#REtangularCuboid"){
-									//need location, width and length
-									//wallsensor, the dot location is at the mid-upmost side of the rectangular
-									if(geometryAll.indexOf("Cuboid") == -1) geometryAll.push("Cuboid");
-									if(SensorAll.indexOf("Wall Sensor") == -1) SensorAll.push("Wall Sensor");
-									if(parseFloat(item.param1) > maxheight) maxheight = parseFloat(item.param1);
-									//x coord, y coord, height, x length, y length
-									cuboiddata.push([coords[i*2],coords[i*2+1],parseFloat(item.param1), parseFloat(item.param2), parseFloat(item.param3)]);
-								}else if(item.geometry == "http://hadatac.org/ont/lesa#Piramid"){	
-									//need location, width and length
-									//celling sensor, the dot location is at the center of the rectangular
-									if(geometryAll.indexOf("Piramid") == -1) geometryAll.push("Piramid");
-									if(SensorAll.indexOf("TOF") == -1) SensorAll.push("TOF");
-									if(parseFloat(item.param1) > maxheight) maxheight = parseFloat(item.param1);
-									piramiddata.push([coords[i*2],coords[i*2+1],parseFloat(item.param1), parseFloat(item.param2), parseFloat(item.param3)]);
-								}
-							}
-						}
-					});	
-
-				});
-				
-				// this snippit set the maxheight when the link call fast.
-				// scale.prop({
-				// 	'max': maxheight,
-				// 	'value': maxheight
-				// });
-				//var SensorAll_1 = ["None", "TOF", "COS", "Wall Sensor"];
-				var dropdownButton = d3.select("#ShowSelected")
-					  .append('select')
-					  
-				dropdownButton 
-					.selectAll('myOptions') 
-						.data(SensorAll)
-					.enter()
-						.append('option')
-					.text(function (d) { return d; }) 
-					.attr("value", function (d) { return d; }) 
-
-				dropdownButton.on("change", function(d) {
-					var selectedOption = d3.select(this).property("value")
-					UpdateGeometry(selectedOption)
-				})
-
-				d3.select("#ShowFOV").on("click", function(){
-					if(d3.select(this).text() == "hide"){
-						scale.hide();
-						HideFov();
-						d3.select(this).text("Visualize Field of View");
-					}else{
-						scale.show();
-						ShowFOV(FovUri, conedata, cuboiddata, piramiddata);
-						d3.select(this).text("hide");
-					}
-				})
-				
-				
-        		   
-				function showTooltip(evt, text) {
-			           	div.transition()		
-            			    .duration(200)		
-                			.style("opacity", .9);		
-			            div.html(text)
-            			    .style("left", (evt.pageX) + "px")		
-                			.style("top", (evt.pageY - 28) + "px");	
-				}
-
-				function hideTooltip() {
-			            div.transition()		
-            			    .duration(500)		
-                			.style("opacity", 0);	
-				}
-
-				function clicked(uri) {
-		             	window.location.href = browser_url.replace("XXXX",uri).replace(/amp;/g,"").replace(/#/g,"%23");
-						//alert("test " + uri);
-				}
-				
-
-				function HideFov(){
-					//imporve: group shapes by "g"
-					
-					d3.selectAll("circle").data(names).remove();
-					d3.selectAll("rect").data(names).remove();
-					
-					svg.selectAll("rect").data([0])
-      				.enter().append("rect")
-        				.attr("x", "0")
-      					.attr("y", "0")
-        				.attr("width", "850")
-        				.attr("height", heightPixels)
-        				.style("stroke", "blue")
-        				.style("stroke-width", "3")   
-        				.style("fill", "url(#Img)");   
-
-					svg.selectAll("foo").data(names)
-      				.enter().append("circle")
-        				.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
-      					.attr("cy", function(d,i) { return heightPixels - (coords[i * 2 + 1] * heightScale); })
-      					.attr("r", 4)
-      					.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
-      					.attr("onmouseout", onmouseout="hideTooltip();")
-                        .attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
-                        .attr("title", function(d,i) { return names[i]; })
-        				.style("fill", "red")
-					
-				}
-
-				function drawCone(conedata){	
-					var circles = svg.selectAll("foo")
-						.data(conedata)
-						.enter()
-						.append("circle");
-							
-					d3.selectAll("circle").data(conedata).remove();
-					
-					circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
-						.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
-						.attr("r", function(d) {return widthPixels*d[3]/widthLayout} )
-						.style("fill", "blue")
-						.attr("fill-opacity", 0.5)	
-				
-				}
-
-				function drawPiramid(piramidData){
-					var rect = svg.selectAll("foo")
-						.data(piramidData)
-						.enter()
-						.append("rect");
-							
-					d3.selectAll("circle").data(piramidData).remove();
-					rect.attr("x", function(d) { return widthOffset + (d[0]-1/2*d[3]) * widthScale; })
-						.attr("y", function(d) { return heightPixels - (d[1]+1/2*d[4]) * heightScale;})
-						.attr("width", function(d) {return widthPixels*d[3]/widthLayout})
-        				.attr("height", function(d) {return heightPixels*d[4]/heightLayout})
-						.style("fill", "green")
-						.attr("fill-opacity", 0.5)	
-				}
-
-				//question: how to we tell if the wall sensor is up or down or left or right
-				function drawCuboid(cuboiddata){
-					var circles = svg.selectAll("foo")
-						.data(cuboiddata)
-						.enter()
-						.append("circle");
-							
-					d3.selectAll("circle").data(cuboiddata).remove();
-					
-					circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
-						.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
-						.attr("r", 8)
-						.style("fill", "orange")
-					
-				}
-
-				function ShowFOV(FovUri, conedata, cuboiddata, piramiddata){
-					drawCone(conedata);
-					drawCuboid(cuboiddata);
-					drawPiramid(piramiddata);
-				}
-				
-				function UpdateGeometry(selectedOption){
-					if(selectedOption == "TOF"){
-						HideFov();
-						drawPiramid(piramiddata);
-					}else if(selectedOption == "COS"){
-						HideFov();
-						drawCone(conedata);
-					}else if(selectedOption == "Wall Sensor"){
-						HideFov();
-						drawCuboid(cuboiddata);
-					}else if(selectedOption == "None"){
-						HideFov();
+	//Change this when correct Uri is called
+//	$.getJSON(FovUri, function(dataset) {
+		//var data = dataset.body;
+		var data = FovUri.body;
+		
+		data.forEach(function(item){	
+			for (var i=0; i<uris.length; i++){
+				//uri is the link between FOV and DPL files
+				if (uris[i] == item.platform_uri){
+					//here we need to add different geometry 
+					if(item.geometry == "http://hadatac.org/ont/lesa#Cone"){													
+						//need location on map, radius
+						if(geometryAll.indexOf("Cone") == -1) geometryAll.push("Cone");
+						if(SensorAll.indexOf("COS") == -1) SensorAll.push("COS");
+						if(parseFloat(item.param1) > maxheight) maxheight = parseFloat(item.param1);
+						//x coord, ycoord, height, radius
+						conedata.push([coords[i*2],coords[i*2+1],parseFloat(item.param1), parseFloat(item.param2)]);
+					}else if(item.geometry == "http://hadatac.org/ont/lesa#REtangularCuboid"){
+						//need location, width and length
+						//wallsensor, the dot location is at the mid-upmost side of the rectangular
+						if(geometryAll.indexOf("Cuboid") == -1) geometryAll.push("Cuboid");
+						if(SensorAll.indexOf("Wall Sensor") == -1) SensorAll.push("Wall Sensor");
+						if(parseFloat(item.param1) > maxheight) maxheight = parseFloat(item.param1);
+						//x coord, y coord, height, x length, y length
+						cuboiddata.push([coords[i*2],coords[i*2+1],parseFloat(item.param1), parseFloat(item.param2), parseFloat(item.param3)]);
+					}else if(item.geometry == "http://hadatac.org/ont/lesa#Piramid"){	
+						//need location, width and length
+						//celling sensor, the dot location is at the center of the rectangular
+						if(geometryAll.indexOf("Piramid") == -1) geometryAll.push("Piramid");
+						if(SensorAll.indexOf("TOF") == -1) SensorAll.push("TOF");
+						if(parseFloat(item.param1) > maxheight) maxheight = parseFloat(item.param1);
+						piramiddata.push([coords[i*2],coords[i*2+1],parseFloat(item.param1), parseFloat(item.param2), parseFloat(item.param3)]);
 					}
 				}
+			}
+		})	
+	//});
 
-				function updateRadius(data, CurrentHeight){
-					data.forEach(function(item){
-						const newR = CurrentHeight * item[3]/item[2];
-						item[2] = CurrentHeight;
-						item[3] = newR;
-					});
-				}
 
-				function UpdateEdges(RectData, CurrentHeight){
-					RectData.forEach(function(item){
-						const newWidth = CurrentHeight * item[3]/item[2];
-						const newLength = CurrentHeight * item[4]/item[2];
-						item[3] = newWidth;
-						item[4] = newLength;
-						item[2] = CurrentHeight;
-					})
-				}
+	d3.select("#ShowFOV").on("click", function(){
+		if(d3.select(this).text() == "Hide Fields of View"){
+			HideFov();
+			d3.select(this).text("Show All Fields of View");
+		}else{
+			ShowFOV(FovUri, conedata, cuboiddata, piramiddata);
+			d3.select(this).text("Hide Fields of View");
+		}
+	})
+
+	d3.select("#HeightSlider").on("change", function(d){
+		const height = this.value;
+		var checkTOF = document.getElementById("TOF").checked;
+		var checkCOS = document.getElementById("COS").checked;
+		var checkTemp = document.getElementById("Temp").checked;
+		HideFov();
+		if(checkTOF){
+			let newpiramiddata = [...piramiddata];
+			UpdateEdges(newpiramiddata, height);
+			drawPiramid(newpiramiddata);
+		};
+		if(checkCOS){
+			let newconedata = [...conedata];
+			updateRadius(newconedata, height);
+			drawCone(newconedata);
+		}
+		if(checkTemp){
+			drawCuboid(cuboiddata);
+		}
+	})
+
+	function showTooltip(evt, text) {
+		div.transition()		
+			.duration(200)		
+			.style("opacity", .9);		
+		div.html(text)
+			.style("left", (evt.pageX) + "px")		
+			.style("top", (evt.pageY - 28) + "px");	
+	}
+
+	function hideTooltip() {
+		div.transition()		
+			.duration(500)		
+			.style("opacity", 0);	
+	}
+
+	function clicked(uri) {
+		window.location.href = browser_url.replace("XXXX",uri).replace(/amp;/g,"").replace(/#/g,"%23");
+	}
+
+	//this function hides everything and only leaves out the floor map
+	function HideFov(){
+		//imporve: group shapes by "g"
+		d3.selectAll("circle").data(names).remove();
+		d3.selectAll("rect").data(names).remove();
+		svg.selectAll("rect").data([0])
+			.enter().append("rect")
+			.attr("x", "0")
+			.attr("y", "0")
+			.attr("width", "850")
+			.attr("height", heightPixels)
+			.style("stroke", "blue")
+			.style("stroke-width", "3")   
+			.style("fill", "url(#Img)");   
+		//if current setting is not showing the sensor, color with full transparenty
+		if(d3.select("#ShowSensors").text() == "Show Sensors"){
+			svg.selectAll("circle").data(names)
+			.enter().append("circle")
+			.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
+				.attr("cy", function(d,i) { return heightPixels - (coords[i * 2 + 1] * heightScale); })
+				.attr("r", 4)
+				.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
+				.attr("onmouseout", onmouseout="hideTooltip();")
+			.attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
+			.attr("title", function(d,i) { return names[i]; })
+			.style("fill", "white")
+			.attr("fill-opacity", 0)
+		}else{
+			svg.selectAll("circle").data(names)
+			.enter().append("circle")
+			.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
+				.attr("cy", function(d,i) { return heightPixels - (coords[i * 2 + 1] * heightScale); })
+				.attr("r", 4)
+				.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
+				.attr("onmouseout", onmouseout="hideTooltip();")
+			.attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
+			.attr("title", function(d,i) { return names[i]; })
+			.style("fill", "red")
+		}
+		
+	}
+
+	function drawConewithSensor(conedata){
+		var circles = svg.selectAll("foo")
+			.data(conedata)
+			.enter()
+			.append("circle");
+
+		circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
+			.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
+			.attr("r", function(d) {return widthPixels*d[3]/widthLayout} )
+			.style("fill", "blue")
+			.attr("fill-opacity", 0.5)	
+	}
+
+	function drawCone(conedata){	
+		var circles = svg.selectAll("foo")
+			.data(conedata)
+			.enter()
+			.append("circle");
 				
+		d3.selectAll("circle").data(conedata).remove();
+		
+		circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
+			.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
+			.attr("r", function(d) {return widthPixels*d[3]/widthLayout} )
+			.style("fill", "blue")
+			.attr("fill-opacity", 0.5)	
 
-				function UpdateScale(height){
-					HideFov();
-					let newconedata = [...conedata];
-					updateRadius(newconedata, height);
-					drawCone(newconedata);
-					let newpiramiddata = [...piramiddata];
-					UpdateEdges(newpiramiddata, height);
-					drawPiramid(newpiramiddata);
-					drawCuboid(cuboiddata);
-				}
+	}
+	
+	function drawPiramidWithSensor(piramidData){
+		var rect = svg.selectAll("foo")
+			.data(piramidData)
+			.enter()
+			.append("rect");
+
+		rect.attr("x", function(d) { return widthOffset + (d[0]-1/2*d[3]) * widthScale; })
+			.attr("y", function(d) { return heightPixels - (d[1]+1/2*d[4]) * heightScale;})
+			.attr("width", function(d) {return widthPixels*d[3]/widthLayout})
+			.attr("height", function(d) {return heightPixels*d[4]/heightLayout})
+			.style("fill", "green")
+			.attr("fill-opacity", 0.5)
+	}
+	function drawPiramid(piramidData){
+		var rect = svg.selectAll("foo")
+			.data(piramidData)
+			.enter()
+			.append("rect");
 				
-				d3.select("#scale").on("change", function(d){
-					selectedValue = this.value;
-					UpdateScale(selectedValue);
-				})
-    		</script>
-    </div>
+		d3.selectAll("circle").data(piramidData).remove();
+		rect.attr("x", function(d) { return widthOffset + (d[0]-1/2*d[3]) * widthScale; })
+			.attr("y", function(d) { return heightPixels - (d[1]+1/2*d[4]) * heightScale;})
+			.attr("width", function(d) {return widthPixels*d[3]/widthLayout})
+			.attr("height", function(d) {return heightPixels*d[4]/heightLayout})
+			.style("fill", "green")
+			.attr("fill-opacity", 0.5)	
+	}
+
+	function drawCuboid(cuboiddata){
+		var circles = svg.selectAll("foo")
+			.data(cuboiddata)
+			.enter()
+			.append("circle");
+		
+		circles.attr("cx", function(d) { return widthOffset + d[0] * widthScale; })
+			.attr("cy", function(d) {return heightPixels - d[1] * heightScale; })
+			.attr("r", 8)
+			.style("fill", "orange")
+		
+	}
+
+
+	function ShowFOV(FovUri, conedata, cuboiddata, piramiddata){
+		if(d3.select("#ShowSensors").text() == "Show Sensors"){
+			drawConewithSensor(conedata);
+			drawPiramidWithSensor(piramiddata);
+			drawCuboid(cuboiddata);
+		}else{
+			drawCone(conedata);
+			drawCuboid(cuboiddata);
+			drawPiramid(piramiddata);
+		};
+		
+	}
+
+	function updateRadius(data, CurrentHeight){
+		data.forEach(function(item){
+			const newR = CurrentHeight * item[3]/item[2];
+			item[2] = CurrentHeight;
+			item[3] = newR;
+		});
+	}
+
+	function UpdateEdges(RectData, CurrentHeight){
+		RectData.forEach(function(item){
+			const newWidth = CurrentHeight * item[3]/item[2];
+			const newLength = CurrentHeight * item[4]/item[2];
+			item[3] = newWidth;
+			item[4] = newLength;
+			item[2] = CurrentHeight;
+		})
+	}
+
+
+	function visualizeTOF(){
+		var check = document.getElementById("TOF").checked;
+		if(check){
+			drawPiramid(piramiddata);
+		}else{
+			HideFov();
+			$("#COS").prop("checked", false);
+			$("#Temp").prop("checked", false);
+
+		}
+		
+	}
+
+	function visualizeCOS(){
+		var check = document.getElementById("COS").checked;
+		if(check){
+			drawCone(conedata);
+		}else{
+			HideFov();
+			$("#TOF").prop("checked", false);
+			$("#Temp").prop("checked", false);
+		}
+	}
+
+
+	function visualizeTemp(){
+		var check = document.getElementById("Temp").checked;
+		if(check){
+			drawCuboid(cuboiddata);
+		}else{
+			HideFov();
+			$("#COS").prop("checked", false);
+			$("#TOF").prop("checked", false);
+		}
+	}
+
+	function ShowSensorSpots(){
+		if (d3.select("#ShowSensors").text() == "Show Sensors"){
+			d3.select("#ShowSensors").text("Hide Sensors");
+			svg.selectAll("circle").data(names)
+			.enter().append("circle")
+			.attr("cx", function(d,i) { return widthOffset + coords[i * 2] * widthScale; })
+				.attr("cy", function(d,i) { return heightPixels - (coords[i * 2 + 1] * heightScale); })
+				.attr("r", 4)
+				.attr("onmousemove", function(d,i) { return "showTooltip(evt, '" + names[i] + "');"; })
+				.attr("onmouseout", onmouseout="hideTooltip();")
+			.attr("onclick", function(d,i) { return "clicked('" + uris[i] + "');"; })      					
+			.attr("title", function(d,i) { return names[i]; })
+			.style("fill", "red")
+		}else if(d3.select("#ShowSensors").text() == "Hide Sensors"){
+			d3.select("#ShowSensors").text("Show Sensors");
+			d3.selectAll("circle").data(names).remove();
+		}
+		
+	}
+</script>
 }
