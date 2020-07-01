@@ -43,8 +43,7 @@
               class="btn btn-primary btn-block" role="button">Browse Ontologies and Metadata</a>
            <a href="@org.hadatac.console.controllers.routes.URILookup.index("", "")"  
               id="urilookup" class="btn btn-primary btn-block" role="button">URI Lookup</a>
-       @*  <a href="" class="btn btn-primary btn-block disabled" role="button">Infer Semantic Differences</a>
-           <a href="" class="btn btn-primary btn-block disabled" role="button">Show Collaboration Insight</a> *@
+
            <h4>Data/Metadata Retrieve and Download</h4>
            <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()"  
               id="downloader" class="btn btn-primary btn-block disabled" role="button">Data Download</a>
@@ -76,8 +75,6 @@
 		   id="DAS" class="btn btn-primary btn-block" role="button">Manage Semantic Data Dictionaries [SDD]</a>
 		<a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" 
 		   id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
-     @* <a href="@org.hadatac.console.controllers.fileviewer.routes.SDDEditor.index()" 
-           id="sddeditor" class="btn btn-primary btn-block" role="button">SDD Editor</a>  *@
 	   }}
         </div>
         @restrict(roles = anyOf(allOf("data_manager"))) {
@@ -86,8 +83,6 @@
            <h4>Knowledge Management</h4>  
            <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")" 
 	      class="btn btn-primary btn-block" role="button">Manage Repository</a>
-	   @*  <a href="@org.hadatac.console.controllers.triplestore.routes.CleanStudy.clean("init")" 
-		  class="btn btn-primary btn-block" role="button">Study Management</a> *@
            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" 
 	      class="btn btn-primary btn-block" role="button">Manage Ontologies</a>
            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")" 
@@ -99,21 +94,6 @@
         }
         <div class="col-md-1 col-xs-0"></div>
       </div>
-
-      @*
-      <div class="row">
-        <div class="col-md-1 col-xs-0"></div>
-		@restrict(roles = anyOf(allOf("data_manager"))) {
-		@defining(AuthApplication.getLocalUser(session())) { user =>
-        <div class="col-md-3 col-xs-2">
-          <h4>Data Analysis Management</h4>  
-          <a href="@org.hadatac.console.controllers.dataanalysis.routes.FunctionManagement.index()" 
-           class="btn btn-primary btn-block" role="button">Manage Functions</a>
-        </div>
-		}
-		}
-      </div> *@
-
 
       <div class="row">
          <div class="col-md-1 col-xs-0"></div>
