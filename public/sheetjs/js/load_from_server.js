@@ -203,22 +203,54 @@ cdg.addEventListener('contextmenu', function (e) {
       console.log(e.cell.value);
       var des;
       if("unknown" === link){
-         des = "unknown ontology" ;
-      }
-      else{
-         des = getDescription(link);
-      }
-
-      input.innerHTML=des;
-
-      e.items.push({
-          title: input,
+         des = "unknown ontology";
+         e.items.push({
+          title: des,
           click: function () {
 
             var win = window.open(link, '_blank');
             win.focus();
           }
-      });
+        });
+      }
+      else{
+         //des = getDescription(link);
+         cellVal = link.trim();
+         $.ajax({
+           type : 'GET',
+           url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
+           data : {iricode: cellVal},
+           success : function(data) {
+             console.log(data);
+             e.items.push({
+               title: data,
+               click: function () {
+
+               var win = window.open(link, '_blank');
+                 win.focus();
+               }
+             });
+           },
+           error : function(xhr, textStatus, errorThrown) {
+                console.log("FAIL: " + xhr + " " + textStatus + " " + errorThrown);
+                console.log(xhr);
+           }
+         });
+      }
+      //console.log(des);
+      //var t = document.createTextNode(des);
+      //document.getElementById("textarea").appendChild(t);
+      //input.innerHTML = des;
+      //input.value=des;
+
+      /*e.items.push({
+          title: des,
+          click: function () {
+
+            var win = window.open(link, '_blank');
+            win.focus();
+          }
+      });*/
 
       }
 
@@ -424,22 +456,22 @@ function chooseItem(data) {
 
 
 
-  // if(ret in approvalList){
-  //   if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
+  if(ret in approvalList){
+     if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
 
-  //   }
-  //   else{
-  //     approvalList[ret]=[rowNum+1,colNum,0]
-  //     indicateApproval();
-  //   }
-  // }
-  // else if(!(ret in approvalList)){
-  //   console.log("here");
-  //   approvalList[ret]=[rowNum+1,colNum,0]
-  //   indicateApproval();
+     }
+     else{
+       approvalList[ret]=[ret, rowNum,colNum,0]
+       //indicateApproval();
+     }
+  }
+  else if(!(ret in approvalList)){
+     console.log("here");
+     approvalList[ret]=[ret, rowNum,colNum,0]
+     //indicateApproval();
 
 
-  // }
+  }
 
 
 
@@ -500,15 +532,16 @@ cdg.addEventListener('contextmenu', function (e) {
     e.items.push({
       title: 'Accept Value as Optimal Value',
       click: function (ev) {
-        // console.log(approvalList);
-        // console.log(e.cell.value);
-        // var originalVal=e.cell.value;
-        // var stripped=originalVal.replace(" + ","")
-        //   approvalList[stripped][2]=1;
-
-        //   acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
-
-
+        console.log(approvalList);
+        console.log(e.cell.value);
+        console.log(e.cell);
+        var originalVal=e.cell.value;
+        var stripped=originalVal.replace(" + ","");
+        approvalList[stripped][0][3] = 1;
+        console.log(stripped);
+        console.log(approvalList);
+        acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
+        indicateApproval(e.cell.rowIndex, e.cell.columnIndex, stripped);
       }
     });
 });
@@ -683,43 +716,47 @@ function createCopySheet(sheetCopy){
     }
     sheetStorage.push(temp);
   }
-
 }
-// function approvalFunction(sheetCopy){
-//   for(var i=1;i<sheetCopy.length;i++){
 
-//     for(var j=1;j<sheetCopy[i].length;j++){
-//       var temp2=[];
-//       if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
+function approvalFunction(sheetCopy){
+   for(var i=1;i<sheetCopy.length;i++){
 
-//       }
-//       else if(sheetCopy[i][j].includes("+")==true){
-//         var keys=sheetCopy[i][j];
-//         temp2.push(i);
-//         temp2.push(j);
-//         temp2.push(1);
-//         approvalList[keys]=temp2;
-//       }
-//       else{
-//         //temp2.push(sheetCopy[i][j]);
-//         var keys=sheetCopy[i][j];
-//         temp2.push(i);
-//         temp2.push(j);
-//         temp2.push(0);
-//         approvalList[keys]=temp2;
+     for(var j=1;j<sheetCopy[i].length;j++){
+       var keys=sheetCopy[i][j];
+       var temp2=[];
+    	   
+       if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
 
-//       }
+       }
+       else if(sheetCopy[i][j].includes("+")==true){
+    	 if((keys in approvalList && approvalList[keys] == undefined) || !(keys in approvalList)){
+    		 approvalList[keys] = [];
+         }
+    	 temp2.push(sheetCopy[i][j]);
+         temp2.push(i);
+         temp2.push(j);
+         temp2.push(1);
+         approvalList[keys].push(temp2);
+       }
+       else{
+	     if((keys in approvalList && approvalList[keys] == undefined) || !(keys in approvalList)){
+  		   approvalList[keys] = [];
+         }
+         temp2.push(sheetCopy[i][j]);
+         temp2.push(i);
+         temp2.push(j);
+         temp2.push(0);
+         approvalList[keys].push(temp2);
 
-//     }
+       }
 
-//   }
+     }
 
-//   //console.log(approvalList)
-//   indicateApproval();
+   }
+   console.log(approvalList)
+   //indicateApproval();
+ }
 
-
-
-// }
 var globalL;
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
@@ -838,6 +875,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     if(sheetName=="Dictionary Mapping"){
       var sheetCopy=removeHeadings(json);
       createCopySheet(sheetCopy);
+      approvalFunction(sheetCopy);
       if(popIndicator==1 && cdg.data.length<=1){
         console.log(cdg.data.length)
         populateSDD();
