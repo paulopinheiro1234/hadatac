@@ -17,7 +17,9 @@ public class DASManagement extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 	public Result index() {
+	    System.out.println("----------->>>>>> Inside DASManagement ");
 	    List<DataAcquisitionSchema> sdds = DataAcquisitionSchema.findAll();
+	    System.out.println("Size of SDD list: " + sdds.size());
 	    return ok(org.hadatac.console.views.html.schema.DASManagement.render(sdds));
 	}
 

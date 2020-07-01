@@ -35,7 +35,7 @@ public class STRMessageGenerator extends BaseGenerator {
 
     public STRMessageGenerator(DataFile dataFile, Study study, RecordFile specRecordFile, String startTime) {
         super(dataFile);
-    	System.out.println("...inside STRMessageGenerator.");
+        dataFile.getLogger().println("...inside STRMessageGenerator.");
 		this.file = specRecordFile;
 		this.records = file.getRecords();
         this.study = study;
@@ -60,6 +60,7 @@ public class STRMessageGenerator extends BaseGenerator {
 
     public boolean isValid() {
     	for (Record rec: specRecordFile.getRecords()) {
+    		System.out.println("STR's message generator: [" + rec.getValueByColumnIndex(0) + "]  [" + rec.getValueByColumnIndex(1) + "]");
             String uri = URIUtils.replacePrefixEx(getUri(rec));
             if (uri.isEmpty()) {
             	errorMessage = "STR_00011";
@@ -109,6 +110,8 @@ public class STRMessageGenerator extends BaseGenerator {
     }
     
     private String getUri(Record rec) {
+        dataFile.getLogger().println("STRMessageGenerator: Value of mapCol[: " + mapCol.get("hasURI") + "]");
+        dataFile.getLogger().println("STRMessageGenerator: Value of hasUri[: " + rec.getValueByColumnName(mapCol.get("hasURI")) + "]");
         String uri = rec.getValueByColumnName(mapCol.get("hasURI")).equalsIgnoreCase("NULL")? 
                 "" : rec.getValueByColumnName(mapCol.get("hasURI"));
         return uri;
