@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import org.hadatac.utils.ConfigProp;
 
 public class FileProcessing extends Controller {
 

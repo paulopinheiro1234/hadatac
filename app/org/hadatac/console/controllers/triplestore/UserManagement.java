@@ -57,6 +57,8 @@ import com.typesafe.config.ConfigFactory;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import org.hadatac.utils.ConfigProp;
+
 public class UserManagement extends Controller {
 
 	private static final String UPLOAD_NAME = "tmp/uploads/users-spreadsheet.xls";
