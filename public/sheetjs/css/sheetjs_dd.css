@@ -83,3 +83,10 @@ color:black;
 border-block-color: black;
 position: relative;
 }
+#gridcopy {
+  height: 100px;
+  display: none;
+}
+#grid {
+  display: inline-block;
+}

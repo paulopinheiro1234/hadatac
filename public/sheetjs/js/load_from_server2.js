@@ -15,7 +15,8 @@ function checkRecs (L,R,checker){
         var colval=cdg.schema[colIndex].title;
         colval=colval.charAt(0).toLowerCase() + colval.slice(1);
         var rowval=cdg.data[rowIndex][0];
-
+	//console.log(cdg);
+	//console.log(cdg.schema);
         if(checker==1){
           if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
             isVirtual=0;
@@ -433,7 +434,7 @@ function indicateApproval(r,c,prop){
   //for(var prop in approvalList){
     //var r= approvalList[prop][0][1];
     //var c= approvalList[prop][0][2];
-    if(approvalList[prop][0][3]==1 && prop == cdg.data[r][c]){
+    if(approvalList[r][c] != "" && prop == cdg.data[r][c]){
       /*cdg.data[r][c]+=" + ";
       cdg.draw();*/
       //console.log(r);
@@ -498,13 +499,13 @@ function indicateApproval(r,c,prop){
 }
 function acceptApproval(val,r,c){
   console.log(val);
-  for(var prop in approvalList){
-	console.log(prop);
-    if(approvalList[prop][0][3]==1){
+  //for(var prop in approvalList){
+	//console.log(prop);
+    //if(approvalList[prop][0][3]==1){
 
       cdg.data[r][c]=val;
 
-    }
-  }
+    //}
+  //}
 
 }

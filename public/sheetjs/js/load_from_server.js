@@ -159,7 +159,7 @@ var make_buttons = function(sheetnames, cb) {
   });
   buttons.appendChild(document.createElement('br'));
 };
-
+//console.log(_grid);
 // Creates the datagrid
 var cdg = canvasDatagrid({
   parentNode: _grid
@@ -198,7 +198,16 @@ cdg.addEventListener('contextmenu', function (e) {
 
     var input = document.createElement("textarea");
     input.style.width="100%";
-    if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
+    if(approvalList[e.cell.rowIndex][e.cell.colIndex] != ""){
+	console.log(approvalList);
+	console.log(e.cell.rowIndex);
+	console.log(e.cell.columnIndex);
+	console.log(approvalList[e.cell.rowIndex][e.cell.columnIndex]);
+	e.items.push({
+	  title: approvalList[e.cell.rowIndex][e.cell.columnIndex]
+	});
+    }
+    /*if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
       var link=convertshortToIri(e.cell.value);
       console.log(e.cell.value);
       var des;
@@ -236,7 +245,7 @@ cdg.addEventListener('contextmenu', function (e) {
                 console.log(xhr);
            }
          });
-      }
+      }*/
       //console.log(des);
       //var t = document.createTextNode(des);
       //document.getElementById("textarea").appendChild(t);
@@ -252,7 +261,7 @@ cdg.addEventListener('contextmenu', function (e) {
           }
       });*/
 
-      }
+     // }
 
 });
 cdg.addEventListener('click', function (e) {
@@ -456,7 +465,7 @@ function chooseItem(data) {
 
 
 
-  if(ret in approvalList){
+  /*if(ret in approvalList){
      if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
 
      }
@@ -471,7 +480,7 @@ function chooseItem(data) {
      //indicateApproval();
 
 
-  }
+  }*/
 
 
 
@@ -536,12 +545,20 @@ cdg.addEventListener('contextmenu', function (e) {
         console.log(e.cell.value);
         console.log(e.cell);
         var originalVal=e.cell.value;
-        var stripped=originalVal.replace(" + ","");
-        approvalList[stripped][0][3] = 1;
-        console.log(stripped);
-        console.log(approvalList);
-        acceptApproval(stripped,e.cell.rowIndex,e.cell.columnIndex);
-        indicateApproval(e.cell.rowIndex, e.cell.columnIndex, stripped);
+        $.ajax({
+            type : 'POST',
+            url : 'http://localhost:9000/hadatac/sddeditor_v2/getUserName',
+            success : function(nameData) {
+            	var today = new Date();
+				var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+				var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+				var dateTime = date+' '+time;
+            	approvalList[e.cell.rowIndex][e.cell.columnIndex] = nameData + ' - ' + dateTime;
+		        console.log(approvalList);
+		        acceptApproval(originalVal,e.cell.rowIndex,e.cell.columnIndex);
+		        indicateApproval(e.cell.rowIndex, e.cell.columnIndex, originalVal);
+            }
+        });
       }
     });
 });
@@ -621,7 +638,7 @@ var json_copy;
 
 var sheetStorage=[];
 // var sheetStorageCopy=[];
-var approvalList={};
+// var approvalList=[];
 
 // Adapted from to_json in dropsheet.js
 function to_json(workbook) {
@@ -637,23 +654,34 @@ function to_json(workbook) {
 
 // Adapted from function handleFileUpload(e) in dropsheet.js
 function saveFile(e){
+   //workbook.Sheets['InfoSheet'].B11 = JSON.stringify(approvalList);
+   //console.log( workbook.Sheets['InfoSheet'].B11 );
+   //var infoHolder = XLSX.utils.sheet_to_json(workbook.Sheets['InfoSheet'], {header:1});
+   //console.log(infoHolder);
+   //console.log(infoHolder[11]);
+   //infoHolder[11][1] = JSON.stringify(approvalList);
    // Save the current view back to the workbook
    workbook.Sheets[sheetName] = XLSX.utils.aoa_to_sheet(cdg.data);
-
+   //console.log(workbook.Sheets);
    // Generate json version of data
    var json = to_json(workbook);
-
+   console.log(json);
+   console.log(json['InfoSheet'][10][1])
+   json['InfoSheet'][10][1] = JSON.stringify(approvalList);
+   console.log(json);
    // iterate over workbook add headers in if we stripped them away
    for (let [sn, header] of headerMap) {
      // Add Header back in
      json[sn].unshift(header);
-
+     console.log(sn);
+     //console.log(json[sn]);
      // Convert back to workbook
      workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
    }
-
+   
    // Save the file
    var wbout = XLSX.write(workbook, { bookType: _filetype, bookSST: false, type: 'array', compression:true});
+ 
    var formdata = new FormData();
    if (_formData) {
      formdata.append('file', new File([wbout], _formData));
@@ -681,6 +709,8 @@ function saveFile(e){
      // Convert back to workbook
      workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
    }
+   console.log(workbook);
+   console.log(workbook.Sheets);
 }
 
 
@@ -719,13 +749,24 @@ function createCopySheet(sheetCopy){
 }
 
 function approvalFunction(sheetCopy){
-   for(var i=1;i<sheetCopy.length;i++){
+   if (approvalList === undefined || approvalList.length == 0) {
+    approvalList = JSON.parse(JSON.stringify(sheetCopy));
+   }
+   for(var i=0;i<sheetCopy.length;i++){
 
-     for(var j=1;j<sheetCopy[i].length;j++){
+     for(var j=0;j<sheetCopy[i].length;j++){
        var keys=sheetCopy[i][j];
        var temp2=[];
-    	   
-       if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
+       
+       if(approvalList[i][j] == sheetCopy[i][j]){
+       		approvalList[i][j] = "";
+       }
+       else{
+	 if(approvalList[i][j] != ""){
+	   indicateApproval(i,j,sheetCopy[i][j]);
+	 }     
+       }
+       /*if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
 
        }
        else if(sheetCopy[i][j].includes("+")==true){
@@ -748,7 +789,7 @@ function approvalFunction(sheetCopy){
          temp2.push(0);
          approvalList[keys].push(temp2);
 
-       }
+       }*/
 
      }
 
@@ -758,6 +799,7 @@ function approvalFunction(sheetCopy){
  }
 
 var globalL;
+var approvalList = [];
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
@@ -834,17 +876,34 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     headerMap.set(sheetName, json[0]);
     //Add Data Dictionary Link if it doesn't already exist
     if(sheetName=="InfoSheet"){
-      var temp=[]
+      var temp=[];
+      var temp2=[];
+      var DDLink = false;
+      var ApproveData = false;
       for(var i=0;i<json.length;i++){
         if(json[i][0]=="Data Dictionary Link"){
-          break;
+          DDLink = true;
         }
-        if(i == json.length-1){
+        if(json[i][0]=="Approval Data"){
+        	ApproveData = true;
+		console.log(json[i][1]);
+		if(json[i][1] == []){
+		  ApproveData = false;
+		}
+		else{
+        	  approvalList = JSON.parse(json[i][1]);
+		}
+        }
+      }
+      if(!DDLink){
           temp.push("Data Dictionary Link");
           temp.push(dd_url);
-          json.push(temp);
-          break;
-        }
+          json.push(temp)
+      }
+      if(!ApproveData){
+      	temp2.push("Approval Data");
+      	temp2.push(JSON.stringify(approvalList));
+      	json.push(temp2);
       }
     }
     if(sheetName=="Prefixes"){
@@ -1126,6 +1185,7 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
     }
 
     else {
+      console.log(data);
       if(rowval.startsWith("??")){
         var keyword="virtual-columns";
         parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual);
