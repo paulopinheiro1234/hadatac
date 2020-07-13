@@ -627,6 +627,7 @@ public class MeasurementGenerator extends BaseGenerator {
             	measurement.setCharacteristicUris(Arrays.asList(codeClass));
             	System.out.println(">>> POSSIBLE CLASS VALUE: Obj: [" + dasa.getObjectUri() + "]  code: [" + originalValue + "]   class: [" + codeClass + "]");
             	//System.out.println(">>> POSSIBLE CLASS VALUE: Current Attr: [" + dasa.getReversedAttributeString() + "]");
+            	measurement.setCategoricalClassUri(dasa.getAttributes().get(0));
             } else {
             	measurement.setCharacteristicUris(Arrays.asList(dasa.getReversedAttributeString()));
             }

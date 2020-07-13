@@ -42,7 +42,7 @@
             	@for((document, index) <- documents.zipWithIndex) {
                 <tr id="@index" href="#" data-toggle="tooltip" data-html="true" data-placement="top">
                     <td>@document.getEntity()</td>
-                	<td>@document.getCharacteristic()</td>
+                	<td>@document.getCharacteristicUris().get(0)</td>
                 	<td>@document.getValue()</td>
                 	<td class="original_value" style="display:none;">@document.getOriginalValue()</td>
                 	<td>@document.getObjectPID()</td>

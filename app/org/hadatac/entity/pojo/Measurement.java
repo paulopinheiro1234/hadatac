@@ -94,6 +94,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String entityUri;
     @Field("characteristic_uri_str_multi")
     private List<String> characteristicUris;
+    @Field("categorical_class_uri_str")
+    private String categoricalClassUri;
     @Field("location_latlong")
     private String location;
     @Field("elevation_double")
@@ -103,7 +105,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     // Variables that are not stored in Solr
     private String entity;
-    private String characteristic;
+    //private String characteristic;
     private String unit;
     private String platformName;
     private String platformUri;
@@ -384,6 +386,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.entityUri = entityUri;
     }
 
+    /*
     public String getCharacteristic() {
         return characteristic;
     }
@@ -391,6 +394,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setCharacteristic(String characteristic) {
         this.characteristic = characteristic;
     }
+    */
 
     public List<String> getCharacteristicUris() {
         return characteristicUris;
@@ -402,6 +406,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setCharacteristicUris(List<String> characteristicUris) {
         this.characteristicUris = characteristicUris;
+    }
+
+    public void setCategoricalClassUri(String categoricalClassUri) {
+        this.categoricalClassUri = categoricalClassUri;
+    }
+
+    public String getCategoricalClassUri() {
+        return categoricalClassUri;
     }
 
     public String getLocation() {
@@ -646,7 +658,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             solr.close();
             SolrDocumentList docs = queryResponse.getResults();
             docSize = docs.getNumFound();
-            //System.out.println("Num of results: " + docSize);
+            System.out.println("Num of results: " + docSize);
 
             Set<String> uri_set = new HashSet<String>();
             Map<String, STR> cachedDA = new HashMap<String, STR>();
@@ -707,6 +719,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
         fTreeEC.addUpperFacet(EntityRole.class);
+        //fTreeEC.addUpperFacet(Category.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
         Pivot pivotEC = getFacetStats(fTreeEC, 
@@ -720,6 +733,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC2.setTargetFacet(AttributeInstance.class);
         fTreeEC2.addUpperFacet(Indicator.class);
         fTreeEC2.addUpperFacet(EntityRole.class);
+        //fTreeEC2.addUpperFacet(Category.class);
         fTreeEC2.addUpperFacet(InRelationToInstance.class);
         fTreeEC2.addUpperFacet(EntityInstance.class);
         Pivot pivotEC2 = getFacetStats(fTreeEC2, 
@@ -727,30 +741,34 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
 
         /*
-    	System.out.println("measurement - >>>>>>>>>>> EC2 Content");
-        for (Pivot pivot1 : pivotEC2.children) {
-        	System.out.println("measurement - EC2_1: field: " + pivot1.getField() + "  value: " + pivot1.getValue() + "   count: " + pivot1.getCount() + "    tooltip: " + pivot1.getTooltip());
+         *  Merging the computation result of pivotEC2 into pivotEC
+         */
+        pivotEC.addChildrenFromPivot(pivotEC2);
+        pivotEC.normalizeCategoricalVariableLabels(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
+        
+    	/*
+        System.out.println("measurement - >>>>>>>>>>> EC Content");
+        for (Pivot pivot1 : pivotEC.children) {
+        	System.out.println("measurement - EC_1: field: " + pivot1.getField() + "  value: " + pivot1.getValue() + "   count: " + pivot1.getCount() + "    tooltip: " + pivot1.getTooltip());
             for (Pivot pivot2 : pivot1.children) {
-            	System.out.println("  measurement - EC2_2: field: " + pivot2.getField() + "   value: " + pivot2.getValue() + "  count: " + pivot2.getCount() + "    tooltip: " + pivot2.getTooltip());
+            	System.out.println("  measurement - EC_2: field: " + pivot2.getField() + "   value: " + pivot2.getValue() + "  count: " + pivot2.getCount() + "    tooltip: " + pivot2.getTooltip());
                 for (Pivot pivot3 : pivot2.children) {
-                	System.out.println("  measurement - EC2_3: field: " + pivot2.getField() + "   value: " + pivot3.getValue() + "  count: " + pivot3.getCount() + "    tooltip: " + pivot3.getTooltip());
+                	System.out.println("    measurement - EC_3: field: " + pivot2.getField() + "   value: " + pivot3.getValue() + "  count: " + pivot3.getCount() + "    tooltip: " + pivot3.getTooltip());
                 	for (Pivot pivot4 : pivot3.children) {
-                    	System.out.println("      measurement - EC2_4: field: " + pivot4.getField() + "   value: " + pivot4.getValue() + "  count: " + pivot4.getCount() + "    tooltip: " + pivot4.getTooltip());
+                    	System.out.println("      measurement - EC_4: field: " + pivot4.getField() + "   value: " + pivot4.getValue() + "  count: " + pivot4.getCount() + "    tooltip: " + pivot4.getTooltip());
                         for (Pivot pivot5 : pivot4.children) {
-                        	System.out.println("        measurement - EC2_5: field: " + pivot5.getField() + "   value: " + pivot5.getValue() + "  count: " + pivot5.getCount() + "    tooltip: " + pivot5.getTooltip());
+                        	System.out.println("        measurement - EC_5: field: " + pivot5.getField() + "   value: " + pivot5.getValue() + "  count: " + pivot5.getCount() + "    tooltip: " + pivot5.getTooltip());
+                            for (Pivot pivot6 : pivot5.children) {
+                            	System.out.println("          measurement - EC_6: field: " + pivot6.getField() + "   value: " + pivot6.getValue() + "  count: " + pivot6.getCount() + "    tooltip: " + pivot6.getTooltip());
+                            }
                         }
                     }
                 }
             }
         }
-    	System.out.println("measurement - <<<<<<<<<<<< EC2 Content");
+    	System.out.println("measurement - <<<<<<<<<<<< EC Content");
 		*/
-
-        /*
-         *  Merging the computation result of pivotEC2 into pivotEC
-         */
-        pivotEC.addChildrenFromPivot(pivotEC2);
-        
+    	
         FacetTree fTreeU = new FacetTree();
         fTreeU.setTargetFacet(UnitInstance.class);
         Pivot pivotU = getFacetStats(fTreeU, 
@@ -963,9 +981,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 attributes.add(attributeUri);
             }
         }
-        if (attributes.size() > 0) {
-            setCharacteristic(String.join("; ", attributes));
-        }
+        //if (attributes.size() > 0) {
+        //    setCharacteristic(String.join("; ", attributes));
+        //}
 
         if (cache.containsKey(getUnitUri())) {
             setUnit(cache.get(getUnitUri()));
@@ -996,6 +1014,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setEntityUri(SolrUtils.getFieldValue(doc, "entity_uri_str"));
         List<String> uris = Measurement.tokenizeSolr(SolrUtils.getFieldValues(doc, "characteristic_uri_str_multi"));
         m.setCharacteristicUris(uris);
+        m.setCategoricalClassUri(SolrUtils.getFieldValue(doc, "categorical_class_uri_str"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
 
         m.setValueClass(SolrUtils.getFieldValue(doc, "value_str"));
