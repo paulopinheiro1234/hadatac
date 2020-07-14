@@ -38,19 +38,16 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class MessageRawData extends Controller {
 
 	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction, boolean show) {
+    public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
 		STR stream = null;
 		MessageTopic topic = null;
     	List<String> results = new ArrayList<String>();
     	String str_uri = null;
     	String tpc_uri = null;
     	String topic_label = null;
-    	if (postAction == null) {
-    		postAction = routes.MessageManagement.index(dir, filename, da_uri, offset, show).url();
-    	}
     	if (stream_uri == null) {
     		results.add("No stream URI provided");
-            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results, postAction, show));
+            return ok(messageRawData.render(dir, filename, da_uri, offset, "", "", "", results, postAction));
     	}
     	try {
     		str_uri = URLDecoder.decode(stream_uri, "UTF-8");
@@ -83,12 +80,12 @@ public class MessageRawData extends Controller {
 			topic_label = topic.getLabel();
 			results.addAll(MqttSubscribe.exec(stream, topic, MqttSubscribe.SUBSCRIBE_BATCH));
 		}
-        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction, show));
+        return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction, boolean show) {
-        return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction, show);
+    public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction) {
+        return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction);
     }
 
 }

@@ -82,7 +82,9 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     private String messageHeaders;
     @Field("message_archive_id_str")
     private String messageArchiveId;
-
+    @Field("message_commit_frequency_str")
+    private String messageCommitFrequency;
+    
     @Field("study_uri_str")
     private String studyUri;
     @Field("method_uri_str")
@@ -143,6 +145,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     private DataAcquisitionSchema sdd;
     private Map<String,MessageTopic> topicsMap;
 	private List<String> headers;
+	private int commitFrequencyInt;
 
     private DataFile archive = null;
     private String log;
@@ -151,7 +154,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     public static final String ACTIVE = "ACTIVE";
     public static final String SUSPENDED = "SUSPENDED";
     public static final String CLOSED = "CLOSED";
-
+    
     public static final String MQTT = "mqtt";
     public static final String HTTP = "http";
 
@@ -166,6 +169,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         messageProtocol = null;
         messageIP = null;
         messagePort = null;
+        messageCommitFrequency = null; 
         topicsMap = null;
         study = null;
         sdd = null;
@@ -272,6 +276,28 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.messageArchiveId = messageArchiveId;
     }
 
+    public String getMessageCommitFrequency() {
+        return messageCommitFrequency;
+    }
+
+    public int getCommitFrequencyInt() {
+        return commitFrequencyInt;
+    }
+
+    public void setMessageCommitFrequency(String messageCommitFrequency) {
+        this.messageCommitFrequency = messageCommitFrequency;
+        try {
+        	this.commitFrequencyInt = Integer.parseInt(messageCommitFrequency);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+
+        System.out.println("Inside STR");
+        System.out.println("  str cf is [" + messageCommitFrequency + "]");
+        System.out.println("  int cf is [" + commitFrequencyInt + "]");
+    
+    }
+    
     public String getMessageStatus() {
         return messageStatus;
     }
@@ -953,6 +979,9 @@ public class STR extends HADatAcThing implements Comparable<STR> {
             }
             if (doc.getFieldValue("message_archive_id_str") != null) {
                 dataAcquisition.setMessageArchiveId(doc.getFieldValue("message_archive_id_str").toString());
+            }
+            if (doc.getFieldValue("message_commit_frequency_str") != null) {
+                dataAcquisition.setMessageCommitFrequency(doc.getFieldValue("message_commit_frequency_str").toString());
             }
             if (doc.getFieldValue("started_at_date") != null) {
                 date = new DateTime((Date) doc.getFieldValue("started_at_date"));

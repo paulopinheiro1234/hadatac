@@ -63,6 +63,7 @@ public class Templates {
     public static String MESSAGEIP = iniConfig.getSection("STR").getString("MessageIP");
     public static String MESSAGEPORT = iniConfig.getSection("STR").getString("MessagePort");
     public static String MESSAGENAME = iniConfig.getSection("STR").getString("MessageName");
+    public static String MESSAGECOMMITFREQUENCY = iniConfig.getSection("STR").getString("MessageCommitFrequency");
 
     // DASA, DASE, DASO Template (Part of SDD)
     public static String LABEL = iniConfig.getSection("DASA").getString("Label");     // also in PV                                                                                   

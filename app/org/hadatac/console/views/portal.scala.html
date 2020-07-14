@@ -57,7 +57,7 @@
 		<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", ".")" 
 		   id="autoannotate" class="btn btn-primary btn-block" role="button">Ingest Files</a>
     	@defining(0) { page =>  
-           <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index("/", filename, da_uri, page, false)" 
+           <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index("/", filename, da_uri, page)" 
 		      id="messages" class="btn btn-primary btn-block" role="button">Ingest Messages</a>
 		}
 		<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")" 

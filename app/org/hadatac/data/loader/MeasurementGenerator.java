@@ -213,6 +213,10 @@ public class MeasurementGenerator extends BaseGenerator {
         	if (selector == null) {
         		return null;
         	}
+        	if (str.getTopicsMap() == null || str.getTopicsMap().get(selector) == null) {
+        		System.out.println("[ERROR] str.getTopicsMap for selector=[" + selector + "] is returning null.");
+        		return null;
+        	}
         	cellObject = str.getTopicsMap().get(selector).getStudyObject();
         	objUri = cellObject.getUri();
         	if (objUri == null) {

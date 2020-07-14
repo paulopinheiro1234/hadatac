@@ -53,6 +53,7 @@ public class STRMessageGenerator extends BaseGenerator {
         mapCol.put("MessageIP", Templates.MESSAGEIP);
         mapCol.put("MessagePort", Templates.MESSAGEPORT);
         mapCol.put("MessageName", Templates.MESSAGENAME);
+        mapCol.put("MessageCommitFrequency", Templates.MESSAGECOMMITFREQUENCY);
         mapCol.put("OwnerEmail", Templates.OWNEREMAIL);
         mapCol.put("PermissionUri", Templates.PERMISSIONURI);
 
@@ -97,6 +98,24 @@ public class STRMessageGenerator extends BaseGenerator {
                 errorArgument = "";
                 return false;
             }
+            String commitFrequency = getCommitFrequency(rec);
+            if (commitFrequency.isEmpty()) {
+            	errorMessage = "STR_00036";
+                errorArgument = "";
+                return false;
+            }
+            try {
+            	int cf = Integer.parseInt(commitFrequency);
+            	if (cf < 0) {
+                	errorMessage = "STR_00036";
+                    errorArgument = "";
+                    return false;
+            	}
+            } catch (Exception e) {
+            	errorMessage = "STR_00036";
+                errorArgument = "";
+                return false;
+            }
     	}
     	return true;
     }
@@ -110,8 +129,8 @@ public class STRMessageGenerator extends BaseGenerator {
     }
     
     private String getUri(Record rec) {
-        dataFile.getLogger().println("STRMessageGenerator: Value of mapCol[: " + mapCol.get("hasURI") + "]");
-        dataFile.getLogger().println("STRMessageGenerator: Value of hasUri[: " + rec.getValueByColumnName(mapCol.get("hasURI")) + "]");
+        //dataFile.getLogger().println("STRMessageGenerator: Value of mapCol[" + mapCol.get("hasURI") + "]");
+        //dataFile.getLogger().println("STRMessageGenerator: Value of hasUri[" + rec.getValueByColumnName(mapCol.get("hasURI")) + "]");
         String uri = rec.getValueByColumnName(mapCol.get("hasURI")).equalsIgnoreCase("NULL")? 
                 "" : rec.getValueByColumnName(mapCol.get("hasURI"));
         return uri;
@@ -155,6 +174,12 @@ public class STRMessageGenerator extends BaseGenerator {
         return messagePort;
     }
 
+    public String getCommitFrequency(Record rec) {
+        String messageCommitFrequency = rec.getValueByColumnName(mapCol.get("MessageCommitFrequency")).equalsIgnoreCase("NULL")? 
+                "" : rec.getValueByColumnName(mapCol.get("MessageCommitFrequency"));
+        return messageCommitFrequency;
+    }
+
     private String getOwnerEmail(Record rec) {
         //System.out.println("STRGenerator: owner email's label is [" + Templates.OWNEREMAIL + "]");
         String ownerEmail = rec.getValueByColumnName(mapCol.get("OwnerEmail"));
@@ -181,7 +206,8 @@ public class STRMessageGenerator extends BaseGenerator {
 		row.put("hasco:hasIP", getIP(rec));
 		row.put("hasco:hasPort", getPort(rec));
 		row.put("hasco:isDataAcquisitionOf", study.getUri());
-		row.put("hasco:hasSchemaSpec", URIUtils.replacePrefixEx(getSdd(rec)));
+		row.put("hasco:hasSchema", URIUtils.replacePrefixEx(getSdd(rec)));
+		row.put("hasco:hasCommitFrequency", getCommitFrequency(rec));
         row.put("hasco:hasMessageStatus", STR.SUSPENDED);
 		if (startTime.isEmpty()) {
 			row.put("prov:startedAtTime", (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")).format(new Date()));
@@ -235,7 +261,7 @@ public class STRMessageGenerator extends BaseGenerator {
         //logger.println(message);
         str.setLabel(URIUtils.replacePrefixEx((String)row.get("rdfs:label")));
         str.setStudyUri(URIUtils.replacePrefixEx((String)row.get("hasco:isDataAcquisitionOf")));
-        str.setSchemaUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasSchemaSpec")));
+        str.setSchemaUri(URIUtils.replacePrefixEx((String)row.get("hasco:hasSchema")));
         str.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
         str.setNumberDataPoints(Measurement.getNumByDataAcquisition(str));
 
@@ -245,6 +271,8 @@ public class STRMessageGenerator extends BaseGenerator {
         str.setMessageIP((String)row.get("hasco:hasIP"));
         str.setMessagePort((String)row.get("hasco:hasPort"));
         str.setMessageStatus((String)row.get("hasco:hasMessageStatus"));
+        System.out.println("Value of commit frequency when creating STR: [" + (String)row.get("hasco:hasCommitFrequency") + "]");
+        str.setMessageCommitFrequency((String)row.get("hasco:hasCommitFrequency"));
         str.addCellScopeName("STREAM");
         str.addCellScopeUri("STREAM");
         String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";

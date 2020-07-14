@@ -35,13 +35,13 @@ public class FacetTree {
             FacetHandler facetHandler, 
             Pivot curPivot) {
         //System.out.println("\n\n\nlevel " + level);
-    	/*
+    	
     	System.out.println("FacetTree:  level: " + level + 
         		"  facetName: " + facet.getFacetName() + 
         		"  facetsSize: " + facets.size() + 
         		"  curPivotField: " + curPivot.getField() +
         		"  curPivotUri: " + curPivot.getTooltip());
-    	*/
+    	
     	
         try {
             Facetable object = null;
@@ -66,10 +66,11 @@ public class FacetTree {
 	            for (Facetable key : dict.keySet()) {
 	            	/*
 	            	if (facet.getFacetName().contentEquals("facetsEC2")) {
+	            	*/
 	            		System.out.println("Facetable: level=[" + level + "]  key.Field=[" + key.getField() + " key.uri=[" + key.getUri() + "]");
 	            		System.out.println("Facets size: " + facets.size());
-	            	}
-	            	*/
+	            	//}
+	            	//*/
 	                if (facets.isEmpty()) {
 	                    Pivot pivot = new Pivot();
 	                    pivot.setField(key.getField());

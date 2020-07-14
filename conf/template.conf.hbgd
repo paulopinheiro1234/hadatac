@@ -51,6 +51,7 @@ MessageProtocol=protocol
 MessageIP=IP
 MessagePort=port
 MessageName=name
+MessageCommitFrequency=commit freq
 
 [DASA]
 # DASA, DASE, DASO Template (Part of SDD)

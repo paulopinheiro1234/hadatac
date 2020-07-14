@@ -4,8 +4,7 @@
   page           : Integer,
   stream_uri     : String,	
   stream_label   : String,
-  results        : List[String],
-  show           : Boolean)
+  results        : List[String])
     
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -43,7 +42,7 @@
 		</div>
 
 		<br>
-		<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)" class="btn btn-primary" 
+		<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)" class="btn btn-primary" 
 	       role="button">Back to Ingest </a>  		
 	
 	</div>

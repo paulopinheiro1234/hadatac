@@ -69,7 +69,7 @@ public class MqttMessageWorker {
 	}
 
 	public static Record processMessage(String streamUri, String topicStr, String message, int currentRow) {
-		System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]");
+		//System.out.println("TopicStr: [" + topicStr + "]   Message: [" + message + "]");
 
 		STR stream = STRStore.getInstance().findCachedByUri(streamUri);
 		MeasurementGenerator generator = MqttMessageWorker.getInstance().getStreamGenerator(streamUri);

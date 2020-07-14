@@ -328,6 +328,11 @@
           "id": "STR_00035",
           "detail": "In FILESTREAM sheet, SDD <%s> cannot be retrieved. ",
           "solution": "For the identified SDD, make sure the SDD file is properly ingested. "
+        },
+        {
+          "id": "STR_00036",
+          "detail": "In MESSAGESTREAM sheet, the stream's commit frequency cannot be <= 0.",
+          "solution": "Assign a value to the stream's commit frequency greater than zero"
         }
       ]
     },

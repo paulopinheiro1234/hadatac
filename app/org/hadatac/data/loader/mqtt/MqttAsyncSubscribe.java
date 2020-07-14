@@ -92,7 +92,7 @@ public class MqttAsyncSubscribe implements MqttCallback {
     public MqttAsyncSubscribe(STR stream, MeasurementGenerator generator, String brokerUrl, String userName, String password) throws MqttException {
     	this.stream    = stream;
     	this.brokerUrl = brokerUrl;
-    	this.quietMode = false;
+    	this.quietMode = true;
     	this.clean 	   = true;
     	this.password  = password;
     	this.userName  = userName;
@@ -197,7 +197,7 @@ public class MqttAsyncSubscribe implements MqttCallback {
 		stream.setTotalMessages(totalMessages);
 		stream.setIngestedMessages(ingestedMessages);
 		partialCounter = partialCounter + 1;
-		if (partialCounter >= 300) {
+		if (partialCounter >= stream.getCommitFrequencyInt()) {
 			partialCounter = 0;
 			System.out.println("Received " + totalMessages + " messages. Ingested " + ingestedMessages + " messages.");
 

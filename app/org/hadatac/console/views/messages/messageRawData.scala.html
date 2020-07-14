@@ -6,8 +6,7 @@
   topic_uri      : String,
   topic_label    : String,
   results        : List[String],
-  postAction     : String,
-  show           : Boolean
+  postAction     : String
   )
     
 @import org.hadatac.console.views.html._
@@ -59,7 +58,7 @@
     <script>
     var refreshVar
 	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri, topic_uri, postAction, show)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri, topic_uri, postAction)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
 	}, 1000);

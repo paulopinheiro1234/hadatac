@@ -3,8 +3,7 @@
   da_uri      : String,
   page        : Integer,
   studyList   : List[String],
-  results     : List[org.hadatac.entity.pojo.STR],
-  show        : Boolean)
+  results     : List[org.hadatac.entity.pojo.STR])
   
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
@@ -20,12 +19,7 @@
 
         <h3>Stream Status</h3>
 
-        @if(show) {
-        	<a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, false)">Hide Topics</a>
-        } else { 
-            <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, true)">Show Topics</a>
-        }
-        <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.refreshCache(dir, filename, da_uri, page, true)">Refresh Cache</a>
+        <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.refreshCache(dir, filename, da_uri, page)">Refresh Cache</a>
 
         <table class="table">
             <thead>
@@ -37,6 +31,7 @@
                     <th>Protocol</th>
                     <th>Study</th>
                     <th>Semantic Data Dictionary</th>
+                    <th>Commit Freq.</th>
                     <th>#labels</th>
                     <th>#ReceivedMsgs</th>
                     <th>#IngestedMsgs</th>
@@ -46,7 +41,7 @@
             </thead>
             <tbody>
               @for(stream <- results){
-                  @stream_entry(dir, filename, da_uri, page, studyList, stream, show)
+                  @stream_entry(dir, filename, da_uri, page, studyList, stream)
               }
             </tbody>
         </table>
@@ -84,7 +79,7 @@
     <script>
     var refreshVar
 	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)";
+		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
 		window.location.href = hrefValue; 
 	}, 2000);

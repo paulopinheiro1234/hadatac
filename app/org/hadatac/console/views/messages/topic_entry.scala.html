@@ -4,8 +4,7 @@
   page          : Integer,
   stream        : org.hadatac.entity.pojo.STR,
   topic         : org.hadatac.entity.pojo.MessageTopic,
-  currentAction : String,
-  show          : Boolean)
+  currentAction : String)
 
 @import java.net._
 @import org.hadatac.utils._
@@ -28,7 +27,7 @@
 	         @topic.getSOC().getLabel()
 	  } </td>
       <td>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction, show)"
+         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction)"
             class="btn-xs btn-primary" role="button">Live Raw Data</a>
       </td>
 	</tr>

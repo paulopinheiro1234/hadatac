@@ -59,37 +59,55 @@ public class MessageManagement extends Controller {
 	private FormFactory formFactory;
     	
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, int offset, boolean topics) {
+    public Result index(String dir, String filename, String da_uri, int offset) {
 
     	// get an updated list of stream
     	List<STR> results = STRStore.getInstance().findCachedOpenStreams();
     	
     	// get an updated list of studies
         List<String> studyIdList = Study.findIds();
-    	return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results, topics));
+    	return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics) {
-        return index(dir, filename, da_uri, offset, topics);
+    public Result postIndex(String dir, String filename, String da_uri, int offset) {
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
-
+    public Result refreshCache(String dir, String filename, String da_uri, int offset) {
     	// get an updated list of stream
     	STRStore.getInstance().refreshStore();
-        return index(dir, filename, da_uri, offset, topics);
-    	
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
-        return refreshCache(dir, filename, da_uri, offset, topics);
+    public Result postRefreshCache(String dir, String filename, String da_uri, int offset) {
+        return refreshCache(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result browseTopics(String dir, String filename, String da_uri, int offset, String stream_uri) {
+
+    	STR stream;
+    	try {
+    		stream_uri = URLDecoder.decode(stream_uri, "utf-8");
+    		stream = STRStore.getInstance().findCachedByUri(stream_uri);
+    	} catch (Exception e) {
+        	System.out.println("error decoding [" + stream_uri + "]");
+        	return badRequest("error decoding [" + stream_uri + "]");
+    	}
+        
+    	return ok(topicManagement.render(dir, filename, da_uri, offset, stream));
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postBrowseTopics(String dir, String filename, String da_uri, int offset, String stream_uri) {
+        return browseTopics(dir, filename, da_uri, offset, stream_uri);
+    }
+
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
     	// retrieve stream
     	String uri = null;
@@ -97,6 +115,7 @@ public class MessageManagement extends Controller {
     		uri = URLDecoder.decode(stream_uri, "utf-8");
     	} catch (Exception e) {
         	System.out.println("error decoding [" + stream_uri + "]");
+        	return badRequest("error decoding [" + stream_uri + "]");
     	}
     	STR stream = STRStore.getInstance().findCachedByUri(uri);
 
@@ -113,16 +132,16 @@ public class MessageManagement extends Controller {
         	//subscription.exec(stream);
         }
         
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return subscribe(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri) {
+        return subscribe(dir, filename, da_uri, offset, stream_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
     	// retrieve stream
     	String uri = null;
@@ -144,16 +163,16 @@ public class MessageManagement extends Controller {
         	}
         }
         
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri) {
+        return unsubscribe(dir, filename, da_uri, offset, stream_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri) {
 
     	// retrieve stream
     	String uri = null;
@@ -175,12 +194,12 @@ public class MessageManagement extends Controller {
         	}
         }
 
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return close(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri) {
+        return close(dir, filename, da_uri, offset, stream_uri);
     }
 
     /*
@@ -210,7 +229,7 @@ public class MessageManagement extends Controller {
     */
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	if (stream_uri == null) {
     		stream_uri = "";
     	}
@@ -225,15 +244,15 @@ public class MessageManagement extends Controller {
     	}
     	if (stream == null || stream.getMessageLogger() == null || stream.getMessageLogger().getLog() == null) {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), 
-                    routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
+                    routes.MessageManagement.index(dir, filename, da_uri, offset).url()));
     	}
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 stream.getMessageLogger().getLog()), 
-                routes.MessageManagement.index(dir, filename, da_uri, offset, topics ).url()));
+                routes.MessageManagement.index(dir, filename, da_uri, offset).url()));
     }
  
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
     	String uri = null;
     	String streamName = "";
@@ -250,16 +269,16 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         
-    	return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamName, results, topics));
+    	return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamName, results));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postTestConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return testConnection(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postTestConnection(String dir, String filename, String da_uri, int offset, String stream_uri) {
+        return testConnection(dir, filename, da_uri, offset, stream_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result testTopics(String dir, String filename, String da_uri, int offset, String stream_uri, boolean show) {
+    public Result testTopics(String dir, String filename, String da_uri, int offset, String stream_uri) {
     	
     	String streamName = "";
         List<String> results = new ArrayList<String>();
@@ -283,16 +302,16 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + stream_uri + "]");
     	}
         
-    	return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamName, results, specified, show));
+    	return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamName, results, specified));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postTestTopics(String dir, String filename, String da_uri, int offset, String topic_uri, boolean topics) {
-        return testTopics(dir, filename, da_uri, offset, topic_uri, topics);
+    public Result postTestTopics(String dir, String filename, String da_uri, int offset, String topic_uri) {
+        return testTopics(dir, filename, da_uri, offset, topic_uri);
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result testLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, boolean topics) {
+    public Result testLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
     	
     	String tpc_uri = null;
     	String streamName = "";
@@ -320,12 +339,12 @@ public class MessageManagement extends Controller {
         	System.out.println("error decoding [" + topic_uri + "]");
     	}
     	return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamName, topicLabel, results, specified,
-    			routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
+    			routes.MessageManagement.index(dir, filename, da_uri, offset).url()));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postTestLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, boolean topics) {
-        return testLabels(dir, filename, da_uri, offset, stream_uri, topic_uri, topics);
+    public Result postTestLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri) {
+        return testLabels(dir, filename, da_uri, offset, stream_uri, topic_uri);
     }
 
 }

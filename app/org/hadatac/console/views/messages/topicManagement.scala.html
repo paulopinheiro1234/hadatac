@@ -2,28 +2,38 @@
   filename      : String,
   da_uri        : String,
   page          : Integer,
-  stream        : org.hadatac.entity.pojo.STR,
-  currentAction : String, 
-  show          : Boolean)
+  stream        : org.hadatac.entity.pojo.STR)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-<div class="collapse" id="@stream.getLabel().replace("/","")">
-	<table class="table table-striped">
-	    <thead>
-	         <tr>
-	            <th>Topic Name</th>
-	            <th>Deployment</th>
-	            <th>Study Object</th>
-	            <th>SOC</th>
-	            <th>Operations</th>
-	         </tr>
-	    </thead>
-	    <tbody>
-	      @for(topic <- stream.getTopicsList()) {
-	         @topic_entry(dir, filename, da_uri, page, stream, topic, currentAction, show)
-	      }
-	    </tbody>
-	</table>
-</div>
+@main("Browse Stream Topics") {
+
+    <h2>Browse Stream Topics</h2>
+    
+    <div class="container-fluid">
+
+		<table class="table table-striped">
+		    <thead>
+		         <tr>
+		            <th>Topic Name</th>
+		            <th>Deployment</th>
+		            <th>Study Object</th>
+		            <th>SOC</th>
+		            <th>Operations</th>
+		         </tr>
+		    </thead>
+		    <tbody>
+		      @for(topic <- stream.getTopicsList()) {
+		         @topic_entry(dir, filename, da_uri, page, stream, topic, "")
+		      }
+		    </tbody>
+		</table>
+
+	</div>
+
+	<br>
+	<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page)" class="btn btn-primary" 
+	   role="button">Back to Ingest </a>  		
+	
+}
