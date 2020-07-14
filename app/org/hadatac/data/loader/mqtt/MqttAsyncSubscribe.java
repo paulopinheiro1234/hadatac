@@ -147,6 +147,7 @@ public class MqttAsyncSubscribe implements MqttCallback {
     	client.subscribe(stream.getLabel() + "/#", qos);
 
     	totalMessages = stream.getTotalMessages();
+    	// this Math.toIntExact method is used to convert from long to int
     	ingestedMessages = Math.toIntExact(stream.getIngestedMessages());
     	partialCounter = 0;
 
@@ -195,7 +196,6 @@ public class MqttAsyncSubscribe implements MqttCallback {
 		 */
 		totalMessages = totalMessages + 1;
 		stream.setTotalMessages(totalMessages);
-		stream.setIngestedMessages(ingestedMessages);
 		partialCounter = partialCounter + 1;
 		if (partialCounter >= stream.getCommitFrequencyInt()) {
 			partialCounter = 0;

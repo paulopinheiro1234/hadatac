@@ -164,8 +164,8 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         numberDataPoints = 0;
         isComplete = false;
         datasetURIs = new ArrayList<String>();
-        totalMessages = 0;
-        ingestedMessages = 0;
+        totalMessages = -1;
+        ingestedMessages = -1;
         messageProtocol = null;
         messageIP = null;
         messagePort = null;
@@ -227,11 +227,11 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     }
 
     public long getIngestedMessages() {
-        return totalMessages;
+        return ingestedMessages;
     }
 
-    public void setIngestedMessages(long totalMessages) {
-        this.totalMessages = totalMessages;
+    public void setIngestedMessages(long ingestedMessages) {
+        this.ingestedMessages = ingestedMessages;
     }
 
     public String getMessageProtocol() {
@@ -291,11 +291,6 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         } catch (Exception e) {
         	e.printStackTrace();
         }
-
-        System.out.println("Inside STR");
-        System.out.println("  str cf is [" + messageCommitFrequency + "]");
-        System.out.println("  int cf is [" + commitFrequencyInt + "]");
-    
     }
     
     public String getMessageStatus() {
@@ -772,9 +767,9 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     public List<String> getDOIs() {
     	List<String> resp = new ArrayList<String>();
     	List<DataFile> dfs = DataFile.findByDataAcquisition(uri);
-    	System.out.println("STR da's uri is [" + uri + "]  and dfs's size is [" + dfs.size() + "]");
+    	//System.out.println("STR da's uri is [" + uri + "]  and dfs's size is [" + dfs.size() + "]");
     	for (DataFile df : dfs) {
-        	System.out.println("STR df's wasDerivedFrom size is [" + df.getWasDerivedFrom().size() + "]");
+        	//System.out.println("STR df's wasDerivedFrom size is [" + df.getWasDerivedFrom().size() + "]");
     		for (String doi : df.getWasDerivedFrom()) {
     			resp.add(doi);
     		}
@@ -947,20 +942,16 @@ public class STR extends HADatAcThing implements Comparable<STR> {
                 dataAcquisition.setStudyUri(doc.getFieldValue("study_uri_str").toString());
             }
             if (doc.getFieldValue("triggering_event_int") != null) {
-                dataAcquisition
-                        .setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event_int").toString()));
+                dataAcquisition.setTriggeringEvent(Integer.parseInt(doc.getFieldValue("triggering_event_int").toString()));
             }
             if (doc.getFieldValue("nr_data_points_long") != null) {
-                dataAcquisition
-                        .setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points_long").toString()));
+                dataAcquisition.setNumberDataPoints(Long.parseLong(doc.getFieldValue("nr_data_points_long").toString()));
             }
             if (doc.getFieldValue("total_messages_long") != null) {
-                dataAcquisition
-                        .setTotalMessages(Long.parseLong(doc.getFieldValue("total_messages_long").toString()));
+                dataAcquisition.setTotalMessages(Long.parseLong(doc.getFieldValue("total_messages_long").toString()));
             }
             if (doc.getFieldValue("ingested_messages_long") != null) {
-                dataAcquisition
-                        .setIngestedMessages(Long.parseLong(doc.getFieldValue("ingested_messages_long").toString()));
+                dataAcquisition.setIngestedMessages(Long.parseLong(doc.getFieldValue("ingested_messages_long").toString()));
             }
             if (doc.getFieldValue("message_protocol_str") != null) {
                 dataAcquisition.setMessageProtocol(doc.getFieldValue("message_protocol_str").toString());
