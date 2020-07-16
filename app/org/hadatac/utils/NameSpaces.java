@@ -15,11 +15,11 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
-
+import org.hadatac.utils.ConfigProp;
 
 public class NameSpaces {
 
-    public static String CACHE_PATH   = "tmp/cache/";
+    public static String CACHE_PATH   = ConfigProp.getTmp() + "cache/";
     public static String CACHE_PREFIX = "copy-";
 
     private ConcurrentHashMap<String, NameSpace> table = new ConcurrentHashMap<String, NameSpace>();
