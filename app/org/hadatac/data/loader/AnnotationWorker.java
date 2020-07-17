@@ -89,7 +89,7 @@ public class AnnotationWorker {
     }
 
     public static void autoAnnotate() {
-        if(ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("off")) {
+        if(ConfigProp.getAuto().equals("off")) {
             return;
         }
 

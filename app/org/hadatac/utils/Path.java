@@ -27,12 +27,22 @@ public class Path {
     }
     
     public String getPath() {
-        String path = ConfigProp.getPropertyValue(getConfigFilePath(), getField());
-        
-        if (CollectionUtil.isSandboxMode()) {
-            return path + Sandbox.SUFFIX;
-        }
-        
-        return path;
+        //String path = ConfigProp.getPropertyValue(getConfigFilePath(), getField());
+        String path = "";
+	if(getLabel().equals("UNPROC")) {
+		return ConfigProp.getPathUnproc();
+	}
+	else if(getLabel().equals("PROC")) { 
+		return ConfigProp.getPathProc();
+	}
+	else if(getLabel().equals("DOWNLOAD")) {
+		return ConfigProp.getPathDownload();
+	}
+	else if(getLabel().equals("WORKING")) {
+		return ConfigProp.getPathWorking();
+	}
+	else {
+        	return path;
+	}
     }
 }
