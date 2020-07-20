@@ -132,7 +132,7 @@ public class ConfigProp {
 		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working");
 	}
 	public static String getAuto() {
-		if(!System.getProperty("hadatac.autoccsv.auto").equals(ConfigFactory.load().getString("hadatac.autoccsv.auto"))){
+		if(System.getProperty("hadatac.autoccsv.auto") != null && !System.getProperty("hadatac.autoccsv.auto").equals(ConfigFactory.load().getString("hadatac.autoccsv.auto"))){
 			return System.getProperty("hadatac.autoccsv.auto");
 		}
 		return ConfigFactory.load().getString("hadatac.autoccsv.auto");
