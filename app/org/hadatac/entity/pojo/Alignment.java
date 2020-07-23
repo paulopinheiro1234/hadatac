@@ -136,7 +136,12 @@ public class Alignment {
         
 	    String mRole = m.getRole().replace(" ","");
 
-        String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
+	    String mKey = null;
+	    if (m.getCategoricalClassUri() != null && !m.getCategoricalClassUri().isEmpty()) {
+        	mKey =  mRole + m.getEntityUri() + m.getCategoricalClassUri() + mInRelationTo + mUnit + mAbstractTime;
+        } else {
+        	mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
+        }
 
         //System.out.println("Align-Debug: Measurement: " + mKey);
         //System.out.println("Align-Debug: Vector: " + alignAttrs); 
@@ -167,15 +172,29 @@ public class Alignment {
 
         //System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
 
-        Attribute attribute = attributeCache.get(m.getCharacteristicUris().get(0));
-        if (attribute == null || !attribute.getUri().equals(m.getCharacteristicUris().get(0))) {
-            attribute = Attribute.find(m.getCharacteristicUris().get(0));
-            if (attribute == null) {
-                System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
-                return null;
-            } else {
-                attributeCache.put(attribute.getUri(),attribute);
-            }
+        Attribute attribute = null;
+        if (m.getCategoricalClassUri() != null && !m.getCategoricalClassUri().isEmpty()) {
+	        attribute = attributeCache.get(m.getCategoricalClassUri());
+	        if (attribute == null || !attribute.getUri().equals(m.getCategoricalClassUri())) {
+	            attribute = Attribute.find(m.getCategoricalClassUri());
+	            if (attribute == null) {
+	                System.out.println("[ERROR] retrieving attribute " + m.getCategoricalClassUri());
+	                return null;
+	            } else {
+	                attributeCache.put(attribute.getUri(),attribute);
+	            }
+	        }
+        } else {
+	        attribute = attributeCache.get(m.getCharacteristicUris().get(0));
+	        if (attribute == null || !attribute.getUri().equals(m.getCharacteristicUris().get(0))) {
+	            attribute = Attribute.find(m.getCharacteristicUris().get(0));
+	            if (attribute == null) {
+	                System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
+	                return null;
+	            } else {
+	                attributeCache.put(attribute.getUri(),attribute);
+	            }
+	        }
         }
 
         //System.out.println("Align-Debug: new alignment attribute 2"); 

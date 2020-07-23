@@ -81,7 +81,8 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
         SolrQuery query = new SolrQuery();
         QueryResponse queryResponse = null;
         String strQuery = facetHandler.getTempSolrQuery(facet);
-
+        //System.out.println("Inside AttributeInstance.getTargetFacetsFromSolr: " + strQuery);
+        
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);
