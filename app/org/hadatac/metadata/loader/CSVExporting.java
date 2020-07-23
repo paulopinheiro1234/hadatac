@@ -5,12 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import org.hadatac.utils.Feedback;
-
+import org.hadatac.utils.ConfigProp;
 public class CSVExporting {
 	
 	public static final String KB_FORMAT = "text/turtle";
 	
-	public static final String TTL_DIR = "tmp/ttl/";
+	public static final String TTL_DIR = ConfigProp.getTmp() + "ttl/";
 
     public static String generateCSV(
     		int mode, String oper, CSVExporterContext csv_context, String csvName) {
