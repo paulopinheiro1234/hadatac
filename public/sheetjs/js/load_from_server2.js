@@ -429,12 +429,12 @@ function revertRow(){
 
 
 function indicateApproval(r,c,prop){
-  console.log("INDICATION");
+  //console.log("INDICATION");
   var imgs2={};
   //for(var prop in approvalList){
     //var r= approvalList[prop][0][1];
     //var c= approvalList[prop][0][2];
-    if(approvalList[r][c] != "" && prop == cdg.data[r][c]){
+    if( prop == cdg.data[r][c]){
       /*cdg.data[r][c]+=" + ";
       cdg.draw();*/
       //console.log(r);
@@ -484,12 +484,15 @@ function indicateApproval(r,c,prop){
 	        }
 	        // if we have an image already, draw it.
 	        i = imgs2[d];
-	        if (i.width !== 0) {
+	        if (i.width !== 0 && approvalList[r][c]!="") {
 	            i.targetHeight = e.cell.height/2;
 	            i.targetWidth = (e.cell.height * (i.width / i.height))/2;
 	
 	            e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
 	        }
+		else if(approvalList[r][c]=="") {
+		    e.ctx.clearRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);		   
+		}
       	}
       });
 

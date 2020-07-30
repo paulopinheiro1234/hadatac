@@ -196,15 +196,17 @@ cdg.addEventListener('contextmenu', function (e) {
   if (!e.cell) { return; }
 
 
-    var input = document.createElement("textarea");
-    input.style.width="100%";
-    if(approvalList[e.cell.rowIndex][e.cell.colIndex] != ""){
-	console.log(approvalList);
-	console.log(e.cell.rowIndex);
-	console.log(e.cell.columnIndex);
-	console.log(approvalList[e.cell.rowIndex][e.cell.columnIndex]);
+    //var input = document.createElement("textarea");
+    //input.style.width="100%";
+    console.log(typeof(approvalList[e.cell.rowIndex][e.cell.colIndex]));
+    if(approvalList[e.cell.rowIndex][e.cell.columnIndex] != ""){
+	//console.log(approvalList);
+	//console.log(e.cell.rowIndex);
+	//console.log(e.cell.columnIndex);
+	//ronsole.log(approvalList[e.cell.rowIndex][e.cell.columnIndex]);
+	//input.innerHTML=approvalList[e.cell.rowIndex][e.cell.columnIndex];
 	e.items.push({
-	  title: approvalList[e.cell.rowIndex][e.cell.columnIndex]
+	  title: "Approved: " + approvalList[e.cell.rowIndex][e.cell.columnIndex]
 	});
     }
     /*if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
@@ -264,11 +266,12 @@ cdg.addEventListener('contextmenu', function (e) {
      // }
 
 });
+var origVal;
 cdg.addEventListener('click', function (e) {
   returnToView();
   colNum=e.cell.columnIndex;
   rowNum=e.cell.rowIndex;
-
+  origVal = cdg.data[rowNum][colNum];
   textCell = e.cell;
 
   var colNum_str=colNum.toString();
@@ -282,8 +285,6 @@ cdg.addEventListener('click', function (e) {
   }
 
   cellEntry.value = cdg.data[rowNum][colNum];
-
-
 
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   var colval=cdg.schema[e.cell.columnIndex].title;
@@ -351,7 +352,10 @@ cdg.addEventListener('endedit',function(e){
   storeThisEdit(rowNum_str,colNum_str,e.value);
   var menuoptns=[];
   starRec(colval,rowval,menuoptns,isVirtual,copyOfL,copyOfR,rowNum,colNum);
-
+  if(approvalList[rowNum][colNum] != "" && origVal != cdg.data[rowNum][colNum]){
+        approvalList[rowNum][colNum] = "";
+	indicateApproval(rowNum,colNum,cdg.data[rowNum][colNum]);
+  }
 
 })
 
@@ -493,15 +497,63 @@ cdg.addEventListener('contextmenu', function (e) {
       click: function (ev) {
           var intendedRow=e.cell.rowIndex;
           cdg.insertRow([],intendedRow);
-
-      }
+	  var copyApproval = [];
+  	  for(var i=0; i<approvalList.length;i++){
+            if(i == intendedRow){
+	      var colHold = [];
+	      for(var j = 0; j<approvalList[i].length; j++){
+                colHold.push("");
+	      }
+              copyApproval[i] = colHold;
+            }
+            if(i < intendedRow){
+              copyApproval[i] = approvalList[i];
+            }
+            if(i >= intendedRow){
+              copyApproval[i+1] = approvalList[i];
+            }
+          }
+         approvalList = copyApproval;
+  	 //console.log(approvalList);
+  	 for(var i=intendedRow; i<approvalList.length; i++){
+           for(var j=0; j<approvalList[i].length; j++){
+	     if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
+               indicateApproval(i,j,cdg.data[i][j]);
+             }
+           }
+  	 }
+    }
   });
   e.items.push({
     title: 'Insert Row Below',
     click: function (ev) {
         var intendedRow=parseFloat(e.cell.rowIndex);
         cdg.insertRow([],intendedRow+1);
-
+	var copyApproval = [];
+	for(var i=0; i<approvalList.length;i++){
+          if(i == intendedRow+1){
+                var colHold = [];
+                for(var j = 0; j<approvalList[i].length; j++){
+                  colHold.push("");
+                }
+                copyApproval[i] = colHold;
+          }
+          if(i < intendedRow+1){
+                copyApproval[i] = approvalList[i];
+          }
+          if(i >= intendedRow+1){
+                copyApproval[i+1] = approvalList[i]
+          }
+        }
+        approvalList = copyApproval;
+	console.log(approvalList);
+         for(var i=intendedRow+1; i<approvalList.length; i++){
+           for(var j=0; j<approvalList[i].length; j++){
+             if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
+               indicateApproval(i,j,cdg.data[i][j]);
+             }
+           }
+         }
     }
   });
   e.items.push({
@@ -530,16 +582,24 @@ cdg.addEventListener('contextmenu', function (e) {
             }
           });
         }
-
-
-  storeRow.push(temp);
-  var intendedRow=parseFloat(e.cell.rowIndex);
-  cdg.deleteRow(intendedRow);
-
+      storeRow.push(temp);
+      var intendedRow=parseFloat(e.cell.rowIndex);
+      cdg.deleteRow(intendedRow);
+      storeApprovalRow=approvalList[intendedRow];
+      approvalList[intendedRow] = [];
+      for(var i=0; i<approvalList[0].length; i++){
+        approvalList[intendedRow].push("");
+      }
+      for(var i=0; i<approvalList[intendedRow].length; i++){
+        indicateApproval(intendedRow,i,cdg.data[intendedRow][i]);
+      }
+      approvalList.splice(intendedRow,1);
+      //console.log(approvalList);
     }
   });
+  if(approvalList[e.cell.rowIndex][e.cell.columnIndex]==""){
     e.items.push({
-      title: 'Accept Value as Optimal Value',
+      title: 'Approve',
       click: function (ev) {
         console.log(approvalList);
         console.log(e.cell.value);
@@ -561,20 +621,60 @@ cdg.addEventListener('contextmenu', function (e) {
         });
       }
     });
+   }
 });
 
 /* functions for context menu */
 function insertRowAbove(){
   var intendedRow=parseFloat(rowNum);
   cdg.insertRow([],intendedRow); // The first argument splices a js array into the csv data, so to insert a blank row insert an empty array
+  copyApproval = [];
+  for(var i=0; i<approvalList.length;i++){
+  	if(i == intendedRow){
+  		copyApproval[i] = []
+  	}
+  	if(i < intendedRow){
+  		copyApproval[i] = approvalList[i];
+  	}
+  	if(i >= intendedRow){
+  		copyApproval[i+1] = approvalList[i]
+  	}
+  }
+  approvalList = copyApproval;
+  console.log(approvalList);
+  for(var i=0; i<approvalList.length; i++){
+        for(var j=0; j<approvalList[i].length; j++){
+          indicateApproval(i,j,cdg.data[i][j]);
+        }
+  }
 }
 
 function insertRowBelow(){
   var intendedRow=parseFloat(rowNum);
   cdg.insertRow([],intendedRow+1); // The first argument splices a js array into the csv data, so to insert a blank row insert an empty array
+  copyApproval = [];
+  for(var i=0; i<approvalList.length;i++){
+  	if(i == intendedRow+1){
+  		copyApproval[i] = []
+  	}
+  	if(i < intendedRow+1){
+  		copyApproval[i] = approvalList[i];
+  	}
+  	if(i >= intendedRow+1){
+  		copyApproval[i+1] = approvalList[i]
+  	}
+  }
+  approvalList = copyApproval;
+  console.log(approvalList);
+  for(var i=0; i<approvalList.length; i++){
+	for(var j=0; j<approvalList[i].length; j++){
+	  indicateApproval(i,j,cdg.data[i][j]);
+	}
+  }
 }
 
 var storeRow=[];
+var storeApprovalRow=[];
 function removeRow(){
   // alert("Warning! You are about to delete a row.");
   var temp=[];
@@ -604,8 +704,13 @@ function removeRow(){
   storeRow.push(temp);
   var intendedRow=parseFloat(rowNum);
   cdg.deleteRow(intendedRow);
-
-
+  storeApprovalRow=approvalList[intendedRow];
+  approvalList[intendedRow] = [];
+  for(var i=0; i<approvalList[intendedRow].length; i++){
+    indicateApproval(intendedRow,i,cdg.data[intendedRow][i]);
+  }
+  console.log(storeApprovalRow);
+  approvalList.splice(intendedRow,1);
 }
 
 //resize
