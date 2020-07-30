@@ -487,11 +487,17 @@ function indicateApproval(r,c,prop){
 	        if (i.width !== 0 && approvalList[r][c]!="") {
 	            i.targetHeight = e.cell.height/2;
 	            i.targetWidth = (e.cell.height * (i.width / i.height))/2;
-	
+		    //if(approvalList[r][c]==""){
+			//e.ctx.globalCompositeOperation = "destination-out";
+		    //}
 	            e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
 	        }
 		else if(approvalList[r][c]=="") {
-		    e.ctx.clearRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);		   
+		     // e.ctx.globalCompositeOperation = "xor";
+		     //e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
+		    e.ctx.fillStyle = "rgba(0, 0, 0, 0)";
+		    e.ctx.fillRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
+		    //e.ctx.clearRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);		   
 		}
       	}
       });
