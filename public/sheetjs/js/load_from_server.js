@@ -179,6 +179,10 @@ cellEntry.value = "";
 //event listeners to edit and navigate the datagrid cells
 cellEntry.addEventListener('input', function (evt){
    if(textCell != null){
+      if(cdg.data[textCell.rowIndex][textCell.columnIndex] != cellEntry.value){
+	approvalList[textCell.rowIndex][textCell.columnIndex] = "";
+	indicateApproval(textCell.rowIndex, textCell.columnIndex, cellEntry.value);
+      }
       cdg.data[textCell.rowIndex][textCell.columnIndex] = cellEntry.value;
 
    }
@@ -198,7 +202,7 @@ cdg.addEventListener('contextmenu', function (e) {
 
     //var input = document.createElement("textarea");
     //input.style.width="100%";
-    console.log(typeof(approvalList[e.cell.rowIndex][e.cell.colIndex]));
+    //console.log(typeof(approvalList[e.cell.rowIndex][e.cell.colIndex]));
     if(approvalList[e.cell.rowIndex][e.cell.columnIndex] != ""){
 	//console.log(approvalList);
 	//console.log(e.cell.rowIndex);
@@ -450,6 +454,7 @@ function chooseItem(data) {
   console.log(data.value[1]);
   var chosen=data.value.split(",")
   var prefixedIRI = getUri(chosen[1]);
+  var hold = cdg.data[rowNum][colNum];
   if(prefixedIRI===""){
     if(!chosen[1].includes("#")){
       var replacement=chosen[1].split("/").pop();
@@ -466,7 +471,11 @@ function chooseItem(data) {
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   cdg.draw();
-
+  
+  if(hold != cdg.data[rowNum][colNum]){
+    approvalList[rowNum][colNum] = "";
+    indicateApproval(rowNum, colNum, cdg.data[rowNum][colNum]);
+  }
 
 
   /*if(ret in approvalList){
