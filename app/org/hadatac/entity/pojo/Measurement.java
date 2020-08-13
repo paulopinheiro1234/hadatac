@@ -42,6 +42,7 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.Feedback;
 
 
 public class Measurement extends HADatAcThing implements Runnable {
@@ -1130,12 +1131,15 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {        
+        DataFile dataFile = null;
+        boolean fileCreated = false;
+
+        // Initiate Alignment
+        Alignment alignment = new Alignment();
+
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
-
-            // Initiate Alignment and Results
-            Alignment alignment = new Alignment();
 
             // Initiate Results
             //     HashMap<base object, Map<measurement's key, value>, where
@@ -1149,7 +1153,6 @@ public class Measurement extends HADatAcThing implements Runnable {
             int prev_ratio = 0;
             int total = measurements.size();
             //System.out.println("Align-Debug: Measurement size is " + total);
-            DataFile dataFile = null;
             for (Measurement m : measurements) {
                 StudyObject referenceObj = null;
 
@@ -1325,13 +1328,6 @@ public class Measurement extends HADatAcThing implements Runnable {
             dataFile = DataFile.findById(fileId);
             if (dataFile != null) {
 
-            	// Write harmonized code book
-            	if (categoricalOption.equals(WITH_CODE_BOOK)) {
-            		outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
-            	}
-
-            	outputProvenance(alignment, file, dataFile.getOwnerEmail());
-            	
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
                     return;
@@ -1340,14 +1336,30 @@ public class Measurement extends HADatAcThing implements Runnable {
                 dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
                 dataFile.setStatus(DataFile.CREATED);
                 dataFile.save();
+                fileCreated = true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        alignment.getCodeBook();
+        if (dataFile != null && fileCreated) {
+        	// Write harmonized code book
+        	if (categoricalOption.equals(WITH_CODE_BOOK)) {
+        		fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
+        	}
+        }
+
+        if (dataFile != null && fileCreated) {
+        	// Write DOI list of sources
+        	outputProvenance(alignment, file, dataFile.getOwnerEmail());
+        }    	
+
     }
 
-    public static void outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
-	try {
+    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
+      boolean fileCreated = false; 
+	  try {
 	    //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
 	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
 	    Date date = new Date();
@@ -1380,34 +1392,58 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    			pretty = c0 + pretty.substring(1);
 	    		}
 	    	}
-	    	CodeBookEntry cbe = new CodeBookEntry(list.get(0), pretty, entry.getKey());
+    		String codeStr = list.get(0).trim();
+    		if (codeStr.length() > 7) {
+    			codeStr = codeStr.substring(0,7);
+    		}
+	    	CodeBookEntry cbe = new CodeBookEntry(codeStr, pretty, entry.getKey());
 	    	codeBook.add(cbe);
 	    }
-        codeBook.sort(new Comparator<CodeBookEntry>() {
-            @Override
-            public int compare(CodeBookEntry cbe1, CodeBookEntry cbe2) {
-            	int v1 = Integer.parseInt(cbe1.getCode());
-            	int v2 = Integer.parseInt(cbe2.getCode());
-                if(v1 > v2) {
-                    return 1;
-                }else if(v1 < v2) {
-                   return -1;
-                }
-                return 0;            
-            }
-        });
-	    for (CodeBookEntry cbe : codeBook) {
-	    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
+	    if (codeBook != null && codeBook.size() > 0) {
+		    codeBook.sort(new Comparator<CodeBookEntry>() {
+	            @Override
+	            public int compare(CodeBookEntry cbe1, CodeBookEntry cbe2) {
+	            	String v1Str = null;
+	            	String v2Str = null;
+	            	try {
+	            		v1Str = cbe1.getCode().trim();
+	            		v2Str = cbe2.getCode().trim();
+	            		if (v1Str.length() <= 7 && v2Str.length() <= 7) {
+	            			int v1 = Integer.parseInt(v1Str);
+	            			int v2 = Integer.parseInt(v2Str);
+	            			if(v1 > v2) {
+	            				return 1;
+	            			}else if(v1 < v2) {
+	            				return -1;
+	            			}
+		            		if (v1Str.length() <= 7) { 
+		            			return 1;
+		            		} else {
+		            			return -1;
+		            		}
+	            		} 
+	                    return 0;            
+	            	} catch (Exception e) {
+	            		dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "[ERROR] Not possible to convert one or both of following codes into integers: [" + v1Str + "] and [" + v2Str + "]"));
+	            	}
+	            	return 0;
+	            }
+	        });
+		    for (CodeBookEntry cbe : codeBook) {
+		    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
+		    }
 	    }
 	    	
     	dataFile.setCompletionPercentage(100);
 	    dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 	    dataFile.setStatus(DataFile.CREATED);
 	    dataFile.save();
+	    fileCreated = true;
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+	  	return fileCreated;
     }
 
     public static void outputProvenance(Alignment alignment, File file, String ownerEmail) {        
@@ -1443,6 +1479,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSVByTimeAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption, String timeResolution) {        
+        DataFile dataFile = null;
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
@@ -1462,7 +1499,6 @@ public class Measurement extends HADatAcThing implements Runnable {
             int total = measurements.size();
             List<String> tss = new ArrayList<String>();
             //System.out.println("Align-Debug: Measurement size is " + total);
-            DataFile dataFile = null;
             for (Measurement m : measurements) {
                 String referenceTS = null;
                 StudyObject referenceObj = null;

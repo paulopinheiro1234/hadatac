@@ -333,6 +333,7 @@ public abstract class HADatAcThing implements Facetable {
                     if (field.isAnnotationPresent(PropertyField.class)) {
                         PropertyField propertyField = field.getAnnotation(PropertyField.class);
                         String propertyUri = propertyField.uri();
+                        System.out.println("inside HADatAcThing.saveToTripleStore(): propertyUri=" + propertyField.uri());
 
                         if (field.getType().equals(String.class)) {
                             String value = (String)field.get(this);
