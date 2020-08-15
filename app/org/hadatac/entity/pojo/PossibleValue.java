@@ -165,7 +165,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
     public static List<PossibleValue> findBySchema(String schemaUri) {    	
 
-    	System.out.println("SchemaUri: " + schemaUri);
+    	//System.out.println("PossibleValue.findBySchema: SchemaUri=" + schemaUri);
     	
     	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
@@ -197,7 +197,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
             }
         } catch (Exception e) {
-            System.out.println("PossibleValue.findBySchema() Error: " + e.getMessage());
+            System.out.println("[ERROR] PossibleValue.findBySchema(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -206,14 +206,15 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
     public static List<PossibleValue> findByVariable(String variableUri) {    	
 
-    	System.out.println("      VariableUri: " + variableUri);
+    	//System.out.println("      VariableUri: " + variableUri);
     	
     	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?uri WHERE { \n"
                 + " ?uri a hasco:PossibleValue . \n"
                 + " ?uri hasco:isPossibleValueOf <" + variableUri + "> .  \n"
-                + " }";
+                + " } \n "
+                + " ORDER BY ?uri ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -234,7 +235,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
             }
         } catch (Exception e) {
-            System.out.println("PossibleValue.findByVariable() Error: " + e.getMessage());
+            System.out.println("[ERROR] PossibleValue.findByVariable(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -313,7 +314,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                 }
             }
         } catch (Exception e) {
-            System.out.println("PossibleValue.findPossibleValues() Error: " + e.getMessage());
+            System.out.println("[ERROR] PossibleValue.findPossibleValues(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -400,7 +401,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
         	return false;
         }
 
-        System.out.println("Deleted hasco:hasClass property of <" + getUri() + "> from triple store");
+        //System.out.println("Deleted hasco:hasClass property of <" + getUri() + "> from triple store");
     	
         return true;
         
@@ -442,7 +443,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
             return false;
         }
 
-        System.out.println("Added hasco:hasClass property of <" + getUri() + "> from triple store");
+        //System.out.println("Added hasco:hasClass property of <" + getUri() + "> from triple store");
     	
 
         return true;

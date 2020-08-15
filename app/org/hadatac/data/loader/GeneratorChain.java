@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.hadatac.entity.pojo.DataFile;
 
-
 public class GeneratorChain {
 
     private List<BaseGenerator> chain = new ArrayList<BaseGenerator>();
     private DataFile dataFile = null;
+    private DataFile codebookFile = null;
     private boolean bValid = true;
-    
+    private boolean pv = false;
+    private String sddName = "";
     private String studyUri = "";
     private String namedGraphUri = "";
 
@@ -39,6 +40,14 @@ public class GeneratorChain {
         this.dataFile = dataFile;
     }
 
+    public DataFile getCodebookFile() {
+        return codebookFile;
+    }
+
+    public void setCodebookFile(DataFile codebookFile) {
+        this.codebookFile = codebookFile;
+    }
+
     public boolean isValid() {
         return bValid;
     }
@@ -47,6 +56,22 @@ public class GeneratorChain {
         bValid = false;
     }
 
+    public boolean getPV() {
+        return pv;
+    }
+
+    public void setPV(boolean pv) {
+        this.pv = pv;
+    }
+
+    public String getSddName() {
+        return sddName;
+    }
+
+    public void setSddName(String sddName) {
+        this.sddName = sddName;
+    }
+    
     public void addGenerator(BaseGenerator generator) {
         chain.add(generator);
     }
@@ -60,14 +85,20 @@ public class GeneratorChain {
             return false;
         }
 
+        /*int i = 0;
         for (BaseGenerator generator : chain) {
+        	System.out.println("GeneratorChain: Position " + i++ + " has generator of type [" + generator.getClass(). getSimpleName() + "]");
+        }*/
+        
+        for (BaseGenerator generator : chain) {
+        	//System.out.println("GeneratorChain: Executing generator of type [" + generator.getClass(). getSimpleName() + "]");
             try {
                 generator.preprocess();
                 generator.createRows();
                 generator.createObjects();
                 generator.postprocess();
             } catch (Exception e) {
-                System.out.println(generator.getErrorMsg(e));
+                System.out.println("[ERROR] GenerationChain: " + generator.getErrorMsg(e));
                 e.printStackTrace();
                 
                 generator.getLogger().printException(generator.getErrorMsg(e));

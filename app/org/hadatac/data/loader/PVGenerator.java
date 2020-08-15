@@ -5,6 +5,7 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.PossibleValue;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.console.controllers.annotator.AnnotationLogger;
 
 import java.lang.String;
 import java.text.Normalizer;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Base64;
 import java.math.BigInteger;  
 import java.nio.charset.StandardCharsets; 
 import java.security.MessageDigest;  
@@ -26,6 +29,7 @@ public class PVGenerator extends BaseGenerator {
 	Map<String, Map<String, String>> pvMap = new HashMap<String, Map<String, String>>();
 	Map<String, String> mapAttrObj;
 	Map<String, String> codeMappings;
+    protected AnnotationLogger logger = null;
 
 	public PVGenerator(DataFile dataFile, String SDDName,  
 			Map<String, String> mapAttrObj, Map<String, String> codeMappings) {
@@ -33,6 +37,7 @@ public class PVGenerator extends BaseGenerator {
 		this.SDDName = SDDName;
 		this.mapAttrObj = mapAttrObj;
 		this.codeMappings = codeMappings;
+		this.logger = dataFile.getLogger();
 	}
 	
 	//Column	Code	Label	Class	Resource
@@ -142,50 +147,24 @@ public class PVGenerator extends BaseGenerator {
 	public String getErrorMsg(Exception e) {
 		return "Error in PVGenerator: " + e.getMessage();
 	}
-
-	  
-	public static byte[] getSHA(String input) throws NoSuchAlgorithmException {  
-        // Static getInstance method is called with hashing SHA  
-        MessageDigest md = MessageDigest.getInstance("SHA-256");  
-  
-        // digest() method called  
-        // to calculate message digest of an input  
-        // and return array of byte 
-        return md.digest(input.getBytes(StandardCharsets.UTF_8));  
-	} 
-	    
-    public static String toHexString(byte[] hash) { 
-        // Convert byte array into signum representation  
-        BigInteger number = new BigInteger(1, hash);  
-  
-        // Convert message digest into hex value  
-        StringBuilder hexString = new StringBuilder(number.toString(16));  
-  
-        // Pad with leading zeros 
-        while (hexString.length() < 32) {  
-            hexString.insert(0, '0');  
-        }  
-  
-        return hexString.toString();  
-	} 
-	  	
-    private String generateDCTerms(String variable, String code) {  
+ 	 
+    public static String hashWith256(String textToHash) {
+    	String encoded = null;
+    	try {
+    		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+    		byte hashBytes[] = messageDigest.digest(textToHash.getBytes(StandardCharsets.UTF_8));
+    		BigInteger noHash = new BigInteger(1, hashBytes);
+    		encoded = noHash.toString(16);
+    	} catch (Exception e) {
+    	}
+        return encoded;
+    }
+    
+    private static String generateDCTerms(String variable, String code) {  
     	return variable + "||||" + code;
     }
     
-    /*
-    <http://purl.org/twc/HHEAR_00525> a owl:Class ;
-        dcterms:identifier "Pvit_2to2||||1" ;
-        rdfs:subClassOf <http://purl.obolibrary.org/obo/MAXO_0001018> .
-
-    <http://purl.org/twc/ctxid/cb10292fc67baf58fe96bf5b3d8ae2249d4c978705991c46f1879018c62313729d4> a owl:Class ;
-        rdfs:label "No Gestational Diabetes" ;
-        dcterms:identifier "GDM||||0" ;
-        rdfs:subClassOf sio:SIO_010056 ;
-        skos:notation 376209662259445586110671426195360743491331431208160433392413756876228049585514964 .
-    */    
-        
-    private void generateOtherOther(String superUri, PossibleValue pv) {
+    private static void generateOtherOther(String superUri, PossibleValue pv) {
     	if (pv.getHasClass() == null || pv.getHasClass().isEmpty()) {
     		return;
     	}
@@ -197,8 +176,8 @@ public class PVGenerator extends BaseGenerator {
     	}
     }
 
-    private void generateOther(String uri, String harmonizedCode, PossibleValue pv) {
-    	if (pv.getHasClass() == null || pv.getHasClass().isEmpty()) {
+    private static void generateOther(String uri, String harmonizedCode, PossibleValue pv) {
+    	if (pv.getHasOtherFor() == null || pv.getHasOtherFor().isEmpty()) {
     		return;
     	}
     	Attribute attr = new Attribute();
@@ -211,51 +190,59 @@ public class PVGenerator extends BaseGenerator {
     	
     }
     
-	@Override
-    public void postprocess() throws Exception {
-		System.out.println("Processing additional knowledge");
-		List<PossibleValue> codes = PossibleValue.findBySchema(URIUtils.replacePrefixEx(kbPrefix + "DAS-" + SDDName));
+    public static void generateOthers(DataFile dataFile, String sddUri, String kbPrefix) {
+		AnnotationLogger logger = dataFile.getLogger();
+		logger.println("PVPostGenerator: Processing additional knowledge for <" + sddUri + ">");
+		List<PossibleValue> codes = PossibleValue.findBySchema(sddUri);
+		List<String> subs = new ArrayList<String>();
+		logger.println("PVPostGenerator: Retrieved codes [" + codes.size() + "]");
 		for (PossibleValue code : codes) {
 			if (code.getHasOtherFor() != null && !code.getHasOtherFor().isEmpty()) {
-				String shaString = "Super="; 
 				String superDCTerm = generateDCTerms(code.getHasVariable(), code.getHasCode());
-				System.out.println("SuperClass: [" + code.getHasOtherFor() + "]   Variable: [" + code.getHasDASAUri() + "]");
-				shaString = shaString + code.getHasOtherFor() + ":Sub=";
+				subs.clear();
+				logger.println("SuperClass: [" + code.getHasOtherFor() + "]   Variable: [" + code.getHasDASAUri() + "]");
 				List<PossibleValue> variableCodes = PossibleValue.findByVariable(code.getHasDASAUri());
 				for (PossibleValue vc : variableCodes) {
-					if (vc.getHasClass() != null && !vc.getHasClass().isEmpty()) {
-						System.out.println("      Variable: [" + code.getHasVariable() + "]    Class: [" + vc.getHasClass() + "]");
-						shaString = shaString + vc.getHasClass();
+					if (vc.getHasClass() != null && !vc.getHasClass().isEmpty() && (vc.getHasOtherFor() == null || vc.getHasOtherFor().isEmpty() )) {
+						//System.out.println("      Variable: [" + code.getHasVariable() + "]    Class: [" + vc.getHasClass() + "]");
+						if (!subs.contains(vc.getHasClass())) {
+							subs.add(vc.getHasClass());
+						}
 						
 						// update the class inside vc as a subclass of super
 						generateOtherOther(code.getHasOtherFor(),vc);
-						System.out.println("        - added " + vc.getHasClass() + " as a subclass of " + code.getHasOtherFor());
+						logger.println("        - added " + vc.getHasClass() + " as a subclass of " + code.getHasOtherFor());
 					}
 				}
 		        try { 
-		        	BigInteger intSha = new BigInteger(1, getSHA(shaString));
-		        	String shaHash = intSha.toString();
-					String harmonizedCode = shaHash.substring(0,7);
-					String newUri = URIUtils.replacePrefixEx(kbPrefix + toHexString(getSHA(shaHash)));
-		            System.out.println("      [" + shaString + "] : Code: [" + shaHash + "]");  
-		            System.out.println("      [" + shaString + "] : harmonizedCode [" + harmonizedCode + "]");  
-		            System.out.println("      [" + shaString + "] : new uri [" + newUri + "]");  
+		        	Collections.sort(subs);
+					String shaString = "Super=" + code.getHasOtherFor() + "|Sub=";
+		        	for (String sub : subs) {
+		        		shaString = shaString + sub;
+		        	}
+		        	String shaHash = hashWith256(shaString);
+					String harmonizedCodeHex = shaHash.substring(0,5);
+					String harmonizedCode = String.valueOf(Integer.parseInt(harmonizedCodeHex,16)); 
+					String newUri = URIUtils.replacePrefixEx(kbPrefix + shaHash);
+		            //System.out.println("      key:           [" + shaString + "]");  
+		            //System.out.println("      harmonizedCode [" + harmonizedCode + "]");  
+		            //System.out.println("      new uri        [" + newUri + "]");  
 		            
 		            // generate the 'other' class
 		            generateOther(newUri, harmonizedCode, code);
-					System.out.println("        - created 'other' class " + newUri + " as a subclass of " + code.getHasOtherFor());
+					logger.println("        - created 'other' class " + newUri + " as a subclass of " + code.getHasOtherFor());
 		            
 		            // associate the new 'other' class to the codebook element for the class
 		            code.setHasClass(newUri);
 		            code.saveHasClass();
 		        } 
 		        // For specifying wrong message digest algorithms  
-		        catch (NoSuchAlgorithmException e) {  
-		            System.out.println("Exception thrown for incorrect algorithm: " + e);  
+		        catch (Exception e) {  
+		            System.out.println("[ERROR] Generating sha-256: " + e);  
 		        }  
 			}
 		}
-		System.out.println("Additional knowledge derived from code book");
+		//System.out.println("PVPostGenerator: Additional knowledge derived from code book");
 	}
- 
+	
 }

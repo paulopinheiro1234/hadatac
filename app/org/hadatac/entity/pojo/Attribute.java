@@ -256,7 +256,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         	return false;
         }
 
-        System.out.println("Deleted <" + getUri() + "> from triple store");
+        //System.out.println("Deleted <" + getUri() + "> from triple store");
     	
         return true;
         
@@ -310,7 +310,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
             return false;
         }
 
-        System.out.println("Added <" + getUri() + "> from triple store");
+        //System.out.println("Added <" + getUri() + "> from triple store");
     	
 
         return true;

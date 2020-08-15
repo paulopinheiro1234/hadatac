@@ -129,7 +129,7 @@ public class Alignment {
         } 
 
         if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
-            System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
+            //System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
         	STR da = STR.findByUri(m.getAcquisitionUri());
         	dataAcquisitions.put(m.getAcquisitionUri(), da);
         }
@@ -199,19 +199,22 @@ public class Alignment {
 
         //System.out.println("Align-Debug: new alignment attribute 2"); 
 
+        /*
         if (!mInRelationTo.equals("")) {
             System.out.println("Adding the following inRelationTo " + mInRelationTo);
-        }
+        }*/
 
         AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attribute, irt); 
 
+        /*
         if (!mUnit.equals("")) {
             System.out.println("Adding the following unit " + mUnit);
-        }
+        }*/
 
+        /*
         if (!mAbstractTime.equals("")) {
             System.out.println("Adding the following time " + mAbstractTime);
-        }
+        }*/
 
         newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
         //System.out.println("Align-Debug: new alignment attribute 3"); 
@@ -303,12 +306,12 @@ public class Alignment {
     	if (dataAcquisitions.size() == 0) {
     		return resp;
     	}
-        System.out.println("getDOI(): da size is " + dataAcquisitions.size());
+        //System.out.println("getDOI(): da size is " + dataAcquisitions.size());
     	for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
             org.hadatac.entity.pojo.STR da = entry.getValue();
-            System.out.println("getDOI(): da is " + da.getUri());
+            //System.out.println("getDOI(): da is " + da.getUri());
             for (String doi : da.getDOIs()) { 
-                System.out.println("getDOI(): doi is " + doi);
+                //System.out.println("getDOI(): doi is " + doi);
             	resp.add(doi);
             }
     	}
