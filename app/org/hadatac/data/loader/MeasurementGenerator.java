@@ -67,6 +67,9 @@ public class MeasurementGenerator extends BaseGenerator {
     private Map<String,ObjectCollection> matchingSOCs = null;
 
     private String dasoUnitUri = "";
+    
+    private int rowErrors = 0;
+    private int rowErrorsLimit = 20;
 
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
     private DASOInstanceGenerator dasoiGen = null; 
@@ -113,6 +116,7 @@ public class MeasurementGenerator extends BaseGenerator {
     		dasoUnitUri = urisByLabels.get(schema.getUnitLabel());
     		groupBySocAndId = new HashMap<String,SOCGroup>();
         }
+        rowErrors = 0;
     
     }
 
@@ -235,6 +239,19 @@ public class MeasurementGenerator extends BaseGenerator {
             }
             objList = dasoiGen.generateRowInstances(id);
             groundObj = dasoiGen.retrieveGroundObject(id);
+            
+            if (groundObj == null) {
+                if (rowErrors < rowErrorsLimit) {
+                    logger.addLine(Feedback.println(Feedback.WEB, String.format(
+                    	"[ERROR] MeasurementGenerator: Could not retrieve Study Object for ID=[%s]",id)));
+                	rowErrors++;
+                	if (rowErrors == rowErrorsLimit) {
+                        logger.addLine(Feedback.println(Feedback.WEB, String.format(
+                        	"[ERROR] MeasurementGenerator: The reporting of ingestion issues has been halted. The limit of %s faulty rows has been exceeded.",rowErrorsLimit)));
+
+                	}
+                }
+            }
             
             // socUri and objUri for row scope is defined later under measurement processing
         }
