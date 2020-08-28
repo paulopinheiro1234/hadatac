@@ -1020,7 +1020,7 @@ function getSuggestion(){
          console.log(data);
          spinnerStatus.stop();
          imageStatus.style.visibility = 'visible';
-         imageStatus.src = imgPath + 'fail.png'
+         imageStatus.src = imgPath + 'fail.png';
 
          if(err == 400){
             alert("Error: SDDGen is " + data['Bad Request'] + ': ' + data['Miss']);
@@ -1042,12 +1042,50 @@ function getSuggestion(){
         dataType: 'json',
         success : function(getSDDGenRequest) {
            sddgenAdress = getSDDGenRequest;
-           getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+	   $.ajax({
+	      type : 'POST',
+	      url : sddgenAdress + '/ping',
+	      dataType : 'json',
+	      timeout : 20000,
+	      success : function(ping) {
+		console.log(ping);
+	        if(ping){
+		  getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+		}
+	      },
+	      error : function() {
+		spinnerStatus.stop();
+		imageStatus.src = imgPath + 'fail.png';
+                imageStatus.style.visibility = 'visible';
+                //imageStatus.src = imgPath + 'fail.png';
+	        alert("Error: SDDGen not running");
+	      }
+	   }); 
+           //getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
         }
       });
    }
    else{
-      getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+      $.ajax({
+         type : 'POST',
+         url : sddgenAdress + '/ping',
+         dataType : 'json',
+	 timeout : 20000,
+         success : function(ping) {
+	   console.log(ping);
+           if(ping){
+             getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+           }
+         },
+         error : function() {
+           spinnerStatus.stop();
+	   imageStatus.src = imgPath + 'fail.png';
+           imageStatus.style.visibility = 'visible';
+           //imageStatus.src = imgPath + 'fail.png';
+           alert("Error: SDDGen not running");
+         }
+      });
+      //getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
    }
    checkRecs(globalL, globalR, 1);
 }
