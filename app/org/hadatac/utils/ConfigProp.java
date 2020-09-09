@@ -189,6 +189,15 @@ public class ConfigProp {
         return ConfigFactory.load().getString("hadatac.test.user_name");
     }
 
+    public static boolean getSignUpBool() {
+        if(ConfigFactory.load().getString("hadatac.test.sign_up").toLowerCase().equals("true")){
+           return true;
+        }
+        else{
+           return false;
+        }
+    }
+
     public static String getTestUserPass() {
         return ConfigFactory.load().getString("hadatac.test.user_password");
     }
