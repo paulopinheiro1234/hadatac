@@ -16,6 +16,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 
@@ -50,7 +51,9 @@ public class SeleniumTest {
 
       // Setup WebDriver
       System.setProperty("webdriver.chrome.driver", webDriverPath);
-      driver = new ChromeDriver();
+      ChromeOptions options = new ChromeOptions();
+      options.addArguments("--no-sandbox");
+      driver = new ChromeDriver(options);
       driver.manage().window().maximize();
 
       // Start HADatAc
@@ -99,7 +102,7 @@ public class SeleniumTest {
    @Test
    public void loginTest() {
       System.out.println("Running SeleniumTest.loginTest()...");
-      
+
       server = Helpers.testServer(9000);
       Helpers.running(server, () ->
       // Code block run once server is started
