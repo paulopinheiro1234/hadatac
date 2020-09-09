@@ -53,6 +53,10 @@ public class SeleniumTest {
       System.setProperty("webdriver.chrome.driver", webDriverPath);
       ChromeOptions options = new ChromeOptions();
       options.addArguments("--no-sandbox");
+
+      // This lines controls if we see the web browser or not, this needs to be diabled for Jenkins, but you might want to disable it for your own tests
+      options.addArguments("--headless"); 
+
       driver = new ChromeDriver(options);
       driver.manage().window().maximize();
 
