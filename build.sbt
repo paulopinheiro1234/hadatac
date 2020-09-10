@@ -17,7 +17,7 @@ val appDependencies = Seq(
   javaJdbc,
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.easytesting" % "fest-assert" % "1.4" % "test",
-  "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
+  // "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
   //"com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
   //"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",
   //"com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.2",

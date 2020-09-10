@@ -34,9 +34,9 @@ public class SeleniumTest {
 
    @Before
    public void setup() throws Exception {
-      System.out.println("Setting up SeleniumTest...");
+      System.out.println("Setting up SeleniumTest..."); // System.err wasw not showing up in Jenkins console so System.out is prefered
 
-      // Test user configuration
+      // Ensure test user configurations are setup
       if(keyUser.equals("")){
          throw new IOException("Missing test username, please set it in hadatac.config");
       }
@@ -54,8 +54,10 @@ public class SeleniumTest {
       ChromeOptions options = new ChromeOptions();
       options.addArguments("--no-sandbox");
 
-      // This lines controls if we see the web browser or not, this needs to be diabled for Jenkins, but you might want to disable it for your own tests
-      options.addArguments("--headless"); 
+      // This lines controls if we see the web browser or not.
+      // This needs to be here for Jenkins!!
+      // but you might want to remove it while developing tests so you can see the interactions
+      options.addArguments("--headless");
 
       driver = new ChromeDriver(options);
       driver.manage().window().maximize();
@@ -69,22 +71,26 @@ public class SeleniumTest {
 
          server = Helpers.testServer(9000);
          Helpers.running(server, () ->
-         // Code block run once server is started
+         // Code block runs once server is started
          {
             try{
+               // Goto the sign up webpage
                driver.get("http://localhost:9000/hadatac/signup");
                Thread.sleep(waitTime);
 
-               // Set Credentials
+               // Set Name
                WebElement element = driver.findElement(By.name("name"));
                element.sendKeys(name);
 
+               // Set Email
                element = driver.findElement(By.name("email"));
                element.sendKeys(keyUser);
 
+               // Set Password
                element = driver.findElement(By.name("password"));
                element.sendKeys(keyPassword);
 
+               // Set password again and submit
                element = driver.findElement(By.name("repeatPassword"));
                element.sendKeys(keyPassword);
                element.sendKeys(Keys.RETURN);
@@ -112,22 +118,22 @@ public class SeleniumTest {
       // Code block run once server is started
       {
          try{
+            // Goto the login page
             driver.get("http://localhost:9000/hadatac/login");
             Thread.sleep(waitTime);
 
-            //Entering user to log.
-            //WebElement is a class that it allows instantiate objects to execute some action using a HTML element.
+            // Entering user email
+            // WebElement is a class that it allows instantiate objects to execute some action using a HTML element.
             WebElement login = driver.findElement(By.name("email"));
             login.sendKeys(keyUser);
 
-            //String keyPassword = "\t"+"pwd";
-            //Entering password to log; \t separate and tabs the field
+            // Entering password
             WebElement password = driver.findElement(By.name("password"));
             password.sendKeys(keyPassword);
-
-            //The parameter Keys.RETURN is used.
-            driver.findElement(By.name("password")).sendKeys(Keys.RETURN);
+            password.sendKeys(Keys.RETURN);
             Thread.sleep(waitTime);
+
+            // Ensure the web page contains the expected headers
             WebElement header = driver.findElement(By.xpath("//h4[contains(text(), 'Data/Metadata Search')]"));
             assertTrue("Page title differs from expected", header != null);
 
