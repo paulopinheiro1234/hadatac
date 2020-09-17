@@ -69,15 +69,15 @@ public class ConfigProp {
 	public static String getKbPrefix() {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix") + "-kb:";
 	}
-	
+
 	public static String getTmp() {
 		return ConfigFactory.load().getString("hadatac.autoccsv.path_tmp");
 	}
-	
+
 	public static String getLogs() {
 		return ConfigFactory.load().getString("hadatac.autoccsv.path_logs");
 	}
-	
+
 	public static String getTemplateFileName() {
 		return ConfigFactory.load().getString("hadatac.autoccsv.template_file_name");
 		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "template_file_name");
@@ -142,7 +142,7 @@ public class ConfigProp {
 		return ConfigFactory.load().getString("hadatac.autoccsv.default_owner_email");
         //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
     }
-	
+
 	public static String getFacetedDataUnit() {
 		return ConfigFactory.load().getString("hadatac.gui.faceted_data_unit");
         //return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_unit");
@@ -183,6 +183,27 @@ public class ConfigProp {
 
     public static String getSDDGenAddress() {
         return ConfigFactory.load().getString("hadatac.search.sdd_gen_address");
+    }
+
+    public static String getTestUsername() {
+        return ConfigFactory.load().getString("hadatac.test.user_name");
+    }
+
+    public static boolean getSignUpBool() {
+        if(ConfigFactory.load().getString("hadatac.test.sign_up").toLowerCase().equals("true")){
+           return true;
+        }
+        else{
+           return false;
+        }
+    }
+
+    public static String getTestUserPass() {
+        return ConfigFactory.load().getString("hadatac.test.user_password");
+    }
+
+    public static String getWebDriverPath() {
+        return ConfigFactory.load().getString("hadatac.test.web_driver_path");
     }
 
     public static boolean hasSDDGenAddress() {
