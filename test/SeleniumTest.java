@@ -19,6 +19,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
+import com.typesafe.config.ConfigException;
 
 public class SeleniumTest {
 
@@ -26,15 +27,28 @@ public class SeleniumTest {
    private TestServer server;
 
    final private String name = "Test User";
-   final private String keyUser = ConfigProp.getTestUsername();
-   final private String keyPassword = ConfigProp.getTestUserPass();
-   final private String webDriverPath = ConfigProp.getWebDriverPath();
+   private String keyUser;
+   private String keyPassword;
+   private String webDriverPath;
+
+   private Boolean testDisabled = false;
 
    final private int waitTime = 5000;
 
    @Before
    public void setup() throws Exception {
       System.out.println("Setting up SeleniumTest..."); // System.err wasw not showing up in Jenkins console so System.out is prefered
+
+      try{
+         keyUser = ConfigProp.getTestUsername();
+         keyPassword = ConfigProp.getTestUserPass();
+         webDriverPath = ConfigProp.getWebDriverPath();
+      }
+      catch(ConfigException e){
+         System.out.println("Selenium test configurations were not set, please set hadatac.test configurations in hadatac.config!");
+         testDisabled = true;
+         return;
+      }
 
       // Ensure test user configurations are setup
       if(keyUser.equals("")){
@@ -113,6 +127,10 @@ public class SeleniumTest {
    public void loginTest() {
       System.out.println("Running SeleniumTest.loginTest()...");
 
+      if(testDisabled){
+         fail();
+      }
+
       server = Helpers.testServer(9000);
       Helpers.running(server, () ->
       // Code block run once server is started
@@ -160,6 +178,10 @@ public class SeleniumTest {
 
    @After
    public void tearDown() throws Exception{
+      if(testDisabled){
+         return;
+      }
+
       driver.quit();
       server.stop();
       System.out.println("Finished running SeleniumTest");
