@@ -38,6 +38,7 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetTree;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.CollectionUtil;
@@ -1130,135 +1131,192 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {        
+    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) { 
+    	String selectedRole = "Child";
+        
         DataFile dataFile = null;
         boolean fileCreated = false;
-
+        
         // Initiate Alignment
         Alignment alignment = new Alignment();
+        Map<String, List<String>> alignCache = new HashMap<String, List<String>>();
 
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
 
             // Initiate Results
-            //     HashMap<base object, Map<measurement's key, value>, where
+            //     HashMap<base object, Map<measurement's key, List<value>>, where
             //        - base object is the object to be aligned. For example, if the alignment is a subject and the current object of the measurement is a sample 
             //          from the subject, the base object is the subject of the sample  
-            Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
-
-            // Prepare rows: Measurements are compared already collected alignment attributes (role/entity/attribute/inrelationto/unit/time)
+            Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
+            List<String> values = null;
+            boolean processOriginalID = false;
+            
+            // Prepare rows: Measurements are compared against alignment attributes from previous measurements (role/entity/attribute-list/inrelationto/unit/time)
             //               New alignment attributes are created for measurements with no corresponding alignment attributes.
             int i = 1;
             int prev_ratio = 0;
             int total = measurements.size();
             //System.out.println("Align-Debug: Measurement size is " + total);
+        	//System.out.println("Phase I: before Measurement loop");
             for (Measurement m : measurements) {
+            	//System.out.println("Phase I: start of Measurement loop");
                 StudyObject referenceObj = null;
 
                 if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
 
-                	//System.out.println("Align-Debug: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
+                	//System.out.println("Phase I: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
 
                     // Perform following actions required if the object of the measurement has not been processed yet
                     //   - add a row in the result set for aligning object, if such row does not exist
                     //   - add entity-role to the collection of entity-roles of the alignment
                     //   - add object to the collection of objects of the alignment 
                 
-                	referenceObj = alignment.getObject(m.getStudyObjectUri());
-                    if (referenceObj == null || !referenceObj.getUri().equals(m.getStudyObjectUri())) {
-                    	//System.out.println("Align-Debug: Reading object [" + m.getStudyObjectUri() + "]");
-                        referenceObj = StudyObject.find(m.getStudyObjectUri());
-                        if (referenceObj != null) {
-                        	//System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
-                            alignment.addObject(referenceObj);
-                        }
-                    }
-                	if (referenceObj == null) {
-                		System.out.println("[ERROR] could not find reference object with uri " + m.getObjectUri());
-                	} else {
-                		if (!results.containsKey(referenceObj.getUri())) {
-                			//System.out.println("Align-Debug: adding entity-role");
-                	        Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
-                	        if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
-                	        	referenceObjEntity = Entity.find(referenceObj.getTypeUri());
-                	            if (referenceObjEntity == null) {
-                	                System.out.println("[ERROR] retrieving entity " + referenceObj.getTypeUri());
-                	            } else {
-                	                alignment.addEntity(referenceObjEntity);
-                	            }
-                	        }
-                	        if (referenceObjEntity != null) {
-                	        	//AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
-                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
-                				if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
-                					alignment.addRole(referenceEntRole);
-                				}
-			    
-                				if (results.get(referenceObj.getUri()) == null) {
-                					results.put(referenceObj.getUri(), new HashMap<String, String>());
-                					if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
-                						if (referenceObj.getOriginalId() != null) { 
-                							//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
-                							results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
-                						}
-                						if (referenceObj.getOriginalId() != null) { 
-                							//System.out.println("Align-Debug: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole)); 
-                							results.get(referenceObj.getUri()).put(alignment.groupKey(referenceEntRole), referenceObj.getGroupId());
-                						}
-                					} 
-                				}
-                	        }
+                	List<String> alignObjs = alignCache.get(m.getObjectUri()); 
+                	if (alignObjs == null) {
+                		alignObjs = Alignment.alignmentObjects(m.getObjectUri(), selectedRole);
+                		if (alignObjs != null) {
+                			alignCache.put(m.getObjectUri(),alignObjs);
+                			/*
+                			System.out.print("Main object: [" + m.getObjectUri() + "] Associated Objects: [ ");
+                			for (String aux : alignObjs) {
+                				System.out.print(aux + " ");
+                			}
+                			System.out.println("]");
+                			*/
                 		}
                 	}
-		    
-                	//System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
-		    
-                	// assign values to results
-                	String key = alignment.measurementKey(m);
-                	//System.out.println("Align-Debug: computed measurement key [" + key + "]");
-                	if (key != null) {
-                		String finalValue = "";
-			
-                		if (categoricalOption.equals(WITH_VALUES)){
-                			finalValue = m.getValue();
-                		} else {
-                			//System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
-                			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
-                				if (!alignment.containsCode(m.getValueClass())) {
-                					String code = Attribute.findHarmonizedCode(m.getValueClass());
-                					//System.out.println("Align-Debug: new alignment attribute Code [" + code + "] for URI-value [" + m.getValueClass() + "]"); 
-                					if (code != null && !code.equals("")) {
-                						List<String> newEntry = new ArrayList<String>();
-                						newEntry.add(code);
-                						newEntry.add(m.getValue());
-                						alignment.addCode(m.getValueClass(), newEntry);
-                					}	
-                				}
-                			}
+                    	
+                	for (String currentAlignmentObjectUri : alignObjs) {
+                		
+	                	/* START OF REFERENCE OBJECT SCOPE */
+	                	
+                		/*
+                		referenceObj = alignment.getObject(m.getStudyObjectUri());
+	                    if (referenceObj == null || !referenceObj.getUri().equals(m.getStudyObjectUri())) {
+	                    	System.out.println("Phase I: Reading object [" + m.getStudyObjectUri() + "]");
+	                        referenceObj = StudyObject.find(m.getStudyObjectUri());
+	                        if (referenceObj != null) {
+	                        	//System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
+	                            alignment.addObject(referenceObj);
+	                        }
+	                    }
+	                    */
+                		referenceObj = alignment.getObject(currentAlignmentObjectUri);
+	                    if (referenceObj == null || !referenceObj.getUri().equals(currentAlignmentObjectUri)) {
+	                    	//System.out.println("Phase I: Reading object [" + currentAlignmentObjectUri + "]");
+	                        referenceObj = StudyObject.find(currentAlignmentObjectUri);
+	                        if (referenceObj != null) {
+	                        	//System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
+	                            alignment.addObject(referenceObj);
+	                        }
+	                    }
+	                    
+	                	if (referenceObj == null) {
+	                		System.out.println("[ERROR] Measurement: could not find reference object with uri " + m.getObjectUri());
+	                	} else {
+	                    	//System.out.println("Phase I: ReferenceUri is [" + referenceObj.getUri() + "]");
+	                		if (!results.containsKey(referenceObj.getUri())) {
+	
+	                			//System.out.println("Align-Debug: adding entity-role");
+	                	        Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
+	                	        if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
+	                	        	referenceObjEntity = Entity.find(referenceObj.getTypeUri());
+	                	            if (referenceObjEntity == null) {
+	                	                System.out.println("[ERROR] Measurement: retrieving entity " + referenceObj.getTypeUri());
+	                	            } else {
+	                	                alignment.addEntity(referenceObjEntity);
+	                	            }
+	                	        }
+	                	        if (referenceObjEntity != null) {
+	                	        	//AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
+	                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
+	                				if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
+	                					alignment.addRole(referenceEntRole);
+	                				}							
+				    
+	                				if (results.get(referenceObj.getUri()) == null) {
+	                					values = new ArrayList<String>();
+	                					results.put(referenceObj.getUri(), new HashMap<String, List<String>>());
+	                					if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
+	                						if (referenceObj.getOriginalId() != null) { 
+	                							//System.out.println("Phase I: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
+	                							values.add(referenceObj.getOriginalId());
+	                							results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), values);
+	                						}
+	                						/*
+	                						if (referenceObj.getOriginalId() != null) { 
+	                							//System.out.println("Phase I: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole)); 
+	                							values.add(referenceObj.getGroupId());
+	                							results.get(referenceObj.getUri()).put(alignment.groupKey(referenceEntRole), values);
+	                						}
+	                						*/
+	                						processOriginalID = true;
+	                					} 
+	                				}
+	                	        } 
+	                		}
+	                	}
 			    
-                			if (alignment.containsCode(m.getValueClass())) {
-                				// get code for qualitative variables
-                				List<String> entry = alignment.getCode(m.getValueClass()); 
-                				finalValue = entry.get(0);
-                			} else {
-                				// get actual value for quantitative variables
-                				finalValue = m.getValueClass();
-                			}
-                		}
-
-                		if (referenceObj != null) {
-                			results.get(referenceObj.getUri()).put(key, finalValue);
-                			//System.out.println("Align-Debug: final value [" + finalValue + "]");
-                		}
-                			
-                	} else {
-                			
-                		System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
-                				"attribute could be created for this measurement): " + 
-                				//m.getEntityUri() + " " + m.getCharacteristicUri());
-                				m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
+	                	//System.out.println("Phase I: processing Object with PID " + m.getObjectPID());
+			    
+	                	// assign values to results
+	                	String key = alignment.measurementKey(m);
+	                	//System.out.println("Phase I: computed measurement key [" + key + "]");
+	                	if (key != null) {
+	                		String finalValue = "";
+				
+	                		if (categoricalOption.equals(WITH_VALUES)){
+	                			finalValue = m.getValue();
+	                		} else {
+	                			//System.out.println("Phase I: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
+	                			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
+	                				if (!alignment.containsCode(m.getValueClass())) {
+	                					String code = Attribute.findHarmonizedCode(m.getValueClass());
+	                					//System.out.println("Phase I: new harmonized Code [" + code + "] for URI-value [" + m.getValueClass() + "]"); 
+	                					if (code != null && !code.equals("")) {
+	                						List<String> newEntry = new ArrayList<String>();
+	                						newEntry.add(code);
+	                						newEntry.add(m.getValue());
+	                						alignment.addCode(m.getValueClass(), newEntry);
+	                					}	
+	                				}
+	                			}
+				    
+	                			if (alignment.containsCode(m.getValueClass())) {
+	                				// get code for qualitative variables
+	                				List<String> entry = alignment.getCode(m.getValueClass()); 
+	                				finalValue = entry.get(0);
+	                			} else {
+	                				// get actual value for quantitative variables
+	                				finalValue = m.getValueClass();
+	                			}
+	                		}
+	
+	                		if (referenceObj != null && finalValue != null) {
+	                			values = results.get(referenceObj.getUri()).get(key);
+	                 			if (values == null) {
+	                 				values = new ArrayList<String>();
+	                 				values.add(finalValue);
+	                			} else {
+	                				values.add(finalValue);
+	                			}
+	                			results.get(referenceObj.getUri()).put(key, values);
+	                			//System.out.println("Phase I: final value [" + finalValue + "]");
+	                		}
+	                			
+	                	} else {
+	                			
+	                		System.out.println("[ERROR] Measurement: the following measurement could not match any alignment attribute (and no alignment " + 
+	                				"attribute could be created for this measurement): " + 
+	                				//m.getEntityUri() + " " + m.getCharacteristicUri());
+	                				m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
+	                	}
+	                	
+	                	/* END OF REFERENCE OBJECT SCOPE */
                 	}
+                	
                 }
                 
 
@@ -1282,9 +1340,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                     }
                 }
                 i++;
+            	//System.out.println("Phase I: end of Measurement loop");
             }
+        	//System.out.println("Phase I: Measurement loop COMPLETED");
             
-            alignment.printAlignment();
+            //alignment.printAlignment();
             
             // Write headers: Labels are derived from collected alignment attributes
             List<Variable> aaList = alignment.getAlignmentAttributes();
@@ -1294,11 +1354,14 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.toString().compareTo(o2.toString());
                 }
             });
-            //System.out.println("aligned attributes size: " + aaList.size());
+            //System.out.println("Phase II: variable list size: " + aaList.size());
+            //System.out.print("Phase II: variable list content: ");
             FileUtils.writeStringToFile(file, "\"STUDY-ID\"", "utf-8", true);
             for (Variable aa : aaList) {
+                //System.out.print(aa + " ");
             	FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
             }
+            //System.out.println("");
             FileUtils.writeStringToFile(file, "\n", "utf-8", true);
 
             // Sort collected objects by their original ID
@@ -1309,15 +1372,25 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.getOriginalId().compareTo(o2.getOriginalId());
                 }
             });
-            //System.out.println("Align-Debug: objects size: " + objects.size());
-
+            
+            //System.out.println("Phase II: download objects size: " + objects.size());
             // Write rows: traverse collected object. From these objects, traverse alignment objects
             for (StudyObject obj : objects) {
                 if (results.containsKey(obj.getUri())) {
-                    Map<String, String> row = results.get(obj.getUri());
+                    Map<String, List<String>> row = results.get(obj.getUri());
+                    // write study id
                     FileUtils.writeStringToFile(file, "\"" + alignment.getStudyId(obj.getIsMemberOf()) + "\"", "utf-8", true);
                     for (Variable aa : aaList) {
-                    	FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
+                    	values = row.get(aa.toString());
+                		FileUtils.writeStringToFile(file, ",", "utf-8", true);
+                    	if (values == null) {
+                    		//System.out.println("[WARNING] Measurement: No values for variable [" + aa.toString() + "]  of object [" + obj.getUri() + "]");
+                    	} else {
+                    		for (String val : values) {
+                    			//FileUtils.writeStringToFile(file, "\"" + val + "\" ", "utf-8", true);
+                    			FileUtils.writeStringToFile(file, val + " ", "utf-8", true);
+                    		}
+                    	}
                     }
                     FileUtils.writeStringToFile(file, "\n", "utf-8", true);
                 }
@@ -1424,7 +1497,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	            		} 
 	                    return 0;            
 	            	} catch (Exception e) {
-	            		dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "[ERROR] Not possible to convert one or both of following codes into integers: [" + v1Str + "] and [" + v2Str + "]"));
+	            		dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "[ERROR] Measurement: not possible to convert one or both of following codes into integers: [" + v1Str + "] and [" + v2Str + "]"));
 	            	}
 	            	return 0;
 	            }
@@ -1458,7 +1531,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         File provenanceFile = new File(dataFile.getAbsolutePath());
         FileUtils.writeStringToFile(provenanceFile, "", "utf-8", true);
 	    
-	    System.out.println("Sources file  [" + provenanceFile.getName() + "]");
+	    //System.out.println("Sources file  [" + provenanceFile.getName() + "]");
 	    
 	    FileUtils.writeStringToFile(provenanceFile, "used_DOI\n", "utf-8", true);
 	    // Write provenance file

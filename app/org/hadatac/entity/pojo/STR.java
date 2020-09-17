@@ -746,9 +746,9 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     public List<String> getDOIs() {
     	List<String> resp = new ArrayList<String>();
     	List<DataFile> dfs = DataFile.findByDataAcquisition(uri);
-    	System.out.println("STR da's uri is [" + uri + "]  and dfs's size is [" + dfs.size() + "]");
+    	//System.out.println("STR da's uri is [" + uri + "]  and dfs's size is [" + dfs.size() + "]");
     	for (DataFile df : dfs) {
-        	System.out.println("STR df's wasDerivedFrom size is [" + df.getWasDerivedFrom().size() + "]");
+        	//System.out.println("STR df's wasDerivedFrom size is [" + df.getWasDerivedFrom().size() + "]");
     		for (String doi : df.getWasDerivedFrom()) {
     			resp.add(doi);
     		}

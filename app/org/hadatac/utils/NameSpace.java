@@ -138,6 +138,9 @@ public class NameSpace {
             setNumberOfLoadedTriples(Integer.valueOf(soln.getLiteral("tot").getValue().toString()).intValue());
             save();
         } catch (Exception e) {
+	    System.out.println("NameSpace.updateLoadedTripleSize()");
+ 	    System.out.println("  - Value of CollectionUtil.Collection.METADATA_SPARQL=[" + CollectionUtil.Collection.METADATA_SPARQL + "]");
+ 	    System.out.println("  - Value of CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL)=[" + CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL) + "]");
             e.printStackTrace();
         }
     }
