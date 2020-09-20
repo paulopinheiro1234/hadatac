@@ -104,6 +104,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.setSpaceScopeUris(spaceScopeUris);
         this.setTimeScopeUris(timeScopeUris);
         this.setGroupUris(groupUris);
+        this.setLastCounter(hasLastCounter);
     }
 
     public ObjectCollection(String uri,
