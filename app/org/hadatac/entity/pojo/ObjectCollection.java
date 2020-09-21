@@ -159,6 +159,10 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return hasLastCounter;
     }
 
+    public void setLastCounter(String hasLastCounter) {
+        this.hasLastCounter = hasLastCounter;
+    }
+
     private void increaseNextCounter() {
         long longCounter = Long.parseLong(hasLastCounter) + 1;
         hasLastCounter = String.valueOf(longCounter);
