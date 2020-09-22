@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
+import org.hadatac.entity.pojo.Category;
 
+import org.hadatac.console.models.Facet;
+import org.hadatac.console.models.FacetHandler;
+import org.hadatac.console.models.Facetable;
 import play.libs.Json;
 
 public class Pivot {
@@ -96,6 +101,42 @@ public class Pivot {
     	sort();
     }
     
+    private void normalizeLabels(Map<String, String> catMap) {
+
+    	//System.out.println("Normalized Labels:  Field=" + getField() + "   Value=" + getValue() + "   Tooltip=" + getTooltip());
+    	if (getField() != null && getField().equals("characteristic_uri_str_multi") && catMap.containsKey(getTooltip())) {
+    		//System.out.println("needs to prefix [" + getValue() + "] with [" + catMap.get(getTooltip()) + "]");
+    		String normalizedLabel = catMap.get(getTooltip()) + ": " + getValue();
+    		setValue(normalizedLabel);
+    	}
+    	
+    	if (!children.isEmpty()) {
+    		for (Pivot child : children) {
+            	child.normalizeLabels(catMap);
+            }
+        }
+    	
+    }
+    
+    public void normalizeCategoricalVariableLabels(Facet facet, FacetHandler facetHandler) {
+    	
+    	// retrieve mapping 
+    	Category cat = new Category();
+        Map<String, String> catMap = cat.getCategoriesSolr(facet, facetHandler);
+        //for (Map.Entry<String, String> entry : catMap.entrySet()) {
+        //    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+        //}
+        
+    	// traverse and replace categorical labels 
+    	normalizeLabels(catMap);
+
+    	// re-order variables
+    	sort();
+
+        return;
+     	    	
+    }
+    
     public void sort() {
     	
     	if (!children.isEmpty()) {
@@ -115,6 +156,19 @@ public class Pivot {
 
         return;
      	
+    }
+    
+    public void print(String ind) {
+    	if (ind == null) {
+    		ind = "";
+    	}
+    	System.out.println(ind + "Field: " + this.field + "   Value: "  + this.value);
+    	if (!children.isEmpty()) {
+            for (Pivot child : children) {
+            	child.print(ind + "   ");
+            }
+        }
+        return;
     }
     
     public int recomputeStats() {

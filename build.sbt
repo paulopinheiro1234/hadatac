@@ -17,7 +17,7 @@ val appDependencies = Seq(
   javaJdbc,
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.easytesting" % "fest-assert" % "1.4" % "test",
-  "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
+  // "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
   //"com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
   //"com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",
   //"com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.2",
@@ -45,8 +45,9 @@ val appDependencies = Seq(
   "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1",
   "com.google.code.gson" % "gson" % "2.8.2",
-  "org.apache.commons" % "commons-jcs" % "2.2.1" pomOnly(), 
-  "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.0.2"
+  "org.apache.commons" % "commons-jcs" % "2.2.1" pomOnly(),
+  "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.0.2",
+  "org.seleniumhq.selenium" % "selenium-java" % "3.141.59" % "test"
 )
 
 // add resolver for deadbolt and easymail snapshots
@@ -64,5 +65,3 @@ lazy val root = project.in(file("."))
 
 libraryDependencies += guice
 libraryDependencies += openId
-
-

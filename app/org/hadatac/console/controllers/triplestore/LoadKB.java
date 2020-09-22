@@ -38,8 +38,8 @@ import play.mvc.Result;
 
 public class LoadKB extends Controller {
 
-	private static final String UPLOAD_NAME = "tmp/uploads/hasneto-spreadsheet.xls";
-	private static final String UPLOAD_TURTLE_NAME = "tmp/uploads/turtle.ttl";
+	private static final String UPLOAD_NAME = ConfigProp.getTmp() + "uploads/hasneto-spreadsheet.xls";
+	private static final String UPLOAD_TURTLE_NAME = ConfigProp.getTmp() + "uploads/turtle.ttl";
 	
 	@Inject
 	private FormFactory formFactory;

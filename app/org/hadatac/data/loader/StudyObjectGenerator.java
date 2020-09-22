@@ -79,7 +79,7 @@ public class StudyObjectGenerator extends BaseGenerator {
             return URIUtils.replaceNameSpaceEx(originalID);
         }
 
-        System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
+        //System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
         return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
     }
 
@@ -147,7 +147,7 @@ public class StudyObjectGenerator extends BaseGenerator {
         		String scopeOCtype = mapContent.get(oc_scope).get(1);
         		return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
         	} else {
-        		System.out.println("StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
+        		System.out.println("[ERROR] StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
         		return "";
         	}
         } else {
@@ -169,7 +169,7 @@ public class StudyObjectGenerator extends BaseGenerator {
         			return kbPrefix + uriMap.get(timeScopeOCtype) + returnedValue.replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
         		}
         	} else {
-        		System.out.println("StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
+        		System.out.println("[ERROR] StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
         		return "";
         	}
         } else {

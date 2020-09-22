@@ -1107,7 +1107,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     	obj = getCachedObject(currentObjUri);
         if (obj == null) {
-            System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve Study Object for URI=[" + currentObjUri + "]");
+            //System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve Study Object for ID=[" + id + "]");
             return null;
         }
         groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());

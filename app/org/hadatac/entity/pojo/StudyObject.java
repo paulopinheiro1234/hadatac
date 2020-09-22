@@ -594,6 +594,101 @@ public class StudyObject extends HADatAcThing {
         return cache;
     }
 
+    /*
+     * Function: Retrieves role of Study Object's SOC 
+     * Return: SOC's role 
+     */
+    public static String findSocRole(String objUri) {
+    	//System.out.println("Inside StudyObject.findSocRole");
+    	if (objUri == null || objUri.isEmpty()) {
+    		return null;
+    	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        		" select * where { " +
+        		" <" + objUri + "> hasco:isMemberOf ?obj . " +
+        		" ?obj hasco:hasRoleLabel ?role . " +
+        	  	" } ";
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("role").toString() != null) {
+                    return soln.get("role").toString();
+                }
+            }
+        } else {
+            System.out.println("[WARNING] StudyObject. Could not find SOC's Role ofr OBJ URI [" + objUri + "]");
+        }
+        return null;
+    }
+
+    /*
+     * Function: Retrieves upstream SOC's from a given Study Object's URI, if any.
+     *           A Study Object belonging to a grounded SOC, i.e., a SOC that is not
+     *           the scope of any other SOC, would not have any upstream SOC. 
+     * Return: List of pairs <SOC's URI, SOC's role> 
+     */
+    public static List<Map<String,String>> findUpstreamSocs(String objUri) {
+    	//System.out.println("Inside StudyObject.findUpstreamSocs");
+    	List<Map<String,String>> resp = new ArrayList<Map<String,String>>();
+    	if (objUri == null || objUri.isEmpty()) {
+    		return resp;
+    	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        	  " select * where { " +
+        	  " <" + objUri + "> hasco:hasObjectScope+ ?obj . " +
+        	  " ?obj hasco:isMemberOf ?soc . " +
+        	  " ?soc hasco:hasRoleLabel ?role . " +
+        	  " } ";
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("obj") != null && soln.get("soc") != null && soln.get("role") != null) {
+                    Map<String,String> entry = new HashMap<String,String>();
+                    entry.put(soln.get("obj").toString(),soln.get("role").toString());
+                    resp.add(entry);
+                }
+            }
+        }        
+        return resp;
+    }
+
+    /*
+     * Function: Retrieves downstream SOC's from a given Study Object's URI, if any. 
+     *           A Study Object belonging to a leaf SOC, i.e., a SOC that is not in 
+     *           the scope of any other SOC, would not have any upstream SOC. 
+     * Return: List of pairs <SOC's URI, SOC's role> 
+     */
+    public static List<Map<String,String>> findDownstreamSocs(String objUri) {
+    	//System.out.println("Inside StudyObject.findDownstreamSocs");
+    	List<Map<String,String>> resp = new ArrayList<Map<String,String>>();
+    	if (objUri == null || objUri.isEmpty()) {
+    		return resp;
+    	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        		" select * where { " +
+        		" ?obj hasco:hasObjectScope+ <" + objUri + "> . " +
+        		" ?obj hasco:isMemberOf ?soc . " +
+        		" ?soc hasco:hasRoleLabel ?role . " +
+        	  	" } ";
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("obj") != null && soln.get("soc") != null && soln.get("role") != null) {
+                    Map<String,String> entry = new HashMap<String,String>();
+                    entry.put(soln.get("obj").toString(),soln.get("role").toString());
+                    resp.add(entry);
+                }
+            }
+        }
+        return resp;
+    }
+
     public static String findUriBySocAndOriginalId(String socUri, String original_id) {
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?objuri WHERE { " + 

@@ -45,7 +45,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
 
-    public List<String> getInRelationToFromSolr(Facet facet, FacetHandler facetHandler) {
+/*    public List<String> getInRelationToFromSolr(Facet facet, FacetHandler facetHandler) {
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -83,6 +83,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
 
         return null;
     }
+    */
 
     public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
