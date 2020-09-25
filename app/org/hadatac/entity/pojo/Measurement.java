@@ -444,6 +444,14 @@ public class Measurement extends HADatAcThing implements Runnable {
         this.datasetUri = datasetUri;
     }
 
+    public String getOriginalId() {
+        return originalId;
+    }
+
+    public void setOriginalId(String originalId) {
+        this.originalId = originalId;
+    }
+
     @Override
     public boolean saveToSolr() {
         SolrClient solr = new HttpSolrClient.Builder(
@@ -1020,6 +1028,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setCharacteristicUris(uris);
         m.setCategoricalClassUri(SolrUtils.getFieldValue(doc, "categorical_class_uri_str"));
         m.setUnitUri(SolrUtils.getFieldValue(doc, "unit_uri_str"));
+        m.setOriginalId(SolrUtils.getFieldValue(doc, "original_id_str"));
 
         m.setValueClass(SolrUtils.getFieldValue(doc, "value_str"));
         if (cachedURILabels.containsKey(m.getValueClass())) {

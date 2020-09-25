@@ -299,11 +299,11 @@ public class MeasurementGenerator extends BaseGenerator {
 
             Measurement measurement = new Measurement();
 
-            /*===================*
-             *                   *
-             *   SET VALUE       *
-             *                   *
-             *===================*/
+            /*==================================*
+             *                                  *
+             *   SET VALUE  AND ORIGINAL ID     *
+             *                                  *
+             *==================================*/
 
             String codeClass = "";
             String originalValue = "";
@@ -328,6 +328,9 @@ public class MeasurementGenerator extends BaseGenerator {
                 } else {
                     measurement.setValue(originalValue);
                 }
+            }
+            if (id != null) {
+            	measurement.setOriginalId(id);
             }
 
             /*===========================*
