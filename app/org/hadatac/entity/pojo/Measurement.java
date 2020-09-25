@@ -1186,7 +1186,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 
                 	List<String> alignObjs = alignCache.get(m.getObjectUri()); 
                 	if (alignObjs == null) {
-                		alignObjs = Alignment.alignmentObjects(m.getObjectUri(), selectedRole);
+                		alignObjs = Alignment.alignmentObjects(m.getObjectUri(), selectedRole, m.getOriginalId());
                 		if (alignObjs != null) {
                 			alignCache.put(m.getObjectUri(),alignObjs);
                 			/*
