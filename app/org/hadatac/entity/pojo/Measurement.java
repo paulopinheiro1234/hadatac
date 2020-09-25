@@ -104,6 +104,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private double elevation;
     @Field("dataset_uri_str")
     private String datasetUri;
+    @Field("original_id_str")
+    private String originalId;
 
     // Variables that are not stored in Solr
     private String entity;
