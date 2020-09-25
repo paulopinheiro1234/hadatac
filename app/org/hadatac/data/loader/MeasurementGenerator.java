@@ -329,9 +329,6 @@ public class MeasurementGenerator extends BaseGenerator {
                     measurement.setValue(originalValue);
                 }
             }
-            if (id != null) {
-            	measurement.setOriginalId(id);
-            }
 
             /*===========================*
              *                           *
@@ -470,6 +467,7 @@ public class MeasurementGenerator extends BaseGenerator {
                 }
 
                 if (!id.equals("")) {
+                	measurement.setOriginalId(id);
                     reference = dasa.getObjectViewLabel();
                     if (reference != null && !reference.equals("")) {
                         if (objList.get(reference) == null) {
