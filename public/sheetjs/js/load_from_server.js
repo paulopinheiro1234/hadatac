@@ -1041,16 +1041,23 @@ function getSuggestion(){
         url : 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress',
         dataType: 'json',
         success : function(getSDDGenRequest) {
+
            sddgenAdress = getSDDGenRequest;
+
+           // Add trailing slash if its missing from the config file
+           if (sddgenAdress.substr(-1) != '/') {         // If the last character is not a slash
+             sddgenAdress = sddgenAdress + '/';            // Append a slash to it.
+           }
+
 	   $.ajax({
 	      type : 'POST',
-	      url : sddgenAdress + '/ping',
+	      url : sddgenAdress + 'ping',
 	      dataType : 'json',
-	      timeout : 20000,
+	      timeout : 5000,
 	      success : function(ping) {
 		console.log(ping);
 	        if(ping){
-		  getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+		  getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
 		}
 	      },
 	      error : function() {
@@ -1060,21 +1067,21 @@ function getSuggestion(){
                 //imageStatus.src = imgPath + 'fail.png';
 	        alert("Error: SDDGen not running");
 	      }
-	   }); 
-           //getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+	   });
+           //getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
         }
       });
    }
    else{
       $.ajax({
          type : 'POST',
-         url : sddgenAdress + '/ping',
+         url : sddgenAdress + 'ping',
          dataType : 'json',
-	 timeout : 20000,
+	 timeout : 5000,
          success : function(ping) {
 	   console.log(ping);
            if(ping){
-             getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+             getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
            }
          },
          error : function() {
@@ -1085,7 +1092,7 @@ function getSuggestion(){
            alert("Error: SDDGen not running");
          }
       });
-      //getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+      //getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
    }
    checkRecs(globalL, globalR, 1);
 }
