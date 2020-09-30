@@ -1020,7 +1020,7 @@ function getSuggestion(){
          console.log(data);
          spinnerStatus.stop();
          imageStatus.style.visibility = 'visible';
-         imageStatus.src = imgPath + 'fail.png'
+         imageStatus.src = imgPath + 'fail.png';
 
          if(err == 400){
             alert("Error: SDDGen is " + data['Bad Request'] + ': ' + data['Miss']);
@@ -1041,13 +1041,58 @@ function getSuggestion(){
         url : 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress',
         dataType: 'json',
         success : function(getSDDGenRequest) {
+
            sddgenAdress = getSDDGenRequest;
-           getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+
+           // Add trailing slash if its missing from the config file
+           if (sddgenAdress.substr(-1) != '/') {         // If the last character is not a slash
+             sddgenAdress = sddgenAdress + '/';            // Append a slash to it.
+           }
+
+	   $.ajax({
+	      type : 'POST',
+	      url : sddgenAdress + 'ping',
+	      dataType : 'json',
+	      timeout : 5000,
+	      success : function(ping) {
+		console.log(ping);
+	        if(ping){
+		  getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
+		}
+	      },
+	      error : function() {
+		spinnerStatus.stop();
+		imageStatus.src = imgPath + 'fail.png';
+                imageStatus.style.visibility = 'visible';
+                //imageStatus.src = imgPath + 'fail.png';
+	        alert("Error: SDDGen not running");
+	      }
+	   });
+           //getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
         }
       });
    }
    else{
-      getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+      $.ajax({
+         type : 'POST',
+         url : sddgenAdress + 'ping',
+         dataType : 'json',
+	 timeout : 5000,
+         success : function(ping) {
+	   console.log(ping);
+           if(ping){
+             getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
+           }
+         },
+         error : function() {
+           spinnerStatus.stop();
+	   imageStatus.src = imgPath + 'fail.png';
+           imageStatus.style.visibility = 'visible';
+           //imageStatus.src = imgPath + 'fail.png';
+           alert("Error: SDDGen not running");
+         }
+      });
+      //getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
    }
    checkRecs(globalL, globalR, 1);
 }
