@@ -19,37 +19,42 @@ dirFile: org.hadatac.entity.pojo.DataFile
 
 @main("Edit DD_2"){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
-    <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
-
+    <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
 
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs_dd.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
     
     <div id="rcorners">
     <h4>@dataFile.getFileName()</h4>
+    <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
     @if(bSavable) {
         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
     }
     
     
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">Download</a>
+    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
+       <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
     <a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" target="_blank" class="btn btn-primary" role="button">Blank Metadata File</a>
-    <button type="button" class="isHeader" role="button">
-        <img src="@controllers.routes.Assets.versioned("icons/header.png")"  width="36" height="30" alt=""/> Column Header 
-    </button>
-    <input type="text" id="headerdetails" value=" "/>
-    <button type="button" class="isDesc" role="button">
-        <img src="@controllers.routes.Assets.versioned("icons/notepad.png")"  width="30" height="28" alt=""/> Description
-    </button>
-    <input type="text" id="descdetails" value=" "/>
+    
+      <button type="button" class="isHeader" role="button">
+          <img src="@controllers.routes.Assets.versioned("icons/header.png")"  width="25" height="25" alt=""/> Column Header 
+      </button>
+      <input type="text" id="headerdetails" value=" "/>
+    
    
-    
-    
-    <button class="main-navi" id="showcarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
-        width="36" height="33" alt=""/> Add to SDD</button>
+      <button type="button" class="isDesc" role="button">
+          <img src="@controllers.routes.Assets.versioned("icons/notepad.png")"  width="24" height="27" alt=""/> Description
+      </button>
+      <input type="text" id="descdetails" value=" "/>
+  
+   
+ 
+      <button class="main-navi" id="showcarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
+        width="32" height="30" alt=""/> Add to SDD</button>
         <button class="Close" id="hidecarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
            width="36" height="33" alt=""/> Hide</button>
 
+	</div>
         <div class="mobile-navi">
             <script type="text/javascript">
             function checkform() {
@@ -85,7 +90,7 @@ dirFile: org.hadatac.entity.pojo.DataFile
            ul.tree li a {
              color: black;
              text-decoration: none;
-            
+	     cursor: default;            
            }
      
            ul.tree li a:before {
@@ -100,11 +105,23 @@ dirFile: org.hadatac.entity.pojo.DataFile
            }
      
            ul.tree li > a:not(:last-child):before {
-             content: '+';
+             content: 'Click To Add SDD';
+	     background-color: #EEEEEE;
+    	     padding-top: 6px;
+	     padding-bottom: 20px;
+	     padding-left: 5px;
+	     padding-right: 5px;
+	     background-color: #428bca;
+	     color: #fff;
+	     border-color: #357ebd;
+    	     text-decoration:none;
+    	     font-weight:bold;
+	     border-radius:5px;
+    	     cursor:pointer;
            }
      
            ul.tree li.open > a:not(:last-child):before {
-             content: '-';
+             content: 'Close';
            }
            
         .container{
@@ -167,7 +184,7 @@ dirFile: org.hadatac.entity.pojo.DataFile
      
            </div>           
          </form>
-         <button class="btn btn-primary" style="padding: 0px;margin-top: 0px;" role="button" id="togoback" onclick="goToSDD()" disabled="disabled"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</button>
+         <button class="btn btn-primary" style="margin-top: 0px;" role="button" id="togoback" onclick="goToSDD()" disabled="disabled"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</button>
        </div>
        <div id="lg"></div>
           <script>
@@ -230,15 +247,12 @@ dirFile: org.hadatac.entity.pojo.DataFile
             }
             </script>
         </div>
+    
     <div><a id="alarmmsg"></a></div>
-    
-
-   
-    
-
-
     <div><a id="error_msg"></a></div>
     <div id="grid"></div>
+    
+    <div id="gridcopy"></div>
     <div id="footnote"></div>
     <div id="buttons"></div>
     </div>

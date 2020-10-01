@@ -56,7 +56,7 @@ public class SDDEditorV2 extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String fileId, boolean bSavable, int indicator) {
         final SysUser user = AuthApplication.getLocalUser(session());
-
+        //System.out.println(user);
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
 
@@ -293,6 +293,9 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(isValid));
 
     }
-
+    
+    public Result getUserName() {
+    	return ok(Json.toJson(AuthApplication.getLocalUser(session()).getName()));
+    }
 
 }
