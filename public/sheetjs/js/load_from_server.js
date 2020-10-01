@@ -159,7 +159,7 @@ var make_buttons = function(sheetnames, cb) {
   });
   buttons.appendChild(document.createElement('br'));
 };
-//console.log(_grid);
+
 // Creates the datagrid
 var cdg = canvasDatagrid({
   parentNode: _grid
@@ -197,90 +197,30 @@ cellEntry.addEventListener('keyup', function (e){
 
 //event listeners to navigate the datagrid
 cdg.addEventListener('contextmenu', function (e) {
-  if (!e.cell) { return; }
+   if (!e.cell) { return; }
 
-
-    //var input = document.createElement("textarea");
-    //input.style.width="100%";
-    //console.log(typeof(approvalList[e.cell.rowIndex][e.cell.colIndex]));
-    if(approvalList[e.cell.rowIndex][e.cell.columnIndex] != ""){
-	//console.log(approvalList);
-	//console.log(e.cell.rowIndex);
-	//console.log(e.cell.columnIndex);
-	//ronsole.log(approvalList[e.cell.rowIndex][e.cell.columnIndex]);
-	//input.innerHTML=approvalList[e.cell.rowIndex][e.cell.columnIndex];
-	e.items.push({
-	  title: "Approved: " + approvalList[e.cell.rowIndex][e.cell.columnIndex]
-	});
-    }
-    /*if(!e.cell.value.startsWith("??")&&e.cell.value!=""&& sheetName=="Dictionary Mapping"&&e.cell.value.includes(":")){
-      var link=convertshortToIri(e.cell.value);
-      console.log(e.cell.value);
-      var des;
-      if("unknown" === link){
-         des = "unknown ontology";
-         e.items.push({
-          title: des,
-          click: function () {
-
-            var win = window.open(link, '_blank');
-            win.focus();
-          }
-        });
-      }
-      else{
-         //des = getDescription(link);
-         cellVal = link.trim();
-         $.ajax({
-           type : 'GET',
-           url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
-           data : {iricode: cellVal},
-           success : function(data) {
-             console.log(data);
-             e.items.push({
-               title: data,
-               click: function () {
-
-               var win = window.open(link, '_blank');
-                 win.focus();
-               }
-             });
-           },
-           error : function(xhr, textStatus, errorThrown) {
-                console.log("FAIL: " + xhr + " " + textStatus + " " + errorThrown);
-                console.log(xhr);
-           }
-         });
-      }*/
-      //console.log(des);
-      //var t = document.createTextNode(des);
-      //document.getElementById("textarea").appendChild(t);
-      //input.innerHTML = des;
-      //input.value=des;
-
-      /*e.items.push({
-          title: des,
-          click: function () {
-
-            var win = window.open(link, '_blank');
-            win.focus();
-          }
-      });*/
-
-     // }
-
+   if(approvalList[e.cell.rowIndex][e.cell.columnIndex] != ""){
+      e.items.push({
+         title: "Approved: " + approvalList[e.cell.rowIndex][e.cell.columnIndex]
+      });
+   }
 });
+
 var origVal;
 cdg.addEventListener('click', function (e) {
   returnToView();
-  colNum=e.cell.columnIndex;
-  rowNum=e.cell.rowIndex;
+  colNum = e.cell.columnIndex;
+  rowNum = e.cell.rowIndex;
   origVal = cdg.data[rowNum][colNum];
   textCell = e.cell;
 
   var colNum_str=colNum.toString();
   var rowNum_str=rowNum.toString();
+
+  // Don't change anything if we are clicking on things that are not data cells
   if (!e.cell) { return; }
+  if (e.cell.columnIndex < 0) { return; }
+  if (e.cell.rowIndex < 0) { return; }
 
   if(e.cell.value==null){
     cdg.data[rowNum][colNum]=" ";
@@ -451,7 +391,6 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 
 //displays and formats prefixedIRI for the chosen data
 function chooseItem(data) {
-  console.log(data.value[1]);
   var chosen=data.value.split(",")
   var prefixedIRI = getUri(chosen[1]);
   var hold = cdg.data[rowNum][colNum];
@@ -476,28 +415,8 @@ function chooseItem(data) {
     approvalList[rowNum][colNum] = "";
     indicateApproval(rowNum, colNum, cdg.data[rowNum][colNum]);
   }
-
-
-  /*if(ret in approvalList){
-     if(rowNum+1==approvalList[ret][0] && colNum==approvalList[ret][1] ){
-
-     }
-     else{
-       approvalList[ret]=[ret, rowNum,colNum,0]
-       //indicateApproval();
-     }
-  }
-  else if(!(ret in approvalList)){
-     console.log("here");
-     approvalList[ret]=[ret, rowNum,colNum,0]
-     //indicateApproval();
-
-
-  }*/
-
-
-
 }
+
 //event listener for the context menu options
 cdg.addEventListener('contextmenu', function (e) {
 
@@ -523,7 +442,6 @@ cdg.addEventListener('contextmenu', function (e) {
             }
           }
          approvalList = copyApproval;
-  	 //console.log(approvalList);
   	 for(var i=intendedRow; i<approvalList.length; i++){
            for(var j=0; j<approvalList[i].length; j++){
 	     if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
@@ -555,7 +473,6 @@ cdg.addEventListener('contextmenu', function (e) {
           }
         }
         approvalList = copyApproval;
-	console.log(approvalList);
          for(var i=intendedRow+1; i<approvalList.length; i++){
            for(var j=0; j<approvalList[i].length; j++){
              if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
@@ -603,16 +520,12 @@ cdg.addEventListener('contextmenu', function (e) {
         indicateApproval(intendedRow,i,cdg.data[intendedRow][i]);
       }
       approvalList.splice(intendedRow,1);
-      //console.log(approvalList);
     }
   });
   if(approvalList[e.cell.rowIndex][e.cell.columnIndex]==""){
     e.items.push({
       title: 'Approve',
       click: function (ev) {
-        console.log(approvalList);
-        console.log(e.cell.value);
-        console.log(e.cell);
         var originalVal=e.cell.value;
         $.ajax({
             type : 'POST',
@@ -623,7 +536,6 @@ cdg.addEventListener('contextmenu', function (e) {
 				var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 				var dateTime = date+' '+time;
             	approvalList[e.cell.rowIndex][e.cell.columnIndex] = nameData + ' - ' + dateTime;
-		        console.log(approvalList);
 		        acceptApproval(originalVal,e.cell.rowIndex,e.cell.columnIndex);
 		        indicateApproval(e.cell.rowIndex, e.cell.columnIndex, originalVal);
             }
@@ -650,7 +562,6 @@ function insertRowAbove(){
   	}
   }
   approvalList = copyApproval;
-  console.log(approvalList);
   for(var i=0; i<approvalList.length; i++){
         for(var j=0; j<approvalList[i].length; j++){
           indicateApproval(i,j,cdg.data[i][j]);
@@ -674,7 +585,6 @@ function insertRowBelow(){
   	}
   }
   approvalList = copyApproval;
-  console.log(approvalList);
   for(var i=0; i<approvalList.length; i++){
 	for(var j=0; j<approvalList[i].length; j++){
 	  indicateApproval(i,j,cdg.data[i][j]);
@@ -718,7 +628,6 @@ function removeRow(){
   for(var i=0; i<approvalList[intendedRow].length; i++){
     indicateApproval(intendedRow,i,cdg.data[intendedRow][i]);
   }
-  console.log(storeApprovalRow);
   approvalList.splice(intendedRow,1);
 }
 
@@ -768,27 +677,25 @@ function to_json(workbook) {
 
 // Adapted from function handleFileUpload(e) in dropsheet.js
 function saveFile(e){
-   //workbook.Sheets['InfoSheet'].B11 = JSON.stringify(approvalList);
-   //console.log( workbook.Sheets['InfoSheet'].B11 );
-   //var infoHolder = XLSX.utils.sheet_to_json(workbook.Sheets['InfoSheet'], {header:1});
-   //console.log(infoHolder);
-   //console.log(infoHolder[11]);
-   //infoHolder[11][1] = JSON.stringify(approvalList);
    // Save the current view back to the workbook
    workbook.Sheets[sheetName] = XLSX.utils.aoa_to_sheet(cdg.data);
-   //console.log(workbook.Sheets);
+
    // Generate json version of data
    var json = to_json(workbook);
-   console.log(json);
-   console.log(json['InfoSheet'][10][1])
-   json['InfoSheet'][10][1] = JSON.stringify(approvalList);
-   console.log(json);
+
+   // Search for where the Approval Data is stored
+   for(var i=0; i<json['InfoSheet'].length; i++){
+      if(json['InfoSheet'][i][0] == "Approval Data"){
+         json['InfoSheet'][i][1] = JSON.stringify(approvalList);
+         break; // Only 1 row so leave early
+      }
+   }
+
    // iterate over workbook add headers in if we stripped them away
    for (let [sn, header] of headerMap) {
      // Add Header back in
      json[sn].unshift(header);
-     console.log(sn);
-     //console.log(json[sn]);
+
      // Convert back to workbook
      workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
    }
@@ -823,8 +730,6 @@ function saveFile(e){
      // Convert back to workbook
      workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
    }
-   console.log(workbook);
-   console.log(workbook.Sheets);
 }
 
 
@@ -864,56 +769,28 @@ function createCopySheet(sheetCopy){
 
 function approvalFunction(sheetCopy){
    if (approvalList === undefined || approvalList.length == 0) {
-    approvalList = JSON.parse(JSON.stringify(sheetCopy));
+      approvalList = JSON.parse(JSON.stringify(sheetCopy));
    }
    for(var i=0;i<sheetCopy.length;i++){
 
-     for(var j=0;j<sheetCopy[i].length;j++){
-       var keys=sheetCopy[i][j];
-       var temp2=[];
+      for(var j=0;j<sheetCopy[i].length;j++){
+         var keys=sheetCopy[i][j];
+         var temp2=[];
 
-       if(approvalList[i][j] == sheetCopy[i][j]){
-       		approvalList[i][j] = "";
-       }
-       else{
-	 if(approvalList[i][j] != ""){
-	   indicateApproval(i,j,sheetCopy[i][j]);
-	 }
-       }
-       /*if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
-
-       }
-       else if(sheetCopy[i][j].includes("+")==true){
-    	 if((keys in approvalList && approvalList[keys] == undefined) || !(keys in approvalList)){
-    		 approvalList[keys] = [];
+         if(approvalList[i][j] == sheetCopy[i][j]){
+            approvalList[i][j] = "";
          }
-    	 temp2.push(sheetCopy[i][j]);
-         temp2.push(i);
-         temp2.push(j);
-         temp2.push(1);
-         approvalList[keys].push(temp2);
-       }
-       else{
-	     if((keys in approvalList && approvalList[keys] == undefined) || !(keys in approvalList)){
-  		   approvalList[keys] = [];
+         else{
+            if(approvalList[i][j] != ""){
+               indicateApproval(i,j,sheetCopy[i][j]);
+            }
          }
-         temp2.push(sheetCopy[i][j]);
-         temp2.push(i);
-         temp2.push(j);
-         temp2.push(0);
-         approvalList[keys].push(temp2);
-
-       }*/
-
-     }
-
+      }
    }
-   console.log(approvalList)
-   //indicateApproval();
- }
+}
 
 var globalL;
-var approvalList = [];
+var approvalList = []; // Stores the cells that have been approved
 var _onsheet = function(json, sheetnames, select_sheet_cb) {
 
   document.getElementById('footnote').style.display = "none";
@@ -1000,7 +877,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
         }
         if(json[i][0]=="Approval Data"){
         	ApproveData = true;
-		console.log(json[i][1]);
+
 		if(json[i][1] == []){
 		  ApproveData = false;
 		}
@@ -1022,7 +899,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     if(sheetName=="Prefixes"){
       for(var i=0;i<newPrefix.length;i++){
-        console.log(json)
+
         if(json[1][0]==""){
           json.splice(1,1)
         }
@@ -1050,7 +927,6 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
       createCopySheet(sheetCopy);
       approvalFunction(sheetCopy);
       if(popIndicator==1 && cdg.data.length<=1){
-        console.log(cdg.data.length)
         populateSDD();
       }
     }
@@ -1150,7 +1026,6 @@ function getSuggestion(){
 
             for (i = 0; i < cdg.data.length; i++) {
                if(!columnsAdded.includes(cdg.data[i][0])){
-                  // console.log(cdg.data[i][0])
 
                   dataDictionary.push(
                      {
@@ -1334,14 +1209,12 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
   };
 
 
-  // getJSON('http://128.113.106.57:5000/get-sdd/',  function(err, data) {
   getJSON('http://localhost:5000/populate-sdd/',  function(err, data) {
     if (err != null) {
         console.error(err);
     }
 
     else {
-      console.log(data);
       if(rowval.startsWith("??")){
         var keyword="virtual-columns";
         parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual);
