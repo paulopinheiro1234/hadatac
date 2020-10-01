@@ -1,10 +1,15 @@
 package org.hadatac.entity.pojo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Variable {
 
     private Entity ent;
     private String role;
-    private Attribute attr;
+    private List<Attribute> attrList;
     private Entity inRelationTo;
     private Unit unit;
     private Attribute timeAttr;
@@ -20,14 +25,14 @@ public class Variable {
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
     	this.ent = entRole.getEntity();
     	this.role = entRole.getRole();
-    	this.attr = attrInRel.getAttribute();
+    	this.attrList = attrInRel.getAttributeList();
     	this.inRelationTo = attrInRel.getInRelationTo();
     	this.unit = unit;
     	this.timeAttr = timeAttr;
     }
 
     public String getKey() {
-    	return getRole() + getEntityStr() + getAttributeStr() + getInRelationToStr() + getUnitStr() + getTimeStr();
+    	return getRole() + getEntityStr() + getAttributeListStr() + getInRelationToStr() + getUnitStr() + getTimeStr();
     }
 
     public Entity getEntity() {
@@ -35,25 +40,34 @@ public class Variable {
     }
 
     public String getEntityStr() {
-        if (ent != null && ent.getUri() != null && !ent.getUri().equals("")) { 
-        	return ent.getUri();
+        if (ent == null || ent.getUri() == null || ent.getUri().isEmpty()) { 
+        	return "";
         }
-        return "";
+    	return ent.getUri();
     }
 
     public String getRole() {
+    	if (role == null) {
+    		return "";
+    	}
     	return role;
     }
 
-    public Attribute getAttribute() {
-    	return attr;
+    public List<Attribute> getAttributeList() {
+    	return attrList;
     }
 
-    public String getAttributeStr() {
-        if (attr != null && attr.getUri() != null && !attr.getUri().equals("")) { 
-        	return attr.getUri();
-        }
-        return "";
+    public String getAttributeListStr() {
+    	if (attrList == null || attrList.isEmpty()) {
+    		return "";
+    	}
+    	String resp = "";
+    	for (Attribute attr : attrList) {
+    		if (attr != null && attr.getUri() != null && !attr.getUri().isEmpty()) { 
+        		resp = resp + attr.getUri();
+    		}
+    	}
+        return resp;
     }
 
     public Entity getInRelationTo() {
@@ -61,10 +75,10 @@ public class Variable {
     }
 
     public String getInRelationToStr() {
-        if (inRelationTo != null && inRelationTo.getUri() != null && !inRelationTo.getUri().equals("")) { 
-        	return inRelationTo.getUri();
+        if (inRelationTo == null || inRelationTo.getUri() == null ||inRelationTo.getUri().isEmpty()) { 
+            return "";
         }
-        return "";
+    	return inRelationTo.getUri();
     }
 
     public Unit getUnit() {
@@ -72,10 +86,10 @@ public class Variable {
     }
 
     public String getUnitStr() {
-        if (unit != null && unit.getUri() != null && !unit.getUri().equals("")) { 
-        	return unit.getUri();
+        if (unit == null || unit.getUri() == null || unit.getUri().isEmpty()) { 
+            return "";
         }
-        return "";
+    	return unit.getUri();
     }
 
     public Attribute getTime() {
@@ -83,10 +97,10 @@ public class Variable {
     }
 
     public String getTimeStr() {
-        if (timeAttr != null && timeAttr.getUri() != null && !timeAttr.getUri().equals("")) { 
-        	return timeAttr.getUri();
+        if (timeAttr == null || timeAttr.getUri() == null || timeAttr.getUri().isEmpty()) { 
+            return "";
         }
-        return "";
+    	return timeAttr.getUri();
     }
 
     public static String upperCase(String orig) {
@@ -108,17 +122,26 @@ public class Variable {
     public String toString() {
     	//System.out.println("[" + attr.getLabel() + "]");
     	String str = "";
-    	if (role != null && !role.equals("")) {
+    	if (role != null && !role.isEmpty()) {
     		str += prep(role) + "-";
     	}
-    	str += prep(ent.getLabel()) + "-" + prep(attr.getLabel());
-    	if (inRelationTo != null && !inRelationTo.getLabel().equals("")) {
+    	if (ent != null && ent.getLabel() != null && !ent.getLabel().isEmpty()) {
+    		str += prep(ent.getLabel());
+    	}
+    	if (attrList != null && attrList.size() > 0) {
+	    	for (Attribute attr : attrList) {
+	    		if (attr != null && attr.getLabel() != null && !attr.getLabel().isEmpty()) {
+	    			str += "-" + prep(attr.getLabel());
+	    		}
+	    	}
+    	}
+    	if (inRelationTo != null && !inRelationTo.getLabel().isEmpty()) {
     		str += "-" + prep(inRelationTo.getLabel());
     	}
-    	if (unit != null) {
+    	if (unit != null && unit.getLabel() != null && !unit.getLabel().isEmpty()) {
     		str += "-" + prep(unit.getLabel());
     	}
-    	if (timeAttr != null) {
+    	if (timeAttr != null && timeAttr.getLabel() != null && !timeAttr.getLabel().isEmpty()) {
     		str += "-" + prep(timeAttr.getLabel());
     	}
     	return str;

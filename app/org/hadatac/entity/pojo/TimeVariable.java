@@ -1,11 +1,16 @@
 package org.hadatac.entity.pojo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TimeVariable {
 
 	private StudyObject obj;
 	private Entity ent;
     private String role;
-    private Attribute attr;
+    private List<Attribute> attrList;
     private Entity inRelationTo;
     private Unit unit;
 
@@ -17,13 +22,13 @@ public class TimeVariable {
         this.obj = obj;
     	this.ent = entRole.getEntity();
     	this.role = entRole.getRole();
-    	this.attr = attrInRel.getAttribute();
+    	this.attrList = attrInRel.getAttributeList();
     	this.inRelationTo = attrInRel.getInRelationTo();
     	this.unit = unit;
     }
 
     public String getKey() {
-    	return getObject() + getRole() + getEntityStr() + getAttributeStr() + getInRelationToStr() + getUnitStr();
+    	return getObject() + getRole() + getEntityStr() + getAttributeListStr() + getInRelationToStr() + getUnitStr();
     }
 
     public String getObject() {
@@ -45,16 +50,24 @@ public class TimeVariable {
     	return role;
     }
 
-    public Attribute getAttribute() {
-    	return attr;
+    public List<Attribute> getAttributeList() {
+    	return attrList;
     }
 
-    public String getAttributeStr() {
-        if (attr != null && attr.getUri() != null && !attr.getUri().equals("")) { 
-        	return attr.getUri();
-        }
-        return "";
+    public String getAttributeListStr() {
+    	if (attrList == null || attrList.isEmpty()) {
+    		return "";
+    	}
+    	String resp = "";
+    	for (Attribute attr : attrList) {
+    		if (attr == null || attr.getUri() == null || !attr.getUri().equals("")) { 
+    			return "";
+    		}
+    		resp = resp + attr.getUri();
+    	}
+        return resp;
     }
+
 
     public Entity getInRelationTo() {
     	return inRelationTo;
@@ -103,7 +116,12 @@ public class TimeVariable {
     	if (role != null && !role.equals("")) {
     		str += prep(role) + "-";
     	}
-    	str += prep(ent.getLabel()) + "-" + prep(attr.getLabel());
+    	str += prep(ent.getLabel());
+    	for (Attribute attr : attrList) {
+    		if (attr != null && attr.getLabel() != null) {
+    			str += "-" + prep(attr.getLabel());
+    		}
+    	}
     	if (inRelationTo != null && !inRelationTo.getLabel().equals("")) {
     		str += "-" + prep(inRelationTo.getLabel());
     	}

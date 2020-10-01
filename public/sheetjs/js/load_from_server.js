@@ -471,7 +471,7 @@ function chooseItem(data) {
   var rowNum_str=rowNum.toString();
   storeThisEdit(rowNum_str,colNum_str,cdg.data[rowNum][colNum]);
   cdg.draw();
-  
+
   if(hold != cdg.data[rowNum][colNum]){
     approvalList[rowNum][colNum] = "";
     indicateApproval(rowNum, colNum, cdg.data[rowNum][colNum]);
@@ -792,10 +792,10 @@ function saveFile(e){
      // Convert back to workbook
      workbook.Sheets[sn] = XLSX.utils.aoa_to_sheet(json[sn]);
    }
-   
+
    // Save the file
    var wbout = XLSX.write(workbook, { bookType: _filetype, bookSST: false, type: 'array', compression:true});
- 
+
    var formdata = new FormData();
    if (_formData) {
      formdata.append('file', new File([wbout], _formData));
@@ -871,14 +871,14 @@ function approvalFunction(sheetCopy){
      for(var j=0;j<sheetCopy[i].length;j++){
        var keys=sheetCopy[i][j];
        var temp2=[];
-       
+
        if(approvalList[i][j] == sheetCopy[i][j]){
        		approvalList[i][j] = "";
        }
        else{
 	 if(approvalList[i][j] != ""){
 	   indicateApproval(i,j,sheetCopy[i][j]);
-	 }     
+	 }
        }
        /*if(sheetCopy[i][j].startsWith("??")||sheetCopy[i][j]==""){
 
@@ -1231,7 +1231,7 @@ function getSuggestion(){
          console.log(data);
          spinnerStatus.stop();
          imageStatus.style.visibility = 'visible';
-         imageStatus.src = imgPath + 'fail.png'
+         imageStatus.src = imgPath + 'fail.png';
 
          if(err == 400){
             alert("Error: SDDGen is " + data['Bad Request'] + ': ' + data['Miss']);
@@ -1253,12 +1253,54 @@ function getSuggestion(){
         dataType: 'json',
         success : function(getSDDGenRequest) {
            sddgenAdress = getSDDGenRequest;
-           getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+           // Add trailing slash if its missing from the config file
+           if (sddgenAdress.substr(-1) != '/') {         // If the last character is not a slash
+             sddgenAdress = sddgenAdress + '/';            // Append a slash to it.
+          }
+          $.ajax({
+             type : 'POST',
+             url : sddgenAdress + 'ping',
+             dataType : 'json',
+             timeout : 5000,
+             success : function(ping) {
+                console.log(ping);
+                if(ping){
+                   getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
+                }
+             },
+             error : function() {
+                spinnerStatus.stop();
+                imageStatus.src = imgPath + 'fail.png';
+                imageStatus.style.visibility = 'visible';
+                //imageStatus.src = imgPath + 'fail.png';
+                alert("Error: SDDGen not running");
+             }
+          });
+           //getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
         }
       });
    }
    else{
-      getJSON(sddgenAdress + '/populate-sdd',  sddGenFunction);
+      $.ajax({
+         type : 'POST',
+         url : sddgenAdress + 'ping',
+         dataType : 'json',
+         timeout : 5000,
+         success : function(ping) {
+            console.log(ping);
+            if(ping){
+               getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
+            }
+         },
+         error : function() {
+            spinnerStatus.stop();
+            imageStatus.src = imgPath + 'fail.png';
+            imageStatus.style.visibility = 'visible';
+            //imageStatus.src = imgPath + 'fail.png';
+            alert("Error: SDDGen not running");
+         }
+      });
+      //getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
    }
    checkRecs(globalL, globalR, 1);
 }

@@ -10,13 +10,14 @@ import org.hadatac.console.models.SecurityRole;
 import org.hadatac.data.loader.mqtt.MqttMessageWorker;
 import org.hadatac.utils.CollectionUtil;
 
+import org.hadatac.utils.ConfigProp;
 @Singleton
 public class OnStart {
 	
     @Inject
     public OnStart() {
     	initDirectoryStructure();
-    	
+    	 
     	// check existence/availability of security role
     	SecurityRole.initialize();
     	
@@ -41,7 +42,7 @@ public class OnStart {
     
     private void initDirectoryStructure(){
 		List<String> listFolderPaths = new LinkedList<String>();
-		listFolderPaths.add("tmp");
+		/*listFolderPaths.add("tmp");
 		listFolderPaths.add("logs");
 		listFolderPaths.add("processed_csv");
 		listFolderPaths.add("unprocessed_csv");
@@ -49,8 +50,18 @@ public class OnStart {
 		listFolderPaths.add("working_csv");
 		listFolderPaths.add("tmp/ttl");
 		listFolderPaths.add("tmp/cache");
-		listFolderPaths.add("tmp/uploads");
-
+		listFolderPaths.add("tmp/uploads");*/
+		
+		listFolderPaths.add(ConfigProp.getTmp());
+		listFolderPaths.add(ConfigProp.getLogs());
+		listFolderPaths.add(ConfigProp.getPathProc());
+		listFolderPaths.add(ConfigProp.getPathUnproc());
+		listFolderPaths.add(ConfigProp.getPathDownload());
+		listFolderPaths.add(ConfigProp.getPathWorking());
+		listFolderPaths.add(ConfigProp.getTmp() + "ttl");
+		listFolderPaths.add(ConfigProp.getTmp() + "cache");
+		listFolderPaths.add(ConfigProp.getTmp() + "uploads");
+		
 		for(String path : listFolderPaths){
 			File folder = new File(path);
 			// if the directory does not exist, create it

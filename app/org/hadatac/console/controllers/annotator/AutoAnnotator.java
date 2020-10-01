@@ -125,7 +125,7 @@ public class AutoAnnotator extends Controller {
         });
 
         boolean bStarted = false;
-        if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
+        if (ConfigProp.getAuto().equals("on")) {
             bStarted = true;
         }
         
@@ -267,12 +267,14 @@ public class AutoAnnotator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result toggleAutoAnnotator(String dir) {
-        if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
-            ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
+        if (ConfigProp.getAuto().equals("on")) {
+            //ConfigProp.setPropertyValue("hadatac.conf", "autoccsv.auto", "off");
+	    System.setProperty("hadatac.autoccsv.auto", "off");
             System.out.println("Turning auto-annotation off");
         }
         else {
-            ConfigProp.setPropertyValue("autoccsv.config", "auto", "on");
+            //ConfigProp.setPropertyValue("hadatac.conf", "autoccsv.auto", "on");
+	    System.setProperty("hadatac.autoccsv.auto", "on");
             System.out.println("Turning auto-annotation on");
         }
 

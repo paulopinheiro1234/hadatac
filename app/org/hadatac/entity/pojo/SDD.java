@@ -508,7 +508,7 @@ public class SDD {
                 if (URIUtils.isValidURI(attributeCell)) {
                     isIndicator = checkIndicatorPath(attributeCell);
                     if (!isIndicator) {
-                        System.out.println("Adding " + attributeCell);
+                        //System.out.println("Adding " + attributeCell);
                         checkStudyIndicatorPathResults.add(attributeCell);
                     }
                 } else {

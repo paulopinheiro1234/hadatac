@@ -10,7 +10,8 @@ public class TimeAlignment {
     private Map<String, StudyObject> objects;
     //private List<String> timestamps;
     private Map<String, StudyObject> refObjects;
-    private Map<String, Attribute> attributeCache;
+    private Map<String, List<Attribute>> attributeListCache;
+    private Map<String, Attribute> attrCache;
     private Map<String, Entity> entityCache;
     private Map<String, Unit> unitCache;
     private Map<String, AlignmentEntityRole> roles;
@@ -22,7 +23,8 @@ public class TimeAlignment {
 
     public TimeAlignment() {
         objects = new HashMap<String, StudyObject>();
-        attributeCache = new HashMap<String, Attribute>();
+        attrCache = new HashMap<String, Attribute>();
+        attributeListCache = new HashMap<String, List<Attribute>>();
         entityCache = new HashMap<String, Entity>();
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
@@ -137,15 +139,42 @@ public class TimeAlignment {
 
         //System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
 
-        Attribute attribute = attributeCache.get(m.getCharacteristicUris().get(0));
-        if (attribute == null || !attribute.getUri().equals(m.getCharacteristicUris().get(0))) {
-            attribute = Attribute.find(m.getCharacteristicUris().get(0));
-            if (attribute == null) {
-                System.out.println("[ERROR] retrieving attribute " + m.getCharacteristicUris().get(0));
-                return null;
-            } else {
-                attributeCache.put(attribute.getUri(),attribute);
-            }
+        Attribute attribute = null;
+        List<Attribute> attributeList = null;
+        if (m.getCategoricalClassUri() != null && !m.getCategoricalClassUri().isEmpty()) {
+	        attribute = attributeListCache.get(m.getCategoricalClassUri()).get(0);
+	        if (attribute == null || !attribute.getUri().equals(m.getCategoricalClassUri())) {
+	        	attribute = attrCache.get(m.getCategoricalClassUri());
+	        	if (attribute == null) {
+	        		attribute = Attribute.find(m.getCategoricalClassUri());
+	        		if (attribute == null) {
+	        			System.out.println("[ERROR] retrieving attribute " + m.getCategoricalClassUri());
+	        			return null;
+	        		}
+	        		attrCache.put(attribute.getUri(), attribute);
+	        	}
+	            attributeList = new ArrayList<Attribute>();
+	            attributeList.add(attribute);
+	            attributeListCache.put(attribute.getUri(), attributeList);
+	        }
+        } else {
+        	attributeList = attributeListCache.get(Alignment.getUrisFromStringList(m.getCharacteristicUris()));
+	        if (attributeList == null || !Alignment.getUrisFromAttributeList(attributeList).equals(Alignment.getUrisFromStringList(m.getCharacteristicUris()))) {
+	        	attributeList = new ArrayList<Attribute>();
+	            for (String attrUri : m.getCharacteristicUris()) {
+		        	attribute = attrCache.get(attrUri);
+		        	if (attribute == null) {
+		        		attribute = Attribute.find(attrUri);
+		        		if (attribute == null) {
+		        			System.out.println("[ERROR] retrieving attribute " + attrUri);
+		        			return null;
+		        		}
+		        		attrCache.put(attribute.getUri(), attribute);
+		        	}
+		        	attributeList.add(attribute);
+	            }
+                attributeListCache.put(Alignment.getUrisFromAttributeList(attributeList),attributeList);
+	        }
         }
 
         //System.out.println("Align-Debug: new alignment attribute 2"); 
@@ -154,7 +183,7 @@ public class TimeAlignment {
         //    System.out.println("Adding the following inRelationTo " + mInRelationTo);
         //}
 
-        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attribute, irt); 
+        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attributeList, irt); 
 
         //if (!mUnit.equals("")) {
         //    System.out.println("Adding the following unit " + mUnit);

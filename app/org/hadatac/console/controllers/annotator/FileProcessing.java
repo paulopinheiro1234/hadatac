@@ -27,10 +27,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import org.hadatac.utils.ConfigProp;
 
 public class FileProcessing extends Controller {
 
-    private static final String UPLOAD_PATH = "tmp/uploads/";
+    private static final String UPLOAD_PATH = ConfigProp.getTmp() + "uploads/";
 
     public static String[] extractFields(String str) {
 	if (str == null || str.equals("")) {
