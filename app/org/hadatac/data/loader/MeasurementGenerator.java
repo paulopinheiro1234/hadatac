@@ -34,7 +34,7 @@ public class MeasurementGenerator extends BaseGenerator {
 
 	public static final int FILEMODE = 0;
 	public static final int MSGMODE = 1;
-	
+
     private int mode;
     private STR str;
     private DataFile dataFile;
@@ -67,14 +67,14 @@ public class MeasurementGenerator extends BaseGenerator {
     private Map<String,ObjectCollection> matchingSOCs = null;
 
     private String dasoUnitUri = "";
-    
+
     private int rowErrors = 0;
     private int rowErrorsLimit = 20;
 
     //private List<DASVirtualObject> templateList = new ArrayList<DASVirtualObject>();
-    private DASOInstanceGenerator dasoiGen = null; 
+    private DASOInstanceGenerator dasoiGen = null;
 
-    public MeasurementGenerator(int mode, DataFile dataFile, STR str, 
+    public MeasurementGenerator(int mode, DataFile dataFile, STR str,
             DataAcquisitionSchema schema, DASOInstanceGenerator dasoiGen) {
         super(dataFile);
         this.mode = mode;
@@ -88,7 +88,7 @@ public class MeasurementGenerator extends BaseGenerator {
         this.str = str;
         this.schema = schema;
     	this.dasoiGen = dasoiGen;
-    	
+
     	boolean cont = true;
         if (str.hasCellScope()) {
         	//System.out.println("Measurement Generator: hasCellScope is TRUE");
@@ -117,7 +117,7 @@ public class MeasurementGenerator extends BaseGenerator {
     		groupBySocAndId = new HashMap<String,SOCGroup>();
         }
         rowErrors = 0;
-    
+
     }
 
     @Override
@@ -136,10 +136,10 @@ public class MeasurementGenerator extends BaseGenerator {
     	for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
             //System.out.println("DASA URI: [" + dasa.getUri() + "]   Position: [" + dasa.getTempPositionInt() + "]");
     	}
-        
+
         if (!unknownHeaders.isEmpty()) {
-            logger.addLine(Feedback.println(Feedback.WEB, 
-                    "[WARNING] Failed to match the following " 
+            logger.addLine(Feedback.println(Feedback.WEB,
+                    "[WARNING] Failed to match the following "
                             + unknownHeaders.size() + " headers: " + unknownHeaders));
         }
 
@@ -189,7 +189,7 @@ public class MeasurementGenerator extends BaseGenerator {
         }
 
         //System.out.println("possibleValues: " + possibleValues);
-        
+
         // Comment out row instance generation
         // Map<String, DASOInstance> rowInstances = new HashMap<String, DASOInstance>();
     }
@@ -197,14 +197,14 @@ public class MeasurementGenerator extends BaseGenerator {
     @Override
     public HADatAcThing createObject(Record record, int rowNumber, String selector) throws Exception {
       	//System.out.println("rowNumber: " + rowNumber);
-        
+
     	//System.out.println("Position 0 : [" + record.getValueByColumnIndex(0) + "]");
     	//System.out.println("Position 1 : [" + record.getValueByColumnIndex(1) + "]");
-    	
+
     	//for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
         //    System.out.println("DASA URI: [" + dasa.getUri() + "]   Position: [" + dasa.getTempPositionInt() + "]");
     	//}
-    	
+
     	Map<String, Map<String,String>> objList = null;
         Map<String,String> groundObj = null;
         String socUri = "";
@@ -239,7 +239,7 @@ public class MeasurementGenerator extends BaseGenerator {
             }
             objList = dasoiGen.generateRowInstances(id);
             groundObj = dasoiGen.retrieveGroundObject(id);
-            
+
             if (groundObj == null) {
                 if (rowErrors < rowErrorsLimit) {
                     logger.addLine(Feedback.println(Feedback.WEB, String.format(
@@ -252,7 +252,7 @@ public class MeasurementGenerator extends BaseGenerator {
                 	}
                 }
             }
-            
+
             // socUri and objUri for row scope is defined later under measurement processing
         }
 
@@ -309,7 +309,7 @@ public class MeasurementGenerator extends BaseGenerator {
             String originalValue = "";
             if (dasa.getTempPositionInt() < 0 || dasa.getTempPositionInt() >= record.size()) {
                 continue;
-            } else if (record.getValueByColumnIndex(dasa.getTempPositionInt()).isEmpty()) { 
+            } else if (record.getValueByColumnIndex(dasa.getTempPositionInt()).isEmpty()) {
                 continue;
             } else {
                 originalValue = record.getValueByColumnIndex(dasa.getTempPositionInt());
@@ -467,14 +467,19 @@ public class MeasurementGenerator extends BaseGenerator {
                 }
 
                 if (!id.equals("")) {
+
                 	measurement.setOriginalId(id);
                     reference = dasa.getObjectViewLabel();
+                    objUri = this.getObjectUri(id, reference, objList);
+
                     if (reference != null && !reference.equals("")) {
                         if (objList.get(reference) == null) {
                             System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
+                        } else if ( objUri == null ) {
+                            System.out.println("MeasurementGenerator: [ERROR] Processing subject with id [" + id + "]: cannot find its full URI");
                         } else {
                             // from object list
-                            objUri = objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
+                            // objUri = objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
                             measurement.setObjectUri(objUri);
                             measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
                             measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
@@ -519,7 +524,7 @@ public class MeasurementGenerator extends BaseGenerator {
                     } else {
                         System.out.println("MeasurementGenerator: [ERROR]: could not find DASA reference for ID=[" + id + "]");
                     }
-                    
+
                 }
             }
 
@@ -528,7 +533,7 @@ public class MeasurementGenerator extends BaseGenerator {
              *   SET GROUP                         *
              *                                     *
              *=====================================*/
-            
+
             if (doGroup && !schema.getGroupLabel().equals("") && posGroup >= 0 && !socUri.equals("") && !objUri.equals("")) {
                 // group value exists
                 String groupValue = record.getValueByColumnIndex(posGroup);
@@ -546,11 +551,11 @@ public class MeasurementGenerator extends BaseGenerator {
                 			grp.saveToTripleStore();
                 			groupBySocAndId.put(key, grp);
                 		}
-                	}              	
+                	}
                 	// add object URI to group
                 	grp.addMemberUri(objUri);
                 	grp.saveMemberToTripleStore(objUri);
-                
+
                 }
                 doGroup = false;
             }
@@ -560,7 +565,7 @@ public class MeasurementGenerator extends BaseGenerator {
              *   SET MATCHING                      *
              *                                     *
              *=====================================*/
-            
+
             if (doMatching && !schema.getMatchingLabel().equals("") && posMatching >= 0) {
                 String scopeObjectUri = objList.get(reference).get(StudyObject.SCOPE_OBJECT_URI);
                 String scopeObjectSOCUri = objList.get(reference).get(StudyObject.SCOPE_OBJECT_SOC_URI);
@@ -589,14 +594,14 @@ public class MeasurementGenerator extends BaseGenerator {
              *=====================================*/
 
             if (mode == FILEMODE) {
-            	measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+            	measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" +
             			URIUtils.replaceNameSpaceEx(str.getUri()).split(":")[1] + "/" +
-            			dasa.getLabel() + "/" + 
+            			dasa.getLabel() + "/" +
             			dataFile.getFileName() + "-" + totalCount++);
             } else {
-                measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" + 
+                measurement.setUri(URIUtils.replacePrefixEx(measurement.getStudyUri()) + "/" +
                         URIUtils.replaceNameSpaceEx(str.getUri()).split(":")[1] + "/" +
-                        dasa.getLabel() + "/" + 
+                        dasa.getLabel() + "/" +
                         str.getLabel() + "-" + totalCount++);
             }
             measurement.setOwnerUri(str.getOwnerUri());
@@ -764,7 +769,7 @@ public class MeasurementGenerator extends BaseGenerator {
     public boolean commitObjectToSolr(HADatAcThing object) throws Exception {
         SolrClient solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
-        	
+
         try {
         	solr.addBean(object);
         } catch (IOException | SolrServerException e) {
@@ -796,6 +801,30 @@ public class MeasurementGenerator extends BaseGenerator {
 
             throw new Exception("Fail to commit to solr");
         }
+    }
+
+    // helper method to get the full URI of the VC object for a given originalId
+    private String getObjectUri(String id, String reference, Map<String, Map<String,String>> objList ) {
+
+        if ( id == null || id.length() == 0 ) return null;
+        if ( objList == null || objList.size() == 0 ) return null;
+
+        String role = objList.get(reference).get(StudyObject.SOC_LABEL);
+        if ( role != null && role.toLowerCase().indexOf("mother") < 0 ) { // this is hard-coded for now
+            return objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
+        }
+
+        for (Map.Entry<String, Map<String,String>> entrySet : objList.entrySet() ) {
+            Map map = entrySet.getValue();
+            if ( map.containsKey(StudyObject.SUBJECT_ID) ) {
+                if (id.equals(map.get(StudyObject.SUBJECT_ID))) {
+                    return (String) map.get(StudyObject.STUDY_OBJECT_URI);
+                }
+            }
+        }
+
+        return null;
+
     }
 
     @Override
