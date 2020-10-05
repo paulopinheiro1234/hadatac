@@ -61,6 +61,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String objectUri;
     @Field("study_object_uri_str")
     private String studyObjectUri;
+    @Field("entry_object_uri_str")
+    private String entryObjectUri;
     @Field("study_object_type_uri_str")
     private String studyObjectTypeUri;
     @Field("timestamp_date")
@@ -171,6 +173,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setStudyObjectUri(String studyObjectUri) {
         this.studyObjectUri = studyObjectUri;
+    }
+
+    public String getEntryObjectUri() {
+        return entryObjectUri;
+    }
+
+    public void setEntryObjectUri(String entryObjectUri) {
+        this.entryObjectUri = entryObjectUri;
     }
 
     public String getStudyObjectTypeUri() {
@@ -1013,6 +1023,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setDasoUri(SolrUtils.getFieldValue(doc, "daso_uri_str"));
         m.setDasaUri(SolrUtils.getFieldValue(doc, "dasa_uri_str"));
         m.setStudyObjectUri(SolrUtils.getFieldValue(doc, "study_object_uri_str"));
+        m.setEntryObjectUri(SolrUtils.getFieldValue(doc, "entry_object_uri_str"));
         m.setStudyObjectTypeUri(SolrUtils.getFieldValue(doc, "study_object_type_uri_str"));
         m.setObjectUri(SolrUtils.getFieldValue(doc, "object_uri_str"));
         m.setRole(SolrUtils.getFieldValue(doc, "role_str"));
@@ -1184,11 +1195,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                     //   - add entity-role to the collection of entity-roles of the alignment
                     //   - add object to the collection of objects of the alignment 
                 
-                	List<String> alignObjs = alignCache.get(m.getObjectUri()); 
+                	List<String> alignObjs = alignCache.get(m.getEntryObjectUri());
                 	if (alignObjs == null) {
-                		alignObjs = Alignment.alignmentObjects(m.getObjectUri(), selectedRole, m.getOriginalId());
+                		alignObjs = Alignment.alignmentObjects(m.getEntryObjectUri(), selectedRole, m.getOriginalId());
                 		if (alignObjs != null) {
-                			alignCache.put(m.getObjectUri(),alignObjs);
+                			alignCache.put(m.getEntryObjectUri(),alignObjs);
                 			/*
                 			System.out.print("Main object: [" + m.getObjectUri() + "] Associated Objects: [ ");
                 			for (String aux : alignObjs) {
@@ -1837,3 +1848,4 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 }
+

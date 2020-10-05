@@ -470,16 +470,15 @@ public class MeasurementGenerator extends BaseGenerator {
 
                 	measurement.setOriginalId(id);
                     reference = dasa.getObjectViewLabel();
-                    objUri = this.getObjectUri(id, reference, objList);
+                    measurement.setEntryObjectUri(this.getEntryObjectUri(id,objList));
+                    // objUri = this.getObjectUri(id, reference, objList);
 
                     if (reference != null && !reference.equals("")) {
                         if (objList.get(reference) == null) {
                             System.out.println("MeasurementGenerator: [ERROR] Processing objList for reference [" + reference + "]");
-                        } else if ( objUri == null ) {
-                            System.out.println("MeasurementGenerator: [ERROR] Processing subject with id [" + id + "]: cannot find its full URI");
                         } else {
                             // from object list
-                            // objUri = objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
+                            objUri = objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
                             measurement.setObjectUri(objUri);
                             measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
                             measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
@@ -804,15 +803,10 @@ public class MeasurementGenerator extends BaseGenerator {
     }
 
     // helper method to get the full URI of the VC object for a given originalId
-    private String getObjectUri(String id, String reference, Map<String, Map<String,String>> objList ) {
+    private String getEntryObjectUri(String id, Map<String, Map<String,String>> objList ) {
 
         if ( id == null || id.length() == 0 ) return null;
         if ( objList == null || objList.size() == 0 ) return null;
-
-        String role = objList.get(reference).get(StudyObject.SOC_LABEL);
-        if ( role != null && role.toLowerCase().indexOf("mother") < 0 ) { // this is hard-coded for now
-            return objList.get(reference).get(StudyObject.STUDY_OBJECT_URI);
-        }
 
         for (Map.Entry<String, Map<String,String>> entrySet : objList.entrySet() ) {
             Map map = entrySet.getValue();
@@ -832,3 +826,4 @@ public class MeasurementGenerator extends BaseGenerator {
         return "";
     }
 }
+
