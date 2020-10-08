@@ -1193,10 +1193,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                     // Perform following actions required if the object of the measurement has not been processed yet
                     //   - add a row in the result set for aligning object, if such row does not exist
                     //   - add entity-role to the collection of entity-roles of the alignment
-                    //   - add object to the collection of objects of the alignment 
-                
+                    //   - add object to the collection of objects of the alignment
+
                 	List<String> alignObjs = alignCache.get(m.getEntryObjectUri());
                 	if (alignObjs == null) {
+
                 		alignObjs = Alignment.alignmentObjects(m.getEntryObjectUri(), selectedRole, m.getOriginalId());
                 		if (alignObjs != null) {
                 			alignCache.put(m.getEntryObjectUri(),alignObjs);
@@ -1317,6 +1318,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 	                		}
 	
 	                		if (referenceObj != null && finalValue != null) {
+	                		    if ( m.isAllNumerical(finalValue) && finalValue.contains(",") ) {
+	                		        finalValue = finalValue.replaceAll(",", "");
+                                }
 	                			values = results.get(referenceObj.getUri()).get(key);
 	                 			if (values == null) {
 	                 				values = new ArrayList<String>();
@@ -1450,6 +1454,15 @@ public class Measurement extends HADatAcThing implements Runnable {
         	outputProvenance(alignment, file, dataFile.getOwnerEmail());
         }    	
 
+    }
+
+    // helper function to check if a give string has all digital and ","
+    private boolean isAllNumerical(String strValue) {
+        if ( strValue == null || strValue.length() == 0 ) return false;
+        for ( char c : strValue.toCharArray() ) {
+            if ( !Character.isDigit(c) && c != ',' && c != '.' ) return false;
+        }
+        return true;
     }
 
     public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
