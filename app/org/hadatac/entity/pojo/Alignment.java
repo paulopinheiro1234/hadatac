@@ -380,6 +380,8 @@ public class Alignment {
     	 * Test if alignment object(s) is(are) downstream from some upstream object 
     	 */
         if (upstream.size() > 0) {
+
+            boolean found = false;
         	for (Map<String,String> socRoleTuple :  upstream) {
                 Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
                 if (itr.hasNext()) { 
@@ -395,11 +397,13 @@ public class Alignment {
                             	Map.Entry<String, String> entry2 = itr2.next();
                             	if (entry2.getValue().equals(selectedRole) && !alignObjs.contains(entry2.getKey())) {
                             		alignObjs.add(entry2.getKey());
+                            		found = true;
                             	}
                             }
                     	}
                     }
                 }
+                if ( found ) break;
         	}
         	if (alignObjs.size() > 0) {
                 //System.out.println("Align-Debug: DOWNSTREAM OF UPSTREAM objects of size " + alignObjs.size()); 
@@ -541,4 +545,5 @@ public class Alignment {
     
     
 }
+
 
