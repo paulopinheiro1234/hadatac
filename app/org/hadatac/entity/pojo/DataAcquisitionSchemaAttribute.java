@@ -604,6 +604,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String inRelationToUri = "";
         String relationUri = "";
 
+        Map<String,String> relationMap = new HashMap<>();
         while (resultsrw.hasNext()) {        	
             QuerySolution soln = resultsrw.next();
 
@@ -639,6 +640,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 relationUri = soln.get("relation").toString();
             }
 
+            if ( relationUri != null && relationUri.length() > 0 && inRelationToUri != null && inRelationToUri.length() > 0 ) {
+                relationMap.put(relationUri, inRelationToUri);
+                relationUri = "";
+                inRelationToUri = "";
+            }
+
         }
 
         dasa = new DataAcquisitionSchemaAttribute(
@@ -653,9 +660,11 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 daseUriStr,
                 dasoUriStr);
 
-        dasa.addRelation(relationUri, inRelationToUri);
+        for ( Map.Entry<String, String> entry : relationMap.entrySet() ) {
+            dasa.addRelation(entry.getKey(), entry.getValue());
+        }
 
-	DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
+	    DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
         return dasa;
     }
 
@@ -926,3 +935,5 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return 0;
     }
 }
+
+
