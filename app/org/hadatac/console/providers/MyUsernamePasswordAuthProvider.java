@@ -402,7 +402,7 @@ public class MyUsernamePasswordAuthProvider extends
 	}
 	
 	public void sendInvitationMailing(String user_name, String user_email, final Context ctx) {
-		final String subject = "Invitation from HADatAc Team";
+		final String subject = ConfigFactory.load().getString("hadatac.community.email_subject_line");
 		final Body body = getInvitationMailingBody(user_name, user_email, ctx);
 		sendMail(subject, body, user_email);
 	}
