@@ -11,13 +11,15 @@
 
 @main("HADatAc: Human-Aware Data Acquisition Framework") {
 
+    <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
+
     <div class="container-fluid">
       <div class="row">
           <div class="col-md-1 col-xs-0"></div>
-          <div class="col-md-8 col-xs-0">
-             <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")'s Human-Aware Data Acquisition Framework</font></h3>
-             @ConfigFactory.load().getString("hadatac.community.description") 
-             <hr>
+          <div id="textTitle" class="col-md-8 col-xs-0">
+              <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+              <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+              <hr>
           </div>
           <div class="col-md-1 col-xs-0"></div>
       </div>
@@ -46,7 +48,7 @@
              <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
          </div> *@
          <div class="col-md-3 col-xs-0">
-             <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-User-Guide" class="btn btn-warning btn-block" role="button">User Guide</a>
+             <a href="@ConfigFactory.load().getString("hadatac.community.user_guide")" class="btn btn-warning btn-block" role="button">User Guide</a>
          </div>
          <div class="col-md-2 col-xs-0"></div>
       </div>

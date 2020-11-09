@@ -34,12 +34,14 @@
     }
   </style>
 
-   <div class="container-fluid">
+  <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
+
+  <div class="container-fluid">
      <div class="row">
        <div class="col-md-1"></div>
-       <div class="col-md-8">
-         <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname") 's Human-Aware Data Acquisition Framework</font></h3>
-         @ConfigFactory.load().getString("hadatac.community.description") 
+       <div id="textTitle" class="col-md-8">
+         <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+         <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
          <hr>
        </div>
        <div class="col-md-1"></div>
