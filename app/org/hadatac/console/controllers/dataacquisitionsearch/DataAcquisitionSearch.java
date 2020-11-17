@@ -28,7 +28,6 @@ import org.hadatac.console.models.ObjectDetails;
 import org.hadatac.console.models.Pivot;
 
 import org.hadatac.entity.pojo.*;
-import org.hadatac.filters.MyLoggingFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.concurrent.HttpExecutionContext;
