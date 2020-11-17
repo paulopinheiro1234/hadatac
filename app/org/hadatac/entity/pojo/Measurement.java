@@ -15,8 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import module.DatabaseExecutionContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -38,15 +42,18 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetTree;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Feedback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Measurement extends HADatAcThing implements Runnable {
+
+    private static final Logger log = LoggerFactory.getLogger(Measurement.class);
+
     @Field("uri")
     private String uri;
     @Field("owner_uri_str")
@@ -625,21 +632,27 @@ public class Measurement extends HADatAcThing implements Runnable {
     public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {
         AcquisitionQueryResult result = new AcquisitionQueryResult();
 
+        long startTime = System.currentTimeMillis();
         List<String> ownedDAs = STR.findAllAccessibleDataAcquisition(user_uri);
+        log.debug("STR.findAllAccessibleDataAcquisition(user_uri) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
         if (ownedDAs.isEmpty()) {
             /*
              * an empty query happens when current user is not allowed to see any
              * data acquisition
              */
-            System.out.println("Not allowed to access any Data Acquisition!");
+            System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
             return result;
         }
 
+        startTime = System.currentTimeMillis();
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacetsFromString(facets);
+        log.debug("facetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
 
+        startTime = System.currentTimeMillis();
         FacetHandler retFacetHandler = new FacetHandler();
         retFacetHandler.loadFacetsFromString(facets);
+        log.debug("retFacetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
 
         // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
         // System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
@@ -649,7 +662,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         // Get facet statistics
         // getAllFacetStats(retFacetHandler, retFacetHandler, result, true);
+        startTime = System.currentTimeMillis();
         getAllFacetStats(facetHandler, retFacetHandler, result, true);
+        log.debug("getAllFacetStats() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
 
         //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
         //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.toJSON());
@@ -674,21 +689,30 @@ public class Measurement extends HADatAcThing implements Runnable {
         query.setFacetLimit(-1);
 
         try {
+            startTime = System.currentTimeMillis();
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
             solr.close();
+            log.debug("solr.query takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
             SolrDocumentList docs = queryResponse.getResults();
             docSize = docs.getNumFound();
             System.out.println("Num of results: " + docSize);
 
+            startTime = System.currentTimeMillis();
             Set<String> uri_set = new HashSet<String>();
             Map<String, STR> cachedDA = new HashMap<String, STR>();
             Map<String, String> mapClassLabel = generateCodeClassLabel();
-            
+            log.debug("generateCodeClassLabel() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
             Iterator<SolrDocument> iterDoc = docs.iterator();
             while (iterDoc.hasNext()) {
+
+                startTime = System.currentTimeMillis();
                 Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
+                log.debug("convertFromSolr() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
                 result.addDocument(measurement);
                 uri_set.add(measurement.getEntityUri());
                 uri_set.addAll(measurement.getCharacteristicUris());
@@ -696,10 +720,13 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
 
             // Assign labels of entity, characteristic, and units collectively
+            startTime = System.currentTimeMillis();
             Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
             for (Measurement measurement : result.getDocuments()) {
                 measurement.setLabels(cachedLabels);
             }
+            log.debug("generateCachedLabel() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
         } catch (SolrServerException e) {
             System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
         } catch (IOException e) {
@@ -714,25 +741,145 @@ public class Measurement extends HADatAcThing implements Runnable {
         return result;
     }
 
+    public static AcquisitionQueryResult findAsync(String user_uri, int page, int qtd, String facets, DatabaseExecutionContext databaseExecutionContext)  {
+
+        AcquisitionQueryResult resultAsync = new AcquisitionQueryResult();
+
+        CompletableFuture<List<String>> promiseOfOwnedDAs = CompletableFuture.supplyAsync((
+                () -> { return STR.findAllAccessibleDataAcquisition(user_uri); }
+        ), databaseExecutionContext);
+
+        CompletableFuture<AcquisitionQueryResult> promiseOfFacetStats = CompletableFuture.supplyAsync((
+                () -> { return getAllFacetStatsWrapper(resultAsync, facets, databaseExecutionContext); }
+        ), databaseExecutionContext);
+
+        List<String> ownedDAs = null;
+        try {
+            ownedDAs = promiseOfOwnedDAs.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        AcquisitionQueryResult result = null;
+        try {
+            result = promiseOfFacetStats.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        // CompletableFuture<AcquisitionQueryResult> ans = promiseOfOwnedDAs.thenCombine(promiseOfFacetStats, (ownedDAs, facetResult) -> {
+
+            if (ownedDAs.isEmpty()) {
+                System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
+                return result;
+            }
+
+            long docSize = 0;
+
+            FacetHandler facetHandler = new FacetHandler();
+            facetHandler.loadFacetsFromString(facets);
+            String q = buildQuery(ownedDAs, facetHandler);
+
+            SolrQuery query = new SolrQuery();
+            query.setQuery(q);
+            if (page != -1) {
+                query.setStart((page - 1) * qtd);
+                query.setRows(qtd);
+            } else {
+                query.setRows(99999999);
+            }
+            query.setFacet(true);
+            query.setFacetLimit(-1);
+
+            try {
+                SolrClient solr = new HttpSolrClient.Builder(
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+                QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+                solr.close();
+
+                SolrDocumentList docs = queryResponse.getResults();
+                docSize = docs.getNumFound();
+                System.out.println("Num of results: " + docSize);
+
+                Set<String> uri_set = new HashSet<String>();
+                Map<String, STR> cachedDA = new HashMap<String, STR>();
+                Map<String, String> mapClassLabel = generateCodeClassLabel();
+
+                Iterator<SolrDocument> iterDoc = docs.iterator();
+                while (iterDoc.hasNext()) {
+                    Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
+                    result.addDocument(measurement);
+                    uri_set.add(measurement.getEntityUri());
+                    uri_set.addAll(measurement.getCharacteristicUris());
+                    uri_set.add(measurement.getUnitUri());
+                }
+
+                // Assign labels of entity, characteristic, and units collectively
+                Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
+                for (Measurement measurement : result.getDocuments()) {
+                    measurement.setLabels(cachedLabels);
+                }
+
+            } catch (SolrServerException e) {
+                System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
+            } catch (IOException e) {
+                System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            result.setDocumentSize(docSize);
+
+            return result;
+        //});
+
+        //return result;
+
+    }
+
+    public static AcquisitionQueryResult getAllFacetStatsWrapper(AcquisitionQueryResult result, String facets, DatabaseExecutionContext databaseExecutionContext) {
+
+        FacetHandler facetHandler = new FacetHandler();
+        facetHandler.loadFacetsFromString(facets);
+
+        FacetHandler retFacetHandler = new FacetHandler();
+        retFacetHandler.loadFacetsFromString(facets);
+
+        getAllFacetStatsAsync(facetHandler, retFacetHandler, result, true, databaseExecutionContext);
+
+        return result;
+
+    }
+
     private static void getAllFacetStats(
             FacetHandler facetHandler, 
             FacetHandler retFacetHandler,
             AcquisitionQueryResult result,
             boolean bAddToResults) {
+
         FacetTree fTreeS = new FacetTree();
         fTreeS.setTargetFacet(STR.class);
         fTreeS.addUpperFacet(Study.class);
+
+        long startTime = System.currentTimeMillis();
         Pivot pivotS = getFacetStats(fTreeS, 
                 retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
                 facetHandler);
+        log.debug("getFacetStats(fTreeS = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectType.class);
         //fTreeOC.addUpperFacet(ObjectCollectionType.class);
         fTreeOC.addUpperFacet(StudyObjectRole.class);
+        startTime = System.currentTimeMillis();
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
+        log.debug("getFacetStats(fTreeOC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         /*
          *  The facet tree EC computes the entity-attribute indicators for indicators based on property's main attribute 
@@ -744,9 +891,12 @@ public class Measurement extends HADatAcThing implements Runnable {
         //fTreeEC.addUpperFacet(Category.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
+        startTime = System.currentTimeMillis();
         Pivot pivotEC = getFacetStats(fTreeEC, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
                 facetHandler);
+        log.debug("getFacetStats(fTreeEC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+
 
         /*
          *  The facet tree EC computes the entity-attribute indicators for indicators based on property's in-relation-to attribute 
@@ -758,9 +908,11 @@ public class Measurement extends HADatAcThing implements Runnable {
         //fTreeEC2.addUpperFacet(Category.class);
         fTreeEC2.addUpperFacet(InRelationToInstance.class);
         fTreeEC2.addUpperFacet(EntityInstance.class);
+        startTime = System.currentTimeMillis();
         Pivot pivotEC2 = getFacetStats(fTreeEC2, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2), 
                 facetHandler);
+        log.debug("getFacetStats(fTreeEC2 = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         /*
          *  Merging the computation result of pivotEC2 into pivotEC
@@ -793,24 +945,30 @@ public class Measurement extends HADatAcThing implements Runnable {
     	
         FacetTree fTreeU = new FacetTree();
         fTreeU.setTargetFacet(UnitInstance.class);
+        startTime = System.currentTimeMillis();
         Pivot pivotU = getFacetStats(fTreeU, 
                 retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
                 facetHandler);
+        log.debug("getFacetStats(fTreeU = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         FacetTree fTreeT = new FacetTree();
         fTreeT.setTargetFacet(TimeInstance.class);
         //fTreeT.addUpperFacet(DASEType.class);
+        startTime = System.currentTimeMillis();
         Pivot pivotT = getFacetStats(fTreeT, 
                 retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
                 facetHandler);
+        log.debug("getFacetStats(fTreeT = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         FacetTree fTreePI = new FacetTree();
         fTreePI.setTargetFacet(STR.class);
         fTreePI.addUpperFacet(Platform.class);
         fTreePI.addUpperFacet(Instrument.class);
+        startTime = System.currentTimeMillis();
         Pivot pivotPI = getFacetStats(fTreePI, 
                 retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
                 facetHandler);
+        log.debug("getFacetStats(fTreePI = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         if (bAddToResults) {
             result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
@@ -821,6 +979,170 @@ public class Measurement extends HADatAcThing implements Runnable {
             result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
         }
                
+    }
+
+    private static void getAllFacetStatsAsync(
+            FacetHandler facetHandler,
+            FacetHandler retFacetHandler,
+            AcquisitionQueryResult result,
+            boolean bAddToResults, DatabaseExecutionContext databaseExecutionContext) {
+
+        AtomicReference<Pivot> pEC = new AtomicReference<>();
+        AtomicReference<Pivot> pEC2 = new AtomicReference<>();
+
+        CompletableFuture<FacetTree> promiseOfTreeS = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreeS = new FacetTree();
+                    fTreeS.setTargetFacet(STR.class);
+                    fTreeS.addUpperFacet(Study.class);
+
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotS = getFacetStats(fTreeS,
+                            retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreeS = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    if (bAddToResults) {
+                        result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
+                    }
+                    return fTreeS;
+                }
+        ), databaseExecutionContext);
+
+        CompletableFuture<FacetTree> promiseOfTreeOC = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreeOC = new FacetTree();
+                    fTreeOC.setTargetFacet(StudyObjectType.class);
+                    //fTreeOC.addUpperFacet(ObjectCollectionType.class);
+                    fTreeOC.addUpperFacet(StudyObjectRole.class);
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotOC = getFacetStats(fTreeOC,
+                            retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreeOC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    if (bAddToResults) {
+                        result.extra_facets.put(FacetHandler.OBJECT_COLLECTION_FACET, pivotOC);
+                    }
+                    return fTreeOC;
+                }
+        ), databaseExecutionContext);
+
+        CompletableFuture<FacetTree> promiseOfTreeEC = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreeEC = new FacetTree();
+                    fTreeEC.setTargetFacet(AttributeInstance.class);
+                    fTreeEC.addUpperFacet(Indicator.class);
+                    fTreeEC.addUpperFacet(EntityRole.class);
+                    //fTreeEC.addUpperFacet(Category.class);
+                    fTreeEC.addUpperFacet(InRelationToInstance.class);
+                    fTreeEC.addUpperFacet(EntityInstance.class);
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotEC = getFacetStats(fTreeEC,
+                            retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreeEC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    if (bAddToResults) {
+                        result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivotEC);
+                    }
+                    pEC.set(pivotEC);
+                    return fTreeEC;
+                }
+        ), databaseExecutionContext);
+
+        CompletableFuture<FacetTree> promiseOfTreeEC2 = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreeEC2 = new FacetTree();
+                    fTreeEC2.setTargetFacet(AttributeInstance.class);
+                    fTreeEC2.addUpperFacet(Indicator.class);
+                    fTreeEC2.addUpperFacet(EntityRole.class);
+                    //fTreeEC2.addUpperFacet(Category.class);
+                    fTreeEC2.addUpperFacet(InRelationToInstance.class);
+                    fTreeEC2.addUpperFacet(EntityInstance.class);
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotEC2 = getFacetStats(fTreeEC2,
+                            retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreeEC2 = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    pEC2.set(pivotEC2);
+                    return fTreeEC2;
+                }
+        ), databaseExecutionContext);
+
+        /*
+         *  Merging the computation result of pivotEC2 into pivotEC
+         */
+
+        CompletableFuture<FacetTree> promiseOfTreeU = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreeU = new FacetTree();
+                    fTreeU.setTargetFacet(UnitInstance.class);
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotU = getFacetStats(fTreeU,
+                            retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreeU = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    if (bAddToResults) {
+                        result.extra_facets.put(FacetHandler.UNIT_FACET, pivotU);
+                    }
+                    return fTreeU;
+                }
+        ), databaseExecutionContext);
+
+        CompletableFuture<FacetTree> promiseOfTreeT = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreeT = new FacetTree();
+                    fTreeT.setTargetFacet(TimeInstance.class);
+                    //fTreeT.addUpperFacet(DASEType.class);
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotT = getFacetStats(fTreeT,
+                            retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreeT = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    if (bAddToResults) {
+                        result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
+                    }
+                    return fTreeT;
+                }
+        ), databaseExecutionContext);
+
+        CompletableFuture<FacetTree> promiseOfTreePI = CompletableFuture.supplyAsync((
+                () -> {
+                    FacetTree fTreePI = new FacetTree();
+                    fTreePI.setTargetFacet(STR.class);
+                    fTreePI.addUpperFacet(Platform.class);
+                    fTreePI.addUpperFacet(Instrument.class);
+                    long startTime = System.currentTimeMillis();
+                    Pivot pivotPI = getFacetStats(fTreePI,
+                            retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
+                            facetHandler);
+                    log.debug("getFacetStats(fTreePI = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    if (bAddToResults) {
+                        result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
+                    }
+                    return fTreePI;
+                }
+        ),databaseExecutionContext);
+
+        try {
+
+            FacetTree fTreeS = promiseOfTreeS.get();
+            FacetTree fTreeOC = promiseOfTreeOC.get();
+            FacetTree fTreeEC = promiseOfTreeEC.get();
+            FacetTree fTreeEC2 = promiseOfTreeEC2.get();
+            FacetTree fTreeU = promiseOfTreeU.get();
+            FacetTree fTreeT = promiseOfTreeT.get();
+            FacetTree fTreePI = promiseOfTreePI.get();
+
+            pEC.get().addChildrenFromPivot(pEC2.get());
+            pEC.get().normalizeCategoricalVariableLabels(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
+            //pivotEC.addChildrenFromPivot(pivotEC2);
+            //pivotEC.normalizeCategoricalVariableLabels(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static Pivot getFacetStats(
