@@ -24,6 +24,7 @@ import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
@@ -36,9 +37,13 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Study extends HADatAcThing {
+
+    private static final Logger log = LoggerFactory.getLogger(Study.class);
 
     private static String className = "hasco:Study";
 
@@ -417,7 +422,7 @@ public class Study extends HADatAcThing {
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
