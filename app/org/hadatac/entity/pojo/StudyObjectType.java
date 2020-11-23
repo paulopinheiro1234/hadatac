@@ -18,14 +18,19 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class StudyObjectType extends HADatAcClass implements Comparable<StudyObjectType> {
+
+    private static final Logger log = LoggerFactory.getLogger(StudyObjectType.class);
 
     static String className = "hasco:StudyObject";
 
@@ -125,7 +130,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {

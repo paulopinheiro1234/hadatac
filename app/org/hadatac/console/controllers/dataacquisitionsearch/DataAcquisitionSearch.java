@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.FacetFormData;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
@@ -96,6 +97,7 @@ public class DataAcquisitionSearch extends Controller {
     public Result index(int page, int rows) {
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.concurrency")) ) {
             log.debug("using async calls for facet search....");
+            SPARQLUtilsFacetSearch.clearCache();
             return indexInternalAsync(0, page, rows);
         } else {
             return indexInternal(0, page, rows);

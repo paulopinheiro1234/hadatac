@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
@@ -28,10 +29,13 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
-	public static String LAT = "http://semanticscience.org/resource/Latitude";
+    private static final Logger log = LoggerFactory.getLogger(Platform.class);
+    public static String LAT = "http://semanticscience.org/resource/Latitude";
 	public static String LONG = "http://semanticscience.org/resource/Longitude";
 	
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -402,7 +406,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             
             while (resultsrw.hasNext()) {
