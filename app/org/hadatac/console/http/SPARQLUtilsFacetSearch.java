@@ -45,7 +45,9 @@ public class SPARQLUtilsFacetSearch {
 
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
             if (selectCache.containsKey(queryString)) {
-                return selectCache.get(queryString);
+                ResultSetRewindable resultSetRewindable = selectCache.get(queryString);
+                resultSetRewindable.reset(); // reset pointer back to the beginning of the result set
+                return resultSetRewindable;
             }
         }
 
