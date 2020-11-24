@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
@@ -264,6 +265,48 @@ public abstract class HADatAcThing implements Facetable {
         }
 
         return "";
+    }
+
+    public static String getFacetSearchShortestLabel(String uri) {
+        List<String> labels = getFacetSearchLabels(uri);
+        if (labels.size() > 0) {
+            labels.sort(new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return Integer.compare(o1.length(), o2.length());
+                }
+            });
+
+            return labels.get(0);
+        }
+
+        return "";
+    }
+
+    public static List<String> getFacetSearchLabels(String uri) {
+        List<String> results = new ArrayList<String>();
+        if (uri == null || uri.equals("")) {
+            return results;
+        }
+        if (uri.startsWith("http")) {
+            uri = "<" + uri.trim() + ">";
+        }
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?label WHERE { \n" +
+                "  " + uri + " rdfs:label ?label . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("label") != null && !soln.get("label").toString().isEmpty()) {
+                results.add(soln.get("label").toString().replace("@en", ""));
+            }
+        }
+
+        return results;
     }
 
     public static int getNumberInstances() {

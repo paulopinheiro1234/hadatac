@@ -17,10 +17,13 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.CollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class EntityInstance extends HADatAcThing implements Comparable<EntityInstance> {
 
+    private static final Logger log = LoggerFactory.getLogger(EntityInstance.class);
     static String className = "sio:SIO_000776";
 
     public EntityInstance() {}
@@ -109,7 +112,7 @@ public class EntityInstance extends HADatAcThing implements Comparable<EntityIns
         for (Pivot pivot_ent : pivot.children) {
             EntityInstance entity = new EntityInstance();
             entity.setUri(pivot_ent.getValue());
-            entity.setLabel("[" + WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()) + "]");
+            entity.setLabel("[" + WordUtils.capitalize(Entity.facetSearchFind(pivot_ent.getValue()).getLabel()) + "]");
             entity.setCount(pivot_ent.getCount());
             entity.setField("entity_uri_str");
             entity.setQuery(query);

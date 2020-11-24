@@ -19,10 +19,13 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.console.models.Facet;
 import org.hadatac.utils.CollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AttributeInstance extends HADatAcThing implements Comparable<AttributeInstance> {
 
+    private static final Logger log = LoggerFactory.getLogger(AttributeInstance.class);
     static String className = "sio:SIO_000614";
 
     public AttributeInstance () {}
@@ -77,7 +80,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
-        
+
         SolrQuery query = new SolrQuery();
         QueryResponse queryResponse = null;
         String strQuery = facetHandler.getTempSolrQuery(facet);
@@ -117,11 +120,11 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             if (pivot_ent.getValue().contains("; ")) {
                 List<String> uris = Arrays.asList(pivot_ent.getValue().split("; "));
                 String label = String.join(" ", uris.stream()
-                        .map(s -> WordUtils.capitalize(Attribute.find(s).getLabel()))
+                        .map(s -> WordUtils.capitalize(Attribute.facetSearchFind(s).getLabel()))
                         .collect(Collectors.toList()));
                 attrib.setLabel(label);
             } else {
-                attrib.setLabel(WordUtils.capitalize(Attribute.find(pivot_ent.getValue()).getLabel()));
+                attrib.setLabel(WordUtils.capitalize(Attribute.facetSearchFind(pivot_ent.getValue()).getLabel()));
             }
             attrib.setCount(pivot_ent.getCount());
             attrib.setQuery(query);

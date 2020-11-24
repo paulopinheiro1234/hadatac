@@ -24,6 +24,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -187,6 +188,42 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         for (Attribute att : list) 
             map.put(att.getUri(),att.getLabel());
         return map;
+    }
+
+    public static Attribute facetSearchFind(String uri) {
+
+        Attribute attribute = null;
+        Statement statement;
+        RDFNode object;
+
+        String queryString = "DESCRIBE <" + uri + ">";
+        Model model = SPARQLUtilsFacetSearch.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        attribute = new Attribute();
+        StmtIterator stmtIterator = model.listStatements();
+
+        while (stmtIterator.hasNext()) {
+            statement = stmtIterator.next();
+            object = statement.getObject();
+            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+                attribute.setLabel(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+                attribute.setSuperUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals("http://purl.org/dc/terms/identifier")) {
+                attribute.setHasDCTerms(object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2004/02/skos/core#notation")) {
+                attribute.setHasSkosNotation(object.asLiteral().getString());
+            }
+        }
+
+        attribute.setUri(uri);
+        attribute.setLocalName(uri.substring(uri.indexOf('#') + 1));
+        if (attribute.getLabel() == null || attribute.getLabel().equals("")) {
+            attribute.setLabel(attribute.getLocalName());
+        }
+
+        return attribute;
     }
 
     public static Attribute find(String uri) {

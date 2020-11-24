@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -79,6 +80,36 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         }
         
         return subclasses;
+    }
+
+    public static Entity facetSearchFind(String uri) {
+
+        String queryString = "DESCRIBE <" + uri + ">";
+        Model model = SPARQLUtilsFacetSearch.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        Entity entity = new Entity();
+        StmtIterator stmtIterator = model.listStatements();
+
+        while (stmtIterator.hasNext()) {
+            Statement statement = stmtIterator.next();
+            RDFNode object = statement.getObject();
+            if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:label"))) {
+                String label = object.asLiteral().getString();
+
+                // prefer longer one
+                if (label.length() > entity.getLabel().length()) {
+                    entity.setLabel(label);
+                }
+            } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:subClassOf"))) {
+                entity.setSuperUri(object.asResource().getURI());
+            }
+        }
+
+        entity.setUri(uri);
+        entity.setLocalName(uri.substring(uri.indexOf('#') + 1));
+
+        return entity;
     }
 
     public static Entity find(String uri) {

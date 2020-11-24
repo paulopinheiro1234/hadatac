@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
@@ -21,8 +22,12 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
+
+    private static final Logger log = LoggerFactory.getLogger(EntityRole.class);
 
     static String className = "sio:SIO_000776";
 
@@ -98,7 +103,7 @@ public class EntityRole extends HADatAcThing implements Comparable<EntityRole> {
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             if (resultsrw.size() == 0) {
