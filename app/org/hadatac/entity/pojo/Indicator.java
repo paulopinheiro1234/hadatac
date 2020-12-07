@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -408,7 +402,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
             	"   ?inRelationToUri rdfs:label ?inRelationToLabel . " +
             	" }";
 
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
         while (resultsrw.hasNext()) {

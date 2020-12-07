@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
+import org.apache.jena.rdf.model.Model;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 import org.hadatac.console.http.SPARQLUtilsFacetSearch;
@@ -95,9 +97,19 @@ public class DataAcquisitionSearch extends Controller {
 
     // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(int page, int rows) {
+
+        //printMemoryStats();
+        /*long startTime = System.currentTimeMillis();
+        Model model = SPARQLUtilsFacetSearch.createInMemoryModel();
+        System.out.println("in-memory model created, taking " + (System.currentTimeMillis()-startTime) + "ms, with # of triples = " + model.size());
+        */
+        //printMemoryStats();
+
+        SPARQLUtilsFacetSearch.clearCache();
+        // SolrUtilsFacetSearch.clearCache();
+
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.concurrency")) ) {
             log.debug("using async calls for facet search....");
-            SPARQLUtilsFacetSearch.clearCache();
             return indexInternalAsync(0, page, rows);
         } else {
             return indexInternal(0, page, rows);
@@ -149,15 +161,19 @@ public class DataAcquisitionSearch extends Controller {
         ObjectDetails objDetails = getObjectDetails(results);
 
         //System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
+        List<ObjectCollection> objectCollections = ObjectCollection.findAllFacetSearch();
+
+        SPARQLUtilsFacetSearch.reportStats();
+        // SolrUtilsFacetSearch.reportStats();
 
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    Measurement.getFieldNames(), ObjectCollection.findAll()));
+                    Measurement.getFieldNames(), objectCollections));
         } else {
             return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    Measurement.getFieldNames(), ObjectCollection.findAll()));
+                    Measurement.getFieldNames(), objectCollections));
         }
     }
 
@@ -178,7 +194,7 @@ public class DataAcquisitionSearch extends Controller {
 
         long startTime = System.currentTimeMillis();
         final SysUser user = AuthApplication.getLocalUser(session());
-        log.debug("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.info("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         if (null == user) {
             ownerUri = "Public";
@@ -195,7 +211,7 @@ public class DataAcquisitionSearch extends Controller {
         startTime = System.currentTimeMillis();
 
         CompletableFuture<List<ObjectCollection>> promiseOfObjs = CompletableFuture.supplyAsync((
-                () -> { return ObjectCollection.findAll(); }
+                () -> { return ObjectCollection.findAllFacetSearch(); }
         ), databaseExecutionContext);
 
         String finalFacets = facets;
@@ -204,9 +220,8 @@ public class DataAcquisitionSearch extends Controller {
                 () -> { return Measurement.findAsync(finalOwnerUri, page, rows, finalFacets, databaseExecutionContext); }
         ), databaseExecutionContext);
 
-        startTime = System.currentTimeMillis();
         List<String> fileNames = Measurement.getFieldNames();
-        log.debug("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.info("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         List<ObjectCollection> objs = null;
         try {
@@ -225,7 +240,7 @@ public class DataAcquisitionSearch extends Controller {
             e.printStackTrace();
         }
 
-        log.debug("---> ObjectCollection.findAll() + Measurement.find() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.info("---> ObjectCollection.findAllFacetSearch() + Measurement.findAsync() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         //System.out.println("OwnerURI: " + ownerUri);
         // startTime = System.currentTimeMillis();
@@ -235,10 +250,13 @@ public class DataAcquisitionSearch extends Controller {
 
         startTime = System.currentTimeMillis();
         ObjectDetails objDetails = getObjectDetails(results);
-        log.debug("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.info("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         //System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
-        
+
+        SPARQLUtilsFacetSearch.reportStats();
+        // SolrUtilsFacetSearch.reportStats();
+
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(), 
                     results, results.toJSON(), facetHandler, objDetails.toJSON(), 
@@ -302,23 +320,34 @@ public class DataAcquisitionSearch extends Controller {
             timeResolution = name_map.get("selTimeRes")[0].toString();
         }
 
-        AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
+        long startTime = System.currentTimeMillis();
+        AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
+        log.info("Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
     	//System.out.println("Object type inside alignment: " + objectType);
+
+        CompletionStage<Integer> promiseOfResult = null;
+        long currentTime = System.currentTimeMillis();
+
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
         	//System.out.println("Selected subject alignment");
-        	CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
+        	promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
 		        results.getDocuments(), finalFacets, email, categoricalOption), 
 	        		ec.current());
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
         	//System.out.println("Selected time alignment");
-	        CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
+	        promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
 			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption), 
 		        		ec.current());
         }
+
+        promiseOfResult.whenComplete(
+                (result, exeception) -> {
+                    log.info("downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
+                });
 
         try {
             Thread.sleep(2000);
@@ -361,5 +390,26 @@ public class DataAcquisitionSearch extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDownloadAlignment() {
         return downloadAlignment();
+    }
+
+    private static void printMemoryStats() {
+        /* Total number of processors or cores available to the JVM */
+        System.out.println("Available processors (cores): " +
+                Runtime.getRuntime().availableProcessors());
+
+        /* Total amount of free memory available to the JVM */
+        System.out.println("Free memory (bytes): " +
+                Runtime.getRuntime().freeMemory());
+
+        /* This will return Long.MAX_VALUE if there is no preset limit */
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        /* Maximum amount of memory the JVM will attempt to use */
+        System.out.println("Maximum memory (bytes): " +
+                (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
+
+        /* Total memory currently in use by the JVM */
+        System.out.println("Total memory (bytes): " +
+                Runtime.getRuntime().totalMemory());
+
     }
 }
