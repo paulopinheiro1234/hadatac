@@ -254,7 +254,7 @@ public class TimeInstance extends HADatAcThing implements Comparable<TimeInstanc
             if (pivot_ent.getValue().startsWith("http")) {
                 time.setUri(pivot_ent.getValue());
                 
-                Entity entity = Entity.find(pivot_ent.getValue());
+                Entity entity = Entity.facetSearchFind(pivot_ent.getValue());
                 if (entity != null) {
                     time.setLabel(WordUtils.capitalize(entity.getLabel()));
                 }

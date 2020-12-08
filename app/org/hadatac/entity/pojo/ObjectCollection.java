@@ -13,7 +13,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.update.UpdateExecutionFactory;
@@ -25,6 +24,9 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
+import org.hadatac.console.http.SolrUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
@@ -36,8 +38,12 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ObjectCollection extends HADatAcThing implements Comparable<ObjectCollection> {
+
+    private static final Logger log = LoggerFactory.getLogger(ObjectCollection.class);
 
     public static String SUBJECT_COLLECTION = "http://hadatac.org/ont/hasco/SubjectGroup";
     public static String SAMPLE_COLLECTION = "http://hadatac.org/ont/hasco/SampleCollection";
@@ -540,6 +546,36 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    private static List<String> retrieveSpaceScopeFacetSearch(String oc_uri) {
+
+        List<String> scopeUris = new ArrayList<String>();
+        String scopeUri = "";
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?spaceScopeUri WHERE { \n" +
+                " <" + oc_uri + "> hasco:hasSpaceScope ?spaceScopeUri . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
+                        scopeUri = soln.getResource("spaceScopeUri").getURI();
+                        if (scopeUri != null && !scopeUri.equals("")) {
+                            scopeUris.add(scopeUri);
+                        }
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+
+        return scopeUris;
+    }
+
     private static List<String> retrieveTimeScope(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = "";
@@ -569,6 +605,35 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    private static List<String> retrieveTimeScopeFacetSearch(String oc_uri) {
+        List<String> scopeUris = new ArrayList<String>();
+        String scopeUri = "";
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?timeScopeUri WHERE { " +
+                " <" + oc_uri + "> hasco:hasTimeScope ?timeScopeUri . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
+                        scopeUri = soln.getResource("timeScopeUri").getURI();
+                        if (scopeUri != null && !scopeUri.equals("")) {
+                            scopeUris.add(scopeUri);
+                        }
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+
+        return scopeUris;
+    }
+
     private static List<String> retrieveGroup(String oc_uri) {
         List<String> groupUris = new ArrayList<String>();
         String groupUri = "";
@@ -578,6 +643,35 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("groupUri") != null && soln.getResource("groupUri").getURI() != null) {
+                        groupUri = soln.getResource("groupUri").getURI();
+                        if (groupUri != null && !groupUri.equals("")) {
+                            groupUris.add(groupUri);
+                        }
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+
+        return groupUris;
+    }
+
+    private static List<String> retrieveGroupFacetSearch(String oc_uri) {
+        List<String> groupUris = new ArrayList<String>();
+        String groupUri = "";
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?groupUri WHERE { " +
+                " <" + oc_uri + "> hasco:hasGroup ?groupUri . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         while (resultsrw.hasNext()) {
@@ -776,7 +870,157 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return oc;
     }
 
+    public static ObjectCollection findFacetSearch(String oc_uri) {
+        ObjectCollection oc = null;
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?ocType ?comment ?studyUri ?hasScopeUri ?hasRoleLabel ?hasVirtualColumnUri ?spaceScopeUri ?timeScopeUri ?lastCounter WHERE { \n" +
+                "    <" + oc_uri + "> a ?ocType . \n" +
+                "    <" + oc_uri + "> hasco:isMemberOf ?studyUri . \n" +
+                "    OPTIONAL { <" + oc_uri + "> rdfs:comment ?comment } . \n" +
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasScope ?hasScopeUri } . \n" +
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasReference ?hasVirtualColumnUri } . \n" +
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasRoleLabel ?hasRoleLabel } . \n" +
+                "    OPTIONAL { <" + oc_uri + "> hasco:hasLastCounter ?lastCounter } . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] ObjectCollection. Could not find OC with URI: <" + oc_uri + ">");
+            return oc;
+        }
+
+        String typeStr = "";
+        String labelStr = "";
+        String studyUriStr = "";
+        String commentStr = "";
+        String hasScopeUriStr = "";
+        String hasVirtualColumnUriStr = "";
+        String hasRoleLabelStr = "";
+        String lastCounterStr = "0";
+        List<String> spaceScopeUrisStr = new ArrayList<String>();
+        List<String> timeScopeUrisStr = new ArrayList<String>();
+        List<String> groupUrisStr = new ArrayList<String>();
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+
+                try {
+                    if (soln.getResource("ocType") != null && soln.getResource("ocType").getURI() != null) {
+                        typeStr = soln.getResource("ocType").getURI();
+                    }
+                } catch (Exception e1) {
+                    typeStr = "";
+                }
+
+                labelStr = FirstLabel.getLabel(oc_uri);
+
+                try {
+                    if (soln.getResource("studyUri") != null && soln.getResource("studyUri").getURI() != null) {
+                        studyUriStr = soln.getResource("studyUri").getURI();
+                    }
+                } catch (Exception e1) {
+                    studyUriStr = "";
+                }
+
+                try {
+                    if (soln.getResource("hasVirtualColumnUri") != null && soln.getResource("hasVirtualColumnUri").getURI() != null) {
+                        hasVirtualColumnUriStr = soln.getResource("hasVirtualColumnUri").getURI();
+                    }
+                } catch (Exception e1) {
+                    hasVirtualColumnUriStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("comment") != null && soln.getLiteral("comment").getString() != null) {
+                        commentStr = soln.getLiteral("comment").getString();
+                    }
+                } catch (Exception e1) {
+                    commentStr = "";
+                }
+
+                try {
+                    if (soln.getResource("hasScopeUri") != null && soln.getResource("hasScopeUri").getURI() != null) {
+                        hasScopeUriStr = soln.getResource("hasScopeUri").getURI();
+                    }
+                } catch (Exception e1) {
+                    hasScopeUriStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("hasRoleLabel") != null && soln.getLiteral("hasRoleLabel").getString() != null) {
+                        hasRoleLabelStr = soln.getLiteral("hasRoleLabel").getString();
+                    }
+                } catch (Exception e1) {
+                    hasRoleLabelStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("lastCounter") != null && soln.getLiteral("lastCounter").getString() != null) {
+                        lastCounterStr = soln.getLiteral("lastCounter").getString();
+                    }
+                } catch (Exception e1) {
+                    lastCounterStr = "";
+                }
+
+                spaceScopeUrisStr = retrieveSpaceScopeFacetSearch(oc_uri);
+
+                timeScopeUrisStr = retrieveTimeScopeFacetSearch(oc_uri);
+
+                groupUrisStr = retrieveGroupFacetSearch(oc_uri);
+
+                oc = new ObjectCollection(
+                        oc_uri,
+                        typeStr,
+                        labelStr,
+                        commentStr,
+                        studyUriStr,
+                        hasVirtualColumnUriStr,
+                        hasRoleLabelStr,
+                        hasScopeUriStr,
+                        spaceScopeUrisStr,
+                        timeScopeUrisStr,
+                        groupUrisStr,
+                        lastCounterStr);
+            }
+        }
+
+        // retrieve URIs of objects that are member of the collection
+        String queryMemberStr = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?uriMember WHERE { \n" +
+                "    ?uriMember hasco:isMemberOf <" + oc_uri + "> . \n" +
+                "}";
+
+        ResultSetRewindable resultsrwMember = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryMemberStr);
+
+        if (resultsrwMember.hasNext()) {
+            String uriMemberStr = "";
+
+            while (resultsrwMember.hasNext()) {
+                QuerySolution soln = resultsrwMember.next();
+                if (soln != null) {
+                    try {
+                        if (soln.getResource("uriMember") != null && soln.getResource("uriMember").getURI() != null) {
+                            uriMemberStr = soln.getResource("uriMember").getURI();
+                            oc.getObjectUris().add(uriMemberStr);
+                        }
+                    } catch (Exception e1) {
+                        uriMemberStr = "";
+                    }
+                }
+            }
+        }
+
+        return oc;
+    }
+
     public static List<ObjectCollection> findAll() {
+
+        long currentTime = System.currentTimeMillis();
         List<ObjectCollection> oc_list = new ArrayList<ObjectCollection>();
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -795,6 +1039,32 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             }
         }
 
+        log.info("findAll() takes "  + (System.currentTimeMillis()-currentTime));
+        return oc_list;
+    }
+
+    public static List<ObjectCollection> findAllFacetSearch() {
+
+        long currentTime = System.currentTimeMillis();
+        List<ObjectCollection> oc_list = new ArrayList<ObjectCollection>();
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri WHERE { " +
+                "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . " +
+                "   ?uri a ?ocType . } ";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("uri").getURI() != null) {
+                ObjectCollection sc = ObjectCollection.findFacetSearch(soln.getResource("uri").getURI());
+                oc_list.add(sc);
+            }
+        }
+
+        log.info("findAllFacetSearch() takes "  + (System.currentTimeMillis()-currentTime));
         return oc_list;
     }
 

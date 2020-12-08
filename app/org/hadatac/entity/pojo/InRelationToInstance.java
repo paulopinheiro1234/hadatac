@@ -134,7 +134,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             InRelationToInstance object = new InRelationToInstance();
             object.setUri(pivot_ent.getValue());
             if (pivot_ent.getValue().contains(":")) {
-            	object.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+            	object.setLabel(WordUtils.capitalize(Entity.facetSearchFind(pivot_ent.getValue()).getLabel()));
             } else {
             	object.setLabel(pivot_ent.getValue());
             }

@@ -14,9 +14,15 @@ import org.hadatac.entity.pojo.Category;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
+import org.hadatac.entity.pojo.Measurement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.libs.Json;
 
 public class Pivot {
+
+    private static final Logger log = LoggerFactory.getLogger(Pivot.class);
+
     public List<Pivot> children;
 
     private String field;
@@ -117,7 +123,25 @@ public class Pivot {
         }
     	
     }
-    
+
+    public void normalizeCategoricalVariableLabelsFacetSearch(Facet facet, FacetHandler facetHandler) {
+
+        // retrieve mapping
+        long currentTime = System.currentTimeMillis();
+        Category cat = new Category();
+        Map<String, String> catMap = cat.getCategoriesSolrFacetSearch(facet, facetHandler);
+        //for (Map.Entry<String, String> entry : catMap.entrySet()) {
+        //    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+        //}
+
+        // traverse and replace categorical labels
+        normalizeLabels(catMap);
+
+        // re-order variables
+        sort();
+        log.info("normalizeCategoricalVariableLabelsFacetSearch = " + (System.currentTimeMillis()-currentTime));
+    }
+
     public void normalizeCategoricalVariableLabels(Facet facet, FacetHandler facetHandler) {
     	
     	// retrieve mapping 

@@ -12,7 +12,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.rdf.model.Model;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.model.ParsingResult;
 import org.hadatac.console.controllers.triplestore.routes;
@@ -48,6 +50,14 @@ public class LoadKB extends Controller {
     public Result loadKB(String oper) {
 		return ok(loadKB.render(oper, ""));
     }
+
+	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	public Result createInMemoryDataset(String oper) {
+		Model model = SPARQLUtilsFacetSearch.createInMemoryModel();
+		String msg = "in-memory model created, with # of triples = " + model.size();
+		System.out.println(msg);
+		return ok(loadInMemory.render(msg));
+	}
 
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postLoadKB(String oper) {
