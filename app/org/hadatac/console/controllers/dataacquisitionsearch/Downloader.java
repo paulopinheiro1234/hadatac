@@ -38,7 +38,7 @@ public class Downloader extends Controller {
 
 	public static final String ALIGNMENT_SUBJECT = "SUBJECT";
 	public static final String ALIGNMENT_TIME = "TIME";
-	
+
     @Inject
     FormFactory formFactory;
 
@@ -156,7 +156,11 @@ public class Downloader extends Controller {
     public Result checkCompletion(String fileId) {
         Map<String, Object> result = new HashMap<String, Object>();
 
-        DataFile dataFile = DataFile.findById(fileId);
+        DataFile dataFile = DataFile.findByNameAndStatus(fileId, DataFile.CREATING);
+        if ( dataFile == null ) {
+            dataFile = DataFile.findByNameAndStatus(fileId, DataFile.CREATED);
+        }
+
         if (dataFile != null) {
             result.put("CompletionPercentage", dataFile.getCompletionPercentage());
             result.put("Status", dataFile.getStatus());
