@@ -1,15 +1,10 @@
 package org.hadatac.console.http;
 
 import com.typesafe.config.ConfigFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
+
+import org.hadatac.utils.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +19,13 @@ public class SPARQLUtilsFacetSearch {
     private static final Logger log = LoggerFactory.getLogger(SPARQLUtilsFacetSearch.class);
     private static Set<String> visited = new HashSet<>();
 
+    private static Model kgModel = null;
+    private static Dataset dataset = null;
+    public static int totalQueries = 0;
+    public static int cachedQueries = 0;
+    public static int freshCalls = 0;
+    public static long totalTimeTaken = 0;
+
     private static ConcurrentHashMap<String, ResultSetRewindable> selectCache = new ConcurrentHashMap<>();
     private static ConcurrentHashMap<String, Model> describeCache = new ConcurrentHashMap<>();
 
@@ -31,6 +33,10 @@ public class SPARQLUtilsFacetSearch {
         selectCache.clear();
         describeCache.clear();
         visited.clear();
+        totalQueries = 0;
+        cachedQueries = 0;
+        freshCalls = 0;
+        totalTimeTaken = 0;
     }
 
     public static ResultSetRewindable select(String sparqlService, String queryString) {
@@ -43,27 +49,64 @@ public class SPARQLUtilsFacetSearch {
             visited.add(queryString);
         }*/
 
-        if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
-            if (selectCache.containsKey(queryString)) {
-                ResultSetRewindable resultSetRewindable = selectCache.get(queryString);
-                resultSetRewindable.reset(); // reset pointer back to the beginning of the result set
-                return resultSetRewindable;
-            }
-        }
+        totalQueries ++;
 
-        try {
+        if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {
+
+            // System.out.println("select: using in-memory model");
+
+            if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
+                if (selectCache.containsKey(queryString)) {
+                    cachedQueries++;
+                    ResultSetRewindable resultSetRewindable = selectCache.get(queryString);
+                    resultSetRewindable.reset(); // reset pointer back to the beginning of the result set
+                    return resultSetRewindable;
+                }
+            }
+
+            freshCalls++;
+            long startTime = System.currentTimeMillis();
             Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
+            QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
             ResultSet results = qexec.execSelect();
             ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
             qexec.close();
+            totalTimeTaken += (System.currentTimeMillis()-startTime);
+
             if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
                 selectCache.put(queryString,resultsrw);
             }
             return resultsrw;
-        } catch (QueryParseException e) {
-            System.out.println("[ERROR] queryString: " + queryString);
-            throw e;
+
+        } else {
+
+            if ("ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode"))) {
+                if (selectCache.containsKey(queryString)) {
+                    ResultSetRewindable resultSetRewindable = selectCache.get(queryString);
+                    resultSetRewindable.reset(); // reset pointer back to the beginning of the result set
+                    return resultSetRewindable;
+                }
+            }
+
+            try {
+                // System.out.println("NOT using in-memory model");
+                freshCalls++;
+                long startTime = System.currentTimeMillis();
+                Query query = QueryFactory.create(queryString);
+                QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
+                ResultSet results = qexec.execSelect();
+                ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+                qexec.close();
+                totalTimeTaken += (System.currentTimeMillis()-startTime);
+
+                if ("ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode"))) {
+                    selectCache.put(queryString, resultsrw);
+                }
+                return resultsrw;
+            } catch (QueryParseException e) {
+                System.out.println("[ERROR] queryString: " + queryString);
+                throw e;
+            }
         }
     }
 
@@ -76,24 +119,103 @@ public class SPARQLUtilsFacetSearch {
             visited.add(queryString);
         }*/
 
-        if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
-            if (describeCache.containsKey(queryString)) {
-                return describeCache.get(queryString);
-            }
-        }
+        totalQueries++;
+        if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {
 
-        try {
+            // System.out.println("desscribe: using in-memory model");
+            if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
+                if (describeCache.containsKey(queryString)) {
+                    cachedQueries++;
+                    return describeCache.get(queryString);
+                }
+            }
+
+            freshCalls++;
+            long startTime = System.currentTimeMillis();
             Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
+            QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
             Model model = qexec.execDescribe();
-            qexec.close();
+            totalTimeTaken += (System.currentTimeMillis()-startTime);
+
             if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
                 describeCache.put(queryString, model);
             }
             return model;
+
+        } else {
+
+            if ("ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode"))) {
+                if (describeCache.containsKey(queryString)) {
+                    return describeCache.get(queryString);
+                }
+            }
+
+            try {
+                // System.out.println("NOT using in-memory model");
+                freshCalls++;
+                long startTime = System.currentTimeMillis();
+                Query query = QueryFactory.create(queryString);
+                QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
+                Model model = qexec.execDescribe();
+                qexec.close();
+                totalTimeTaken += (System.currentTimeMillis()-startTime);
+
+                if ("ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode"))) {
+                    describeCache.put(queryString, model);
+                }
+                return model;
+
+            } catch (QueryParseException e) {
+                System.out.println("[ERROR] queryString: " + queryString);
+                throw e;
+            }
+        }
+    }
+
+    public static void reportStats() {
+
+        if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {
+            log.info("in-memory model. # of calls (fresh/total) = " + freshCalls + "/" + totalQueries + ", total time taken: " + totalTimeTaken
+                    + ", ave. time taken: " + totalTimeTaken/freshCalls);
+        } else {
+            log.info("remote DB. # of calls (fresh/total) = " + freshCalls + "/" + totalQueries + ", total time taken: " + totalTimeTaken
+                    + ", ave. time taken: " + totalTimeTaken/freshCalls);
+        }
+    }
+
+    public static Model createInMemoryModel() {
+
+        /*if ( kgModel != null && kgModel.size() > 0 ) {
+            System.out.println("we have the in-memory model already, by-pass this!");
+            return kgModel;
+        }*/
+
+        // final String queryString = "select * where { ?subject ?predicaet ?object .  } ";
+        final String sparqlService = CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL);
+        final String queryString = "CONSTRUCT { ?s ?p ?o  } where { ?s ?p ?o. }";
+
+        try {
+            Query query = QueryFactory.create(queryString);
+            QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
+            kgModel = qexec.execConstruct();
         } catch (QueryParseException e) {
             System.out.println("[ERROR] queryString: " + queryString);
             throw e;
         }
+
+        dataset = DatasetFactory.createTxnMem();
+        // dataset = DatasetFactory.createGeneral();
+        dataset.setDefaultModel(kgModel);
+        // dataset = DatasetFactory.assemble(kgModel);
+        return kgModel;
     }
 }
+
+
+/*
+ Query query = QueryFactory.create(
+        "select ?f ?k WHERE {?f <http://example.com/fatherOf> ?k .}");
+    QueryExecution qexec = QueryExecutionFactory.create(query, model);
+    ResultSet results = qexec.execSelect();
+    https://docs.oracle.com/database/121/RDFRM/rdf-jena.htm#RDFRM275
+ */

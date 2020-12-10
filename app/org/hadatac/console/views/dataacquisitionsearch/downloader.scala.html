@@ -46,7 +46,7 @@
 	        	$.ajax({
 	                type: 'GET',
 	                url: '/hadatac/downloader/checkcompletion',
-	                data: { 'file_name': row.find("td:nth-child(1)").html() }, 
+	                data: { 'file_id': row.find("td:nth-child(1)").html().toString() },
 	                dataType: 'json',
 	                success: function (data) {
 	                	@if(bAdmin) {

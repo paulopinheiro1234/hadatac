@@ -137,7 +137,7 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
                 QuerySolution soln = resultsrw.next();
                 StudyObjectType studyObjectType = new StudyObjectType();
                 studyObjectType.setUri(soln.get("studyObjType").toString());
-                studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("studyObjType").toString())));
+                studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getFacetSearchShortestLabel(soln.get("studyObjType").toString())));
                 studyObjectType.setQuery(query);
                 studyObjectType.setField("entity_uri_str");
 
