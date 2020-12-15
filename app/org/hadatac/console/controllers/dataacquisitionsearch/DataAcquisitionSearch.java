@@ -322,7 +322,7 @@ public class DataAcquisitionSearch extends Controller {
 
         long startTime = System.currentTimeMillis();
         AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
-        log.info("Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
+        log.info("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
@@ -335,22 +335,22 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
         	//System.out.println("Selected subject alignment");
         	promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-		        results.getDocuments(), finalFacets, email, categoricalOption), 
-	        		ec.current());
+		        results.getDocuments(), finalFacets, email, categoricalOption),
+                    databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
         	//System.out.println("Selected time alignment");
 	        promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
-			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption), 
-		        		ec.current());
+			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption),
+                    databaseExecutionContext);
         }
 
         promiseOfResult.whenComplete(
                 (result, exeception) -> {
-                    log.info("downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
+                    log.info("DOWNLOA: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
                 });
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

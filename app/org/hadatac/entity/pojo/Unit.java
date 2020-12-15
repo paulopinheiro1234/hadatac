@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -70,6 +71,43 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");
 		    return null;
+		}
+		StmtIterator stmtIterator = model.listStatements();
+		if (model.size() > 0) {
+			unit = new Unit();
+			while (stmtIterator.hasNext()) {
+				statement = stmtIterator.next();
+				object = statement.getObject();
+				if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+					unit.setLabel(object.asLiteral().getString());
+				} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+					unit.setSuperUri(object.asResource().getURI());
+				}
+			}
+
+			unit.setUri(uri);
+			unit.setLocalName(uri.substring(uri.indexOf('#') + 1));
+			if (unit.getLabel() == null || unit.getLabel().equals("")) {
+				unit.setLabel(unit.getLocalName());
+			}
+		}
+
+		return unit;
+	}
+
+	public static Unit facetSearchFind(String uri) {
+		Unit unit = null;
+		Model model;
+		Statement statement;
+		RDFNode object;
+
+		String queryString = "DESCRIBE <" + uri + ">";
+		try {
+			model = SPARQLUtilsFacetSearch.describe(CollectionUtil.getCollectionPath(
+					CollectionUtil.Collection.METADATA_SPARQL), queryString);
+		} catch (Exception e) {
+			System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");
+			return null;
 		}
 		StmtIterator stmtIterator = model.listStatements();
 		if (model.size() > 0) {

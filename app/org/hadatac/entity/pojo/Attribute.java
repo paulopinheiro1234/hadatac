@@ -129,7 +129,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
         //System.out.println("Attribute: query [" +  queryString + "]");
 
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         //System.out.println("Attribute: size of answer [" +  resultsrw.size() + "]");

@@ -3,6 +3,7 @@ package org.hadatac.utils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 
 public class FirstLabel {
@@ -46,6 +47,48 @@ public class FirstLabel {
             }
         }
       
+        return labelStr;
+    }
+
+    public static String getLabelFacetSearch(String uri) {
+
+        if ((uri == null) || (uri.equals(""))) {
+            return "";
+        }
+
+        //System.out.println("[FirstLabel] getLabel() request:[" + uri + "]");
+
+        if (uri.startsWith("http")) {
+            uri = "<" + uri.trim() + ">";
+        }
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?label WHERE { \n" +
+                "  " + uri + " rdfs:label ?label . \n" +
+                "}";
+
+        //System.out.println("[FirstLabel] getLabel() queryString: \n" + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        String labelStr = "";
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("label") != null) {
+                labelStr = soln.get("label").toString();
+
+            }
+
+
+            if (!labelStr.isEmpty()) {
+
+                break;
+            }
+            else if(labelStr.isEmpty()){
+                System.out.println("RETURNED EMPTY");
+            }
+        }
+
         return labelStr;
     }
 

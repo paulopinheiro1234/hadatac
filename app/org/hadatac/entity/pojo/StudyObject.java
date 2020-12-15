@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
@@ -316,6 +317,34 @@ public class StudyObject extends HADatAcThing {
         return retrievedUris;
     }
 
+    public static List<String> retrieveScopeUrisFacetSearch(String obj_uri) {
+
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?scopeUri WHERE { " +
+                " <" + obj_uri + "> hasco:hasObjectScope ?scopeUri . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("scopeUri") != null && soln.getResource("scopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("scopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
     public static List<String> retrieveUrisScopedByThisUri(String obj_uri) {
         List<String> retrievedUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -355,6 +384,34 @@ public class StudyObject extends HADatAcThing {
         //System.out.println("Study.retrieveTimeScopeUris() queryString: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("timeScopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveTimeScopeUrisFacetSearch(String obj_uri) {
+
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?timeScopeUri WHERE { " +
+                " <" + obj_uri + "> hasco:hasTimeObjectScope ?timeScopeUri . " +
+                "}";
+
+       ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
@@ -414,6 +471,34 @@ public class StudyObject extends HADatAcThing {
         //System.out.println("Study.retrieveSpaceScopeUris() queryString: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("spaceScopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveSpaceScopeUrisFacetSearch(String obj_uri) {
+
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?spaceScopeUri WHERE { " +
+                " <" + obj_uri + "> hasco:hasSpaceObjectScope ?spaceScopeUri . " +
+                "}";
+
+       ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
@@ -514,7 +599,88 @@ public class StudyObject extends HADatAcThing {
 
         return obj;
     }
-    
+
+    public static StudyObject findFacetSearch(String obj_uri) {
+
+        StudyObject obj = null;
+        if (obj_uri == null || obj_uri.trim().equals("")) {
+            return obj;
+        }
+        obj_uri = obj_uri.trim();
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?objType ?originalId ?isMemberOf ?hasLabel ?hasComment WHERE { \n" +
+                "    <" + obj_uri + "> a ?objType . \n" +
+                "    <" + obj_uri + "> hasco:isMemberOf ?isMemberOf . \n" +
+                "    OPTIONAL { <" + obj_uri + "> hasco:originalID ?originalId } . \n" +
+                "    OPTIONAL { <" + obj_uri + "> rdfs:label ?hasLabel } . \n" +
+                "    OPTIONAL { <" + obj_uri + "> rdfs:comment ?hasComment } . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            //System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: <" + obj_uri + ">");
+            return obj;
+        }
+
+        String typeStr = "";
+        String originalIdStr = "";
+        String isMemberOfStr = "";
+        String commentStr = "";
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+
+                try {
+                    if (soln.getResource("objType") != null && soln.getResource("objType").getURI() != null) {
+                        typeStr = soln.getResource("objType").getURI();
+                    }
+                } catch (Exception e1) {
+                    typeStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("originalId") != null && soln.getLiteral("originalId").getString() != null) {
+                        originalIdStr = soln.getLiteral("originalId").getString();
+                    }
+                } catch (Exception e1) {
+                    originalIdStr = "";
+                }
+
+                try {
+                    if (soln.getResource("isMemberOf") != null && soln.getResource("isMemberOf").getURI() != null) {
+                        isMemberOfStr = soln.getResource("isMemberOf").getURI();
+                    }
+                } catch (Exception e1) {
+                    isMemberOfStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("hasComment") != null && soln.getLiteral("hasComment").getString() != null) {
+                        commentStr = soln.getLiteral("hasComment").getString();
+                    }
+                } catch (Exception e1) {
+                    commentStr = "";
+                }
+
+                obj = new StudyObject(obj_uri,
+                        typeStr,
+                        originalIdStr,
+                        FirstLabel.getLabelFacetSearch(obj_uri),
+                        isMemberOfStr,
+                        commentStr,
+                        retrieveScopeUrisFacetSearch(obj_uri),
+                        retrieveTimeScopeUrisFacetSearch(obj_uri),
+                        retrieveSpaceScopeUrisFacetSearch(obj_uri));
+            }
+        }
+
+        return obj;
+    }
+
     public static Map<String, String> buildCachedUriByOriginalId() {
         Map<String, String> cache = new HashMap<String, String>();
         
@@ -608,7 +774,7 @@ public class StudyObject extends HADatAcThing {
         		" <" + objUri + "> hasco:isMemberOf ?obj . " +
         		" ?obj hasco:hasRoleLabel ?role . " +
         	  	" } ";
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         if (resultsrw.size() >= 1) {
             QuerySolution soln = resultsrw.next();
@@ -641,7 +807,7 @@ public class StudyObject extends HADatAcThing {
         	  " ?obj hasco:isMemberOf ?soc . " +
         	  " ?soc hasco:hasRoleLabel ?role . " +
         	  " } ";
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
@@ -674,7 +840,7 @@ public class StudyObject extends HADatAcThing {
         		" ?obj hasco:isMemberOf ?soc . " +
         		" ?soc hasco:hasRoleLabel \"" + alignmentType + "\" ." +
         	  	" } ";
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
