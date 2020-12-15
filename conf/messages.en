@@ -49,7 +49,7 @@ playauthenticate.change_password.success=Password has been changed successfully.
 playauthenticate.password.signup.error.passwords_not_same=Passwords do not match.
 playauthenticate.password.login.unknown_user_or_pw=Unknown user or password.
 
-playauthenticate.password.verify_signup.subject=PlayAuthenticate: Complete your signup
+playauthenticate.password.verify_signup.subject=Invitation from HHEAR Data Center
 playauthenticate.password.verify_email.subject=PlayAuthenticate: Confirm your e-mail address
 playauthenticate.password.reset_email.subject=PlayAuthenticate: How to reset your password
 
