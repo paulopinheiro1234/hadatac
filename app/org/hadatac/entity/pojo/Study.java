@@ -24,7 +24,6 @@ import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
