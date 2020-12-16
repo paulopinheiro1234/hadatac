@@ -128,7 +128,7 @@ public class Alignment {
             if (irt != null && irt.getUri().equals(m.getInRelationToUri())) {
                 mInRelationTo = irt.getUri();
             } else {		
-                irt = Entity.find(m.getInRelationToUri());
+                irt = Entity.facetSearchFind(m.getInRelationToUri());
                 if (irt == null) {
                     System.out.println("[ERROR] Alignment: retrieving entity playing inRelationTo " + m.getInRelationToUri());
                 } else {
@@ -144,7 +144,7 @@ public class Alignment {
             if (unit != null && unit.getUri().equals(m.getUnitUri())) {
                 mUnit = unit.getUri();
             } else {
-                unit = Unit.find(m.getUnitUri());
+                unit = Unit.facetSearchFind(m.getUnitUri());
                 if (unit == null) {
                     System.out.println("[ERROR] Alignment: could not retrieve unit [" + m.getUnitUri() + "]. Ignoring unit.");
                 } else {
@@ -160,7 +160,7 @@ public class Alignment {
             if (timeAttr != null && timeAttr.getUri().equals(m.getAbstractTime())) {
                 mAbstractTime = timeAttr.getUri();
             } else {
-                timeAttr = Attribute.find(m.getAbstractTime());
+                timeAttr = Attribute.facetSearchFind(m.getAbstractTime());
                 if (timeAttr == null) {
                     System.out.println("[ERROR] Alignment: could not retrieve abstract time [" + m.getAbstractTime() + "]. Ignoring abstract time.");
                 } else {
@@ -203,7 +203,7 @@ public class Alignment {
 
         Entity entity = entityCache.get(m.getEntityUri());
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
-            entity = Entity.find(m.getEntityUri());
+            entity = Entity.facetSearchFind(m.getEntityUri());
             if (entity == null) {
                 System.out.println("[ERROR] Alignment: retrieving entity " + m.getEntityUri());
                 return null;
@@ -230,7 +230,7 @@ public class Alignment {
 	        if (attribute == null || !attribute.getUri().equals(m.getCategoricalClassUri())) {
 	        	attribute = attrCache.get(m.getCategoricalClassUri());
 	        	if (attribute == null) {
-	        		attribute = Attribute.find(m.getCategoricalClassUri());
+	        		attribute = Attribute.facetSearchFind(m.getCategoricalClassUri());
 	        		if (attribute == null) {
 	        			System.out.println("[ERROR] Alignment: retrieving attribute " + m.getCategoricalClassUri());
 	        			return null;
@@ -255,7 +255,7 @@ public class Alignment {
 	            for (String attrUri : m.getCharacteristicUris()) {
 		        	attribute = attrCache.get(attrUri);
 		        	if (attribute == null) {
-		        		attribute = Attribute.find(attrUri);
+		        		attribute = Attribute.facetSearchFind(attrUri);
 		        		if (attribute == null) {
 		        			System.out.println("[ERROR] Alignment: retrieving attribute " + attrUri);
 		        			return null;
@@ -515,7 +515,7 @@ public class Alignment {
     public void addObject(StudyObject obj) {
         objects.put(obj.getUri(), obj);
         if (!studyId.containsKey(obj.getIsMemberOf())) {
-        	ObjectCollection soc = ObjectCollection.find(obj.getIsMemberOf());
+        	ObjectCollection soc = ObjectCollection.findFacetSearch(obj.getIsMemberOf());
         	if (soc != null) {
         		Study std = soc.getStudy();
         		if (std != null && std.getId() != null) {

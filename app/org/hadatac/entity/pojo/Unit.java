@@ -5,10 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -70,6 +66,43 @@ public class Unit extends HADatAcClass implements Comparable<Unit> {
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");
 		    return null;
+		}
+		StmtIterator stmtIterator = model.listStatements();
+		if (model.size() > 0) {
+			unit = new Unit();
+			while (stmtIterator.hasNext()) {
+				statement = stmtIterator.next();
+				object = statement.getObject();
+				if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+					unit.setLabel(object.asLiteral().getString());
+				} else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+					unit.setSuperUri(object.asResource().getURI());
+				}
+			}
+
+			unit.setUri(uri);
+			unit.setLocalName(uri.substring(uri.indexOf('#') + 1));
+			if (unit.getLabel() == null || unit.getLabel().equals("")) {
+				unit.setLabel(unit.getLocalName());
+			}
+		}
+
+		return unit;
+	}
+
+	public static Unit facetSearchFind(String uri) {
+		Unit unit = null;
+		Model model;
+		Statement statement;
+		RDFNode object;
+
+		String queryString = "DESCRIBE <" + uri + ">";
+		try {
+			model = SPARQLUtilsFacetSearch.describe(CollectionUtil.getCollectionPath(
+					CollectionUtil.Collection.METADATA_SPARQL), queryString);
+		} catch (Exception e) {
+			System.out.println("[ERROR] Unit.find(uri) failed to execute descrive query");
+			return null;
 		}
 		StmtIterator stmtIterator = model.listStatements();
 		if (model.size() > 0) {
