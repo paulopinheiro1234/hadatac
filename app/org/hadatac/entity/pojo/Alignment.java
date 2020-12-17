@@ -9,9 +9,12 @@ import java.util.Iterator;
 
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Alignment {
 
+    private static final Logger log = LoggerFactory.getLogger(Alignment.class);
     private Map<String, StudyObject> objects;
     //private List<String> timestamps;
     private Map<String, StudyObject> refObjects;
@@ -315,21 +318,20 @@ public class Alignment {
      *           GRAPH OPERATIONS
      * ========================================== */
 
-    public static List<String> alignmentObjects(String currentObj, String selectedRole, String originalId) {
+    public static List<String> alignmentObjects(String currentObj, List<String> selectedRoles, String originalId) {
         //System.out.println("Align-Debug: Current Object [" + currentObj + "]"); 
     	List<String> alignObjs = new ArrayList<String>();
-    	if (currentObj == null || currentObj.isEmpty() || selectedRole == null || selectedRole.isEmpty()) {
-            //System.out.println("Align-Debug: Current Obj or Selected Role are empty"); 
+    	if (currentObj == null || currentObj.isEmpty() || selectedRoles == null || selectedRoles.size() == 0 ) {
+            log.debug("Current Obj or Selected Role are empty");
     		return alignObjs;
     	}
     		
     	/* 
     	 * Test if the current object is already the alignment object
     	 */
-    	// if (selectedRole.equals(StudyObject.findSocRole(currentObj)) || currentObj.toUpperCase().indexOf("SPL-C") >= 0 ) {
-        if (selectedRole.equals(StudyObject.findSocRole(currentObj)) ) {
+    	if (selectedRoles.contains(StudyObject.findSocRole(currentObj)) ) {
             alignObjs.add(currentObj);
-            //System.out.println("Align-Debug: Already ALIGNMENT object"); 
+            log.debug("Already ALIGNMENT object");
     		return alignObjs;
     	};
 
@@ -343,7 +345,7 @@ public class Alignment {
                 Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
                 if (itr.hasNext()) { 
                 	Map.Entry<String, String> entry = itr.next();
-                	if (entry.getValue().equals(selectedRole)) {
+                	if ( selectedRoles.contains(entry.getValue()) ) {
                 		alignObjs.add(entry.getKey());
                         //System.out.println("Align-Debug: UPSTREAM object"); 
                 		return new ArrayList<>(new HashSet<>(alignObjs));
@@ -355,25 +357,27 @@ public class Alignment {
     	/* 
     	 * Test if alignment object(s) is(are) downstream 
     	 */
-        List<Map<String,String>> downstream = StudyObject.findDownstreamSocs(currentObj, originalId, selectedRole);
-        if (downstream.size() > 0) {
-        	// iteration is not interrupted and selects all objs with matching role 
-        	for (Map<String,String> socRoleTuple :  downstream) {
-                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
-                if (itr.hasNext()) { 
-                	Map.Entry<String, String> entry = itr.next();
-                	if (entry.getValue().equals(selectedRole)) {
-                		alignObjs.add(entry.getKey());
-                	}
+        for ( String selectedRole : selectedRoles ) {
+            List<Map<String, String>> downstream = StudyObject.findDownstreamSocs(currentObj, originalId, selectedRole);
+            if (downstream.size() > 0) {
+                // iteration is not interrupted and selects all objs with matching role
+                for (Map<String, String> socRoleTuple : downstream) {
+                    Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
+                    if (itr.hasNext()) {
+                        Map.Entry<String, String> entry = itr.next();
+                        if (entry.getValue().equals(selectedRole)) {
+                            alignObjs.add(entry.getKey());
+                        }
+                    }
                 }
-        	}
-        	if (alignObjs.size() > 1) {
-        		
-        	}
-        	if (alignObjs.size() > 0) {
-                //System.out.println("Align-Debug: DOWNSTREAM objects of size " + alignObjs.size()); 
-        		return new ArrayList<>(new HashSet<>(alignObjs));
-        	}
+                if (alignObjs.size() > 1) {
+
+                }
+                if (alignObjs.size() > 0) {
+                    //System.out.println("Align-Debug: DOWNSTREAM objects of size " + alignObjs.size());
+                    return new ArrayList<>(new HashSet<>(alignObjs));
+                }
+            }
         }
 
     	/* 
@@ -381,34 +385,36 @@ public class Alignment {
     	 */
         if (upstream.size() > 0) {
 
-            boolean found = false;
         	for (Map<String,String> socRoleTuple :  upstream) {
-                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
-                if (itr.hasNext()) { 
+
+                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
+
+                if (itr.hasNext()) {
+
                 	Map.Entry<String, String> entry = itr.next();
                 	String upstreamObj = entry.getKey();
-                	
-                    List<Map<String,String>> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, originalId, selectedRole);
-                    if (downstreamFromUpstream.size() > 0) {
-                    	// iteration is not interrupted and selects all objs with matching role 
-                    	for (Map<String,String> socRoleTuple2 :  downstreamFromUpstream) {
-                            Iterator<Map.Entry<String, String>> itr2 = socRoleTuple2.entrySet().iterator(); 
-                            if (itr2.hasNext()) { 
-                            	Map.Entry<String, String> entry2 = itr2.next();
-                            	if (entry2.getValue().equals(selectedRole) && !alignObjs.contains(entry2.getKey())) {
-                            		alignObjs.add(entry2.getKey());
-                            		found = true;
-                            	}
+
+                	for ( String selectedRole : selectedRoles ) {
+                        List<Map<String, String>> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, originalId, selectedRole);
+                        if (downstreamFromUpstream.size() > 0) {
+                            // iteration is not interrupted and selects all objs with matching role
+                            for (Map<String, String> socRoleTuple2 : downstreamFromUpstream) {
+                                Iterator<Map.Entry<String, String>> itr2 = socRoleTuple2.entrySet().iterator();
+                                if (itr2.hasNext()) {
+                                    Map.Entry<String, String> entry2 = itr2.next();
+                                    if (entry2.getValue().equals(selectedRole) && !alignObjs.contains(entry2.getKey())) {
+                                        alignObjs.add(entry2.getKey());
+                                        return new ArrayList<>(new HashSet<>(alignObjs));
+                                    }
+                                }
                             }
-                    	}
-                    }
-                }
-                if ( found ) break;
-        	}
-        	if (alignObjs.size() > 0) {
-                //System.out.println("Align-Debug: DOWNSTREAM OF UPSTREAM objects of size " + alignObjs.size()); 
-        		return new ArrayList<>(new HashSet<>(alignObjs));
-        	}
+                        }
+                    }  // end of for
+
+                } // end of hasNext()
+
+        	} // end of upstream role map
+
         }
 
         System.out.println("[ERROR] Alignment: COULD NOT FIND alignment object for [" + currentObj + "]"); 

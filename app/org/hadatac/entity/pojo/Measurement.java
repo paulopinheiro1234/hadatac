@@ -4,22 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QuerySolution;
@@ -1564,9 +1555,19 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) { 
-    	String selectedRole = "Child";
-        
+    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {
+
+        String roles = ConfigFactory.load().getString("hadatac.download.alignment");
+        List<String> selecteedRoles = new ArrayList<>();
+
+        if ( roles == null || roles.length() == 0 ) {
+            selecteedRoles.add("Child"); // default to Child is not configured
+        } else if ( !roles.contains(",") ) {
+            selecteedRoles.add(roles);
+        } else {
+            selecteedRoles.addAll(Arrays.asList(roles.split(",")));
+        }
+
         DataFile dataFile = null;
         boolean fileCreated = false;
         
@@ -1614,7 +1615,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 	if (alignObjs == null) {
 
                 	    startTime = System.currentTimeMillis();
-                		alignObjs = Alignment.alignmentObjects(m.getEntryObjectUri(), selectedRole, m.getOriginalId());
+                		alignObjs = Alignment.alignmentObjects(m.getEntryObjectUri(), selecteedRoles, m.getOriginalId());
                 		duration = System.currentTimeMillis() - startTime;
                         if ( duration > threshold ) log.info("DOWNLOAD: alignment.alignmentObject: " + duration);
 
