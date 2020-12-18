@@ -8,12 +8,18 @@ import javax.inject.Singleton;
 
 import org.hadatac.console.models.SecurityRole;
 import org.hadatac.data.loader.mqtt.MqttMessageWorker;
+import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 
 import org.hadatac.utils.ConfigProp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Singleton
 public class OnStart {
-	
+
+	private static final Logger log = LoggerFactory.getLogger(OnStart.class);
+
     @Inject
     public OnStart() {
     	initDirectoryStructure();
@@ -37,6 +43,11 @@ public class OnStart {
 		// TODO: implement this code
 
     	MqttMessageWorker.getInstance();
+
+		// also populate the in-memory model
+		log.warn("building in-memory model ... : ");
+		SPARQLUtilsFacetSearch.createInMemoryModel();
+		log.warn("finished building in-memory model.");
     
     }
     
