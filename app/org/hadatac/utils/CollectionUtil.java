@@ -122,13 +122,14 @@ public class CollectionUtil {
     }
     
     public static boolean isSandboxMode() {
-        List<OperationMode> modes = OperationMode.findAll();
+	    // disable sandbox for now
+        /*List<OperationMode> modes = OperationMode.findAll();
         if (modes.size() > 0) {
             OperationMode mode = modes.get(0);
             if (mode.getOperationMode().equals(OperationMode.SANDBOX)) {
                 return true;
             }
-        }
+        }*/
         
         return false;
     }

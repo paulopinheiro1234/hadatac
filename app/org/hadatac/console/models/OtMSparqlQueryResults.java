@@ -407,22 +407,30 @@ public class OtMSparqlQueryResults{
     // This is the same as SparqlQueryResults regardless of whether the
     //    properties are one-to-one or one-to-many
     private void buildTreeQueryResults(JsonNode bindings, boolean usingURIs, String tabName){
+
         this.newTree = null;
         Iterator<JsonNode> elements = bindings.elements();
         String modelN = null;
         String superN = null;
         ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
         TreeNode topNode = null;
+
         while (elements.hasNext()){
+
             modelN = "";
 	        superN = "";
             JsonNode binding = elements.next();
-            String modelLabel = binding.findPath("label").get("value").toString().replace(",","").replace("-","").replace("\"", "");
-            String superLabel = binding.findPath("superLabel").get("value").toString().replace(",","").replace("-","").replace("\"", "");
-            //System.out.println(modelLabel + "  " + superLabel);
-            //System.out.println("Binding: " + binding + "\n");
+
+            String modelLabel = null, superLabel = null;
+
+            if ( binding.findPath("label") != null && binding.findPath("label").get("value") != null ) {
+				modelLabel = binding.findPath("label").get("value").toString().replace(",", "").replace("-", "").replace("\"", "");
+			}
+            if ( binding.findPath("superLabel") != null && binding.findPath("superLabel").get("value") != null ) {
+				superLabel = binding.findPath("superLabel").get("value").toString().replace(",", "").replace("-", "").replace("\"", "");
+			}
+
             JsonNode modelNameNode = binding.findPath("id");
-            //System.out.println("modelNameNode: " + modelNameNode + "\n");
             if (modelLabel != null && !modelLabel.isEmpty()) {
             	modelN = modelLabel;
             } else {

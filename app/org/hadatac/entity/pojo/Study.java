@@ -1116,5 +1116,66 @@ public class Study extends HADatAcThing {
         return -1;
     }
 
+    public static Map<String,Map<String,String>> retrieveStudiesAndAtttributes() {
+
+        Map<String, Map<String, String>> result = new HashMap<>();
+
+        String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT DISTINCT ?studyId ?studyUri ?studyLabel ?proj ?studyTitle ?agentName ?institutionName " +
+                "WHERE { \n" +
+                "   ?studyUri a ?subUri . \n" +
+                "   ?studyUri hasco:hasId ?studyId . \n" +
+                "   ?subUri rdfs:subClassOf* hasco:Study . \n" +
+                "   OPTIONAL { ?studyUri rdfs:label ?studyLabel } . \n" +
+                "   OPTIONAL { ?studyUri hasco:hasProject ?proj } . \n" +
+                "   OPTIONAL { ?studyUri skos:definition ?studyTitle } . \n" +
+                "   OPTIONAL { ?studyUri rdfs:comment ?studyComment  } . \n" +
+                "   OPTIONAL { ?studyUri hasco:hasAgent ?agent . ?agent foaf:name ?agentName } . \n" +
+                "   OPTIONAL { ?studyUri hasco:hasInstitution ?institution . ?institution foaf:name ?institutionName } . \n" +
+                " } \n";
+
+        try {
+
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
+
+            while (resultsrw.hasNext()) {
+
+                QuerySolution soln = resultsrw.next();
+                if (!soln.contains("studyUri")) continue;
+
+                String studyUri = soln.get("studyUri").toString();
+                Map<String, String> study = result.getOrDefault(studyUri, new HashMap<>());
+
+                if (soln.contains("studyId")) {
+                    study.put("studyId", soln.get("studyId").toString());
+                }
+                if (soln.contains("studyLabel")) {
+                    study.put("studyLabel", soln.get("studyLabel").toString());
+                }
+                if (soln.contains("proj")) {
+                    study.put("proj", soln.get("proj").toString());
+                }
+                if (soln.contains("studyTitle")) {
+                    study.put("studyTitle", soln.get("studyTitle").toString());
+                }
+                if (soln.contains("agentName")) {
+                    study.put("agentName", soln.get("agentName").toString());
+                }
+                if (soln.contains("institutionName")) {
+                    study.put("institutionName", soln.get("institutionName").toString());
+                }
+
+                result.put(studyUri, study);
+            }
+
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
+
+        return result;
+
+    }
+
 }
 
