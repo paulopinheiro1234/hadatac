@@ -67,12 +67,13 @@ public class DynamicFunctions extends Controller {
         Map<String, String> indicatorTypes = getIndicatorTypes();
         Map<String, Map<String, String>> valueMapWithLabels = Indicator.getValuesAndLabels(indicatorTypes);
         
-        System.out.println("valueMapWithLabels: " + valueMapWithLabels);
+        // System.out.println("valueMapWithLabels: " + valueMapWithLabels);
         
         String uri = "";
         for (String key : valueMapWithLabels.keySet() ){
             for (String k : valueMapWithLabels.get(key).keySet()) {
-                if (tabName.equals(valueMapWithLabels.get(key).get(k).replace(" ", "").replace(",", ""))) {
+                String targetStr = valueMapWithLabels.get(key).get(k).replace(" ", "");
+                if (tabName.equalsIgnoreCase(targetStr)) {
                     uri = k;
                     return uri;
                 }

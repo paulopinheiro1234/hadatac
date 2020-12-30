@@ -1,11 +1,6 @@
 package org.hadatac.entity.pojo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
+import java.util.*;
 
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
@@ -15,6 +10,8 @@ import org.slf4j.LoggerFactory;
 public class Alignment {
 
     private static final Logger log = LoggerFactory.getLogger(Alignment.class);
+    private static Set<String> errMsgs = new HashSet<>();
+
     private Map<String, StudyObject> objects;
     //private List<String> timestamps;
     private Map<String, StudyObject> refObjects;
@@ -113,6 +110,7 @@ public class Alignment {
      * returns a key to retrieve variables. if needed, measuremtnKey adds new variables 
      */
     public String measurementKey(Measurement m) {
+
         if (variables == null) {
             System.out.println("[ERROR] Alignment: alignment attribute list not initialized ");
             return null;
@@ -149,7 +147,12 @@ public class Alignment {
             } else {
                 unit = Unit.facetSearchFind(m.getUnitUri());
                 if (unit == null) {
-                    System.out.println("[ERROR] Alignment: could not retrieve unit [" + m.getUnitUri() + "]. Ignoring unit.");
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("[ERROR] Alignment: could not retrieve unit [").append(m.getUnitUri()).append("]. Ignoring unit.");
+                    if ( errMsgs.contains(sb.toString()) == false ) {
+                        log.error(sb.toString());
+                        errMsgs.add(sb.toString());
+                    }
                 } else {
                     unitCache.put(unit.getUri(),unit);
                     mUnit = m.getUnitUri();
