@@ -1,5 +1,6 @@
 package org.hadatac.entity.pojo;
 
+import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
@@ -189,7 +190,7 @@ public class Variable {
 				System.out.println(s);
 			});*/
 			List<String> pivotResultWithLabels = retrieveLabelsForPivotResult(parsedPivotResult);
-			pivotResultWithLabels.forEach( s -> System.out.println(s) );
+			// pivotResultWithLabels.forEach( s -> System.out.println(s) );
 			return pivotResultWithLabels;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -276,7 +277,7 @@ public class Variable {
 				"   ?attributeUri rdfs:label ?attributeLabel . \n" +
 				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
 				"	?indicator rdfs:label ?indicatorLabel . \n" +
-				"   FILTER(lang(?attributeLabel) != 'en') . \n" +
+				"   #FILTER(lang(?attributeLabel) != 'en') . \n" +
 				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
 				"} \n";
 
@@ -298,10 +299,10 @@ public class Variable {
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				if (soln.contains("indicatorLabel")) {
-					indicatorLabel = soln.get("indicatorLabel").toString();
+					indicatorLabel = beautifiesLabel(soln.get("indicatorLabel").toString());
 				}
 				if ( soln.contains("attributeLabel")) {
-					attributeLabel = soln.get("attributeLabel").toString();
+					attributeLabel = beautifiesLabel(soln.get("attributeLabel").toString());
 				}
 			}
 
@@ -311,6 +312,11 @@ public class Variable {
 
 		return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
 
+	}
+
+	private static String beautifiesLabel(String label) {
+    	if ( label == null || label.length() == 0 || !label.contains("@en") ) return label;
+		return WordUtils.capitalize(label.substring(0, label.indexOf("@en")));
 	}
 
 	public static String retrieveLabelForURI(String targetUri) {
@@ -329,7 +335,7 @@ public class Variable {
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				if (soln.contains("label")) {
-					return soln.get("label").toString();
+					return beautifiesLabel(soln.get("label").toString());
 				}
 			}
 

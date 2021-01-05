@@ -140,8 +140,11 @@ public class MetadataAcquisition extends Controller {
 				studyInfo.put("studyLabel_str", "<a href=\""
 						+ ConfigFactory.load().getString("hadatac.console.host_deploy")
 						+ "/hadatac/studies/view?study_uri="
-						+ URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
-						+ studyDetails.get("studyId") + "</a>");
+						+ URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\"><b>"
+						+ studyDetails.get("studyId") + "</b></a>");
+			}
+			if (studyDetails.containsKey("studyLabel") && !studyInfo.containsKey("studyShortDesc_str")) {
+				studyInfo.put("studyShortDesc_str", studyDetails.get("studyLabel"));
 			}
 			if (studyDetails.containsKey("studyTitle") && !studyInfo.containsKey("studyTitle_str")) {
 				studyInfo.put("studyTitle_str", studyDetails.get("studyTitle"));
@@ -284,7 +287,7 @@ public class MetadataAcquisition extends Controller {
 			results.add(new JSONObject(info));
 		}
 
-		// System.out.println(results.toString());
+		System.out.println(results.toString());
 
 		return SolrUtils.commitJsonDataToSolr(
 				CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES), results.toString());
