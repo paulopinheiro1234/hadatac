@@ -10,8 +10,8 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
-import org.hadatac.console.controllers.metadataacquisition.MetadataAcquisition;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,6 +192,7 @@ public class Variable {
 			pivotResultWithLabels.forEach( s -> System.out.println(s) );
 			return pivotResultWithLabels;
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error(e.getMessage());
 		}
     	return null;
@@ -204,13 +205,22 @@ public class Variable {
 
 		// study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str
 		parsedPivotResult.forEach( line -> {
+
+			String tmpLabel = VARIABLE_EMPTY_LABEL;
 			String[] items = line.split(",");
 			StringBuffer sb = new StringBuffer();
+
 			if ( items == null || items.length != 6 ) {
 				log.warn("Study search parsing pivot facet issue:" + line);
 			} else {
 				sb.append(items[SolrPivotFacet.STUDY_URI_STR.ordinal()]).append(VARIABLE_SEPARATOR).append(items[SolrPivotFacet.ROLE_STR.ordinal()]).append(VARIABLE_SEPARATOR);
-				sb.append(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]).append("(").append(retrieveLabelForURI(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()])).append(")").append(VARIABLE_SEPARATOR);
+				if ( "n/a".equalsIgnoreCase(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
+					tmpLabel = VARIABLE_EMPTY_LABEL;
+				} else {
+					tmpLabel = FirstLabel.getPrettyLabel(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
+					if (tmpLabel == null || tmpLabel.length() == 0) tmpLabel = VARIABLE_EMPTY_LABEL;
+				}
+				sb.append(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]).append("(").append(tmpLabel).append(")").append(VARIABLE_SEPARATOR);
 				sb.append(items[SolrPivotFacet.DASA_URI_STR.ordinal()]).append("(");
 				String indicatorLabel = retrieveIndicatorAndAttributeLabel(items[SolrPivotFacet.DASA_URI_STR.ordinal()]);
 				if ( indicatorLabel == null || indicatorLabel.length() == 0 || (VARIABLE_EMPTY_LABEL+LABEL_SEPARATOR+VARIABLE_EMPTY_LABEL).equalsIgnoreCase(indicatorLabel)) {
@@ -220,8 +230,20 @@ public class Variable {
 					log.warn("Study search parsing pivot facet issue - cannot find indicator label:" + line);
 				}
 				sb.append(indicatorLabel).append(")").append(VARIABLE_SEPARATOR);
-				sb.append(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]).append("(").append(retrieveLabelForURI(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()])).append(")").append(VARIABLE_SEPARATOR);
-				sb.append(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]).append("(").append(retrieveLabelForURI(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()])).append(")");
+				if ( "n/a".equalsIgnoreCase(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
+					tmpLabel = VARIABLE_EMPTY_LABEL;
+				} else {
+					tmpLabel = FirstLabel.getPrettyLabel(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
+					if (tmpLabel == null || tmpLabel.length() == 0) tmpLabel = VARIABLE_EMPTY_LABEL;
+				}
+				sb.append(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]).append("(").append(tmpLabel).append(")").append(VARIABLE_SEPARATOR);
+				if ( "n/a".equalsIgnoreCase(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
+					tmpLabel = VARIABLE_EMPTY_LABEL;
+				} else {
+					tmpLabel = FirstLabel.getPrettyLabel(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
+					if (tmpLabel == null || tmpLabel.length() == 0) tmpLabel = VARIABLE_EMPTY_LABEL;
+				}
+				sb.append(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]).append("(").append(tmpLabel).append(")");
 				result.add(sb.toString());
 			}
 		});
@@ -276,7 +298,7 @@ public class Variable {
 				"   ?attributeUri rdfs:label ?attributeLabel . \n" +
 				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
 				"	?indicator rdfs:label ?indicatorLabel . \n" +
-				"   FILTER(lang(?attributeLabel) != 'en') . \n" +
+				"   #FILTER(lang(?attributeLabel) != 'en') . \n" +
 				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
 				"} \n";
 
@@ -298,10 +320,10 @@ public class Variable {
 			while (resultsrw.hasNext()) {
 				QuerySolution soln = resultsrw.next();
 				if (soln.contains("indicatorLabel")) {
-					indicatorLabel = soln.get("indicatorLabel").toString();
+					indicatorLabel = FirstLabel.getPrettyLabel(soln.get("indicatorLabel").toString());
 				}
 				if ( soln.contains("attributeLabel")) {
-					attributeLabel = soln.get("attributeLabel").toString();
+					attributeLabel = FirstLabel.getPrettyLabel(soln.get("attributeLabel").toString());
 				}
 			}
 
@@ -310,34 +332,6 @@ public class Variable {
 		}
 
 		return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
-
-	}
-
-	public static String retrieveLabelForURI(String targetUri) {
-
-		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?label " +
-				"WHERE { <" + targetUri + "> rdfs:label ?label . \n" +
-    			"        #FILTER(lang(?label) != 'en') . \n" +
-    			"} \n";
-
-		try {
-
-			ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
-					CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
-
-			while (resultsrw.hasNext()) {
-				QuerySolution soln = resultsrw.next();
-				if (soln.contains("label")) {
-					return soln.get("label").toString();
-				}
-			}
-
-		} catch (QueryExceptionHTTP e) {
-			e.printStackTrace();
-		}
-
-		return VARIABLE_EMPTY_LABEL;
 
 	}
 
