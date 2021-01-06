@@ -287,7 +287,7 @@ public class MetadataAcquisition extends Controller {
 			results.add(new JSONObject(info));
 		}
 
-		System.out.println(results.toString());
+		// System.out.println(results.toString());
 
 		return SolrUtils.commitJsonDataToSolr(
 				CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES), results.toString());

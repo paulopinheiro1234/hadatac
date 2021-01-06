@@ -92,7 +92,18 @@ public class FirstLabel {
     }
 
     public static String getPrettyLabel(String uri) {
-        String prettyLabel = getLabel(uri).replace("@en","");
+
+        String prettyLabel = null;
+
+        // the passed parameter is indeed a URI
+        if ( uri.startsWith("http") || uri.startsWith("<http") ) {
+            prettyLabel = getLabel(uri).replace("@en", "");
+        }
+        // the passed parameter is a label already
+        else {
+            prettyLabel = uri.replace("@en", "");
+        }
+
         if (!prettyLabel.equals("")) {
             String c0 = prettyLabel.substring(0,1).toUpperCase();
             if (prettyLabel.length() == 1) {
