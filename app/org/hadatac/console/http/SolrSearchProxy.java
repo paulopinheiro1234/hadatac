@@ -7,12 +7,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.CollectionUtil;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.data.DynamicForm;
@@ -21,6 +24,8 @@ import play.data.FormFactory;
 import javax.inject.Inject;
 
 public class SolrSearchProxy extends Controller {
+
+    private static final Logger log = LoggerFactory.getLogger(SolrSearchProxy.class);
 
     @Inject
     private FormFactory formFactory;
@@ -108,8 +113,19 @@ public class SolrSearchProxy extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result getStudyAcquisition() {
-        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDY_ACQUISITION) 
-                + "/select" + request().toString().split((request().path()))[1];
+        // get the request parameter from ajax call. for this case, we have only one parameter
+        String queryStr = null;
+        Map<String, String[]> params = request().body().asFormUrlEncoded();
+        log.info("Params : " + params.size());
+        for (Map.Entry<String, String[]> param : params.entrySet()) {
+            log.info(param.getKey() + " = " + param.getValue()[0]);
+            queryStr = param.getValue()[0];
+            break;
+        }
+
+        String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDY_ACQUISITION) + "/select?" + queryStr;
+        log.info("query string to Solr: " + path);
+
         return getSolrSearch(path);
     }
 
