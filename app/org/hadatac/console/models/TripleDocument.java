@@ -6,13 +6,13 @@ import java.util.Random;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class TripleDocument{
-	public TreeMap<String,String> items = new TreeMap<String,String>();
-	//public String resultType;
-	private ArrayList<String> vars;
-	private int numVars;
-	
-	public TripleDocument() {}
-	
+    public TreeMap<String,String> items = new TreeMap<String,String>();
+    //public String resultType;
+    private ArrayList<String> vars;
+    private int numVars;
+
+    public TripleDocument() {}
+
     public TripleDocument(JsonNode node, ArrayList<String> vars) {
         //this.resultType = resultType;
         this.vars = vars;
@@ -23,14 +23,14 @@ public class TripleDocument{
             try {
                 if(node.get(vars.get(i)).hasNonNull("value"))
                     variable = node.get(vars.get(i)).get("value").asText();
-                    //if(variable.contains("#")) 
-                    	//if(!vars.get(i).contains("URI")){
-                            //variable = prettyFromURI(variable);
-                            //System.out.println(variable);
-                        //}
-                    if(isDouble(variable)){
-                        variable = toNum(Double.parseDouble(variable));
-                    }
+                //if(variable.contains("#"))
+                //if(!vars.get(i).contains("URI")){
+                //variable = prettyFromURI(variable);
+                //System.out.println(variable);
+                //}
+                if(isDouble(variable)){
+                    variable = toNum(Double.parseDouble(variable));
+                }
                 //System.out.println("read: " + vars.get(i) + " = " + variable);
             } catch (NullPointerException e){
                 if(vars.get(i).equals("sn")) {
@@ -46,45 +46,45 @@ public class TripleDocument{
         }// /for
         //System.out.println("Generated triple: " + this.get("sn"));
     }// constructor
-	
+
     public void addItem(String key, String value){
         if(value.contains("#"))
             if(!value.contains("URI"))
                 value = prettyFromURI(value);
-            if(isDouble(value)){
-                value = toNum(Double.parseDouble(value));
-            }
+        if(isDouble(value)){
+            value = toNum(Double.parseDouble(value));
+        }
         this.items.put(key, value);
     }
-	
-	// The Scala table generators use this method to access the triple's fields
-	public String get(String key){
-	    return this.items.get(key);
-	}
-	
-	public boolean has(String key){
-	    if (!this.vars.contains(key))
-	        return false;
-	    else if (this.items.get(key).equals(""))
-	        return false;
-	    else return true;
-	}
-	
-	private static String prettyFromURI (String origURI) {
-		if (!origURI.contains("#"))
-			return origURI;
-		String pretty = origURI.substring(origURI.indexOf('#') + 1);
-		String prettyFinal = "" + pretty.charAt(0);
-		for (int pos = 1; pos < pretty.length(); pos++) {
-			if (Character.isLowerCase(pretty.charAt(pos - 1)) && Character.isUpperCase(pretty.charAt(pos))) {
-				prettyFinal = prettyFinal + " " + pretty.charAt(pos);
-			} else {
-				prettyFinal = prettyFinal + pretty.charAt(pos);
-			}
-		}
-		return prettyFinal;
-	}
-	
+
+    // The Scala table generators use this method to access the triple's fields
+    public String get(String key){
+        return this.items.get(key);
+    }
+
+    public boolean has(String key){
+        if (!this.vars.contains(key))
+            return false;
+        else if (this.items.get(key).equals(""))
+            return false;
+        else return true;
+    }
+
+    private static String prettyFromURI (String origURI) {
+        if (!origURI.contains("#"))
+            return origURI;
+        String pretty = origURI.substring(origURI.indexOf('#') + 1);
+        String prettyFinal = "" + pretty.charAt(0);
+        for (int pos = 1; pos < pretty.length(); pos++) {
+            if (Character.isLowerCase(pretty.charAt(pos - 1)) && Character.isUpperCase(pretty.charAt(pos))) {
+                prettyFinal = prettyFinal + " " + pretty.charAt(pos);
+            } else {
+                prettyFinal = prettyFinal + pretty.charAt(pos);
+            }
+        }
+        return prettyFinal;
+    }
+
     private static boolean isDouble(String str) {
         try {
             Double.parseDouble(str);
@@ -93,7 +93,7 @@ public class TripleDocument{
             return false;
         }
     }
-	
+
     private static String toNum(double d) {
         if(d == (long) d)
             return String.format("%d",(long)d);

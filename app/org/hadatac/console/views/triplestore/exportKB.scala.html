@@ -3,10 +3,10 @@
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.triplestore._
-@import org.hadatac.metadata.loader._
+@* @import org.hadatac.metadata.loader._ *@
 @import java.net._
 
-@main("Export Facts from Metadata Store") {
+@main("Export Facts from Metadata Store","","") {
 	
 	<script>
         function checkform1() {
@@ -23,12 +23,12 @@
         <div class="col-md-8 col-md-offset-1">
 
          @if(oper=="init") {
-	         <h4>Export facts from metadata store...</h4>
+	         <h4>Export facts from org.hadatac.metadata store...</h4>
 
              <div id="rcorners">
-                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
+                 The org.hadatac.metadata store has MetadataContext.playTotalTriples() triples. <br> @* @MetadataContext.playTotalTriples() triples. <br> *@
 				<!-- 
-                 <form name="fileDownloadForm" id='download1' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.ExportKB.exportFile("load")">
+                 <form name="fileDownloadForm" id='download1' method="POST" enctype="multipart/form-org.hadatac.data" action="@org.hadatac.console.controllers.triplestore.routes.ExportKB.exportFile("load")">
                       <input type="file" class="btn btn-info" name="pic">  
                      <div id='submitMessage1'  style="display:none;" >
                         <br>Press <input type="submit" class="btn-sm btn-success" value="Generate CSV File"> to generate csv files from the knowledge base. 
@@ -36,11 +36,11 @@
                  </form>
                   -->
                  
-                 <form name="fileDownloadForm" id='download1' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.ExportKB.exportFile("load")">
+                 <form name="fileDownloadForm" id='download1' method="POST" enctype="multipart/form-org.hadatac.data" action="@org.hadatac.console.controllers.triplestore.routes.ExportKB.exportFile("load")">
                  	<br>Press <input type="submit" class="btn-sm btn-success" value="Generate CSV File"> to generate csv files from the knowledge base. 
                  </form>
                  
-                 <a href='@controllers.routes.Assets.versioned("csv/triple.csv")'>Download the CSV</a>
+                 <a href='@controllers.routes.Assets.at("csv/triple.csv")'>Download the CSV</a>
                  <div id='submitMessage1'  style="display:none;" >
                  	
                  </div>

@@ -12,21 +12,21 @@ import org.hadatac.utils.NameSpaces;
 
 
 public class Metadata extends Controller {
-	
-	// for /metadata HTTP GET requests
+
+    // for /metadata HTTP GET requests
     public Result index() {
-    	Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
+        Map<String,String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String,List<String>> values = Indicator.getValuesJustLabels(indicators);
         return ok(metadata.render(values, getLoadedList()));
-        
+
     }// /index()
 
 
     // for /metadata HTTP POST requests
     public Result postIndex() {
-        
-         return index();
-        
+
+        return index();
+
     }// /postIndex()
 
     private List<String> getLoadedList() {

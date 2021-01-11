@@ -12,7 +12,6 @@ import org.hadatac.entity.pojo.StudyObjectMatching;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.data.loader.Cache;
 
 import java.lang.String;
 import java.util.concurrent.ConcurrentHashMap;

@@ -912,8 +912,8 @@ public class Study extends HADatAcThing {
                 // Attribute References 
                 "    ?subUri rdfs:subClassOf* hasco:Study . " + 
                 "    ?study a ?subUri . " +
-                "    ?data hasco:isDatasetOf ?study . " +
-                "    ?s hasco:isAttributeReferenceOf ?data . " +
+                "    ?org.hadatac.data hasco:isDatasetOf ?study . " +
+                "    ?s hasco:isAttributeReferenceOf ?org.hadatac.data . " +
                 "    ?s ?p ?o . " +
                 "    FILTER (?study = " + study + ") " +
                 "    } " +
@@ -922,8 +922,8 @@ public class Study extends HADatAcThing {
                 // Other Attribute References
                 "    ?subUri rdfs:subClassOf* hasco:Study . " + 
                 "    ?study a ?subUri . " +
-                "    ?data hasco:isDatasetOf ?study . " +
-                "     ?s hasco:isAttributeReferenceOf ?data . " +
+                "    ?org.hadatac.data hasco:isDatasetOf ?study . " +
+                "     ?s hasco:isAttributeReferenceOf ?org.hadatac.data . " +
                 "    ?s ?p ?o . " +
                 "    FILTER (?study != " + study + ") " +
                 "    } " +

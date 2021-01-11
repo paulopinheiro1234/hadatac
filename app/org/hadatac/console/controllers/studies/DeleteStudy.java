@@ -3,10 +3,10 @@ package org.hadatac.console.controllers.studies;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import org.hadatac.Constants;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.views.html.studies.*;
 import org.hadatac.entity.pojo.Study;
@@ -21,7 +21,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteStudy extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String study_uri) {
         Study study = null;
         String result = "";
@@ -43,21 +43,21 @@ public class DeleteStudy extends Controller {
         return ok(deleteStudy.render(study, result));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex(String study_uri) {
         return index(study_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public static String deleteStudy(String studyUri) {
         NameSpaces.getInstance();
-        MetadataContext metadata = new MetadataContext("user", "password", 
+        MetadataContext metadata = new MetadataContext("user", "password",
                 ConfigFactory.load().getString("hadatac.solr.triplestore"), false);
-        
+
         return metadata.cleanStudy(Feedback.WEB, studyUri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result processForm(String study_uri) {
         Study study = null;
 

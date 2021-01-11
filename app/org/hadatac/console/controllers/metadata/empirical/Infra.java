@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.metadata.empirical;
 import java.util.List;
 import java.util.Map;
 
+import org.hadatac.Constants;
 import org.hadatac.entity.pojo.DetectorType;
 import org.hadatac.entity.pojo.GenericInstance;
 import org.hadatac.entity.pojo.HADatAcClass;
@@ -34,7 +35,7 @@ public class Infra extends Controller {
 	public static String INFRA_DETECTOR_TYPE = "DetectorType";
 	public static String INFRA_DETECTOR = "Detector";
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri) {
 		String platformJson = GenericInstance.jsonInstanceStatisticsByType("vstoi:" + Infra.INFRA_PLATFORM); 
 		String instrumentJson = GenericInstance.jsonInstanceStatisticsByType("vstoi:" + Infra.INFRA_INSTRUMENT); 
@@ -42,12 +43,12 @@ public class Infra extends Controller {
         return ok(infra.render(dir, filename, da_uri, platformJson, instrumentJson, detectorJson));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postIndex(String dir, String filename, String da_uri) {
         return index(dir, filename, da_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result hierarchy(String tabName, String dir, String filename, String da_uri) {
         //SparqlQuery query = new SparqlQuery();
         //GetSparqlQueryDynamic query_submit = new GetSparqlQueryDynamic(query);
@@ -87,19 +88,19 @@ public class Infra extends Controller {
         return ok(infra_browser.render(dir, filename, da_uri, results, objects, labelUri, tabName));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postHierarchy(String concept, String dir, String filename, String da_uri) {
         return hierarchy(concept, dir, filename, da_uri);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result findWithPages(String concept, String dir, String filename, String da_uri, int offset) {
     	List<GenericInstance> instances = GenericInstance.findGenericWithPages("vstoi:" + concept, PAGESIZE, offset * PAGESIZE);
     	int total = GenericInstance.getNumberGenericInstances("vstoi:" + concept);
         return ok(instanceManagement.render(dir, filename, da_uri, total, PAGESIZE, offset, instances, concept));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postFindWithPages(String concept, String dir, String filename, String da_uri, int offset) {
         return findWithPages(concept, dir, filename, da_uri, offset);
     }

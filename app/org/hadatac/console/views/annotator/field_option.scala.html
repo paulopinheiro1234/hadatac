@@ -1,67 +1,68 @@
+@import org.hadatac.console.models.SparqlQueryResults
 @(index : Int,
- field : String,
- charNames: Map[String, String],
- theEntities : org.hadatac.console.models.SparqlQueryResults,
- theUnits : org.hadatac.console.models.SparqlQueryResults)
+        field : String,
+        charNames: Map[String, String],
+        theEntities : SparqlQueryResults,
+        theUnits : SparqlQueryResults)
 
 @import java.net._
 @import org.hadatac.utils._
 
 <tr>
 
-   <td>@field</td> 
-   
-   <td>	 
-      <div class="form-group">
-         <select class="form-control col-sm-6" name="@index-entity" id="@index-entity">
-            <option value=""></option>
-            @for((k, triple) <- theEntities.sparqlResults){
-               <option value="@triple.get("id")">@triple.get("label")</option>
-            }
-         </select>
-         
-         <script language="JavaScript" type="text/javascript">
-         	$("#@index-entity").html($('#@index-entity option').sort(function(x, y) {        
-             	return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
-        	}));
-        	$("#@index-entity").get(0).selectedIndex = 0;
-		</script>
-     </div>
-   </td>
+    <td>@field</td>
 
-   <td>	 
-      <div class="form-group">
-         <select class="form-control col-sm-6" name="@index-characteristic" id="@index-characteristic">
-            <option value=""></option>
-            @for((ecuri,ecname) <- charNames) {
-                <option value="@ecuri">@ecname</option>         
-            }
-         </select>
-         
-       	<script language="JavaScript" type="text/javascript">
-         	$("#@index-characteristic").html($('#@index-characteristic option').sort(function(x, y) {        
-             	return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
-        	}));
-        	$("#@index-characteristic").get(0).selectedIndex = 0;
-		</script>
-     </div>
-   </td>
+    <td>
+        <div class="form-group">
+            <select class="form-control col-sm-6" name="@index-org.hadatac.entity" id="@index-org.hadatac.entity">
+                <option value=""></option>
+                @for((k, triple) <- theEntities.sparqlResults){
+                    <option value="@triple.get("id")">@triple.get("label")</option>
+                }
+            </select>
 
-   <td>
-	 <div class="form-group">
-         <select class="form-control col-sm-6" name="@index-unit" id="@index-unit">
-            <option value=""></option>
-            @for((k, triple) <- theUnits.sparqlResults){
-               <option value="@triple.get("id")">@triple.get("label")</option>
-            }
-         </select>
-         
-		<script language="JavaScript" type="text/javascript">
-         	$("#@index-unit").html($('#@index-unit option').sort(function(x, y) {        
-             	return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
-        	}));
-        	$("#@index-unit").get(0).selectedIndex = 0;
-		</script>
-     </div>
-   </td>
+            <script language="JavaScript" type="text/javascript">
+                    $("#@index-org.hadatac.entity").html($('#@index-org.hadatac.entity option').sort(function(x, y) {
+                        return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+                    }));
+                    $("#@index-org.hadatac.entity").get(0).selectedIndex = 0;
+            </script>
+        </div>
+    </td>
+
+    <td>
+        <div class="form-group">
+            <select class="form-control col-sm-6" name="@index-characteristic" id="@index-characteristic">
+                <option value=""></option>
+                @for((ecuri,ecname) <- charNames) {
+                    <option value="@ecuri">@ecname</option>
+                }
+            </select>
+
+            <script language="JavaScript" type="text/javascript">
+                    $("#@index-characteristic").html($('#@index-characteristic option').sort(function(x, y) {
+                        return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+                    }));
+                    $("#@index-characteristic").get(0).selectedIndex = 0;
+            </script>
+        </div>
+    </td>
+
+    <td>
+        <div class="form-group">
+            <select class="form-control col-sm-6" name="@index-unit" id="@index-unit">
+                <option value=""></option>
+                @for((k, triple) <- theUnits.sparqlResults){
+                    <option value="@triple.get("id")">@triple.get("label")</option>
+                }
+            </select>
+
+            <script language="JavaScript" type="text/javascript">
+                    $("#@index-unit").html($('#@index-unit option').sort(function(x, y) {
+                        return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+                    }));
+                    $("#@index-unit").get(0).selectedIndex = 0;
+            </script>
+        </div>
+    </td>
 </tr>

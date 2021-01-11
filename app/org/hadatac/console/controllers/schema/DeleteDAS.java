@@ -7,17 +7,13 @@ import javax.inject.Inject;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
-import org.hadatac.console.controllers.AuthApplication;
+//import controllers.AuthApplication;
 import org.hadatac.console.models.DataAcquisitionSchemaForm;
-import org.hadatac.console.views.html.schema.*;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpace;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 
 public class DeleteDAS extends Controller {
@@ -25,7 +21,7 @@ public class DeleteDAS extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String das_uri) {
 
         DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
@@ -43,24 +39,24 @@ public class DeleteDAS extends Controller {
 
         if (!das_uri.equals("")) {
             das = DataAcquisitionSchema.find(das_uri);
-            System.out.println("delete data acquisition schema");
+            System.out.println("delete org.hadatac.data acquisition schema");
             dasForm.setUri(das_uri);
             dasForm.setLabel(das.getLabel());
-            return ok(deleteDAS.render(das_uri, dasForm));
+            return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm));
         }
-        
-        return ok(deleteDAS.render(das_uri, dasForm));
+
+        return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String das_uri) {
         return index(das_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String das_uri) {
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(String das_uri, Http.Request request) {
 
-    	DataAcquisitionSchema das = null;
+        DataAcquisitionSchema das = null;
 
         try {
             if (das_uri != null) {
@@ -76,7 +72,7 @@ public class DeleteDAS extends Controller {
             das = DataAcquisitionSchema.find(das_uri);
         }
 
-        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest(request);
         DataAcquisitionSchemaForm data = form.get();
         data.setLabel(das.getLabel());
 
@@ -85,9 +81,9 @@ public class DeleteDAS extends Controller {
         }
 
         if (form.hasErrors()) {
-            return badRequest(DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from form", data.getLabel()));
+            return badRequest(org.hadatac.console.views.html.schema.DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from form", data.getLabel()));
         } else {
-            return ok(DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel()));
+            return ok(org.hadatac.console.views.html.schema.DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel()));
         }
     }
 }

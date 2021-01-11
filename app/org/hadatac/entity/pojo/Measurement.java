@@ -39,7 +39,6 @@ import org.hadatac.console.models.FacetTree;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
@@ -244,12 +243,12 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public void setTimestamp(Date timestamp) {
-    	//System.out.println("Inside Measurement.setTimestamp()");
-    	this.timestamp = timestamp;
+        //System.out.println("Inside Measurement.setTimestamp()");
+        this.timestamp = timestamp;
         if (timestamp != null) {
 
 
-        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             this.strTimestamp = sdf.format(timestamp);
 
             //this.strTimestamp = timestamp.toString();
@@ -540,14 +539,14 @@ public class Measurement extends HADatAcThing implements Runnable {
         return q;
     }
 
-    public static AcquisitionQueryResult findForViews(String user_uri, String study_uri, 
-            String subject_uri, String char_uri, boolean bNumberOfResultsOnly) {
+    public static AcquisitionQueryResult findForViews(String user_uri, String study_uri,
+                                                      String subject_uri, String char_uri, boolean bNumberOfResultsOnly) {
         AcquisitionQueryResult result = new AcquisitionQueryResult();
 
         String q = buildQuery(user_uri, study_uri, subject_uri, char_uri);
         /*
          * an empty query happens when current user is not allowed to see any
-         * data acquisition
+         * org.hadatac.data acquisition
          */
         if (q.equals("")) {
             return result;
@@ -595,7 +594,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         if (ownedDAs.isEmpty()) {
             /*
              * an empty query happens when current user is not allowed to see any
-             * data acquisition
+             * org.hadatac.data acquisition
              */
             System.out.println("Not allowed to access any Data Acquisition!");
             return result;
@@ -651,7 +650,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             Set<String> uri_set = new HashSet<String>();
             Map<String, STR> cachedDA = new HashMap<String, STR>();
             Map<String, String> mapClassLabel = generateCodeClassLabel();
-            
+
             Iterator<SolrDocument> iterDoc = docs.iterator();
             while (iterDoc.hasNext()) {
                 Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
@@ -661,7 +660,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 uri_set.add(measurement.getUnitUri());
             }
 
-            // Assign labels of entity, characteristic, and units collectively
+            // Assign labels of org.hadatac.entity, characteristic, and units collectively
             Map<String, String> cachedLabels = Measurement.generateCachedLabel(new ArrayList<String>(uri_set));
             for (Measurement measurement : result.getDocuments()) {
                 measurement.setLabels(cachedLabels);
@@ -681,27 +680,27 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     private static void getAllFacetStats(
-            FacetHandler facetHandler, 
+            FacetHandler facetHandler,
             FacetHandler retFacetHandler,
             AcquisitionQueryResult result,
             boolean bAddToResults) {
         FacetTree fTreeS = new FacetTree();
         fTreeS.setTargetFacet(STR.class);
         fTreeS.addUpperFacet(Study.class);
-        Pivot pivotS = getFacetStats(fTreeS, 
-                retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
+        Pivot pivotS = getFacetStats(fTreeS,
+                retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET),
                 facetHandler);
 
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectType.class);
         //fTreeOC.addUpperFacet(ObjectCollectionType.class);
         fTreeOC.addUpperFacet(StudyObjectRole.class);
-        Pivot pivotOC = getFacetStats(fTreeOC, 
-                retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
+        Pivot pivotOC = getFacetStats(fTreeOC,
+                retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET),
                 facetHandler);
 
         /*
-         *  The facet tree EC computes the entity-attribute indicators for indicators based on property's main attribute 
+         *  The facet tree EC computes the org.hadatac.entity-attribute indicators for indicators based on property's main attribute
          */
         FacetTree fTreeEC = new FacetTree();
         fTreeEC.setTargetFacet(AttributeInstance.class);
@@ -709,12 +708,12 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC.addUpperFacet(EntityRole.class);
         fTreeEC.addUpperFacet(InRelationToInstance.class);
         fTreeEC.addUpperFacet(EntityInstance.class);
-        Pivot pivotEC = getFacetStats(fTreeEC, 
-                retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
+        Pivot pivotEC = getFacetStats(fTreeEC,
+                retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET),
                 facetHandler);
 
         /*
-         *  The facet tree EC computes the entity-attribute indicators for indicators based on property's in-relation-to attribute 
+         *  The facet tree EC computes the org.hadatac.entity-attribute indicators for indicators based on property's in-relation-to attribute
          */
         FacetTree fTreeEC2 = new FacetTree();
         fTreeEC2.setTargetFacet(AttributeInstance.class);
@@ -722,8 +721,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreeEC2.addUpperFacet(EntityRole.class);
         fTreeEC2.addUpperFacet(InRelationToInstance.class);
         fTreeEC2.addUpperFacet(EntityInstance.class);
-        Pivot pivotEC2 = getFacetStats(fTreeEC2, 
-                retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2), 
+        Pivot pivotEC2 = getFacetStats(fTreeEC2,
+                retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2),
                 facetHandler);
 
         /*
@@ -750,17 +749,17 @@ public class Measurement extends HADatAcThing implements Runnable {
          *  Merging the computation result of pivotEC2 into pivotEC
          */
         pivotEC.addChildrenFromPivot(pivotEC2);
-        
+
         FacetTree fTreeU = new FacetTree();
         fTreeU.setTargetFacet(UnitInstance.class);
-        Pivot pivotU = getFacetStats(fTreeU, 
+        Pivot pivotU = getFacetStats(fTreeU,
                 retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
                 facetHandler);
 
         FacetTree fTreeT = new FacetTree();
         fTreeT.setTargetFacet(TimeInstance.class);
         //fTreeT.addUpperFacet(DASEType.class);
-        Pivot pivotT = getFacetStats(fTreeT, 
+        Pivot pivotT = getFacetStats(fTreeT,
                 retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
                 facetHandler);
 
@@ -768,7 +767,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         fTreePI.setTargetFacet(STR.class);
         fTreePI.addUpperFacet(Platform.class);
         fTreePI.addUpperFacet(Instrument.class);
-        Pivot pivotPI = getFacetStats(fTreePI, 
+        Pivot pivotPI = getFacetStats(fTreePI,
                 retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
                 facetHandler);
 
@@ -780,11 +779,11 @@ public class Measurement extends HADatAcThing implements Runnable {
             result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
             result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
         }
-               
+
     }
 
     private static Pivot getFacetStats(
-            FacetTree fTree, 
+            FacetTree fTree,
             Facet facet,
             FacetHandler facetHandler) {
         Pivot pivot = new Pivot();
@@ -805,7 +804,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             QueryResponse response = solr.query(query);
             solr.close();
             SolrDocumentList results = response.getResults();
-            // Update the data set URI list
+            // Update the org.hadatac.data set URI list
             dataAcquisition.deleteAllDatasetURIs();
             Iterator<SolrDocument> iter = results.iterator();
             while (iter.hasNext()) {
@@ -849,14 +848,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static List<Measurement> findByObjectUri(String obj_uri) {
 
-    	List<Measurement> listMeasurement = new ArrayList<Measurement>();
+        List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
         SolrClient solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
         SolrQuery query = new SolrQuery();
         query.set("q", "object_uri_str:\"" + obj_uri + "\"");
         query.set("rows", "10000000");
-        
+
         try {
             QueryResponse response = solr.query(query);
             solr.close();
@@ -972,8 +971,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static Measurement convertFromSolr(SolrDocument doc, 
-            Map<String, STR> cachedDA, Map<String, String> cachedURILabels) {
+    public static Measurement convertFromSolr(SolrDocument doc,
+                                              Map<String, STR> cachedDA, Map<String, String> cachedURILabels) {
         Measurement m = new Measurement();
         m.setUri(SolrUtils.getFieldValue(doc, "uri"));
         m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
@@ -1038,13 +1037,13 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static List<String> tokenizeSolr(List<String> solrInput) {
-	List<String> response = new ArrayList<String>();
-	for (String str : solrInput) {
-	    StringTokenizer st = new StringTokenizer(str, ";"); 
-	    while (st.hasMoreTokens()) 
-		response.add(st.nextToken().trim()); 
-	}
-	return response;
+        List<String> response = new ArrayList<String>();
+        for (String str : solrInput) {
+            StringTokenizer st = new StringTokenizer(str, ";");
+            while (st.hasMoreTokens())
+                response.add(st.nextToken().trim());
+        }
+        return response;
     }
 
     public static List<String> getFieldNames() {
@@ -1060,8 +1059,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         return results;
     }
 
-    public static void outputAsCSV(List<Measurement> measurements, 
-            List<String> fieldNames, File file, String fileId) {
+    public static void outputAsCSV(List<Measurement> measurements,
+                                   List<String> fieldNames, File file, String fileId) {
         try {
             // Create headers
             FileUtils.writeStringToFile(file, String.join(",", fieldNames) + "\n", "utf-8", true);
@@ -1110,7 +1109,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {        
+    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
@@ -1120,11 +1119,11 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             // Initiate Results
             //     HashMap<base object, Map<measurement's key, value>, where
-            //        - base object is the object to be aligned. For example, if the alignment is a subject and the current object of the measurement is a sample 
-            //          from the subject, the base object is the subject of the sample  
+            //        - base object is the object to be aligned. For example, if the alignment is a subject and the current object of the measurement is a sample
+            //          from the subject, the base object is the subject of the sample
             Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
 
-            // Prepare rows: Measurements are compared already collected alignment attributes (role/entity/attribute/inrelationto/unit/time)
+            // Prepare rows: Measurements are compared already collected alignment attributes (role/org.hadatac.entity/attribute/inrelationto/unit/time)
             //               New alignment attributes are created for measurements with no corresponding alignment attributes.
             int i = 1;
             int prev_ratio = 0;
@@ -1136,111 +1135,111 @@ public class Measurement extends HADatAcThing implements Runnable {
 
                 if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
 
-                	//System.out.println("Align-Debug: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
+                    //System.out.println("Align-Debug: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
 
                     // Perform following actions required if the object of the measurement has not been processed yet
                     //   - add a row in the result set for aligning object, if such row does not exist
-                    //   - add entity-role to the collection of entity-roles of the alignment
-                    //   - add object to the collection of objects of the alignment 
-                
-                	referenceObj = alignment.getObject(m.getStudyObjectUri());
+                    //   - add org.hadatac.entity-role to the collection of org.hadatac.entity-roles of the alignment
+                    //   - add object to the collection of objects of the alignment
+
+                    referenceObj = alignment.getObject(m.getStudyObjectUri());
                     if (referenceObj == null || !referenceObj.getUri().equals(m.getStudyObjectUri())) {
-                    	//System.out.println("Align-Debug: Reading object [" + m.getStudyObjectUri() + "]");
+                        //System.out.println("Align-Debug: Reading object [" + m.getStudyObjectUri() + "]");
                         referenceObj = StudyObject.find(m.getStudyObjectUri());
                         if (referenceObj != null) {
-                        	//System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
+                            //System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
                             alignment.addObject(referenceObj);
                         }
                     }
-                	if (referenceObj == null) {
-                		System.out.println("[ERROR] could not find reference object with uri " + m.getObjectUri());
-                	} else {
-                		if (!results.containsKey(referenceObj.getUri())) {
-                			//System.out.println("Align-Debug: adding entity-role");
-                	        Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
-                	        if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
-                	        	referenceObjEntity = Entity.find(referenceObj.getTypeUri());
-                	            if (referenceObjEntity == null) {
-                	                System.out.println("[ERROR] retrieving entity " + referenceObj.getTypeUri());
-                	            } else {
-                	                alignment.addEntity(referenceObjEntity);
-                	            }
-                	        }
-                	        if (referenceObjEntity != null) {
-                	        	//AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
-                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
-                				if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
-                					alignment.addRole(referenceEntRole);
-                				}
-			    
-                				if (results.get(referenceObj.getUri()) == null) {
-                					results.put(referenceObj.getUri(), new HashMap<String, String>());
-                					if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
-                						if (referenceObj.getOriginalId() != null) { 
-                							//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
-                							results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
-                						}
-                						if (referenceObj.getOriginalId() != null) { 
-                							//System.out.println("Align-Debug: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole)); 
-                							results.get(referenceObj.getUri()).put(alignment.groupKey(referenceEntRole), referenceObj.getGroupId());
-                						}
-                					} 
-                				}
-                	        }
-                		}
-                	}
-		    
-                	//System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
-		    
-                	// assign values to results
-                	String key = alignment.measurementKey(m);
-                	//System.out.println("Align-Debug: computed measurement key [" + key + "]");
-                	if (key != null) {
-                		String finalValue = "";
-			
-                		if (categoricalOption.equals(WITH_VALUES)){
-                			finalValue = m.getValue();
-                		} else {
-                			//System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
-                			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
-                				if (!alignment.containsCode(m.getValueClass())) {
-                					String code = Attribute.findHarmonizedCode(m.getValueClass());
-                					//System.out.println("Align-Debug: new alignment attribute Code [" + code + "] for URI-value [" + m.getValueClass() + "]"); 
-                					if (code != null && !code.equals("")) {
-                						List<String> newEntry = new ArrayList<String>();
-                						newEntry.add(code);
-                						newEntry.add(m.getValue());
-                						alignment.addCode(m.getValueClass(), newEntry);
-                					}	
-                				}
-                			}
-			    
-                			if (alignment.containsCode(m.getValueClass())) {
-                				// get code for qualitative variables
-                				List<String> entry = alignment.getCode(m.getValueClass()); 
-                				finalValue = entry.get(0);
-                			} else {
-                				// get actual value for quantitative variables
-                				finalValue = m.getValueClass();
-                			}
-                		}
+                    if (referenceObj == null) {
+                        System.out.println("[ERROR] could not find reference object with uri " + m.getObjectUri());
+                    } else {
+                        if (!results.containsKey(referenceObj.getUri())) {
+                            //System.out.println("Align-Debug: adding org.hadatac.entity-role");
+                            Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
+                            if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
+                                referenceObjEntity = Entity.find(referenceObj.getTypeUri());
+                                if (referenceObjEntity == null) {
+                                    System.out.println("[ERROR] retrieving org.hadatac.entity " + referenceObj.getTypeUri());
+                                } else {
+                                    alignment.addEntity(referenceObjEntity);
+                                }
+                            }
+                            if (referenceObjEntity != null) {
+                                //AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
+                                AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
+                                if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the org.hadatac.entity
+                                    alignment.addRole(referenceEntRole);
+                                }
 
-                		if (referenceObj != null) {
-                			results.get(referenceObj.getUri()).put(key, finalValue);
-                			//System.out.println("Align-Debug: final value [" + finalValue + "]");
-                		}
-                			
-                	} else {
-                			
-                		System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
-                				"attribute could be created for this measurement): " + 
-                				//m.getEntityUri() + " " + m.getCharacteristicUri());
-                				m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
-                	}
+                                if (results.get(referenceObj.getUri()) == null) {
+                                    results.put(referenceObj.getUri(), new HashMap<String, String>());
+                                    if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
+                                        if (referenceObj.getOriginalId() != null) {
+                                            //System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole));
+                                            results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
+                                        }
+                                        if (referenceObj.getOriginalId() != null) {
+                                            //System.out.println("Align-Debug: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole));
+                                            results.get(referenceObj.getUri()).put(alignment.groupKey(referenceEntRole), referenceObj.getGroupId());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
+
+                    // assign values to results
+                    String key = alignment.measurementKey(m);
+                    //System.out.println("Align-Debug: computed measurement key [" + key + "]");
+                    if (key != null) {
+                        String finalValue = "";
+
+                        if (categoricalOption.equals(WITH_VALUES)){
+                            finalValue = m.getValue();
+                        } else {
+                            //System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]");
+                            if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
+                                if (!alignment.containsCode(m.getValueClass())) {
+                                    String code = Attribute.findHarmonizedCode(m.getValueClass());
+                                    //System.out.println("Align-Debug: new alignment attribute Code [" + code + "] for URI-value [" + m.getValueClass() + "]");
+                                    if (code != null && !code.equals("")) {
+                                        List<String> newEntry = new ArrayList<String>();
+                                        newEntry.add(code);
+                                        newEntry.add(m.getValue());
+                                        alignment.addCode(m.getValueClass(), newEntry);
+                                    }
+                                }
+                            }
+
+                            if (alignment.containsCode(m.getValueClass())) {
+                                // get code for qualitative variables
+                                List<String> entry = alignment.getCode(m.getValueClass());
+                                finalValue = entry.get(0);
+                            } else {
+                                // get actual value for quantitative variables
+                                finalValue = m.getValueClass();
+                            }
+                        }
+
+                        if (referenceObj != null) {
+                            results.get(referenceObj.getUri()).put(key, finalValue);
+                            //System.out.println("Align-Debug: final value [" + finalValue + "]");
+                        }
+
+                    } else {
+
+                        System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " +
+                                "attribute could be created for this measurement): " +
+                                //m.getEntityUri() + " " + m.getCharacteristicUri());
+                                m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
+                    }
                 }
-                
 
-                // compute and show progress 
+
+                // compute and show progress
                 double ratio = (double)i / total * 100;
                 int current_ratio = (int)ratio;
                 if (current_ratio > prev_ratio) {
@@ -1261,9 +1260,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
                 i++;
             }
-            
+
             alignment.printAlignment();
-            
+
             // Write headers: Labels are derived from collected alignment attributes
             List<Variable> aaList = alignment.getAlignmentAttributes();
             aaList.sort(new Comparator<Variable>() {
@@ -1275,7 +1274,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //System.out.println("aligned attributes size: " + aaList.size());
             FileUtils.writeStringToFile(file, "\"STUDY-ID\"", "utf-8", true);
             for (Variable aa : aaList) {
-            	FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
+                FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
             }
             FileUtils.writeStringToFile(file, "\n", "utf-8", true);
 
@@ -1295,7 +1294,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     Map<String, String> row = results.get(obj.getUri());
                     FileUtils.writeStringToFile(file, "\"" + alignment.getStudyId(obj.getIsMemberOf()) + "\"", "utf-8", true);
                     for (Variable aa : aaList) {
-                    	FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
+                        FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
                     }
                     FileUtils.writeStringToFile(file, "\n", "utf-8", true);
                 }
@@ -1306,13 +1305,13 @@ public class Measurement extends HADatAcThing implements Runnable {
             dataFile = DataFile.findById(fileId);
             if (dataFile != null) {
 
-            	// Write harmonized code book
-            	if (categoricalOption.equals(WITH_CODE_BOOK)) {
-            		outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
-            	}
+                // Write harmonized code book
+                if (categoricalOption.equals(WITH_CODE_BOOK)) {
+                    outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
+                }
 
-            	outputProvenance(alignment, file, dataFile.getOwnerEmail());
-            	
+                outputProvenance(alignment, file, dataFile.getOwnerEmail());
+
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
                     return;
@@ -1327,103 +1326,103 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
-	try {
-	    //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
-	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
-	    Date date = new Date();
-	    //String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + "_codebook.csv";
-	    //DataFile dataFile = new DataFile(codeBookFile.getName());
-	    //dataFile.setOwnerEmail(ownerEmail);
-	    //dataFile.setStatus(DataFile.CREATING);
-	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
-	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
-	    dataFile.save();
+    public static void outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {
+        try {
+            //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
+            String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
+            Date date = new Date();
+            //String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + "_codebook.csv";
+            //DataFile dataFile = new DataFile(codeBookFile.getName());
+            //dataFile.setOwnerEmail(ownerEmail);
+            //dataFile.setStatus(DataFile.CREATING);
+            DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+            dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+            dataFile.save();
 
-	    // Write empty string to create the file
-        File codeBookFile = new File(dataFile.getAbsolutePath());
-        FileUtils.writeStringToFile(codeBookFile, "", "utf-8", true);
-	    
-	    System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
-	    
-	    FileUtils.writeStringToFile(codeBookFile, "code, value, class\n", "utf-8", true);
-	    // Write code book
-	    List<CodeBookEntry> codeBook = new ArrayList<CodeBookEntry>();
-	    for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
-	    	List<String> list = entry.getValue();
-	    	//System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
-	    	String pretty = list.get(1).replace("@en","");
-	    	if (!pretty.equals("")) {
-	    		String c0 = pretty.substring(0,1).toUpperCase();
-	    		if (pretty.length() == 1) {
-	    			pretty = c0;
-	    		} else {
-	    			pretty = c0 + pretty.substring(1);
-	    		}
-	    	}
-	    	CodeBookEntry cbe = new CodeBookEntry(list.get(0), pretty, entry.getKey());
-	    	codeBook.add(cbe);
-	    }
-        codeBook.sort(new Comparator<CodeBookEntry>() {
-            @Override
-            public int compare(CodeBookEntry cbe1, CodeBookEntry cbe2) {
-            	int v1 = Integer.parseInt(cbe1.getCode());
-            	int v2 = Integer.parseInt(cbe2.getCode());
-                if(v1 > v2) {
-                    return 1;
-                }else if(v1 < v2) {
-                   return -1;
+            // Write empty string to create the file
+            File codeBookFile = new File(dataFile.getAbsolutePath());
+            FileUtils.writeStringToFile(codeBookFile, "", "utf-8", true);
+
+            System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
+
+            FileUtils.writeStringToFile(codeBookFile, "code, value, class\n", "utf-8", true);
+            // Write code book
+            List<CodeBookEntry> codeBook = new ArrayList<CodeBookEntry>();
+            for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
+                List<String> list = entry.getValue();
+                //System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
+                String pretty = list.get(1).replace("@en","");
+                if (!pretty.equals("")) {
+                    String c0 = pretty.substring(0,1).toUpperCase();
+                    if (pretty.length() == 1) {
+                        pretty = c0;
+                    } else {
+                        pretty = c0 + pretty.substring(1);
+                    }
                 }
-                return 0;            
+                CodeBookEntry cbe = new CodeBookEntry(list.get(0), pretty, entry.getKey());
+                codeBook.add(cbe);
             }
-        });
-	    for (CodeBookEntry cbe : codeBook) {
-	    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
-	    }
-	    	
-    	dataFile.setCompletionPercentage(100);
-	    dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-	    dataFile.setStatus(DataFile.CREATED);
-	    dataFile.save();
+            codeBook.sort(new Comparator<CodeBookEntry>() {
+                @Override
+                public int compare(CodeBookEntry cbe1, CodeBookEntry cbe2) {
+                    int v1 = Integer.parseInt(cbe1.getCode());
+                    int v2 = Integer.parseInt(cbe2.getCode());
+                    if(v1 > v2) {
+                        return 1;
+                    }else if(v1 < v2) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            });
+            for (CodeBookEntry cbe : codeBook) {
+                FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
+            }
+
+            dataFile.setCompletionPercentage(100);
+            dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.setStatus(DataFile.CREATED);
+            dataFile.save();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void outputProvenance(Alignment alignment, File file, String ownerEmail) {        
-	try {
-	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
-	    Date date = new Date();
-	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
-	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
-	    dataFile.save();
+    public static void outputProvenance(Alignment alignment, File file, String ownerEmail) {
+        try {
+            String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
+            Date date = new Date();
+            DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+            dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+            dataFile.save();
 
-	    // Write empty string to create the file
-        File provenanceFile = new File(dataFile.getAbsolutePath());
-        FileUtils.writeStringToFile(provenanceFile, "", "utf-8", true);
-	    
-	    System.out.println("Sources file  [" + provenanceFile.getName() + "]");
-	    
-	    FileUtils.writeStringToFile(provenanceFile, "used_DOI\n", "utf-8", true);
-	    // Write provenance file
-	    List<String> provenance = alignment.getDOIs();
-        provenance.sort(Comparator.comparing( String::toString));
-	    for (String prov : provenance) {
-	    	FileUtils.writeStringToFile(provenanceFile, prov + "\n", "utf-8", true);
-	    }
-	    	
-    	dataFile.setCompletionPercentage(100);
-	    dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-	    dataFile.setStatus(DataFile.CREATED);
-	    dataFile.save();
+            // Write empty string to create the file
+            File provenanceFile = new File(dataFile.getAbsolutePath());
+            FileUtils.writeStringToFile(provenanceFile, "", "utf-8", true);
+
+            System.out.println("Sources file  [" + provenanceFile.getName() + "]");
+
+            FileUtils.writeStringToFile(provenanceFile, "used_DOI\n", "utf-8", true);
+            // Write provenance file
+            List<String> provenance = alignment.getDOIs();
+            provenance.sort(Comparator.comparing( String::toString));
+            for (String prov : provenance) {
+                FileUtils.writeStringToFile(provenanceFile, prov + "\n", "utf-8", true);
+            }
+
+            dataFile.setCompletionPercentage(100);
+            dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+            dataFile.setStatus(DataFile.CREATED);
+            dataFile.save();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void outputAsCSVByTimeAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption, String timeResolution) {        
+    public static void outputAsCSVByTimeAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption, String timeResolution) {
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
@@ -1433,10 +1432,10 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             // Initiate Results
             //     HashMap<base timestamp, Map<measurement's key, value>, where
-            //        - base timestamp is the timestamp to be aligned. 
+            //        - base timestamp is the timestamp to be aligned.
             Map<String, Map<String, String>> results = new HashMap<String, Map<String, String>>();
 
-            // Prepare rows: Measurements are compared already collected alignment attributes (role/entity/attribute/inrelationto/unit/time)
+            // Prepare rows: Measurements are compared already collected alignment attributes (role/org.hadatac.entity/attribute/inrelationto/unit/time)
             //               New alignment attributes are created for measurements with no corresponding alignment attributes.
             int i = 1;
             int prev_ratio = 0;
@@ -1449,128 +1448,128 @@ public class Measurement extends HADatAcThing implements Runnable {
                 StudyObject referenceObj = null;
 
                 if (m.getTimestampString() != null && !m.getTimestampString().isEmpty()) {
- 
-                	//System.out.println("Align-Debug: ReferenceTS is [" + m.getTimestampString() + "]   ObjectURI is [" + m.getObjectUri() + "]");
+
+                    //System.out.println("Align-Debug: ReferenceTS is [" + m.getTimestampString() + "]   ObjectURI is [" + m.getObjectUri() + "]");
 
                     // Perform following actions required if the object of the measurement has not been processed yet
                     //   - add a row in the result set for aligning object, if such row does not exist
-                    //   - add entity-role to the collection of entity-roles of the alignment
-                    //   - add object to the collection of objects of the alignment 
-                
-                	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                    //   - add org.hadatac.entity-role to the collection of org.hadatac.entity-roles of the alignment
+                    //   - add object to the collection of objects of the alignment
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                     referenceTS = sdf.format(m.getTimestamp()).trim();
                     if (timeResolution.equals("yyyy-MM-dd HH:mm:ss.SS")) {
-                    	referenceTS = referenceTS.substring(0,referenceTS.length() - 1);
+                        referenceTS = referenceTS.substring(0,referenceTS.length() - 1);
                     } else if (timeResolution.equals("yyyy-MM-dd HH:mm:ss.S")) {
-                    	referenceTS = referenceTS.substring(0,referenceTS.length() - 2);
+                        referenceTS = referenceTS.substring(0,referenceTS.length() - 2);
                     } else if (timeResolution.equals("yyyy-MM-dd HH:mm:ss")) {
-                    	referenceTS = referenceTS.substring(0,referenceTS.length() - 4);
+                        referenceTS = referenceTS.substring(0,referenceTS.length() - 4);
                     }
                     //System.out.println("Align-Debug: timestampTS [" + referenceTS + "]");
 
                     //referenceTS = m.getTimestampString();
-            		//System.out.println("Align-Debug: Total timestamps size is " + tss.size());
-                	if (!tss.contains(referenceTS)) {
-                		tss.add(referenceTS);
-                		//System.out.println("Align-Debug: Adding reference timestamp. Total size is " + tss.size());
+                    //System.out.println("Align-Debug: Total timestamps size is " + tss.size());
+                    if (!tss.contains(referenceTS)) {
+                        tss.add(referenceTS);
+                        //System.out.println("Align-Debug: Adding reference timestamp. Total size is " + tss.size());
                     }
-                	referenceObj = timeAlignment.getObject(m.getStudyObjectUri());
+                    referenceObj = timeAlignment.getObject(m.getStudyObjectUri());
                     if (referenceObj == null || !referenceObj.getUri().equals(m.getStudyObjectUri())) {
-                    	//System.out.println("Align-Debug: Reading object [" + m.getStudyObjectUri() + "]");
+                        //System.out.println("Align-Debug: Reading object [" + m.getStudyObjectUri() + "]");
                         referenceObj = StudyObject.find(m.getStudyObjectUri());
                         if (referenceObj != null) {
-                        	//System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
+                            //System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
                             timeAlignment.addObject(referenceObj);
                         }
                     }
-                	if (referenceTS == null) {
-                		//System.out.println("[ERROR] could not find reference timestamp with object with uri " + m.getObjectUri());
-                	} else {
-                		if (!results.containsKey(referenceTS)) {
-                			//System.out.println("Align-Debug: adding entity-role");
-                	        Entity referenceObjEntity = timeAlignment.getEntity(referenceObj.getUri());
-                			//System.out.println("Align-Debug: HERE 1");
-                	        if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
-                	        	referenceObjEntity = Entity.find(referenceObj.getTypeUri());
-                	            if (referenceObjEntity == null) {
-                	                System.out.println("[ERROR] retrieving entity " + referenceObj.getTypeUri());
-                	            } else {
-                	                timeAlignment.addEntity(referenceObjEntity);
-                	            }
-                	        }
-                	        if (referenceObjEntity != null) {
-                	        	//AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
-                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
-                				if (!timeAlignment.containsRole(referenceObj, referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
-                					timeAlignment.addRole(referenceObj, referenceEntRole);
-                				}
-			    
-                				if (results.get(referenceTS) == null) {
-                					results.put(referenceTS, new HashMap<String, String>());
+                    if (referenceTS == null) {
+                        //System.out.println("[ERROR] could not find reference timestamp with object with uri " + m.getObjectUri());
+                    } else {
+                        if (!results.containsKey(referenceTS)) {
+                            //System.out.println("Align-Debug: adding org.hadatac.entity-role");
+                            Entity referenceObjEntity = timeAlignment.getEntity(referenceObj.getUri());
+                            //System.out.println("Align-Debug: HERE 1");
+                            if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
+                                referenceObjEntity = Entity.find(referenceObj.getTypeUri());
+                                if (referenceObjEntity == null) {
+                                    System.out.println("[ERROR] retrieving org.hadatac.entity " + referenceObj.getTypeUri());
+                                } else {
+                                    timeAlignment.addEntity(referenceObjEntity);
+                                }
+                            }
+                            if (referenceObjEntity != null) {
+                                //AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
+                                AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
+                                if (!timeAlignment.containsRole(referenceObj, referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the org.hadatac.entity
+                                    timeAlignment.addRole(referenceObj, referenceEntRole);
+                                }
+
+                                if (results.get(referenceTS) == null) {
+                                    results.put(referenceTS, new HashMap<String, String>());
                 					/*
                 					if (results.get(referenceTS) != null && timeAlignment.objectKey(referenceEntRole) != null) {
-                						if (referenceObj.getOriginalId() != null) { 
-                							//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
+                						if (referenceObj.getOriginalId() != null) {
+                							//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole));
                 							results.get(referenceTS).put(timeAlignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
                 						}
                 					} */
-                				}
+                                }
 
-                	        } 
-                		}
-                	}
-		    
-                	//System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
-		    
-                	// assign values to results
-                	String key = timeAlignment.timeMeasurementKey(m);
-                	//System.out.println("Align-Debug: computed measurement key [" + key + "]");
-                	if (key != null) {
-                		String finalValue = "";
-			
-                		if (categoricalOption.equals(WITH_VALUES)){
-                			finalValue = m.getValue();
-                		} else {
-                			//System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
-                			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
-                				if (!timeAlignment.containsCode(m.getValueClass())) {
-                					String code = Attribute.findHarmonizedCode(m.getValueClass());
-                					//System.out.println("Align-Debug: new alignment attribute Code [" + code + "] for URI-value [" + m.getValueClass() + "]"); 
-                					if (code != null && !code.equals("")) {
-                						List<String> newEntry = new ArrayList<String>();
-                						newEntry.add(code);
-                						newEntry.add(m.getValue());
-                						timeAlignment.addCode(m.getValueClass(), newEntry);
-                					}	
-                				}
-                			}
-			    
-                			if (timeAlignment.containsCode(m.getValueClass())) {
-                				// get code for qualitative variables
-                				List<String> entry = timeAlignment.getCode(m.getValueClass()); 
-                				finalValue = entry.get(0);
-                			} else {
-                				// get actual value for quantitative variables
-                				finalValue = m.getValueClass();
-                			}
-                		}
+                            }
+                        }
+                    }
 
-                		if (referenceTS != null) {
-                			//System.out.println("Align-Debug: final value [" + finalValue + "]");
-                			results.get(referenceTS).put(key, finalValue);
-                		}
-                			
-                	} else {
-                			
-                		System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " + 
-                				"attribute could be created for this measurement): " + 
-                				//m.getEntityUri() + " " + m.getCharacteristicUri());
-                				m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
-                	}
+                    //System.out.println("Align-Debug: processing Object with PID " + m.getObjectPID());
+
+                    // assign values to results
+                    String key = timeAlignment.timeMeasurementKey(m);
+                    //System.out.println("Align-Debug: computed measurement key [" + key + "]");
+                    if (key != null) {
+                        String finalValue = "";
+
+                        if (categoricalOption.equals(WITH_VALUES)){
+                            finalValue = m.getValue();
+                        } else {
+                            //System.out.println("Align-Debug: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]");
+                            if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
+                                if (!timeAlignment.containsCode(m.getValueClass())) {
+                                    String code = Attribute.findHarmonizedCode(m.getValueClass());
+                                    //System.out.println("Align-Debug: new alignment attribute Code [" + code + "] for URI-value [" + m.getValueClass() + "]");
+                                    if (code != null && !code.equals("")) {
+                                        List<String> newEntry = new ArrayList<String>();
+                                        newEntry.add(code);
+                                        newEntry.add(m.getValue());
+                                        timeAlignment.addCode(m.getValueClass(), newEntry);
+                                    }
+                                }
+                            }
+
+                            if (timeAlignment.containsCode(m.getValueClass())) {
+                                // get code for qualitative variables
+                                List<String> entry = timeAlignment.getCode(m.getValueClass());
+                                finalValue = entry.get(0);
+                            } else {
+                                // get actual value for quantitative variables
+                                finalValue = m.getValueClass();
+                            }
+                        }
+
+                        if (referenceTS != null) {
+                            //System.out.println("Align-Debug: final value [" + finalValue + "]");
+                            results.get(referenceTS).put(key, finalValue);
+                        }
+
+                    } else {
+
+                        System.out.println("[ERROR] the following measurement could not match any alignment attribute (and no alignment " +
+                                "attribute could be created for this measurement): " +
+                                //m.getEntityUri() + " " + m.getCharacteristicUri());
+                                m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
+                    }
                 }
-                
 
-                // compute and show progress 
+
+                // compute and show progress
                 double ratio = (double)i / total * 100;
                 int current_ratio = (int)ratio;
                 if (current_ratio > prev_ratio) {
@@ -1591,9 +1590,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
                 i++;
             }
-            
+
             //timeAlignment.printAlignment();
-            
+
             // Write headers: Labels are derived from collected alignment attributes
             List<TimeVariable> aaList = timeAlignment.getAlignmentAttributes();
             aaList.sort(new Comparator<TimeVariable>() {
@@ -1605,7 +1604,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //System.out.println("aligned attributes size: " + aaList.size());
             FileUtils.writeStringToFile(file, "\"Timestamp\"", "utf-8", true);
             for (TimeVariable aa : aaList) {
-            	FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
+                FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
             }
             FileUtils.writeStringToFile(file, "\n", "utf-8", true);
 
@@ -1618,11 +1617,11 @@ public class Measurement extends HADatAcThing implements Runnable {
             for (String ts : tss) {
                 if (results.containsKey(ts)) {
                     //System.out.println("Align-Debug: WRITING: timestamp = " + ts);
-                	FileUtils.writeStringToFile(file, "\"" + ts + "\"", "utf-8", true);
+                    FileUtils.writeStringToFile(file, "\"" + ts + "\"", "utf-8", true);
                     Map<String, String> row = results.get(ts);
                     for (TimeVariable aa : aaList) {
                         //System.out.println("Align-Debug: WRITING: variable = " + aa + "  value = " + row.get(aa.toString()));
-                    	FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
+                        FileUtils.writeStringToFile(file, ",\"" + row.get(aa.toString()) + "\"", "utf-8", true);
                     }
                     FileUtils.writeStringToFile(file, "\n", "utf-8", true);
                 }
@@ -1638,7 +1637,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             	if (categoricalOption.equals(WITH_CODE_BOOK)) {
             		outputHarmonizedCodebook(timeAlignment, file, dataFile.getOwnerEmail());
             	}*/
-		
+
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
                     return;
@@ -1647,7 +1646,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
                 dataFile.setStatus(DataFile.CREATED);
                 dataFile.save();
-             
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -1680,12 +1679,12 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     @Override
-    public boolean saveToTripleStore() {   
+    public boolean saveToTripleStore() {
         return false;
     }
 
     @Override
-    public void deleteFromTripleStore() {  
+    public void deleteFromTripleStore() {
     }
 
     @Override

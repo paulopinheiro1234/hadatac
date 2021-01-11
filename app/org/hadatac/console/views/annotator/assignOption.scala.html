@@ -1,8 +1,8 @@
 @(ownerOptions : List[String],
-  action : play.mvc.Call, 
-  title : String,
-  targetType : String,
-  targetValue : String)
+        action : play.mvc.Call,
+        title : String,
+        targetType : String,
+        targetValue : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,48 +11,48 @@
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
 
-@main("Assign " + title) {
+@main("Assign " + title,"","") {
 
-<script type="text/javascript">
-   function checkform() {
-      var cansubmit = true;
+    <script type="text/javascript">
+            function checkform() {
+                var cansubmit = true;
 
-      if (document.getElementById('option').value.length == 0) {
-          cansubmit = false;
-      }
-         
-      if (cansubmit) {
-          document.getElementById('submitbutton').disabled = false;
-      } else {
-          document.getElementById('submitbutton').disabled = 'disabled';
-      }
-   }
-</script>
+                if (document.getElementById('option').value.length == 0) {
+                    cansubmit = false;
+                }
 
-  <div class="container">
-    <h2>Assign @title</h2>
+                if (cansubmit) {
+                    document.getElementById('submitbutton').disabled = false;
+                } else {
+                    document.getElementById('submitbutton').disabled = 'disabled';
+                }
+            }
+    </script>
 
-    <form class="form-horizontal" name="assignOption" method="post" action="@action">
+    <div class="container">
+        <h2>Assign @title</h2>
 
-    <div class="form-group">
-      <label>@targetType</label> <br>
-      @targetValue <br>
-      <br>
-      <label>New @title</label> 
-      <select class="form-control col-sm-6" id="option" name="option" onchange="checkform()" >
-        <option value=""></option>
-        @for(opt <- ownerOptions) {
-                    <option value="@opt">@opt</option>
-		    }
-      </select>
+        <form class="form-horizontal" name="assignOption" method="post" action="@action">
+
+            <div class="form-group">
+                <label>@targetType</label> <br>
+                @targetValue <br>
+                <br>
+                <label>New @title</label>
+                <select class="form-control col-sm-6" id="option" name="option" onchange="checkform()" >
+                    <option value=""></option>
+                    @for(opt <- ownerOptions) {
+                        <option value="@opt">@opt</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group" class="col-sm-6 col-offset-3">
+                <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign @title" disabled="disabled" />
+            </div>
+
+        </form>
     </div>
-    
-    <div class="form-group" class="col-sm-6 col-offset-3">
-      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Assign @title" disabled="disabled" />
-    </div>
-    
-    </form>    
-  </div>
-  
-  }
-  
+
+}
+

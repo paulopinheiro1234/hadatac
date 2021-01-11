@@ -6,7 +6,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 import org.hadatac.entity.pojo.Study;
@@ -24,15 +27,18 @@ public class ObjectManagement extends Controller {
 
     @Inject
     private FormFactory formFactory;
+
+    @Inject
+    private Application application;
     
     public static int PAGESIZE = 20;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result indexNomsg(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
         return index(dir, filename, da_uri, std_uri, oc_uri, page, "");
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
 
     	try {
@@ -66,12 +72,12 @@ public class ObjectManagement extends Controller {
         return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total, message));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
         return index(dir, filename, da_uri, std_uri, oc_uri, page, message);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result listURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
         
         try {
@@ -103,14 +109,14 @@ public class ObjectManagement extends Controller {
         return ok(listURIs.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postListURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
         return listURIs(dir, filename, da_uri, std_uri, oc_uri, page);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result updateCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, int total) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result updateCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, int total, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");
@@ -157,7 +163,7 @@ public class ObjectManagement extends Controller {
         }
 
         // get new values
-        Form<ObjectsForm> form = formFactory.form(ObjectsForm.class).bindFromRequest();
+        Form<ObjectsForm> form = formFactory.form(ObjectsForm.class).bindFromRequest(request);
         ObjectsForm data = form.get();
         List<String> newLabels = data.getNewLabel();
         List<String> newOriginalIds = data.getNewOriginalId();
@@ -214,10 +220,10 @@ public class ObjectManagement extends Controller {
         return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, newObjList, page, total, message));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page) {
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result deleteCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, Http.Request request) {
 
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");

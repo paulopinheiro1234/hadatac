@@ -1,14 +1,14 @@
 @(dir            : String,
-  filename       : String,
-  da_uri         : String,
-  page           : Integer,
-  topic_uri      : String,	
-  stream_label   : String,
-  results        : List[String],
-  specified      : List[String],
-  show           : Boolean
-  )
-    
+        filename       : String,
+        da_uri         : String,
+        page           : Integer,
+        topic_uri      : String,
+        stream_label   : String,
+        results        : List[String],
+        specified      : List[String],
+        show           : Boolean
+)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers._
@@ -16,63 +16,63 @@
 @import java.net.URLEncoder
 
 @maingraph("Test Topics") {
-	<head>
+    <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
-	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
     </head>
     <body>
 
-    <div class="container-fluid">
-        <div class="col-lg-1">
-        </div>
-        <div class="col-lg-11">
-	    	<h2>Test Topics</h2>
-			<br>
-	    	<h3>Stream: @stream_label</h3>
-			<br>
-		    <div class="row">
-		        <table class="table">
-		            <thead>
-		                 <tr>
-		                    <th>Received Topics</th>
-		                 </tr>
-		            </thead>
-		            <tbody>
-		        	   @for(line <- results){
-		                 <tr>
-		                     <td>@line</td>
-		                 </tr>
-		               }
-		            </tbody>
-		        </table>
-			</div>
-		    <div class="row">
-		        <table class="table">
-		            <thead>
-		                 <tr>
-		                    <th>Specified Topics</th>
-		                 </tr>
-		            </thead>
-		            <tbody>
-		        	   @for(spec <- specified){
-		                 <tr>
-		                     <td>@spec</td>
-		                 </tr>
-		               }
-		            </tbody>
-		        </table>
-			</div>
-	
-			<br>
-			<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)" class="btn btn-primary" 
-		       role="button">Back to Ingest </a>  		
-		</div>		
-	</div>
+        <div class="container-fluid">
+            <div class="col-lg-1">
+            </div>
+            <div class="col-lg-11">
+                <h2>Test Topics</h2>
+                <br>
+                <h3>Stream: @stream_label</h3>
+                <br>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Received Topics</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(line <- results){
+                            <tr>
+                                <td>@line</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Specified Topics</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(spec <- specified){
+                            <tr>
+                                <td>@spec</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
 
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-   	</body>
-} 
+                <br>
+                <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)" class="btn btn-primary"
+                role="button">Back to Ingest </a>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+    </body>
+}

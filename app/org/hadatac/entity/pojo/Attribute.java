@@ -6,13 +6,7 @@ import java.util.Map;
 
 import java.util.HashMap;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -22,8 +16,6 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
-
-import com.typesafe.config.ConfigFactory;
 
 public class Attribute extends HADatAcClass implements Comparable<Attribute> {
 
@@ -37,7 +29,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         List<Attribute> attributes = new ArrayList<Attribute>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* sio:SIO_000614 . " + 
+                " ?uri rdfs:subClassOf* sio:SIO_000614 . " +
                 "} ";
 
         //System.out.println("Query: " + queryString);
@@ -48,7 +40,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
             QuerySolution soln = resultsrw.next();
             Attribute attribute = find(soln.getResource("uri").getURI());
             attributes.add(attribute);
-        }			
+        }
 
         java.util.Collections.sort((List<Attribute>) attributes);
         return attributes;
@@ -79,7 +71,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
             if (attribute != null && !attributes.contains(attribute)) {
                 attributes.add(attribute);
             }
-        }			
+        }
 
         java.util.Collections.sort((List<Attribute>) attributes);
         return attributes;
@@ -150,7 +142,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
     public static Map<String,String> getMap() {
         List<Attribute> list = find();
         Map<String,String> map = new HashMap<String,String>();
-        for (Attribute att : list) 
+        for (Attribute att : list)
             map.put(att.getUri(),att.getLabel());
         return map;
     }

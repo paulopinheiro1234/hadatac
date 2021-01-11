@@ -27,8 +27,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.triplestore.UserManagement;
+//import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Deployment;
@@ -43,16 +42,16 @@ import org.hadatac.data.model.ParsingResult;
 import play.mvc.Controller;
 
 public class TripleProcessing {
-	
-	public static final String KB_FORMAT = "text/turtle";
-	
-	public static final String TTL_DIR = "tmp/ttl/";
-	
-	public static int count;
-	
-	public static String printFileWithLineNumber(int mode, String filename) {
-		String str = "";
-		int lineNumber = 1;
+
+    public static final String KB_FORMAT = "text/turtle";
+
+    public static final String TTL_DIR = "tmp/ttl/";
+
+    public static int count;
+
+    public static String printFileWithLineNumber(int mode, String filename) {
+        String str = "";
+        int lineNumber = 1;
 
         LineNumberReader reader = null;
         String line = null;
@@ -64,25 +63,25 @@ public class TripleProcessing {
             }
             reader.close();
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
         return str;
-	}
+    }
 
 	/*
-	public static SpreadsheetParsingResult generateTTL(int mode, 
+	public static SpreadsheetParsingResult generateTTL(int mode,
 			Map< String, List<PlainTriple> > sheet, List<String> predicates) {
 		String shttl = "";
 		String message = "";
-		
-		// Prints all identified predicates as a turtle comment 
+
+		// Prints all identified predicates as a turtle comment
 		shttl = shttl + "# properties: ";
 		for (String pred : predicates) {
 			URIUtils.validateNameSpace(pred);
 			shttl = shttl + "[" + pred + "] ";
 		}
 		shttl = shttl + "\n";
-		
+
 		int processedRows = 0;
 		int processedTriples = 0;
 		for (String uri : sheet.keySet()) {
@@ -91,7 +90,7 @@ public class TripleProcessing {
 			processedRows++;
 			processedTriples += row.size();
 		}
-		
+
 		System.out.println(String.format("%d rows processed!", processedRows));
 		message += Feedback.println(mode, "processed " + processedRows + " row(s) " + "( " + processedTriples + " Triples ).");
 		SpreadsheetParsingResult result = new SpreadsheetParsingResult(message, shttl);
@@ -102,19 +101,19 @@ public class TripleProcessing {
 	/*
 	public static String processTriplesOfRow(List<PlainTriple> triples, List<String> predicates) {
 		String clttl = "";
-		
+
 		boolean bListSubject = false;
 		Iterator<PlainTriple> iterTriple = triples.iterator();
 		while(iterTriple.hasNext()){
 			PlainTriple triple = iterTriple.next();
 			String cellValue = triple.obj.trim();
 			String predicate = triple.pred.trim();
-			
+
 			if(!bListSubject){
 				clttl = clttl + URIUtils.processSubjectValue(triple.sub.trim());
 				bListSubject = true;
 			}
-			
+
 			// cell has object value
 			clttl = clttl + "   " + predicate + " ";
 			if (URIUtils.isObjectSet(cellValue)) {
@@ -142,18 +141,18 @@ public class TripleProcessing {
 				clttl = clttl + " . \n\n";
 			}
 		}
-				
+
 		return clttl;
 	}
 	*/
 
 	/*
     private static String loadTriples(
-    		LabkeyDataHandler loader, 
-    		List<String> list_names, 
-    		Map< String, Map< String, List<PlainTriple> > > mapSheets, 
+    		LabkeyDataHandler loader,
+    		List<String> list_names,
+    		Map< String, Map< String, List<PlainTriple> > > mapSheets,
     		Map< String, List<String> > mapPreds) throws CommandException {
-    	
+
     	String message = "";
 		try {
 			List<String> queryNames = null;
@@ -180,21 +179,21 @@ public class TripleProcessing {
 				return e.getMessage();
 			}
 		}
-		
+
 		return message;
     }
     */
-    
+
 	/*
-	public static Model importStudy(String labkey_site, String path, 
+	public static Model importStudy(String labkey_site, String path,
             String user_name, String password, String studyUri) throws CommandException {
-    	
+
 		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
-		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
+		Map< String, Map< String, List<PlainTriple> > > mapSheets =
 				new HashMap< String, Map< String, List<PlainTriple> > >();
-		Map< String, List<String> > mapPreds = 
+		Map< String, List<String> > mapPreds =
 				new HashMap< String, List<String> >();
-		
+
 		loadTriples(loader, loader.getAllQueryNames(), mapSheets, mapPreds);
 		String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
 		for(String queryName : mapSheets.keySet()){
@@ -209,12 +208,12 @@ public class TripleProcessing {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		Model refModel = RDFDataMgr.loadModel(fileName);
 		Model targetModel = ModelFactory.createDefaultModel();
-		
+
 		HashSet<String> visitedNodes = new HashSet<String>();
-		
+
 		Selector selector = new SimpleSelector(
 				refModel.getResource(URIUtils.replacePrefixEx(studyUri)), (Property)null, (RDFNode)null);
 		StmtIterator iter = refModel.listStatements(selector);
@@ -222,7 +221,7 @@ public class TripleProcessing {
 			Resource studyNode = iter.nextStatement().getSubject();
 			forwardTraverseGraph(studyNode, visitedNodes, refModel, targetModel);
 		}
-		
+
 		selector = new SimpleSelector(
 				null, (Property)null, refModel.getResource(URIUtils.replacePrefixEx(studyUri)));
 		iter = refModel.listStatements(selector);
@@ -230,67 +229,67 @@ public class TripleProcessing {
 			RDFNode studyNode = iter.nextStatement().getObject();
 			backwardTraverseGraph((Resource)studyNode, visitedNodes, refModel, targetModel);
 		}
-		
+
 		return targetModel;
     }
     */
-    
-    private static void forwardTraverseGraph(Resource node, HashSet<String> visitedNodes, 
-    		Model refModel, Model targetModel) {
-    	StmtIterator iter = node.listProperties();
-    	while (iter.hasNext()) {
-    		Statement stmt = iter.nextStatement();
-    		RDFNode object = stmt.getObject();
-    		if (object.isResource()) {
-    			targetModel.add(node, stmt.getPredicate(), object);
-    			if (!visitedNodes.contains(object.toString())) {
-    				visitedNodes.add(node.toString());
-    				forwardTraverseGraph((Resource)object, visitedNodes, refModel, targetModel);
-    			}
-    		}
-    		else {
-    			targetModel.add(node, stmt.getPredicate(), object);
-    		}
-    	}
+
+    private static void forwardTraverseGraph(Resource node, HashSet<String> visitedNodes,
+                                             Model refModel, Model targetModel) {
+        StmtIterator iter = node.listProperties();
+        while (iter.hasNext()) {
+            Statement stmt = iter.nextStatement();
+            RDFNode object = stmt.getObject();
+            if (object.isResource()) {
+                targetModel.add(node, stmt.getPredicate(), object);
+                if (!visitedNodes.contains(object.toString())) {
+                    visitedNodes.add(node.toString());
+                    forwardTraverseGraph((Resource)object, visitedNodes, refModel, targetModel);
+                }
+            }
+            else {
+                targetModel.add(node, stmt.getPredicate(), object);
+            }
+        }
     }
-    
-    private static void backwardTraverseGraph(Resource node, HashSet<String> visitedNodes, 
-    		Model refModel, Model targetModel) {
-    	Selector selector = new SimpleSelector(null, (Property)null, node);
-    	StmtIterator iter = refModel.listStatements(selector);
-    	while (iter.hasNext()) {
-    		Statement stmt = iter.nextStatement();
-    		Resource subject = stmt.getSubject();
-    		
-    		targetModel.add(subject, stmt.getPredicate(), node);
-    		
-    		forwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
-    		backwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
-    	}
+
+    private static void backwardTraverseGraph(Resource node, HashSet<String> visitedNodes,
+                                              Model refModel, Model targetModel) {
+        Selector selector = new SimpleSelector(null, (Property)null, node);
+        StmtIterator iter = refModel.listStatements(selector);
+        while (iter.hasNext()) {
+            Statement stmt = iter.nextStatement();
+            Resource subject = stmt.getSubject();
+
+            targetModel.add(subject, stmt.getPredicate(), node);
+
+            forwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
+            backwardTraverseGraph(subject, visitedNodes, refModel, targetModel);
+        }
     }
-    
+
     /*
-    public static ParsingResult importDataAcquisition(String labkey_site, String path, 
+    public static ParsingResult importDataAcquisition(String labkey_site, String path,
             String user_name, String password, String target_study_uri) throws CommandException {
-    	
+
     	final SysUser user = AuthApplication.getLocalUser(Controller.session());
 		String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-		
+
     	String message = "";
     	LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
-		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
+		Map< String, Map< String, List<PlainTriple> > > mapSheets =
 				new HashMap< String, Map< String, List<PlainTriple> > >();
-		Map< String, List<String> > mapPreds = 
+		Map< String, List<String> > mapPreds =
 				new HashMap< String, List<String> >();
-		
+
 		List<String> list_names = new ArrayList<String>();
 		list_names.add("DataAcquisition");
 		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
-		
+
 		if(!ret.equals("")){
 			return new ParsingResult(1, message + ret);
 		}
-		
+
 		String filePath = TTL_DIR + "labkey.ttl";
 		message += parseTriplesToTTL(Feedback.WEB, filePath, mapSheets, mapPreds);
 		ParsingResult isValid = verifyTTL(Feedback.WEB, filePath);
@@ -298,12 +297,12 @@ public class TripleProcessing {
 		if (isValid.getStatus() != 0) {
 			return new ParsingResult(1, message);
 		}
-		
+
 		for(String queryName : mapSheets.keySet()){
 			Map< String, List<PlainTriple> > sheet = mapSheets.get(queryName);
 			for (String uri : sheet.keySet()) {
 				System.out.println(String.format("Processing data acquisition %s", uri));
-				
+
 				String dataAcquisitionUri = URIUtils.convertToWholeURI(uri);
 				STR dataAcquisition = STR.findByUri(dataAcquisitionUri);
 				if (null == dataAcquisition) {
@@ -315,12 +314,12 @@ public class TripleProcessing {
 					dataAcquisition.setNumberDataPoints(
 							Measurement.getNumByDataAcquisition(dataAcquisition));
 				}
-				
+
 				boolean bCanSave = true;
 				for (PlainTriple triple : sheet.get(uri)) {
 					String cellValue = triple.obj.trim();
 					String predicate = triple.pred.trim();
-					
+
 					if (predicate.equals("a")) {
 						StringTokenizer st;
 						if(cellValue.contains("&")){
@@ -361,7 +360,7 @@ public class TripleProcessing {
 						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 						System.out.println("prov:startedAtTime: " + cellValue);
 						dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue));
-						
+
 						//String pattern = "EEE MMM dd HH:mm:ss zzz yyyy";
 						//System.out.println("prov:startedAtTime: " + cellValue);
 						//dataAcquisition.setStartedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue.replace(" BRT ", " EDT ")));
@@ -369,7 +368,7 @@ public class TripleProcessing {
 					else if (predicate.equals("prov:endedAtTime")) {
 						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 						dataAcquisition.setEndedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue));
-						
+
 						//String pattern = "EEE MMM dd HH:mm:ss zzz yyyy";
 						//dataAcquisition.setEndedAt(DateTimeFormat.forPattern(pattern).parseDateTime(cellValue.replace(" BRT ", " EDT ")));
 					}
@@ -398,7 +397,7 @@ public class TripleProcessing {
 					else if (predicate.equals("hasco:hasDeployment")) {
 						String deployment_uri = URIUtils.convertToWholeURI(cellValue);
 						dataAcquisition.setDeploymentUri(deployment_uri);
-						
+
 						Deployment deployment = Deployment.find(deployment_uri);
 						if (deployment != null) {
 							if(deployment.getPlatform()!=null){
@@ -413,64 +412,64 @@ public class TripleProcessing {
 						}
 					}
 				}
-				
-				if (bCanSave == false || dataAcquisition.getStartedAt() == null || dataAcquisition.getStartedAt().isEmpty() 
+
+				if (bCanSave == false || dataAcquisition.getStartedAt() == null || dataAcquisition.getStartedAt().isEmpty()
 						|| dataAcquisition.getDeploymentUri() == null || dataAcquisition.getDeploymentUri().isEmpty()
 						|| dataAcquisition.getSchemaUri() == null || dataAcquisition.getSchemaUri().isEmpty()) {
 					continue;
 				}
-				
+
 				dataAcquisition.save();
 				System.out.println("Successfully saved " + dataAcquisition.getUri() + " in Solr");
 			}
 		}
-		
+
 		return new ParsingResult(0, message);
     }
     */
-    
+
     private static ParsingResult verifyTTL(int mode, String filePath) {
-		String listing = "";
-		try {
-			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, filePath), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		};
-		
-		String message = "";
-		message += Feedback.println(mode, " ");
-		message += Feedback.println(mode, "   Generated " + filePath + " and stored locally.");
-		try {
-			RDFDataMgr.loadModel(filePath);
-			message += Feedback.println(mode, " ");
-			message += Feedback.print(mode, "SUCCESS parsing the document!");
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
-			message += listing;
-		} catch (Exception e) {
-			message += Feedback.println(mode, " ");
-			message += Feedback.print(mode, "ERROR parsing the document!");
-			message += Feedback.println(mode, " ");
-			message += e.getMessage();
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
-			message += listing;
-			return new ParsingResult(1, message);
-		}
-		
-		return new ParsingResult(0, message);
+        String listing = "";
+        try {
+            listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, filePath), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        };
+
+        String message = "";
+        message += Feedback.println(mode, " ");
+        message += Feedback.println(mode, "   Generated " + filePath + " and stored locally.");
+        try {
+            RDFDataMgr.loadModel(filePath);
+            message += Feedback.println(mode, " ");
+            message += Feedback.print(mode, "SUCCESS parsing the document!");
+            message += Feedback.println(mode, " ");
+            message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
+            message += listing;
+        } catch (Exception e) {
+            message += Feedback.println(mode, " ");
+            message += Feedback.print(mode, "ERROR parsing the document!");
+            message += Feedback.println(mode, " ");
+            message += e.getMessage();
+            message += Feedback.println(mode, " ");
+            message += Feedback.println(mode, " ");
+            message += Feedback.println(mode, "==== TURTLE (TTL) CODE GENERATED FROM LABKEY ====");
+            message += listing;
+            return new ParsingResult(1, message);
+        }
+
+        return new ParsingResult(0, message);
     }
-    
+
     /*
-    private static String parseTriplesToTTL(int mode, String filePath, 
-    		Map< String, Map< String, List<PlainTriple> > > mapSheets, 
+    private static String parseTriplesToTTL(int mode, String filePath,
+    		Map< String, Map< String, List<PlainTriple> > > mapSheets,
     		Map< String, List<String> > mapPreds) {
-    	
+
     	String message = "";
 		message += Feedback.println(mode, "   Parsing triples from LABKEY " );
 		message += Feedback.println(mode, " ");
-		
+
 		String ttl = NameSpaces.getInstance().printTurtleNameSpaceList();
 		for(String queryName : mapSheets.keySet()) {
 			Map< String, List<PlainTriple> > sheet = mapSheets.get(queryName);
@@ -490,13 +489,13 @@ public class TripleProcessing {
 			e.printStackTrace();
 			return message;
 		}
-		
+
 		return message;
     }
     */
 
     /*
-    public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site, 
+    public static String generateTTL(int mode, String oper, RDFContext rdf, String labkey_site,
     		String user_name, String password, String path, List<String> list_names) throws CommandException {
 
 		String message = "";
@@ -504,18 +503,18 @@ public class TripleProcessing {
 			message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
 			message += Feedback.println(mode, " ");
 		}
-		
+
 		LabkeyDataHandler loader = new LabkeyDataHandler(labkey_site, path, user_name, password);
-		Map< String, Map< String, List<PlainTriple> > > mapSheets = 
+		Map< String, Map< String, List<PlainTriple> > > mapSheets =
 				new HashMap< String, Map< String, List<PlainTriple> > >();
-		Map< String, List<String> > mapPreds = 
+		Map< String, List<String> > mapPreds =
 				new HashMap< String, List<String> >();
-		
+
 		String ret = loadTriples(loader, list_names, mapSheets, mapPreds);
 		if(!ret.equals("")) {
 			return (message + ret);
 		}
-		
+
 		String filePath = TTL_DIR + "labkey.ttl";
 		message += parseTriplesToTTL(mode, filePath, mapSheets, mapPreds);
 		message += verifyTTL(mode, filePath).getMessage();
@@ -531,47 +530,47 @@ public class TripleProcessing {
 	    return message;
 	}
 	*/
-    
+
     public static String processTTL(int mode, String oper, RDFContext rdf, String fileName) {
-		String message = "";
-		if (oper.equals("load")) {
-		   message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
-		   message += Feedback.println(mode, " ");
-		}
-		
-		String listing = "";
-		try {
-			listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		};
+        String message = "";
+        if (oper.equals("load")) {
+            message += Feedback.println(mode, "   Triples before loading from LABKEY: " + rdf.totalTriples());
+            message += Feedback.println(mode, " ");
+        }
 
-		message += Feedback.println(mode, " ");
-		message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
-		try {
-			RDFDataMgr.loadModel(fileName);
-			message += Feedback.println(mode, " ");
-			message += Feedback.print(mode, "SUCCESS parsing the document!");
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "==== TURTLE (TTL) FILE CONTENT ====");
-			message += listing;
-		} catch (Exception e) {
-			message += Feedback.println(mode, " ");
-			message += Feedback.print(mode, "ERROR parsing the document!");
-			message += Feedback.println(mode, " ");
-			message += e.getMessage();
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, " ");
-			message += Feedback.println(mode, "==== TURTLE (TTL) FILE CONTENT ====");
-			message += listing;
-			return message;
-		}
+        String listing = "";
+        try {
+            listing = URLEncoder.encode(SpreadsheetProcessing.printFileWithLineNumber(mode, fileName), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        };
 
-	    message += Feedback.print(mode, "   Uploading generated file.");
-	    rdf.loadLocalFile(mode, fileName, KB_FORMAT, "");
-	    message += Feedback.println(mode, "");
-	    message += Feedback.println(mode, " ");
-	    message += Feedback.println(mode, "   Triples after [loading]: " + rdf.totalTriples());
-	    return message;
-	}
+        message += Feedback.println(mode, " ");
+        message += Feedback.println(mode, "   Generated " + fileName + " and stored locally.");
+        try {
+            RDFDataMgr.loadModel(fileName);
+            message += Feedback.println(mode, " ");
+            message += Feedback.print(mode, "SUCCESS parsing the document!");
+            message += Feedback.println(mode, " ");
+            message += Feedback.println(mode, "==== TURTLE (TTL) FILE CONTENT ====");
+            message += listing;
+        } catch (Exception e) {
+            message += Feedback.println(mode, " ");
+            message += Feedback.print(mode, "ERROR parsing the document!");
+            message += Feedback.println(mode, " ");
+            message += e.getMessage();
+            message += Feedback.println(mode, " ");
+            message += Feedback.println(mode, " ");
+            message += Feedback.println(mode, "==== TURTLE (TTL) FILE CONTENT ====");
+            message += listing;
+            return message;
+        }
+
+        message += Feedback.print(mode, "   Uploading generated file.");
+        rdf.loadLocalFile(mode, fileName, KB_FORMAT, "");
+        message += Feedback.println(mode, "");
+        message += Feedback.println(mode, " ");
+        message += Feedback.println(mode, "   Triples after [loading]: " + rdf.totalTriples());
+        return message;
+    }
 }

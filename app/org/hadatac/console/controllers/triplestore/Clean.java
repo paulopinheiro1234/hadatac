@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.triplestore;
 import java.util.List;
 import java.io.File;
 
+import org.hadatac.Constants;
 import play.mvc.*;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -25,12 +26,12 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class Clean extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     public Result clean(String oper) {
         return ok(clean.render(oper));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     public Result postClean(String oper) {
         return ok(clean.render(oper));
     }

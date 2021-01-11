@@ -1,4 +1,5 @@
-@(das_uri : String, das: org.hadatac.console.models.DataAcquisitionSchemaForm)
+@import org.hadatac.console.models.DataAcquisitionSchemaForm
+@(das_uri : String, das: DataAcquisitionSchemaForm)
 
 @import helper._
 @import org.hadatac.utils._
@@ -6,7 +7,7 @@
 @import org.hadatac.console.views.html.schema._
 @import org.hadatac.console.controllers.schema._
 
-@main("Delete Semantic Data Dictionary") {
+@main("Delete Semantic Data Dictionary","","") {
 <div class="container">
    <h4>Delete Semantic Data Dictionary</h4>
 

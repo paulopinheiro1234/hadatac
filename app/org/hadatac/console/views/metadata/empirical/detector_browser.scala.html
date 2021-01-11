@@ -1,3 +1,6 @@
+@import org.hadatac.console.views.html.metadata.empirical.empirical_navigation
+@import org.hadatac.console.views.html.metadata.empirical.detector_model_entry
+@import org.hadatac.console.views.html.metadata.empirical.print_detector_model_entry
 @( dir          : String,
    filename     : String,
    da_uri       : String,
@@ -15,7 +18,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Hierarchies") {
+@main("Hierarchies","","") {
     @empirical_navigation(dir, filename, da_uri, category)
     <div class="container-fluid container-spaced">
       <div class="row">

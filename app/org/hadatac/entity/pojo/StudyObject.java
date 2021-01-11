@@ -6,17 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.ByteArrayOutputStream;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -32,7 +23,6 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.URIUtils;
 
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
@@ -998,7 +988,7 @@ public class StudyObject extends HADatAcThing {
 
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += " DELETE WHERE { \n";
-        if (study_uri.startsWith("http")) {
+        if (study_uri.startsWith("org.hadatac.console.http")) {
             query += "<" + this.getUri() + ">";
         } else {
             query += this.getUri();

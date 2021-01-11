@@ -2,7 +2,10 @@ package org.hadatac.console.controllers.indicators;
 
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 
@@ -22,49 +25,51 @@ import org.hadatac.console.controllers.AuthApplication;
 
 public class NewIndicator extends Controller {
 
-	@Inject
-	private FormFactory formFactory;
+    @Inject
+    private FormFactory formFactory;
+    @Inject
+    private Application application;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index() {
-		// may need addressing
-		Indicator indicator = new Indicator();
-		
-		return ok(newIndicator.render(indicator));
-	}
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result index() {
+        // may need addressing
+        Indicator indicator = new Indicator();
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex() {
-		return index();
-	}
+        return ok(newIndicator.render(indicator));
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm() {
-		final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result postIndex() {
+        return index();
+    }
 
-		Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest();
-		IndicatorForm data = form.get();
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processForm(Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
-		if (form.hasErrors()) {
-			return badRequest("The submitted form has errors!");
-		}
+        Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest(request);
+        IndicatorForm data = form.get();
 
-		// store new values
-		String newURI = URIUtils.replacePrefixEx(data.getNewUri());
-		if (newURI == null || newURI.equals("")) {
-			return badRequest("[ERROR] New URI cannot be empty.");
-		}
-		String newLabel = data.getNewLabel();
-		String newComment = data.getNewComment();
+        if (form.hasErrors()) {
+            return badRequest("The submitted form has errors!");
+        }
 
-		// insert current state of the STD
-		Indicator ind = new Indicator(DynamicFunctions.replacePrefixWithURL(newURI),
-				newLabel,
-				newComment);
+        // store new values
+        String newURI = URIUtils.replacePrefixEx(data.getNewUri());
+        if (newURI == null || newURI.equals("")) {
+            return badRequest("[ERROR] New URI cannot be empty.");
+        }
+        String newLabel = data.getNewLabel();
+        String newComment = data.getNewComment();
 
-		// insert the new indicator content inside of the triplestore
-		ind.save();
+        // insert current state of the STD
+        Indicator ind = new Indicator(DynamicFunctions.replacePrefixWithURL(newURI),
+                newLabel,
+                newComment);
 
-		return ok(newIndicatorConfirm.render(ind));
-	}
+        // insert the new indicator content inside of the triplestore
+        ind.save();
+
+        return ok(newIndicatorConfirm.render(ind));
+    }
 }

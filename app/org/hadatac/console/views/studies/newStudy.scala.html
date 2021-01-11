@@ -1,8 +1,8 @@
 @(studyType     : org.hadatac.entity.pojo.StudyType,
-  organizations : List[org.hadatac.entity.pojo.Agent],
-  persons       : List[org.hadatac.entity.pojo.Agent],
-  dir           : String,
-  file          : org.hadatac.entity.pojo.DataFile) 
+        organizations : List[org.hadatac.entity.pojo.Agent],
+        persons       : List[org.hadatac.entity.pojo.Agent],
+        dir           : String,
+        file          : org.hadatac.entity.pojo.DataFile)
 
 @import helper._
 @import org.hadatac.utils._
@@ -12,187 +12,187 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("New Study") {
+@main("New Study","","") {
 
-  <div class="container">
-    <h2>New Study</h2>
+    <div class="container">
+        <h2>New Study</h2>
 
-   <script type="text/javascript">
-     function checkform() {
-        var cansubmit = true;
-	
-	if (!document.getElementById('newLabel').value || 
-            document.getElementById('newLabel').value.length === 0) {
-	   cansubmit = false;
-	}
+        <script type="text/javascript">
+                function checkform() {
+                    var cansubmit = true;
 
-	if ($('input[type=radio]:checked').size() === 0) {
-	  cansubmit = false;
-	}
+                    if (!document.getElementById('newLabel').value ||
+                            document.getElementById('newLabel').value.length === 0) {
+                        cansubmit = false;
+                    }
 
-	if (cansubmit) {
-	  document.getElementById('submit').disabled = false;
-	} else {
-	  document.getElementById('submit').disabled = 'disabled';
-	}
-     }
+                    if ($('input[type=radio]:checked').size() === 0) {
+                        cansubmit = false;
+                    }
 
-     function replaceAll(str, find, replace) {
-        while (str.indexOf(find) > -1) {
-            str = str.replace(find, replace);
-        }
-        return str;
-     }
-       
-     function labelchange() {
-        var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + "-kb:STD-" + document.getElementById("newLabel").value;
-        newUri = replaceAll(newUri," ","-");
-	newUri = replaceAll(newUri,"<","");
-        newUri = replaceAll(newUri,">","");
-        newUri = replaceAll(newUri,"?","");
-	$('#newUri').val(newUri);
-        checkform();
-     };
+                    if (cansubmit) {
+                        document.getElementById('submit').disabled = false;
+                    } else {
+                        document.getElementById('submit').disabled = 'disabled';
+                    }
+                }
 
-   </script>
-   <style>
-      ul.tree li {
-        list-style-type: none;
-        position: relative;
-      }
+                function replaceAll(str, find, replace) {
+                    while (str.indexOf(find) > -1) {
+                        str = str.replace(find, replace);
+                    }
+                    return str;
+                }
 
-      ul.tree li ul {
-        display: none;
-      }
+                function labelchange() {
+                    var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + "-kb:STD-" + document.getElementById("newLabel").value;
+                    newUri = replaceAll(newUri," ","-");
+                    newUri = replaceAll(newUri,"<","");
+                    newUri = replaceAll(newUri,">","");
+                    newUri = replaceAll(newUri,"?","");
+                    $('#newUri').val(newUri);
+                    checkform();
+                };
 
-      ul.tree li.open > ul {
-        display: block;
-      }
+        </script>
+        <style>
+                ul.tree li {
+                    list-style-type: none;
+                    position: relative;
+                }
 
-      ul.tree li a {
-        color: black;
-        text-decoration: none;
-      }
+                ul.tree li ul {
+                    display: none;
+                }
 
-      ul.tree li a:before {
-        height: 1em;
-        padding:0 .1em;
-        font-size: .8em;
-        display: block;
-        position: absolute;
-        left: -1.3em;
-        top: .2em;
-      }
+                ul.tree li.open > ul {
+                    display: block;
+                }
 
-      ul.tree li > a:not(:last-child):before {
-        content: '+';
-      }
+                ul.tree li a {
+                    color: black;
+                    text-decoration: none;
+                }
 
-      ul.tree li.open > a:not(:last-child):before {
-        content: '-';
-      }
-   </style>
+                ul.tree li a:before {
+                    height: 1em;
+                    padding:0 .1em;
+                    font-size: .8em;
+                    display: block;
+                    position: absolute;
+                    left: -1.3em;
+                    top: .2em;
+                }
 
-    <form class="form-horizontal" name="newStudy">
-	
-	<div class="form-group">
-		<label>URI:</label>
-		<input type="text" class="form-control col-sm-6" name="newUri" id="newUri" 
-		       onchange="checkform()" readonly >
- 	</div>
- 	<div class="form-group">
-		<label>Id:</label>
- 		<input type="text" class="form-control col-sm-6" name="newId" id="newId" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>Short Name:</label>
- 		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="labelchange()" >
- 	</div>
-	<div class="form-group">
-	        <label>Type:</label>
-		<input type="text" class="form-control col-sm-6" name="currentType" id="currentType" 
-		       onchange="checkform()" readonly >
-		<div>
-                   (Use selector below to set/modify study type)
-                   <ul class="tree" onchange="checkform()">
-		     @tree_node(studyType.getHierarchy(),"newStudyType", "")
-                   </ul>
+                ul.tree li > a:not(:last-child):before {
+                    content: '+';
+                }
+
+                ul.tree li.open > a:not(:last-child):before {
+                    content: '-';
+                }
+        </style>
+
+        <form class="form-horizontal" name="newStudy">
+
+            <div class="form-group">
+                <label>URI:</label>
+                <input type="text" class="form-control col-sm-6" name="newUri" id="newUri"
+                onchange="checkform()" readonly >
+            </div>
+            <div class="form-group">
+                <label>Id:</label>
+                <input type="text" class="form-control col-sm-6" name="newId" id="newId" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>Short Name:</label>
+                <input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="labelchange()" >
+            </div>
+            <div class="form-group">
+                <label>Type:</label>
+                <input type="text" class="form-control col-sm-6" name="currentType" id="currentType"
+                onchange="checkform()" readonly >
+                <div>
+                    (Use selector below to set/modify study type)
+                    <ul class="tree" onchange="checkform()">
+                    @tree_node(studyType.getHierarchy(),"newStudyType", "")
+                    </ul>
                 </div>
- 	</div>
- 	<div class="form-group">
-		<label>Title</label>
- 		<input type="text" class="form-control col-sm-6" name="newTitle" id="newTitle" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>Project</label>
- 		<input type="text" class="form-control col-sm-6" name="newProject" id="newProject" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>Description</label>
- 		<input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>External Source</label>
- 		<input type="text" class="form-control col-sm-6" name="newExternalSource" id="newExternalSource" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>PI</label>
-	     <select id="newAgent" class="form-control col-sm-6" name="newAgent">
-	       <option></option>
-	       @if(persons != null) {
-                 @for(person <- persons){
- 	           @agent_select_entry(person,"")
-                 }
-               } 
-             </select>
- 	</div>
- 	<div class="form-group">
-	     <label>Institution</label>
-	     <select id="newInstitution" class="form-control col-sm-6" name="newInstitution">
-	       <option></option>
-	       @if(organizations != null) {
-                 @for(organization <- organizations){
- 	           @agent_select_entry(organization,"")
-                 }
-               } 
-             </select>
- 	</div>
-     
-	<div class="form-group">
-	  <label>Updates</label> <br>
-	  @if(file == null) {
-	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, "", "")"/><br>
-	       <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
-          } else {
-	       <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled 
-		      formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, file.getFileName(),file.getDataAcquisitionUri())"/><br>
-    	       <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getId(), file.getDataAcquisitionUri())" 
-		  class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
-          }
-	</div>
-     
-     <script>
-       var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
-       for(var i = 0; i < tree.length; i++){
-          tree[i].addEventListener('click', function(e) {
-          var parent = e.target.parentElement;
-          var classList = parent.classList;
-          if(classList.contains("open")) {
-            classList.remove('open');
-            var opensubs = parent.querySelectorAll(':scope .open');
-            for(var i = 0; i < opensubs.length; i++){
-                opensubs[i].classList.remove('open');
-            }
-          } else {
-            classList.add('open');
-          }
-         });
-       }
-     </script>
-		   
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" class="form-control col-sm-6" name="newTitle" id="newTitle" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>Project</label>
+                <input type="text" class="form-control col-sm-6" name="newProject" id="newProject" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" class="form-control col-sm-6" name="newComment" id="newComment" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>External Source</label>
+                <input type="text" class="form-control col-sm-6" name="newExternalSource" id="newExternalSource" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>PI</label>
+                <select id="newAgent" class="form-control col-sm-6" name="newAgent">
+                    <option></option>
+                    @if(persons != null) {
+                        @for(person <- persons){
+                            @agent_select_entry(person,"")
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Institution</label>
+                <select id="newInstitution" class="form-control col-sm-6" name="newInstitution">
+                    <option></option>
+                    @if(organizations != null) {
+                        @for(organization <- organizations){
+                            @agent_select_entry(organization,"")
+                        }
+                    }
+                </select>
+            </div>
 
-   </form>
-  </div>
+            <div class="form-group">
+                <label>Updates</label> <br>
+                @if(file == null) {
+                    <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled
+                    formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, "", "")"/><br>
+                    <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+                } else {
+                    <input class="btn btn-success btn-sm" role="button" type="submit" id="submit" value="Create Study" disabled
+                    formmethod="post" formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.processForm(dir, file.getFileName(),file.getDataAcquisitionUri())"/><br>
+                    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getId(), file.getDataAcquisitionUri())"
+                    class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+                }
+            </div>
+
+            <script>
+                    var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
+                    for(var i = 0; i < tree.length; i++){
+                        tree[i].addEventListener('click', function(e) {
+                            var parent = e.target.parentElement;
+                            var classList = parent.classList;
+                            if(classList.contains("open")) {
+                                classList.remove('open');
+                                var opensubs = parent.querySelectorAll(':scope .open');
+                                for(var i = 0; i < opensubs.length; i++){
+                                    opensubs[i].classList.remove('open');
+                                }
+                            } else {
+                                classList.add('open');
+                            }
+                        });
+                    }
+            </script>
+
+
+        </form>
+    </div>
 
 }

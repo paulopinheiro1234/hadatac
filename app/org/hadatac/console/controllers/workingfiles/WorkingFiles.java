@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpStatus;
 
-import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.http.ResumableUpload;
@@ -52,6 +52,7 @@ import com.typesafe.config.ConfigFactory;
 import play.libs.Json;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import play.mvc.Http;
 import play.twirl.api.Html;
 import play.data.Form;
 import play.data.FormFactory;
@@ -67,9 +68,9 @@ public class WorkingFiles extends Controller {
     
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String dest) {        
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
 
         String newDir = Paths.get(dir, dest).normalize().toString();
         
@@ -83,7 +84,7 @@ public class WorkingFiles extends Controller {
             folders.add(0, "..");
         }
         
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
         	wkFiles = DataFile.findInDir(newDir, DataFile.WORKING);
         	
         	String basePath = newDir;
@@ -92,10 +93,10 @@ public class WorkingFiles extends Controller {
             }
             
         	DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), 
-        	        basePath, wkFiles, user.getEmail(), DataFile.WORKING);
-        } else {
-            wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
-        }
+        	        basePath, wkFiles, "sheersha.kandwal@mssm.edu", DataFile.WORKING); //TODO: fix this -- user.getEmail(), DataFile.WORKING);
+//        } else {
+//            wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
+//        }
 
         DataFile.filterNonexistedFiles(pathWorking, wkFiles);
 
@@ -106,26 +107,26 @@ public class WorkingFiles extends Controller {
             }
         });
         
-        DataFile.updatePermission(wkFiles, user.getEmail());
+        DataFile.updatePermission(wkFiles, "sheersha.kandwal@mssm.edu"); //TODO: fix this -- user.getEmail());
         
-        return ok(workingFiles.render(newDir, folders, wkFiles, user.isDataManager()));
+        return ok(workingFiles.render(newDir, folders, wkFiles, true)); //TODO : fix this -- user.isDataManager()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String dest) {
         return index(dir, dest);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result renameDataFile(String dir, String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -134,27 +135,27 @@ public class WorkingFiles extends Controller {
         return ok(renameFile.render(dir, dataFile));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postRenameDataFile(String dir, String fileId) {
         return renameDataFile(dir, fileId);
     } 
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processRenameDataFileForm(String dir, String fileId) throws Exception {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processRenameDataFileForm(String dir, String fileId, Http.Request request) throws Exception {
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
         
-        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
 
         if (form.hasErrors()) {
@@ -188,16 +189,16 @@ public class WorkingFiles extends Controller {
         }
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result moveDataFile(String dir, String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -209,27 +210,27 @@ public class WorkingFiles extends Controller {
         return ok(moveFile.render(dir, dataFile, dirFile));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result postMoveDataFile(String dir, String fileId) {
         return moveDataFile(dir, fileId);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processMoveDataFileForm(String dir, String fileId) throws Exception {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processMoveDataFileForm(String dir, String fileId, Http.Request request) throws Exception {
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
         
-        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
 
         if (form.hasErrors()) {
@@ -275,11 +276,11 @@ public class WorkingFiles extends Controller {
         }
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result moveDataFiles(String dir) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result moveDataFiles(String dir, Http.Request request) {
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
-        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         List<String> selectedFileIds = new ArrayList<String>();
         String fileIdString = name_map.get("fileIds")[0];
         if (fileIdString.length() > 0) {
@@ -291,11 +292,11 @@ public class WorkingFiles extends Controller {
         List<DataFile> dataFiles = new ArrayList<DataFile>();
         for (String fileId : selectedFileIds) {
             DataFile dataFile = null;
-            if (user.isDataManager()) {
+//            if (user.isDataManager()) {
                 dataFile = DataFile.findById(fileId);
-            } else {
-                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-            }
+//            } else {
+//                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//            }
             
             if (null == dataFile) {
                 return badRequest(String.format(
@@ -311,16 +312,16 @@ public class WorkingFiles extends Controller {
         return ok(moveFiles.render(dir, dataFiles, dirFile));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postMoveDataFiles(String dir) {
-        return moveDataFiles(dir);
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result postMoveDataFiles(String dir, Http.Request request) {
+        return moveDataFiles(dir, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processMoveDataFilesForm(String dir) throws Exception {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result processMoveDataFilesForm(String dir, Http.Request request) throws Exception {
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
-        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         List<String> selectedFileIds = new ArrayList<String>();
         String fileIdString = name_map.get("fileIds")[0];
         if (fileIdString.length() > 0) {
@@ -331,18 +332,18 @@ public class WorkingFiles extends Controller {
         
         for (String fileId : selectedFileIds) {
             DataFile dataFile = null;
-            if (user.isDataManager()) {
+//            if (user.isDataManager()) {
                 dataFile = DataFile.findById(fileId);
-            } else {
-                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-            }
+//            } else {
+//                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//            }
             
             if (null == dataFile) {
                 return badRequest(String.format(
                         "You do NOT have the permission to operate this file with id %s !", fileId));
             }
             
-            Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+            Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
             NewFileForm data = form.get();
 
             if (form.hasErrors()) {
@@ -394,16 +395,16 @@ public class WorkingFiles extends Controller {
         }
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result shareDataFile(String dir, String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to share this file!");
@@ -423,22 +424,22 @@ public class WorkingFiles extends Controller {
     }
     
     @SuppressWarnings("unchecked")
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result saveViewerEmails() throws Exception {
-        Form form = formFactory.form().bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result saveViewerEmails(Http.Request request) throws Exception {
+        Form form = formFactory.form().bindFromRequest(request);
         Map<String, String> data = form.rawData();
         
         String dir = data.get("dir");
         String fileId = data.get("fileId");
         
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         List<String> emails = new ArrayList<String>();
         for (int i = 0; i < data.size() - 2; i++) {
@@ -456,22 +457,22 @@ public class WorkingFiles extends Controller {
     }
     
     @SuppressWarnings("unchecked")
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result saveEditorEmails() throws Exception {
-        Form form = formFactory.form().bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    public Result saveEditorEmails(Http.Request request) throws Exception {
+        Form form = formFactory.form().bindFromRequest(request);
         Map<String, String> data = form.rawData();
         
         String dir = data.get("dir");
         String fileId = data.get("fileId");
         
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         List<String> emails = new ArrayList<String>();
         for (int i = 0; i < data.size() - 2; i++) {
@@ -526,17 +527,17 @@ public class WorkingFiles extends Controller {
     } 
     */
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadTemplates(String dir) {
         return ok(download_templates.render(dir));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDownloadTemplates(String dir) {
         return postDownloadTemplates(dir);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkAnnotationLog(String dir, String fileId) {
         DataFile dataFile = DataFile.findById(fileId);
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
@@ -565,16 +566,16 @@ public class WorkingFiles extends Controller {
         return ok(Json.toJson(result));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteDataFile(String dir, String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-        } else {
-            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -587,11 +588,11 @@ public class WorkingFiles extends Controller {
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFiles(String dir) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result deleteDataFiles(String dir, Http.Request request) {
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
-        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         List<String> selectedFileIds = new ArrayList<String>();
         String fileIdString = name_map.get("fileIds")[0];
         if (fileIdString.length() > 0) {
@@ -603,11 +604,11 @@ public class WorkingFiles extends Controller {
         System.out.println("selectedFileIds: " + selectedFileIds);
         for (String fileId : selectedFileIds) {
         	DataFile dataFile = null;
-            if (user.isDataManager()) {
+//            if (user.isDataManager()) {
                 dataFile = DataFile.findById(fileId);
-            } else {
-                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-            }
+//            } else {
+//                dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//            }
             
             if (null == dataFile) {
                 return badRequest(String.format(
@@ -622,33 +623,34 @@ public class WorkingFiles extends Controller {
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadDataFile(String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         DataFile dataFile = DataFile.findById(fileId);
         
-        if (null == dataFile || 
-                ( !dataFile.getOwnerEmail().equals(user.getEmail()) 
-                && !dataFile.getViewerEmails().contains(user.getEmail())
-                && !dataFile.getEditorEmails().contains(user.getEmail()))) {
-            return badRequest("You do NOT have the permission to download this file!");
-        }
+//        if (null == dataFile ||
+//                ( !dataFile.getOwnerEmail().equals(user.getEmail())
+//                && !dataFile.getViewerEmails().contains(user.getEmail())
+//                && !dataFile.getEditorEmails().contains(user.getEmail()))) {
+//            return badRequest("You do NOT have the permission to download this file!");
+//        }
         
-        response().setHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
-        return ok(new File(dataFile.getAbsolutePath()));
+//        response().setHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
+        return ok(new File(dataFile.getAbsolutePath()))
+                .withHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result ingestDataFile(String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         
         DataFile dataFile = null;
-        if (user.isDataManager()) {
+//        if (user.isDataManager()) {
             dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
-        } else {
-            dataFile = DataFile.findByIdAndOwnerEmailAndStatus(
-                    fileId, user.getEmail(), DataFile.WORKING);
-        }
+//        } else {
+//            dataFile = DataFile.findByIdAndOwnerEmailAndStatus(
+//                    fileId, user.getEmail(), DataFile.WORKING);
+//        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -681,7 +683,7 @@ public class WorkingFiles extends Controller {
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", "."));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result verifyDataFile(String fileId) {
         DataFile dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
@@ -703,7 +705,7 @@ public class WorkingFiles extends Controller {
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
                 routes.WorkingFiles.index("/", ".").url()));
     }
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result verifyDataFileTemp(String file_id) {
         DataFile dataFile = DataFile.findByIdAndStatus(file_id, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
@@ -726,7 +728,7 @@ public class WorkingFiles extends Controller {
         
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result uploadDataFileByChunking(
             String resumableChunkNumber,
             String resumableChunkSize, 
@@ -735,10 +737,11 @@ public class WorkingFiles extends Controller {
             String resumableType,
             String resumableIdentifier,
             String resumableFilename,
-            String resumableRelativePath) {
+            String resumableRelativePath,
+            Http.Request request) {
 
         String baseDir = Paths.get(ConfigProp.getPathWorking(), resumableRelativePath).toString();
-        if (ResumableUpload.uploadFileByChunking(request(), baseDir)) {
+        if (ResumableUpload.uploadFileByChunking(request, baseDir)) {
             //This Chunk has been Uploaded.
             return ok("Uploaded.");
         } else {
@@ -746,7 +749,7 @@ public class WorkingFiles extends Controller {
         }
     } 
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postUploadDataFileByChunking(
             String resumableChunkNumber, 
             String resumableChunkSize, 
@@ -755,7 +758,8 @@ public class WorkingFiles extends Controller {
             String resumableType,
             String resumableIdentifier,
             String resumableFilename,
-            String resumableRelativePath) {
+            String resumableRelativePath,
+            Http.Request request) {
 
         String baseDir = Paths.get(ConfigProp.getPathWorking(), resumableRelativePath).toString();
         Path path = Paths.get(resumableFilename);
@@ -765,9 +769,9 @@ public class WorkingFiles extends Controller {
 
         String fileName = path.getFileName().toString();
 
-        if (ResumableUpload.postUploadFileByChunking(request(), baseDir)) {
+        if (ResumableUpload.postUploadFileByChunking(request, baseDir)) {
             DataFile dataFile = DataFile.create(
-                    fileName, resumableRelativePath, AuthApplication.getLocalUser(session()).getEmail(), 
+                    fileName, resumableRelativePath, "sheersha.kandwal@mssm.edu",//TODO: fix this: AuthApplication.getLocalUser(session()).getEmail(),
                     DataFile.WORKING);
             
             String originalPath = Paths.get(baseDir, dataFile.getPureFileName()).toString();

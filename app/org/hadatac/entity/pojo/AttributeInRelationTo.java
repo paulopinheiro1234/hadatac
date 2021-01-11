@@ -5,28 +5,28 @@ public class AttributeInRelationTo {
     private Attribute attr;
     private Entity inRelationTo;
     public AttributeInRelationTo(Attribute attr, Entity inRelationTo) {
-	this.attr = attr;
-	this.inRelationTo = inRelationTo;
+        this.attr = attr;
+        this.inRelationTo = inRelationTo;
     }
 
     public String getKey() {
-	return attr.getUri() + inRelationTo.getUri();
+        return attr.getUri() + inRelationTo.getUri();
     }
 
     public Attribute getAttribute() {
-	return attr;
+        return attr;
     }
 
     public Entity getInRelationTo() {
-	return inRelationTo;
+        return inRelationTo;
     }
 
     public String toString() {
-	if (inRelationTo.equals("")) {
-	    return attr.getLabel();
-	} else {
-		return attr.getLabel() + "-" + inRelationTo;
-	}
+        if (inRelationTo.equals("")) {
+            return attr.getLabel();
+        } else {
+            return attr.getLabel() + "-" + inRelationTo;
+        }
     }
-    
+
 }

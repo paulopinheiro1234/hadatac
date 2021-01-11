@@ -13,7 +13,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
@@ -38,7 +37,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
     public int hashCode() {
         return getUri().hashCode();
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
@@ -49,7 +48,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
 
         SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
-        List<String> response = new ArrayList<String>(); 
+        List<String> response = new ArrayList<String>();
         query.setQuery(strQuery);
         query.setRows(0);
         query.setFacet(true);
@@ -66,15 +65,15 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
 
             //System.out.println("InRelationTo: query response [" + queryResponse.getFacetFields() + "]"); 
-            
+
             for (FacetField facetField : queryResponse.getFacetFields()) {
-                List<Count> facetInfo = facetField.getValues(); 
-                for (FacetField.Count facetInstance : facetInfo) { 
-                	facetInstance.getName();
-                	response.add(facetInstance.getName());
-                	facetInstance.getCount();
-               } 
-            } 
+                List<Count> facetInfo = facetField.getValues();
+                for (FacetField.Count facetInstance : facetInfo) {
+                    facetInstance.getName();
+                    response.add(facetInstance.getName());
+                    facetInstance.getCount();
+                }
+            }
             solr.close();
             return response;
         } catch (Exception e) {
@@ -87,9 +86,9 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
     public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
 
-    	//System.out.println("Inside inRelationTo.getTargerFacetsFromSolr(): facet name is " + facet.getFacetName() + "  query[" + facet.getQuery() + "]  ");
-    	
-    	SolrQuery query = new SolrQuery();
+        //System.out.println("Inside inRelationTo.getTargerFacetsFromSolr(): facet name is " + facet.getFacetName() + "  query[" + facet.getQuery() + "]  ");
+
+        SolrQuery query = new SolrQuery();
         String strQuery = facetHandler.getTempSolrQuery(facet);
         query.setQuery(strQuery);
         query.setRows(0);
@@ -119,7 +118,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
         	pivotResult.recomputeStats();
         	pivot = pivotResult;
         } 
-        */          
+        */
 
         return parsePivot(pivot, facet, query.toString());
 
@@ -133,9 +132,9 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
             InRelationToInstance object = new InRelationToInstance();
             object.setUri(pivot_ent.getValue());
             if (pivot_ent.getValue().contains(":")) {
-            	object.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
+                object.setLabel(WordUtils.capitalize(Entity.find(pivot_ent.getValue()).getLabel()));
             } else {
-            	object.setLabel(pivot_ent.getValue());
+                object.setLabel(pivot_ent.getValue());
             }
             object.setCount(pivot_ent.getCount());
             object.setQuery(query);
@@ -167,7 +166,7 @@ public class InRelationToInstance extends HADatAcThing implements Comparable<InR
     }
 
     @Override
-    public void deleteFromTripleStore() {        
+    public void deleteFromTripleStore() {
     }
 
     @Override

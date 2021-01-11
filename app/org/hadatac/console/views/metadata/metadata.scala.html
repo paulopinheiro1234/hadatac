@@ -1,31 +1,31 @@
 @(indicatorMap : Map[String,List[String]],
-  loadedList: List[String])
+        loadedList: List[String])
 
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Browse Metadata") {
+@main("Browse Metadata","","") {
     <div class="container-fluid">
-    
+
         <h3>Browse Ontologies</h3>
-        <div id="rcorners">  
-            @for(loadedFile <- loadedList) {
-                <a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile"><button class="btn btn-info btn-md" style="margin-right:10px">@loadedFile</button></a>
-            }
+        <div id="rcorners">
+        @for(loadedFile <- loadedList) {
+            <a href="/hadatac/metadata/graph?oper=ent&className=@loadedFile"><button class="btn btn-info btn-md" style="margin-right:10px">@loadedFile</button></a>
+        }
         </div>
 
         <h3>Browse Metadata</h3>
-        
+
         @for(indicatorKey <- indicatorMap.keySet()){
-        <div id="rcorners">  
-            <div class="row">
-               @indicator_navigation("",indicatorMap,indicatorKey)
+            <div id="rcorners">
+                <div class="row">
+                @indicator_navigation("",indicatorMap,indicatorKey)
+                </div>
             </div>
-        </div>
-        <hr>
+            <hr>
         }
 
         <br><br><br>
-        @mainButton(false)
+    @mainButton(false)
     </div>
 }

@@ -1,6 +1,6 @@
 package org.hadatac.console.controllers.annotator;
 
-import org.hadatac.console.controllers.AuthApplication;
+//import controllers.AuthApplication;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.GetSparqlQuery;
 
@@ -23,12 +23,9 @@ import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.STR;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-
 public class Annotator extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -52,7 +49,7 @@ public class Annotator extends Controller {
 
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postSelectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -73,7 +70,7 @@ public class Annotator extends Controller {
         return ok();
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result uploadCSV(String uri) {
         CSVAnnotationHandler handler;
         try {
@@ -124,10 +121,10 @@ public class Annotator extends Controller {
             handler = new CSVAnnotationHandler(uri, "", "");
         }
 
-        return ok(uploadCSV.render(handler, "init",""));   
+        return ok(uploadCSV.render(handler, "init",""));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postUploadCSV(String uri) {
 
         CSVAnnotationHandler handler;

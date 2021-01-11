@@ -11,7 +11,7 @@ import org.hadatac.utils.NameSpaces;
 import com.typesafe.config.ConfigFactory;
 
 public class Version extends Controller {
-	
+
     public Result index() {
         String code_version = "1.2.4";
         String base_ontology = ConfigFactory.load().getString("hadatac.community.ont_prefix");

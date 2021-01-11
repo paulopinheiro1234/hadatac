@@ -19,13 +19,13 @@ public class OCNode {
     public static final int DEPLOYMENT = 9;
     public static final int SDD = 10;
     public static final int DASPEC = 11;
-    
+
     private String name;
     private String uri;
     private int type;
     private String htmlDoc;
     private List<String> memberOf;
-    
+
     public OCNode(String n, String u , int t, String hd, List<String> mOf) {
         name = n;
         uri = u;
@@ -33,31 +33,31 @@ public class OCNode {
         htmlDoc = hd;
         memberOf = mOf;
     }
-    
+
     public String getName() {
         return name;
-    } 
-        
+    }
+
     public String getURI() {
         return uri;
     }
-    
+
     public int getType() {
         return type;
-    }	    
-        
+    }
+
     public String getHtmlDoc() {
         return htmlDoc;
-    }	    
-        
+    }
+
     public List<String> getMemberOf() {
         return memberOf;
     }
-    
+
     public void addMember(String memberName) {
-    	memberOf.add(memberName);
+        memberOf.add(memberName);
     }
-    
-    
-    
+
+
+
 }

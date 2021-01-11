@@ -6,324 +6,319 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.CollectionUtil.Collection;
 import org.hadatac.utils.NameSpaces;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
 
 public class GetSparqlQuery {
     public String collection;
-    
-    public GetSparqlQuery () {} 
+
+    public GetSparqlQuery () {}
 
     public GetSparqlQuery (SparqlQuery query) {
-    	this(CollectionUtil.Collection.METADATA_SPARQL, query);
+        this(CollectionUtil.Collection.METADATA_SPARQL, query);
     }
-    
+
     public GetSparqlQuery (Collection collectionSource, SparqlQuery query) {
         collection = CollectionUtil.getCollectionPath(collectionSource);
         System.out.println("Collection: " + collection);
     }
 
     public GetSparqlQuery (SparqlQuery query, String tabName) {
-    	this(CollectionUtil.Collection.METADATA_SPARQL, query, tabName);
+        this(CollectionUtil.Collection.METADATA_SPARQL, query, tabName);
     }
 
     public GetSparqlQuery (Collection collectionSource, SparqlQuery query, String tabName) {
         collection = CollectionUtil.getCollectionPath(collectionSource);;
         System.out.println("Collection: " + collection);
     }
-    
+
     public String querySelector(String tabName) {
         String prefixes = NameSpaces.getInstance().printSparqlNameSpaceList();
         String q = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
         switch (tabName){
-            case "Platforms" : 
+            case "Platforms" :
                 q = "SELECT ?platURI ?name ?modelName ?sn ?lat ?lng WHERE {" +
-                    "    ?platModel rdfs:subClassOf+" + 
-                    "    vstoi:Platform  ." + 
-                    "    ?platURI a ?platModel ." +
-                    "    ?platModel rdfs:label ?modelName ." +
-                    "    ?platURI rdfs:label ?name ." + 
-                    "    OPTIONAL { ?platURI vstoi:hasSerialNumber ?sn } ." + 
-                    "    OPTIONAL { ?platURI hasco:hasFirstCoordinate ?lat ." +
-                    "               ?platURI hasco:hasSecondCoordinate ?lng } ." +
-                    "}";
+                        "    ?platModel rdfs:subClassOf+" +
+                        "    vstoi:Platform  ." +
+                        "    ?platURI a ?platModel ." +
+                        "    ?platModel rdfs:label ?modelName ." +
+                        "    ?platURI rdfs:label ?name ." +
+                        "    OPTIONAL { ?platURI vstoi:hasSerialNumber ?sn } ." +
+                        "    OPTIONAL { ?platURI hasco:hasFirstCoordinate ?lat ." +
+                        "               ?platURI hasco:hasSecondCoordinate ?lng } ." +
+                        "}";
                 break;
-            case "Instruments" : 
+            case "Instruments" :
                 q = "SELECT ?instURI ?name ?modelName ?sn WHERE {" +
-                    " ?instModel rdfs:subClassOf+" +
-                    " vstoi:Instrument ." +
-                    " ?instURI a ?instModel ." +
-                    " ?instURI rdfs:label ?name ." +
-                    " OPTIONAL { ?instURI vstoi:hasSerialNumber ?sn } ." +
-                    " ?instModel rdfs:label ?modelName ." +
-                    "}";
+                        " ?instModel rdfs:subClassOf+" +
+                        " vstoi:Instrument ." +
+                        " ?instURI a ?instModel ." +
+                        " ?instURI rdfs:label ?name ." +
+                        " OPTIONAL { ?instURI vstoi:hasSerialNumber ?sn } ." +
+                        " ?instModel rdfs:label ?modelName ." +
+                        "}";
                 break;
-            case "Detectors" : 
+            case "Detectors" :
                 q = "SELECT ?detURI ?name ?modelName ?instName ?sn ?instSN WHERE {" +
-                    " ?model rdfs:subClassOf+" +
-                    " vstoi:Detector ." +
-                    " ?model rdfs:label ?modelName ." + 
-                    " ?detURI a ?model ." +
-                    " ?detURI rdfs:label ?name ." +
-                    " OPTIONAL { ?detURI vstoi:hasSerialNumber ?sn } ." +
-                    " OPTIONAL { ?detURI vstoi:isInstrumentAttachment ?inst ." +
-                    "            ?inst rdfs:label ?instName  ." +                    
-                    "            ?inst vstoi:hasSerialNumber ?instSN } ." +
-                    "}";
+                        " ?model rdfs:subClassOf+" +
+                        " vstoi:Detector ." +
+                        " ?model rdfs:label ?modelName ." +
+                        " ?detURI a ?model ." +
+                        " ?detURI rdfs:label ?name ." +
+                        " OPTIONAL { ?detURI vstoi:hasSerialNumber ?sn } ." +
+                        " OPTIONAL { ?detURI vstoi:isInstrumentAttachment ?inst ." +
+                        "            ?inst rdfs:label ?instName  ." +
+                        "            ?inst vstoi:hasSerialNumber ?instSN } ." +
+                        "}";
                 break;
-            case "InstrumentModels" : 
+            case "InstrumentModels" :
                 q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page ?minTemp ?maxTemp ?tempUnit ?docLink ?numAtt ?numDet ?maxLog WHERE {" +
-                    "   ?model rdfs:subClassOf* vstoi:Instrument . " + 
-                    "   ?model rdfs:label ?modelName ." + 
-                    "   OPTIONAL { ?model rdfs:subClassOf ?superModel .  " + 
-                    "              ?superModel rdfs:label ?superModelName } ." +
-                    "   OPTIONAL { ?model vstoi:hasMaker ?m ." +
-                    "              ?m foaf:homepage ?page ." +
-                    "              ?m foaf:name ?maker } ." +
-                    "   OPTIONAL { ?model vstoi:minOperatingTemperature ?minTemp ." +
-                    "              ?model vstoi:maxOperatingTemperature ?maxTemp ." +
-                    "              ?model vstoi:hasOperatingTemperatureUnit ?tempUnit } ." +
-                    "   OPTIONAL { ?model rdfs:comment ?desc } ." + 
-                    "   OPTIONAL { ?model vstoi:numAttachedDetectors ?numAtt } ." +
-                    "   OPTIONAL { ?model vstoi:maxDetachableDetectors ?numDet } ." +
-                    "   OPTIONAL { ?model vstoi:maxLoggedMeasurements ?maxLog } ." +
-                    "   OPTIONAL { ?model vstoi:hasWebDocumentation ?docLink } ." + 
-                    "}";
+                        "   ?model rdfs:subClassOf* vstoi:Instrument . " +
+                        "   ?model rdfs:label ?modelName ." +
+                        "   OPTIONAL { ?model rdfs:subClassOf ?superModel .  " +
+                        "              ?superModel rdfs:label ?superModelName } ." +
+                        "   OPTIONAL { ?model vstoi:hasMaker ?m ." +
+                        "              ?m foaf:homepage ?page ." +
+                        "              ?m foaf:name ?maker } ." +
+                        "   OPTIONAL { ?model vstoi:minOperatingTemperature ?minTemp ." +
+                        "              ?model vstoi:maxOperatingTemperature ?maxTemp ." +
+                        "              ?model vstoi:hasOperatingTemperatureUnit ?tempUnit } ." +
+                        "   OPTIONAL { ?model rdfs:comment ?desc } ." +
+                        "   OPTIONAL { ?model vstoi:numAttachedDetectors ?numAtt } ." +
+                        "   OPTIONAL { ?model vstoi:maxDetachableDetectors ?numDet } ." +
+                        "   OPTIONAL { ?model vstoi:maxLoggedMeasurements ?maxLog } ." +
+                        "   OPTIONAL { ?model vstoi:hasWebDocumentation ?docLink } ." +
+                        "}";
                 break;
-            case "Entities" : 
-                q = "SELECT ?id ?superId ?label ?chara WHERE { " + 
-                    "   ?id rdfs:subClassOf* sio:SIO_000776 . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label . } " + 
-                    "   OPTIONAL { ?id rdfs:comment ?chara . } " +
-                    "}";
+            case "Entities" :
+                q = "SELECT ?id ?superId ?label ?chara WHERE { " +
+                        "   ?id rdfs:subClassOf* sio:SIO_000776 . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label . } " +
+                        "   OPTIONAL { ?id rdfs:comment ?chara . } " +
+                        "}";
                 break;
-            case "OrganizationsH" : 
-            	q = "SELECT * WHERE { " +
-            		"  ?agent a foaf:Organization . " + 
-            		"  OPTIONAL { ?agent foaf:name ?name . } " + 
-            		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"}";
+            case "OrganizationsH" :
+                q = "SELECT * WHERE { " +
+                        "  ?agent a foaf:Organization . " +
+                        "  OPTIONAL { ?agent foaf:name ?name . } " +
+                        "  OPTIONAL { ?agent foaf:mbox ?email . } " +
+                        "}";
                 break;
-            case "GroupsH" : 
-            	q = "SELECT * WHERE { " +
-            		"  ?agent a foaf:Group . " + 
-            		"  OPTIONAL { ?agent foaf:name ?name . } " + 
-            		"  OPTIONAL { ?agent foaf:homepage ?page . } " + 
-            		"  OPTIONAL { ?agent sio:SIO_000095 ?group . } " + 
-            		"}";
+            case "GroupsH" :
+                q = "SELECT * WHERE { " +
+                        "  ?agent a foaf:Group . " +
+                        "  OPTIONAL { ?agent foaf:name ?name . } " +
+                        "  OPTIONAL { ?agent foaf:homepage ?page . } " +
+                        "  OPTIONAL { ?agent sio:SIO_000095 ?group . } " +
+                        "}";
                 break;
-            case "PeopleH" : 
-            	q = "SELECT * WHERE { " +
-            		"  ?agent a foaf:Person . " + 
-            		"  OPTIONAL { ?agent foaf:name ?name . } " + 
-            		"  OPTIONAL { ?agent foaf:mbox ?email . } " + 
-            		"  OPTIONAL { ?agent sio:SIO_000095 ?group . } " + 
-            		"}";
+            case "PeopleH" :
+                q = "SELECT * WHERE { " +
+                        "  ?agent a foaf:Person . " +
+                        "  OPTIONAL { ?agent foaf:name ?name . } " +
+                        "  OPTIONAL { ?agent foaf:mbox ?email . } " +
+                        "  OPTIONAL { ?agent sio:SIO_000095 ?group . } " +
+                        "}";
                 break;
-            case "DetectorModels" : 
-                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
-                    "    ?model rdfs:subClassOf* vstoi:Detector . " + 
-                	"    ?model rdfs:subClassOf ?superModel .  " + 
-                	"    OPTIONAL { ?model rdfs:label ?modelName }  " + 
-                	"    OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
-                    "    OPTIONAL { ?model vstoi:hasMaker ?m ." +
-                    "               ?m foaf:name ?maker ." + 
-                    "               ?m foaf:homepage ?page } ." + 
-                    "    OPTIONAL { ?model rdfs:comment ?desc } ." + 
-                    "    OPTIONAL { ?model vstoi:hasWebDocumentation ?docLink } ." + 
-                	"}";
+            case "DetectorModels" :
+                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " +
+                        "    ?model rdfs:subClassOf* vstoi:Detector . " +
+                        "    ?model rdfs:subClassOf ?superModel .  " +
+                        "    OPTIONAL { ?model rdfs:label ?modelName }  " +
+                        "    OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
+                        "    OPTIONAL { ?model vstoi:hasMaker ?m ." +
+                        "               ?m foaf:name ?maker ." +
+                        "               ?m foaf:homepage ?page } ." +
+                        "    OPTIONAL { ?model rdfs:comment ?desc } ." +
+                        "    OPTIONAL { ?model vstoi:hasWebDocumentation ?docLink } ." +
+                        "}";
                 break;
-            case "Characteristics" : 
-                q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
-                    "   ?modelName rdfs:subClassOf* sio:SIO_000614 . " +
-                    "   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                    "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +
-                	"}";
+            case "Characteristics" :
+                q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " +
+                        "   ?modelName rdfs:subClassOf* sio:SIO_000614 . " +
+                        "   ?modelName rdfs:subClassOf ?superModelName .  " +
+                        "   OPTIONAL { ?modelName rdfs:label ?label } . " +
+                        " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +
+                        "}";
                 break;
-            case "PlatformModels" : 
-                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " + 
-                    "   ?model rdfs:subClassOf* vstoi:Platform . " + 
-                	"   ?model rdfs:subClassOf ?superModel .  " + 
-                	"   OPTIONAL { ?model rdfs:label ?modelName }  " + 
-                	"   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
-                	"   OPTIONAL { ?modelName vstoi:hasMaker ?m ." +
-                    "               ?m foaf:name ?maker ." + 
-                    "               ?m foaf:homepage ?page } ." + 
-                    "    OPTIONAL { ?model rdfs:comment ?desc } ." + 
-                	"}";
+            case "PlatformModels" :
+                q = "SELECT ?model ?modelName ?superModelName ?maker ?desc ?page WHERE { " +
+                        "   ?model rdfs:subClassOf* vstoi:Platform . " +
+                        "   ?model rdfs:subClassOf ?superModel .  " +
+                        "   OPTIONAL { ?model rdfs:label ?modelName }  " +
+                        "   OPTIONAL { ?superModel rdfs:label ?superModelName }  " +
+                        "   OPTIONAL { ?modelName vstoi:hasMaker ?m ." +
+                        "               ?m foaf:name ?maker ." +
+                        "               ?m foaf:homepage ?page } ." +
+                        "    OPTIONAL { ?model rdfs:comment ?desc } ." +
+                        "}";
                 break;
-            case "Units" : 
-                q = "SELECT ?id ?superModelName ?comment ?label WHERE { " + 
-                    "   ?id rdfs:subClassOf* uo:0000000 . " + 
-                    "   ?id rdfs:subClassOf ?superModelName .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } ." +
-                    "   OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+            case "Units" :
+                q = "SELECT ?id ?superModelName ?comment ?label WHERE { " +
+                        "   ?id rdfs:subClassOf* uo:0000000 . " +
+                        "   ?id rdfs:subClassOf ?superModelName .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } ." +
+                        "   OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
-            case "SensingPerspectives" : 
+            case "SensingPerspectives" :
                 q = "SELECT ?sp ?ofModelName ?chara ?accpercent ?accrtwo ?outputres ?maxresponse ?timeunit ?low ?high WHERE {" +
-                    " ?sp a vstoi:SensingPerspective . " +
-                    " ?sp vstoi:perspectiveOf ?ofModel . " +
-                    " ?ofModel rdfs:label ?ofModelName . " +
-                    " ?sp hasco:hasPerspectiveCharacteristic ?chara ." +
-                    " OPTIONAL { ?sp vstoi:hasAccuracyPercentage ?accpercent } ." +
-                    " OPTIONAL { ?sp vstoi:hasAccuracyR2 ?accrtwo } ." +
-                    " OPTIONAL { ?sp vstoi:hasOutputResolution ?outputres } ." +
-                    " OPTIONAL { ?sp vstoi:hasMaxResponseTime ?maxresponse ." +
-                    "            ?sp vstoi:hasResponseTimeUnit ?timeunit } ." +
-                    " OPTIONAL { ?sp vstoi:hasLowRangeValue ?low ." +
-                    "            ?sp vstoi:hasHighRangeValue ?high } ." +
-                    "}";
+                        " ?sp a vstoi:SensingPerspective . " +
+                        " ?sp vstoi:perspectiveOf ?ofModel . " +
+                        " ?ofModel rdfs:label ?ofModelName . " +
+                        " ?sp hasco:hasPerspectiveCharacteristic ?chara ." +
+                        " OPTIONAL { ?sp vstoi:hasAccuracyPercentage ?accpercent } ." +
+                        " OPTIONAL { ?sp vstoi:hasAccuracyR2 ?accrtwo } ." +
+                        " OPTIONAL { ?sp vstoi:hasOutputResolution ?outputres } ." +
+                        " OPTIONAL { ?sp vstoi:hasMaxResponseTime ?maxresponse ." +
+                        "            ?sp vstoi:hasResponseTimeUnit ?timeunit } ." +
+                        " OPTIONAL { ?sp vstoi:hasLowRangeValue ?low ." +
+                        "            ?sp vstoi:hasHighRangeValue ?high } ." +
+                        "}";
                 break;
-            case "EntityCharacteristics" : 
-                q = "SELECT ?ecName ?entity ?chara WHERE { " + 
-                    "   ?ec a hasneto:EntityCharacteristic . " + 
-                    "   ?ec rdfs:label ?ecName .  " + 
-                    "   ?ec hasneto:ofEntity ?entity .  " + 
-                    "   ?ec hasneto:ofCharacteristic ?chara .  " + 
-                    "}";
+            case "EntityCharacteristics" :
+                q = "SELECT ?ecName ?entity ?chara WHERE { " +
+                        "   ?ec a hasneto:EntityCharacteristic . " +
+                        "   ?ec rdfs:label ?ecName .  " +
+                        "   ?ec hasneto:ofEntity ?entity .  " +
+                        "   ?ec hasneto:ofCharacteristic ?chara .  " +
+                        "}";
                 break;
-            case "Deployments" : 
-                q = "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " + 
-                    "   ?uri a vstoi:Deployment . " + 
-                    "   ?uri vstoi:hasPlatform ?platform .  " + 
-                    "   ?uri hasco:hasInstrument ?instrument .  " + 
-                    "   ?uri prov:startedAtTime ?date .  " + 
-                    "   OPTIONAL { ?platform rdfs:label ?platformName } ." + 
-                    "   OPTIONAL { ?instrument rdfs:label ?instrumentName } ." + 
-                    "}";
+            case "Deployments" :
+                q = "SELECT ?uri ?platform ?platformName ?instrument ?instrumentName ?date WHERE { " +
+                        "   ?uri a vstoi:Deployment . " +
+                        "   ?uri vstoi:hasPlatform ?platform .  " +
+                        "   ?uri hasco:hasInstrument ?instrument .  " +
+                        "   ?uri prov:startedAtTime ?date .  " +
+                        "   OPTIONAL { ?platform rdfs:label ?platformName } ." +
+                        "   OPTIONAL { ?instrument rdfs:label ?instrumentName } ." +
+                        "}";
                 break;
             case "Demographics" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:Demographic . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:Demographic . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-					" 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+                        " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
             case "BirthOutcomes" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:BirthOutcome . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:BirthOutcome . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+                        " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
             case "HousingCharacteristic" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:HousingCharacteristic . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:HousingCharacteristic . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+                        " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
             case "ATIDU" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:ATIDU . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:ATIDU . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+                        " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
             case "Anthropometry" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:Anthropometry . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:Anthropometry . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+                        " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
             case "PregnancyCharacteristic" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:PregnancyCharacteristic . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:PregnancyCharacteristic . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
 //                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
-                    "}";
+                        " 	OPTIONAL { ?id rdfs:comment ?comment } . " +
+                        "}";
                 break;
             case "Analytes" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:Analyte . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    "}";
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:Analyte . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
+                        " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                        "}";
                 break;
             case "Alkaloids" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:AlkylPhosphatePesticideMetabolite . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    "}";
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:AlkylPhosphatePesticideMetabolite . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
+                        " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                        "}";
                 break;
             case "Arsenic" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:ArsenicSpecies . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    "}";
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:ArsenicSpecies . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
+                        " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                        "}";
                 break;
             case "Elements" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:Element . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    "}";
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:Element . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
+                        " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                        "}";
                 break;
             case "OrganicAromatic" :
-            	q = "SELECT ?id ?superId ?label ?comment WHERE { " + 
-                    "   ?id rdfs:subClassOf* hhear:OrganicAromaticCompound . " + 
-                    "   ?id rdfs:subClassOf ?superId .  " + 
-                    "   OPTIONAL { ?id rdfs:label ?label } . " + 
-                    " 	OPTIONAL { ?id skos:definition ?comment } . " +
-                    "}";
+                q = "SELECT ?id ?superId ?label ?comment WHERE { " +
+                        "   ?id rdfs:subClassOf* hhear:OrganicAromaticCompound . " +
+                        "   ?id rdfs:subClassOf ?superId .  " +
+                        "   OPTIONAL { ?id rdfs:label ?label } . " +
+                        " 	OPTIONAL { ?id skos:definition ?comment } . " +
+                        "}";
                 break;
             case "Indicators" :
-            	q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " + 
+                q = "SELECT DISTINCT ?modelName ?superModelName ?label ?comment WHERE { " +
                         "   ?modelName rdfs:subClassOf* hasco:Indicator . " +
-                        "   ?modelName rdfs:subClassOf ?superModelName .  " + 
-                        "   OPTIONAL { ?modelName rdfs:label ?label } . " + 
+                        "   ?modelName rdfs:subClassOf ?superModelName .  " +
+                        "   OPTIONAL { ?modelName rdfs:label ?label } . " +
                         " 	OPTIONAL { ?modelName rdfs:comment ?comment } . " +
-                    	"}";
+                        "}";
                 break;
             default:
-            	q = "";
-            	System.out.println("WARNING: no query for tab " + tabName);
+                q = "";
+                System.out.println("WARNING: no query for tab " + tabName);
         }
-        
+
         return prefixes + " " + q;
     }
-    
+
     public String executeQuery(String tab) {
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	try {
-    		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-    				querySelector(tab);
-    		ResultSetRewindable resultsrw = SPARQLUtils.select(collection, queryString);
-    		ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
-    		
-    		return outputStream.toString("UTF-8");
-    	} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	
-    	return "";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                    querySelector(tab);
+            ResultSetRewindable resultsrw = SPARQLUtils.select(collection, queryString);
+            ResultSetFormatter.outputAsJSON(outputStream, resultsrw);
+
+            return outputStream.toString("UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }
 

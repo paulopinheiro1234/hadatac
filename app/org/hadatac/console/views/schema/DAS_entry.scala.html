@@ -1,16 +1,16 @@
 @(das : org.hadatac.entity.pojo.DataAcquisitionSchema)
 
 @import java.net._
-@import org.hadatac.utils._
+    @import org.hadatac.utils._
 
 <tr>
-   <td>@if(das != null && das.getLabel() != null) { @das.getLabel() }</td> 
-   <td>@if(das != null) { @das.getVersion() }</td>  
-   <td>@if(das != null) { @das.getTotalDASA() }</td> 
-   <td>@if(das != null) { @das.getTotalDASO() }</td> 
-   <td>
-       <a href="@org.hadatac.console.controllers.schema.routes.ViewDAS.index(URLEncoder.encode(das.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>
-       <a href="@org.hadatac.console.controllers.schema.routes.DeleteDAS.index(URLEncoder.encode(das.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
-       <a href="" class="btn-xs btn-primary" role="button">Download</a>
-   </td>
+    <td>@if(das != null && das.getLabel() != null) { @das.getLabel() }</td>
+    <td>@if(das != null) { @das.getVersion() }</td>
+    <td>@if(das != null) { @das.getTotalDASA() }</td>
+    <td>@if(das != null) { @das.getTotalDASO() }</td>
+    <td>
+        <a href="@org.hadatac.console.controllers.schema.routes.ViewDAS.index(URLEncoder.encode(das.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">View</a>
+        <a href="@org.hadatac.console.controllers.schema.routes.DeleteDAS.index(URLEncoder.encode(das.getUri(),"UTF-8"))" class="btn-xs btn-primary" role="button">Delete</a>
+        <a href="" class="btn-xs btn-primary" role="button">Download</a>
+    </td>
 </tr>

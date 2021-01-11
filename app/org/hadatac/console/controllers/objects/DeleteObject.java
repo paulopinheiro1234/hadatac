@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.objects;
 import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import org.hadatac.Constants;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.ConfigProp;
@@ -16,7 +18,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class DeleteObject extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, String obj_id, int page) {
         
         try {
@@ -43,7 +45,7 @@ public class DeleteObject extends Controller {
         return badRequest(objectConfirm.render("PLACEHOLDER", dir, filename, da_uri, std_uri, oc_uri, page));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, String obj_id, int page) {
         return index(dir, filename, da_uri, std_uri, oc_uri, obj_id, page);
     }

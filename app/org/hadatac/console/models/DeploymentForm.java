@@ -16,100 +16,100 @@ public class DeploymentForm {
     public String startDateTime;
     public String endDateTime;
     public String type;
- 
+
     public DeploymentForm () {
-    	detectors = new ArrayList<String>();
+        detectors = new ArrayList<String>();
     }
-    
+
     public String getUri() {
-	return deploymentUri;
+        return deploymentUri;
     }
-    
+
     public void setUri(String uri) {
-	this.deploymentUri = uri;
+        this.deploymentUri = uri;
     }
-    
+
     public String getDataAcquisitionUri() {
-	return dataAcquisitionUri;
+        return dataAcquisitionUri;
     }
-    
+
     public void setDataAcquisitionUri(String dataAcquisitionUri) {
-	this.dataAcquisitionUri = dataAcquisitionUri;
+        this.dataAcquisitionUri = dataAcquisitionUri;
     }
-    
+
     public String getInitialParameter() {
-	return initialParam;
+        return initialParam;
     }
-    
+
     public void setInitialParameter(String initialParam) {
-	this.initialParam = initialParam;
+        this.initialParam = initialParam;
     }
-    
+
     public String getType() {
-	return type;
+        return type;
     }
-    
+
     public void setType(String type) {
-	this.type = type;
+        this.type = type;
     }
-    
+
     public String getPlatform() {
-    	return platform;
+        return platform;
     }
-    
+
     public void setPlatform(String platform) {
-    	this.platform = platform;
+        this.platform = platform;
     }
-    
+
     public String getHasFirstCoordinate() {
-    	return hasFirstCoordinate;
+        return hasFirstCoordinate;
     }
-    
+
     public void setHasFirstCoordinate(String hasFirstCoordinate) {
-    	this.hasFirstCoordinate = hasFirstCoordinate;
+        this.hasFirstCoordinate = hasFirstCoordinate;
     }
 
     public String getHasSecondCoordinate() {
-    	return hasSecondCoordinate;
+        return hasSecondCoordinate;
     }
-    
+
     public void setHasSecondCoordinate(String hasSecondCoordinate) {
-    	this.hasSecondCoordinate = hasSecondCoordinate;
+        this.hasSecondCoordinate = hasSecondCoordinate;
     }
 
     public String getInstrument() {
-    	return instrument;
+        return instrument;
     }
-    
+
     public void setInstrument(String instrument) {
-    	this.instrument = instrument;
+        this.instrument = instrument;
     }
 
     public List<String> getDetectors() {
-    	return detectors;
+        return detectors;
     }
-    
+
     public void setDetectors(List<String> detector) {
-    	this.detectors = detector;
+        this.detectors = detector;
     }
 
     public void addDetector(String detector) {
-    	this.detectors.add(detector);
+        this.detectors.add(detector);
     }
 
     public String getStartDateTime() {
-    	return startDateTime;
+        return startDateTime;
     }
-    
+
     public void setStartDateTime(String startDateTime) {
-    	this.startDateTime = startDateTime;
+        this.startDateTime = startDateTime;
     }
 
     public String getEndDateTime() {
-    	return endDateTime;
+        return endDateTime;
     }
-    
+
     public void setEndDateTime(String endDateTime) {
-    	this.endDateTime = endDateTime;
+        this.endDateTime = endDateTime;
     }
 }

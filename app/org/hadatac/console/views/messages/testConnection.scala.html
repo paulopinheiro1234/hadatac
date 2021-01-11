@@ -1,12 +1,12 @@
 @(dir            : String,
-  filename       : String,
-  da_uri         : String,
-  page           : Integer,
-  stream_uri     : String,	
-  stream_label   : String,
-  results        : List[String],
-  show           : Boolean)
-    
+        filename       : String,
+        da_uri         : String,
+        page           : Integer,
+        stream_uri     : String,
+        stream_label   : String,
+        results        : List[String],
+        show           : Boolean)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers._
@@ -14,41 +14,41 @@
 @import java.net.URLEncoder
 
 @maingraph("Test Stream Connection") {
-	<head>
+    <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
-	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
     </head>
     <body>
 
-    <div class="container-fluid">
-    	<h3>Test Stream Connection</h3>
-    	<h3>Stream: @stream_label</h3>
+        <div class="container-fluid">
+            <h3>Test Stream Connection</h3>
+            <h3>Stream: @stream_label</h3>
 
-	    <div class="row">
-        	<div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-12">
 
-        	    <div id="content">
-        	      @for(line <- results){
-                     @line <br>
-                  }
-        	    </div>
-            	<div id="docs-container">
-                	<a id="docs-close" href="#">&times;</a>
-                	<div id="docs" class="docs"></div>
-            	</div>
+                    <div id="content">
+                    @for(line <- results){
+                        @line <br>
+                        }
+                    </div>
+                    <div id="docs-container">
+                        <a id="docs-close" href="#">&times;</a>
+                        <div id="docs" class="docs"></div>
+                    </div>
+                </div>
             </div>
-		</div>
 
-		<br>
-		<a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)" class="btn btn-primary" 
-	       role="button">Back to Ingest </a>  		
-	
-	</div>
+            <br>
+            <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)" class="btn btn-primary"
+            role="button">Back to Ingest </a>
 
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-   	</body>
-} 
+        </div>
+
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+    </body>
+}

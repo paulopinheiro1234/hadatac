@@ -7,7 +7,10 @@ import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 
@@ -34,7 +37,10 @@ public class NewObjectsFromScratch extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Inject
+    private Application application;
+
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
 
         try {
@@ -61,19 +67,19 @@ public class NewObjectsFromScratch extends Controller {
         return ok(newObjectsFromScratch.render(dir, filename, da_uri, study, oc, typeList, page));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
         return index(dir, filename, da_uri, std_uri, oc_uri, page);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Study std = Study.find(std_uri);
         ObjectCollection oc = ObjectCollection.find(oc_uri);
 
-        Form<NewObjectsFromScratchForm> form = formFactory.form(NewObjectsFromScratchForm.class).bindFromRequest();
+        Form<NewObjectsFromScratchForm> form = formFactory.form(NewObjectsFromScratchForm.class).bindFromRequest(request);
         NewObjectsFromScratchForm data = form.get();
 
         if (form.hasErrors()) {
@@ -145,21 +151,21 @@ public class NewObjectsFromScratch extends Controller {
         return ok(objectConfirm.render(message, dir, filename, da_uri, std_uri, oc_uri, page));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processScopeForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processScopeForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
         try {
             oc_uri = URLDecoder.decode(oc_uri, "utf-8");
         } catch (UnsupportedEncodingException e) {
             oc_uri = "";
         }
         
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Study std = Study.find(std_uri);
         ObjectCollection oc = ObjectCollection.find(oc_uri);
 
         Form<NewObjectsFromScratchForm> form = formFactory.form(
-                NewObjectsFromScratchForm.class).bindFromRequest();
+                NewObjectsFromScratchForm.class).bindFromRequest(request);
         NewObjectsFromScratchForm data = form.get();
 
         if (form.hasErrors()) {

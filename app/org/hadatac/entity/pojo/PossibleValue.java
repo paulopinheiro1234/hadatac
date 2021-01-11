@@ -42,60 +42,60 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
     @PropertyField(uri="hasco:hasResource")
     private String hasResource;
-   
+
     public String getHasDASAUri() {
-    	return hasDASAUri;
+        return hasDASAUri;
     }
-    
+
     public void setHasDASAUri(String hasDASAUri) {
-    	this.hasDASAUri = hasDASAUri;
+        this.hasDASAUri = hasDASAUri;
     }
-    
+
     public String getHasVariable() {
-    	return hasVariable;
+        return hasVariable;
     }
-    
+
     public void setHasVariable(String hasVariable) {
-    	this.hasVariable = hasVariable;
+        this.hasVariable = hasVariable;
     }
-    
+
     public String getHasCode() {
-    	return hasCode;
+        return hasCode;
     }
-    
+
     public void setHasCode(String hasCode) {
-    	this.hasCode = hasCode;
+        this.hasCode = hasCode;
     }
-    
+
     public String getHasCodeLabel() {
-    	return hasCodeLabel;
+        return hasCodeLabel;
     }
-    
+
     public void setHasCodeLabel(String hasCodeLabel) {
-    	this.hasCodeLabel = hasCodeLabel;
+        this.hasCodeLabel = hasCodeLabel;
     }
-    
+
     public String getHasClass() {
-    	return hasClass;
+        return hasClass;
     }
-    
+
     public void setHasClass(String hasClass) {
-    	this.hasClass = hasClass;
+        this.hasClass = hasClass;
     }
-    
+
     public String getHasResource() {
-    	return hasResource;
+        return hasResource;
     }
-    
+
     public void setHasResource(String hasResource) {
-    	this.hasResource = hasResource;
+        this.hasResource = hasResource;
     }
-    
+
     public static List<PossibleValue> find() {
         List<PossibleValue> codebook = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* " + className + " . " + 
+                " ?uri rdfs:subClassOf* " + className + " . " +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -105,22 +105,22 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
             QuerySolution soln = resultsrw.next();
             PossibleValue code = find(soln.getResource("uri").getURI());
             codebook.add(code);
-        }			
+        }
 
         java.util.Collections.sort((List<PossibleValue>) codebook);
         return codebook;
     }
 
-    public static List<PossibleValue> findBySchema(String schemaUri) {    	
+    public static List<PossibleValue> findBySchema(String schemaUri) {
 
-    	System.out.println("SchemaUri: " + schemaUri);
-    	
-    	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
+        System.out.println("SchemaUri: " + schemaUri);
+
+        List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?uri WHERE { \n"
                 + " ?uri a hasco:PossibleValue . \n"
                 + " ?uri hasco:isPossibleValueOf ?daso_or_dasa . \n"
-                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
+                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n"
                 + " OPTIONAL { ?uri hasco:hasVariable ?variable . } \n"
                 + " OPTIONAL { ?uri hasco:hasCode ?code . } \n"
                 + " } \n"
@@ -136,12 +136,12 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                 if (soln.get("uri") != null && !soln.get("uri").toString().isEmpty()) {
                     pvUri = soln.get("uri").toString();
                     if (pvUri != null) {
-                    	PossibleValue pv = find(pvUri);
-                    	if (pv != null) {
-                    		possibleValues.add(pv);
-                    	}
+                        PossibleValue pv = find(pvUri);
+                        if (pv != null) {
+                            possibleValues.add(pv);
+                        }
                     }
-                } 
+                }
 
             }
         } catch (Exception e) {
@@ -182,14 +182,14 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
         return null;
     }
 
-    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {    	
-    	Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
+    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
+        Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource WHERE { \n"
                 + " ?possibleValue a hasco:PossibleValue . \n"
                 + " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . \n"
                 + " ?possibleValue hasco:hasCode ?code . \n"
-                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
+                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n"
                 + " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . \n"
                 + " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . \n"
                 + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
@@ -251,21 +251,21 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/isPossibleValueOf")) {
                 code.setHasDASAUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCode")) {
-            	code.setHasCode(object.asLiteral().getString());
+                code.setHasCode(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasVariable")) {
-            	code.setHasVariable(object.asLiteral().getString());
+                code.setHasVariable(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCodeLabel")) {
-            	code.setHasCodeLabel(object.asLiteral().getString());
+                code.setHasCodeLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
                 code.setSuperUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasClass")) {
-            	try {
-            		code.setHasClass(object.asResource().getURI());
-            	} catch (Exception e) {
-            		code.setHasClass("");
-            	}
+                try {
+                    code.setHasClass(object.asResource().getURI());
+                } catch (Exception e) {
+                    code.setHasClass("");
+                }
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasResource")) {
-            	code.setHasResource(object.asResource().getURI());
+                code.setHasResource(object.asResource().getURI());
             }
         }
 

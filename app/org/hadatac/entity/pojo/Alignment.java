@@ -35,10 +35,10 @@ public class Alignment {
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
         variables = new HashMap<String, Variable>();
-	    hCodeBook = new HashMap<String, List<String>>();
-	    studyId = new HashMap<String,String>();
-	    dataAcquisitions = new HashMap<String,STR>();
-	    ID.setLabel("ID");
+        hCodeBook = new HashMap<String, List<String>>();
+        studyId = new HashMap<String,String>();
+        dataAcquisitions = new HashMap<String,STR>();
+        ID.setLabel("ID");
         GROUPID.setLabel("GROUPID");
     }
 
@@ -65,7 +65,7 @@ public class Alignment {
         return aa.toString();
     }
 
-    /* returns a key to retrieve variables. if needed, measuremtnKey adds new variables 
+    /* returns a key to retrieve variables. if needed, measuremtnKey adds new variables
      */
     public String measurementKey(Measurement m) {
         if (variables == null) {
@@ -73,10 +73,10 @@ public class Alignment {
             return null;
         }
 
-        /* 
+        /*
          * Look for existing variables
          */
-        
+
         //System.out.println("Align-Debug: Measurement Key");
 
         Entity irt = null;
@@ -85,16 +85,16 @@ public class Alignment {
             irt = entityCache.get(m.getInRelationToUri());
             if (irt != null && irt.getUri().equals(m.getInRelationToUri())) {
                 mInRelationTo = irt.getUri();
-            } else {		
+            } else {
                 irt = Entity.find(m.getInRelationToUri());
                 if (irt == null) {
-                    System.out.println("[ERROR] retrieving entity playing inRelationTo " + m.getInRelationToUri());
+                    System.out.println("[ERROR] retrieving org.hadatac.entity playing inRelationTo " + m.getInRelationToUri());
                 } else {
                     entityCache.put(irt.getUri(),irt);
                     mInRelationTo = m.getInRelationToUri();
                 }
             }
-        } 
+        }
         Unit unit = null;
         String mUnit = "";
         if (m.getUnitUri() != null && !m.getUnitUri().equals("")) {
@@ -110,8 +110,8 @@ public class Alignment {
                     mUnit = m.getUnitUri();
                 }
             }
-        } 
-        Attribute timeAttr = null; 
+        }
+        Attribute timeAttr = null;
         String mAbstractTime = "";
         if (m.getAbstractTime() != null && !m.getAbstractTime().equals("")) {
             timeAttr = attributeCache.get(m.getAbstractTime());
@@ -123,29 +123,29 @@ public class Alignment {
                     System.out.println("[ERROR] could not retrieve abstract time [" + m.getAbstractTime() + "]. Ignoring abstract time.");
                 } else {
                     attributeCache.put(timeAttr.getUri(),timeAttr);
-                    mAbstractTime = m.getAbstractTime(); 
+                    mAbstractTime = m.getAbstractTime();
                 }
             }
-        } 
+        }
 
         if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
             System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
-        	STR da = STR.findByUri(m.getAcquisitionUri());
-        	dataAcquisitions.put(m.getAcquisitionUri(), da);
+            STR da = STR.findByUri(m.getAcquisitionUri());
+            dataAcquisitions.put(m.getAcquisitionUri(), da);
         }
-        
-	    String mRole = m.getRole().replace(" ","");
+
+        String mRole = m.getRole().replace(" ","");
 
         String mKey =  mRole + m.getEntityUri() + m.getCharacteristicUris().get(0) + mInRelationTo + mUnit + mAbstractTime;
 
         //System.out.println("Align-Debug: Measurement: " + mKey);
-        //System.out.println("Align-Debug: Vector: " + alignAttrs); 
+        //System.out.println("Align-Debug: Vector: " + alignAttrs);
 
         if (variables.containsKey(mKey)) {
             return variables.get(mKey).toString();
         }
 
-        /* 
+        /*
          * create new variable
          */
 
@@ -155,17 +155,17 @@ public class Alignment {
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
             entity = Entity.find(m.getEntityUri());
             if (entity == null) {
-                System.out.println("[ERROR] retrieving entity " + m.getEntityUri());
+                System.out.println("[ERROR] retrieving org.hadatac.entity " + m.getEntityUri());
                 return null;
             } else {
                 entityCache.put(entity.getUri(),entity);
             }
         }
 
-        //System.out.println("Align-Debug: new alignment attribute"); 
+        //System.out.println("Align-Debug: new alignment attribute");
         AlignmentEntityRole newRole = new AlignmentEntityRole(entity,mRole);
 
-        //System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]"); 
+        //System.out.println("Align-Debug: new alignment characteristic: [" + m.getCharacteristicUris().get(0) + "]");
 
         Attribute attribute = attributeCache.get(m.getCharacteristicUris().get(0));
         if (attribute == null || !attribute.getUri().equals(m.getCharacteristicUris().get(0))) {
@@ -178,13 +178,13 @@ public class Alignment {
             }
         }
 
-        //System.out.println("Align-Debug: new alignment attribute 2"); 
+        //System.out.println("Align-Debug: new alignment attribute 2");
 
         if (!mInRelationTo.equals("")) {
             System.out.println("Adding the following inRelationTo " + mInRelationTo);
         }
 
-        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attribute, irt); 
+        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attribute, irt);
 
         if (!mUnit.equals("")) {
             System.out.println("Adding the following unit " + mUnit);
@@ -195,7 +195,7 @@ public class Alignment {
         }
 
         newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
-        //System.out.println("Align-Debug: new alignment attribute 3"); 
+        //System.out.println("Align-Debug: new alignment attribute 3");
 
         if (!variables.containsKey(newVar.getKey())) {
             variables.put(newVar.getKey(), newVar);
@@ -233,7 +233,7 @@ public class Alignment {
      */
 
     public StudyObject getObject(String uri) {
-    	return objects.get(uri);
+        return objects.get(uri);
     }
 
     public Entity getEntity(String uri) {
@@ -249,15 +249,15 @@ public class Alignment {
     }
 
     public Map<String, List<String>> getCodeBook() {
-    	return hCodeBook;
+        return hCodeBook;
     }
-    
+
     public String getStudyId(String uri) {
         return studyId.get(uri);
     }
 
     /* GET LIST METHODS
-     */ 
+     */
 
     public List<StudyObject> getObjects() {
         return new ArrayList<StudyObject>(objects.values());
@@ -280,35 +280,35 @@ public class Alignment {
     }
 
     public List<String> getDOIs() {
-    	List<String> resp = new ArrayList<String>();
-    	if (dataAcquisitions.size() == 0) {
-    		return resp;
-    	}
+        List<String> resp = new ArrayList<String>();
+        if (dataAcquisitions.size() == 0) {
+            return resp;
+        }
         System.out.println("getDOI(): da size is " + dataAcquisitions.size());
-    	for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
+        for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
             org.hadatac.entity.pojo.STR da = entry.getValue();
             System.out.println("getDOI(): da is " + da.getUri());
-            for (String doi : da.getDOIs()) { 
+            for (String doi : da.getDOIs()) {
                 System.out.println("getDOI(): doi is " + doi);
-            	resp.add(doi);
+                resp.add(doi);
             }
-    	}
-    	return resp;
+        }
+        return resp;
     }
-    
+
     /* ADD METHODS
      */
 
     public void addObject(StudyObject obj) {
         objects.put(obj.getUri(), obj);
         if (!studyId.containsKey(obj.getIsMemberOf())) {
-        	ObjectCollection soc = ObjectCollection.find(obj.getIsMemberOf());
-        	if (soc != null) {
-        		Study std = soc.getStudy();
-        		if (std != null && std.getId() != null) {
-        			studyId.put(obj.getIsMemberOf(), std.getId());
-        		}
-        	}
+            ObjectCollection soc = ObjectCollection.find(obj.getIsMemberOf());
+            if (soc != null) {
+                Study std = soc.getStudy();
+                if (std != null && std.getId() != null) {
+                    studyId.put(obj.getIsMemberOf(), std.getId());
+                }
+            }
         }
     }
 

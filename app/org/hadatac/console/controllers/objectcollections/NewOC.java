@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 import play.data.FormFactory;
@@ -26,7 +28,7 @@ public class NewOC extends Controller {
 	@Inject
 	private FormFactory formFactory;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result index(String dir, String filename, String da_uri, String std_uri) {
 		Study study = Study.find(std_uri);
 		List<ObjectCollectionType> typeList = ObjectCollectionType.find();
@@ -48,14 +50,14 @@ public class NewOC extends Controller {
 		return ok(newObjectCollection.render(dir, filename, da_uri, study, domainList, locationList, timeList, typeList));
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
 		return index(dir, filename, da_uri, std_uri);
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String dir, String filename, String da_uri, String std_uri) {
-		Form<ObjectCollectionForm> form = formFactory.form(ObjectCollectionForm.class).bindFromRequest();
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+	public Result processForm(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
+		Form<ObjectCollectionForm> form = formFactory.form(ObjectCollectionForm.class).bindFromRequest(request);
 		ObjectCollectionForm data = form.get();
 
 		if (form.hasErrors()) {

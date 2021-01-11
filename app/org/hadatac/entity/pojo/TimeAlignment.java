@@ -80,7 +80,7 @@ public class TimeAlignment {
             } else {		
                 irt = Entity.find(m.getInRelationToUri());
                 if (irt == null) {
-                    System.out.println("[ERROR] retrieving entity playing inRelationTo " + m.getInRelationToUri());
+                    System.out.println("[ERROR] retrieving org.hadatac.entity playing inRelationTo " + m.getInRelationToUri());
                 } else {
                     entityCache.put(irt.getUri(),irt);
                     mInRelationTo = m.getInRelationToUri();
@@ -125,7 +125,7 @@ public class TimeAlignment {
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
             entity = Entity.find(m.getEntityUri());
             if (entity == null) {
-                System.out.println("[ERROR] retrieving entity " + m.getEntityUri());
+                System.out.println("[ERROR] retrieving org.hadatac.entity " + m.getEntityUri());
                 return null;
             } else {
                 entityCache.put(entity.getUri(),entity);

@@ -7,65 +7,65 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.deployments._
 
-<head> 
+<head>
     <script type="text/javascript">
-       var datefield=document.createElement("input")
-       datefield.setAttribute("type", "date")
-       if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
-           document.write('<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
-           document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"><\/script>\n')
-           document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n') 
-        }
+            var datefield=document.createElement("input")
+            datefield.setAttribute("type", "date")
+            if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
+                document.write('<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
+                document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"><\/script>\n')
+                document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n')
+            }
     </script>
- 
+
     <script>
-       if (datefield.type!="date"){ //if browser doesn't support input type="date", initialize date picker widget:
-       jQuery(function($){ //on document.ready
-           $('#birthday').datepicker();
-           })
-       }
+            if (datefield.type!="date"){ //if browser doesn't support input type="date", initialize date picker widget:
+                jQuery(function($){ //on document.ready
+                    $('#birthday').datepicker();
+                })
+            }
     </script>
 </head>
 
-@main("URI Generator Registration") {
-  <div class="container">
-    <h2>URI Generator Registration</h2>
-    
-    <!--   
+@main("URI Generator Registration","","") {
+    <div class="container">
+        <h2>URI Generator Registration</h2>
+
+            <!--
     <form class="form-horizontal" method="post" action=" org.hadatac.console.controllers.deployments.routes.URIGenerator.processForm">
 
     <div class="form-group">
          <label>Owner</label> 
-         <input type="text" class="form-control col-sm-6" name="ownerURI" value="@AuthApplication.getAuthApplication().getUserProvider().getUser(session()).getName()" readonly />
-         
-     </div>
-	 <div class="form-group">
-         <label>Description</label>
-         <input class="form-control col-sm-6" name="description" />
-         </select>
-     </div>
+         <input type="text" class="form-control col-sm-6" name="ownerURI" value=" @* @AuthApplication.getAuthApplication().getUserProvider().getUser(session()).getName()" readonly />*@
 
-      <div class="form-group class="col-sm-6 col-offset-3">
-          <input class="btn btn-success" role="button" type="submit" value="Create" />
-      </div>
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <input class="form-control col-sm-6" name="description" />
+        </select>
+    </div>
 
-      <div class="form-group class="col-sm-6 col-offset-3">
+    <div class="form-group class="col-sm-6 col-offset-3">
+    <input class="btn btn-success" role="button" type="submit" value="Create" />
+    </div>
 
-	    @defining("") { dir => 
-	       @defining("") { filename => 
-	          @defining("") { da_uri =>  
-	             @defining(0) { page =>  
-	                @deploymentButton(true, dir, filename, da_uri, page) 
-	             }
-	          }
-	       }
-	    }
+    <div class="form-group class="col-sm-6 col-offset-3">
 
-      </div>
+    @defining("") { dir =>
+        @defining("") { filename =>
+            @defining("") { da_uri =>
+                @defining(0) { page =>
+                    @deploymentButton(true, dir, filename, da_uri, page)
+                }
+            }
+        }
+    }
 
-     </form>   
-     -->  
-</div>
+    </div>
+
+    </form>
+    -->
+    </div>
 
 
 }

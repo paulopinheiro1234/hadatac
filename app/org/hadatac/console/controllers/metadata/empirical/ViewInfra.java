@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.metadata.empirical;
 
 import java.util.List;
 
+import org.hadatac.Constants;
 import org.hadatac.entity.pojo.Detector;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.Platform;
@@ -17,7 +18,7 @@ import play.mvc.Controller;
 
 public class ViewInfra extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result viewPlatform(String dir, String filename, String da_uri, String platform_uri) {
     	try {
     	    platform_uri = java.net.URLDecoder.decode(platform_uri,"UTF8");
@@ -28,12 +29,12 @@ public class ViewInfra extends Controller {
         return ok(viewPlatform.render(dir, filename, da_uri, platform));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postViewPlatform(String dir, String filename, String da_uri, String platform_uri) {
         return viewPlatform(dir, filename, da_uri, platform_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result viewInstrument(String dir, String filename, String da_uri, String instrument_uri) {
     	try {
     	    instrument_uri = java.net.URLDecoder.decode(instrument_uri,"UTF8");
@@ -43,12 +44,12 @@ public class ViewInfra extends Controller {
         return ok(viewInstrument.render(dir, filename, da_uri, instrument));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postViewInstrument(String dir, String filename, String da_uri, String instrument_uri) {
         return viewInstrument(dir, filename, da_uri, instrument_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result viewDetector(String dir, String filename, String da_uri, String detector_uri) {
     	try {
     	    detector_uri = java.net.URLDecoder.decode(detector_uri,"UTF8");
@@ -59,7 +60,7 @@ public class ViewInfra extends Controller {
         return ok(viewDetector.render(dir, filename, da_uri, detector));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postViewDetector(String dir, String filename, String da_uri, String detector_uri) {
         return viewDetector(dir, filename, da_uri, detector_uri);
     }

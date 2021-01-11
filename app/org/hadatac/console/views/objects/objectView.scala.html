@@ -1,8 +1,8 @@
 @(results     : org.hadatac.console.controllers.objects.ObjectForceFieldGraph,
-  obj         : org.hadatac.entity.pojo.StudyObject,
-  obj_uri     : String,
-  autorefresh : Boolean)
-  
+        obj         : org.hadatac.entity.pojo.StudyObject,
+        obj_uri     : String,
+        autorefresh : Boolean)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers._
@@ -12,75 +12,75 @@
 @import java.net.URLEncoder
 
 @maingraph("Object View") {
-	<head>
+    <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
-	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
     </head>
     <body>
 
-    <div class="container-fluid">
+        <div class="container-fluid">
 
-    	<h4>Object's Graph View</h4>
-		<div class="container">
-  			<form>
-    			<label class="checkbox-inline">
-      				<input id="autorefresh" type="checkbox" >Auto-Refresh
-    			</label>
-  			</form>
-		</div>
-
-	    <div class="row">
-        	<div class="col-lg-12">
-        	    <div id="query" data-results="@results.toJson()"></div>
- 	            <div id="graph-container">
-    	            <div id="graph"></div>
-        	    </div>
-            	<div id="docs-container">
-                	<a id="docs-close" href="#">&times;</a>
-                	<div id="docs" class="docs"></div>
-            	</div>
+            <h4>Object's Graph View</h4>
+            <div class="container">
+                <form>
+                    <label class="checkbox-inline">
+                        <input id="autorefresh" type="checkbox" >Auto-Refresh
+                    </label>
+                </form>
             </div>
-		</div>
 
-		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary" 
-	       role="button">Back to Search Studies</a>  		
-	
-	</div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="query" data-results="@results.toJson()"></div>
+                    <div id="graph-container">
+                        <div id="graph"></div>
+                    </div>
+                    <div id="docs-container">
+                        <a id="docs-close" href="#">&times;</a>
+                        <div id="docs" class="docs"></div>
+                    </div>
+                </div>
+            </div>
 
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/colorbrewer.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/geometry.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/graphview.js")"></script>
-    <!--   <script src="jquery/jquery-1.10.2.min.js"></script>  -->
-    <script>
-var refreshVar
+            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary"
+            role="button">Back to Search Studies</a>
 
-$( '#autorefresh' ).prop( "checked", @autorefresh );
-if ($('#autorefresh').is(':checked')) {
-	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,autorefresh)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-	}, 30000)};
+        </div>
+
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/colorbrewer.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/geometry.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/graphview.js")"></script>
+            <!--   <script src="jquery/jquery-1.10.2.min.js"></script>  -->
+        <script>
+                var refreshVar
+
+                $( '#autorefresh' ).prop( "checked", @autorefresh );
+                if ($('#autorefresh').is(':checked')) {
+                    refreshVar = setTimeout(function() {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,autorefresh)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }, 30000)};
 
 
-$('#autorefresh').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,true)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,false)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+                $('#autorefresh').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,true)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.objects.routes.ObjectView.index(obj_uri,false)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
 
-    </script> 
-   	</body>
-} 
+        </script>
+    </body>
+}
