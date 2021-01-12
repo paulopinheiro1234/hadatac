@@ -54,7 +54,7 @@ public class Application extends Controller {
         return profileManager.getAll(true);
     }
 
-    //TODo: fix it ffor all users
+    //TODo: fix it for all users
     private  CommonProfile getProfile(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
@@ -75,30 +75,12 @@ public class Application extends Controller {
         return userEmail;
     }
 
-    @Secure(clients = "AnonymousClient")
-    public Result index(Http.Request request) throws Exception {
-        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-        final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
-        final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN).orElse(null);
-        return ok(org.hadatac.console.views.html.index.render(getProfiles(request), token, sessionId));
-    }
-
     private Result protectedIndexView(Http.Request request) {
-        // profiles
-//        getProfile(request);
-//        getProfiles(request);
-//        getSessionId(request);
         getUserEmail(request);
         return ok(org.hadatac.console.views.html.protectedIndex.render(getProfiles(request),getUserEmail(request)));
     }
 
-    @Secure(clients = "FacebookClient", matchers = "excludedPath")
-    public Result facebookIndex(Http.Request request) {
-        return protectedIndexView(request);
-    }
-
     private Result notProtectedIndexView(Http.Request request) {
-        // profiles
         return ok(org.hadatac.console.views.html.notprotectedIndex.render(getProfiles(request)));
     }
 
@@ -131,15 +113,6 @@ public class Application extends Controller {
     public Result formIndex(Http.Request request) {
         return protectedIndexView(request);
     }
-
-    // Setting the isAjax parameter is no longer necessary as AJAX requests are automatically detected:
-    // a 401 error response will be returned instead of a redirection to the login url.
-//    @Secure(clients = "FormClient")
-//    public Result formIndexJson(Http.Request request) {
-//        Content content = org.hadatac.console.views.html.protectedIndex.render(getProfiles(request));
-//        JsonContent jsonContent = new JsonContent(content.body());
-//        return ok(jsonContent);
-//    }
 
     @Secure(clients = "IndirectBasicAuthClient")
     public Result basicauthIndex(Http.Request request) {

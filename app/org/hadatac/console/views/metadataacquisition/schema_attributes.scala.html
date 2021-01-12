@@ -7,18 +7,18 @@
 @import java.net._
 
 @main("DASA Browser Home","","") {
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
-    <link rel="stylesheet" href="@controllers.routes.Assets.at("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
-    <link rel="stylesheet" href="@controllers.routes.Assets.at("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")"/>
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/jquery.facetview.js")"></script>
-    <link rel="stylesheet" href="@controllers.routes.Assets.at("css/facetview.css")"/>
-    <link rel="stylesheet" href="@controllers.routes.Assets.at("css/style.css")"/>
-    <link rel="stylesheet" href="@controllers.routes.Assets.at("javascripts/vendor/c3-0.4.10/c3.css")"/>
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
-    <script type="text/javascript" src="@controllers.routes.Assets.at("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")"/>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.facetview.js")"></script>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("css/facetview.css")"/>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("css/style.css")"/>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.css")"/>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
     <script type="text/javascript">
             jQuery(document).ready(function($) {
                 $('.facet-view-simple').each(function() {
