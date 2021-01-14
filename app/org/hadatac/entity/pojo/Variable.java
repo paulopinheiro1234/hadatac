@@ -292,7 +292,7 @@ public class Variable {
 	public static String retrieveIndicatorAndAttributeLabel(String targetUri) {
 
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?indicatorLabel ?attributeLabel " +
+				"SELECT DISTINCT  ?attributeUri ?indicatorLabel ?attributeLabel " +
 				"WHERE { \n" +
 				"   <" + targetUri + "> ?x ?attributeUri . \n" +
 				"   ?attributeUri rdfs:label ?attributeLabel . \n" +
@@ -302,16 +302,9 @@ public class Variable {
 				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
 				"} \n";
 
-		/*String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?indicatorLabel " +
-				"WHERE { \n" +
-				"   <" + targetUri + "> ?x ?attributeUri . \n" +
-				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
-				"	?indicator rdfs:label ?indicatorLabel . \n" +
-				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
-				"} \n";*/
-
 		String attributeLabel = VARIABLE_EMPTY_LABEL, indicatorLabel = VARIABLE_EMPTY_LABEL;
+		Map<String, String> attributeMap = new HashMap<>();
+
 		try {
 
 			ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
@@ -324,6 +317,12 @@ public class Variable {
 				}
 				if ( soln.contains("attributeLabel")) {
 					attributeLabel = FirstLabel.getPrettyLabel(soln.get("attributeLabel").toString());
+					if ( soln.contains("attributeUri") ) {
+						String attributeUri = soln.get("attributeUri").toString();
+						if (!attributeMap.containsKey(attributeUri)) {
+							attributeMap.put(attributeUri, attributeLabel);
+						}
+					}
 				}
 			}
 
@@ -331,7 +330,30 @@ public class Variable {
 			e.printStackTrace();
 		}
 
-		return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+		if ( attributeMap.size() <= 1 ) {
+			return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+		} else {
+			// first make sure this is for Z-Score, and note this fix only applies to Z-score attributes
+			boolean zScoreRelated = false;
+			for ( Map.Entry<String, String>  entry: attributeMap.entrySet() ) {
+				if ("Z-Score".equalsIgnoreCase(entry.getValue())) {
+					zScoreRelated = true;
+					break;
+				}
+			}
+			if ( !zScoreRelated ) {
+				return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+			} else {
+				StringBuffer sb = new StringBuffer();
+				for (Map.Entry<String, String> entry : attributeMap.entrySet()) {
+					if ("Z-Score".equalsIgnoreCase(entry.getValue())) continue;
+					if (sb.length() > 0) {
+						sb.append(",").append(entry.getValue());
+					} else sb.append(entry.getValue());
+				}
+				return "Z-Score (" + sb.toString() + ")" + LABEL_SEPARATOR + indicatorLabel;
+			}
+		}
 
 	}
 
