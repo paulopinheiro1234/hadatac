@@ -293,10 +293,7 @@ public class Variable {
 	}
 
 	public static String retrieveIndicatorAndAttributeLabel(String targetUri) {
-
-    	if ( "http://hadatac.org/kb/hhear#DASA-2016-1449-4-MSLelcStandard".equalsIgnoreCase(targetUri) ) {
-    		int x = 1;
-		}
+    	
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT DISTINCT  ?attributeUri ?indicatorLabel ?attributeLabel " +
 				"WHERE { \n" +
