@@ -25,6 +25,9 @@ public class Variable {
 	public static final String VARIABLE_SEPARATOR = ";";
 	public static final String VARIABLE_EMPTY_LABEL = "**";
 
+	// patch for multi-valued attributes
+	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
+
 	private Entity ent;
     private String role;
     private List<Attribute> attrList;
@@ -290,9 +293,9 @@ public class Variable {
 	}
 
 	public static String retrieveIndicatorAndAttributeLabel(String targetUri) {
-
+    	
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?indicatorLabel ?attributeLabel " +
+				"SELECT DISTINCT  ?attributeUri ?indicatorLabel ?attributeLabel " +
 				"WHERE { \n" +
 				"   <" + targetUri + "> ?x ?attributeUri . \n" +
 				"   ?attributeUri rdfs:label ?attributeLabel . \n" +
@@ -302,16 +305,9 @@ public class Variable {
 				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
 				"} \n";
 
-		/*String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?indicatorLabel " +
-				"WHERE { \n" +
-				"   <" + targetUri + "> ?x ?attributeUri . \n" +
-				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
-				"	?indicator rdfs:label ?indicatorLabel . \n" +
-				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
-				"} \n";*/
-
 		String attributeLabel = VARIABLE_EMPTY_LABEL, indicatorLabel = VARIABLE_EMPTY_LABEL;
+		Map<String, String> attributeMap = new HashMap<>();
+
 		try {
 
 			ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
@@ -324,6 +320,12 @@ public class Variable {
 				}
 				if ( soln.contains("attributeLabel")) {
 					attributeLabel = FirstLabel.getPrettyLabel(soln.get("attributeLabel").toString());
+					if ( soln.contains("attributeUri") ) {
+						String attributeUri = soln.get("attributeUri").toString();
+						if (!attributeMap.containsKey(attributeUri)) {
+							attributeMap.put(attributeUri, attributeLabel);
+						}
+					}
 				}
 			}
 
@@ -331,7 +333,31 @@ public class Variable {
 			e.printStackTrace();
 		}
 
-		return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+		if ( attributeMap.size() <= 1 ) {
+			return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+		} else {
+			String attributeTag = null;
+			for ( Map.Entry<String, String>  entry: attributeMap.entrySet() ) {
+				for ( int i = 0; i < multiAttributeTag.length; i++ ) {
+					if ( multiAttributeTag[i].equalsIgnoreCase(entry.getValue()) ) {
+						attributeTag = multiAttributeTag[i];
+						break;
+					}
+				}
+			}
+			if ( attributeTag == null || attributeTag.length() == 0 ) {
+				return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+			} else {
+				StringBuffer sb = new StringBuffer();
+				for (Map.Entry<String, String> entry : attributeMap.entrySet()) {
+					if (attributeTag.equalsIgnoreCase(entry.getValue())) continue;
+					if (sb.length() > 0) {
+						sb.append(",").append(entry.getValue());
+					} else sb.append(entry.getValue());
+				}
+				return attributeTag + " (" + sb.toString() + ")" + LABEL_SEPARATOR + indicatorLabel;
+			}
+		}
 
 	}
 
