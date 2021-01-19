@@ -25,6 +25,9 @@ public class Variable {
 	public static final String VARIABLE_SEPARATOR = ";";
 	public static final String VARIABLE_EMPTY_LABEL = "**";
 
+	// patch for multi-valued attributes
+	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
+
 	private Entity ent;
     private String role;
     private List<Attribute> attrList;
@@ -291,6 +294,9 @@ public class Variable {
 
 	public static String retrieveIndicatorAndAttributeLabel(String targetUri) {
 
+    	if ( "http://hadatac.org/kb/hhear#DASA-2016-1449-4-MSLelcStandard".equalsIgnoreCase(targetUri) ) {
+    		int x = 1;
+		}
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT DISTINCT  ?attributeUri ?indicatorLabel ?attributeLabel " +
 				"WHERE { \n" +
@@ -333,25 +339,26 @@ public class Variable {
 		if ( attributeMap.size() <= 1 ) {
 			return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
 		} else {
-			// first make sure this is for Z-Score, and note this fix only applies to Z-score attributes
-			boolean zScoreRelated = false;
+			String attributeTag = null;
 			for ( Map.Entry<String, String>  entry: attributeMap.entrySet() ) {
-				if ("Z-Score".equalsIgnoreCase(entry.getValue())) {
-					zScoreRelated = true;
-					break;
+				for ( int i = 0; i < multiAttributeTag.length; i++ ) {
+					if ( multiAttributeTag[i].equalsIgnoreCase(entry.getValue()) ) {
+						attributeTag = multiAttributeTag[i];
+						break;
+					}
 				}
 			}
-			if ( !zScoreRelated ) {
+			if ( attributeTag == null || attributeTag.length() == 0 ) {
 				return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
 			} else {
 				StringBuffer sb = new StringBuffer();
 				for (Map.Entry<String, String> entry : attributeMap.entrySet()) {
-					if ("Z-Score".equalsIgnoreCase(entry.getValue())) continue;
+					if (attributeTag.equalsIgnoreCase(entry.getValue())) continue;
 					if (sb.length() > 0) {
 						sb.append(",").append(entry.getValue());
 					} else sb.append(entry.getValue());
 				}
-				return "Z-Score (" + sb.toString() + ")" + LABEL_SEPARATOR + indicatorLabel;
+				return attributeTag + " (" + sb.toString() + ")" + LABEL_SEPARATOR + indicatorLabel;
 			}
 		}
 
