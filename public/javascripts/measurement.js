@@ -148,8 +148,9 @@ function create_merged_item(data, selected_elems, curLevel,
 		for (var i_child in children) {	
 			var element = {};
 			element.id = tree_id++;
-			element.text = getNodeText(children[i_child])
-			//element.text = (children[i_child]).value + ' (' + (children[i_child]).count + ')'
+			// element.text = getNodeText(children[i_child])
+			// disable the hyperlink on the indicators
+			element.text = (children[i_child]).value + ' (' + (children[i_child]).count + ')'
 			element.tooltip = '<' + children[i_child].tooltip + '>';
 			element.label = children[i_child].value;
 			element.count = children[i_child].count;
