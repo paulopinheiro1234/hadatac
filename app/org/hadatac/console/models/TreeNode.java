@@ -26,8 +26,9 @@ public class TreeNode {
 			String before = name.split("_")[0]; // "Gets the first part of the file name with the extension"
 			toRet=before+".xlsx";
 		}
-
-		//System.out.println(toRet);
+		
+		
+		System.out.println(toRet);
 
         return toRet;
     }

@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.dataacquisitionsearch;
 
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
+import org.apache.jena.rdf.model.Model;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 
@@ -15,17 +16,19 @@ import javax.inject.Inject;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+import org.hadatac.console.http.SPARQLUtilsFacetSearch;
 import org.hadatac.console.models.FacetFormData;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ObjectDetails;
+import org.hadatac.console.models.Pivot;
 
 import org.hadatac.entity.pojo.*;
 import org.slf4j.Logger;
@@ -34,6 +37,7 @@ import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import org.hadatac.console.controllers.dataacquisitionsearch.routes;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.data.model.AcquisitionQueryResult;
@@ -318,7 +322,7 @@ public class DataAcquisitionSearch extends Controller {
 
         long startTime = System.currentTimeMillis();
         AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
-        log.info("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
+        log.info("Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
@@ -331,22 +335,22 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
         	//System.out.println("Selected subject alignment");
         	promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-		        results.getDocuments(), finalFacets, email, categoricalOption),
-                    databaseExecutionContext);
+		        results.getDocuments(), finalFacets, email, categoricalOption), 
+	        		ec.current());
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
         	//System.out.println("Selected time alignment");
 	        promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileByTimeAlignment(
-			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption),
-                    databaseExecutionContext);
+			        results.getDocuments(), finalFacets, email, categoricalOption, timeOption), 
+		        		ec.current());
         }
 
         promiseOfResult.whenComplete(
                 (result, exeception) -> {
-                    log.info("DOWNLOA: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
+                    log.info("downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
                 });
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
