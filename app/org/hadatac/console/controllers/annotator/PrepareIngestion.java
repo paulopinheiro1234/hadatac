@@ -10,10 +10,14 @@ import javax.inject.Inject;
 
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
-import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.console.views.html.annotator.prepareIngestion;
+import org.hadatac.console.views.html.annotator.selectStudy;
+import org.hadatac.console.views.html.annotator.selectDeployment;
+import org.hadatac.console.views.html.annotator.selectScope;
+import org.hadatac.console.views.html.annotator.selectSchema;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SelectScopeForm;
-import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.models.SysUser;
@@ -38,17 +42,17 @@ public class PrepareIngestion extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result create(String dir, String fileId, String da_uri) {
         final String kbPrefix = ConfigProp.getKbPrefix();
-        String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
+        String ownerEmail = "sheersha.kandwal@mssm.edu"; //TODO: fix this -- ownerEmail);
         STR da = null;
 
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, ownerEmail);
         if (dataFile == null) {
             return badRequest("[ERROR] Could not update file records with new DA information");
         }
-        
+
         System.out.println("DataFile's Dataset URI : [" + dataFile.getDatasetUri() + "]");
 
         // Load associated DA
@@ -65,7 +69,7 @@ public class PrepareIngestion extends Controller {
         }
 
         // OR create a new DA if the file is not associated with any existing DA
-        
+
         String da_label = "";
         String new_da_uri = "";
 
@@ -98,12 +102,12 @@ public class PrepareIngestion extends Controller {
         return ok(prepareIngestion.render(dir, fileId, da, "New data acquisition has been created to support file ingestion"));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postCreate(String dir, String fileId, String da_uri) {
         return create(dir, fileId, da_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result reconfigure(String dir, String fileId, String da_uri) {
         STR dataAcquisition = STR.findByUri(da_uri);
         if (null != dataAcquisition) {
@@ -113,7 +117,7 @@ public class PrepareIngestion extends Controller {
         return create(dir, fileId, da_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result refine(String dir, String fileId, String da_uri, String message) {
 
         STR da = null;
@@ -130,12 +134,12 @@ public class PrepareIngestion extends Controller {
         return badRequest("[ERROR] In PrepareIngestion.refine, cannot retrieve DA from provided URI");
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postRefine(String dir, String fileId, String da_uri, String message) {
         return refine(dir, fileId, da_uri, message);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectStudy(String dir, String fileId, String da_uri) {
 
         List<Study> studies = Study.find();
@@ -143,7 +147,7 @@ public class PrepareIngestion extends Controller {
         return ok(selectStudy.render(dir, fileId, da_uri, studies));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectScope(String dir, String fileId, String da_uri, String std_uri) {
 
         String[] fields = null;
@@ -185,11 +189,11 @@ public class PrepareIngestion extends Controller {
         List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(std_uri);
         System.out.println("Collection list size: " + ocList.size());
 
-        return ok(selectScope.render(dir, fileId, da_uri, ocList, Arrays.asList(fields), 
+        return ok(selectScope.render(dir, fileId, da_uri, ocList, Arrays.asList(fields),
                 rowScope, rowScopeUri, cellScope, cellScopeUri));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectDeployment(String dir, String fileId, String da_uri) {
 
         State active = new State(State.ACTIVE);
@@ -199,7 +203,7 @@ public class PrepareIngestion extends Controller {
         return ok(selectDeployment.render(dir, fileId, da_uri, deployments));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result selectSchema(String dir, String fileId, String da_uri) {
 
         List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
@@ -207,9 +211,9 @@ public class PrepareIngestion extends Controller {
         return ok(selectSchema.render(dir, fileId, da_uri, schemas));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectStudy(String dir, String fileId, String da_uri) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processSelectStudy(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         String message = "";
         AssignOptionForm data = form.get();
         String std_uri = data.getOption();
@@ -240,9 +244,9 @@ public class PrepareIngestion extends Controller {
         return refine(dir, fileId, da_uri, message);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectScope(String dir, String fileId, String da_uri) {
-        Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processSelectScope(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest(request);
         String message = "";
         SelectScopeForm data = form.get();
         String rowScopeUri = data.getNewRowScopeUri();
@@ -275,9 +279,9 @@ public class PrepareIngestion extends Controller {
         return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with scope information"));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectDeployment(String dir, String fileId, String da_uri) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processSelectDeployment(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         String message = "";
         AssignOptionForm data = form.get();
         String dep_uri = data.getOption();
@@ -300,7 +304,7 @@ public class PrepareIngestion extends Controller {
             da.setDeploymentUri(dep_uri);
 
             da.saveToSolr();
-            
+
             return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
         }
 
@@ -308,9 +312,9 @@ public class PrepareIngestion extends Controller {
         return refine(dir, fileId, da_uri, message);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectSchema(String dir, String fileId, String da_uri) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processSelectSchema(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         String message = "";
         AssignOptionForm data = form.get();
         String das_uri = data.getOption();
@@ -333,7 +337,7 @@ public class PrepareIngestion extends Controller {
             da.setSchemaUri(das_uri);
 
             da.saveToSolr();
-            
+
             return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with data acquisition schema information"));
         }
 
@@ -341,7 +345,7 @@ public class PrepareIngestion extends Controller {
         return refine(dir, fileId, da_uri, message);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result removeAssociation(String dir, String fileId, String da_uri, String daComponent) {
 
         String message = "";
@@ -353,37 +357,37 @@ public class PrepareIngestion extends Controller {
 
         switch (daComponent) {
 
-        // removing a study's relationship also removes scope information
-        case "Study":  
-            da.setStudyUri("");
-            //da.setRowScopeUri("");
-            //da.setRowScopeName("");
-            da.setCellScopeUri(new ArrayList<String>());
-            da.setCellScopeName(new ArrayList<String>());
-            break;
+            // removing a study's relationship also removes scope information
+            case "Study":
+                da.setStudyUri("");
+                //da.setRowScopeUri("");
+                //da.setRowScopeName("");
+                da.setCellScopeUri(new ArrayList<String>());
+                da.setCellScopeName(new ArrayList<String>());
+                break;
 
-        case "Scope":  
-            //da.setRowScopeUri("");
-            //da.setRowScopeName("");
-            da.setCellScopeUri(new ArrayList<String>());
-            da.setCellScopeName(new ArrayList<String>());
-            break;
+            case "Scope":
+                //da.setRowScopeUri("");
+                //da.setRowScopeName("");
+                da.setCellScopeUri(new ArrayList<String>());
+                da.setCellScopeName(new ArrayList<String>());
+                break;
 
-        case "Deployment":  
-            da.setDeploymentUri("");
-            break;
+            case "Deployment":
+                da.setDeploymentUri("");
+                break;
 
-        case "Schema":  
-            da.setSchemaUri("");
+            case "Schema":
+                da.setSchemaUri("");
         }
 
         da.saveToSolr();
-            
+
         message = "Association with " + daComponent + " removed from the Stream Specification.";
         return ok(prepareIngestion.render(dir, fileId, da, message));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result completeDataAcquisition(String dir, String fileId, String da_uri) {
         String message = "";
         STR da = STR.findByUri(da_uri);
@@ -393,9 +397,9 @@ public class PrepareIngestion extends Controller {
         }
 
         da.setStatus(9999);
-        
+
         da.saveToSolr();
-        
+
         message = "Stream Specification set as complete";
         return ok(prepareIngestion.render(dir, fileId, da, message));
     }

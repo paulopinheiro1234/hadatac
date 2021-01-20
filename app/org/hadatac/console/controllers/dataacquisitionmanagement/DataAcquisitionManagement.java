@@ -1,9 +1,9 @@
 package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import org.apache.commons.io.FileUtils;
-import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
-import org.hadatac.console.controllers.triplestore.UserManagement;
+//import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import play.data.Form;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.FormFactory;
 
@@ -46,17 +47,17 @@ public class DataAcquisitionManagement extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(int stateId) {
         List<STR> results = null;
         State state = new State(stateId);
-        final SysUser user = AuthApplication.getLocalUser(session());
-        if (user.isDataManager()) {
+//        final SysUser user = AuthApplication.getLocalUser(session());
+//        if (user.isDataManager()) {
             results = STR.findAll(state);
-        } else {
-            String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-            results = STR.find(ownerUri, state);
-        }
+//        } else {
+//            String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+//            results = STR.find(ownerUri, state);
+//        }
 
         for (STR dataAcquisition : results) {
             dataAcquisition.setSchemaUri(URIUtils.replaceNameSpaceEx(dataAcquisition.getSchemaUri()));
@@ -68,48 +69,48 @@ public class DataAcquisitionManagement extends Controller {
             }
         });
 
-        return ok(dataAcquisitionManagement.render(state, results, user.isDataManager()));
+        return ok(dataAcquisitionManagement.render(state, results, true)); //TODO : fix this -- user.isDataManager()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(int stateId) {
         return index(stateId);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result newDataAcquisition() {
 
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+//        final SysUser sysUser = AuthApplication.getLocalUser(session());
 
         Map<String, String> nameList = new HashMap<String, String>();
         List<User> groups = UserGroup.find();
         for (User group : groups) {
             nameList.put(group.getUri(), group.getName());
         }
-        
+
         for (String uri : User.getUserURIs()) {
             nameList.put(uri, uri);
         }
 
         return ok(newDataAcquisition.render(
-        		Study.find(),
-        		DataAcquisitionSchema.findAll(),
+                Study.find(),
+                DataAcquisitionSchema.findAll(),
                 Deployment.find(new State(State.ACTIVE)),
                 nameList,
-                User.getUserEmails(), 
-                sysUser.isDataManager()));
+                User.getUserEmails(),
+                true)); //TODO -- fix this sysUser.isDataManager()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postNewDataAcquisition() {
         return newDataAcquisition();
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm() {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(Http.Request request) {
+//        final SysUser sysUser = AuthApplication.getLocalUser(session());
 
-        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
+        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest(request);
         DataAcquisitionForm data = form.get();
 
         if (form.hasErrors()) {
@@ -125,9 +126,9 @@ public class DataAcquisitionManagement extends Controller {
         da.setSchemaUri(data.getNewSchema());
         da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
         da.setParameter(data.getNewParameter());
-        if (sysUser.isDataManager()) {
+//        if (sysUser.isDataManager()) {
             da.setOwnerUri(data.getNewOwner());
-        }
+//        }
         da.setPermissionUri(data.getNewPermission());
         DateTimeFormatter isoFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm a");
         da.setStartedAt(isoFormat.parseDateTime(data.getNewStartDate()));
@@ -136,11 +137,11 @@ public class DataAcquisitionManagement extends Controller {
         return redirect(routes.DataAcquisitionManagement.index(State.ACTIVE));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result generateSTRFileFromForm(String dir) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result generateSTRFileFromForm(String dir, Http.Request request) {
+//        final SysUser sysUser = AuthApplication.getLocalUser(session());
 
-        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
+        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest(request);
         DataAcquisitionForm data = form.get();
 
         if (form.hasErrors()) {
@@ -166,22 +167,22 @@ public class DataAcquisitionManagement extends Controller {
 
         headers.add(Templates.DATAACQUISITIONNAME);
         row.add(data.getDaName());
-        
+
         headers.add(Templates.DATADICTIONARYNAME);
         row.add(data.getSddName());
-        
+
         headers.add(Templates.DEPLOYMENTURI);
         row.add(data.getDeploymentUri());
-        
+
         headers.add(Templates.CELLSCOPE);
         row.add(data.getCellScope());
-        
+
         headers.add(Templates.OWNEREMAIL);
         row.add(data.getOwnerEmail());
-        
+
         headers.add(Templates.PERMISSIONURI);
         row.add(data.getPermissionUri());
-        
+
         try {
             FileUtils.writeStringToFile(file, String.join(",", headers) + "\n", "utf-8", true);
             FileUtils.writeStringToFile(file, String.join(",", row) + "\n", "utf-8", true);
@@ -189,7 +190,7 @@ public class DataAcquisitionManagement extends Controller {
             e.printStackTrace();
         }
 
-        dataFile = DataFile.create(filename, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.FREEZED);
+//        dataFile = DataFile.create(filename, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.FREEZED);
 
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, "."));
     }

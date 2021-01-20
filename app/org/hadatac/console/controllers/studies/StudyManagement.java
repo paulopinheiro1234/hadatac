@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.studies;
 
 import java.util.List;
 
+import org.hadatac.Constants;
 import org.hadatac.entity.pojo.Study;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -15,14 +16,14 @@ import play.mvc.Controller;
 
 public class StudyManagement extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index() {
-    	List<Study> theResults = Study.find();
-    	
+        List<Study> theResults = Study.find();
+
         return ok(studyManagement.render(theResults));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex() {
         return index();
     }

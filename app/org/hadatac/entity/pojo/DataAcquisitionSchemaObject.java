@@ -49,7 +49,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     private static Map<String, DataAcquisitionSchemaObject> getCache() {
         if (DASOCache == null) {
-            DASOCache = new HashMap<String, DataAcquisitionSchemaObject>(); 
+            DASOCache = new HashMap<String, DataAcquisitionSchemaObject>();
         }
         return DASOCache;
     }
@@ -60,16 +60,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public DataAcquisitionSchemaObject() {}
 
-    public DataAcquisitionSchemaObject(String uri, 
-            String label, 
-            String partOfSchema,
-            String position,
-            String entity, 
-            String role, 
-            String inRelationTo, 
-            String inRelationToLabel,
-            String wasDerivedFrom,
-            String relation) {
+    public DataAcquisitionSchemaObject(String uri,
+                                       String label,
+                                       String partOfSchema,
+                                       String position,
+                                       String entity,
+                                       String role,
+                                       String inRelationTo,
+                                       String inRelationToLabel,
+                                       String wasDerivedFrom,
+                                       String relation) {
         this.uri = uri;
         this.label = label;
         this.partOfSchema = partOfSchema;
@@ -199,7 +199,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         }
         if (!getEntityNamespace().equals("")) {
             annotation += " [" + getEntityNamespace() + "]";
-        } 
+        }
         return annotation;
     }
 
@@ -287,16 +287,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         if (DataAcquisitionSchemaObject.getCache().containsKey(uri)) {
             return DataAcquisitionSchemaObject.getCache().get(uri);
         }
-        
-        //System.out.println("Looking for data acquisition schema object with uri: " + uri);
+
+        //System.out.println("Looking for org.hadatac.data acquisition schema object with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom ?alternativeName WHERE { \n" + 
-                "   <" + uri + "> a hasco:DASchemaObject . \n" + 
-                "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
-                "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" + 
-                "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" + 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom ?alternativeName WHERE { \n" +
+                "   <" + uri + "> a hasco:DASchemaObject . \n" +
+                "   <" + uri + "> hasco:partOfSchema ?partOfSchema . \n" +
+                "   OPTIONAL { <" + uri + "> hasco:hasEntity ?entity } . \n" +
+                "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" +
                 "   OPTIONAL { <" + uri + "> sio:SIO_000668 ?inRelationTo } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:Relation ?relation } . \n" +
                 "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
@@ -334,9 +334,9 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 labelStr = FirstLabel.getPrettyLabel(uri);
 
                 try {
-                    if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {
-                        entityStr = soln.getResource("entity").getURI();
-                    } 
+                    if (soln.getResource("org/hadatac/entity") != null && soln.getResource("org/hadatac/entity").getURI() != null) {
+                        entityStr = soln.getResource("org/hadatac/entity").getURI();
+                    }
                 } catch (Exception e1) {
                     entityStr = "";
                 }
@@ -344,7 +344,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 try {
                     if (soln.getResource("partOfSchema") != null && soln.getResource("partOfSchema").getURI() != null) {
                         partOfSchemaStr = soln.getResource("partOfSchema").getURI();
-                    } 
+                    }
                 } catch (Exception e1) {
                     partOfSchemaStr = "";
                 }
@@ -352,7 +352,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 try {
                     if (soln.getResource("role") != null && soln.getResource("role").getURI() != null) {
                         roleStr = soln.getResource("role").getURI();
-                    } 
+                    }
                 } catch (Exception e1) {
                     roleStr = "";
                 }
@@ -418,13 +418,13 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static List<String> findUriBySchema(String schemaUri) {
-        //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
+        //System.out.println("Looking for org.hadatac.data acquisition schema objects for <" + schemaUri + ">");
 
         List<String> objectUris = new ArrayList<String>();
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?uri WHERE { \n" + 
-                "   ?uri a hasco:DASchemaObject . \n" + 
-                "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri WHERE { \n" +
+                "   ?uri a hasco:DASchemaObject . \n" +
+                "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" +
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -453,14 +453,14 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
-        //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
+        //System.out.println("Looking for org.hadatac.data acquisition schema objects for <" + schemaUri + ">");
 
         List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { \n" + 
-                "   ?uri a hasco:DASchemaObject . \n" + 
-                "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" + 
-                "   ?uri rdfs:label ?label . \n" + 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri ?label ?hasEntity ?hasRole ?inRelationTo ?relation WHERE { \n" +
+                "   ?uri a hasco:DASchemaObject . \n" +
+                "   ?uri hasco:partOfSchema <" + schemaUri + "> . \n" +
+                "   ?uri rdfs:label ?label . \n" +
                 "} " +
                 "ORDER BY ?label";
 
@@ -513,7 +513,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             if (daso.getRole().equals(newInRelationTo)) {
                 return URIUtils.replacePrefixEx(daso.getUri());
             }
-        } 
+        }
         return "";
     }
 
@@ -541,16 +541,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         insert += this.getUri() + " a hasco:DASchemaObject . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
         if (partOfSchema.startsWith("http")) {
-            insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
+            insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  ";
         } else {
-            insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
-        } 
+            insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  ";
+        }
         if (!role.equals("")) {
-            insert += this.getUri() + " hasco:hasRole  \"" + role + "\" . "; 
+            insert += this.getUri() + " hasco:hasRole  \"" + role + "\" . ";
         }
         if (!entity.equals("")) {
             insert += this.getUri() + " hasco:hasEntity "  + entity + " .  ";
-        }   
+        }
         if (!inRelationTo.equals("")) {
             String inRelationToStr =  URIUtils.replacePrefixEx(inRelationTo);
             if (inRelationToStr.startsWith("<")) {

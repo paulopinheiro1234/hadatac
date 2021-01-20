@@ -3,7 +3,10 @@ package org.hadatac.console.controllers.studies;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 
@@ -29,19 +32,20 @@ public class NewStudy extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    private Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {
-        return indexFromFile("/", "");
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result index(Http.Request request) {
+        return indexFromFile("/", "", request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result postIndex(Http.Request request) {return index(request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result indexFromFile(String dir, String fileId) {
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result indexFromFile(String dir, String fileId, Http.Request request) {
         List<Agent> organizations = Agent.findOrganizations();
         List<Agent> persons = Agent.findPersons();
         StudyType studyType = new StudyType();
@@ -49,7 +53,7 @@ public class NewStudy extends Controller {
         String ownerEmail = null;
 
         if (fileId != null && !fileId.equals("")) {
-            ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
+            ownerEmail = AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail();
             file = DataFile.findByIdAndEmail(fileId, ownerEmail);
         }
 
@@ -57,16 +61,16 @@ public class NewStudy extends Controller {
 
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndexFromFile(String dir, String filename) {
-        return indexFromFile(dir, filename);
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result postIndexFromFile(String dir, String filename, Http.Request request) {
+        return indexFromFile(dir, filename, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir, String filename, String da_uri) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processForm(String dir, String filename, String da_uri, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
-        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
+        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest(request);
         StudyForm data = form.get();
 
         if (form.hasErrors()) {
@@ -92,37 +96,37 @@ public class NewStudy extends Controller {
 
         // insert current state of the STD
         Study std = new Study(newId,
-			      newURI,
-			      newStudyType,
-			      newLabel,
-			      newTitle,
-			      newProject,
-			      newComment,
-			      newExternalSource,
-			      newInstitution,
-			      newAgent,
-			      newStartDateTime,
-			      newStartDateTime);
-	
+                newURI,
+                newStudyType,
+                newLabel,
+                newTitle,
+                newProject,
+                newComment,
+                newExternalSource,
+                newInstitution,
+                newAgent,
+                newStartDateTime,
+                newStartDateTime);
+
         // insert the new STD content inside of the triplestore regardless of any change -- the previous content has already been deleted
         std.save();
 
         System.out.println("Inserting new Study from file. filename:  " + filename + "   da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
         System.out.println("Inserting new Study from file. Study URI : [" + std.getUri() + "]");
-        
-        // when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA 
+
+        // when a new study is created in the scope of a datafile, the new study needs to be associated to the datafile's DA
         if (filename != null && !filename.equals("") && da_uri != null && !da_uri.equals("")) {
             STR da = STR.findByUri(URIUtils.replacePrefixEx(da_uri));
             if (da != null) {
                 da.setStudyUri(std.getUri());
-                
+
                 System.out.println("Inserting new Study from file. Found DA");
                 da.save();
             } else {
                 System.out.println("[WARNING] DA from associated DataFile not found when creating a new study");
             }
         }
-        
+
         return ok(newStudyConfirm.render(std, dir, filename, da_uri));
     }
 }

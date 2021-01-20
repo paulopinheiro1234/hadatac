@@ -1,4 +1,4 @@
-10005:org.hadatac.console.service.MyUserServicePlugin
+1500:com.typesafe.plugin.CommonsMailerPlugin
 #10010:com.feth.play.module.pa.providers.oauth2.google.GoogleAuthProvider
 #10020:com.feth.play.module.pa.providers.oauth2.facebook.FacebookAuthProvider
 #10030:com.feth.play.module.pa.providers.oauth2.foursquare.FoursquareAuthProvider
@@ -11,6 +11,5 @@
 #10100:com.feth.play.module.pa.providers.oauth2.untappd.UntappdAuthProvider
 #10110:com.feth.play.module.pa.providers.oauth2.pocket.PocketAuthProvider
 #10120:com.feth.play.module.pa.providers.oauth2.github.GithubAuthProvider
-10130:org.hadatac.console.providers.MyStupidBasicAuthProvider
 #10140:com.feth.play.module.pa.providers.wwwauth.negotiate.SpnegoAuthProvider
 #10150:com.feth.play.module.pa.providers.oauth2.eventbrite.EventBriteAuthProvider

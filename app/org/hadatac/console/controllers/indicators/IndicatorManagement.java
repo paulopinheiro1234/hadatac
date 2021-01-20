@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.indicators;
 
 import java.util.List;
 
+import org.hadatac.Constants;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.utils.State;
 
@@ -16,13 +17,13 @@ import play.mvc.Controller;
 
 public class IndicatorManagement extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index() {
-    	List<Indicator> theResults = Indicator.findSubClasses();
+        List<Indicator> theResults = Indicator.findSubClasses();
         return ok(indicatorManagement.render(theResults));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex() {
         return index();
     }

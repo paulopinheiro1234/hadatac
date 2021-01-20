@@ -24,14 +24,20 @@ import org.hadatac.console.models.FacetFormData;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetsWithCategories;
 import org.hadatac.console.models.SpatialQueryResults;
-import org.hadatac.console.models.SysUser;
+//import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ObjectDetails;
 
 import org.hadatac.entity.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import model.Pivot;
+
+import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.ObjectCollection;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
@@ -79,7 +85,7 @@ public class DataAcquisitionSearch extends Controller {
             }
             for (String uri: setObj) {
                 if (uri != null) {
-                	// NEEDS TO REPLACE WITH VIEWSTUDYOBJECT
+                    // NEEDS TO REPLACE WITH VIEWSTUDYOBJECT
                     //String html = ViewSubject.findBasicHTML(uri);
                     //if (html != null) {
                     //    objDetails.putObject(uri, html);
@@ -111,26 +117,26 @@ public class DataAcquisitionSearch extends Controller {
             return indexInternal(0, page, rows);
         }
     }
-
-    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(int page, int rows) {
-        return index(page, rows);
+//
+//    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndex(int page, int rows, Http.Request request) {
+        return index(page, rows, request);
     }
 
-    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result indexData(int page, int rows) {
-        return indexInternal(1, page, rows);
+//    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result indexData(int page, int rows, Http.Request request) {
+        return indexInternal(1, page, rows, request);
     }
 
-    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndexData(int page, int rows) {
-        return indexData(page, rows);
+//    // @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postIndexData(int page, int rows, Http.Request request) {
+        return indexData(page, rows, request);
     }
 
-    private Result indexInternal(int mode, int page, int rows) {
+    private Result indexInternal(int mode, int page, int rows, Http.Request request) {
         String facets = "";
-        if (request().body().asFormUrlEncoded() != null) {
-            facets = request().body().asFormUrlEncoded().get("facets")[0];
+        if (request.body().asFormUrlEncoded() != null) {
+            facets = request.body().asFormUrlEncoded().get("facets")[0];
         }
 
         //System.out.println("\n\n\n\n\nfacets: " + facets);
@@ -140,16 +146,16 @@ public class DataAcquisitionSearch extends Controller {
 
         AcquisitionQueryResult results = null;
         String ownerUri;
-        final SysUser user = AuthApplication.getLocalUser(session());
-        if (null == user) {
+//        final SysUser user = AuthApplication.getLocalUser(request.session());
+//        if (null == user) {
             ownerUri = "Public";
-        }
-        else {
-            ownerUri = UserManagement.getUriByEmail(user.getEmail());
-            if (null == ownerUri){
-                ownerUri = "Public";
-            }
-        }
+//        }
+//        else {
+//            ownerUri = UserManagement.getUriByEmail(user.getEmail());
+//            if (null == ownerUri){
+//                ownerUri = "Public";
+//            }
+//        }
         //System.out.println("OwnerURI: " + ownerUri);
 
         results = Measurement.find(ownerUri, page, rows, facets);
@@ -263,15 +269,15 @@ public class DataAcquisitionSearch extends Controller {
                     fileNames, objs));
         }
     }
-
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result download() {    	
-        String ownerUri = getOwnerUri();
-        String email = getUserEmail();
+//
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result download(Http.Request request) {
+        String ownerUri = getOwnerUri(request);
+        String email = getUserEmail(request);
 
         String facets = "";
         List<String> selectedFields = new LinkedList<String>();
-        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         if (name_map != null) {
             facets = name_map.get("facets")[0];
 
@@ -286,7 +292,7 @@ public class DataAcquisitionSearch extends Controller {
 
         final String finalFacets = facets;
         CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
-                results.getDocuments(), finalFacets, selectedFields, email), 
+                results.getDocuments(), finalFacets, selectedFields, email),
                 ec.current());
 
         try {
@@ -298,17 +304,17 @@ public class DataAcquisitionSearch extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadAlignment() {
-        String ownerUri = getOwnerUri();
-        String email = getUserEmail();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result downloadAlignment(Http.Request request) {
+        String ownerUri = getOwnerUri(request);
+        String email = getUserEmail(request);
 
         String facets = "";
         String objectType = "";
         String categoricalValues = "";
         String timeResolution = "";
         List<String> selectedFields = new LinkedList<String>();
-        Map<String, String[]> name_map = request().body().asFormUrlEncoded();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         if (name_map != null) {
             facets = name_map.get("facets")[0];
             objectType = name_map.get("selObjectType")[0].toString();
@@ -354,38 +360,39 @@ public class DataAcquisitionSearch extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-    private String getUserEmail() {
-        final SysUser user = AuthApplication.getLocalUser(session());
-        if (null != user) {
-            return user.getEmail();
-        }
+    private String getUserEmail(Http.Request request) {
+//        final SysUser user = AuthApplication.getLocalUser(request.session());
+//        if (null != user) {
+//            return user.getEmail();
+//        }
 
-        return "";
+        return "sheersha.kandwal@mssm.edu";
+//        return "";
     }
 
-    private String getOwnerUri() {
+    private String getOwnerUri(Http.Request request) {
         String ownerUri = "";
-        final SysUser user = AuthApplication.getLocalUser(session());
-        if (null == user) {
+//        final SysUser user = AuthApplication.getLocalUser(request.session());
+//        if (null == user) {
             ownerUri = "Public";
-        } else {
-            ownerUri = UserManagement.getUriByEmail(user.getEmail());
-            if(null == ownerUri){
-                ownerUri = "Public";
-            }
-        }
+//        } else {
+//            ownerUri = UserManagement.getUriByEmail(user.getEmail());
+//            if(null == ownerUri){
+//                ownerUri = "Public";
+//            }
+//        }
 
         return ownerUri;
     }
-
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postDownload() {
-        return download();
+//
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postDownload(Http.Request request) {
+        return download(request);
     }
-
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postDownloadAlignment() {
-        return downloadAlignment();
+//
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result postDownloadAlignment(Http.Request request) {
+        return downloadAlignment(request);
     }
 
     private static void printMemoryStats() {

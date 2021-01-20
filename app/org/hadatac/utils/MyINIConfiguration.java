@@ -8,7 +8,7 @@ import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public class MyINIConfiguration extends INIConfiguration {
-    
+
     public MyINIConfiguration(String filePath) {
         try {
             read(new InputStreamReader(MyINIConfiguration.class.getClassLoader().getResourceAsStream(filePath)));

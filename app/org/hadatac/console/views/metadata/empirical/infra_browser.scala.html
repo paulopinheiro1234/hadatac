@@ -1,3 +1,5 @@
+@import org.hadatac.console.views.html.metadata.empirical.empirical_navigation
+@import org.hadatac.console.views.html.metadata.empirical.typeManagement
 @(dir       : String,
   fileId    : String,
   da_uri    : String,
@@ -10,7 +12,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.metadata._
 
-@main("Hierarchies") {
+@main("Hierarchies","","") {
 
     @empirical_navigation(dir, fileId, da_uri, category)
 

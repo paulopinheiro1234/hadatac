@@ -1,13 +1,14 @@
+@import org.hadatac.console.views.html.deployments.deploymentButton
 @(deployment      : org.hadatac.entity.pojo.Deployment,
-  dataCollections : List[org.hadatac.entity.pojo.STR],
-  urlReturn       : String)
+        dataCollections : List[org.hadatac.entity.pojo.STR],
+        urlReturn       : String)
 
 @import java.net._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.deployments._
 
-@main("View Deployment") {
+@main("View Deployment","","") {
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
@@ -15,137 +16,137 @@
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-5">
-           <h2>View Deployment</h2>
+            <h2>View Deployment</h2>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-md-5">            
+        <div class="col-md-5">
             <h3>Basic Info</h3>
+            <ul>
+                <li><b>URI</b>: @deployment.getUri()</li>
+                <li><b>Platform</b>: @deployment.getPlatform().getLabel()</li>
                 <ul>
-                    <li><b>URI</b>: @deployment.getUri()</li>
-                    <li><b>Platform</b>: @deployment.getPlatform().getLabel()</li>
-                    <ul>
-                       <li><b>First Coordinate</b>: @deployment.getPlatform().getFirstCoordinate()</li>
-                       <li><b>Second Coordinate</b>: @deployment.getPlatform().getSecondCoordinate() </li>
-                       <li><b>Third Coordinate</b>: @deployment.getPlatform().getThirdCoordinate()</li>
-                    </ul>
-                    @if(deployment.getInstrument() != null) {
-                       <li><b>Instrument</b>: @deployment.getInstrument().getLabel()</li>
-                       <ul>
-                         <li><b>Model</b>: @deployment.getInstrument().getTypeLabel()</li>
-						 @if(deployment.getInstrument.getTypeURL() != null && !deployment.getInstrument.getTypeURL().isEmpty()) {
-                             <li><b>On the Web</b>: <a href="@deployment.getInstrument().getTypeURL()">@deployment.getInstrument().getTypeURL()</a></li>
-						 }
-                         <li><b>Serial Number</b>: @deployment.getInstrument().getSerialNumber()</li>
-                      </ul>
-                    }
-                    <li><b>Start Date/Time</b>: @deployment.getStartedAt()</li>
-                    <li><b>End Date/Time</b>: @deployment.getEndedAt()</li>
+                    <li><b>First Coordinate</b>: @deployment.getPlatform().getFirstCoordinate()</li>
+                    <li><b>Second Coordinate</b>: @deployment.getPlatform().getSecondCoordinate() </li>
+                    <li><b>Third Coordinate</b>: @deployment.getPlatform().getThirdCoordinate()</li>
                 </ul>
-	    </div>
+                @if(deployment.getInstrument() != null) {
+                    <li><b>Instrument</b>: @deployment.getInstrument().getLabel()</li>
+                    <ul>
+                        <li><b>Model</b>: @deployment.getInstrument().getTypeLabel()</li>
+                        @if(deployment.getInstrument.getTypeURL() != null && !deployment.getInstrument.getTypeURL().isEmpty()) {
+                            <li><b>On the Web</b>: <a href="@deployment.getInstrument().getTypeURL()">@deployment.getInstrument().getTypeURL()</a></li>
+                        }
+                        <li><b>Serial Number</b>: @deployment.getInstrument().getSerialNumber()</li>
+                    </ul>
+                }
+                <li><b>Start Date/Time</b>: @deployment.getStartedAt()</li>
+                <li><b>End Date/Time</b>: @deployment.getEndedAt()</li>
+            </ul>
+        </div>
         <div class="col-md-5">
             <div class="row">
-            <h3>Sensing Info</h3>
+                <h3>Sensing Info</h3>
                 <ul>
-                   @for(detector <- deployment.getDetectors()) {
-                      <li><b>Detector</b>: @detector.getLabel()</li>
-                      <ul>
-                         <li><b>Model</b>: @deployment.getInstrument().getTypeLabel()</li>
-						 @if(deployment.getInstrument.getTypeURL() != null && !deployment.getInstrument.getTypeURL().isEmpty()) {
-                             <li><b>On the Web</b>: <a href="@deployment.getInstrument().getTypeURL()">@deployment.getInstrument().getTypeURL()</a></li>
-						 }
-                         <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
-                         <li><b>Characteristic</b>: </li>
-                      </ul>   
-                   }
-                   @for(detector <- deployment.getInstrument().getAttachments()) {
-                      <li><b>Detector</b>: @detector.getLabel() (permanently attached to instrument)</li>
-                      <ul>
-                         <li><b>Model</b>: @detector.getTypeLabel()</li>
-						 @if(detector.getTypeURL() != null && !detector.getTypeURL().isEmpty()) {
-                             <li><b>On the Web</b>: <a href="@detector.getTypeURL()">@detector.getTypeURL()</a></li>
-						 }
-                         <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
-                         <li><b>Characteristic</b>: </li>
-                      </ul>   
-                   }
+                    @for(detector <- deployment.getDetectors()) {
+                        <li><b>Detector</b>: @detector.getLabel()</li>
+                        <ul>
+                            <li><b>Model</b>: @deployment.getInstrument().getTypeLabel()</li>
+                            @if(deployment.getInstrument.getTypeURL() != null && !deployment.getInstrument.getTypeURL().isEmpty()) {
+                                <li><b>On the Web</b>: <a href="@deployment.getInstrument().getTypeURL()">@deployment.getInstrument().getTypeURL()</a></li>
+                            }
+                            <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
+                            <li><b>Characteristic</b>: </li>
+                        </ul>
+                    }
+                    @for(detector <- deployment.getInstrument().getAttachments()) {
+                        <li><b>Detector</b>: @detector.getLabel() (permanently attached to instrument)</li>
+                        <ul>
+                            <li><b>Model</b>: @detector.getTypeLabel()</li>
+                            @if(detector.getTypeURL() != null && !detector.getTypeURL().isEmpty()) {
+                                <li><b>On the Web</b>: <a href="@detector.getTypeURL()">@detector.getTypeURL()</a></li>
+                            }
+                            <li><b>Serial Number</b>: @detector.getSerialNumber()</li>
+                            <li><b>Characteristic</b>: </li>
+                        </ul>
+                    }
                 </ul>
-        	</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
 
-	@if(deployment.getPlatform().hasGeoReference()) {
+    @if(deployment.getPlatform().hasGeoReference()) {
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-4">
-	            <h3>Geo-Location</h3>
+                <h3>Geo-Location</h3>
                 <div class="row text-center">
                     <div style="width:95%; height:500px" id="map"></div>
                     <script type="text/javascript">locations=["@deployment.getPlatform().getFirstCoordinate()","@deployment.getPlatform().getSecondCoordinate()"];createMap(locations);</script>
                 </div>
             </div>
         </div>
-	}
+    }
 
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-11">
             <h3>Deployment's Data Streams</h3>
-               <div class="container-fluid">
-                 <table class="table">
+            <div class="container-fluid">
+                <table class="table">
                     <thead>
-                      <tr>
-                        <th>Triggering Event</th>
-                        <th>Start Date/Time</th>
-                        <th>End Date/Time</th>
-                        <th># of Data Points</th>
-                        <th>Operations</th>
-                      </tr>
+                        <tr>
+                            <th>Triggering Event</th>
+                            <th>Start Date/Time</th>
+                            <th>End Date/Time</th>
+                            <th># of Data Points</th>
+                            <th>Operations</th>
+                        </tr>
                     </thead>
                     <tbody>
-                       @for(dc <- dataCollections){
-                          <tr>
-                             <td>@dc.getTriggeringEventName()</td> 
-                             <td>@dc.getStartedAt()</td>
-                             <td>@dc.getEndedAt()</td>
-                             <td>@dc.getNumberDataPoints()</td>
-                             <td>
+                    @for(dc <- dataCollections){
+                        <tr>
+                            <td>@dc.getTriggeringEventName()</td>
+                            <td>@dc.getStartedAt()</td>
+                            <td>@dc.getEndedAt()</td>
+                            <td>@dc.getNumberDataPoints()</td>
+                            <td>
                                 <a href="@org.hadatac.console.controllers.streams.routes.StreamVisualization.index("", "", URLEncoder.encode(dc.getUri(), "UTF-8"))"
-                                         class="btn-xs btn-primary" role="button">Visualize Data</a>
-                             </td>
-                          </tr>
-                       }
+                                class="btn-xs btn-primary" role="button">Visualize Data</a>
+                            </td>
+                        </tr>
+                    }
                     </tbody>
-                 </table>
-               </div>
+                </table>
+            </div>
         </div>
     </div>
 
-      @defining("/") { dir => 
-         @defining("") { filename => 
-            @defining("") { da_uri => 
-			   @if(urlReturn == null || urlReturn.isEmpty()) {
-                  @defining(0) { page => 
-                     @deploymentButton(true, dir, filename, da_uri, page) 
-                  }
-               } else {
-                  <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-11">
-                       @if(urlReturn.equals(DeploymentBrowser.GEODEPLOYMENT)) {
-     	                   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "", "")" 
-     	                   class="btn-sm btn-primary" role="button">Back</a>
-                       } else {
-     	                   <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, urlReturn,"")" 
-    	                   class="btn-sm btn-primary" role="button">Back</a>
-                       }
-	                </div>
-	              </div>
-               }
+    @defining("/") { dir =>
+        @defining("") { filename =>
+            @defining("") { da_uri =>
+                @if(urlReturn == null || urlReturn.isEmpty()) {
+                    @defining(0) { page =>
+                        @deploymentButton(true, dir, filename, da_uri, page)
+                    }
+                } else {
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-11">
+                        @if(urlReturn.equals(DeploymentBrowser.GEODEPLOYMENT)) {
+                            <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, "", "")"
+                            class="btn-sm btn-primary" role="button">Back</a>
+                        } else {
+                            <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index(dir, filename, da_uri, urlReturn,"")"
+                            class="btn-sm btn-primary" role="button">Back</a>
+                        }
+                        </div>
+                    </div>
+                }
             }
-         }
-      }
+        }
+    }
 
 }

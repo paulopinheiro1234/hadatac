@@ -1,146 +1,155 @@
 @(collection_url : String,
-  indicatorList : List[String],
-  bAdmin : Boolean)
+indicatorList : List[String],
+bAdmin : Boolean)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Study Browser Home") {
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
-	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
-	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")"/>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.facetview.js")"></script>
-	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("css/facetview.css")"/>
- 	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("css/style.css")"/>
-	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.css")"/>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
-	
-	<script type="text/javascript">
-jQuery(document).ready(function($) {
-  $('.facet-view-simple').each(function() {
-  $(this).facetview({
-    search_url: '@collection_url',
-    search_index: 'solr',
-    datatype: 'json',
-    facets: [ 
-    	@for(studyIndicator <- indicatorList){
-    		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi', 
-    		'display': '@studyIndicator'
-    		},
-    }],
-    search_sortby: [
-        {'field':'studyUri.exact', 'display':'Study URI'},
-    	@for(studyIndicator <- indicatorList){
-    		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi.exact', 
-    		'display': '@studyIndicator'
-    		},
-    }],
-    searchbox_fieldselect: [
-        {'field':'studyUri.exact', 'display':'Study URI'},
-    	@for(studyIndicator <- indicatorList){
-    		{
-    		'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi.exact', 
-    		'display': '@studyIndicator'
-    		},
-    }],
-    paging: {
-      size: 10
-    },
-    predefined_filters: {
-        //'owner.exact': {'term':{'owner.exact':'test'}}
-    },
-    result_display : [
-        [
-          {
-            "pre" : " ",
-              "field" : "studyLabel_str",
-            "post" : ": "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Study Title:</b> ",
-            "field" : "studyShortDesc_str",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Study Description:</b> ",
-            "field" : "studyTitle_str",
-            "post" : " "
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Institution:</b> ",
-            "field" : "institutionName_str",
-            "post" : "\n"
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Principal Investigator(s):</b> ",
-            "field" : "agentName_str",
-            "post" : "\n"
-          }
-        ],
-        [
-          {
-            "pre" : "<b>Comment:</b> ",
-            "field" : "studyComment_str",
-            "post" : ""
-          }
-        ]
-    ],
-    default_operator: "AND",
-    default_freetext_fuzzify: "*"
+@main("Study Browser Home","","") {
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("
+    javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
+<link rel="stylesheet" href="@controllers.routes.Assets.versioned("
+    javascripts/vendor/bootstrap/css/bootstrap.min.css")" />
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("
+    javascripts/vendor/linkify/1.0/jquery.linkify-1.0-min.js")"></script>
+<link rel="stylesheet" href="@controllers.routes.Assets.versioned("
+    javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css")" />
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("
+    javascripts/vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js")"></script>
+<script type="text/javascript" src="@controllers.routes.Assets.versioned(" javascripts/jquery.facetview.js")"></script>
+<link rel="stylesheet" href="@controllers.routes.Assets.versioned(" css/facetview.css")" />
+<link rel="stylesheet" href="@controllers.routes.Assets.versioned(" css/style.css")" />
+<link rel="stylesheet" href="@controllers.routes.Assets.versioned(" javascripts/vendor/c3-0.4.10/c3.css")" />
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("
+    javascripts/vendor/d3-3.5.6/d3.min.js")"></script>
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("
+    javascripts/vendor/c3-0.4.10/c3.min.js")"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function ($) {
+        $('.facet-view-simple').each(function () {
+            $(this).facetview({
+                search_url: '@collection_url',
+                search_index: 'solr',
+                datatype: 'json',
+                facets: [
+                            @for (studyIndicator < - indicatorList) {
+                {
+                    'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi',
+                        'display': '@studyIndicator'
+                },
+            }],
+            search_sortby: [
+                { 'field': 'studyUri.exact', 'display': 'Study URI' },
+                            @for (studyIndicator < - indicatorList) {
+                {
+                    'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi.exact',
+                        'display': '@studyIndicator'
+                },
+            }],
+            searchbox_fieldselect: [
+                { 'field': 'studyUri.exact', 'display': 'Study URI' },
+                            @for (studyIndicator < - indicatorList) {
+                {
+                    'field': '@studyIndicator.replace(" ","").replace(",","")_str_multi.exact',
+                        'display': '@studyIndicator'
+                },
+            }],
+            paging: {
+                size: 10
+            },
+            predefined_filters: {
+                //'owner.exact': {'term':{'owner.exact':'test'}}
+            },
+            result_display: [
+                [
+                    {
+                        "pre": " ",
+                        "field": "studyLabel_str",
+                        "post": ": "
+                    }
+                ],
+                [
+                    {
+                        "pre": "<b>Study Title:</b> ",
+                        "field": "studyShortDesc_str",
+                        "post": " "
+                    }
+                ],
+                [
+                    {
+                        "pre": "<b>Study Description:</b> ",
+                        "field": "studyTitle_str",
+                        "post": " "
+                    }
+                ],
+                [
+                    {
+                        "pre": "<b>Institution:</b> ",
+                        "field": "institutionName_str",
+                        "post": "\n"
+                    }
+                ],
+                [
+                    {
+                        "pre": "<b>Principal Investigator(s):</b> ",
+                        "field": "agentName_str",
+                        "post": "\n"
+                    }
+                ],
+                [
+                    {
+                        "pre": "<b>Comment:</b> ",
+                        "field": "studyComment_str",
+                        "post": ""
+                    }
+                ]
+            ],
+                default_operator: "AND",
+                    default_freetext_fuzzify: "*"
+        });
     });
-  });
-});
-    </script>
-	<hr>  
-    <div class="container-fluid">
+            });
+</script>
+<hr>
+<div class="container-fluid">
     <div class="page-header">
-      <h2>
-      Study Faceted Search
-      </h2>
-   </div>
-   	@if(bAdmin) {
-		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.update()" class="btn btn-primary" role="button">Update</a>
-   	}
-   <!-- Trigger the modal with a button -->
-   <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
-   <!-- Modal -->
-   <div class="content">
-	 <div class="facet-view-simple"></div>
-   </div> 
-   <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
-	<div id="myModal" class="modal fade" role="dialog">
-	  <div class="modal-dialog">
-	    <!-- Modal content-->
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Download</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Format:</p>
-	        <select class="form-control" id="sel_format">
-              <option>CSV</option>
-              <option>JSON</option>
-            </select>
-	        <a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-}
+        <h2>
+            Study Faceted Search
+        </h2>
+    </div>
+    @if(bAdmin) {
+    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.update()"
+        class="btn btn-primary" role="button">Update</a>
+    }
+    <!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Download</button>
+    <!-- Modal -->
+    <div class="content">
+        <div class="facet-view-simple"></div>
+    </div>
+    <div id="download_url" style="visibility: hidden ;">
+        @org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Download</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Format:</p>
+                    <select class="form-control" id="sel_format">
+                        <option>CSV</option>
+                        <option>JSON</option>
+                    </select>
+                    <a href="" class="btn btn-info" role="button" id="btn_download">Confirm</a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    }

@@ -125,7 +125,7 @@ public class FacetHandler {
     /**
      * To transform the constraints hold by a given facet object
      * into an executable Solr query for getting its corresponding
-     * data point statistics.
+     * org.hadatac.data point statistics.
      * @param facet The facet to be transformed
      * @return String An executable Solr query
      */
@@ -151,7 +151,7 @@ public class FacetHandler {
         if (query.isEmpty()) {
             query = "*:*";
         } else {
-            query = "(" + query + ")"; 
+            query = "(" + query + ")";
         }
 
         return query;
@@ -160,7 +160,7 @@ public class FacetHandler {
     /**
      * To transform the constraints specified by user selections
      * for all facets into an executable Solr query for getting
-     * data point statistics.
+     * org.hadatac.data point statistics.
      * @return String Executable Solr queries
      */
     public String toSolrQuery() {
@@ -179,7 +179,7 @@ public class FacetHandler {
         if (query.isEmpty()) {
             query = "*:*";
         } else {
-            query = "(" + query + ")"; 
+            query = "(" + query + ")";
         }
 
         return query;

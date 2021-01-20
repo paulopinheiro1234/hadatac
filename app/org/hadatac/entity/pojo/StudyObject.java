@@ -1249,7 +1249,7 @@ public class StudyObject extends HADatAcThing {
 
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += " DELETE WHERE { \n";
-        if (study_uri.startsWith("http")) {
+        if (study_uri.startsWith("org.hadatac.console.http")) {
             query += "<" + this.getUri() + ">";
         } else {
             query += this.getUri();

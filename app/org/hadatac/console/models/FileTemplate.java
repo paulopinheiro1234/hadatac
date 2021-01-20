@@ -28,48 +28,48 @@ public class FileTemplate {
     public static FileTemplate SSD_HHEAR = new FileTemplate("SSD", "HHEAR", routes.Assets.versioned(new Asset("example/data/templates/hhear/SSD.xlsx")).toString());
     public static FileTemplate SDD_HHEAR = new FileTemplate("SDD", "HHEAR", routes.Assets.versioned(new Asset("example/data/templates/hhear/SDD.xlsx")).toString());
     public static FileTemplate STR_HHEAR = new FileTemplate("STR", "HHEAR", routes.Assets.versioned(new Asset("example/data/templates/hhear/STR.csv")).toString());
-    
+
     public static List<FileTemplate> FILETEMPLATES = Arrays.asList(
-            DPL_GEN, STD_GEN, SSD_GEN, SDD_GEN, STR_GEN, 
+            DPL_GEN, STD_GEN, SSD_GEN, SDD_GEN, STR_GEN,
             DPL_HHEAR, STD_HHEAR, SSD_HHEAR, SDD_HHEAR, STR_HHEAR);
 
     public FileTemplate(String name, String template, String path) {
-    	this.name = name;
-    	this.template = template;
-    	this.path = path;
+        this.name = name;
+        this.template = template;
+        this.path = path;
     }
-    
+
     public static FileTemplate find(String name, String template) {
-    	for (FileTemplate tp : FILETEMPLATES) {
-    		if (tp.getName().equals(name) && tp.getTemplate().equals(template)) {
-    			return tp;
-    		}
-    	}
-    	return null;
+        for (FileTemplate tp : FILETEMPLATES) {
+            if (tp.getName().equals(name) && tp.getTemplate().equals(template)) {
+                return tp;
+            }
+        }
+        return null;
     }
-    
+
     public String getName() {
-    	return name;
+        return name;
     }
 
     public void setName(String name) {
-    	this.name = name;
+        this.name = name;
     }
-    
+
     public String getTemplate() {
-    	return template;
+        return template;
     }
 
     public void setTemplate(String template) {
-    	this.template = template;
+        this.template = template;
     }
-    
+
     public String getPath() {
-    	return path;
+        return path;
     }
 
     public void setPath(String path) {
-    	this.path = path;
+        this.path = path;
     }
-        
+
 }

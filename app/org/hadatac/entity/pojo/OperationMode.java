@@ -18,33 +18,33 @@ import org.hadatac.utils.CollectionUtil;
 
 
 public class OperationMode {
-	@Field("user_email")
-	private String userEmail = "";
-	@Field("operation_mode_str")
-	private String operationMode = "";
-	@Field("last_enter_time_str")
+    @Field("user_email")
+    private String userEmail = "";
+    @Field("operation_mode_str")
+    private String operationMode = "";
+    @Field("last_enter_time_str")
     private String lastEnterTime = "";
-	
-	public static final String REGULAR = "regular";
-	public static final String SANDBOX = "sandbox";
-	
-	public OperationMode() {}
 
-	public String getUserEmail() {
-		return userEmail;
-	}
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
-	
-	public String getOperationMode() {
-		return operationMode;
-	}
-	public void setOperationMode(String operationMode) {
-		this.operationMode = operationMode;
-	}
-	
-	public String getLastEnterTime() {
+    public static final String REGULAR = "regular";
+    public static final String SANDBOX = "sandbox";
+
+    public OperationMode() {}
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getOperationMode() {
+        return operationMode;
+    }
+    public void setOperationMode(String operationMode) {
+        this.operationMode = operationMode;
+    }
+
+    public String getLastEnterTime() {
         return lastEnterTime;
     }
     public void setLastEnterTime(String lastEnterTime) {
@@ -121,19 +121,19 @@ public class OperationMode {
         SolrQuery query = new SolrQuery();
         query.set("q", "*:*");
         query.set("rows", "10000000");
-        
+
         return findByQuery(query);
     }
-	
-	public static OperationMode findByEmail(String email) {
-		SolrQuery query = new SolrQuery();
-		query.set("q", "user_email:\"" + email + "\"");
-		query.set("rows", "10000000");
-		List<OperationMode> modes = findByQuery(query);
-		if (modes.isEmpty()) {
-			return null;
-		}
-		
-		return modes.get(0);
-	}
+
+    public static OperationMode findByEmail(String email) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "user_email:\"" + email + "\"");
+        query.set("rows", "10000000");
+        List<OperationMode> modes = findByQuery(query);
+        if (modes.isEmpty()) {
+            return null;
+        }
+
+        return modes.get(0);
+    }
 }

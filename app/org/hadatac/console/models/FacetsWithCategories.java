@@ -15,7 +15,7 @@ public class FacetsWithCategories {
 
 
     public FacetsWithCategories() {}
-    
+
     //TODO update this to create facets Map
     public FacetsWithCategories(Map<String, Boolean> facet_categories, ArrayList<String> all_facets){
         this.categories = new TreeMap<String, Boolean>(facet_categories);

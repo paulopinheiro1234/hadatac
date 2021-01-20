@@ -19,42 +19,42 @@ public class FileType {
     public static List<FileType> FILETYPES = new ArrayList<FileType>(Arrays.asList(DPL, STD, SSD, SDD, STR));
 
     public static FileType find(String name) {
-    	for (FileType ft : FILETYPES) {
-    		if (ft.getName().equals(name)) {
-    			return ft;
-    		}
-    	}
-    	return null;
+        for (FileType ft : FILETYPES) {
+            if (ft.getName().equals(name)) {
+                return ft;
+            }
+        }
+        return null;
     }
-    
+
     public FileType(String name, String longName, String suffix) {
-    	this.name = name;
-    	this.longName = longName;
-    	this.suffix = suffix;
+        this.name = name;
+        this.longName = longName;
+        this.suffix = suffix;
     }
-    
+
     public String getName() {
-    	return name;
+        return name;
     }
 
     public void setName(String name) {
-    	this.name = name;
+        this.name = name;
     }
-    
+
     public String getLongName() {
-    	return longName;
+        return longName;
     }
 
     public void setLongName(String longName) {
-    	this.longName = longName;
+        this.longName = longName;
     }
-    
+
     public String getSuffix() {
-    	return suffix;
+        return suffix;
     }
 
     public void setSuffix(String suffix) {
-    	this.suffix = suffix;
+        this.suffix = suffix;
     }
-        
+
 }

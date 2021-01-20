@@ -16,7 +16,7 @@
 @import org.hadatac.entity.pojo.DataFile;
 @import java.net._
 
-@main("CSV Preview"){
+@main("CSV Preview","",""){
    <style>
      .col-selected { background: #AED6F1; }
    </style>
@@ -63,7 +63,7 @@
 
 	    <input type="submit" id="colSelector" name="colSelector" class="btn btn-primary" disabled="disabled"
  		   role="button" value="Generate Objects" formmethod="post"
-		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(dir, fileId, da_uri, oc_uri, page)">
+@*		   formaction="@org.hadatac.console.controllers.objects.routes.NewObjectsFromFile.processForm(dir, fileId, da_uri, oc_uri, page)">*@
             </input>
 	    <a href=""  id="reset" name="reset" class="btn btn-primary"
  	       role="button">Reset</a>

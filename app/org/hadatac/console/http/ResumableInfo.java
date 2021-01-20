@@ -45,7 +45,7 @@ public class ResumableInfo {
             return true;
         }
     }
-    
+
     public boolean checkIfUploadFinished() {
         //check if upload finished
         int count = (int) Math.ceil(((double) resumableTotalSize) / ((double) resumableChunkSize));

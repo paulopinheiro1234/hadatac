@@ -1,35 +1,35 @@
 @(dir         : String,
-  filename    : String,
-  da_uri      : String,
-  page        : Integer,
-  studyList   : List[String],
-  results     : List[org.hadatac.entity.pojo.STR],
-  show        : Boolean)
-  
+        filename    : String,
+        da_uri      : String,
+        page        : Integer,
+        studyList   : List[String],
+        results     : List[org.hadatac.entity.pojo.STR],
+        show        : Boolean)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 @import org.hadatac.utils._
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Message Stream Ingestion") {
+@main("Message Stream Ingestion","","") {
 
     <h2>Message Stream Ingestion</h2>
-    
+
     <div class="container-fluid">
 
         <h3>Stream Status</h3>
 
         @if(show) {
-        	<a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, false)">Hide Topics</a>
-        } else { 
+            <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, false)">Hide Topics</a>
+        } else {
             <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, true)">Show Topics</a>
         }
         <a class="btn btn-primary" role="button" href="@org.hadatac.console.controllers.messages.routes.MessageManagement.refreshCache(dir, filename, da_uri, page, true)">Refresh Cache</a>
 
         <table class="table">
             <thead>
-                 <tr>
+                <tr>
                     <th>Topic</th>
                     <th>IP</th>
                     <th>Port</th>
@@ -42,12 +42,12 @@
                     <th>#IngestedMsgs</th>
                     <th>State Operations</th>
                     <th>Other Operations</th>
-                 </tr>
+                </tr>
             </thead>
             <tbody>
-              @for(stream <- results){
-                  @stream_entry(dir, filename, da_uri, page, studyList, stream, show)
-              }
+            @for(stream <- results){
+                @stream_entry(dir, filename, da_uri, page, studyList, stream, show)
+            }
             </tbody>
         </table>
 
@@ -55,40 +55,40 @@
 
         <table class="table">
             <thead>
-                 <tr>
+                <tr>
                     <th>Status</th>
                     <th>Meaning</th>
-                 </tr>
+                </tr>
             </thead>
             <tbody>
-                 <tr>
+                <tr>
                     <td>SUSPENDED</td>
                     <td>A stream is available to acquire data although no data is being acquired. A suspended stream can be activated or closed.</td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
                     <td>ACTIVE</td>
                     <td>A stream is available and its data is being acquired and ingested into the knowledge graph. An active stream can be suspended or closed.</td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
                     <td>CLOSED</td>
                     <td>A closed stream is no longer available to collect data. Once a message stream is closed it can no longer be used to acquire data.</td>
-                 </tr>
+                </tr>
             </tbody>
         </table>
         @mainButton(false)
     </div>
 
-    <!--
+        <!--
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
     <script>
     var refreshVar
-	refreshVar = setTimeout(function() { 
+	refreshVar = setTimeout(function() {
 		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageManagement.index(dir, filename, da_uri, page, show)";
 		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
+		window.location.href = hrefValue;
 	}, 2000);
-   </script> 
-   -->
+   </script>
+    -->
 
 }

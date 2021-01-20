@@ -681,7 +681,7 @@ public class MeasurementGenerator extends BaseGenerator {
                         }
                     }
                 } else {
-                    // Assign the entity of inRelationToDaso to inRelationToUri
+                    // Assign the org.hadatac.entity of inRelationToDaso to inRelationToUri
                     measurement.setInRelationToUri(inRelationToDaso.getEntity());
                 }
             }

@@ -43,7 +43,7 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
     public int hashCode() {
         return getUri().hashCode();
     }
-    
+
     @Override
     public long getNumber(Facet facet, FacetHandler facetHandler) {
         return getNumberFromSolr(facet, facetHandler);
@@ -70,13 +70,13 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
 
         return -1;
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromSolr(facet, facetHandler);
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacetsFromSolr(
             Facet facet, FacetHandler facetHandler) {
@@ -106,14 +106,14 @@ public class AttributeInstance extends HADatAcThing implements Comparable<Attrib
             return null;
         }
 
-        Pivot pivot = Pivot.parseQueryResponse(queryResponse);            
+        Pivot pivot = Pivot.parseQueryResponse(queryResponse);
         return parsePivot(pivot, facet, query.toString());
 
     }
 
     private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
-        
+
         for (Pivot pivot_ent : pivot.children) {
             AttributeInstance attrib = new AttributeInstance();
             attrib.setUri(pivot_ent.getValue());

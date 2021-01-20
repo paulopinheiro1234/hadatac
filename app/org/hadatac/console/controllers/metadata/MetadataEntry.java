@@ -44,17 +44,17 @@ public class MetadataEntry extends Controller {
     public Result postIndex(String tabName) {
         return index(tabName);
     }
-    
+
     public Result indexByUri(String uri) {
         System.out.println("Request indicator URI: " + uri);
-        
+
         Indicator indicator = Indicator.find(uri);
         if (indicator == null) {
             return badRequest();
         }
-        
+
         String tabName = indicator.getLabel().replace(" ", "");
-        
+
         return index(tabName);
     }
 

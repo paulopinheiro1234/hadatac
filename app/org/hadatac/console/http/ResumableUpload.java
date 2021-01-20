@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import play.mvc.Http;
 import play.mvc.Http.Request;
 
 public class ResumableUpload {

@@ -1,8 +1,9 @@
-@()
+@* @import org.springframework.test.web.servlet.result.MockMvcResultMatchers.request*@
+@* @()*@
 
-@import org.hadatac.console.views.html._
+@* @import org.hadatac.console.views.html._*@
 
-@main(Messages("playauthenticate.token.error.title")) {
-	<h1>@Messages("playauthenticate.token.error.title")</h1>
-	<p>@Messages("playauthenticate.token.error.message")</p>
-}
+@* @main(Messages("playauthenticate.token.error.title")(implicit request: RequestHeader, messagesProvider: MessagesProvider){*@
+@*	<h1>@Messages("playauthenticate.token.error.title")</h1>*@
+@*	<p>@Messages("playauthenticate.token.error.message")</p>*@
+@*}*@

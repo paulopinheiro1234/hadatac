@@ -1,10 +1,9 @@
 @(mode: String,
   dasa : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute)
 
-@import java.net._
-@import org.hadatac.utils._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.metadata.loader.URIUtils
+
 
 @for(attr <- dasa.getAttributes()) {
 	@if(!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))){

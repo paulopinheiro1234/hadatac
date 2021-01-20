@@ -191,8 +191,8 @@ public class Facet {
     }
 
     /**
-     * To transform the constraints hold by this facet object 
-     * into an executable Solr query for getting data point 
+     * To transform the constraints hold by this facet object
+     * into an executable Solr query for getting org.hadatac.data point
      * statistics.
      * @return String An executable Solr query
      */
@@ -229,9 +229,9 @@ public class Facet {
     }
 
     /**
-     * To transform the constraints hold by a dictionary of 
-     * field values into an executable Solr query for getting 
-     * data point statistics.
+     * To transform the constraints hold by a dictionary of
+     * field values into an executable Solr query for getting
+     * org.hadatac.data point statistics.
      * @return String An executable Solr query
      */
     private String fieldValuesToSolrQuery(Map<String, List<String>> fieldValues) {
@@ -254,8 +254,8 @@ public class Facet {
 
     /**
      * To transform the constraints hold by the leaf node children
-     * of this facet object into an executable Solr query for getting 
-     * data point statistics.
+     * of this facet object into an executable Solr query for getting
+     * org.hadatac.data point statistics.
      * @return String An executable Solr query
      */
     public String bottommostFacetsToSolrQuery() {
