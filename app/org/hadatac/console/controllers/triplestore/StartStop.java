@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.triplestore;
 
+import org.hadatac.Constants;
 import play.*;
 import play.mvc.*;
 
@@ -12,7 +13,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class StartStop extends Controller {
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
 	public Result index(String oper, String repository) {	    
 		String message = Repository.startStopMetadataRepository(oper, repository);
 		if (message.equals("FAIL")) {
@@ -21,7 +22,7 @@ public class StartStop extends Controller {
 		return ok(clean.render("doneOk"));
     }
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     public Result postIndex(String oper, String repository) {
 		String message = Repository.startStopMetadataRepository(oper, repository);
 		if (message.equals("FAIL")) {

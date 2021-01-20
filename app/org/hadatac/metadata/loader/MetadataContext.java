@@ -49,7 +49,7 @@ public class MetadataContext implements RDFContext {
                 false);
         return metadata.totalTriples();
     }
-
+//
     public Long totalTriples() {
         try {
             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -110,7 +110,7 @@ public class MetadataContext implements RDFContext {
     }
 
     /*
-     *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
+     *   contentType correspond to the mime type required for curl to process the org.hadatac.data provided. For example, application/rdf+xml is
      *   used to process rdf/xml content.
      */
     public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
@@ -124,9 +124,9 @@ public class MetadataContext implements RDFContext {
                 RepositoryConnection con = repo.getConnection();
                 ValueFactory factory = repo.getValueFactory();
                 if (graphUri.isEmpty()) {
-                	con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createBNode());
+                    con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createBNode());
                 } else {
-                	con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
+                    con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
                 }
             }
         } catch (NotFoundException e) {

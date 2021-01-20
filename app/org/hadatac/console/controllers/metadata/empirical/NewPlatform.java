@@ -2,7 +2,9 @@ package org.hadatac.console.controllers.metadata.empirical;
 
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 import play.data.FormFactory;
@@ -27,7 +29,7 @@ public class NewPlatform extends Controller {
 	@Inject
 	private FormFactory formFactory;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result index(String dir, String fileId, String da_uri) {
 
 		PlatformType platformType = new PlatformType();
@@ -35,16 +37,17 @@ public class NewPlatform extends Controller {
 		return ok(newPlatform.render(dir, fileId, da_uri, platformType));
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
 	public Result postIndex(String dir, String fileId, String da_uri) {
 		return index(dir, fileId, da_uri);
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String dir, String fileId, String da_uri) {
-		final SysUser sysUser = AuthApplication.getLocalUser(session());
+	//TODO: fix this
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+	public Result processForm(String dir, String fileId, String da_uri, Http.Request request) {
+//		final SysUser sysUser = AuthApplication.getLocalUser(request.session());
 
-		Form<PlatformForm> form = formFactory.form(PlatformForm.class).bindFromRequest();
+		Form<PlatformForm> form = formFactory.form(PlatformForm.class).bindFromRequest(request);
 		PlatformForm data = form.get();
 
 		if (form.hasErrors()) {

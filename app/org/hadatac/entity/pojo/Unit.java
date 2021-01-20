@@ -18,20 +18,20 @@ import org.hadatac.utils.NameSpaces;
 
 public class Unit extends HADatAcClass implements Comparable<Unit> {
 
-	static String className = "uo:0000000";
+    static String className = "uo:0000000";
 
-	public Unit() {
-		super(className);
-	}
+    public Unit() {
+        super(className);
+    }
 
-	public static List<Unit> find() {
-		List<Unit> units = new ArrayList<Unit>();
-		String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				" SELECT ?uri WHERE { " +
-				" ?uri rdfs:subClassOf* sio:SIO_000052 . " + 
-				"} ";
+    public static List<Unit> find() {
+        List<Unit> units = new ArrayList<Unit>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT ?uri WHERE { " +
+                " ?uri rdfs:subClassOf* sio:SIO_000052 . " +
+                "} ";
 
-		ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
 		while (resultsrw.hasNext()) {

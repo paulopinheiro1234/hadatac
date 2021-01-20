@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.schema;
 
+import play.mvc.Http;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.http.GetSparqlQuery;
 
@@ -8,20 +9,15 @@ import play.mvc.Result;
 import play.data.*;
 import javax.inject.Inject;
 
-import org.hadatac.console.views.html.schema.*;
+//import views.html.schema.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 import org.hadatac.console.models.DataAcquisitionSchemaForm;
 import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.schema.NewDAS;
-import org.hadatac.console.controllers.annotator.FileProcessing;
+//import controllers.AuthApplication;
+import org.hadatac.console.views.html.schema.newDAS;
 
 public class NewDAS extends Controller {
 
@@ -44,20 +40,20 @@ public class NewDAS extends Controller {
         return thePlatforms;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index() {
         
         return ok(newDAS.render());
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex() {
         return index();
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm() {
-        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(Http.Request request) {
+        Form<DataAcquisitionSchemaForm> form = formFactory.form(DataAcquisitionSchemaForm.class).bindFromRequest(request);
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }
@@ -68,24 +64,24 @@ public class NewDAS extends Controller {
         DataAcquisitionSchema das = DataFactory.createDataAcquisitionSchema(label);
 
         das.save();
-        return ok(DASConfirm.render("New Data Acquisition Schema", 
+        return ok(org.hadatac.console.views.html.schema.DASConfirm.render("New Data Acquisition Schema",
                 String.format("Rows have been inserted in Table \"DataAcquisitionSchema\" \n"),data.getLabel()));
      }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processFormFromFile(String attributes) {
     	
         DataAcquisitionSchema das = new DataAcquisitionSchema();
 
-        return ok(editDAS.render(das));
+        return ok(org.hadatac.console.views.html.schema.editDAS.render(das));
        
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processFormFromFileLabels(String attributes) {
 
     	DataAcquisitionSchema das = new DataAcquisitionSchema();
     	    	
-        return ok(editDAS.render(das));
+        return ok(org.hadatac.console.views.html.schema.editDAS.render(das));
     }
 }

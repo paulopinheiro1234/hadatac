@@ -27,9 +27,9 @@ import org.hadatac.metadata.loader.URIUtils;
 public class GenericInstance extends HADatAcThing implements Comparable<GenericInstance> {
 
     public GenericInstance(String uri,
-            String typeUri,
-            String label,
-            String comment) {
+                           String typeUri,
+                           String label,
+                           String comment) {
         this.uri = uri;
         this.typeUri = typeUri;
         this.label = label;
@@ -44,11 +44,11 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
     }
 
     public String getTypeLabel() {
-    	PlatformType pltType = PlatformType.find(getTypeUri());
-    	if (pltType == null || pltType.getLabel() == null) {
-    		return "";
-    	}
-    	return pltType.getLabel();
+        PlatformType pltType = PlatformType.find(getTypeUri());
+        if (pltType == null || pltType.getLabel() == null) {
+            return "";
+        }
+        return pltType.getLabel();
     }
 
     public static GenericInstance find(String uri) {
@@ -65,9 +65,9 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
 
         StmtIterator stmtIterator = model.listStatements();
         if (!stmtIterator.hasNext()) {
-        	return instance;
+            return instance;
         }
-        
+
         instance = new GenericInstance();
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
@@ -89,9 +89,9 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
     public static int getNumberGenericInstances(String requiredClass) {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += " select (count(?uri) as ?tot) where { " + 
-                " ?model rdfs:subClassOf* " + requiredClass + " . " + 
-                " ?uri a ?model ." + 
+        query += " select (count(?uri) as ?tot) where { " +
+                " ?model rdfs:subClassOf* " + requiredClass + " . " +
+                " ?uri a ?model ." +
                 "}";
 
         try {
@@ -109,13 +109,13 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
     }
 
     public static String jsonInstanceStatisticsByType(String requiredClass) {
-    	String result = "[['Model', 'Quantity']";
+        String result = "[['Model', 'Quantity']";
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += " select ?modelName (count(?uri) as ?tot) where { " + 
-                " ?model rdfs:subClassOf* " + requiredClass + " . " + 
+        query += " select ?modelName (count(?uri) as ?tot) where { " +
+                " ?model rdfs:subClassOf* " + requiredClass + " . " +
                 " ?model rdfs:label ?modelName . " +
-                " ?uri a ?model ." + 
+                " ?uri a ?model ." +
                 " } " +
                 " GROUP BY ?modelName ";
         System.out.println(query);
@@ -130,9 +130,9 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
                 i = Integer.parseInt(soln.getLiteral("tot").getString());
                 n = soln.getLiteral("modelName").getString();
                 if (n != null && !n.isEmpty()) {
-                	result = result + ", ['" + n + "'," + i + "]";
+                    result = result + ", ['" + n + "'," + i + "]";
                 }
-            }	
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,11 +142,11 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
 
     public static List<GenericInstance> findGenericWithPages(String requiredClass, int pageSize, int offset) {
         List<GenericInstance> instances = new ArrayList<GenericInstance>();
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-        		"SELECT ?uri WHERE { " + 
-                " ?model rdfs:subClassOf* " + requiredClass + " . " + 
-                " ?uri a ?model . } " + 
-                " LIMIT " + pageSize + 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri WHERE { " +
+                " ?model rdfs:subClassOf* " + requiredClass + " . " +
+                " ?uri a ?model . } " +
+                " LIMIT " + pageSize +
                 " OFFSET " + offset;
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(

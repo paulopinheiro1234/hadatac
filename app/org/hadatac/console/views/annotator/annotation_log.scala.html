@@ -1,6 +1,6 @@
 @(log : String,
-  postAction : String
-  )
+        postAction : String
+)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -11,29 +11,29 @@
 @import org.hadatac.console.controllers.annotator._
 @import java.net._
 
-@main("Annotation Log") {
-	
-	<div class="container-fluid">
-   	<div id="end-process-box" style="display:none;">
-		<h4>Annotation Logs: </h4>
-  	</div>
-	
-	<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+@main("Annotation Log","","") {
 
-	<script>
-		var msg = '@log';
-		var msg2 = decodeURIComponent(msg);
-		console.log(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
-       	$('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
-		  document.getElementById('end-process-box').style.display = 'inline';
-		
-	
-	</script>
-	
-	
-	
-    <br><br>
-    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>
-    <a href="@postAction" class="btn btn-primary" role="button">Back</a>
-	</div>
+    <div class="container-fluid">
+        <div id="end-process-box" style="display:none;">
+            <h4>Annotation Logs: </h4>
+        </div>
+
+        <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+
+        <script>
+                var msg = '@log';
+                var msg2 = decodeURIComponent(msg);
+                console.log(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
+                $('#msgarea').html(msg2.replace(/&amp;lt;br&amp;gt;/g, '<br>').replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;'));
+                document.getElementById('end-process-box').style.display = 'inline';
+
+
+        </script>
+
+
+
+        <br><br>
+@*        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>*@
+        <a href="@postAction" class="btn btn-primary" role="button">Back</a>
+    </div>
 }

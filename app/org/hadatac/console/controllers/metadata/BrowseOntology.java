@@ -18,21 +18,22 @@ import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
 import play.libs.Json;
 
+
 public class BrowseOntology extends Controller {
     String file_id;
     public Result index(String oper) {
-	return ok(browseOntology.render(oper, EditingOptions.getEntities(), EditingOptions.getAttributes(), EditingOptions.getUnits()));
+        return ok(browseOntology.render(oper, EditingOptions.getEntities(), EditingOptions.getAttributes(), EditingOptions.getUnits()));
     }
 
     public Result postIndex(String oper) {
-	return index(oper);
+        return index(oper);
     }
 
     public Result graphIndex(String oper, String className) {
-        
-    //System.out.println(className);
-    //System.out.println(EditingOptions.getHierarchy(className));
-    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(),getF_ID()));
+
+        //System.out.println(className);
+        //System.out.println(EditingOptions.getHierarchy(className));
+        return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(),getF_ID()));
     }
 
 
@@ -46,7 +47,7 @@ public class BrowseOntology extends Controller {
             System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
             try{
                 folder.mkdir();
-            } 
+            }
             catch(SecurityException se){
                 System.out.println("Failed to create directory.");
             }
@@ -76,7 +77,7 @@ public class BrowseOntology extends Controller {
         file_id=fileid;
         return new Result(200);
     }
-    
+
 
     public String getF_ID(){
         return file_id;

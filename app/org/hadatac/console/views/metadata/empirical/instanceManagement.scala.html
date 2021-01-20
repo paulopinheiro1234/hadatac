@@ -1,3 +1,5 @@
+@import org.hadatac.console.views.html.metadata.empirical.empirical_navigation
+@import org.hadatac.console.views.html.metadata.empirical.instance_entry
 @(dir      : String,
   fileId   : String,
   da_uri   : String,
@@ -11,7 +13,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main(concept + " Management") {
+@main(concept + " Management","","") {
 
    @empirical_navigation(dir, fileId, da_uri, concept)
 

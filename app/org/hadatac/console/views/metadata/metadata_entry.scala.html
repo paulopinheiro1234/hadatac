@@ -1,37 +1,37 @@
 @(triple : org.hadatac.console.models.OtMTripleDocument)
 
 @*****************************
-  hasURI/label    | id (array[0])
+hasURI/label    | id (array[0])
 *****************************@
 
 @defining(triple.get("id").get(0)) {itemID =>
     @defining(itemID.replaceAll("[\\W]|_", "")) {cleanName =>
-    <div class="panel-heading" role="tab" id="heading@itemID">
-        <h4 class="panel-title">
-            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@cleanName">
+        <div class="panel-heading" role="tab" id="heading@itemID">
+            <h4 class="panel-title">
+                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#@cleanName" aria-expanded="false" aria-controls="@cleanName">
                 @itemID</a></h4>
-	 </div>
-    <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
-        <div class="panel-body">
-            <h3>@itemID</h3>
-            @defining(triple.get("label").get(0)) {theuri =>
-            <form>
-                <input type="text" size="80" value="@theuri">
-            </form>
-            }
         </div>
-        <h4>ID:</h4>
+        <div id="@cleanName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@cleanName">
+            <div class="panel-body">
+                <h3>@itemID</h3>
+                @defining(triple.get("label").get(0)) {theuri =>
+                    <form>
+                        <input type="text" size="80" value="@theuri">
+                    </form>
+                }
+            </div>
+            <h4>ID:</h4>
             @for(c <- triple.get("iden")) {
                 <p>@c</p>
             }
-        <h4>Comment:</h4>
+            <h4>Comment:</h4>
             @for(c <- triple.get("comment")) {
                 <p>@c</p>
             }
-        <h4>Note:</h4>
+            <h4>Note:</h4>
             @for(c <- triple.get("note")) {
                 <p>@c</p>
             }
-    </div>
+        </div>
     }
 }

@@ -4,30 +4,40 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
+import play.libs.Files.TemporaryFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.rdf.model.Model;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.triplestore.*;
+import org.hadatac.data.model.ParsingResult;
+import org.hadatac.console.controllers.triplestore.routes;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.metadata.loader.TripleProcessing;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.State;
 
 import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
+import org.hadatac.Constants;
 
 public class LoadKB extends Controller {
 
@@ -37,12 +47,12 @@ public class LoadKB extends Controller {
 	@Inject
 	private FormFactory formFactory;
 	
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     public Result loadKB(String oper) {
 		return ok(loadKB.render(oper, ""));
     }
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
 	public Result createInMemoryDataset(String oper) {
 		Model model = SPARQLUtilsFacetSearch.createInMemoryModel();
 		String msg = "in-memory model created, with # of triples = " + model.size();
@@ -50,7 +60,7 @@ public class LoadKB extends Controller {
 		return ok(loadInMemory.render(msg));
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     public Result postLoadKB(String oper) {
 		return ok(loadKB.render(oper, ""));
     }
@@ -73,7 +83,7 @@ public class LoadKB extends Controller {
 	}
     
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result uploadFile(String oper) {
     	System.out.println("uploadFile CALLED!");
@@ -108,40 +118,41 @@ public class LoadKB extends Controller {
     		return ok (loadKB.render("fail", "Error uploading file. Please try again."));
     	}
     }
-    
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+
+   @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
-    public Result uploadTurtleFile(String oper) {
-    	System.out.println("uploadTurtleFile CALLED!");
-    	FilePart uploadedfile = request().body().asMultipartFormData().getFile("pic");
-    	if (uploadedfile != null) {
-    		File file = (File)uploadedfile.getFile();
-    		File newFile = new File(UPLOAD_TURTLE_NAME);
-    		InputStream isFile;
-    		try {
-    			isFile = new FileInputStream(file);
-    			byte[] byteFile;
-    			try {
-    				byteFile = IOUtils.toByteArray(isFile);
-    				try {
-    					FileUtils.writeByteArrayToFile(newFile, byteFile);
-    				} catch (Exception e) {
-    					e.printStackTrace();
-    				}
-    				try {
-    					isFile.close();
-    				} catch (Exception e) {
-    					return ok (loadKB.render("fail", "Could not save uploaded file."));
-    				}
-    			} catch (Exception e) {
-    				return ok (loadKB.render("fail", "Could not process uploaded file."));
-    			}
-    		} catch (FileNotFoundException e1) {
-    			return ok (loadKB.render("fail", "Could not find uploaded file"));
-    		}
-    		return ok(loadKB.render("turtle", "File uploaded successfully."));
-    	} else {
-    		return ok (loadKB.render("fail", "Error uploading file. Please try again."));
-    	}
+    public Result uploadTurtleFile(String oper, Http.Request request) {
+        System.out.println("uploadTurtleFile CALLED!");
+        FilePart uploadedfile = request.body().asMultipartFormData().getFile("pic");
+        if (uploadedfile != null) {
+            TemporaryFile temporaryFile = (TemporaryFile) uploadedfile.getRef();
+            File file = temporaryFile.path().toFile();
+            File newFile = new File(UPLOAD_TURTLE_NAME);
+            InputStream isFile;
+            try {
+                isFile = new FileInputStream(file);
+                byte[] byteFile;
+                try {
+                    byteFile = IOUtils.toByteArray(isFile);
+                    try {
+                        FileUtils.writeByteArrayToFile(newFile, byteFile);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        isFile.close();
+                    } catch (Exception e) {
+                        return ok (loadKB.render("fail", "Could not save uploaded file."));
+                    }
+                } catch (Exception e) {
+                    return ok (loadKB.render("fail", "Could not process uploaded file."));
+                }
+            } catch (FileNotFoundException e1) {
+                return ok (loadKB.render("fail", "Could not find uploaded file"));
+            }
+            return ok(loadKB.render("turtle", "File uploaded successfully."));
+        } else {
+            return ok (loadKB.render("fail", "Error uploading file. Please try again."));
+        }
     }
 }

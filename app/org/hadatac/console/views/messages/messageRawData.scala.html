@@ -1,15 +1,15 @@
 @(dir            : String,
-  filename       : String,
-  da_uri         : String,
-  page           : Integer,
-  stream_uri     : String,
-  topic_uri      : String,
-  topic_label    : String,
-  results        : List[String],
-  postAction     : String,
-  show           : Boolean
-  )
-    
+        filename       : String,
+        da_uri         : String,
+        page           : Integer,
+        stream_uri     : String,
+        topic_uri      : String,
+        topic_label    : String,
+        results        : List[String],
+        postAction     : String,
+        show           : Boolean
+)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers._
@@ -17,53 +17,53 @@
 @import java.net.URLEncoder
 
 @maingraph("Message Stream Raw Data") {
-	<head>
+    <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
-	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
     </head>
     <body>
 
-    <div class="container-fluid">
-    	<h4>Stream Raw Data View</h4>
-    	@if(topic_uri.equals("")) {
-    	   <h4>Topic: All</h4>
-    	} else {		   	
-    	   <h4>Topic: @topic_label</h4>
-    	}
+        <div class="container-fluid">
+            <h4>Stream Raw Data View</h4>
+            @if(topic_uri.equals("")) {
+                <h4>Topic: All</h4>
+            } else {
+                <h4>Topic: @topic_label</h4>
+            }
 
-		<a href="@postAction" class="btn btn-primary" 
-	       role="button">Back</a>  		
-	
-	    <div class="row">
-        	<div class="col-lg-12">
+            <a href="@postAction" class="btn btn-primary"
+            role="button">Back</a>
 
-        	    <div id="content">
-        	      @for(line <- results){
-                     @line <br>
-                  }
-        	    </div>
-            	<div id="docs-container">
-                	<a id="docs-close" href="#">&times;</a>
-                	<div id="docs" class="docs"></div>
-            	</div>
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div id="content">
+                    @for(line <- results){
+                        @line <br>
+                        }
+                    </div>
+                    <div id="docs-container">
+                        <a id="docs-close" href="#">&times;</a>
+                        <div id="docs" class="docs"></div>
+                    </div>
+                </div>
             </div>
-		</div>
 
-	</div>
+        </div>
 
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-    <script>
-    var refreshVar
-	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri, topic_uri, postAction, show)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-	}, 1000);
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+        <script>
+                var refreshVar
+                refreshVar = setTimeout(function() {
+                    hrefValueEncoded = "@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, stream_uri, topic_uri, postAction, show)";
+                    hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                    window.location.href = hrefValue;
+                }, 1000);
 
-    </script> 
-   	</body>
-} 
+        </script>
+    </body>
+}

@@ -1,34 +1,34 @@
 @(dir           : String,
-  filename      : String,
-  da_uri        : String,
-  page          : Integer,
-  stream        : org.hadatac.entity.pojo.STR,
-  topic         : org.hadatac.entity.pojo.MessageTopic,
-  currentAction : String,
-  show          : Boolean)
+        filename      : String,
+        da_uri        : String,
+        page          : Integer,
+        stream        : org.hadatac.entity.pojo.STR,
+        topic         : org.hadatac.entity.pojo.MessageTopic,
+        currentAction : String,
+        show          : Boolean)
 
 @import java.net._
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader._
 
-	<tr>
-	  <td>@topic.getLabel()</td>
-	  <td>@if(topic.getDeployment() != null && topic.getDeployment().getPlatform().getLabel() != null) {
-     	  <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(topic.getDeployment().getUri(),"UTF-8"), "")" >
-	  	     @topic.getDeployment().getPlatform().getLabel()
-	      </a>	  
-	  } </td>
-	  <td>@if(topic.getStudyObject() != null && topic.getStudyObject().getOriginalId() != null) {
-	         @if(topic.getStudyObject().getTypeLabel() != null) {
-	         	@topic.getStudyObject().getTypeLabel() 
-	         }
-	  	     @topic.getStudyObject().getOriginalId()
-	  } </td>
-	  <td>@if(topic.getSOC() != null && topic.getSOC().getLabel() != null) {
-	         @topic.getSOC().getLabel()
-	  } </td>
-      <td>
-         <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction, show)"
-            class="btn-xs btn-primary" role="button">Live Raw Data</a>
-      </td>
-	</tr>
+<tr>
+    <td>@topic.getLabel()</td>
+    <td>@if(topic.getDeployment() != null && topic.getDeployment().getPlatform().getLabel() != null) {
+        <a href="@org.hadatac.console.controllers.deployments.routes.ViewDeployment.index(URLEncoder.encode(topic.getDeployment().getUri(),"UTF-8"), "")" >
+        @topic.getDeployment().getPlatform().getLabel()
+        </a>
+    } </td>
+    <td>@if(topic.getStudyObject() != null && topic.getStudyObject().getOriginalId() != null) {
+        @if(topic.getStudyObject().getTypeLabel() != null) {
+            @topic.getStudyObject().getTypeLabel()
+        }
+        @topic.getStudyObject().getOriginalId()
+    } </td>
+    <td>@if(topic.getSOC() != null && topic.getSOC().getLabel() != null) {
+        @topic.getSOC().getLabel()
+    } </td>
+    <td>
+        <a href="@org.hadatac.console.controllers.messages.routes.MessageRawData.index(dir, filename, da_uri, page, URLEncoder.encode(stream.getUri(), "UTF-8"), URLEncoder.encode(topic.getUri(), "UTF-8"), currentAction, show)"
+        class="btn-xs btn-primary" role="button">Live Raw Data</a>
+    </td>
+</tr>

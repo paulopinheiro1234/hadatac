@@ -16,9 +16,9 @@
         <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/moment-with-locales.js")"></script>
         <script type="text/javascript" src="@controllers.routes.Assets.versioned("lib/bootstrap/js/bootstrap.js")"></script>
         <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/bootstrap-datetimepicker.js")"></script>
-        <script type="text/javascript" src="@org.hadatac.console.controllers.routes.AuthApplication.jsRoutes" defer="defer"></script>
-        
-        <!-- Load React.
+@*        <script type="text/javascript" src="@org.hadatac.console.controllers.routes.AuthApplication.jsRoutes" defer="defer"></script>*@
+
+            <!-- Load React.
         <script src="https://unpkg.com/react@@16/umd/react.production.min.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@@16/umd/react-dom.production.min.js" crossorigin></script>
         -->
@@ -26,70 +26,70 @@
         <link rel="stylesheet" href="@controllers.routes.Assets.versioned("lib/bootstrap/css/bootstrap.css")">
         <link href="@controllers.routes.Assets.versioned("css/upload.css")" rel="stylesheet">
         <link href="@controllers.routes.Assets.versioned("css/main.css")" rel="stylesheet">
-        
-		<link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("lib/dhtmlx/css/dhtmlx.css")"/>
+
+        <link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("lib/dhtmlx/css/dhtmlx.css")"/>
         <link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("stylesheets/bootstrap-datetimepicker.css")"/>
-		<script src="@controllers.routes.Assets.versioned("lib/dhtmlx/js/dhtmlx.js")"></script>
-		<script type="text/stylesheet" rel="stylesheet" media="print" href="@controllers.routes.Assets.versioned("css/printfriendly.css")"></script>
+        <script src="@controllers.routes.Assets.versioned("lib/dhtmlx/js/dhtmlx.js")"></script>
+        <script type="text/stylesheet" rel="stylesheet" media="print" href="@controllers.routes.Assets.versioned("css/printfriendly.css")"></script>
 
     </head>
     <body>
         <nav class="navbar navbar-inverse">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="@org.hadatac.console.controllers.routes.Portal.index()">HADatAc Home</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()">Search Data</a></li>
-                <li><a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()">Browse Metadata</a></li>
-                <li><a href="@org.hadatac.console.controllers.routes.Dashboard.index()">Dashboard</a></li>
-                @* @if(org.hadatac.utils.CollectionUtil.isSandboxMode()) {
-                    <li><a style="background-color: #FFFF00" href="@org.hadatac.console.controllers.sandbox.routes.Sandbox.index()">Sandbox Mode</a></li>
-                } else {
-                    <li><a href="@org.hadatac.console.controllers.sandbox.routes.Sandbox.index()">Sandbox Mode</a></li>
-                } *@
-                @subjectNotPresent() {
-                   <li class="@("active".when(nav == "signup"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
-                }
-              </ul>
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@org.hadatac.console.controllers.routes.Portal.index()">HADatAc Home</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()">Search Data</a></li>
+                        <li><a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()">Browse Metadata</a></li>
+                        <li><a href="@org.hadatac.console.controllers.routes.Dashboard.index()">Dashboard</a></li>
+@*                        @if(org.hadatac.utils.CollectionUtil.isSandboxMode()) {*@
+@*                            <li><a style="background-color: #FFFF00" href="@org.hadatac.console.controllers.sandbox.routes.Sandbox.index()">Sandbox Mode</a></li>*@
+@*                        } else {*@
+@*                            <li><a href="@org.hadatac.console.controllers.sandbox.routes.Sandbox.index()">Sandbox Mode</a></li>*@
+@*                        }*@
+@*                        @subjectNotPresent() {*@
+@*                            <li class="@("active".when(nav == "signup"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.signup()">@Messages("playauthenticate.navigation.signup")</a></li>*@
+@*                        }*@
+                    </ul>
 
-              @subjectPresentOr() {
-                  <ul class="nav navbar-nav navbar-right">
-                  @defining(AuthApplication.getAuthApplication().getUserProvider().getUser(session())) { user =>
-                     <li class="dropdown">
-                     	 @if(user!=null){
-	                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.getName() <span class="caret"></span></a>
-	                     }
-                         <ul class="dropdown-menu" role="menu">
-                            <li class="@("active".when(nav == "profile"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
-                            <li><a href="@org.hadatac.console.controllers.routes.AuthApplication.doSignout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
-                         </ul>
-                     </li>
-                  }
-                  </ul>
-              } {
-                  <a href="@org.hadatac.console.controllers.routes.AuthApplication.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
-              }
+@*                    @subjectPresentOr() {*@
+@*                        <ul class="nav navbar-nav navbar-right">*@
+@*                        @defining(AuthApplication.getAuthApplication().getUserProvider().getUser(session())) { user =>*@
+@*                            <li class="dropdown">*@
+@*                                @if(user!=null){*@
+@*                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.getName() <span class="caret"></span></a>*@
+@*                                }*@
+@*                            <ul class="dropdown-menu" role="menu">*@
+@*                                <li class="@("active".when(nav == "profile"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.profile()">@Messages("playauthenticate.navigation.profile")</a></li>*@
+@*                                <li><a href="@org.hadatac.console.controllers.routes.AuthApplication.doSignout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>*@
+@*                            </ul>*@
+@*                            </li>*@
+@*                        }*@
+@*                        </ul>*@
+@*                    } {*@
+@*                        <a href="@org.hadatac.console.controllers.routes.AuthApplication.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>*@
+@*                    }*@
 
+                </div>
             </div>
-          </div>
         </nav>
 
         @content
-        
+
         <div class="footer">
-           <hr>
-           <a href="@org.hadatac.console.controllers.routes.Version.index()">Version</a><br>
-           (c) 2015, <a href="http://hadatac.org">HADatAc.org</a>
+            <hr>
+            <a href="@org.hadatac.console.controllers.routes.Version.index()">Version</a><br>
+            (c) 2015, <a href="http://hadatac.org">HADatAc.org</a>
         </div>
-        
+
     </body>
 </html>

@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.dataanalysis;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.views.html.dataanalysis.*;
 
 import java.util.List;
@@ -21,16 +23,19 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 public class NewFunction extends Controller {
 	
 	@Inject
 	FormFactory formFactory;
+	@javax.inject.Inject
+	private Application application;
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {
-		final SysUser sysUser = AuthApplication.getLocalUser(session());
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result index(Http.Request request) {
+		final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 		
     	// may need addressing
     	Indicator indicator = new Indicator();
@@ -39,15 +44,15 @@ public class NewFunction extends Controller {
     	return ok(newFunction.render(indicator, entityCharacteristic, aggregates));
     }
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-    	return index();
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result postIndex(Http.Request request) {
+    	return index(request);
     }
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm() {
+	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processForm(Http.Request request) {
 		
-        Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest();
+        Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest(request);
         IndicatorForm data = form.get();
         
         if (form.hasErrors()) {

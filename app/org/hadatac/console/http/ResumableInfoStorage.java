@@ -30,8 +30,8 @@ public class ResumableInfoStorage {
      * @return
      */
     public synchronized ResumableInfo get(int resumableChunkSize, long resumableTotalSize,
-                             String resumableIdentifier, String resumableFilename,
-                             String resumableRelativePath, String resumableFilePath) {
+                                          String resumableIdentifier, String resumableFilename,
+                                          String resumableRelativePath, String resumableFilePath) {
 
         ResumableInfo info = mMap.get(resumableIdentifier);
 
@@ -55,6 +55,6 @@ public class ResumableInfoStorage {
      * @param info
      */
     public void remove(ResumableInfo info) {
-       mMap.remove(info.resumableIdentifier);
+        mMap.remove(info.resumableIdentifier);
     }
 }

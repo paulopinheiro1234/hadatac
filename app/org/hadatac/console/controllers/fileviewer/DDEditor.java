@@ -3,7 +3,7 @@ package org.hadatac.console.controllers.fileviewer;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.entity.pojo.DataFile;
@@ -23,10 +23,10 @@ public class DDEditor extends Controller {
     public static String commentSheetColumn;
     DataFile dirFile = new DataFile("/");
     public static DataFile dd_df;
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))    
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String fileId, boolean bSavable,String dir) {
-        final SysUser user = AuthApplication.getLocalUser(session());
-        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+//        final SysUser user = AuthApplication.getLocalUser(session());
+        DataFile dataFile = DataFile.findByIdAndEmail(fileId, "sheersha.kandwal@mssm.edu"); //TODO : fixhis -- user.getEmail());
         dirFile.setStatus(DataFile.WORKING);
         if (null == dataFile) {
 
@@ -38,7 +38,7 @@ public class DDEditor extends Controller {
         List<DataFile> files = null;
         String path = ConfigProp.getPathDownload();
 
-        files = DataFile.find(user.getEmail());
+        files = DataFile.find("sheersha.kandwal@mssm.edu"); //TODO : fixhis -- user.getEmail());
 
     //     String sdd_filename=dataFile.getFileName();
     //     sdd_filename = "S"+sdd_filename; // Only files with the prefix SDD are allowed so were always going to have a second character
@@ -56,12 +56,12 @@ public class DDEditor extends Controller {
         return ok(dd_editor.render(dataFile, bSavable,dir,dirFile));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String fileId, boolean bSavable,String dir) {
         return index(fileId, bSavable,dir);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result fromViewableLink(String viewableId, String dir) {
         DataFile dataFile = DataFile.findByViewableId(viewableId);
         if (null == dataFile) {
@@ -71,7 +71,7 @@ public class DDEditor extends Controller {
         return ok(dd_editor.render(dataFile, false,dir,dirFile));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postFromViewableLink(String viewableId, String dir) {
         return fromViewableLink(viewableId, dir);
     }
@@ -94,11 +94,11 @@ public class DDEditor extends Controller {
     
     public Result getCheckedSDD(String sddFileName){
         System.out.println("sdd filename: "+sddFileName);
-        final SysUser user = AuthApplication.getLocalUser(session());
+//        final SysUser user = AuthApplication.getLocalUser(session());
         List<DataFile> files = null;
         String path = ConfigProp.getPathDownload();
 
-        files = DataFile.find(user.getEmail());
+        files = DataFile.find("sheersha.kandwal@mssm.edu"); //TODO: fix it -- user.getEmail());
         String sdd_filename=sddFileName;
         DataFile sdd_dataFile = new DataFile("");
         for(DataFile df : files){
@@ -111,7 +111,7 @@ public class DDEditor extends Controller {
        System.out.println("sdd fileid: "+sdd_id);
        return ok(Json.toJson(sdd_id));
     }
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result fromEditableLink(String editableId, String dir) {
         DataFile dataFile = DataFile.findByEditableId(editableId);
         if (null == dataFile) {
@@ -121,7 +121,7 @@ public class DDEditor extends Controller {
 
         return ok(dd_editor.render(dataFile, false, dir,dirFile));
     }
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postFromEditableLink(String editableId, String dir) {
         return fromEditableLink(editableId, dir);
     }

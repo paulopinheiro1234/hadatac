@@ -1,3 +1,4 @@
+@import org.hadatac.console.views.html.tree_node
 @(node : org.hadatac.console.models.TreeNode, optionName : String, selected : String)
 
 @import org.hadatac.console.controllers.metadata._
@@ -7,19 +8,19 @@
 @import org.hadatac.metadata.loader.URIUtils
 
 @if(node == null) {
-   EMPTY
+    EMPTY
 } else {
-   @if(!selected.equals("") && node.getName().equals(selected)) {
-      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@URIUtils.replaceNameSpaceEx(node.getName())" onchange="typechange()" checked>@FirstLabel.getLabel(node.getName())</a>
-   } else {
-      <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@URIUtils.replaceNameSpaceEx(node.getName())" onchange="typechange()" >@FirstLabel.getLabel(node.getName())</a>
-   }
-   @if(node.getChildren().size() > 0) {
-      <ul>
-	     @for(child <- node.getChildren()) { 
+    @if(!selected.equals("") && node.getName().equals(selected)) {
+        <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@URIUtils.replaceNameSpaceEx(node.getName())" onchange="typechange()" checked>@FirstLabel.getLabel(node.getName())</a>
+    } else {
+        <li><a href="#"><input type="radio" name="@optionName" id="@optionName" value="@URIUtils.replaceNameSpaceEx(node.getName())" onchange="typechange()" >@FirstLabel.getLabel(node.getName())</a>
+            }
+    @if(node.getChildren().size() > 0) {
+        <ul>
+        @for(child <- node.getChildren()) {
             @tree_node(child, optionName, selected)
-         }
-      </ul>
-   }
+        }
+        </ul>
+    }
 }
 </li>

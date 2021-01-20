@@ -7,7 +7,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-@main("Add Access Level") {
+@main("Add Access Level","","") {
 
 	<script type="text/javascript">
 		function checkform() {
@@ -29,44 +29,44 @@
 
   <div class="container">
 
-    <form class="form-horizontal" name="newGroup" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_groups")">
-  		<div class="form-group">
-  			<label for="group_uri">Group URI:*</label>
- 			<input type="text" value="@cur_group.getUri()" class="form-control" name="group_uri" id="group_uri" onchange="checkform()" >
- 		</div>
- 		
-		<div class="form-group">
-			<label for="group_name">Group Name:*</label>
-  			<input type="text" value="@cur_group.getName()" class="form-control" name="group_name" id="group_name" onchange="checkform()" >
-		</div>
-		
-		<div class="form-group">
-			<label for="comment">Comment:</label>
-  			<input type="text" value="@cur_group.getComment()" class="form-control" name="comment" id="comment" >
-		</div>
-		
-		<div class="form-group">
-			<label for="homepage">Homepage:</label>
-  			<input type="text" value="@cur_group.getHomepage()" class="form-control" name="homepage" id="homepage"" >
-		</div>
-		
-		<div class="form-group">
-			<label for="parent_group_uri">Parent Access Level: </label>
-  			<select class="form-control col-sm-6" id="parent_group_uri" name="parent_group_uri" >
-  				<option value="Public">Public</option>
-              	@for(group <- theGroups){
-              		@if(group.getUri().equals(cur_group.getImmediateGroupUri())){
-              			<option selected value="@group.getUri()">@group.getName()</option>
-              	 	} else {
-              	 		<option value="@group.getUri()">@group.getName()</option>
-              	 	}
-                }
-            </select>
-		</div>
-  		
-     	<div class="form-group" class="col-sm-6 col-offset-3">
-        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Submit" />
-     	</div>
-   	</form>    
+@*    <form class="form-horizontal" name="newGroup" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_groups")">*@
+@*  		<div class="form-group">*@
+@*  			<label for="group_uri">Group URI:*</label>*@
+@* 			<input type="text" value="@cur_group.getUri()" class="form-control" name="group_uri" id="group_uri" onchange="checkform()" >*@
+@* 		</div>*@
+@* 		*@
+@*		<div class="form-group">*@
+@*			<label for="group_name">Group Name:*</label>*@
+@*  			<input type="text" value="@cur_group.getName()" class="form-control" name="group_name" id="group_name" onchange="checkform()" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*			<label for="comment">Comment:</label>*@
+@*  			<input type="text" value="@cur_group.getComment()" class="form-control" name="comment" id="comment" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*			<label for="homepage">Homepage:</label>*@
+@*  			<input type="text" value="@cur_group.getHomepage()" class="form-control" name="homepage" id="homepage"" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*			<label for="parent_group_uri">Parent Access Level: </label>*@
+@*  			<select class="form-control col-sm-6" id="parent_group_uri" name="parent_group_uri" >*@
+@*  				<option value="Public">Public</option>*@
+@*              	@for(group <- theGroups){*@
+@*              		@if(group.getUri().equals(cur_group.getImmediateGroupUri())){*@
+@*              			<option selected value="@group.getUri()">@group.getName()</option>*@
+@*              	 	} else {*@
+@*              	 		<option value="@group.getUri()">@group.getName()</option>*@
+@*              	 	}*@
+@*                }*@
+@*            </select>*@
+@*		</div>*@
+@*  		*@
+@*     	<div class="form-group" class="col-sm-6 col-offset-3">*@
+@*        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Submit" />*@
+@*     	</div>*@
+@*   	</form>    *@
   </div>
 }

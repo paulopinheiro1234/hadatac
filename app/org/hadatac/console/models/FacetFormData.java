@@ -2,18 +2,17 @@ package org.hadatac.console.models;
 
 import play.data.validation.ValidationError;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FacetFormData {
 
     public String subject;
-    public String predicate; 
+    public String predicate;
 
     //These are just lists of strings
     //because when the query gets submitted the "category" (e.g "characteristic")
     //they fall into is irrelevant
-    //public ArrayList<String> field_facets; 
+    //public ArrayList<String> field_facets;
     //public ArrayList<String> query_facets;
     //public ArrayList<String> pivot_facets;
     //public ArrayList<String> range_facets;
@@ -35,7 +34,7 @@ public class FacetFormData {
         this.predicate = spatial_predicate;
         //this.field_facets = field_facets;
         //this.query_facets = query_facets;
-        
+
         for (String category : field_facets.facets.keySet() ) {
             for (String facet : field_facets.facets.get(category).keySet()){
                 this.field_facets.addFacet(category, facet);

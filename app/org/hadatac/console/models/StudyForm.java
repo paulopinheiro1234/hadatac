@@ -1,8 +1,5 @@
 package org.hadatac.console.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class StudyForm {
 
     public String newStudyUri;

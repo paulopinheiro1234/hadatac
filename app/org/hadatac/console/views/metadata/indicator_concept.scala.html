@@ -1,14 +1,14 @@
 @(selection : String,
-indicatorMap : Map[String,List[String]],
-key : String)
+        indicatorMap : Map[String,List[String]],
+        key : String)
 
 
 @import org.hadatac.console.controllers._
 
 <div class="navbar-collapse collapse navbar-secondary hidden-print">
-  @for((indicators,index) <- indicatorMap.get(key).zipWithIndex) {
-       @if(selection == indicators.replace(" ","").replace(",","")) {
-              <h4>@indicators</h4>
-       }
-  }
+@for((indicators,index) <- indicatorMap.get(key).zipWithIndex) {
+    @if(selection == indicators.replace(" ","").replace(",","")) {
+        <h4>@indicators</h4>
+    }
+}
 </div>

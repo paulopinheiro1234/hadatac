@@ -6,7 +6,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-@main("Add Preregistered User") {
+@main("Add Preregistered User","","") {
 
 	<script type="text/javascript">
 		function checkform() {
@@ -34,50 +34,50 @@
 
   <div class="container">
 
-    <form class="form-horizontal" name="newUser" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_users")">
-  		<div class="form-group">
-  			<label for="usr_uri">User URI:*</label>
- 			<input type="text" class="form-control" name="usr_uri" id="usr_uri" onchange="checkform()" >
- 		</div>
- 		
-		<div class="form-group">
-			<label for="given_name">Given Name:*</label>
-  			<input type="text" class="form-control" name="given_name" id="given_name" onchange="checkform()" >
-		</div>
-		
-		<div class="form-group">
-  			<label for="family_name">Family Name:*</label>
- 			<input type="text" class="form-control" name="family_name" id="family_name" onchange="checkform()" >
- 		</div>
- 		
-		<div class="form-group">
-			<label for="email">Email Address:*</label>
-  			<input type="text" class="form-control" name="email" id="email" onchange="checkform()" >
-		</div>
-		
-		<div class="form-group">
-			<label for="comment">Comment:</label>
-  			<input type="text" class="form-control" name="comment" id="comment" >
-		</div>
-		
-		<div class="form-group">
-			<label for="homepage">Homepage:</label>
-  			<input type="text" class="form-control" name="homepage" id="homepage"" >
-		</div>
-		
-		<div class="form-group">
-			<label for="group_uri">Access Level: </label>
-  			<select class="form-control col-sm-6" id="group_uri" name="group_uri" >
-  				<option value="Public">Public</option>
-              	@for(group <- theGroups){
-              		<option value="@group.getUri()">@group.getName()</option>
-                }
-            </select>
-		</div>
-  		
-     	<div class="form-group" class="col-sm-6 col-offset-3">
-        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-     	</div>
-   	</form>    
+@*    <form class="form-horizontal" name="newUser" method="post" action="@org.hadatac.console.controllers.triplestore.routes.UserManagement.submitPreRegistrationForm("load_users")">*@
+@*  		<div class="form-group">*@
+@*  			<label for="usr_uri">User URI:*</label>*@
+@* 			<input type="text" class="form-control" name="usr_uri" id="usr_uri" onchange="checkform()" >*@
+@* 		</div>*@
+@* 		*@
+@*		<div class="form-group">*@
+@*			<label for="given_name">Given Name:*</label>*@
+@*  			<input type="text" class="form-control" name="given_name" id="given_name" onchange="checkform()" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*  			<label for="family_name">Family Name:*</label>*@
+@* 			<input type="text" class="form-control" name="family_name" id="family_name" onchange="checkform()" >*@
+@* 		</div>*@
+@* 		*@
+@*		<div class="form-group">*@
+@*			<label for="email">Email Address:*</label>*@
+@*  			<input type="text" class="form-control" name="email" id="email" onchange="checkform()" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*			<label for="comment">Comment:</label>*@
+@*  			<input type="text" class="form-control" name="comment" id="comment" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*			<label for="homepage">Homepage:</label>*@
+@*  			<input type="text" class="form-control" name="homepage" id="homepage"" >*@
+@*		</div>*@
+@*		*@
+@*		<div class="form-group">*@
+@*			<label for="group_uri">Access Level: </label>*@
+@*  			<select class="form-control col-sm-6" id="group_uri" name="group_uri" >*@
+@*  				<option value="Public">Public</option>*@
+@*              	@for(group <- theGroups){*@
+@*              		<option value="@group.getUri()">@group.getName()</option>*@
+@*                }*@
+@*            </select>*@
+@*		</div>*@
+@*  		*@
+@*     	<div class="form-group" class="col-sm-6 col-offset-3">*@
+@*        	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />*@
+@*     	</div>*@
+@*   	</form>    *@
   </div>
 }

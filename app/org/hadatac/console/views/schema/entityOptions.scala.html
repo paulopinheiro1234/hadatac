@@ -1,10 +1,11 @@
-@(entities   : org.hadatac.console.models.OtMSparqlQueryResults)
+@import org.hadatac.console.models.OtMSparqlQueryResults
+@(entities   : OtMSparqlQueryResults)
 
 @import java.net._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 
-@main("Entities") {
+@main("Entities","","") {
    <script type="text/javascript" src="/hadatac/assets/javascripts/d3.v3.min.js"></script>
    <style>
 
@@ -29,7 +30,7 @@
 
    </style>
    <div id="entityTree" class="hidden-print tab-pane fade in active">
-     <div id="query" data-results="@entities.treeResults"></div>
+     <div id="query" org.hadatac.data-results="@entities.treeResults"></div>
      <div id="bodyEntity"></div>
      <script type="text/javascript" src="/hadatac/assets/javascripts/treeRenderer.js"></script>
    </div>

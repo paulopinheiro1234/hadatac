@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.studies;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.text.DateFormat;
@@ -14,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import play.data.*;
@@ -42,11 +45,13 @@ public class EditStudy extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    private Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String da_uri, String std_uri) {
 
-    	Study std = null;
+        Study std = null;
         StudyType stdType = null;
         List<Agent> organizations = null;
         List<Agent> persons = null;
@@ -74,16 +79,16 @@ public class EditStudy extends Controller {
         return ok(editStudy.render(dir, filename, da_uri, std, stdType, organizations, persons));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
         return index(dir, filename, da_uri, std_uri);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String std_uri) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processForm(String std_uri, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
-        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
+        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest(request);
         StudyForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
 
@@ -172,10 +177,10 @@ public class EditStudy extends Controller {
         oldStudy.setAgentUri(newAgent);
         oldStudy.setStartedAt(newStartDateTime);
         oldStudy.setEndedAt(newEndDateTime);
-	
+
         // insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
         oldStudy.save();
-	
+
         return ok(studyConfirm.render("Edit Study", oldStudy));
     }
 }

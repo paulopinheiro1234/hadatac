@@ -28,7 +28,7 @@ public class URIUtils {
     }
 
     public static boolean isValidURI(String str) {
-        
+
         if (str == null) {
             return false;
         }
@@ -107,7 +107,7 @@ public class URIUtils {
             String nsString = entry.getValue().getName();
             if (str.startsWith(nsString)) {
                 resp = str.replace(nsString, abbrev + ":");
-                
+
                 return resp;
             }
         }

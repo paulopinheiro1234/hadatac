@@ -10,12 +10,13 @@ import javax.inject.Inject;
 
 import play.data.Form;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import play.data.FormFactory;
 
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
+//import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.*;
@@ -38,10 +39,10 @@ public class EditDataAcquisition extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String filename, String uri, boolean bChangeParam) {
 
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+//        final SysUser sysUser = AuthApplication.getLocalUser(session()); //TODO : Fix this
         try {
             if (uri != null) {
                 uri = URLDecoder.decode(uri, "UTF-8");
@@ -76,23 +77,23 @@ public class EditDataAcquisition extends Controller {
                 mapSchemas.put(schema.getUri(), URIUtils.replaceNameSpaceEx(schema.getUri()));
             }
 
-            return ok(editDataAcquisition.render(dir, filename, dataAcquisition, nameList, 
-                    User.getUserURIs(), mapSchemas, sysUser.isDataManager(), bChangeParam));
+            return ok(editDataAcquisition.render(dir, filename, dataAcquisition, nameList,
+                    User.getUserURIs(), mapSchemas, true, bChangeParam)); //sysUser.isDataManager(), bChangeParam));
         }
 
         return badRequest("Invalid data acquisition URI!");
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String filename, String uri, boolean bChangeParam) {
         return index(dir, filename, uri, bChangeParam);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir, String filename, String acquisitionUri, boolean bChangeParam) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(String dir, String filename, String acquisitionUri, boolean bChangeParam, Http.Request request) {
+//        final SysUser sysUser = AuthApplication.getLocalUser(session());
 
-        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest();
+        Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest(request);
         DataAcquisitionForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
 
@@ -119,12 +120,12 @@ public class EditDataAcquisition extends Controller {
                 if (!data.getNewEndDate().equals("")) {
                     isoFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm a");
                     da.setEndedAt(isoFormat.parseDateTime(data.getNewEndDate()));
-                }  
+                }
 
                 da.saveToSolr();
 
-                return ok(main.render("Results,", "", new Html("<h3>" 
-                        + String.format("Content have been inserted in Table \"DataAcquisition\"") 
+                return ok(main.render("Results,", "","", new Html("<h3>"
+                        + String.format("Content have been inserted in Table \"DataAcquisition\"")
                         + "</h3>")));
             }
         }
@@ -137,26 +138,26 @@ public class EditDataAcquisition extends Controller {
             }
         }
         else {
-            if (sysUser.isDataManager()) {
+//            if (sysUser.isDataManager()) {
                 if (da.getOwnerUri() == null || !da.getOwnerUri().equals(data.getNewOwner())) {
                     da.setOwnerUri(data.getNewOwner());
                     changedInfos.add(data.getNewOwner());
                 }
-            }
-            if (da.getPermissionUri() == null || !da.getPermissionUri().equals(data.getNewPermission())) {
-                da.setPermissionUri(data.getNewPermission());
-                changedInfos.add(data.getNewPermission());
-            }
-            if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {
-                da.setSchemaUri(data.getNewSchema());
-                changedInfos.add(data.getNewSchema());
-            }
+//            }
+//            if (da.getPermissionUri() == null || !da.getPermissionUri().equals(data.getNewPermission())) {
+//                da.setPermissionUri(data.getNewPermission());
+//                changedInfos.add(data.getNewPermission());
+//            }
+//            if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {
+//                da.setSchemaUri(data.getNewSchema());
+//                changedInfos.add(data.getNewSchema());
+//            }
         }
 
         if (!changedInfos.isEmpty()) {
             da.save();
         }
 
-        return ok(editDataAcquisitionConfirm.render(dir, filename, da, changedInfos, sysUser.isDataManager()));
+        return ok(editDataAcquisitionConfirm.render(dir, filename, da, changedInfos, true)); //sysUser.isDataManager()));
     }
 }

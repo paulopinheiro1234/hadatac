@@ -1,5 +1,5 @@
-@(results : String, 
-  numOfTriples : Int)
+@(results : String,
+        numOfTriples : Int)
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,19 +8,19 @@
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.console.controllers.triplestore._
 
-@main("Refresh Study") {
-	<div class="container">
-		<h2>Refresh Study</h2>
-		<div id="end-process-box" style="display:none;">
-			<h4>Operation Refresh Study complete - Imported @numOfTriples triples: </h4>
-	    </div>
-	    <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-		<script type="text/javascript">
-			var msg = "@results";
-       		var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
-        	$('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
-       		document.getElementById('end-process-box').style.display = 'inline';
+@main("Refresh Study","","") {
+    <div class="container">
+        <h2>Refresh Study</h2>
+        <div id="end-process-box" style="display:none;">
+            <h4>Operation Refresh Study complete - Imported @numOfTriples triples: </h4>
+        </div>
+        <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+        <script type="text/javascript">
+                var msg = "@results";
+                var msg2 = decodeURIComponent(msg).replace(/\+/g, '&nbsp;');
+                $('#msgarea').html(msg2.replace(/&lt;br&gt;/g, '<br>'));
+                document.getElementById('end-process-box').style.display = 'inline';
         </script>
-		<a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
-	</div>
+        <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()" class="btn btn-primary" role="button">Back to Study Management</a>
+    </div>
 }

@@ -6,37 +6,37 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Download CSV Templates") {
-	
-	<div class="container-fluid">
-		<h4>CSV Templates:</h4>
-		Use the templates below to create csv files for the automatic annotator
-		<table class="table">
-			<thead>
-         		<tr>
-            		<th>Templates</th>
-            		<th>Examples</th>
-         		</tr>
-         	</thead>
-			<tbody>
-				<tr>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/STD.csv")'>Study file</a> - Used to create studies</td>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/STD-Example.csv")'>Study example file</a></td>
-    			</tr>
-    			<tr>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/PID.csv")'>PID file</a> - Used to create subjects</td>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/PID-Example.csv")'>PID example file</a></td>
-    			</tr>
-    			<tr>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/SID.csv")'>SID file</a> - Used to create samples</td>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/SID-Example.csv")'>SID example file</a></td>
-    			</tr>
-    			<tr>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/MAP-PID-SID.csv")'>PID-SID Mapping file</a> - Used to create PID-SID mappings</td>
-    				<td><a href='@controllers.routes.Assets.versioned("example/data/templates/MAP-PID-SID-Example.csv")'>PID-SID mapping example file</a></td>
-    			</tr>
-    		</tbody>
-    	</table>
-    	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Annotator</a>
+@main("Download CSV Templates","","") {
+
+    <div class="container-fluid">
+        <h4>CSV Templates:</h4>
+        Use the templates below to create csv files for the automatic annotator
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Templates</th>
+                    <th>Examples</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/STD.csv")'>Study file</a> - Used to create studies</td>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/STD-Example.csv")'>Study example file</a></td>
+                </tr>
+                <tr>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/PID.csv")'>PID file</a> - Used to create subjects</td>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/PID-Example.csv")'>PID example file</a></td>
+                </tr>
+                <tr>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/SID.csv")'>SID file</a> - Used to create samples</td>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/SID-Example.csv")'>SID example file</a></td>
+                </tr>
+                <tr>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/MAP-PID-SID.csv")'>PID-SID Mapping file</a> - Used to create PID-SID mappings</td>
+                    <td><a href='@controllers.routes.Assets.versioned("example/data/templates/MAP-PID-SID-Example.csv")'>PID-SID mapping example file</a></td>
+                </tr>
+            </tbody>
+        </table>
+@*        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Annotator</a>*@
     </div>
 }

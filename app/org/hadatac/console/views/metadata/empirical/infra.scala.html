@@ -1,3 +1,4 @@
+@import org.hadatac.console.views.html.metadata.empirical.empirical_navigation
 @(dir            : String,
   fileId         : String,
   da_uri         : String,
@@ -14,7 +15,7 @@
 @import play.api.Play
 @import com.typesafe.config.ConfigFactory
 
-@main("Infrastructure Dashboard") {
+@main("Infrastructure Dashboard","","") {
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>

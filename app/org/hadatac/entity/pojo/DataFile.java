@@ -15,13 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import play.mvc.Controller;
-import play.mvc.Result;
-import play.data.*;
-
 import org.apache.commons.io.FilenameUtils;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -32,8 +26,6 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
-import org.hadatac.console.controllers.sandbox.Sandbox;
-import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.TreeNode;
 import org.hadatac.data.loader.CSVRecordFile;
@@ -43,7 +35,6 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.typesafe.config.ConfigFactory;
@@ -289,8 +280,8 @@ public class DataFile implements Cloneable {
     	if (filename == null || !filename.startsWith("file:///media/")) {
     		return "";
     	}
-    	return ConfigFactory.load().getString("hadatac.console.host") + 
-    			org.hadatac.console.controllers.routes.Portal.index().url() + 
+    	return ConfigFactory.load().getString("hadatac.host") + 
+    			org.hadatac.console.controllers.routes.Portal.index().url() +
     			filename.replace("file:///", "");
     }
     
@@ -934,7 +925,8 @@ public class DataFile implements Cloneable {
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isDirectory() && !listOfFiles[i].getName().equals(Sandbox.SUFFIX)) {
+            //TODO add Sandbox details
+            if (listOfFiles[i].isDirectory() ){ //&& !listOfFiles[i].getName().equals(Sandbox.SUFFIX)) {
                 if (ignoreEmptyFolders) {
                     if (!isEmptyDir(listOfFiles[i])) {
                         results.add(listOfFiles[i].getName() + "/");

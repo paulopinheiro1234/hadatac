@@ -49,11 +49,11 @@ public class Variable {
 	}
 
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
-    	this(entRole, attrInRel, null, null);
+        this(entRole, attrInRel, null, null);
     }
 
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit) {
-    	this(entRole, attrInRel, unit, null);
+        this(entRole, attrInRel, unit, null);
     }
 
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
@@ -70,7 +70,7 @@ public class Variable {
     }
 
     public Entity getEntity() {
-    	return ent;
+        return ent;
     }
 
     public String getEntityStr() {
@@ -105,7 +105,7 @@ public class Variable {
     }
 
     public Entity getInRelationTo() {
-    	return inRelationTo;
+        return inRelationTo;
     }
 
     public String getInRelationToStr() {
@@ -116,7 +116,7 @@ public class Variable {
     }
 
     public Unit getUnit() {
-    	return unit;
+        return unit;
     }
 
     public String getUnitStr() {
@@ -127,7 +127,7 @@ public class Variable {
     }
 
     public Attribute getTime() {
-    	return timeAttr;
+        return timeAttr;
     }
 
     public String getTimeStr() {
@@ -138,19 +138,19 @@ public class Variable {
     }
 
     public static String upperCase(String orig) {
-    	String[] words = orig.split(" ");
-    	StringBuffer sb = new StringBuffer();
+        String[] words = orig.split(" ");
+        StringBuffer sb = new StringBuffer();
 
-    	for (int i = 0; i < words.length; i++) {
-    		sb.append(Character.toUpperCase(words[i].charAt(0)))
-    		.append(words[i].substring(1)).append(" ");
-    	}          
-    	return sb.toString().trim();
-    }      
+        for (int i = 0; i < words.length; i++) {
+            sb.append(Character.toUpperCase(words[i].charAt(0)))
+                    .append(words[i].substring(1)).append(" ");
+        }
+        return sb.toString().trim();
+    }
 
     public String prep(String orig) {
-    	String aux = upperCase(orig);
-    	return aux.replaceAll(" ","-").replaceAll("[()]","");
+        String aux = upperCase(orig);
+        return aux.replaceAll(" ","-").replaceAll("[()]","");
     }
 
     public static List<String> retrieveStudyVariablesWithLabels(String studyUri) {

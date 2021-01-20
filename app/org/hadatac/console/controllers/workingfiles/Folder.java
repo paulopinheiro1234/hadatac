@@ -17,6 +17,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.Environment;
 import play.data.*;
@@ -25,7 +26,7 @@ import org.hadatac.console.models.FileType;
 import org.hadatac.console.models.NewFileForm;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.workingfiles.routes;
 import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
@@ -41,19 +42,19 @@ public class Folder extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir) {
         return index(dir);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir) {
     	return ok(newFolder.render(dir));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir) {
-        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    public Result processForm(String dir, Http.Request request) {
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
@@ -66,16 +67,16 @@ public class Folder extends Controller {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        
+
         return redirect(routes.WorkingFiles.index(dir, "."));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result delete(String dir, String path) {
     	if (dir == null || path == null || path.equals("/")) {
     		return redirect(routes.WorkingFiles.index(dir, "."));
     	}
-    	
+
         String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
     	File folder = new File(fullPath);
 
@@ -85,12 +86,12 @@ public class Folder extends Controller {
         return ok(deleteFolder.render(dir, path, folderEmpty));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postDelete(String dir, String path) {
         return delete(dir, path);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteForm(String dir, String path) {
     	if (dir == null || path == null || path.equals("/")) {
     		return redirect(routes.WorkingFiles.index(dir, "."));
@@ -98,7 +99,7 @@ public class Folder extends Controller {
 
     	String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
         File deleteFolder = new File(fullPath);
-        
+
         try {
         	FileUtils.deleteDirectory(deleteFolder);
         } catch (Exception e) {

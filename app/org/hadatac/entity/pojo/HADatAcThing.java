@@ -23,9 +23,9 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.eclipse.rdf4j.model.Model;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-import org.hadatac.utils.CollectionUtil;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.ReversedPropertyField;
 import org.hadatac.annotations.Subject;
@@ -34,27 +34,27 @@ import org.hadatac.console.http.SPARQLUtils;
 
 public abstract class HADatAcThing implements Facetable {
 
-	public static String OWL_THING = "http://www.w3.org/2002/07/owl#Thing";
-	
+    public static String OWL_THING = "http://www.w3.org/2002/07/owl#Thing";
+
     @Subject
     String uri = "";
-    
+
     @PropertyField(uri="rdf:type")
     String typeUri = "";
 
     @PropertyField(uri="rdfs:label")
     String label = "";
-    
+
     @PropertyField(uri="rdfs:comment")
     String comment = "";
-    
+
     String field = "";
     String query = "";
     int count = 0;
 
     String namedGraph = "";
-    
-    // delete the object or not when deleting the data file it was generated from
+
+    // delete the object or not when deleting the org.hadatac.data file it was generated from
     boolean deletable = true;
 
     public Map<Facetable, List<Facetable>> getTargetFacets(
@@ -120,7 +120,7 @@ public abstract class HADatAcThing implements Facetable {
             this.uri = "";
             return;
         }
-		this.uri = URIUtils.replacePrefixEx(uri);
+        this.uri = URIUtils.replacePrefixEx(uri);
     }
 
     public String getTypeUri() {
@@ -128,16 +128,16 @@ public abstract class HADatAcThing implements Facetable {
     }
 
     public String getTypeLabel() {
-    	if (typeUri == null) {
-    		return "";
-    	}
-    	Entity ent = Entity.find(typeUri);
-    	if (ent == null || ent.getLabel() == null) {
-    		return "";
-    	}
-    	return ent.getLabel();
+        if (typeUri == null) {
+            return "";
+        }
+        Entity ent = Entity.find(typeUri);
+        if (ent == null || ent.getLabel() == null) {
+            return "";
+        }
+        return ent.getLabel();
     }
-    
+
     public void setTypeUri(String typeUri) {
         this.typeUri = typeUri;
     }
@@ -197,7 +197,7 @@ public abstract class HADatAcThing implements Facetable {
     public void setNamedGraph(String namedGraph) {
         this.namedGraph = namedGraph;
     }
-    
+
     public boolean getDeletable() {
         return deletable;
     }
@@ -207,16 +207,16 @@ public abstract class HADatAcThing implements Facetable {
     }
 
     public static List<String> getLabels(String uri) {
-    	List<String> results = new ArrayList<String>();
-    	if (uri == null || uri.equals("")) {
-    		return results;
-    	}
+        List<String> results = new ArrayList<String>();
+        if (uri == null || uri.equals("")) {
+            return results;
+        }
         if (uri.startsWith("http")) {
             uri = "<" + uri.trim() + ">";
         }
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?label WHERE { \n" + 
-                "  " + uri + " rdfs:label ?label . \n" + 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?label WHERE { \n" +
+                "  " + uri + " rdfs:label ?label . \n" +
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -302,12 +302,12 @@ public abstract class HADatAcThing implements Facetable {
     public static int getNumberInstances() {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += "select (COUNT(?categ) as ?tot) where " +  
+        query += "select (COUNT(?categ) as ?tot) where " +
                 " { SELECT ?i (COUNT(?i) as ?categ) " +
-                "     WHERE {" + 
+                "     WHERE {" +
                 "             ?i a ?c . " +
                 "     } " +
-                " GROUP BY ?i " + 
+                " GROUP BY ?i " +
                 " }";
 
         try {
@@ -337,7 +337,7 @@ public abstract class HADatAcThing implements Facetable {
 
         try {
             Class<?> currentClass = getClass();
-            while(currentClass != null) {                
+            while(currentClass != null) {
                 for (Field field: currentClass.getDeclaredFields()) {
                     field.setAccessible(true);
                     if (field.isAnnotationPresent(Subject.class)) {
@@ -348,11 +348,11 @@ public abstract class HADatAcThing implements Facetable {
                             return false;
                         }
                     }
-                    
+
                     if (field.isAnnotationPresent(ReversedPropertyField.class)) {
                         ReversedPropertyField reversedPropertyField = field.getAnnotation(ReversedPropertyField.class);
                         String propertyUri = reversedPropertyField.uri();
-                        
+
                         if (field.getType().equals(String.class)) {
                             String value = (String)field.get(this);
                             if (!value.isEmpty()) {
@@ -399,7 +399,7 @@ public abstract class HADatAcThing implements Facetable {
                         }
                     }
                 }
-                
+
                 currentClass = currentClass.getSuperclass();
             }
         } catch (IllegalArgumentException e) {
@@ -409,11 +409,11 @@ public abstract class HADatAcThing implements Facetable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         if (!row.containsKey("hasURI")) {
             return false;
         }
-        
+
         String objUri = (String)row.get("hasURI");
         for (Map<String, Object> rvs_row : reversed_rows) {
             for (String key : rvs_row.keySet()) {
@@ -436,34 +436,34 @@ public abstract class HADatAcThing implements Facetable {
 
         return numCommitted >= 0;
     }
-    
+
     public void fromStatement(Statement statement) {
         String predicate = statement.getPredicate().getURI();
         String object = statement.getObject().toString();
-        
+
         fromPredicateObject(predicate, object);
     }
-    
+
     public void fromQuerySolution(QuerySolution solnFromDescribe) {
         // build object from results of DESCRIBE query
         String predicate = solnFromDescribe.get("predicate").toString();
         String object = solnFromDescribe.get("object").toString();
-        
+
         fromPredicateObject(predicate, object);
     }
-    
+
     @SuppressWarnings("unchecked")
     public void fromPredicateObject(String predicate, String object) {
         try {
             Class<?> currentClass = getClass();
-            while(currentClass != null) {                
+            while(currentClass != null) {
                 for (Field field: currentClass.getDeclaredFields()) {
                     field.setAccessible(true);
-                    
+
                     if (field.isAnnotationPresent(PropertyField.class)) {
                         PropertyField propertyField = field.getAnnotation(PropertyField.class);
                         String propertyUri = URIUtils.replacePrefixEx(propertyField.uri());
-                        
+
                         if (predicate.equals(propertyUri)) {
                             if (field.getType().equals(String.class)) {
                                 field.set(this, object);
@@ -490,7 +490,7 @@ public abstract class HADatAcThing implements Facetable {
                         }
                     }
                 }
-                
+
                 currentClass = currentClass.getSuperclass();
             }
         } catch (IllegalArgumentException e) {
@@ -502,7 +502,7 @@ public abstract class HADatAcThing implements Facetable {
         }
     }
 
-    public void deleteFromTripleStore() {       
+    public void deleteFromTripleStore() {
         String query = "";
         if (getUri() == null || getUri().equals("")) {
             return;
@@ -519,7 +519,7 @@ public abstract class HADatAcThing implements Facetable {
         query += " } ";
 
         //System.out.println("Delete from triplestore query: " + query);
-        
+
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));

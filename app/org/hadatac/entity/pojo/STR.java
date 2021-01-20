@@ -26,11 +26,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.data.loader.Record;
-import org.hadatac.data.loader.RecordFile;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.StudyObject;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -38,7 +34,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import io.ebeaninternal.server.lib.util.Str;
+//import io.ebeaninternal.server.lib.util.Str;
 
 public class STR extends HADatAcThing implements Comparable<STR> {
     private static final String className = "hasco:DataAcquisition";
@@ -67,7 +63,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     private int triggeringEvent;
     @Field("nr_data_points_long")
     private long numberDataPoints;
-    
+
     @Field("total_messages_long")
     private long totalMessages;
     @Field("ingested_messages_long")
@@ -112,10 +108,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
     /*
      * Possible values for message status:
-     * ACTIVE:     It is not closed and it is collecting data
-     * SUSPENDED:  It is not closed but it is not collecting data
-     * CLOSED:     It is not collecting data. It is no longer available 
-     *             for data collection 
+     * ACTIVE:     It is not closed and it is collecting org.hadatac.data
+     * SUSPENDED:  It is not closed but it is not collecting org.hadatac.data
+     * CLOSED:     It is not collecting org.hadatac.data. It is no longer available
+     *             for org.hadatac.data collection
      */
     @Field("message_status_str")
     private String messageStatus;
@@ -135,14 +131,14 @@ public class STR extends HADatAcThing implements Comparable<STR> {
      */
     @Field("status_int")
     private int status;
-    
+
     private boolean isComplete;
     private String localName;
     private Study study;
     private Deployment deployment;
     private DataAcquisitionSchema sdd;
     private Map<String,MessageTopic> topicsMap;
-	private List<String> headers;
+    private List<String> headers;
 
     private DataFile archive = null;
     private String log;
@@ -255,13 +251,13 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     }
 
     public String getMessageName() {
-    	if (label == null && label.isEmpty()) {
-    		return "";
-    	}
-    	if (messagePort == null || messagePort.isEmpty()) {
-        	return label + "_at_" + messageIP; 
-    	}
-    	return label + "_at_" + messageIP + "_" + messagePort; 
+        if (label == null && label.isEmpty()) {
+            return "";
+        }
+        if (messagePort == null || messagePort.isEmpty()) {
+            return label + "_at_" + messageIP;
+        }
+        return label + "_at_" + messageIP + "_" + messagePort;
     }
 
     public String getMessageArchiveId() {
@@ -375,7 +371,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     public void setStudyUri(String study_uri) {
         this.studyUri = study_uri;
     }
-    
+
     public String getOwnerUri() {
         return ownerUri;
     }
@@ -418,40 +414,40 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
     public String getTriggeringEventName() {
         switch (triggeringEvent) {
-        case TriggeringEvent.INITIAL_DEPLOYMENT:
-            return TriggeringEvent.INITIAL_DEPLOYMENT_NAME;
-        case TriggeringEvent.LEGACY_DEPLOYMENT:
-            return TriggeringEvent.LEGACY_DEPLOYMENT_NAME;
-        case TriggeringEvent.CHANGED_CONFIGURATION:
-            return TriggeringEvent.CHANGED_CONFIGURATION_NAME;
-        case TriggeringEvent.CHANGED_OWNERSHIP:
-            return TriggeringEvent.CHANGED_OWNERSHIP_NAME;
-        case TriggeringEvent.AUTO_CALIBRATION:
-            return TriggeringEvent.AUTO_CALIBRATION_NAME;
-        case TriggeringEvent.SUSPEND_DATA_ACQUISITION:
-            return TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME;
-        case TriggeringEvent.RESUME_DATA_ACQUISITION:
-            return TriggeringEvent.RESUME_DATA_ACQUISITION_NAME;
+            case TriggeringEvent.INITIAL_DEPLOYMENT:
+                return TriggeringEvent.INITIAL_DEPLOYMENT_NAME;
+            case TriggeringEvent.LEGACY_DEPLOYMENT:
+                return TriggeringEvent.LEGACY_DEPLOYMENT_NAME;
+            case TriggeringEvent.CHANGED_CONFIGURATION:
+                return TriggeringEvent.CHANGED_CONFIGURATION_NAME;
+            case TriggeringEvent.CHANGED_OWNERSHIP:
+                return TriggeringEvent.CHANGED_OWNERSHIP_NAME;
+            case TriggeringEvent.AUTO_CALIBRATION:
+                return TriggeringEvent.AUTO_CALIBRATION_NAME;
+            case TriggeringEvent.SUSPEND_DATA_ACQUISITION:
+                return TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME;
+            case TriggeringEvent.RESUME_DATA_ACQUISITION:
+                return TriggeringEvent.RESUME_DATA_ACQUISITION_NAME;
         }
         return "";
     }
 
     public int getTriggeringEventByName(String name) {
         switch (name) {
-        case TriggeringEvent.INITIAL_DEPLOYMENT_NAME:
-            return TriggeringEvent.INITIAL_DEPLOYMENT;
-        case TriggeringEvent.LEGACY_DEPLOYMENT_NAME:
-            return TriggeringEvent.LEGACY_DEPLOYMENT;
-        case TriggeringEvent.CHANGED_CONFIGURATION_NAME:
-            return TriggeringEvent.CHANGED_CONFIGURATION;
-        case TriggeringEvent.CHANGED_OWNERSHIP_NAME:
-            return TriggeringEvent.CHANGED_OWNERSHIP;
-        case TriggeringEvent.AUTO_CALIBRATION_NAME:
-            return TriggeringEvent.AUTO_CALIBRATION;
-        case TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME:
-            return TriggeringEvent.SUSPEND_DATA_ACQUISITION;
-        case TriggeringEvent.RESUME_DATA_ACQUISITION_NAME:
-            return TriggeringEvent.RESUME_DATA_ACQUISITION;
+            case TriggeringEvent.INITIAL_DEPLOYMENT_NAME:
+                return TriggeringEvent.INITIAL_DEPLOYMENT;
+            case TriggeringEvent.LEGACY_DEPLOYMENT_NAME:
+                return TriggeringEvent.LEGACY_DEPLOYMENT;
+            case TriggeringEvent.CHANGED_CONFIGURATION_NAME:
+                return TriggeringEvent.CHANGED_CONFIGURATION;
+            case TriggeringEvent.CHANGED_OWNERSHIP_NAME:
+                return TriggeringEvent.CHANGED_OWNERSHIP;
+            case TriggeringEvent.AUTO_CALIBRATION_NAME:
+                return TriggeringEvent.AUTO_CALIBRATION;
+            case TriggeringEvent.SUSPEND_DATA_ACQUISITION_NAME:
+                return TriggeringEvent.SUSPEND_DATA_ACQUISITION;
+            case TriggeringEvent.RESUME_DATA_ACQUISITION_NAME:
+                return TriggeringEvent.RESUME_DATA_ACQUISITION;
         }
 
         return -1;
@@ -506,7 +502,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
         this.endedAt = formatter.parseDateTime(endedAt);
     }
-    
+
     public String getMethodUri() {
         return methodUri;
     }
@@ -520,28 +516,28 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     }
 
     public DataAcquisitionSchema getSchema() {
-    	if (sdd != null) {
-    		return sdd;
-    	}
-    	if (schemaUri == null || schemaUri.equals("")) {
-    		return null;
-    	}
-    	DataAcquisitionSchema schema = DataAcquisitionSchema.find(schemaUri);
+        if (sdd != null) {
+            return sdd;
+        }
+        if (schemaUri == null || schemaUri.equals("")) {
+            return null;
+        }
+        DataAcquisitionSchema schema = DataAcquisitionSchema.find(schemaUri);
         headers = new ArrayList<String>();
         if (schema != null && schema.getAttributes() != null) {
-        	for (DataAcquisitionSchemaAttribute attr : schema.getAttributes()) {
-        		headers.add(attr.getLabel());
-        	}
+            for (DataAcquisitionSchemaAttribute attr : schema.getAttributes()) {
+                headers.add(attr.getLabel());
+            }
         }
         setHeaders(headers.toString());
-    	return schema;
+        return schema;
     }
-    
+
     public void setSchemaUri(String schemaUri) {
         this.schemaUri = schemaUri;
         getSchema();
     }
-   
+
     public String getDeploymentUri() {
         return deploymentUri;
     }
@@ -563,60 +559,60 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     }
 
     private void loadTopicsMap() {
-		List<MessageTopic> topics = MessageTopic.findByStream(uri);
-		if (topics != null) {
-			topicsMap = new HashMap<String, MessageTopic>(); 
-			for (MessageTopic topic : topics) {
-				topic.cacheTopic();
-				topicsMap.put(topic.getLabel(), topic);
-			}
-		}    	
+        List<MessageTopic> topics = MessageTopic.findByStream(uri);
+        if (topics != null) {
+            topicsMap = new HashMap<String, MessageTopic>();
+            for (MessageTopic topic : topics) {
+                topic.cacheTopic();
+                topicsMap.put(topic.getLabel(), topic);
+            }
+        }
     }
-    
+
     public Map<String,MessageTopic> getTopicsMap() {
-		if (topicsMap != null) {
-			return topicsMap;
-		}
-		loadTopicsMap();
-		return topicsMap; 
-	};
-	
-	public List<MessageTopic> getTopicsList() {
-		if (topicsMap != null) {
-			return new ArrayList<MessageTopic>(topicsMap.values());
-		}
-		loadTopicsMap();
-		if (topicsMap != null) {
-			return new ArrayList<MessageTopic>(topicsMap.values());			
-		}
-		return new ArrayList<MessageTopic>();
-	}
-	
-	public void resetTopicsMap() {
-		topicsMap = null;
-	}
+        if (topicsMap != null) {
+            return topicsMap;
+        }
+        loadTopicsMap();
+        return topicsMap;
+    };
+
+    public List<MessageTopic> getTopicsList() {
+        if (topicsMap != null) {
+            return new ArrayList<MessageTopic>(topicsMap.values());
+        }
+        loadTopicsMap();
+        if (topicsMap != null) {
+            return new ArrayList<MessageTopic>(topicsMap.values());
+        }
+        return new ArrayList<MessageTopic>();
+    }
+
+    public void resetTopicsMap() {
+        topicsMap = null;
+    }
 
     public List<String> getHeaders() {
-    	if (headers != null) {
-    		return headers;
-    	}
-    	List<String> headers = new ArrayList<String>();
-    	if (messageHeaders == null || messageHeaders.isEmpty()) {
-    		return headers;
-    	}
-    	String auxstr = messageHeaders.replace("[","").replace("]","");
-    	StringTokenizer str = new StringTokenizer(auxstr,","); 
+        if (headers != null) {
+            return headers;
+        }
+        List<String> headers = new ArrayList<String>();
+        if (messageHeaders == null || messageHeaders.isEmpty()) {
+            return headers;
+        }
+        String auxstr = messageHeaders.replace("[","").replace("]","");
+        StringTokenizer str = new StringTokenizer(auxstr,",");
         while (str.hasMoreTokens()) {
-        	headers.add(str.nextToken().trim()); 
+            headers.add(str.nextToken().trim());
         }
         return headers;
     }
-    
+
     private void setHeaders(String headersStr) {
         this.messageHeaders = headersStr;
         getHeaders();
     }
-    
+
     public String getInstrumentModel() {
         return instrumentModel;
     }
@@ -755,7 +751,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     	}
     	return resp;
     }
-    
+
     public boolean isFinished() {
         if (endedAt == null) {
             return false;
@@ -812,7 +808,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
         return -1;
     }
-    
+
     @Override
     public long getNumber(Facet facet, FacetHandler facetHandler) {
         return getNumberFromSolr(facet, facetHandler);
@@ -839,7 +835,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
         return -1;
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
@@ -875,7 +871,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
     private Map<Facetable, List<Facetable>> parsePivot(Pivot pivot, Facet facet, String query) {
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
-        
+
         for (Pivot pivot_ent : pivot.children) {
             STR da = new STR();
             da.setUri(pivot_ent.getValue());
@@ -1061,17 +1057,17 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         }
 
         for (STR str : findAll()) {
-        	if (str == null || str.getUri() == null) {
-        		continue;
-        	}
-        	if (str.getPermissionUri() == null) {
-        		System.out.println("[ERROR] PermissionUri for STR " + str.getUri() + "is missing");
-        		continue;
-        	}
-        	if (str.getOwnerUri() == null) {
-        		System.out.println("[ERROR] OwnerUri for STR " + str.getUri() + "is missing");
-        		continue;
-        	}
+            if (str == null || str.getUri() == null) {
+                continue;
+            }
+            if (str.getPermissionUri() == null) {
+                System.out.println("[ERROR] PermissionUri for STR " + str.getUri() + "is missing");
+                continue;
+            }
+            if (str.getOwnerUri() == null) {
+                System.out.println("[ERROR] OwnerUri for STR " + str.getUri() + "is missing");
+                continue;
+            }
             if (str.getPermissionUri().equals("Public") || str.getPermissionUri().equals(user_uri)
                     || str.getOwnerUri().equals(user_uri)) {
                 results.add(str.getUri());
@@ -1207,7 +1203,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         List<STR> listDA = findByQuery(query);
 
         if (active == true) {
-            // Filter out inactive data acquisition
+            // Filter out inactive org.hadatac.data acquisition
             Iterator<STR> iterDA = listDA.iterator();
             while (iterDA.hasNext()) {
                 STR dataAcquisition = iterDA.next();
@@ -1289,5 +1285,5 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     @Override
     public void deleteFromTripleStore() {
     }
-        
+
 }

@@ -7,7 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 import org.hadatac.utils.ConfigProp;
@@ -37,15 +40,17 @@ public class NewObjectsFromFile extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    private Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir, String filename, String da_uri, String oc_uri, int page) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    public Result processForm(String dir, String filename, String da_uri, String oc_uri, int page, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         Study study = oc.getStudy();
 
-        Form<NewObjectsFromFileForm> form = formFactory.form(NewObjectsFromFileForm.class).bindFromRequest();
+        Form<NewObjectsFromFileForm> form = formFactory.form(NewObjectsFromFileForm.class).bindFromRequest(request);
         NewObjectsFromFileForm data = form.get();
 
         if (form.hasErrors()) {

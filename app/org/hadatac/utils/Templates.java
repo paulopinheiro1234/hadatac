@@ -3,11 +3,11 @@ package org.hadatac.utils;
 import org.apache.commons.configuration2.INIConfiguration;
 
 public class Templates {
-	
+
     public static String TEMPLATE_FILE = ConfigProp.getTemplateFileName();
     public static INIConfiguration iniConfig = new MyINIConfiguration(TEMPLATE_FILE);
 
-    // STD Template (Study)                                                                     
+    // STD Template (Study)
     public static String STUDYID = iniConfig.getSection("STD").getString("studyID"); // also in ACQ, PID and SID
     public static String STUDYTITLE = iniConfig.getSection("STD").getString("studyTitle");
     public static String STUDYAIMS = iniConfig.getSection("STD").getString("studyAims");
@@ -35,7 +35,7 @@ public class Templates {
     public static String UPDATEDDATE = iniConfig.getSection("STD").getString("updatedDate");
     public static String DCACCESSBOOL = iniConfig.getSection("STD").getString("DCAccessBool");
     public static String EXTSRC = iniConfig.getSection("STD").getString("externalSource");
-    
+
     // ACQ Template
     public static String ACQ_DATAACQUISITIONNAME = iniConfig.getSection("ACQ").getString("DataAcquisitionName");
     public static String ACQ_METHOD = iniConfig.getSection("ACQ").getString("Method");
@@ -44,7 +44,7 @@ public class Templates {
     public static String ACQ_EPILAB = iniConfig.getSection("ACQ").getString("Epi/Lab");
     public static String ACQ_OWNEREMAIL = iniConfig.getSection("ACQ").getString("OwnerEmail");
     public static String ACQ_PERMISSIONURI = iniConfig.getSection("ACQ").getString("PermissionURI");
-    
+
     // STR Template
     public static String DATAACQUISITIONNAME = iniConfig.getSection("STR").getString("DataAcquisitionName");
     public static String METHOD = iniConfig.getSection("STR").getString("Method");
@@ -65,7 +65,7 @@ public class Templates {
     public static String MESSAGENAME = iniConfig.getSection("STR").getString("MessageName");
 
     // DASA, DASE, DASO Template (Part of SDD)
-    public static String LABEL = iniConfig.getSection("DASA").getString("Label");     // also in PV                                                                                   
+    public static String LABEL = iniConfig.getSection("DASA").getString("Label");     // also in PV
     public static String ATTRIBUTETYPE = iniConfig.getSection("DASA").getString("AttributeType");
     public static String ATTTRIBUTEOF = iniConfig.getSection("DASA").getString("AttributeOf");
     public static String UNIT = iniConfig.getSection("DASA").getString("Unit");
@@ -76,25 +76,25 @@ public class Templates {
     public static String INRELATIONTO = iniConfig.getSection("DASA").getString("InRelationTo");
     public static String WASDERIVEDFROM = iniConfig.getSection("DASA").getString("WasDerivedFrom");
     public static String WASGENERATEDBY = iniConfig.getSection("DASA").getString("WasGeneratedBy");
-    
-    // PV Template (Part of SDD)                                                                                     
+
+    // PV Template (Part of SDD)
     public static String CODE = iniConfig.getSection("PV").getString("Code");
     public static String CODEVALUE = iniConfig.getSection("PV").getString("CodeValue");
     public static String CLASS = iniConfig.getSection("PV").getString("Class");
-    
-    // SID Template                                                                                                    
-    public static String SAMPLEID = iniConfig.getSection("SID").getString("sampleID");                      
+
+    // SID Template
+    public static String SAMPLEID = iniConfig.getSection("SID").getString("sampleID");
     public static String SAMPLESTUDYID = iniConfig.getSection("SID").getString("sampleStudyID");
     public static String SAMPLESUFFIX = iniConfig.getSection("SID").getString("sampleSuffix");
-    public static String SUBJECTID = iniConfig.getSection("SID").getString("subjectID");  // also in PID                                                                             
+    public static String SUBJECTID = iniConfig.getSection("SID").getString("subjectID");  // also in PID
     public static String SAMPLETYPE = iniConfig.getSection("SID").getString("sampleType");
     public static String SAMPLINGMETHOD = iniConfig.getSection("SID").getString("samplingMethod");
     public static String SAMPLINGVOL = iniConfig.getSection("SID").getString("samplingVol");
     public static String SAMPLINGVOLUNIT = iniConfig.getSection("SID").getString("samplingVolUnit");
     public static String STORAGETEMP = iniConfig.getSection("SID").getString("storageTemp");
     public static String FTCOUNT = iniConfig.getSection("SID").getString("FTcount");
-    
-    // MAP Template                                                                                                  
+
+    // MAP Template
     public static String ORIGINALPID = iniConfig.getSection("MAP").getString("originalPID");
     public static String ORIGINALSID = iniConfig.getSection("MAP").getString("originalSID");
     public static String OBJECTTYPE = iniConfig.getSection("MAP").getString("objecttype");

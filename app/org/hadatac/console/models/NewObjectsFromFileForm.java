@@ -10,21 +10,21 @@ public class NewObjectsFromFileForm {
 
     public NewObjectsFromFileForm () {
     }
-    
+
     public String getPosition() {
-	return position;
+        return position;
     }
-    
+
     public void setPosition(String position) {
-	this.position = position;
+        this.position = position;
     }
-    
+
     public String getCollection() {
-	return collection;
+        return collection;
     }
-    
+
     public void setCollection(String collection) {
-	this.collection = collection;
+        this.collection = collection;
     }
-    
+
 }

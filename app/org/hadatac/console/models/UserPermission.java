@@ -9,100 +9,98 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.utils.CollectionUtil;
-
-import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.models.Permission;
+import org.hadatac.utils.CollectionUtil;
 
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
  * Deadbolt2
  */
 public class UserPermission implements Permission {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	public Long id;
-	
-	@Field("id")
-	public String id_s;
+    public Long id;
 
-	@Field("value_str")
-	public String value;
+    @Field("id")
+    public String id_s;
 
-	public String getValue() {
-		return value;
-	}
+    @Field("value_str")
+    public String value;
 
-	public static UserPermission findByValue(String value) {
-		return findByValueSolr(value);
-	}
-	
-	public static UserPermission findByValueSolr(String value) {
-		UserPermission permission = null;
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
-    	SolrQuery solrQuery = new SolrQuery("value_str:" + value);
-    	
-    	try {
-			QueryResponse queryResponse = solrClient.query(solrQuery);
-			solrClient.close();
-			SolrDocumentList list = queryResponse.getResults();
-			if (list.size() == 1) {
-				permission = convertSolrDocumentToUserPermission(list.get(0));
-			}
-		} catch (Exception e) {
-			System.out.println("[ERROR] UserPermission.findByValueSolr - Exception message: " + e.getMessage());
-		}
-    	
-    	return permission;
-	}
-	
-	public static UserPermission findByIdSolr(String id) {
-		UserPermission permission = null;
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
-    	SolrQuery solrQuery = new SolrQuery("id:" + id);
-    	
-    	try {
-			QueryResponse queryResponse = solrClient.query(solrQuery);
-			solrClient.close();
-			SolrDocumentList list = queryResponse.getResults();
-			if (list.size() == 1) {
-				permission = convertSolrDocumentToUserPermission(list.get(0));
-			}
-		} catch (Exception e) {
-			System.out.println("[ERROR] UserPermission.findByIdSolr - Exception message: " + e.getMessage());
-		}
-    	
-    	return permission;
-	}
-	
-	public void save() {
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
-		
-		if (this.id_s == null) {
-			this.id_s = UUID.randomUUID().toString();
-		}
-        
+    public String getValue() {
+        return value;
+    }
+
+    public static UserPermission findByValue(String value) {
+        return findByValueSolr(value);
+    }
+
+    public static UserPermission findByValueSolr(String value) {
+        UserPermission permission = null;
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
+        SolrQuery solrQuery = new SolrQuery("value_str:" + value);
+
         try {
-        	solrClient.addBean(this);
-			solrClient.commit();
-			solrClient.close();
-		} catch (Exception e) {
-			System.out.println("[ERROR] UserPermission.save - Exception message: " + e.getMessage());
-		}
-	}
-	
-	private static UserPermission convertSolrDocumentToUserPermission(SolrDocument doc) {
-		UserPermission permission = new UserPermission();
-		permission.id_s = doc.getFieldValue("id").toString();
-		permission.value = doc.getFieldValue("value_str").toString();
-		
-		return permission;
-	}
+            QueryResponse queryResponse = solrClient.query(solrQuery);
+            solrClient.close();
+            SolrDocumentList list = queryResponse.getResults();
+            if (list.size() == 1) {
+                permission = convertSolrDocumentToUserPermission(list.get(0));
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] UserPermission.findByValueSolr - Exception message: " + e.getMessage());
+        }
+
+        return permission;
+    }
+
+    public static UserPermission findByIdSolr(String id) {
+        UserPermission permission = null;
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
+        SolrQuery solrQuery = new SolrQuery("id:" + id);
+
+        try {
+            QueryResponse queryResponse = solrClient.query(solrQuery);
+            solrClient.close();
+            SolrDocumentList list = queryResponse.getResults();
+            if (list.size() == 1) {
+                permission = convertSolrDocumentToUserPermission(list.get(0));
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] UserPermission.findByIdSolr - Exception message: " + e.getMessage());
+        }
+
+        return permission;
+    }
+
+    public void save() {
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_PERMISSIONS)).build();
+
+        if (this.id_s == null) {
+            this.id_s = UUID.randomUUID().toString();
+        }
+
+        try {
+            solrClient.addBean(this);
+            solrClient.commit();
+            solrClient.close();
+        } catch (Exception e) {
+            System.out.println("[ERROR] UserPermission.save - Exception message: " + e.getMessage());
+        }
+    }
+
+    private static UserPermission convertSolrDocumentToUserPermission(SolrDocument doc) {
+        UserPermission permission = new UserPermission();
+        permission.id_s = doc.getFieldValue("id").toString();
+        permission.value = doc.getFieldValue("value_str").toString();
+
+        return permission;
+    }
 }
