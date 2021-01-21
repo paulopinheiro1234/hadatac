@@ -1,16 +1,16 @@
 package org.hadatac.entity.pojo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
 
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Alignment {
-
-    private static final Logger log = LoggerFactory.getLogger(Alignment.class);
-    private static Set<String> errMsgs = new HashSet<>();
 
     private Map<String, StudyObject> objects;
     //private List<String> timestamps;
@@ -110,7 +110,6 @@ public class Alignment {
      * returns a key to retrieve variables. if needed, measuremtnKey adds new variables 
      */
     public String measurementKey(Measurement m) {
-
         if (variables == null) {
             System.out.println("[ERROR] Alignment: alignment attribute list not initialized ");
             return null;
@@ -129,7 +128,7 @@ public class Alignment {
             if (irt != null && irt.getUri().equals(m.getInRelationToUri())) {
                 mInRelationTo = irt.getUri();
             } else {		
-                irt = Entity.facetSearchFind(m.getInRelationToUri());
+                irt = Entity.find(m.getInRelationToUri());
                 if (irt == null) {
                     System.out.println("[ERROR] Alignment: retrieving entity playing inRelationTo " + m.getInRelationToUri());
                 } else {
@@ -145,14 +144,9 @@ public class Alignment {
             if (unit != null && unit.getUri().equals(m.getUnitUri())) {
                 mUnit = unit.getUri();
             } else {
-                unit = Unit.facetSearchFind(m.getUnitUri());
+                unit = Unit.find(m.getUnitUri());
                 if (unit == null) {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append("[ERROR] Alignment: could not retrieve unit [").append(m.getUnitUri()).append("]. Ignoring unit.");
-                    if ( errMsgs.contains(sb.toString()) == false ) {
-                        log.error(sb.toString());
-                        errMsgs.add(sb.toString());
-                    }
+                    System.out.println("[ERROR] Alignment: could not retrieve unit [" + m.getUnitUri() + "]. Ignoring unit.");
                 } else {
                     unitCache.put(unit.getUri(),unit);
                     mUnit = m.getUnitUri();
@@ -166,7 +160,7 @@ public class Alignment {
             if (timeAttr != null && timeAttr.getUri().equals(m.getAbstractTime())) {
                 mAbstractTime = timeAttr.getUri();
             } else {
-                timeAttr = Attribute.facetSearchFind(m.getAbstractTime());
+                timeAttr = Attribute.find(m.getAbstractTime());
                 if (timeAttr == null) {
                     System.out.println("[ERROR] Alignment: could not retrieve abstract time [" + m.getAbstractTime() + "]. Ignoring abstract time.");
                 } else {
@@ -209,7 +203,7 @@ public class Alignment {
 
         Entity entity = entityCache.get(m.getEntityUri());
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
-            entity = Entity.facetSearchFind(m.getEntityUri());
+            entity = Entity.find(m.getEntityUri());
             if (entity == null) {
                 System.out.println("[ERROR] Alignment: retrieving entity " + m.getEntityUri());
                 return null;
@@ -236,7 +230,7 @@ public class Alignment {
 	        if (attribute == null || !attribute.getUri().equals(m.getCategoricalClassUri())) {
 	        	attribute = attrCache.get(m.getCategoricalClassUri());
 	        	if (attribute == null) {
-	        		attribute = Attribute.facetSearchFind(m.getCategoricalClassUri());
+	        		attribute = Attribute.find(m.getCategoricalClassUri());
 	        		if (attribute == null) {
 	        			System.out.println("[ERROR] Alignment: retrieving attribute " + m.getCategoricalClassUri());
 	        			return null;
@@ -261,7 +255,7 @@ public class Alignment {
 	            for (String attrUri : m.getCharacteristicUris()) {
 		        	attribute = attrCache.get(attrUri);
 		        	if (attribute == null) {
-		        		attribute = Attribute.facetSearchFind(attrUri);
+		        		attribute = Attribute.find(attrUri);
 		        		if (attribute == null) {
 		        			System.out.println("[ERROR] Alignment: retrieving attribute " + attrUri);
 		        			return null;
@@ -321,20 +315,21 @@ public class Alignment {
      *           GRAPH OPERATIONS
      * ========================================== */
 
-    public static List<String> alignmentObjects(String currentObj, List<String> selectedRoles, String originalId) {
+    public static List<String> alignmentObjects(String currentObj, String selectedRole, String originalId) {
         //System.out.println("Align-Debug: Current Object [" + currentObj + "]"); 
     	List<String> alignObjs = new ArrayList<String>();
-    	if (currentObj == null || currentObj.isEmpty() || selectedRoles == null || selectedRoles.size() == 0 ) {
-            log.debug("Current Obj or Selected Role are empty");
+    	if (currentObj == null || currentObj.isEmpty() || selectedRole == null || selectedRole.isEmpty()) {
+            //System.out.println("Align-Debug: Current Obj or Selected Role are empty"); 
     		return alignObjs;
     	}
     		
     	/* 
     	 * Test if the current object is already the alignment object
     	 */
-    	if (selectedRoles.contains(StudyObject.findSocRole(currentObj)) ) {
+    	// if (selectedRole.equals(StudyObject.findSocRole(currentObj)) || currentObj.toUpperCase().indexOf("SPL-C") >= 0 ) {
+        if (selectedRole.equals(StudyObject.findSocRole(currentObj)) ) {
             alignObjs.add(currentObj);
-            log.debug("Already ALIGNMENT object");
+            //System.out.println("Align-Debug: Already ALIGNMENT object"); 
     		return alignObjs;
     	};
 
@@ -348,7 +343,7 @@ public class Alignment {
                 Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
                 if (itr.hasNext()) { 
                 	Map.Entry<String, String> entry = itr.next();
-                	if ( selectedRoles.contains(entry.getValue()) ) {
+                	if (entry.getValue().equals(selectedRole)) {
                 		alignObjs.add(entry.getKey());
                         //System.out.println("Align-Debug: UPSTREAM object"); 
                 		return new ArrayList<>(new HashSet<>(alignObjs));
@@ -360,27 +355,25 @@ public class Alignment {
     	/* 
     	 * Test if alignment object(s) is(are) downstream 
     	 */
-        for ( String selectedRole : selectedRoles ) {
-            List<Map<String, String>> downstream = StudyObject.findDownstreamSocs(currentObj, originalId, selectedRole);
-            if (downstream.size() > 0) {
-                // iteration is not interrupted and selects all objs with matching role
-                for (Map<String, String> socRoleTuple : downstream) {
-                    Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
-                    if (itr.hasNext()) {
-                        Map.Entry<String, String> entry = itr.next();
-                        if (entry.getValue().equals(selectedRole)) {
-                            alignObjs.add(entry.getKey());
-                        }
-                    }
+        List<Map<String,String>> downstream = StudyObject.findDownstreamSocs(currentObj, originalId, selectedRole);
+        if (downstream.size() > 0) {
+        	// iteration is not interrupted and selects all objs with matching role 
+        	for (Map<String,String> socRoleTuple :  downstream) {
+                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
+                if (itr.hasNext()) { 
+                	Map.Entry<String, String> entry = itr.next();
+                	if (entry.getValue().equals(selectedRole)) {
+                		alignObjs.add(entry.getKey());
+                	}
                 }
-                if (alignObjs.size() > 1) {
-
-                }
-                if (alignObjs.size() > 0) {
-                    //System.out.println("Align-Debug: DOWNSTREAM objects of size " + alignObjs.size());
-                    return new ArrayList<>(new HashSet<>(alignObjs));
-                }
-            }
+        	}
+        	if (alignObjs.size() > 1) {
+        		
+        	}
+        	if (alignObjs.size() > 0) {
+                //System.out.println("Align-Debug: DOWNSTREAM objects of size " + alignObjs.size()); 
+        		return new ArrayList<>(new HashSet<>(alignObjs));
+        	}
         }
 
     	/* 
@@ -388,36 +381,34 @@ public class Alignment {
     	 */
         if (upstream.size() > 0) {
 
+            boolean found = false;
         	for (Map<String,String> socRoleTuple :  upstream) {
-
-                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
-
-                if (itr.hasNext()) {
-
+                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
+                if (itr.hasNext()) { 
                 	Map.Entry<String, String> entry = itr.next();
                 	String upstreamObj = entry.getKey();
-
-                	for ( String selectedRole : selectedRoles ) {
-                        List<Map<String, String>> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, originalId, selectedRole);
-                        if (downstreamFromUpstream.size() > 0) {
-                            // iteration is not interrupted and selects all objs with matching role
-                            for (Map<String, String> socRoleTuple2 : downstreamFromUpstream) {
-                                Iterator<Map.Entry<String, String>> itr2 = socRoleTuple2.entrySet().iterator();
-                                if (itr2.hasNext()) {
-                                    Map.Entry<String, String> entry2 = itr2.next();
-                                    if (entry2.getValue().equals(selectedRole) && !alignObjs.contains(entry2.getKey())) {
-                                        alignObjs.add(entry2.getKey());
-                                        return new ArrayList<>(new HashSet<>(alignObjs));
-                                    }
-                                }
+                	
+                    List<Map<String,String>> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, originalId, selectedRole);
+                    if (downstreamFromUpstream.size() > 0) {
+                    	// iteration is not interrupted and selects all objs with matching role 
+                    	for (Map<String,String> socRoleTuple2 :  downstreamFromUpstream) {
+                            Iterator<Map.Entry<String, String>> itr2 = socRoleTuple2.entrySet().iterator(); 
+                            if (itr2.hasNext()) { 
+                            	Map.Entry<String, String> entry2 = itr2.next();
+                            	if (entry2.getValue().equals(selectedRole) && !alignObjs.contains(entry2.getKey())) {
+                            		alignObjs.add(entry2.getKey());
+                            		found = true;
+                            	}
                             }
-                        }
-                    }  // end of for
-
-                } // end of hasNext()
-
-        	} // end of upstream role map
-
+                    	}
+                    }
+                }
+                if ( found ) break;
+        	}
+        	if (alignObjs.size() > 0) {
+                //System.out.println("Align-Debug: DOWNSTREAM OF UPSTREAM objects of size " + alignObjs.size()); 
+        		return new ArrayList<>(new HashSet<>(alignObjs));
+        	}
         }
 
         System.out.println("[ERROR] Alignment: COULD NOT FIND alignment object for [" + currentObj + "]"); 
@@ -524,7 +515,7 @@ public class Alignment {
     public void addObject(StudyObject obj) {
         objects.put(obj.getUri(), obj);
         if (!studyId.containsKey(obj.getIsMemberOf())) {
-        	ObjectCollection soc = ObjectCollection.findFacetSearch(obj.getIsMemberOf());
+        	ObjectCollection soc = ObjectCollection.find(obj.getIsMemberOf());
         	if (soc != null) {
         		Study std = soc.getStudy();
         		if (std != null && std.getId() != null) {

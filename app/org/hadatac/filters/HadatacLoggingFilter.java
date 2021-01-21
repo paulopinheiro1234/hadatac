@@ -33,9 +33,7 @@ public class HadatacLoggingFilter extends Filter {
 
         Session session = requestHeader.asScala().session();
         String sessionEmail = "unknown";
-        if ( session != null && requestHeader.uri().contains("/hadatac/downloader/checkcompletion") == false &&
-                requestHeader.uri().contains("hadatac/downloader") == false && requestHeader.uri().contains("hadatac/assets/") == false ) {
-            // System.out.println("------------------------------------->>>>> retrieving users: " + requestHeader.uri().toString());
+        if ( session != null ) {
             SysUser user = AuthApplication.getLocalUser(session.asJava());
             if (user != null) {
                 sessionEmail = user.getEmail();
@@ -54,8 +52,7 @@ public class HadatacLoggingFilter extends Filter {
                                     requstTime,
                                     result.status());
                             if ( !msg.contains("/assets/") && requestHeader.uri() != null
-                                    && requestHeader.uri().contains("/hadatac/downloader/checkcompletion") == false
-                                    && requestHeader.uri().contains("/hadatac/downloader") == false ) {
+                                    && requestHeader.uri().contains("/hadatac/downloader/checkcompletion") == false ) {
                                 log.info(msg);
                             }
                             return result.withHeader("Request-Time", "" + requstTime);

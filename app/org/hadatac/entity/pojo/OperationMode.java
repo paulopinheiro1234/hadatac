@@ -110,7 +110,6 @@ public class OperationMode {
 			}
 		} catch (Exception e) {
 			list.clear();
-			e.printStackTrace();
 			System.out.println("[ERROR] OperationMode.find(SolrQuery) - Exception message: " + e.getMessage());
 		}
 		

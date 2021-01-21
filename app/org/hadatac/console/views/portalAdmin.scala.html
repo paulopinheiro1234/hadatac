@@ -8,16 +8,16 @@
        <h4>Data/Metadata Search</h4>
         @*<a href="@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(false, false, false, false, false, false)"
           id="kg" class="btn btn-primary btn-block" role="button">Knowledge Graph Browsing</a>    *@
-        <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()"
-          id="metadatafacet" class="btn btn-primary btn-block" role="button">Study Search</a>
-        <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()"
-          id="dataacquisitionfacet" class="btn btn-primary btn-block" role="button">Acquisition Search</a>
+        @*<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()"
+          id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Study Search</a>  *@
+        @*<a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()"
+          id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Data Stream Search</a>  *@
         <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()"
           id="data" class="btn btn-primary btn-block" role="button">Data Faceted Search</a>
         <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index("/", "", "", "", "")"
           id="spatial" class="btn btn-primary btn-block" role="button">Data Spatial Search</a>
-        <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()"
-          id="variables" class="btn btn-primary btn-block" role="button">Variable Search</a>
+        @*<a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()"
+          id="variables" class="btn btn-primary btn-block disabled" role="button">Variable Search</a>  *@
         @*<a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()"
           id="analytes" class="btn btn-primary btn-block disabled" role="button">Analyte Search</a>  *@
         @*<a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()"
