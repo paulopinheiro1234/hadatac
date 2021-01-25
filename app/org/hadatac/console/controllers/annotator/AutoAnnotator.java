@@ -530,8 +530,9 @@ public class AutoAnnotator extends Controller {
       }
 
       if (!user.isDataManager()) {
-         if (!dataFile.getViewerEmails().contains(user.getEmail())
-         && !dataFile.getEditorEmails().contains(user.getEmail())) {
+         if ( (dataFile.getOwnerEmail() != null && !dataFile.getOwnerEmail().equalsIgnoreCase(user.getEmail()))
+                 && !dataFile.getViewerEmails().contains(user.getEmail())
+                 && !dataFile.getEditorEmails().contains(user.getEmail())) {
             return badRequest("You do NOT have the permission to download this file!");
          }
       }

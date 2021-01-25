@@ -26,7 +26,7 @@
           id="urilookup" class="btn btn-primary btn-block" role="button">URI Lookup</a>
 
         <h4>Data/Metadata Retrieve and Download</h4>
-        <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()"
+        <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
            id="downloader" class="btn btn-primary btn-block" role="button">Data Download</a>
         <a href="@org.hadatac.console.controllers.restapi.routes.ExampleCalls.index()"
            id="apicall" class="btn btn-primary btn-block" role="button">RESTFul API Calls</a>
@@ -40,7 +40,7 @@
                 <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index("/", filename, da_uri, page, false)"
                 id="messages" class="btn btn-primary btn-block" role="button">Ingest Messages</a>
             }
-            <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
+            <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/", true)"
                id="workingfiles" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
             <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()"
                id="studies" class="btn btn-primary btn-block" role="button">Manage Studies [STD/SSD]</a>

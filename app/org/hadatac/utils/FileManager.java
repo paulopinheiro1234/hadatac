@@ -7,7 +7,7 @@ public class FileManager {
     
     public static String UNPROC = "unproc";
     public static String PROC = "proc";
-    public static String DOWNLOAD = "download";
+    // public static String DOWNLOAD = "download";
     public static String WORKING = "working";
     
     private static FileManager manager = null;
@@ -16,7 +16,7 @@ public class FileManager {
     private FileManager() {
         addPath(new Path(UNPROC, /*ConfigProp.AUTOANNOTATOR_CONFIG_FILE*/ "hadatac.autoccsv", "path_unproc"));
         addPath(new Path(PROC, /*ConfigProp.AUTOANNOTATOR_CONFIG_FILE*/ "hadatac.autoccsv", "path_proc"));
-        addPath(new Path(DOWNLOAD, /*ConfigProp.AUTOANNOTATOR_CONFIG_FILE*/ "hadatac.autoccsv", "path_download"));
+        // addPath(new Path(DOWNLOAD, /*ConfigProp.AUTOANNOTATOR_CONFIG_FILE*/ "hadatac.autoccsv", "path_download"));
         addPath(new Path(WORKING, /*ConfigProp.AUTOANNOTATOR_CONFIG_FILE*/ "hadatac.autoccsv", "path_working"));
     }
     

@@ -36,7 +36,7 @@ public class Path {
 		return ConfigProp.getPathProc();
 	}
 	else if(getLabel().equals("DOWNLOAD")) {
-		return ConfigProp.getPathDownload();
+		return ConfigProp.getPathWorking();
 	}
 	else if(getLabel().equals("WORKING")) {
 		return ConfigProp.getPathWorking();

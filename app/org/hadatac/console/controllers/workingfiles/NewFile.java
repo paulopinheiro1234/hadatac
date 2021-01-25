@@ -92,6 +92,6 @@ public class NewFile extends Controller {
             e.printStackTrace();
         }
         
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 }

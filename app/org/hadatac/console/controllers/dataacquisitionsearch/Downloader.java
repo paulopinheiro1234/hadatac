@@ -27,6 +27,7 @@ import org.hadatac.utils.Feedback;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.hadatac.utils.FileManager;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -48,7 +49,7 @@ public class Downloader extends Controller {
 
         List<DataFile> files = null;
 
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.CREATED);
@@ -154,7 +155,15 @@ public class Downloader extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result checkCompletion(String fileId) {
+
         Map<String, Object> result = new HashMap<String, Object>();
+
+        if ( fileId == null || fileId.indexOf("object_alignment") < 0 ) {
+            return ok(Json.toJson(result));
+        }
+        if ( fileId.startsWith("object_alignment") == false ) {
+            fileId = fileId.substring(fileId.indexOf("object_alignment"));
+        }
 
         DataFile dataFile = DataFile.findByNameAndStatus(fileId, DataFile.CREATING);
         if ( dataFile == null ) {
@@ -200,16 +209,19 @@ public class Downloader extends Controller {
         Date date = new Date();
         String fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
-        DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+        // will use the user email address as the directory
+        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "download/"+ ownerEmail, ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
         System.out.println("Created download " + fileName);
-        
-        File file = new File(dataFile.getAbsolutePath());
+
+        String absolutePath = dataFile.getAbsolutePath();
+        System.out.println("downloaded file... absolute path = " + absolutePath);
+        File file = new File(absolutePath);
 
         Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption);
-        System.out.println("Generated CSV files ...");
+        System.out.println("download finished, CSV files are generated...");
 
         return 0;
     }

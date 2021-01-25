@@ -50,12 +50,12 @@ public class ExportKB extends Controller {
             
             System.out.println("Model size: " + model.size());
             
-            RDFDataMgr.write(new FileOutputStream(ConfigProp.getPathDownload() + DOWNLOAD_FILE_NAME, false), 
+            RDFDataMgr.write(new FileOutputStream(ConfigProp.getPathWorking() + DOWNLOAD_FILE_NAME, false),
                     model, RDFFormat.TURTLE);
             
             System.out.println("Export finished");
             
-            return ok(new File(ConfigProp.getPathDownload() + DOWNLOAD_FILE_NAME));
+            return ok(new File(ConfigProp.getPathWorking() + DOWNLOAD_FILE_NAME));
         } catch (Exception e) {
             e.printStackTrace();
             return badRequest("Export failed ...");

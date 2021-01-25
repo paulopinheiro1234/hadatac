@@ -105,22 +105,8 @@ public class ConfigProp {
 	    return Paths.get(getPathProc(), "/" + MEDIA_FOLDER + "/").toString();
 	}
 
-	public static String getPathDownload() {
-	    if (CollectionUtil.isSandboxMode()) {
-	    	return ConfigFactory.load().getString("hadatac.autoccsv.path_download") + Sandbox.SUFFIX;
-	        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + Sandbox.SUFFIX;
-	    }
-	    return ConfigFactory.load().getString("hadatac.autoccsv.path_download");
-		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
-	}
-
 	public static String getPathDataDictionary() {
-        if (CollectionUtil.isSandboxMode()) {
-        	return ConfigFactory.load().getString("hadatac.autoccsv.path_download") + Sandbox.SUFFIX;
-            //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict") + Sandbox.SUFFIX;
-        }
-        return ConfigFactory.load().getString("hadatac.autoccsv.path_download");
-        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict");
+        return getPathWorking();
     }
 
 	public static String getPathWorking() {

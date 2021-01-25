@@ -67,13 +67,13 @@ public class Folder extends Controller {
             folder.mkdirs();
         }
         
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result delete(String dir, String path) {
     	if (dir == null || path == null || path.equals("/")) {
-    		return redirect(routes.WorkingFiles.index(dir, "."));
+    		return redirect(routes.WorkingFiles.index(dir, ".", false));
     	}
     	
         String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
@@ -93,7 +93,7 @@ public class Folder extends Controller {
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteForm(String dir, String path) {
     	if (dir == null || path == null || path.equals("/")) {
-    		return redirect(routes.WorkingFiles.index(dir, "."));
+    		return redirect(routes.WorkingFiles.index(dir, ".", false));
     	}
 
     	String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
@@ -105,6 +105,6 @@ public class Folder extends Controller {
         	e.printStackTrace();
         }
 
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 }

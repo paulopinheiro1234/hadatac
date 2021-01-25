@@ -36,7 +36,7 @@ public class DDEditor extends Controller {
         
         getdd_df(dataFile);
         List<DataFile> files = null;
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         files = DataFile.find(user.getEmail());
 
@@ -96,7 +96,7 @@ public class DDEditor extends Controller {
         System.out.println("sdd filename: "+sddFileName);
         final SysUser user = AuthApplication.getLocalUser(session());
         List<DataFile> files = null;
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         files = DataFile.find(user.getEmail());
         String sdd_filename=sddFileName;

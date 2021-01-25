@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-
+import org.hadatac.console.controllers.workingfiles.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -180,7 +180,7 @@ public class DataAcquisitionSearch extends Controller {
             facets = request().body().asFormUrlEncoded().get("facets")[0];
         }
 
-        //System.out.println("\n\n\n\n\nfacets: " + facets);
+        log.debug("facets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacetsFromString(facets);
@@ -342,16 +342,16 @@ public class DataAcquisitionSearch extends Controller {
 
         promiseOfResult.whenComplete(
                 (result, exeception) -> {
-                    log.info("DOWNLOA: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
+                    log.info("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
                 });
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        return redirect(routes.Downloader.index());
+        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/", false));
     }
 
     private String getUserEmail() {

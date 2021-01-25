@@ -54,7 +54,7 @@ public class DataDictionaryAnnotator extends Controller {
 
         List<DataFile> files = null;
 
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.DD_UNPROCESSED);
@@ -76,7 +76,7 @@ public class DataDictionaryAnnotator extends Controller {
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result downloadDataFile(String file_name) {
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
         return ok(new File(path + "/" + file_name));
     }
 
