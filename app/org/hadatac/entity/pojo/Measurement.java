@@ -1878,28 +1878,27 @@ public class Measurement extends HADatAcThing implements Runnable {
                     dataFile.delete();
                     return;
                 }
+
+                // Write harmonized code book
+                alignment.getCodeBook();
+                if (categoricalOption.equals(WITH_CODE_BOOK)) {
+                    fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                }
+
+                // Write DOI list of sources
+                outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+
+                // finalize the main download file
                 dataFile.setCompletionPercentage(100);
                 dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
                 dataFile.setStatus(DataFile.CREATED);
                 dataFile.save();
                 fileCreated = true;
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        alignment.getCodeBook();
-        if (dataFile != null && fileCreated) {
-        	// Write harmonized code book
-        	if (categoricalOption.equals(WITH_CODE_BOOK)) {
-        		fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
-        	}
-        }
-
-        if (dataFile != null && fileCreated) {
-        	// Write DOI list of sources
-        	outputProvenance(alignment, file, dataFile.getOwnerEmail());
-        }    	
 
     }
 
@@ -1912,7 +1911,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         return true;
     }
 
-    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
+    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail, String dataDir) {
       boolean fileCreated = false; 
 	  try {
 	    //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
@@ -1922,7 +1921,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    //DataFile dataFile = new DataFile(codeBookFile.getName());
 	    //dataFile.setOwnerEmail(ownerEmail);
 	    //dataFile.setStatus(DataFile.CREATING);
-	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+	    DataFile dataFile = DataFile.create(fileName, dataDir, ownerEmail, DataFile.CREATING);
 	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 	    dataFile.save();
 
@@ -2001,11 +2000,11 @@ public class Measurement extends HADatAcThing implements Runnable {
 	  	return fileCreated;
     }
 
-    public static void outputProvenance(Alignment alignment, File file, String ownerEmail) {        
+    public static void outputProvenance(Alignment alignment, File file, String ownerEmail, String dataDir) {
 	try {
 	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
 	    Date date = new Date();
-	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+	    DataFile dataFile = DataFile.create(fileName, dataDir, ownerEmail, DataFile.CREATING);
 	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 	    dataFile.save();
 

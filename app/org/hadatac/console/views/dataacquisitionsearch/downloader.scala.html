@@ -14,6 +14,7 @@
 	<script type="text/javascript">
 	$(document).ready(function() {
 	    function checkCompletion() {
+	    	// console.log("calling checkCompletion...");
 	        $("#download_files tbody tr").each(function () {
 		        var row = $(this);
 		        var status;
@@ -30,6 +31,7 @@
 		            } else {
 		                row.find("td:nth-child(6) [name='download']").removeClass("disabled");
                         row.find("td:nth-child(6) [name='assign_owner']").removeClass("disabled");
+					    row.find("td:nth-child(6) [name='to_my_workspace']").removeClass("disabled");
 		            }
 		            
 		            return;
@@ -41,9 +43,14 @@
                 } else {
                     row.find("td:nth-child(6) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
                     row.find("td:nth-child(6) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
+				    row.find("td:nth-child(6) [name='to_my_workspace']").attr('class', 'btn btn-xs btn-primary disabled');
                 }
-		        
-	        	$.ajax({
+		        console.log(row.find("td:nth-child(1)").html().toString());
+				console.log(row.find("td:nth-child(2)").html().toString());
+				//console.log(row.find("td:nth-child(3)").html().toString());
+				//console.log(row.find("td:nth-child(4)").html().toString());
+
+				$.ajax({
 	                type: 'GET',
 	                url: '/hadatac/downloader/checkcompletion',
 	                data: { 'file_id': row.find("td:nth-child(1)").html().toString() },
@@ -58,11 +65,16 @@
                         row.find("td:nth-child(4)").html(data['CompletionPercentage'] + '%');
                         row.find("td:nth-child(5)").html(data['Status']);
 		                }
+						console.log("completionPercentage = " + data['CompletionPercentage']);
+						if( data['CompletionPercentage'] >= 100 ) {
+							console.log("stopping the scheduled query since download is done...");
+							setTimeout(() => { clearInterval(timerId); }, 0);
+						}
 	                }
 	            });
 	        });
 	    }
-	    setInterval(checkCompletion, 1000);
+	    let timerId = setInterval(checkCompletion, 1000);
 	});
     </script>
 	
@@ -101,7 +113,9 @@
 	    				<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getId())" 
 					   class="btn btn-xs btn-primary" name="assign_owner" role="button">Assign Owner</a>
 	    			}
-	    			<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getId())" 
+					<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
+					class="btn btn-xs btn-primary" name="to_my_workspace" role="button">to my workspace</a>
+					<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getId())"
 				   class="btn btn-xs btn-primary" name="logs" role="button">Logs</a>
     			</td>
     		</tr>

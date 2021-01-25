@@ -208,7 +208,7 @@ public class LoadOnt extends Controller {
         NameSpaces.getInstance().reload();
 
         // save the name of the last uploaded namespace
-        File lastloadedfile = new File(ConfigProp.getPathDownload() + LAST_LOADED_NAMESPACE);
+        File lastloadedfile = new File(ConfigProp.getPathWorking() + LAST_LOADED_NAMESPACE);
         try {
             FileOutputStream lastLoadedOutputStream = new FileOutputStream(lastloadedfile);
             System.out.println("Name last loaded prop file: " + lastLoadedOutputStream);
@@ -222,7 +222,7 @@ public class LoadOnt extends Controller {
     }
 
     public static String getNameLastLoadedNamespace() {
-        File lastloadedfile = new File(ConfigProp.getPathDownload() + LAST_LOADED_NAMESPACE);
+        File lastloadedfile = new File(ConfigProp.getPathWorking() + LAST_LOADED_NAMESPACE);
         String name_last_loaded_namespace = "";
         try {
             FileInputStream inputStream = new FileInputStream(lastloadedfile);
@@ -237,7 +237,7 @@ public class LoadOnt extends Controller {
     
     @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result exportNamespaces() {
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
