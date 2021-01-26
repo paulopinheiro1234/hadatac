@@ -217,9 +217,12 @@ public class Downloader extends Controller {
         System.out.println("Created download " + fileName);
 
         String absolutePath = dataFile.getAbsolutePath();
+        if ( !absolutePath.startsWith("/") ) {
+            absolutePath = "/" + absolutePath;
+        }
         System.out.println("downloaded file... absolute path = " + absolutePath);
-        File file = new File(absolutePath);
 
+        File file = new File(absolutePath);
         Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption);
         System.out.println("download finished, CSV files are generated...");
 
