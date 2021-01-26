@@ -68,55 +68,67 @@ public class WorkingFiles extends Controller {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String dest) {        
+    public Result index(String dir, String dest, Boolean stayAtRoot) {
+
         final SysUser user = AuthApplication.getLocalUser(session());
 
-        String newDir = Paths.get(dir, dest).normalize().toString();
-        
+        String targetDir = null;
         List<DataFile> wkFiles = null;
-
         String pathWorking = ConfigProp.getPathWorking();
-        
-        List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString(), false);
+
+        if ( stayAtRoot ) {
+            targetDir = pathWorking;
+        } else {
+            if ("/".equals(dest)) {
+                targetDir = pathWorking + "download/" + user.getEmail();
+            } else {
+                targetDir = Paths.get(dir, dest).normalize().toString();
+            }
+        }
+
+        if ( targetDir.startsWith(pathWorking.substring(0, pathWorking.length()-1)) == false )  {
+            targetDir = Paths.get(pathWorking, targetDir).normalize().toString();
+        }
+
+        // List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString(), false);
+        List<String> folders = DataFile.findFolders(targetDir, false);
         Collections.sort(folders);
-        if (!"/".equals(newDir)) {
+        if (!"/".equals(targetDir)) {
             folders.add(0, "..");
         }
         
         if (user.isDataManager()) {
-        	wkFiles = DataFile.findInDir(newDir, DataFile.WORKING);
+        	wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
         	
-        	String basePath = newDir;
+        	String basePath = targetDir;
             if (basePath.startsWith("/")) {
                 basePath = basePath.substring(1, basePath.length());
             }
             
-        	DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), 
-        	        basePath, wkFiles, user.getEmail(), DataFile.WORKING);
+        	// DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
         } else {
-            wkFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.WORKING);
+            // since we can see other users' download, we don't send it email anymore
+            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, /*user.getEmail(), */ DataFile.CREATING);
         }
 
-        DataFile.filterNonexistedFiles(pathWorking, wkFiles);
-
-        wkFiles.sort(new Comparator<DataFile>() {
-            @Override
-            public int compare(DataFile d1, DataFile d2) {
-                return d1.getFileName().compareTo(d2.getFileName());
-            }
-        });
+        // DataFile.filterNonexistedFiles(pathWorking, wkFiles);
         
         DataFile.updatePermission(wkFiles, user.getEmail());
-        
-        return ok(workingFiles.render(newDir, folders, wkFiles, user.isDataManager()));
+
+        // once we reach the level that contains download, we don't want to allow the use to nevigate back to upper level
+        if ( folders.contains("download/") ) {
+            folders.remove("..");
+        }
+        return ok(workingFiles.render(targetDir, folders, wkFiles, user.isDataManager()));
+
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result postIndex(String dir, String dest) {
-        return index(dir, dest);
+        return index(dir, dest, false);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result renameDataFile(String dir, String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
@@ -139,7 +151,7 @@ public class WorkingFiles extends Controller {
         return renameDataFile(dir, fileId);
     } 
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result processRenameDataFileForm(String dir, String fileId) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(session());
         
@@ -184,11 +196,11 @@ public class WorkingFiles extends Controller {
                 }
             }
             
-            return redirect(routes.WorkingFiles.index(dir, "."));
+            return redirect(routes.WorkingFiles.index(dir, ".", false));
         }
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result moveDataFile(String dir, String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
@@ -271,7 +283,7 @@ public class WorkingFiles extends Controller {
                 }
             }
             
-            return redirect(routes.WorkingFiles.index(dir, "."));
+            return redirect(routes.WorkingFiles.index(dir, ".", false));
         }
     }
     
@@ -357,7 +369,7 @@ public class WorkingFiles extends Controller {
             }
         }
         
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
     
     public void moveSingleDataFile(DataFile dataFile, String destination) throws Exception {
@@ -394,7 +406,7 @@ public class WorkingFiles extends Controller {
         }
     }
     
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result shareDataFile(String dir, String fileId) {
         final SysUser user = AuthApplication.getLocalUser(session());
         
@@ -423,7 +435,7 @@ public class WorkingFiles extends Controller {
     }
     
     @SuppressWarnings("unchecked")
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result saveViewerEmails() throws Exception {
         Form form = formFactory.form().bindFromRequest();
         Map<String, String> data = form.rawData();
@@ -540,14 +552,13 @@ public class WorkingFiles extends Controller {
     public Result checkAnnotationLog(String dir, String fileId) {
         DataFile dataFile = DataFile.findById(fileId);
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                DataFile.findById(fileId).getLog()), 
-                routes.WorkingFiles.index(dir, dir).url()));
+                DataFile.findById(fileId).getLog()),
+                routes.WorkingFiles.index(dir, "/", false).url()));
     }
 
     public Result getAnnotationStatus(String fileId) {
         DataFile dataFile = DataFile.findById(fileId);
         Map<String, Object> result = new HashMap<String, Object>();
-
         if (dataFile == null) {
             result.put("File Id", fileId);
             result.put("Status", "Unknown");
@@ -584,7 +595,7 @@ public class WorkingFiles extends Controller {
         file.delete();
         dataFile.delete();
 
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -619,7 +630,7 @@ public class WorkingFiles extends Controller {
             dataFile.delete();
         }
 
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
     
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -701,7 +712,7 @@ public class WorkingFiles extends Controller {
         }
         
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog), 
-                routes.WorkingFiles.index("/", ".").url()));
+                routes.WorkingFiles.index("/", ".", false).url()));
     }
     @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result verifyDataFileTemp(String file_id) {

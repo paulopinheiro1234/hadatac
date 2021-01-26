@@ -81,7 +81,7 @@ public class SDDEditorV2 extends Controller {
 
         } else if (indicator == 0) {
             List<DataFile> files = null;
-            String path = ConfigProp.getPathDownload();
+            String path = ConfigProp.getPathWorking();
             files = DataFile.find(user.getEmail());
             String dd_filename=dataFile.getFileName();
             dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character

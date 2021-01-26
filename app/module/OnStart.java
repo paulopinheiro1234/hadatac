@@ -67,7 +67,7 @@ public class OnStart {
 		listFolderPaths.add(ConfigProp.getLogs());
 		listFolderPaths.add(ConfigProp.getPathProc());
 		listFolderPaths.add(ConfigProp.getPathUnproc());
-		listFolderPaths.add(ConfigProp.getPathDownload());
+		//listFolderPaths.add(ConfigProp.getPathDownload());
 		listFolderPaths.add(ConfigProp.getPathWorking());
 		listFolderPaths.add(ConfigProp.getTmp() + "ttl");
 		listFolderPaths.add(ConfigProp.getTmp() + "cache");
