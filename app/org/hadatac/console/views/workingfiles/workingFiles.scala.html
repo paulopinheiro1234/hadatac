@@ -131,7 +131,11 @@
 
     }
 
-    <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
+
+    <h4>Current Working Files Folder: <font color="Green">
+        @(if(dir.indexOf("/download")>=0) {
+            dir.substring(dir.indexOf("/download"));
+        } else { "/"; })</font></h4>
 
     <form id="fileListForm" method="post">
     @if(!workingFiles.isEmpty()) {

@@ -380,7 +380,7 @@ public class DataFile implements Cloneable {
     }
     public void setDir(String dir) {
         dir = Paths.get(dir).toString();
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
         this.dir = dir;
@@ -906,7 +906,7 @@ public class DataFile implements Cloneable {
 
     public static List<DataFile> findDownloadedFilesInDir(String dir, String userEmail, String status) {
 
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
 
@@ -921,7 +921,7 @@ public class DataFile implements Cloneable {
 
     public static List<DataFile> findDownloadedFilesInDir(String dir, String status) {
 
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
         
