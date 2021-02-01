@@ -1,48 +1,35 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.util.NamedList;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
-import org.hadatac.console.models.Pivot;
 import org.hadatac.console.models.SysUser;
-
-import java.io.IOException;
-import java.util.*;
-
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+import org.hadatac.console.views.html.metadataacquisition.metadataacquisition;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.Variable;
+import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.NameSpaces;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.metadataacquisition.*;
-import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.NameSpaces;
-import org.json.simple.JSONObject;
-
-import com.typesafe.config.ConfigFactory;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MetadataAcquisition extends Controller {
 
@@ -64,19 +51,16 @@ public class MetadataAcquisition extends Controller {
     }
     
     public static List<String> getIndicators() {
-		String initStudyQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT DISTINCT ?indicatorLabel WHERE { "
-				+ " ?subTypeUri rdfs:subClassOf* hasco:Study . "
-				+ " ?studyUri a ?subTypeUri . "
-				+ " ?dataAcq hasco:isDataAcquisitionOf ?studyUri ."
-				+ " ?dataAcq hasco:hasSchema ?schemaUri ."
-				+ " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
-				+ " ?schemaAttribute hasco:hasAttribute ?attribute . "
-				+ " {  { ?indicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?indicator rdfs:subClassOf hasco:SampleIndicator } } . "
-				+ " ?indicator rdfs:label ?indicatorLabel . " 
-				+ " ?attribute rdfs:subClassOf+ ?indicator . " 
-				+ " ?attribute rdfs:label ?attributeLabel . "
-				+ " }";
+		String initStudyQuery = NameSpaces.getInstance().printSparqlNameSpaceList()
+				+ "SELECT DISTINCT ?indicatorLabel\n" +
+				"WHERE {\n" +
+				"  ?attribute ?x ?attributeUri .\n" +
+				"  ?attributeUri rdfs:label ?attributeLabel .\n" +
+				"  ?attributeUri rdfs:subClassOf* ?indicator . \n" +
+				"  ?indicator rdfs:label ?indicatorLabel . \n" +
+				"  #FILTER(lang(?attributeLabel) != 'en') .\n" +
+				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
+				"  }";
 		
 		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), initStudyQuery);
@@ -163,9 +147,6 @@ public class MetadataAcquisition extends Controller {
 			}
 
 			String key = "", value = "", labelContent = "";
-			if ( indicatorLine.indexOf("human") > 0 )  {
-				int x = 1;
-			}
 
 			labelContent = getLabelContent(items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()]);
 			if ( labelContent == null || labelContent.length() == 0 ) {
@@ -287,6 +268,8 @@ public class MetadataAcquisition extends Controller {
 			results.add(new JSONObject(info));
 		}
 
+		log.info("here is the json string before writing to Solr:");
+		log.info(results.toString());
 		// System.out.println(results.toString());
 
 		return SolrUtils.commitJsonDataToSolr(
