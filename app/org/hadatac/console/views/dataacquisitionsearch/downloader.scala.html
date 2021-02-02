@@ -62,28 +62,8 @@
                         });
                     });
                 }
-		        
-	        	$.ajax({
-	                type: 'GET',
-	                url: '/hadatac/downloader/checkcompletion',
-	                data: { 'file_id': row.find("td:nth-child(1)").html().toString() },
-	                dataType: 'json',
-	                success: function (data) {
-	                	@if(bAdmin) {
-		                row.find("td:nth-child(4)").html(data['CompletionTime']);
-		                row.find("td:nth-child(5)").html(data['CompletionPercentage'] + '%');
-		                row.find("td:nth-child(6)").html(data['Status']);
-		                } else {
-		                row.find("td:nth-child(3)").html(data['CompletionTime']);
-                        row.find("td:nth-child(4)").html(data['CompletionPercentage'] + '%');
-                        row.find("td:nth-child(5)").html(data['Status']);
-		                }
-	                }
-	            });
-	        });
-	    }
-	    setInterval(checkCompletion, 1000);
-	});
+                setInterval(checkCompletion, 1000);
+            });
     </script>
 
     <div class="container-fluid">

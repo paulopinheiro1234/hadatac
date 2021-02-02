@@ -17,10 +17,14 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 //import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
+import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.metadata.loader.URIUtils;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
-//import controllers.AuthApplication;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 
 public class DataAcquisitionSchemaAttribute extends HADatAcThing {
@@ -42,7 +46,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private String position;
     private int    positionInt;
 
-    /* 
+    /*
        tempPositionInt is set every time a new csv file is loaded. tempPositionIn = -1 indicates that the attribute is not valid for the given cvs
          - because an original position is out of range for the csv
          - because there is no original position and the given localName does not match any of the labels in the CSV
@@ -490,7 +494,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     public void setEventUri(String daseUri) {
         this.daseUri = daseUri;
     }
-    
+
     /*
     public DataAcquisitionSchemaEvent getEvent() {
         if (daseUri == null || daseUri.equals("")) {
@@ -559,7 +563,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             return DataAcquisitionSchemaAttribute.getCache().get(dasa_uri);
         }
         DataAcquisitionSchemaAttribute dasa = null;
-        //System.out.println("Looking for org.hadatac.data acquisition schema attribute with URI <" + dasa_uri + ">");
+        //System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "SELECT ?partOfSchema ?hasEntity ?hasAttribute " +
@@ -600,18 +604,14 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String inRelationToUri = "";
         String relationUri = "";
 
-<<<<<<< HEAD
         Map<String,String> relationMap = new HashMap<>();
-        while (resultsrw.hasNext()) {        	
-=======
         while (resultsrw.hasNext()) {
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
             QuerySolution soln = resultsrw.next();
 
             /*
              *  The label should be the exact value in the SDD, e.g., cannot be altered be something like
              *  FirstLabel.getPrettyLabel(dasa_uri) since that would prevent the matching of the label with
-             *  the column header of the org.hadatac.data acquisition file/message
+             *  the column header of the data acquisition file/message
              */
             labelStr = soln.get("label").toString();
 
@@ -664,12 +664,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             dasa.addRelation(entry.getKey(), entry.getValue());
         }
 
-	    DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
+        DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
         return dasa;
     }
 
     public static List<DataAcquisitionSchemaAttribute> findByAttribute(String attributeUri) {
-        //System.out.println("Looking for org.hadatac.data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
+        //System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
         if (attributeUri.startsWith("http")) {
             attributeUri = "<" + attributeUri + ">";
         }
@@ -713,11 +713,11 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return attributes;
     }
 
-    // Given a study URI, 
+    // Given a study URI,
     // returns a list of DASA's
-    // (we need to go study -> org.hadatac.data acqusition(s) -> org.hadatac.data acqusition schema(s) -> org.hadatac.data acquisition schema attributes)
+    // (we need to go study -> data acqusition(s) -> data acqusition schema(s) -> data acquisition schema attributes)
     public static List<DataAcquisitionSchemaAttribute> findByStudy(String studyUri){
-        //System.out.println("Looking for org.hadatac.data acquisition schema attributes from study " + studyUri);
+        //System.out.println("Looking for data acquisition schema attributes from study " + studyUri);
         if (studyUri.startsWith("http")) {
             studyUri = "<" + studyUri + ">";
         }
@@ -764,7 +764,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static List<String> findUriBySchema(String schemaUri) {
-        //System.out.println("Looking for org.hadatac.data acquisition schema attribute URIs for <" + schemaUri + ">");
+        //System.out.println("Looking for data acquisition schema attribute URIs for <" + schemaUri + ">");
 
         List<String> attributeUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -797,7 +797,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
-        //System.out.println("Looking for org.hadatac.data acquisition schema attributes for <" + schemaUri + ">");
+        //System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
 
         List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -935,5 +935,3 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return 0;
     }
 }
-
-

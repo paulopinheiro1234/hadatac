@@ -57,7 +57,7 @@ import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-//import providers.MyUsernamePasswordAuthProvider;
+import org.hadatac.utils.ConfigProp;
 
 public class UserManagement extends Controller {
 

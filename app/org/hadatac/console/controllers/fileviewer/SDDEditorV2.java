@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-//import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.AuthApplication;
+import com.google.inject.Inject;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.entity.pojo.DataFile;
@@ -16,6 +18,7 @@ import org.hadatac.utils.ConfigProp;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.NameSpace;
@@ -47,6 +50,9 @@ public class SDDEditorV2 extends Controller {
     String dd_file_id="";
     int indicatorVal;
 
+    @Inject
+    private Application application;
+
 
 
 
@@ -54,8 +60,8 @@ public class SDDEditorV2 extends Controller {
 
     // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
 //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String fileId, boolean bSavable, int indicator) {
-//        final SysUser user = AuthApplication.getLocalUser(session());
+    public Result index(String fileId, boolean bSavable, int indicator, Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
@@ -103,8 +109,8 @@ public class SDDEditorV2 extends Controller {
     }
 
 //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String fileId, boolean bSavable,int indicator) {
-        return index(fileId, bSavable,indicator);
+    public Result postIndex(String fileId, boolean bSavable,int indicator, Http.Request request) {
+        return index(fileId, bSavable,indicator, request);
     }
 
 //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))

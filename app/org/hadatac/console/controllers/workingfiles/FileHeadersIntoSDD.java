@@ -58,7 +58,7 @@ public class FileHeadersIntoSDD extends Controller {
 
     	/* ADD THE DD CONTENT FROM DD_URI INTO THE SDD)URI  */
 
-    	return redirect(routes.WorkingFiles.index(dir, "."));
+    	return redirect(routes.WorkingFiles.index(dir, ".",false));
     }
     public Result getdd_df(DataFile d){
         dd_df=d;

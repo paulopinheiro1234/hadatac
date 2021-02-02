@@ -36,7 +36,7 @@ public class HadatacLoggingFilter extends Filter {
         if ( session != null && requestHeader.uri().contains("/hadatac/downloader/checkcompletion") == false &&
                 requestHeader.uri().contains("hadatac/downloader") == false && requestHeader.uri().contains("hadatac/assets/") == false ) {
             // System.out.println("------------------------------------->>>>> retrieving users: " + requestHeader.uri().toString());
-            SysUser user = AuthApplication.getLocalUser(session.asJava());
+            SysUser user = AuthApplication.getLocalUser(String.valueOf(session.asJava()));
             if (user != null) {
                 sessionEmail = user.getEmail();
             }

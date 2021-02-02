@@ -9,7 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
-//import org.hadatac.console.controllers.AuthApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.hadatac.utils.CollectionUtil;
 import play.mvc.Controller;

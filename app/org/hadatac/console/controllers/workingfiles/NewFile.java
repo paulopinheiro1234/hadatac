@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -47,17 +48,17 @@ public class NewFile extends Controller {
     @Inject
     private FormFactory formFactory;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result index(String dir) {
         return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result postIndex(String dir) {
         return index(dir);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
     public Result processForm(String dir, Http.Request request) {
         Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
@@ -79,6 +80,7 @@ public class NewFile extends Controller {
 
             DataFile dataFile = new DataFile(fileName);
             dataFile.setDir(dir);
+            //TODO fixit
 //            dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
             dataFile.setStatus(DataFile.WORKING);
             dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
@@ -93,6 +95,6 @@ public class NewFile extends Controller {
             e.printStackTrace();
         }
 
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        return redirect(routes.WorkingFiles.index(dir, ".",false));
     }
 }

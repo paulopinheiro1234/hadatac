@@ -15,7 +15,7 @@ public class Alignment {
     private Map<String, StudyObject> objects;
     //private List<String> timestamps;
     private Map<String, StudyObject> refObjects;
-    
+
     /*
      * key for attributeListCache is the outcome of calling getAttributeUris(List<Attribute> attrList)
      */
@@ -43,17 +43,17 @@ public class Alignment {
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
         variables = new HashMap<String, Variable>();
-	    hCodeBook = new HashMap<String, List<String>>();
-	    studyId = new HashMap<String,String>();
-	    dataAcquisitions = new HashMap<String,STR>();
+        hCodeBook = new HashMap<String, List<String>>();
+        studyId = new HashMap<String,String>();
+        dataAcquisitions = new HashMap<String,STR>();
 
-	    Attribute ID = new Attribute();
-	    ID.setLabel("ID");
-	    ID_LIST.add(ID);
+        Attribute ID = new Attribute();
+        ID.setLabel("ID");
+        ID_LIST.add(ID);
 
-	    //Attribute GROUPID = new Attribute();
+        //Attribute GROUPID = new Attribute();
         //GROUPID.setLabel("GROUPID");
-	    //GROUPID_LIST.add(GROUPID);
+        //GROUPID_LIST.add(GROUPID);
     }
 
     public void printAlignment() {
@@ -66,29 +66,29 @@ public class Alignment {
     }
 
     public static String getUrisFromAttributeList(List<Attribute> attrList) {
-    	if (attrList == null) {
-    		return "";
-    	}
-    	String attributeUri = "";
-    	for (Attribute attr : attrList) {			
-    		attributeUri = attributeUri + attr.getUri();
-    	}
-    	return attributeUri;
+        if (attrList == null) {
+            return "";
+        }
+        String attributeUri = "";
+        for (Attribute attr : attrList) {
+            attributeUri = attributeUri + attr.getUri();
+        }
+        return attributeUri;
     }
-    
-    public static String getUrisFromStringList(List<String> attrListUri) {
-    	if (attrListUri == null) {
-    		return "";
-    	}
-    	String attributeUri = "";
-    	for (String attrUri : attrListUri) {			
-    		attributeUri = attributeUri + attrUri;
-    	}
-    	return attributeUri;
-    }
-    
 
-    /* 
+    public static String getUrisFromStringList(List<String> attrListUri) {
+        if (attrListUri == null) {
+            return "";
+        }
+        String attributeUri = "";
+        for (String attrUri : attrListUri) {
+            attributeUri = attributeUri + attrUri;
+        }
+        return attributeUri;
+    }
+
+
+    /*
      * objectKey adds a new object identifier into variables
      */
     public String objectKey(AlignmentEntityRole entRole) {
@@ -96,7 +96,7 @@ public class Alignment {
         return aa.toString();
     }
 
-    /* 
+    /*
      * groupKey adds a new group identifier into variables
      */
     /*
@@ -104,15 +104,10 @@ public class Alignment {
         Variable aa = new Variable(entRole, GROUPID_IRT);
         return aa.toString();
     }
-<<<<<<< HEAD
 	*/
-    
-    /* 
-     * returns a key to retrieve variables. if needed, measuremtnKey adds new variables 
-=======
 
-    /* returns a key to retrieve variables. if needed, measuremtnKey adds new variables
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
+    /*
+     * returns a key to retrieve variables. if needed, measuremtnKey adds new variables
      */
     public String measurementKey(Measurement m) {
 
@@ -133,17 +128,10 @@ public class Alignment {
             irt = entityCache.get(m.getInRelationToUri());
             if (irt != null && irt.getUri().equals(m.getInRelationToUri())) {
                 mInRelationTo = irt.getUri();
-<<<<<<< HEAD
-            } else {		
+            } else {
                 irt = Entity.facetSearchFind(m.getInRelationToUri());
                 if (irt == null) {
                     System.out.println("[ERROR] Alignment: retrieving entity playing inRelationTo " + m.getInRelationToUri());
-=======
-            } else {
-                irt = Entity.find(m.getInRelationToUri());
-                if (irt == null) {
-                    System.out.println("[ERROR] retrieving org.hadatac.entity playing inRelationTo " + m.getInRelationToUri());
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
                 } else {
                     entityCache.put(irt.getUri(),irt);
                     mInRelationTo = m.getInRelationToUri();
@@ -170,11 +158,7 @@ public class Alignment {
                     mUnit = m.getUnitUri();
                 }
             }
-<<<<<<< HEAD
-        } 
-=======
         }
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
         Attribute timeAttr = null;
         String mAbstractTime = "";
         if (m.getAbstractTime() != null && !m.getAbstractTime().equals("")) {
@@ -186,47 +170,32 @@ public class Alignment {
                 if (timeAttr == null) {
                     System.out.println("[ERROR] Alignment: could not retrieve abstract time [" + m.getAbstractTime() + "]. Ignoring abstract time.");
                 } else {
-<<<<<<< HEAD
-                	attrCache.put(timeAttr.getUri(),timeAttr);
-                    mAbstractTime = m.getAbstractTime(); 
-=======
-                    attributeCache.put(timeAttr.getUri(),timeAttr);
+                    attrCache.put(timeAttr.getUri(),timeAttr);
                     mAbstractTime = m.getAbstractTime();
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
                 }
             }
         }
 
         if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
-<<<<<<< HEAD
             //System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
-        	STR da = STR.findByUri(m.getAcquisitionUri());
-        	dataAcquisitions.put(m.getAcquisitionUri(), da);
-=======
-            System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
             STR da = STR.findByUri(m.getAcquisitionUri());
             dataAcquisitions.put(m.getAcquisitionUri(), da);
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
         }
 
         String mRole = m.getRole().replace(" ","");
 
-	    String mKey = null;
-	    if (m.getCategoricalClassUri() != null && !m.getCategoricalClassUri().isEmpty()) {
-        	mKey =  mRole + m.getEntityUri() + m.getCategoricalClassUri() + mInRelationTo + mUnit + mAbstractTime;
+        String mKey = null;
+        if (m.getCategoricalClassUri() != null && !m.getCategoricalClassUri().isEmpty()) {
+            mKey =  mRole + m.getEntityUri() + m.getCategoricalClassUri() + mInRelationTo + mUnit + mAbstractTime;
         } else {
-        	String attributeUris = "";
-        	for (String attrUri : m.getCharacteristicUris()) {
-        		attributeUris = attributeUris + attrUri;
-        	}
-        	mKey =  mRole + m.getEntityUri() + attributeUris + mInRelationTo + mUnit + mAbstractTime;
+            String attributeUris = "";
+            for (String attrUri : m.getCharacteristicUris()) {
+                attributeUris = attributeUris + attrUri;
+            }
+            mKey =  mRole + m.getEntityUri() + attributeUris + mInRelationTo + mUnit + mAbstractTime;
         }
 
         //System.out.println("Align-Debug: Measurement: " + mKey);
-<<<<<<< HEAD
-=======
-        //System.out.println("Align-Debug: Vector: " + alignAttrs);
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
 
         if (variables.containsKey(mKey)) {
             return variables.get(mKey).toString();
@@ -242,11 +211,7 @@ public class Alignment {
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
             entity = Entity.facetSearchFind(m.getEntityUri());
             if (entity == null) {
-<<<<<<< HEAD
                 System.out.println("[ERROR] Alignment: retrieving entity " + m.getEntityUri());
-=======
-                System.out.println("[ERROR] retrieving org.hadatac.entity " + m.getEntityUri());
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
                 return null;
             } else {
                 entityCache.put(entity.getUri(),entity);
@@ -263,56 +228,52 @@ public class Alignment {
 
         // Attribute List has only one entry that is the Categorical Class
         if (m.getCategoricalClassUri() != null && !m.getCategoricalClassUri().isEmpty()) {
-	        //System.out.println("Align-Debug: new alignment Categorical Class [" + m.getCategoricalClassUri() + "]"); 
-	        attributeList = attributeListCache.get(m.getCategoricalClassUri());
-	        if (attributeList != null && attributeList.size() > 0) {
-	        	attribute = attributeList.get(0);
-	        }
-	        if (attribute == null || !attribute.getUri().equals(m.getCategoricalClassUri())) {
-	        	attribute = attrCache.get(m.getCategoricalClassUri());
-	        	if (attribute == null) {
-	        		attribute = Attribute.facetSearchFind(m.getCategoricalClassUri());
-	        		if (attribute == null) {
-	        			System.out.println("[ERROR] Alignment: retrieving attribute " + m.getCategoricalClassUri());
-	        			return null;
-	        		}
-	        		attrCache.put(attribute.getUri(), attribute);
-	        	}
-	            attributeList = new ArrayList<Attribute>();
-	            attributeList.add(attribute);
-	            attributeListCache.put(attribute.getUri(), attributeList);
-	        }
-            //System.out.println("Align-Debug: attribute list is for categorical variable"); 
+            //System.out.println("Align-Debug: new alignment Categorical Class [" + m.getCategoricalClassUri() + "]");
+            attributeList = attributeListCache.get(m.getCategoricalClassUri());
+            if (attributeList != null && attributeList.size() > 0) {
+                attribute = attributeList.get(0);
+            }
+            if (attribute == null || !attribute.getUri().equals(m.getCategoricalClassUri())) {
+                attribute = attrCache.get(m.getCategoricalClassUri());
+                if (attribute == null) {
+                    attribute = Attribute.facetSearchFind(m.getCategoricalClassUri());
+                    if (attribute == null) {
+                        System.out.println("[ERROR] Alignment: retrieving attribute " + m.getCategoricalClassUri());
+                        return null;
+                    }
+                    attrCache.put(attribute.getUri(), attribute);
+                }
+                attributeList = new ArrayList<Attribute>();
+                attributeList.add(attribute);
+                attributeListCache.put(attribute.getUri(), attributeList);
+            }
+            //System.out.println("Align-Debug: attribute list is for categorical variable");
         }
 
-<<<<<<< HEAD
         // Attribute List may have one or more elements
         else {
-            //System.out.println("Align-Debug: new alignment Non-CategoricalClass ]"); 
-        	attributeList = attributeListCache.get(getUrisFromStringList(m.getCharacteristicUris()));
-        	//System.out.println("Align-Debug: Characteristic URIs are [" + getUrisFromStringList(m.getCharacteristicUris()) + "]");
-        	//System.out.println("Align-Debug: Attribute List URIs are [" + getUrisFromAttributeList(attributeList) + "]");
-	        if (attributeList == null || !getUrisFromAttributeList(attributeList).equals(getUrisFromStringList(m.getCharacteristicUris()))) {
-	        	attributeList = new ArrayList<Attribute>();
-	            for (String attrUri : m.getCharacteristicUris()) {
-		        	attribute = attrCache.get(attrUri);
-		        	if (attribute == null) {
-		        		attribute = Attribute.facetSearchFind(attrUri);
-		        		if (attribute == null) {
-		        			System.out.println("[ERROR] Alignment: retrieving attribute " + attrUri);
-		        			return null;
-		        		}
-		        		attrCache.put(attribute.getUri(), attribute);
-		        	}
-		        	attributeList.add(attribute);
-	            }
+            //System.out.println("Align-Debug: new alignment Non-CategoricalClass ]");
+            attributeList = attributeListCache.get(getUrisFromStringList(m.getCharacteristicUris()));
+            //System.out.println("Align-Debug: Characteristic URIs are [" + getUrisFromStringList(m.getCharacteristicUris()) + "]");
+            //System.out.println("Align-Debug: Attribute List URIs are [" + getUrisFromAttributeList(attributeList) + "]");
+            if (attributeList == null || !getUrisFromAttributeList(attributeList).equals(getUrisFromStringList(m.getCharacteristicUris()))) {
+                attributeList = new ArrayList<Attribute>();
+                for (String attrUri : m.getCharacteristicUris()) {
+                    attribute = attrCache.get(attrUri);
+                    if (attribute == null) {
+                        attribute = Attribute.facetSearchFind(attrUri);
+                        if (attribute == null) {
+                            System.out.println("[ERROR] Alignment: retrieving attribute " + attrUri);
+                            return null;
+                        }
+                        attrCache.put(attribute.getUri(), attribute);
+                    }
+                    attributeList.add(attribute);
+                }
                 attributeListCache.put(getUrisFromAttributeList(attributeList),attributeList);
-	        }
-            //System.out.println("Align-Debug: attribute list is for non-categorical variable"); 
+            }
+            //System.out.println("Align-Debug: attribute list is for non-categorical variable");
         }
-=======
-        //System.out.println("Align-Debug: new alignment attribute 2");
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
 
         /*
         System.out.print("Align-Debug: attributeList is [");
@@ -321,20 +282,16 @@ public class Alignment {
         		System.out.print(attr.getLabel() + " ");
         	}
         }
-    	System.out.println("]"); 
-        System.out.println("Align-Debug: itr is [" + irt + "]"); 
+    	System.out.println("]");
+        System.out.println("Align-Debug: itr is [" + irt + "]");
         */
-        
+
         /*
         if (!mInRelationTo.equals("")) {
             System.out.println("Adding the following inRelationTo " + mInRelationTo);
         }*/
 
-<<<<<<< HEAD
-        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attributeList, irt); 
-=======
-        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attribute, irt);
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
+        AttributeInRelationTo newAttrInRel = new AttributeInRelationTo(attributeList, irt);
 
         /*
         if (!mUnit.equals("")) {
@@ -349,11 +306,11 @@ public class Alignment {
         newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
         //System.out.println("Align-Debug: new alignment attribute 3");
 
-        //System.out.println("Align-Debug: new variable's key: [" + newVar.getKey() + "]"); 
+        //System.out.println("Align-Debug: new variable's key: [" + newVar.getKey() + "]");
 
         if (!variables.containsKey(newVar.getKey())) {
             variables.put(newVar.getKey(), newVar);
-            //System.out.println("Align-Debug: adding new var to variable's list"); 
+            //System.out.println("Align-Debug: adding new var to variable's list");
         }
 
         return newVar.toString();
@@ -365,44 +322,44 @@ public class Alignment {
      * ========================================== */
 
     public static List<String> alignmentObjects(String currentObj, List<String> selectedRoles, String originalId) {
-        //System.out.println("Align-Debug: Current Object [" + currentObj + "]"); 
-    	List<String> alignObjs = new ArrayList<String>();
-    	if (currentObj == null || currentObj.isEmpty() || selectedRoles == null || selectedRoles.size() == 0 ) {
+        //System.out.println("Align-Debug: Current Object [" + currentObj + "]");
+        List<String> alignObjs = new ArrayList<String>();
+        if (currentObj == null || currentObj.isEmpty() || selectedRoles == null || selectedRoles.size() == 0 ) {
             log.debug("Current Obj or Selected Role are empty");
-    		return alignObjs;
-    	}
-    		
-    	/* 
-    	 * Test if the current object is already the alignment object
-    	 */
-    	if (selectedRoles.contains(StudyObject.findSocRole(currentObj)) ) {
-            alignObjs.add(currentObj);
-            log.debug("Already ALIGNMENT object");
-    		return alignObjs;
-    	};
-
-    	/* 
-    	 * Test if alignment object is upstream
-    	 */
-        List<Map<String,String>> upstream = StudyObject.findUpstreamSocs(currentObj);
-        if (upstream.size() > 0) {
-        	// iteration stops for first obj with matching role 
-        	for (Map<String,String> socRoleTuple :  upstream) {
-                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator(); 
-                if (itr.hasNext()) { 
-                	Map.Entry<String, String> entry = itr.next();
-                	if ( selectedRoles.contains(entry.getValue()) ) {
-                		alignObjs.add(entry.getKey());
-                        //System.out.println("Align-Debug: UPSTREAM object"); 
-                		return new ArrayList<>(new HashSet<>(alignObjs));
-                	}
-                }
-        	}
+            return alignObjs;
         }
 
-    	/* 
-    	 * Test if alignment object(s) is(are) downstream 
-    	 */
+        /*
+         * Test if the current object is already the alignment object
+         */
+        if (selectedRoles.contains(StudyObject.findSocRole(currentObj)) ) {
+            alignObjs.add(currentObj);
+            log.debug("Already ALIGNMENT object");
+            return alignObjs;
+        };
+
+        /*
+         * Test if alignment object is upstream
+         */
+        List<Map<String,String>> upstream = StudyObject.findUpstreamSocs(currentObj);
+        if (upstream.size() > 0) {
+            // iteration stops for first obj with matching role
+            for (Map<String,String> socRoleTuple :  upstream) {
+                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
+                if (itr.hasNext()) {
+                    Map.Entry<String, String> entry = itr.next();
+                    if ( selectedRoles.contains(entry.getValue()) ) {
+                        alignObjs.add(entry.getKey());
+                        //System.out.println("Align-Debug: UPSTREAM object");
+                        return new ArrayList<>(new HashSet<>(alignObjs));
+                    }
+                }
+            }
+        }
+
+        /*
+         * Test if alignment object(s) is(are) downstream
+         */
         for ( String selectedRole : selectedRoles ) {
             List<Map<String, String>> downstream = StudyObject.findDownstreamSocs(currentObj, originalId, selectedRole);
             if (downstream.size() > 0) {
@@ -426,21 +383,21 @@ public class Alignment {
             }
         }
 
-    	/* 
-    	 * Test if alignment object(s) is(are) downstream from some upstream object 
-    	 */
+        /*
+         * Test if alignment object(s) is(are) downstream from some upstream object
+         */
         if (upstream.size() > 0) {
 
-        	for (Map<String,String> socRoleTuple :  upstream) {
+            for (Map<String,String> socRoleTuple :  upstream) {
 
                 Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
 
                 if (itr.hasNext()) {
 
-                	Map.Entry<String, String> entry = itr.next();
-                	String upstreamObj = entry.getKey();
+                    Map.Entry<String, String> entry = itr.next();
+                    String upstreamObj = entry.getKey();
 
-                	for ( String selectedRole : selectedRoles ) {
+                    for ( String selectedRole : selectedRoles ) {
                         List<Map<String, String>> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, originalId, selectedRole);
                         if (downstreamFromUpstream.size() > 0) {
                             // iteration is not interrupted and selects all objs with matching role
@@ -459,16 +416,16 @@ public class Alignment {
 
                 } // end of hasNext()
 
-        	} // end of upstream role map
+            } // end of upstream role map
 
         }
 
-        System.out.println("[ERROR] Alignment: COULD NOT FIND alignment object for [" + currentObj + "]"); 
-    	return alignObjs;
+        System.out.println("[ERROR] Alignment: COULD NOT FIND alignment object for [" + currentObj + "]");
+        return alignObjs;
     }
-    
 
-    
+
+
     /* ------------------------------------------ *
      *           CONTAINS METHODS
      * ------------------------------------------ */
@@ -545,31 +502,17 @@ public class Alignment {
     }
 
     public List<String> getDOIs() {
-<<<<<<< HEAD
-    	List<String> resp = new ArrayList<String>();
-    	if (dataAcquisitions.size() == 0) {
-    		return resp;
-    	}
-        //System.out.println("getDOI(): da size is " + dataAcquisitions.size());
-    	for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
-            org.hadatac.entity.pojo.STR da = entry.getValue();
-            //System.out.println("getDOI(): da is " + da.getUri());
-            for (String doi : da.getDOIs()) { 
-                //System.out.println("getDOI(): doi is " + doi);
-            	resp.add(doi);
-=======
         List<String> resp = new ArrayList<String>();
         if (dataAcquisitions.size() == 0) {
             return resp;
         }
-        System.out.println("getDOI(): da size is " + dataAcquisitions.size());
+        //System.out.println("getDOI(): da size is " + dataAcquisitions.size());
         for (Map.Entry<String,STR> entry : dataAcquisitions.entrySet())  {
             org.hadatac.entity.pojo.STR da = entry.getValue();
-            System.out.println("getDOI(): da is " + da.getUri());
+            //System.out.println("getDOI(): da is " + da.getUri());
             for (String doi : da.getDOIs()) {
-                System.out.println("getDOI(): doi is " + doi);
+                //System.out.println("getDOI(): doi is " + doi);
                 resp.add(doi);
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
             }
         }
         return resp;
@@ -581,23 +524,13 @@ public class Alignment {
     public void addObject(StudyObject obj) {
         objects.put(obj.getUri(), obj);
         if (!studyId.containsKey(obj.getIsMemberOf())) {
-<<<<<<< HEAD
-        	ObjectCollection soc = ObjectCollection.findFacetSearch(obj.getIsMemberOf());
-        	if (soc != null) {
-        		Study std = soc.getStudy();
-        		if (std != null && std.getId() != null) {
-        			studyId.put(obj.getIsMemberOf(), std.getId());
-        		}
-        	}
-=======
-            ObjectCollection soc = ObjectCollection.find(obj.getIsMemberOf());
+            ObjectCollection soc = ObjectCollection.findFacetSearch(obj.getIsMemberOf());
             if (soc != null) {
                 Study std = soc.getStudy();
                 if (std != null && std.getId() != null) {
                     studyId.put(obj.getIsMemberOf(), std.getId());
                 }
             }
->>>>>>> a517d63a92ebdbcd65a5d8e9c3c24d317af8db5d
         }
     }
 
@@ -617,9 +550,7 @@ public class Alignment {
     public void addCode(String attrUri, List<String> code) {
         hCodeBook.put(attrUri, code);
     }
-    
-    
-    
+
+
+
 }
-
-
