@@ -168,7 +168,7 @@ public class MetadataAcquisition extends Controller {
 			key = key.replace(",", "").replace(" ", "") + "_str_multi";
 			String temp = "";
 
-			if ( key.contains("TargetedAnalyte") ) {
+			if ( key.contains("TargetedAnalyte") || key.contains("BiologicalResponse") ) {
 
 				// since this is targeted analyte, we would like to organize the components in this order:
 				// In_Relation_To *in* Entity *from* Role *at* Time”.
