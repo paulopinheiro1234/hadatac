@@ -10,7 +10,7 @@ services:
         restart: always
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
-            - hadatac-solr:/opt/solr/server
+            - hadatac-solr:/opt/solr-8.6.3/server
         networks:
             hadatac:
                 aliases:

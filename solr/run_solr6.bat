@@ -1,5 +1,5 @@
 echo off
-set SOLR_INSTALL_DIR=%HADATAC_SOLR%\solr-6.5.0
+set SOLR_INSTALL_DIR=%HADATAC_SOLR%\solr-8.6.1
 
 :STEP 1
 
@@ -10,7 +10,7 @@ GOTO THEEND
 
 :STEP2
 
-set SOLR_ENV=%HADATAC_SOLR%\solr6.in.bat
+set SOLR_ENV=%HADATAC_SOLR%\solr8.in.bat
 
 if EXIST "%SOLR_ENV%" GOTO STEP3
 
