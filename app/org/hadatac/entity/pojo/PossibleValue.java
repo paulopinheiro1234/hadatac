@@ -22,13 +22,17 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.annotations.PropertyField;
+import org.hadatac.console.activities.SearchActivityAnnotationAction;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PossibleValue extends HADatAcClass implements Comparable<PossibleValue> {
 
+    private static final Logger log = LoggerFactory.getLogger(PossibleValue.class);
     static String className = "hasco:PossibleValue";
 
     public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -165,7 +169,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
     public static List<PossibleValue> findBySchema(String schemaUri) {    	
 
-    	//System.out.println("PossibleValue.findBySchema: SchemaUri=" + schemaUri);
+    	log.debug("PossibleValue.findBySchema: SchemaUri=" + schemaUri);
     	
     	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
@@ -197,7 +201,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
             }
         } catch (Exception e) {
-            System.out.println("[ERROR] PossibleValue.findBySchema(): " + e.getMessage());
+            log.error("[ERROR] PossibleValue.findBySchema(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -206,7 +210,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
     public static List<PossibleValue> findByVariable(String variableUri) {    	
 
-    	//System.out.println("      VariableUri: " + variableUri);
+    	log.debug("      VariableUri: " + variableUri);
     	
     	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
@@ -235,7 +239,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
             }
         } catch (Exception e) {
-            System.out.println("[ERROR] PossibleValue.findByVariable(): " + e.getMessage());
+            log.error("[ERROR] PossibleValue.findByVariable(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -285,7 +289,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                 + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
                 + " }";
 
-        //System.out.println("findPossibleValues query: \n" + queryString);
+        log.debug("----> findPossibleValues query: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -314,7 +318,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                 }
             }
         } catch (Exception e) {
-            System.out.println("[ERROR] PossibleValue.findPossibleValues(): " + e.getMessage());
+            log.error("[ERROR] PossibleValue.findPossibleValues(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -397,12 +401,11 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 	                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
 	        processor.execute();
         } catch (Exception e) {
-            System.out.println("[ERROR] Possiblevalue.java: QueryParseException due to update query: " + query);
+            log.error("[ERROR] Possiblevalue.java: QueryParseException due to update query: " + query);
         	return false;
         }
 
-        //System.out.println("Deleted hasco:hasClass property of <" + getUri() + "> from triple store");
-    	
+        log.debug("Deleted hasco:hasClass property of <" + getUri() + "> from triple store");
         return true;
         
     }
@@ -439,13 +442,11 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                     request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (Exception e) {
-            System.out.println("[ERROR] PossibleValue.java: QueryParseException due to update query: " + insert);
+            log.error("[ERROR] PossibleValue.java: QueryParseException due to update query: " + insert);
             return false;
         }
 
-        //System.out.println("Added hasco:hasClass property of <" + getUri() + "> from triple store");
-    	
-
+        log.debug("Added hasco:hasClass property of <" + getUri() + "> from triple store");
         return true;
     	
     }

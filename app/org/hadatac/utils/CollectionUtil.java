@@ -67,6 +67,8 @@ public class CollectionUtil {
         AUTHENTICATE_ROLES ("/security_role"),
         AUTHENTICATE_TOKENS ("/token_action"),
         AUTHENTICATE_PERMISSIONS ("/user_permission"),
+        SEARCH_ACTIVITIES ("/user_search_activities"),
+        DOWNLOAD_ACTIVITIES ("/user_download_activities"),
 
         // permissions
         PERMISSIONS_SPARQL ("/store_users/query"),
@@ -88,7 +90,9 @@ public class CollectionUtil {
     public static String getCollectionName(String collection) {
         if (Arrays.asList(
                 Collection.OPERATION_MODE.get(),
-                Collection.AUTHENTICATE_ACCOUNTS.get(), 
+                Collection.AUTHENTICATE_ACCOUNTS.get(),
+                Collection.SEARCH_ACTIVITIES.get(),
+                Collection.DOWNLOAD_ACTIVITIES.get(),
                 Collection.AUTHENTICATE_USERS.get(), 
                 Collection.AUTHENTICATE_ROLES.get(),
                 Collection.AUTHENTICATE_TOKENS.get(),
@@ -143,7 +147,9 @@ public class CollectionUtil {
             collectionName = getConfigCache().get("hadatac.solr.triplestore") + getCollectionName(collection.get());
         break;
         case AUTHENTICATE_USERS:
-        case AUTHENTICATE_ACCOUNTS: 
+        case AUTHENTICATE_ACCOUNTS:
+        case SEARCH_ACTIVITIES:
+        case DOWNLOAD_ACTIVITIES:
         case AUTHENTICATE_ROLES: 
         case AUTHENTICATE_TOKENS:
         case AUTHENTICATE_PERMISSIONS: 
