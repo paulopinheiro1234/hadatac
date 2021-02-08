@@ -1,4 +1,4 @@
-package org.hadatac.console.activities;
+package org.hadatac.annotations;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
@@ -10,8 +10,6 @@ import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;

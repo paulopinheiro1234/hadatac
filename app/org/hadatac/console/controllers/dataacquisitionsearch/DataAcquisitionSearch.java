@@ -4,7 +4,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
-import org.hadatac.console.activities.SearchActivityAnnotation;
+import org.hadatac.annotations.SearchActivityAnnotation;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.*;

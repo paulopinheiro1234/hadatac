@@ -1,4 +1,4 @@
-package org.hadatac.console.activities;
+package org.hadatac.annotations;
 
 import play.mvc.With;
 
