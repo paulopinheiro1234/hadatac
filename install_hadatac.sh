@@ -101,7 +101,6 @@ mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/run_solr8.sh
 sh $HADATAC_SOLR/run_solr8.sh stop
 wait $!
 cp $HADATAC_DOWNLOAD/jts-1.15.jar $HADATAC_SOLR/solr-8.6.1/server/solr-webapp/webapp/WEB-INF/lib/
-#sleep 100
 
 echo "=== Starting Apache Solr 8.6.1..."
 sh $HADATAC_SOLR/run_solr8.sh start -v

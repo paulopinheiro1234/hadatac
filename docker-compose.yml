@@ -10,7 +10,7 @@ services:
         restart: always
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
-            - hadatac-solr:/opt/solr-8.6.3/server
+            - hadatac-solr:/opt/solr/server
         networks:
             hadatac:
                 aliases:
@@ -53,10 +53,10 @@ services:
             # Creates a volume to store the various csv files. This allows the data
             #   to be persisted when the container is removed or when Hadatac is rebuilt.
             # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
-            - hadatac-csvs:/root/app2/csvs
+            - hadatac-csvs:/root/app/csvs
             # Creates a volume for the config files. This way configuration file changes
             #   are persisted when the container is removed or rebuilt.
-            - hadatac-conf:/root/app2/conf
+            - hadatac-conf:/root/app/conf
         links:
             - blazegraph
             - solr
