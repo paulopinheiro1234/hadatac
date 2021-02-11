@@ -17,6 +17,11 @@ RUN wget -O jts-1.15.jar https://repo1.maven.org/maven2/org/locationtech/jts/jts
 # Perform the copy to the mycores directory. All cores here get created automatically.
 COPY ./solr-home /opt/solr/server/solr/mycores
 COPY ./solr-home/solr.xml /opt/solr/server/solr/mycores/solr.xml
+COPY ./D* /opt/solr/server/solr/
+COPY ./solr8* /opt/solr/server/solr/
+COPY ./LICENSE /opt/solr/server/solr/LICENSE
+COPY ./.dockerignore /opt/solr/server/solr/.dockerignore
+
 # Make the solr user the owner of these files
 USER root
 RUN chown -R solr:solr /opt/solr/server/solr/mycores

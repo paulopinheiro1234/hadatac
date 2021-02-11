@@ -3,8 +3,7 @@
 FROM openjdk:11
 
 ENV SBT_VERSION 1.3.10
-#1.4.6
-ENV CHECKSUM 86a6f28e79966074101066ab1aa19267d0c8d44eae21daa93c9c6056ca6f9da4
+
 # Install sbt
 RUN \
   curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \

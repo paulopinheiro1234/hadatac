@@ -23,4 +23,3 @@ case "$1" in
 esac
 
 SOLR_INCLUDE=$SOLR_ENV $SOLR_INSTALL_DIR/bin/solr $SOLR_CMD -force
-

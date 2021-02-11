@@ -58,6 +58,3 @@ copy /b %HADATAC_SOLR%\hadatac_solr.bat+%HADATAC_SOLR%\solr8.in.bat %HADATAC_SOL
 %HADATAC_SOLR%\run_solr8.bat start
 
 copy $HADATAC_DOWNLOAD\jts-1.15\lib\* $HADATAC_SOLR\solr-8.6.1\server\solr-webapp\webapp\WEB-INF\lib\
-
-%HADATAC_SOLR%\run_solr8.bat restart
-

@@ -22,6 +22,8 @@ COPY create_namespaces.sh /tmp/import/create_namespaces.sh
 
 USER jetty
 
+EXPOSE 8080
+
 # Imports the namespaces
 RUN (cd /var/lib/jetty && java -jar /usr/local/jetty/start.jar &) && sh /tmp/import/create_namespaces.sh
 

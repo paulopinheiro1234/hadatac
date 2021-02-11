@@ -29,7 +29,7 @@ GOTO THEEND
 
 :STEP4
 
-set SOLR_INCLUDE=%SOLR_ENV% 
+set SOLR_INCLUDE=%SOLR_ENV%
 
 echo Issuing command %SOLR_INSTALL_DIR%\bin\solr %1
 
