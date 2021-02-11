@@ -28,36 +28,35 @@ ECHO %HADATAC_HOME%
 
 SET HADATAC_DOWNLOAD=%HADATAC_HOME%\download
 SET HADATAC_SOLR=%HADATAC_HOME%\solr
-SET SOLR5_HOME=%HADATAC_SOLR%\solr-6.5.0
+SET SOLR5_HOME=%HADATAC_SOLR%\solr-8.6.1
 
 mkdir %HADATAC_HOME%
 mkdir %HADATAC_DOWNLOAD%
 mkdir %HADATAC_SOLR%
-MKDIR %HADATAC_DOWNLOAD%\jts-1.14
+MKDIR %HADATAC_DOWNLOAD%\jts-1.15
 
 cp -R solr/ %HADATAC_SOLR%
 
-ECHO === Downloading Apache Solr 6.5.0...
-wget -O %HADATAC_DOWNLOAD%\solr-6.5.0.zip http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.zip
-wget -O %HADATAC_DOWNLOAD%\solr-6.5.0.zip.md5 http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.zip.md5
-ECHO === Downloading JTS Topology Suite 1.14...
-wget -O %HADATAC_DOWNLOAD%\jts-1.14.zip http://pilotfiber.dl.sourceforge.net/project/jts-topo-suite/jts/1.14/jts-1.14.zip
+ECHO === Downloading Apache Solr 8.6.1...
+wget -O %HADATAC_DOWNLOAD%\solr-8.6.1.zip http://archive.apache.org/dist/lucene/solr/8.6.1/solr-8.6.1.zip
+wget -O %HADATAC_DOWNLOAD%\solr-8.6.1.zip.md5 http://archive.apache.org/dist/lucene/solr/8.6.1/solr-8.6.1.zip.md5
+ECHO === Downloading JTS Topology Suite 1.15...
+wget -O %HADATAC_DOWNLOAD%\jts-1.15.zip http://pilotfiber.dl.sourceforge.net/project/jts-topo-suite/jts/1.15/jts-1.15.zip
 
-ECHO === Uncompressing Apache Solr 6.5.0...
-winrar x %HADATAC_DOWNLOAD%\solr-6.5.0.zip *.* %HADATAC_SOLR%
-ECHO === Uncompressing JTS Topology Suite 1.14...
-winrar x %HADATAC_DOWNLOAD%\jts-1.14.zip *.* %HADATAC_DOWNLOAD%\jts-1.14
-
-ECHO "HADATAC_SOLR=%HADATAC_SOLR%" >> %HADATAC_SOLR%\hadatac_solr.bat
-copy /b %HADATAC_SOLR%\hadatac_solr.bat+%HADATAC_SOLR%\solr6.in.bat %HADATAC_SOLR%\solr6.in.bat
+ECHO === Uncompressing Apache Solr 8.6.1...
+winrar x %HADATAC_DOWNLOAD%\solr-8.6.1.zip *.* %HADATAC_SOLR%
+ECHO === Uncompressing JTS Topology Suite 1.15...
+winrar x %HADATAC_DOWNLOAD%\jts-1.15.zip *.* %HADATAC_DOWNLOAD%\jts-1.15
 
 ECHO "HADATAC_SOLR=%HADATAC_SOLR%" >> %HADATAC_SOLR%\hadatac_solr.bat
-copy /b %HADATAC_SOLR%\hadatac_solr.bat+%HADATAC_SOLR%\solr6.in.bat %HADATAC_SOLR%\solr6.in.bat
+copy /b %HADATAC_SOLR%\hadatac_solr.bat+%HADATAC_SOLR%\solr8.in.bat %HADATAC_SOLR%\solr8.in.bat
 
-%HADATAC_SOLR%\run_solr6.bat stop
-%HADATAC_SOLR%\run_solr6.bat start
+ECHO "HADATAC_SOLR=%HADATAC_SOLR%" >> %HADATAC_SOLR%\hadatac_solr.bat
+copy /b %HADATAC_SOLR%\hadatac_solr.bat+%HADATAC_SOLR%\solr8.in.bat %HADATAC_SOLR%\solr8.in.bat
 
-copy $HADATAC_DOWNLOAD\jts-1.14\lib\* $HADATAC_SOLR\solr-6.5.0\server\solr-webapp\webapp\WEB-INF\lib\
+%HADATAC_SOLR%\run_solr8.bat stop
+%HADATAC_SOLR%\run_solr8.bat start
 
-%HADATAC_SOLR%\run_solr6.bat restart
+copy $HADATAC_DOWNLOAD\jts-1.15\lib\* $HADATAC_SOLR\solr-8.6.1\server\solr-webapp\webapp\WEB-INF\lib\
 
+%HADATAC_SOLR%\run_solr8.bat restart

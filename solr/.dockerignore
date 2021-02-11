@@ -2,4 +2,3 @@ LICENSE
 *.md
 *.bat
 *.sh
-solr-home/solr.xml
