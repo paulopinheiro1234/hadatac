@@ -51,6 +51,8 @@ RUN sbt compile && sbt test:compile
 
 # Expose the port the play app runs on
 EXPOSE 9000
+EXPOSE 8080
+EXPOSE 8983
 
 # Run the app when starting up the Docker container
 ENTRYPOINT ["sbt"]
