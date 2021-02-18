@@ -11,6 +11,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import be.objectify.deadbolt.java.models.Role;
+import org.hadatac.Constants;
 import org.hadatac.utils.CollectionUtil;
 
 /**
@@ -38,15 +39,15 @@ public class SecurityRole implements Role {
 	public static void initialize() {
 		if (SecurityRole.existsSolr() == false) {
 			System.out.println("Initializing SecurityRole table");
-//			addSecurityRole(
-//					controllers.AuthApplication.DATA_OWNER_ROLE,
-//					"f4251649-751e-4190-b0ed-e824f3cdd6fc");
-//			addSecurityRole(
-//					controllers.AuthApplication.DATA_MANAGER_ROLE,
-//					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");
-//			addSecurityRole(
-//                    controllers.AuthApplication.FILE_VIEWER_EDITOR_ROLE,
-//                    "47adcdaf-1f93-40ba-b8d9-9bb324eac308");
+			addSecurityRole(
+					Constants.DATA_OWNER_ROLE,
+					"f4251649-751e-4190-b0ed-e824f3cdd6fc");
+			addSecurityRole(
+					Constants.DATA_MANAGER_ROLE,
+					"fdeff289-daee-4ecc-8c9c-3ef111cf7a06");
+			addSecurityRole(
+					Constants.FILE_VIEWER_EDITOR_ROLE,
+                    "47adcdaf-1f93-40ba-b8d9-9bb324eac308");
 		}
 	}
 
