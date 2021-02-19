@@ -89,11 +89,11 @@ public class LinkedAccount {
 
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);
-			System.out.println("queryResponse: "+queryResponse);
+//			System.out.println("queryResponse: "+queryResponse);
 
 			solrClient.close();
 			SolrDocumentList list = queryResponse.getResults();
-			System.out.println("queryResponse: "+queryResponse);
+//			System.out.println("queryResponse: "+queryResponse);
 			Iterator<SolrDocument> i = list.iterator();
 
 			while (i.hasNext()) {

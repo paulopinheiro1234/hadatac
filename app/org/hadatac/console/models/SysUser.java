@@ -504,7 +504,7 @@ public class SysUser implements Subject {
 				sys_user.uri = uri;
 			}
 			System.out.println("sys_user before save uri admin: " + admin_uri);
-			user.save();
+//			user.save();
 			sys_user.save();
 
 			return sys_user;
@@ -591,7 +591,7 @@ public class SysUser implements Subject {
 				sys_user.uri = uri;
 			}
 			System.out.println("sys_user before save uri admin: " + admin_uri);
-			user.save();
+//			user.save(); -- possible duplication
 			sys_user.save();
 
 			return sys_user;
@@ -680,6 +680,7 @@ public class SysUser implements Subject {
 		User user = new User();
 		user.setName(sys_user.name);
 		user.setEmail(sys_user.email);
+		System.out.println("SysUser.existsSolr():"+SysUser.existsSolr());
 
 		if (SysUser.existsSolr() == false) {
 			sys_user.roles.add(SecurityRole
