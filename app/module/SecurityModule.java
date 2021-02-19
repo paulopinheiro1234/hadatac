@@ -61,7 +61,7 @@ public class SecurityModule extends AbstractModule {
 
     public SecurityModule(final Environment environment, final com.typesafe.config.Config configuration) {
         this.configuration = configuration;
-        this.baseUrl = configuration.getString("baseUrl");
+        this.baseUrl = configuration.getString("hadatac.console.host");
     }
 
     @Override
@@ -86,19 +86,6 @@ public class SecurityModule extends AbstractModule {
         logoutController.setDefaultUrl("/?defaulturlafterlogout");
         //logoutController.setDestroySession(true);
         bind(LogoutController.class).toInstance(logoutController);
-    }
-
-    @Provides
-    protected FacebookClient provideFacebookClient() {
-        final String fbId = configuration.getString("fbId");
-        final String fbSecret = configuration.getString("fbSecret");
-        final FacebookClient fbClient = new FacebookClient(fbId, fbSecret);
-        final String baseUrl = configuration.getString("baseUrl");
-        if (baseUrl.contains("9000")) {
-            fbClient.setCallbackUrl("https://localhost/callback");
-        }
-        return fbClient;
-
     }
 
     @Provides
