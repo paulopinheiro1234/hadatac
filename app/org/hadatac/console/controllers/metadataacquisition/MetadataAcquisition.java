@@ -14,10 +14,12 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.metadataacquisition;
+import org.hadatac.entity.pojo.Pair;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.Variable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -76,29 +78,37 @@ public class MetadataAcquisition extends Controller {
     }
 
 	@SuppressWarnings("unchecked")
-	public static boolean updateStudy() {
+	public static boolean updateStudySearch() {
 
-    	// retrieve all the studies and their attributes, such as study URI, study label, study comments, etc.
-    	Map<String, Map<String,String>> studies = Study.retrieveStudiesAndAtttributes();
+		// retrieve all the studies and their attributes, such as study URI, study label, study comments, etc.
+		Map<String, Map<String,String>> studies = Study.retrieveStudiesAndAtttributes();
 
-    	// retrieve all the indicators for all the studies
-		List<String> indicators = Variable.retrieveStudyVariablesWithLabels(null);
+		// retrieve the facet results from Solr
+		List<String> facetResult = Variable.retrieveStudySearchFacetResult(null);
 
 		// combine the above two search results and prepare for the GUI side display
 
 		HashMap<String, HashMap<String, Object>> mapStudyInfo = new HashMap<String, HashMap<String, Object>>();
 
-		for (String indicatorLine : indicators ) {
+		/*
+			a typical facetLine would look like this:
+			study URI: http://hadatac.org/kb/hhear#STD-2016-1431
+			role (NOT URI!): Child Sample
+			entity URI: http://purl.obolibrary.org/obo/UBERON_0001088
+			DASA URI: http://hadatac.org/kb/hhear#DASA-Lab-LOD
+			InRelationTo URI: http://purl.obolibrary.org/obo/CHEBI_27528,http://purl.org/twc/HHEAR_00342
+		 */
+		for (String facetLine : facetResult ) {
 
-			String[] items = indicatorLine.split(Variable.VARIABLE_SEPARATOR);
+			String[] items = facetLine.split(Variable.HIERARCHICAL_FACET_SEPARATOR);
 
 			if ( items == null || items.length < Variable.SolrPivotFacet.DASA_URI_STR.ordinal() + 1 ) {
-				log.warn("Study Search skips this line: " + indicatorLine);
+				log.warn("Study Search skips this line because it is too short: " + facetLine);
 				continue;
 			}
 
 			if ( items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()] == null ) {
-				log.warn("Study Search skips this line since it does not have a indicator value: " + indicatorLine);
+				log.warn("Study Search skips this line since it does not have a DASA URI: " + facetLine);
 				continue;
 			}
 
@@ -115,11 +125,9 @@ public class MetadataAcquisition extends Controller {
 				studyInfo = new HashMap<String, Object>();
 				studyInfo.put("studyUri", studyUri);
 				mapStudyInfo.put(studyUri, studyInfo);
-			}
-			else {
+			} else {
 				studyInfo = mapStudyInfo.get(studyUri);
 			}
-
 			if (studyDetails.containsKey("studyLabel") && !studyInfo.containsKey("studyLabel_str")) {
 				studyInfo.put("studyLabel_str", "<a href=\""
 						+ ConfigFactory.load().getString("hadatac.console.host_deploy")
@@ -146,116 +154,128 @@ public class MetadataAcquisition extends Controller {
 				studyInfo.put("institutionName_str", studyDetails.get("institutionName"));
 			}
 
-			String key = "", value = "", labelContent = "";
+			// for each component in the facet line, get their labels
 
-			labelContent = getLabelContent(items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()]);
-			if ( labelContent == null || labelContent.length() == 0 ) {
-				log.warn("Study Search encounters empty indicator label: " + indicatorLine);
+			List<Pair<String, String>> indicators = Variable.computeIndicatorList(items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()]);
+			if ( indicators == null || indicators.size() == 0 ) {
+				indicators = Variable.computeIndicatorList(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
+			}
+			if ( indicators == null || indicators.size() == 0 ) {
+				log.warn("Study Search encounters empty indicator URI(s) for this facet search result line: " + facetLine);
 				continue;
 			}
 
-			String[] attributeAndIndicatorLabels =labelContent.split("\\"+Variable.LABEL_SEPARATOR,-1);
-			if ( attributeAndIndicatorLabels != null && attributeAndIndicatorLabels.length == 2 ) {
-				key = attributeAndIndicatorLabels[1];
-				value = attributeAndIndicatorLabels[0];
-			}
+			boolean multipleIndicators = indicators.size() > 1 ? true : false;
+			boolean hasStandardTestScore = Variable.constainsStandardTestScore(indicators);
 
-			if ( key == null || key.length() == 0 || key.equalsIgnoreCase(Variable.VARIABLE_EMPTY_LABEL)) {
-				log.warn("Study Search encounters empty indicator label: " + indicatorLine);
-				continue;
-			}
+			for ( Pair<String, String> labelAndIndcator : indicators ) {
 
-			key = key.replace(",", "").replace(" ", "") + "_str_multi";
-			String temp = "";
+				String key = "", value = "", labelContent = "";
 
-			if ( key.contains("TargetedAnalyte") || key.contains("BiologicalResponse") ) {
+				if ( hasStandardTestScore == false ) value = FirstLabel.getPrettyLabel(labelAndIndcator.getLeft());
+				else {
+					final String testScoreTag = Variable.retrieveTestScoreLabel(indicators);
+					if ( testScoreTag != null ) {
+						if ( testScoreTag.equalsIgnoreCase(FirstLabel.getPrettyLabel(labelAndIndcator.getLeft())) ) continue;
+						value = testScoreTag + " (" + FirstLabel.getPrettyLabel(labelAndIndcator.getLeft()) + ")";
+					} else value = FirstLabel.getPrettyLabel(labelAndIndcator.getLeft());
+				}
+				key = FirstLabel.getPrettyLabel(labelAndIndcator.getRight());
 
-				// since this is targeted analyte, we would like to organize the components in this order:
-				// In_Relation_To *in* Entity *from* Role *at* Time”.
-
-				value = "";
-				labelContent = items[Variable.SolrPivotFacet.ROLE_STR.ordinal()];
-				if (labelContent != null && labelContent.length() > 0) {
-					value = " from " + labelContent + value;
+				if ( multipleIndicators ) {
+					log.info("multiple indicators detected: " + items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()] + " :" + value + " | " + key);
 				}
 
-				labelContent = getLabelContent(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
-				if (labelContent != null && labelContent.length() > 0) {
-					value = value + " at " + labelContent;
-				}
+				key = key.replace(",", "").replace(" ", "") + "_str_multi";
+				String temp = "";
 
-				labelContent = getLabelContent(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
-				if (labelContent != null && labelContent.length() > 0) {
-					if (!labelContent.toLowerCase().equals("human") && !labelContent.toLowerCase().equals("human@en") && !labelContent.toLowerCase().equals("sample")) {
-						value = labelContent + " " + value;
+				if (key.contains("TargetedAnalyte") || key.contains("BiologicalResponse")) {
+
+					value = "";  // targeted analyte uses this format: In_Relation_To *in* Entity *from* Role *at* Time”.
+
+					// get the role label
+					value = " from " + items[Variable.SolrPivotFacet.ROLE_STR.ordinal()] + value;
+
+					// get named-time label
+					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
+						value = value + " at " + FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
 					}
-				}
 
-				labelContent = getLabelContent(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
-				if (labelContent != null && labelContent.length() > 0) {
-					value = labelContent + " in " + value;
-				}
+					// get entity label
+					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
+						labelContent = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
+						if (labelContent != null && labelContent.length() > 0) {
+							if (!labelContent.toLowerCase().equals("human") && !labelContent.toLowerCase().equals("human@en") && !labelContent.toLowerCase().equals("sample")) {
+								value = labelContent + " " + value;
+							}
+						}
+					}
 
-			} else {
+					// get the inRelationTo label
+					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
+						value = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + " in " + value;
+					}
 
-				labelContent = items[Variable.SolrPivotFacet.ROLE_STR.ordinal()];
-				if (labelContent != null && labelContent.length() > 0) {
-					temp = labelContent + "'s " + value;
+				} else {
+
+					// role label
+					temp = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.ROLE_STR.ordinal()]) + "'s " + value;
 					value = temp;
-				}
 
-				labelContent = getLabelContent(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
-				if (labelContent != null && labelContent.length() > 0) {
-					temp = value + " at " + labelContent;
-					value = temp;
-				}
-
-				labelContent = getLabelContent(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
-				if (labelContent != null && labelContent.length() > 0) {
-					if (!labelContent.toLowerCase().equals("human") && !labelContent.toLowerCase().equals("human@en") && !labelContent.toLowerCase().equals("sample")) {
-						temp = labelContent + " " + value;
+					// get named time label
+					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
+						temp = value + " at " + FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
 						value = temp;
 					}
-				}
 
-				labelContent = getLabelContent(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
-				if (labelContent != null && labelContent.length() > 0) {
-					temp = labelContent + "'s " + value;
-					value = temp;
-				}
-
-			}
-
-			// Remove duplicate consecutive words
-			value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
-			ArrayList<String> arrValues = null;
-			if ( !studyInfo.containsKey(key) ) {
-				arrValues = new ArrayList<String>();
-				studyInfo.put(key, arrValues);
-			}
-			else if (studyInfo.get(key) instanceof ArrayList<?>) {
-				arrValues = (ArrayList<String>)studyInfo.get(key);
-			}
-
-			if ((!arrValues.contains(value))&&(value!="")) {
-				boolean dupl=false;
-				int valueCharVal = 0, valCharVal = 0;
-				for(String val : arrValues){
-					if(val.toLowerCase().equals(value.toLowerCase())){
-						dupl=true;
-						//System.out.println("Value: " + value + (int)value.charAt(0) + "\tVal: " + val + (int)val.charAt(0) + "\n" );
-						valueCharVal = 0;
-						valCharVal = 0;
-						for(int i=0;i<value.length();i++){
-							valueCharVal += (int)value.charAt(i);
-						}
-						for(int i=0;i<val.length();i++){
-							valCharVal += (int)val.charAt(i);
+					// get entity label
+					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
+						labelContent = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
+						if (labelContent != null && labelContent.length() > 0) {
+							if (!labelContent.toLowerCase().equals("human") && !labelContent.toLowerCase().equals("human@en") && !labelContent.toLowerCase().equals("sample")) {
+								value = labelContent + " " + value;
+							}
 						}
 					}
+
+					// get inRelationTo label
+					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
+						temp = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + "'s " + value;
+						value = temp;
+					}
+
 				}
-				if(!dupl){
-					arrValues.add(value);
+
+				// Remove duplicate consecutive words
+				value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
+				ArrayList<String> arrValues = null;
+				if (!studyInfo.containsKey(key)) {
+					arrValues = new ArrayList<String>();
+					studyInfo.put(key, arrValues);
+				} else if (studyInfo.get(key) instanceof ArrayList<?>) {
+					arrValues = (ArrayList<String>) studyInfo.get(key);
+				}
+
+				if ((!arrValues.contains(value)) && (value != "")) {
+					boolean dupl = false;
+					int valueCharVal = 0, valCharVal = 0;
+					for (String val : arrValues) {
+						if (val.toLowerCase().equals(value.toLowerCase())) {
+							dupl = true;
+							//System.out.println("Value: " + value + (int)value.charAt(0) + "\tVal: " + val + (int)val.charAt(0) + "\n" );
+							valueCharVal = 0;
+							valCharVal = 0;
+							for (int i = 0; i < value.length(); i++) {
+								valueCharVal += (int) value.charAt(i);
+							}
+							for (int i = 0; i < val.length(); i++) {
+								valCharVal += (int) val.charAt(i);
+							}
+						}
+					}
+					if (!dupl) {
+						arrValues.add(value);
+					}
 				}
 			}
 
@@ -274,166 +294,6 @@ public class MetadataAcquisition extends Controller {
 
 		return SolrUtils.commitJsonDataToSolr(
 				CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES), results.toString());
-	}
-
-	private static String getLabelContent(String label) {
-    	if ( label == null || label.indexOf("(") < 0 || label.indexOf(")") < 0 ) return null;
-    	if ( label.contains(Variable.VARIABLE_EMPTY_LABEL) ) return "";
-    	return label.substring(label.indexOf("(")+1,label.lastIndexOf(")"));
-	}
-
-    @SuppressWarnings("unchecked")
-	public static boolean updateStudyOldVersion() {
-		String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
-				+ " SELECT DISTINCT ?studyId ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment"
-				+ " ?indicatorLabel ?attributeLabel ?roleLabel ?eventLabel ?entityLabel" 
-				+ " ?agentName ?institutionName ?relationLabel ?relationTo ?relationToRole ?relationToRoleLabel WHERE { "
-				+ " ?studyUri a ?subUri . "
-				+ " ?studyUri hasco:hasId ?studyId . "
-				+ " ?subUri rdfs:subClassOf* hasco:Study . "
-				+ " OPTIONAL{ ?schemaAttribute hasco:partOfSchema ?schemaUri . "
-				+ " ?dataAcq hasco:isDataAcquisitionOf ?studyUri ."
-				+ " ?dataAcq hasco:hasSchema ?schemaUri ."
-				+ " ?schemaAttribute hasco:hasAttribute ?attribute . "
-				+ " {  { ?indicator rdfs:subClassOf hasco:StudyIndicator } UNION { ?indicator rdfs:subClassOf hasco:SampleIndicator } } . "
-				+ " ?indicator rdfs:label ?indicatorLabel . " 
-				+ " ?attribute rdfs:subClassOf+ ?indicator . " 
-				+ " ?attribute rdfs:label ?attributeLabel . "
-				+ "		FILTER(lang(?attributeLabel) != 'en') } . " 
-				+ " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
-                + " ?object hasco:hasRole ?role . "
-                + " ?role rdfs:label ?roleLabel } . "
-                + " OPTIONAL { ?schemaAttribute hasco:isAttributeOf ?object . "
-                + " ?object sio:SIO_000668 ?relationTo . "
-                + " ?object hasco:Relation ?relation . "
-                + " ?relation rdfs:label ?relationLabel . "
-                + " ?relationTo hasco:hasRole ?relationToRole . "
-                + " ?relationToRole rdfs:label ?relationToRoleLabel} . "
-                + " OPTIONAL { ?schemaAttribute hasco:hasEvent ?event . "
-                + " ?event hasco:hasEntity ?eventEn . "
-                + " ?eventEn rdfs:label ?eventLabel } . "
-                + " OPTIONAL { ?schemaAttribute hasco:hasEntity ?entity . "
-                + " ?entity rdfs:label ?entityLabel . "
-				+ "		FILTER(lang(?entityLabel) != 'en') } . " 
-				+ " OPTIONAL{ ?studyUri rdfs:label ?studyLabel } . "
-				+ " OPTIONAL{ ?studyUri hasco:hasProject ?proj } . "
-				+ " OPTIONAL{ ?studyUri skos:definition ?studyTitle } . "
-				+ " OPTIONAL{ ?studyUri rdfs:comment ?studyComment } . "
-				+ " OPTIONAL{ ?studyUri hasco:hasAgent ?agent . "
-				+ "           ?agent foaf:name ?agentName } . "
-				+ " OPTIONAL{ ?studyUri hasco:hasInstitution ?institution . "
-				+ "           ?institution foaf:name ?institutionName } . " 
-				+ " } ";
-		
-		System.out.println("strQuery: " + strQuery);
-		
-		ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
-		
-		HashMap<String, HashMap<String, Object>> mapStudyInfo = new HashMap<String, HashMap<String, Object>>();
-		while (resultsrwStudy.hasNext()) {
-			QuerySolution soln = resultsrwStudy.next();
-			String studyUri = soln.get("studyUri").toString();
-			HashMap<String, Object> studyInfo = null;
-			if (!mapStudyInfo.containsKey(studyUri)) {
-				studyInfo = new HashMap<String, Object>();
-				studyInfo.put("studyUri", studyUri);
-				mapStudyInfo.put(studyUri, studyInfo);
-			}
-			else {
-				studyInfo = mapStudyInfo.get(studyUri);
-			}
-			
-			if (soln.contains("studyLabel") && !studyInfo.containsKey("studyLabel_str")) {
-				studyInfo.put("studyLabel_str", "<a href=\""
-						+ ConfigFactory.load().getString("hadatac.console.host_deploy") 
-						+ "/hadatac/studies/view?study_uri=" 
-						+ URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
-						+ soln.get("studyId").toString() + "</a>");
-			}
-			if (soln.contains("studyTitle") && !studyInfo.containsKey("studyTitle_str")) {
-				studyInfo.put("studyTitle_str", soln.get("studyTitle").toString());
-			}
-			if (soln.contains("proj") && !studyInfo.containsKey("proj_str")){
-				studyInfo.put("proj_str", soln.get("proj").toString());
-			}
-			if (soln.contains("studyComment") && !studyInfo.containsKey("studyComment_str")){
-				studyInfo.put("studyComment_str", soln.get("studyComment").toString());
-			}
-			if (soln.contains("agentName") && !studyInfo.containsKey("agentName_str")){
-				studyInfo.put("agentName_str", soln.get("agentName").toString());
-			}
-			if (soln.contains("institutionName") && !studyInfo.containsKey("institutionName_str")){
-				studyInfo.put("institutionName_str", soln.get("institutionName").toString());
-			}
-			if (soln.contains("indicatorLabel")) {
-				String key = soln.get("indicatorLabel").toString().
-						replace(",", "").replace(" ", "") + "_str_multi";
-				String value = soln.get("attributeLabel").toString();
-				String temp = "";
-				if (soln.contains("roleLabel")) {
-					temp = soln.get("roleLabel").toString() + "'s " + value;
-					value = temp.toString();
-				}
-				if (soln.contains("eventLabel")){
-					temp = value + " at " + soln.get("eventLabel").toString();
-					value = temp.toString();
-				}
-				if (soln.contains("entityLabel")){
-					if(!soln.get("entityLabel").toString().toLowerCase().equals("human")&&!soln.get("entityLabel").toString().toLowerCase().equals("sample")){
-						temp = soln.get("entityLabel").toString() + " " + value;
-						value = temp.toString();
-					}
-				}
-				if (soln.contains("relationToRoleLabel")){
-					temp = soln.get("relationToRoleLabel") + "'s " + value;
-					value = temp.toString();
-				}
-				// Remove duplicate consecutive words
-				value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
-				ArrayList<String> arrValues = null;
-				if (!studyInfo.containsKey(key)) {
-					arrValues = new ArrayList<String>();
-					studyInfo.put(key, arrValues);
-				}
-				else if (studyInfo.get(key) instanceof ArrayList<?>) {
-					arrValues = (ArrayList<String>)studyInfo.get(key);
-				}
-				
-				if ((!arrValues.contains(value))&&(value!="")) {
-					boolean dupl=false;
-					int valueCharVal = 0;
-					int valCharVal = 0;
-					for(String val : arrValues){
-						if(val.toLowerCase().equals(value.toLowerCase())){
-							dupl=true;
-							//System.out.println("Value: " + value + (int)value.charAt(0) + "\tVal: " + val + (int)val.charAt(0) + "\n" );
-							valueCharVal = 0;
-							valCharVal = 0;
-							for(int i=0;i<value.length();i++){
-								valueCharVal += (int)value.charAt(i);
-							}
-							for(int i=0;i<val.length();i++){
-								valCharVal += (int)val.charAt(i);
-							}
-						}
-					}
-					if(!dupl){
-						arrValues.add(value);	
-					}
-				}
-			}
-		}
-
-		deleteFromSolr();
-		
-		ArrayList<JSONObject> results = new ArrayList<JSONObject>();
-		for (HashMap<String, Object> info : mapStudyInfo.values()) {
-			results.add(new JSONObject(info));
-		}
-		
-		return SolrUtils.commitJsonDataToSolr(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES), results.toString());
 	}
 
 	public static int deleteFromSolr() {
@@ -457,8 +317,7 @@ public class MetadataAcquisition extends Controller {
 	
 	@Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result update() {
-		updateStudy();
-		
+		updateStudySearch();
 		return redirect(routes.MetadataAcquisition.index());
     }
     
