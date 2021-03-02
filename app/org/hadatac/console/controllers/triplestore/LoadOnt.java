@@ -11,7 +11,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.base.Sys;
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import play.libs.Files.TemporaryFile;
 import play.mvc.*;
 import play.data.Form;
@@ -40,9 +42,12 @@ public class LoadOnt extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
-    public Result loadOnt(String oper) {
+//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    public Result loadOnt(String oper, Http.Request request) {
+//        System.out.println(Constants.DATA_MANAGER_ROLE);
 
         List<String> cacheList = new ArrayList<String>();
         File folder = new File(NameSpaces.CACHE_PATH);
@@ -59,6 +64,7 @@ public class LoadOnt extends Controller {
         }
 
         String name = "";
+        System.out.println("folder.listFiles:"+folder.listFiles());
         for (final File fileEntry : folder.listFiles()) {
             if (!fileEntry.isDirectory()) {
                 name = fileEntry.getName();
@@ -69,12 +75,12 @@ public class LoadOnt extends Controller {
             }
         }
 
-        return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList()));
+        return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
-    public Result postLoadOnt(String oper) {
-        return loadOnt(oper);
+//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    public Result postLoadOnt(String oper, Http.Request request) {
+        return loadOnt(oper, request);
     }
 
     public static String playLoadOntologies(String oper) {
@@ -88,7 +94,7 @@ public class LoadOnt extends Controller {
     }
 
     @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
-    public Result eraseCache() {
+    public Result eraseCache(Http.Request request) {
         List<String> cacheList = new ArrayList<String>();
         File folder = new File(NameSpaces.CACHE_PATH);
         String name = "";
@@ -102,7 +108,7 @@ public class LoadOnt extends Controller {
             }
         }
 
-        return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList()));
+        return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));
     }
 
     @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
@@ -181,7 +187,7 @@ public class LoadOnt extends Controller {
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result importNamespaces(Http.Request request) {
         System.out.println("importNamespaces is called");

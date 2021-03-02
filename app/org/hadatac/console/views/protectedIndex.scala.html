@@ -78,7 +78,7 @@
                 }}
             </div>
                 @defining(AuthApplication.getAuthApplication().getUserProvider().getUser(userName)) { user =>
-                        @if(user.isDataManager){
+                    @if(user.isDataManager){
                             <div class="col-md-3 col-xs-2">
                                 <h4>Knowledge Management</h4>
                                 <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")"

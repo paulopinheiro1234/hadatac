@@ -1,6 +1,7 @@
 @(oper: String,
         cacheList : List[String],
-        namespaces : List[org.hadatac.utils.NameSpace]
+        namespaces : List[org.hadatac.utils.NameSpace],
+        userName: String
 )
 
     @import helper._
@@ -9,7 +10,7 @@
     @import org.hadatac.metadata.loader._
     @import java.net._
 
-    @main("Load Ontologies into Metadata Store","","") {
+    @main("Load Ontologies into Metadata Store","",userName) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">

@@ -4,7 +4,8 @@
         processedFiles   : List[org.hadatac.entity.pojo.DataFile],
         studyURIs        : List[String],
         bStarted         : Boolean,
-        bAdmin           : Boolean)
+        bAdmin           : Boolean,
+        userName         : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -15,7 +16,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Automatic Annotator","","") {
+@main("Automatic Annotator","",userName) {
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
 
@@ -215,7 +216,7 @@
         <p>No records for processed files</p>
     }
     <br><br>
-    <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+    <a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Page</a>
     </div>
 
     <script type="text/javascript">

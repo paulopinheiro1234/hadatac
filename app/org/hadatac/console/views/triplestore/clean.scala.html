@@ -1,4 +1,4 @@
-@(oper: String)
+@(oper: String, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -11,7 +11,7 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("Repository Management","","") {
+@main("Repository Management","",userName) {
 
     <div class="container-fluid">
 
@@ -142,7 +142,7 @@
                 @if(oper=="init") {
 
                     <br>
-                    <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Menu</a>
+                    <a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
 
                 }
 

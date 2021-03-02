@@ -22,6 +22,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 //import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
@@ -67,9 +69,12 @@ public class AutoAnnotator extends Controller {
     @Inject
     FormFactory formFactory;
 
+    @Inject
+    Application application;
+
 //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result index(String dir, String dest, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         String newDir = Paths.get(dir, dest).normalize().toString();
 
@@ -85,7 +90,7 @@ public class AutoAnnotator extends Controller {
             folders.add(0, "..");
         }
 
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             procFiles = DataFile.findInDir(newDir, DataFile.PROCESSED);
 
             unprocFiles = DataFile.findInDir("", DataFile.UNPROCESSED);
@@ -96,17 +101,17 @@ public class AutoAnnotator extends Controller {
                 basePath = basePath.substring(1, basePath.length());
             }
 
-//            DataFile.includeUnrecognizedFiles(Paths.get(pathProc, newDir).toString(),
-//                    basePath, procFiles, user.getEmail(), DataFile.PROCESSED);
-//
-//            DataFile.includeUnrecognizedFiles(pathUnproc, "",
-//                    unprocFiles, user.getEmail(), DataFile.UNPROCESSED);
-//        } else {
-//            procFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.PROCESSED);
-//
-//            unprocFiles = DataFile.findInDir("", user.getEmail(), DataFile.UNPROCESSED);
-//            unprocFiles.addAll(DataFile.findInDir("", user.getEmail(), DataFile.FREEZED));
-//        }
+            DataFile.includeUnrecognizedFiles(Paths.get(pathProc, newDir).toString(),
+                    basePath, procFiles, user.getEmail(), DataFile.PROCESSED);
+
+            DataFile.includeUnrecognizedFiles(pathUnproc, "",
+                    unprocFiles, user.getEmail(), DataFile.UNPROCESSED);
+        } else {
+            procFiles = DataFile.findInDir(newDir, user.getEmail(), DataFile.PROCESSED);
+
+            unprocFiles = DataFile.findInDir("", user.getEmail(), DataFile.UNPROCESSED);
+            unprocFiles.addAll(DataFile.findInDir("", user.getEmail(), DataFile.FREEZED));
+        }
 
         DataFile.filterNonexistedFiles(pathProc, procFiles);
         DataFile.filterNonexistedFiles(pathUnproc, unprocFiles);
@@ -143,7 +148,7 @@ public class AutoAnnotator extends Controller {
             }
         });
 
-        return ok(autoAnnotator.render(newDir, folders, unprocFiles, procFiles, studyURIs, bStarted, true)); //TODO: fix this -- user.isDataManager()));
+        return ok(autoAnnotator.render(newDir, folders, unprocFiles, procFiles, studyURIs, bStarted, true, user.getEmail()));
     }
 
 //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
@@ -153,14 +158,13 @@ public class AutoAnnotator extends Controller {
 
 //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result assignFileOwner(String dir, String ownerEmail, String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
-
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -194,7 +198,7 @@ public class AutoAnnotator extends Controller {
             DataFile file = DataFile.findByIdAndEmail(fileId, ownerEmail);
             if (file == null) {
                 file = new DataFile(fileId);
-//                file.setOwnerEmail(AuthApplication.getLocalUser(request.session()).getEmail());
+                file.setOwnerEmail(AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail());
                 file.setStatus(DataFile.UNPROCESSED);
                 file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             }
@@ -206,14 +210,13 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
     public Result assignDataAcquisition(String dir, String dataAcquisitionUri, String fileId,Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
-
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -255,7 +258,7 @@ public class AutoAnnotator extends Controller {
             DataFile file = DataFile.findById(fileId);
             if (file == null) {
                 file = new DataFile("Unknown_File.csv");
-//                file.setOwnerEmail(AuthApplication.getLocalUser(request.session()).getEmail());
+                file.setOwnerEmail(AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail());
                 file.setStatus(DataFile.UNPROCESSED);
                 file.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
             }
@@ -343,14 +346,13 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result moveDataFile(String dir, String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
-
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have t		        object.setLogger(new AnnotationLogger(object, SolrUtils.getFieldValue(doc, \"log_str\").toString()));\n" +
@@ -386,15 +388,15 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result moveDataFileToWorking(String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findByIdAndStatus(fileId, DataFile.UNPROCESSED);
-//        } else {
-//            dataFile = DataFile.findByIdAndOwnerEmailAndStatus(
-//                    fileId, user.getEmail(), DataFile.UNPROCESSED);
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndOwnerEmailAndStatus(
+                    fileId, user.getEmail(), DataFile.UNPROCESSED);
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -423,13 +425,13 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result activateDataFile(String dir, String fileId,Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -444,14 +446,14 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteDataFile(String dir, String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -481,14 +483,14 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
     public Result deleteDataFileOnly(String dir, String fileId,Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -518,7 +520,7 @@ public class AutoAnnotator extends Controller {
 
     //    @Restrict(@Group(AuthApplication.FILE_VIEWER_EDITOR_ROLE))
     public Result downloadDataFile(String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
         dataFile = DataFile.findByIdAndEmail(fileId, null);
@@ -527,14 +529,12 @@ public class AutoAnnotator extends Controller {
             return badRequest("Invalid file id!");
         }
 
-//        if (!user.isDataManager()) {
-//            if (!dataFile.getViewerEmails().contains(user.getEmail())
-//                    && !dataFile.getEditorEmails().contains(user.getEmail())) {
-//                return badRequest("You do NOT have the permission to download this file!");
-//            }
-//        }
-
-//        response().setHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
+        if (!user.isDataManager()) {
+            if (!dataFile.getViewerEmails().contains(user.getEmail())
+                    && !dataFile.getEditorEmails().contains(user.getEmail())) {
+                return badRequest("You do NOT have the permission to download this file!");
+            }
+        }
         return ok(new File(dataFile.getAbsolutePath()))
                 .withHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
     }
@@ -629,8 +629,8 @@ public class AutoAnnotator extends Controller {
         String fileId = (String)params.get("fileId");
 
         if (uploadedfile != null) {
-//            final SysUser user = AuthApplication.getLocalUser(request.session());
-            DataFile dataFile = DataFile.findByIdAndEmail(fileId, null); //TODO: fix this : user.getEmail());
+            final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+            DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
             if (null == dataFile) {
                 return ok("<a style=\"color:#cc3300; font-size: large;\">This file can be modified only by its owner!</a>");
             }
@@ -693,24 +693,24 @@ public class AutoAnnotator extends Controller {
 
         String fileName = path.getFileName().toString();
 
-//        if (ResumableUpload.postUploadFileByChunking(request, ConfigProp.getPathUnproc())) {
-//            DataFile dataFile = DataFile.create(
-//                    fileName, "", AuthApplication.getLocalUser(request.session()).getEmail(),
-//                    DataFile.UNPROCESSED);
-//
-//            String originalPath = Paths.get(ConfigProp.getPathUnproc(), dataFile.getPureFileName()).toString();
-//            File file = new File(originalPath);
-//
-//            String newPath = originalPath.replace(
-//                    "/" + dataFile.getPureFileName(),
-//                    "/" + dataFile.getStorageFileName());
-//            file.renameTo(new File(newPath));
-//            file.delete();
-//
-//            return(ok("Upload finished"));
-//        } else {
+        if (ResumableUpload.postUploadFileByChunking(request, ConfigProp.getPathUnproc())) {
+            DataFile dataFile = DataFile.create(
+                    fileName, "", AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail(),
+                    DataFile.UNPROCESSED);
+
+            String originalPath = Paths.get(ConfigProp.getPathUnproc(), dataFile.getPureFileName()).toString();
+            File file = new File(originalPath);
+
+            String newPath = originalPath.replace(
+                    "/" + dataFile.getPureFileName(),
+                    "/" + dataFile.getStorageFileName());
+            file.renameTo(new File(newPath));
+            file.delete();
+
+            return(ok("Upload finished"));
+        } else {
             return(ok("Upload"));
-//        }
+        }
     }
 }
 

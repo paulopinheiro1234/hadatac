@@ -76,7 +76,8 @@ public class Application extends Controller {
     }
 
     private Result protectedIndexView(Http.Request request) {
-        getUserEmail(request);
+//        getUserEmail(request);
+//        getProfiles(request);
         return ok(org.hadatac.console.views.html.protectedIndex.render(getProfiles(request),getUserEmail(request)));
     }
 
