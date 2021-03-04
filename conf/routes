@@ -13,8 +13,8 @@ GET     /hadatac/sandbox                                  org.hadatac.console.co
 POST    /hadatac/sandbox                                  org.hadatac.console.controllers.sandbox.Sandbox.postIndex(request: Request)
 GET     /hadatac/sandbox/startmode                       org.hadatac.console.controllers.sandbox.Sandbox.startSandboxMode(request: Request)
 GET     /hadatac/sandbox/exitmode                         org.hadatac.console.controllers.sandbox.Sandbox.exitSandboxMode(request: Request)
-GET	    /hadatac/dash                                      org.hadatac.console.controllers.Dashboard.index()
-POST    /hadatac/dash                                      org.hadatac.console.controllers.Dashboard.postIndex()
+GET	    /hadatac/dash                                      org.hadatac.console.controllers.Dashboard.index(request: Request)
+POST    /hadatac/dash                                      org.hadatac.console.controllers.Dashboard.postIndex(request: Request)
 GET     /hadatac/URILookup                                 org.hadatac.console.controllers.URILookup.index(mode : String, message : String)
 POST    /hadatac/URILookup                                org.hadatac.console.controllers.URILookup.postIndex(mode : String, message : String)
 POST 	/hadatac/URILookup/form	                          org.hadatac.console.controllers.URILookup.processForm(mode : String, request: Request)
@@ -51,8 +51,8 @@ POST    /hadatac/apiStudyVariable/download		       org.hadatac.console.http.Solr
 POST    /hadatac/apiStudyVariableData/download		   org.hadatac.console.http.SolrSearchProxy.getApiStudyVariableDataDownload(request: Request)
 
 # Metadata
-GET	    /hadatac/metadata  		 	                   org.hadatac.console.controllers.metadata.Metadata.index()
-POST	/hadatac/metadata			                   org.hadatac.console.controllers.metadata.Metadata.postIndex()
+GET	    /hadatac/metadata  		 	                   org.hadatac.console.controllers.metadata.Metadata.index(request: Request)
+POST	/hadatac/metadata			                   org.hadatac.console.controllers.metadata.Metadata.postIndex(request: Request)
 GET	    /hadatac/metadata/metadataentry  	           org.hadatac.console.controllers.metadata.MetadataEntry.index(tabName: String)
 POST	/hadatac/metadata/metadataentry		           org.hadatac.console.controllers.metadata.MetadataEntry.postIndex(tabName: String)
 GET     /hadatac/metadata/metadataentrybyuri           org.hadatac.console.controllers.metadata.MetadataEntry.indexByUri(uri: String)

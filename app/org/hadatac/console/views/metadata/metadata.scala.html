@@ -1,10 +1,11 @@
 @(indicatorMap : Map[String,List[String]],
-        loadedList: List[String])
+        loadedList: List[String],
+        userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Browse Metadata","","") {
+@main("Browse Metadata","",userName) {
     <div class="container-fluid">
 
         <h3>Browse Ontologies</h3>
