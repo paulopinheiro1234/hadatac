@@ -189,7 +189,7 @@ public class SecurityModule extends AbstractModule {
         config.addMatcher("excludedPath", new PathMatcher().excludeRegex("^/facebook/notprotected\\.html$"));
         // for deadbolt:
         config.setHttpActionAdapter(PlayHttpActionAdapter.INSTANCE);
-        System.out.println("Config:"+config.getClients());
+//        System.out.println("Config:"+config.getClients());
         return config;
     }
 }

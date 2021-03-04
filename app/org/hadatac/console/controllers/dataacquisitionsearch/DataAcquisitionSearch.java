@@ -170,11 +170,11 @@ public class DataAcquisitionSearch extends Controller {
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    Measurement.getFieldNames(), objectCollections));
+                    Measurement.getFieldNames(), objectCollections, application.getUserEmail(request)));
         } else {
             return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    Measurement.getFieldNames(), objectCollections));
+                    Measurement.getFieldNames(), objectCollections, application.getUserEmail(request)));
         }
     }
 
@@ -261,11 +261,11 @@ public class DataAcquisitionSearch extends Controller {
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    fileNames, objs));
+                    fileNames, objs, application.getUserEmail(request)));
         } else {
             return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    fileNames, objs));
+                    fileNames, objs, application.getUserEmail(request)));
         }
     }
 

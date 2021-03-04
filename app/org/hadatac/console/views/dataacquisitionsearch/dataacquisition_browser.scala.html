@@ -12,10 +12,11 @@
         handler : org.hadatac.console.models.FacetHandler,
         objDetails : String,
         objFields : List[String],
-        objOCs : List[org.hadatac.entity.pojo.ObjectCollection]
+        objOCs : List[org.hadatac.entity.pojo.ObjectCollection],
+        userName : String
 )
 
-@main("Simple Faceted Search","","") {
+@main("Simple Faceted Search","",userName) {
     <script type="text/javascript" src="/hadatac/assets/javascripts/jquery.redirect.js"></script>
     <script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
     <div id="query" data-documents="@documentJson"/>
