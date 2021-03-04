@@ -58,8 +58,7 @@ public class Application extends Controller {
     private  CommonProfile getProfile(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
-        System.out.println("Single profile:"+profileManager.getAll(true).get(0));
-        return profileManager.getAll(true).get(0);
+        return (profileManager.getAll(true).isEmpty()? null : profileManager.getAll(true).get(0));
     }
 
     public String getSessionId (Http.Request request){
@@ -70,8 +69,7 @@ public class Application extends Controller {
     }
 
     public String getUserEmail(Http.Request request){
-        final String userEmail = getProfile(request).getUsername();
-        System.out.println("userEmail :"+ userEmail);
+        final String userEmail = (getProfile(request)==null)? "" : getProfile(request).getUsername();
         return userEmail;
     }
 

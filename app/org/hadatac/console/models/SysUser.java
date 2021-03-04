@@ -775,7 +775,7 @@ public class SysUser implements Subject {
 
 	public static SysUser findByEmailSolr(final String email) {
 		if(email.isEmpty()){
-			System.out.println("USER NOT found:");
+			System.out.println("Email is empty");
 			return null;
 		}
 		List<SysUser> users = getEmailUserFindSolr(email);
