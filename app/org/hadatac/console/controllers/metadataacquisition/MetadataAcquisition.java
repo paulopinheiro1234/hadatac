@@ -24,6 +24,7 @@ import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -77,6 +78,8 @@ public class MetadataAcquisition extends Controller {
 		return results; 
     }
 
+    // reference: https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i
+    @CrossOrigin("*")
 	@SuppressWarnings("unchecked")
 	public static boolean updateStudySearch() {
 
@@ -194,7 +197,7 @@ public class MetadataAcquisition extends Controller {
 					value = "";  // targeted analyte uses this format: In_Relation_To *in* Entity *from* Role *at* Time”.
 
 					// get the role label
-					value = " from " + items[Variable.SolrPivotFacet.ROLE_STR.ordinal()] + value;
+					value = "from " + items[Variable.SolrPivotFacet.ROLE_STR.ordinal()] + value;
 
 					// get named-time label
 					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
@@ -214,6 +217,8 @@ public class MetadataAcquisition extends Controller {
 					// get the inRelationTo label
 					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
 						value = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + " in " + value;
+					} else {
+						value = FirstLabel.getPrettyLabel(labelAndIndcator.getLeft()) + " of " + value;
 					}
 
 				} else {
@@ -245,6 +250,9 @@ public class MetadataAcquisition extends Controller {
 					}
 
 				}
+
+				// write this to log
+				// System.out.println("---> " + value);
 
 				// Remove duplicate consecutive words
 				value = value.replaceAll("(?i)\\b([a-z]+)\\b(?:\\s+\\1\\b)+", "$1");
@@ -281,6 +289,7 @@ public class MetadataAcquisition extends Controller {
 
 		}
 
+		// System.out.println("\n\n\n study search update almost completed...");
 		deleteFromSolr();
 
 		ArrayList<JSONObject> results = new ArrayList<JSONObject>();
