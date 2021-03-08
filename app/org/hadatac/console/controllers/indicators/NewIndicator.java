@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -30,20 +31,20 @@ public class NewIndicator extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index() {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(Http.Request request) {
         // may need addressing
         Indicator indicator = new Indicator();
 
-        return ok(newIndicator.render(indicator));
+        return ok(newIndicator.render(indicator,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(Http.Request request) {
+        return index(request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -70,6 +71,6 @@ public class NewIndicator extends Controller {
         // insert the new indicator content inside of the triplestore
         ind.save();
 
-        return ok(newIndicatorConfirm.render(ind));
+        return ok(newIndicatorConfirm.render(ind,sysUser.getEmail()));
     }
 }

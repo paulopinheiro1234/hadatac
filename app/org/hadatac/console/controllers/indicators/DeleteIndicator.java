@@ -9,8 +9,11 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -25,11 +28,16 @@ import org.hadatac.utils.NameSpaces;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import scala.concurrent.stm.skel.HashTrieTMap;
+
+import javax.inject.Inject;
 
 public class DeleteIndicator extends Controller {
+    @Inject
+    Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String ind_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String ind_uri, Http.Request request) {
 
         Indicator indicator = null;
         String result = "";
@@ -51,18 +59,18 @@ public class DeleteIndicator extends Controller {
 
             result = deleteIndicator(DynamicFunctions.replaceURLWithPrefix(ind_uri));
 
-            return ok(deleteIndicator.render(indicator, result));
+            return ok(deleteIndicator.render(indicator, result,application.getUserEmail(request)));
         }
 
-        return ok(deleteIndicator.render(indicator, result));
+        return ok(deleteIndicator.render(indicator, result, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String ind_uri) {
-        return index(ind_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String ind_uri,Http.Request request) {
+        return index(ind_uri,request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public static String deleteIndicator(String ind_uri) {
         String result = "";
         NameSpaces.getInstance();
@@ -71,8 +79,8 @@ public class DeleteIndicator extends Controller {
         return result;
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result processForm(String ind_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processForm(String ind_uri,Http.Request request) {
         Indicator indicator = null;
 
         try {
@@ -91,6 +99,6 @@ public class DeleteIndicator extends Controller {
 
         indicator.delete();
 
-        return ok(indicatorConfirm.render("Delete Indicator", indicator));
+        return ok(indicatorConfirm.render("Delete Indicator", indicator,application.getUserEmail(request)));
     }
 }

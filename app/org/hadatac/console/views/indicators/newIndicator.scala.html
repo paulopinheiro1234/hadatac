@@ -1,4 +1,4 @@
-@(indicator     : org.hadatac.entity.pojo.Indicator)
+@(indicator     : org.hadatac.entity.pojo.Indicator, userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -7,7 +7,7 @@
 @import org.hadatac.entity.pojo.Indicator
 @import play._
 
-@main("New Indicator","","") {
+@main("New Indicator","",userName) {
 
     <div class="container">
         <h2>New Indicator</h2>

@@ -1,10 +1,10 @@
-@(indicatorList : List[org.hadatac.entity.pojo.Indicator])
+@(indicatorList : List[org.hadatac.entity.pojo.Indicator], userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Indicator Management","","") {
+@main("Indicator Management","",userName) {
 
     <h3>Indicator Management</h3>
 

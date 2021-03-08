@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -33,8 +34,8 @@ public class EditIndicator extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String ind_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String ind_uri,Http.Request request) {
 
         Indicator indicator = null;
 
@@ -54,15 +55,15 @@ public class EditIndicator extends Controller {
             return badRequest("No URI is provided to retrieve Indicator");
         }
 
-        return ok(editIndicator.render(indicator));
+        return ok(editIndicator.render(indicator,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String ind_uri) {
-        return index(ind_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String ind_uri,Http.Request request) {
+        return index(ind_uri,request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String ind_uri, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -113,6 +114,6 @@ public class EditIndicator extends Controller {
         oldIndicator.save();
 
 
-        return ok(indicatorConfirm.render("Edit Indicator", oldIndicator));
+        return ok(indicatorConfirm.render("Edit Indicator", oldIndicator, sysUser.getEmail()));
     }
 }

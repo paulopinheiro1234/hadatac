@@ -1,4 +1,4 @@
-@(indicator: org.hadatac.entity.pojo.Indicator, results : String)
+@(indicator: org.hadatac.entity.pojo.Indicator, results : String, userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -7,7 +7,7 @@
 @import org.hadatac.console.controllers.indicators._
 @import org.hadatac.console.controllers.triplestore._
 
-@main("Delete Indicator","","") {
+@main("Delete Indicator","",userName) {
     <h2>Delete Indicator</h2>
 
     <div class="container">

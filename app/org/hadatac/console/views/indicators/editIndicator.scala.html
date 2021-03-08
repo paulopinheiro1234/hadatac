@@ -1,4 +1,4 @@
-@(indicator : org.hadatac.entity.pojo.Indicator )
+@(indicator : org.hadatac.entity.pojo.Indicator , userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -7,7 +7,7 @@
 @import org.hadatac.entity.pojo.Indicator
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("Edit Indicator","","") {
+@main("Edit Indicator","",userName) {
     <script type="text/javascript">
             function checkform() {
                 var cansubmit = true;
