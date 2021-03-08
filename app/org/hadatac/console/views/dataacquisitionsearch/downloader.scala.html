@@ -1,5 +1,5 @@
 @(files  : List[org.hadatac.entity.pojo.DataFile],
-        bAdmin : Boolean)
+        bAdmin : Boolean, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,7 +8,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Download Management","","") {
+@main("Download Management","",userName) {
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
     <script type="text/javascript">

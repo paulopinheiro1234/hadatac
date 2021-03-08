@@ -1,5 +1,5 @@
 @(log : String,
-        postAction : String
+        postAction : String, userName: String
 )
 
 @import helper._
@@ -11,7 +11,7 @@
 @import org.hadatac.console.controllers.annotator._
 @import java.net._
 
-@main("Annotation Log","","") {
+@main("Annotation Log","",userName) {
 
     <div class="container-fluid">
         <div id="end-process-box" style="display:none;">
@@ -33,7 +33,7 @@
 
 
         <br><br>
-@*        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>*@
+        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>
         <a href="@postAction" class="btn btn-primary" role="button">Back</a>
     </div>
 }

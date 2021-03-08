@@ -162,7 +162,7 @@ public class AutoAnnotator extends Controller {
                 routes.AutoAnnotator.processOwnerForm(dir, ownerEmail, fileId),
                 "Owner",
                 "Selected File",
-                dataFile.getFileName()));
+                dataFile.getFileName(),user.getEmail()));
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
@@ -181,7 +181,7 @@ public class AutoAnnotator extends Controller {
                     routes.AutoAnnotator.processOwnerForm(dir, ownerEmail, fileId),
                     "Owner",
                     "Selected File",
-                    fileId));
+                    fileId,application.getUserEmail(request)));
         } else {
             DataFile file = DataFile.findByIdAndEmail(fileId, ownerEmail);
             if (file == null) {
@@ -218,7 +218,7 @@ public class AutoAnnotator extends Controller {
                 routes.AutoAnnotator.processDataAcquisitionForm(dir, dataAcquisitionUri, fileId),
                 "Stream Specification",
                 "Selected File",
-                dataFile.getFileName()));
+                dataFile.getFileName(),user.getEmail()));
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
@@ -241,7 +241,7 @@ public class AutoAnnotator extends Controller {
                     routes.AutoAnnotator.processDataAcquisitionForm(dir, dataAcquisitionUri, fileId),
                     "Stream Specification",
                     "Selected File",
-                    fileId));
+                    fileId,application.getUserEmail(request)));
         } else {
             DataFile file = DataFile.findById(fileId);
             if (file == null) {
@@ -271,8 +271,8 @@ public class AutoAnnotator extends Controller {
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result downloadTemplates(String dir) {
-        return ok(download_templates.render(dir));
+    public Result downloadTemplates(String dir, Http.Request request) {
+        return ok(download_templates.render(dir,application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
@@ -281,7 +281,7 @@ public class AutoAnnotator extends Controller {
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result checkAnnotationLog(String dir, String fileId) {
+    public Result checkAnnotationLog(String dir, String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
         if (fileId == null) {
             fileId = "";
@@ -289,16 +289,16 @@ public class AutoAnnotator extends Controller {
         if (DataFile.findById(fileId) == null ||
                 DataFile.findById(fileId).getLogger() == null) {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""),
-                    routes.AutoAnnotator.index(dir, ".").url()));
+                    routes.AutoAnnotator.index(dir, ".").url(),application.getUserEmail(request)));
         }
         return ok(annotation_log.render(Feedback.print(Feedback.WEB,
                 DataFile.findById(fileId).getLogger().getLog()),
-                routes.AutoAnnotator.index(dir, ".").url()));
+                routes.AutoAnnotator.index(dir, ".").url(),application.getUserEmail(request)));
     }
 
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result checkErrorDictionary() {
+    public Result checkErrorDictionary(Http.Request request) {
         InputStream inputStream = getClass().getClassLoader()
                 .getResourceAsStream("error_dictionary.json");
         String jsonText = "";
@@ -308,7 +308,7 @@ public class AutoAnnotator extends Controller {
             e.printStackTrace();
         }
 
-        return ok(error_dictionary.render(jsonText, routes.AutoAnnotator.index("/", ".").url()));
+        return ok(error_dictionary.render(jsonText, routes.AutoAnnotator.index("/", ".").url(),application.getUserEmail(request)));
     }
 
     public Result getAnnotationStatus(String fileId) {
@@ -534,7 +534,7 @@ public class AutoAnnotator extends Controller {
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result deleteFolder(String dir) {
+    public Result deleteFolder(String dir, Http.Request request) {
         List<DataFile> dfs = DataFile.findInDir(dir,DataFile.PROCESSED);
         int totFiles;
         if (dfs == null) {
@@ -552,12 +552,12 @@ public class AutoAnnotator extends Controller {
             statusMsg = "Folder cannot be deleted becuase it has sub-folders.";
         }
 
-        return ok(deleteFolder.render(dir, !noSubFolders, totFiles, statusMsg));
+        return ok(deleteFolder.render(dir, !noSubFolders, totFiles, statusMsg,application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result postDeleteFolder(String dir) {
-        return deleteFolder(dir);
+    public Result postDeleteFolder(String dir, Http.Request request) {
+        return deleteFolder(dir,request);
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)

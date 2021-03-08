@@ -1,4 +1,4 @@
-@(dir : String)
+@(dir : String, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -6,7 +6,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Download CSV Templates","","") {
+@main("Download CSV Templates","",userName) {
 
     <div class="container-fluid">
         <h4>CSV Templates:</h4>
@@ -37,6 +37,6 @@
                 </tr>
             </tbody>
         </table>
-@*        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Annotator</a>*@
+        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Annotator</a>
     </div>
 }

@@ -1,6 +1,7 @@
 @(dir       : String,
   dataFiles : List[org.hadatac.entity.pojo.DataFile],
-  dirFile   : org.hadatac.entity.pojo.DataFile)
+  dirFile   : org.hadatac.entity.pojo.DataFile,
+  userName : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -10,7 +11,7 @@
 @import org.hadatac.entity.pojo.DataFile 
 
 
-@main("Move File","","") {
+@main("Move File","",userName) {
 
 <script type="text/javascript">
 	   function checkform() {

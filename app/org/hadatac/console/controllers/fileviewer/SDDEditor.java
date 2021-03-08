@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.fileviewer;
 
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
@@ -30,30 +32,34 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+
 public class SDDEditor extends Controller {
+    @Inject
+    Application application;
     
-    public Result index() {
-//        final SysUser user = AuthApplication.getLocalUser(session());
+    public Result index(Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         
         List<DataFile> files = null;
 
         String path = ConfigProp.getPathDownload();
 
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.DD_UNPROCESSED);
             files.addAll(DataFile.findByStatus(DataFile.DD_PROCESSED));
-//        } else {
-//            files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
-//            files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
-//        }
+        } else {
+            files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
+            files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
+        }
 
         DataFile.filterNonexistedFiles(path, files);
         
-        return ok(sdd_editor.render(files, true)); //TODO: fix this -- user.isDataManager()));
+        return ok(sdd_editor.render(files, user.isDataManager(),application.getUserEmail(request)));
     }
     
-    public Result postIndex() {
-        return index();
+    public Result postIndex(Http.Request request) {
+        return index(request);
     }
     
     public Result uploadSDDFile(Http.Request request) {
@@ -70,8 +76,7 @@ public class SDDEditor extends Controller {
                 RecordFile recordFile = new SpreadsheetRecordFile(file, newFileName, "InfoSheet");
                 
                 DataFile dataFile = DataFile.create(
-                        newFileName, "", "sheersha.kandwal@mssm.edu",
-                  //TODO: fix this--      AuthApplication.getLocalUser(session()).getEmail(),
+                        newFileName, "", AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail(),
                         DataFile.WORKING);
                 
                 dataFile.setRecordFile(recordFile);

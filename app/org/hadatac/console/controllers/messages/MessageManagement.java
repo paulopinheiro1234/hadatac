@@ -2,6 +2,7 @@ package org.hadatac.console.controllers.messages;
 
 import org.apache.commons.io.FileUtils;
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.DataAcquisitionForm;
@@ -18,8 +19,10 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.FormFactory;
 
@@ -58,8 +61,10 @@ public class MessageManagement extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(String dir, String filename, String da_uri, int offset, boolean topics) {
 
         // get an updated list of stream
@@ -70,12 +75,12 @@ public class MessageManagement extends Controller {
         return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results, topics));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics) {
         return index(dir, filename, da_uri, offset, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
 
         // get an updated list of stream
@@ -84,12 +89,12 @@ public class MessageManagement extends Controller {
 
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
         return refreshCache(dir, filename, da_uri, offset, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
 
         // retrieve stream
@@ -117,12 +122,12 @@ public class MessageManagement extends Controller {
         return index(dir, filename, da_uri, offset, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
         return subscribe(dir, filename, da_uri, offset, stream_uri, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
 
         // retrieve stream
@@ -148,12 +153,12 @@ public class MessageManagement extends Controller {
         return index(dir, filename, da_uri, offset, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
         return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
 
         // retrieve stream
@@ -179,13 +184,13 @@ public class MessageManagement extends Controller {
         return index(dir, filename, da_uri, offset, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
         return close(dir, filename, da_uri, offset, stream_uri, topics);
     }
 
     /*
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteData(String dir, String filename, String da_uri, int offset, String stream_uri) {
 
     	// retrieve stream
@@ -204,14 +209,14 @@ public class MessageManagement extends Controller {
     	return ok(deleteData.render(dir, filename, da_uri, offset, stream));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDeleteData(String dir, String filename, String da_uri, int offset, String stream_uri) {
         return deleteData(dir, filename, da_uri, offset, stream_uri);
     }
     */
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
         if (stream_uri == null) {
             stream_uri = "";
         }
@@ -226,14 +231,14 @@ public class MessageManagement extends Controller {
         }
         if (stream == null || stream.getMessageLogger() == null || stream.getMessageLogger().getLog() == null) {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""),
-                    routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
+                    routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url(),application.getUserEmail(request)));
         }
         return ok(annotation_log.render(Feedback.print(Feedback.WEB,
                 stream.getMessageLogger().getLog()),
-                routes.MessageManagement.index(dir, filename, da_uri, offset, topics ).url()));
+                routes.MessageManagement.index(dir, filename, da_uri, offset, topics ).url(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
 
         String uri = null;
@@ -254,12 +259,12 @@ public class MessageManagement extends Controller {
         return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamName, results, topics));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postTestConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
         return testConnection(dir, filename, da_uri, offset, stream_uri, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result testTopics(String dir, String filename, String da_uri, int offset, String stream_uri, boolean show) {
 
         String streamName = "";
@@ -287,12 +292,12 @@ public class MessageManagement extends Controller {
         return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamName, results, specified, show));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postTestTopics(String dir, String filename, String da_uri, int offset, String topic_uri, boolean topics) {
         return testTopics(dir, filename, da_uri, offset, topic_uri, topics);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result testLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, boolean topics) {
 
         String tpc_uri = null;
@@ -324,7 +329,7 @@ public class MessageManagement extends Controller {
                 routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postTestLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, boolean topics) {
         return testLabels(dir, filename, da_uri, offset, stream_uri, topic_uri, topics);
     }

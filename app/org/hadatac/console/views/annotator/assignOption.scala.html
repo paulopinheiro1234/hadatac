@@ -2,7 +2,8 @@
         action : play.mvc.Call,
         title : String,
         targetType : String,
-        targetValue : String)
+        targetValue : String,
+        userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,7 +12,7 @@
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
 
-@main("Assign " + title,"","") {
+@main("Assign " + title,"",userName) {
 
     <script type="text/javascript">
             function checkform() {

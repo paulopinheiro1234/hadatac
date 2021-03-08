@@ -1,5 +1,6 @@
 @(dir : String,
-  dataFile : org.hadatac.entity.pojo.DataFile)
+  dataFile : org.hadatac.entity.pojo.DataFile,
+  userName : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -8,7 +9,7 @@
 @import org.hadatac.metadata.loader.URIUtils; 
 
 
-@main("Rename File","","") {
+@main("Rename File","",userName) {
 
 <script type="text/javascript">
 	   function checkform() {

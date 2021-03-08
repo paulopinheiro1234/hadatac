@@ -1,12 +1,12 @@
 @(jsonText : String,
-        postAction : String)
+        postAction : String, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.annotator._
 @import java.net._
 
-@main("Error Dictionary","","") {
+@main("Error Dictionary","",userName) {
     <script src="@controllers.routes.Assets.versioned("javascripts/json-table/json-table.js")"></script>
     <link href="@controllers.routes.Assets.versioned("javascripts/json-table/json-table.css")" rel="stylesheet">
 

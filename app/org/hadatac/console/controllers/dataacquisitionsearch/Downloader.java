@@ -11,6 +11,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 //import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.models.AssignOptionForm;
@@ -27,6 +30,7 @@ import org.hadatac.utils.Feedback;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -42,54 +46,56 @@ public class Downloader extends Controller {
 
     @Inject
     FormFactory formFactory;
+    @Inject
+    Application application;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         List<DataFile> files = null;
 
         String path = ConfigProp.getPathDownload();
 
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.CREATED);
             files.addAll(DataFile.findByStatus(DataFile.CREATING));
-//        } else {
-//            files = DataFile.find(user.getEmail(), DataFile.CREATED);
-//            files.addAll(DataFile.find(user.getEmail(), DataFile.CREATING));
-//        }
+        } else {
+            files = DataFile.find(user.getEmail(), DataFile.CREATED);
+            files.addAll(DataFile.find(user.getEmail(), DataFile.CREATING));
+        }
 
         DataFile.filterNonexistedFiles(path, files);
 
-        return ok(downloader.render(files, true));//user.isDataManager()));
+        return ok(downloader.render(files, user.isDataManager(),user.getEmail()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+@Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+@Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadDataFile(String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
-        DataFile dataFile = DataFile.findById(fileId); //TODO : -- actual value: DataFile.findByIdAndEmail(fileId, user.getEmail());
-//
-//        if (null == dataFile) {
-//            return badRequest("You do NOT have the permission to download this file! fileId: " + fileId + "   user.email: " + user.getEmail());
-//        }
+    final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+        DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+
+        if (null == dataFile) {
+            return badRequest("You do NOT have the permission to download this file! fileId: " + fileId + "   user.email: " + user.getEmail());
+        }
 
         return ok(new File(dataFile.getAbsolutePath()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+@Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteDataFile(String fileId, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -104,21 +110,21 @@ public class Downloader extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result assignFileOwner(String ownerEmail, String fileId) {
+@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result assignFileOwner(String ownerEmail, String fileId,Http.Request request) {
         return ok(assignOption.render(User.getUserEmails(),
                 routes.Downloader.processOwnerForm(ownerEmail, fileId),
                 "Owner",
                 "Selected File",
-                fileId));
+                fileId,application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postAssignFileOwner(String ownerEmail, String fileId) {
-        return assignFileOwner(ownerEmail, fileId);
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postAssignFileOwner(String ownerEmail, String fileId, Http.Request request) {
+        return assignFileOwner(ownerEmail, fileId, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processOwnerForm(String ownerEmail, String fileId, Http.Request request) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         AssignOptionForm data = form.get();
@@ -129,7 +135,7 @@ public class Downloader extends Controller {
                     routes.Downloader.processOwnerForm(ownerEmail, fileId),
                     "Owner",
                     "Selected File",
-                    fileId));
+                    fileId,application.getUserEmail(request)));
         } else {
             DataFile file = DataFile.findByIdAndEmail(fileId, ownerEmail);
             if (file != null) {
@@ -141,19 +147,19 @@ public class Downloader extends Controller {
         }
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String fileId) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result checkAnnotationLog(String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
         if (DataFile.findById(fileId) == null) {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB,""),
-                    routes.Downloader.index().url()));
+                    routes.Downloader.index().url(),application.getUserEmail(request)));
         }
         return ok(annotation_log.render(Feedback.print(Feedback.WEB,
                 DataFile.findById(fileId).getLog()),
-                routes.Downloader.index().url()));
+                routes.Downloader.index().url(),application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkCompletion(String fileId) {
         Map<String, Object> result = new HashMap<String, Object>();
 

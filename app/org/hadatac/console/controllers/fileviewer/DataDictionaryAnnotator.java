@@ -14,6 +14,9 @@ import javax.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 //import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.fileviewer.routes;
 import org.hadatac.console.models.AssignOptionForm;
@@ -35,6 +38,7 @@ import org.hadatac.utils.Feedback;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -49,47 +53,50 @@ public class DataDictionaryAnnotator extends Controller {
     @Inject
     FormFactory formFactory;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {		
-//        final SysUser user = AuthApplication.getLocalUser(session());
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         List<DataFile> files = null;
 
         String path = ConfigProp.getPathDownload();
 
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.DD_UNPROCESSED);
             files.addAll(DataFile.findByStatus(DataFile.DD_PROCESSED));
-//        } else {
-//            files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
-//            files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
-//        }
+        } else {
+            files = DataFile.find(user.getEmail(), DataFile.DD_UNPROCESSED);
+            files.addAll(DataFile.find(user.getEmail(), DataFile.DD_PROCESSED));
+        }
 
         DataFile.filterNonexistedFiles(path, files);
 
-        return ok(sdd_editor.render(files, true )); //TODO: fix this -- user.isDataManager()));
+        return ok(sdd_editor.render(files, user.isDataManager(),user.getEmail()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(Http.Request request) {
+        return index(request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadDataFile(String file_name) {
         String path = ConfigProp.getPathDownload();
         return ok(new File(path + "/" + file_name));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFile(String fileId) {
-//        final SysUser user = AuthApplication.getLocalUser(session());
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result deleteDataFile(String fileId, Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
+        }
         
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -104,16 +111,15 @@ public class DataDictionaryAnnotator extends Controller {
         return redirect(routes.SDDEditor.index());
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    
-    public Result checkAnnotationLog(String fileId) {
+   @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result checkAnnotationLog(String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
                 DataFile.findById(fileId).getLog()), 
-                routes.SDDEditor.index().url()));
+                routes.SDDEditor.index().url(),application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkCompletion(String fileId) {
         Map<String, Object> result = new HashMap<String, Object>();
 
@@ -153,7 +159,7 @@ public class DataDictionaryAnnotator extends Controller {
                 }
             }
             
-            String ownerEmail = "sheersha.kandwal@mssm.edu"; //TODO: fix this -- AuthApplication.getLocalUser(session()).getEmail();
+            String ownerEmail = AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail();
             DataFile.create(fileName, "", ownerEmail, DataFile.DD_UNPROCESSED);
             
             return redirect(routes.DataDictionaryAnnotator.index());
