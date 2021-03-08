@@ -1,13 +1,14 @@
 @(state   : org.hadatac.utils.State, 
   results : List[org.hadatac.entity.pojo.STR],
-  bAdmin  : Boolean)
+  bAdmin  : Boolean,
+  userName : String)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-@main("Data Stream Management","","") {
+@main("Data Stream Management","",userName) {
 
     <h2>Data Stream Management</h2>
     
@@ -43,15 +44,15 @@
 
    <hr>
    
-@*   @if(state.getCurrent() == State.ACTIVE) {*@
-@*        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Active Streams</h3>*@
-@*   } *@
-@*   @if(state.getCurrent() == State.CLOSED) {*@
-@*        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Closed Streams</h3>*@
-@*   } *@
-@*   @if(state.getCurrent() == State.ALL) {*@
-@*        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(session()).getName()'s Active and Closed Streams</h3>*@
-@*   } *@
+   @if(state.getCurrent() == State.ACTIVE) {
+        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(userName).getName()'s Active Streams</h3>
+   }
+   @if(state.getCurrent() == State.CLOSED) {
+        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(userName).getName()'s Closed Streams</h3>
+   }
+   @if(state.getCurrent() == State.ALL) {
+        <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(userName).getName()'s Active and Closed Streams</h3>
+   }
 
    
     <div class="container-fluid">

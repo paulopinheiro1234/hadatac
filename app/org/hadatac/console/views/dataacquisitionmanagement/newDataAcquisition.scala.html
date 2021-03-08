@@ -3,7 +3,8 @@
   theDeployments : List[org.hadatac.entity.pojo.Deployment],
   permissions    : Map[String, String], 
   ownerOptions   : List[String], 
-  bAdmin         : Boolean)
+  bAdmin         : Boolean,
+  userName       : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -12,7 +13,7 @@
 @import org.hadatac.metadata.loader.URIUtils; 
 
 
-@main("New Data Stream","","") {
+@main("New Data Stream","",userName) {
 
 <script type="text/javascript">
 	   function checkform() {

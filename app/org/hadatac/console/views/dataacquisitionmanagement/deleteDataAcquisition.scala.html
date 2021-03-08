@@ -1,6 +1,7 @@
 @(oper : String, 
   da : org.hadatac.entity.pojo.STR,
-  bAdmin : Boolean)
+  bAdmin : Boolean,
+  userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,7 +9,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Delete Data Stream","","") {
+@main("Delete Data Stream","",userName) {
 
     <h2>Delete Data Stream</h2>
     

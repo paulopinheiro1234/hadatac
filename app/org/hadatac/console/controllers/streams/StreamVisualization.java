@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.streams.*;
@@ -27,8 +30,12 @@ import org.hadatac.utils.State;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 
 public class StreamVisualization extends Controller {
+    @Inject
+    Application application;
 
     //private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -37,15 +44,15 @@ public class StreamVisualization extends Controller {
     private boolean is9Pixel = false;
     private boolean is25by20 = false;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, Http.Request request) {
 
         try {
             da_uri = URLDecoder.decode(da_uri, "UTF-8");
         } catch (Exception e) {
         }
         if (da_uri == null || da_uri.isEmpty()) {
-            return ok(genericVisualization.render(dir, filename, da_uri, "[]", "", ""));
+            return ok(genericVisualization.render(dir, filename, da_uri, "[]", "", "", application.getUserEmail(request)));
         }
         List<Measurement> measurements = Measurement.findByDataAcquisitionUri(da_uri);
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-05:00"));
@@ -55,23 +62,23 @@ public class StreamVisualization extends Controller {
         //	System.out.println("Stream Visualization: " +  sdf.format(m.getTimestamp()) + " " + m.getCharacteristicUris().get(0) + "  " + m.getValue());
         //}
         if (measurements == null) {
-            return ok(genericVisualization.render(dir, filename, da_uri, "[]", "", ""));
+            return ok(genericVisualization.render(dir, filename, da_uri, "[]", "", "",application.getUserEmail(request)));
         }
         String json = generateJSON(measurements);
         //System.out.println("Min Date: " + sdf.format(minDate));
         //System.out.println("Max Date: " + sdf.format(maxDate));
         if (is9Pixel) {
-            return ok(tof9PixelPodImageVisualization.render(dir, filename, da_uri, generateJSON(measurements), sdf.format(minDate), sdf.format(maxDate)));
+            return ok(tof9PixelPodImageVisualization.render(dir, filename, da_uri, generateJSON(measurements), sdf.format(minDate), sdf.format(maxDate),application.getUserEmail(request)));
         }
         if (is25by20) {
-            return ok(tof25by20ImageVisualization.render(dir, filename, da_uri, generateJSON(measurements), sdf.format(minDate), sdf.format(maxDate)));
+            return ok(tof25by20ImageVisualization.render(dir, filename, da_uri, generateJSON(measurements), sdf.format(minDate), sdf.format(maxDate),application.getUserEmail(request)));
         }
-        return ok(genericVisualization.render(dir, filename, da_uri, generateJSON(measurements), sdf.format(minDate), sdf.format(maxDate)));
+        return ok(genericVisualization.render(dir, filename, da_uri, generateJSON(measurements), sdf.format(minDate), sdf.format(maxDate),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri) {
-        return index(dir, filename, da_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, Http.Request request) {
+        return index(dir, filename, da_uri, request);
     }
 
     private String generateJSON(List<Measurement> measurements) {

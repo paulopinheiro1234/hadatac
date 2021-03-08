@@ -2,7 +2,8 @@
   fileId      : String,
   da          : org.hadatac.entity.pojo.STR,
   changedInfo : List[String],
-  bAdmin      : Boolean)
+  bAdmin      : Boolean,
+  userName    : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -10,7 +11,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Change Data Stream Permission","","") {
+@main("Change Data Stream Permission","",userName) {
 
     <h2>Change Data Stream Permission</h2>
     

@@ -3,7 +3,13 @@ package org.hadatac.console.controllers.dataacquisitionmanagement;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import org.apache.xml.security.configuration.HandlerType;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 //import org.hadatac.console.controllers.AuthApplication;
@@ -16,10 +22,14 @@ import org.hadatac.entity.pojo.Measurement;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class DeleteDataAcquisition extends Controller {
+import javax.inject.Inject;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String oper, String uri) {
+public class DeleteDataAcquisition extends Controller {
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String oper, String uri, Http.Request request) {
         STR dc = new STR();
         try {
             if (uri != null) {
@@ -41,17 +51,17 @@ public class DeleteDataAcquisition extends Controller {
             if (dc == null) {
                 return badRequest("Incorrect data acquisition uri detected!");
             }
-//            final SysUser user = AuthApplication.getLocalUser(session());
+            final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
-            return ok(deleteDataAcquisition.render(oper, dc, true)); // TODO -- fix this -- user.isDataManager()));
+            return ok(deleteDataAcquisition.render(oper, dc, user.isDataManager(),user.getEmail()));
         }
 
         return badRequest("No data acquisition uri specified!");
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String oper, String uri) {
-        return index(oper, uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String oper, String uri,Http.Request request) {
+        return index(oper, uri, request);
     }
 
     public static String delete(String uri) {

@@ -7,7 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 //import org.hadatac.console.controllers.AuthApplication;
@@ -24,13 +29,17 @@ import org.hadatac.utils.ConfigProp;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-public class DataAcquisitionScope extends Controller {
+import javax.inject.Inject;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result create(String dir, String fileId, String da_uri) {
+public class DataAcquisitionScope extends Controller {
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result create(String dir, String fileId, String da_uri, Http.Request request) {
 
         STR da = null;
-        String ownerEmail = "sheersha.kandwal@mssm.edu"; //TODO : fix it AuthApplication.getLocalUser(session()).getEmail();
+        String ownerEmail = AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail();
 
         // Load associated DA
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, ownerEmail);
@@ -84,21 +93,21 @@ public class DataAcquisitionScope extends Controller {
         List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(da.getStudyUri());
         //System.out.println("Collection list size: " + ocList.size());
 
-        return ok(editScope.render(dir, fileId, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri));
+        return ok(editScope.render(dir, fileId, da_uri, ocList, Arrays.asList(fields), globalScope, globalScopeUri, localScope, localScopeUri, ownerEmail));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreate(String dir, String fileId, String da_uri) {
-        return create(dir, fileId, da_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postCreate(String dir, String fileId, String da_uri, Http.Request request) {
+        return create(dir, fileId, da_uri, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result view(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result view(String dir, String fileId, String da_uri, Http.Request request) {
 
         STR da = null;
 
         // Load associated DA
-        String ownerEmail = "sheersha.kandwal@mssm.edu"; //TODO : fix it AuthApplication.getLocalUser(session()).getEmail();
+        String ownerEmail = AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail();
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, ownerEmail);
         if (dataFile == null) {
             return badRequest("[ERROR] Could not update file records with new DA information");
@@ -125,12 +134,12 @@ public class DataAcquisitionScope extends Controller {
             System.out.println("  - name : " + str);
         }
 
-        return ok(viewScope.render(dir, fileId, da_uri, cellScopeName, cellScopeUri));
+        return ok(viewScope.render(dir, fileId, da_uri, cellScopeName, cellScopeUri, ownerEmail));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postView(String dir, String fileId, String da_uri) {
-        return view(dir, fileId, da_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postView(String dir, String fileId, String da_uri, Http.Request request) {
+        return view(dir, fileId, da_uri, request);
     }
 
 }

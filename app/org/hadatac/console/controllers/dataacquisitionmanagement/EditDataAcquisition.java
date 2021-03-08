@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -38,11 +42,13 @@ public class EditDataAcquisition extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String uri, boolean bChangeParam) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String uri, boolean bChangeParam,Http.Request request) {
 
-//        final SysUser sysUser = AuthApplication.getLocalUser(session()); //TODO : Fix this
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
         try {
             if (uri != null) {
                 uri = URLDecoder.decode(uri, "UTF-8");
@@ -78,20 +84,20 @@ public class EditDataAcquisition extends Controller {
             }
 
             return ok(editDataAcquisition.render(dir, filename, dataAcquisition, nameList,
-                    User.getUserURIs(), mapSchemas, true, bChangeParam)); //sysUser.isDataManager(), bChangeParam));
+                    User.getUserURIs(), mapSchemas, sysUser.isDataManager(), bChangeParam,sysUser.getEmail()));
         }
 
         return badRequest("Invalid data acquisition URI!");
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String uri, boolean bChangeParam) {
-        return index(dir, filename, uri, bChangeParam);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String uri, boolean bChangeParam, Http.Request request) {
+        return index(dir, filename, uri, bChangeParam, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String acquisitionUri, boolean bChangeParam, Http.Request request) {
-//        final SysUser sysUser = AuthApplication.getLocalUser(session());
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest(request);
         DataAcquisitionForm data = form.get();
@@ -138,26 +144,26 @@ public class EditDataAcquisition extends Controller {
             }
         }
         else {
-//            if (sysUser.isDataManager()) {
+            if (sysUser.isDataManager()) {
                 if (da.getOwnerUri() == null || !da.getOwnerUri().equals(data.getNewOwner())) {
                     da.setOwnerUri(data.getNewOwner());
                     changedInfos.add(data.getNewOwner());
                 }
-//            }
-//            if (da.getPermissionUri() == null || !da.getPermissionUri().equals(data.getNewPermission())) {
-//                da.setPermissionUri(data.getNewPermission());
-//                changedInfos.add(data.getNewPermission());
-//            }
-//            if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {
-//                da.setSchemaUri(data.getNewSchema());
-//                changedInfos.add(data.getNewSchema());
-//            }
+            }
+            if (da.getPermissionUri() == null || !da.getPermissionUri().equals(data.getNewPermission())) {
+                da.setPermissionUri(data.getNewPermission());
+                changedInfos.add(data.getNewPermission());
+            }
+            if (da.getSchemaUri() == null || !da.getSchemaUri().equals(data.getNewSchema())) {
+                da.setSchemaUri(data.getNewSchema());
+                changedInfos.add(data.getNewSchema());
+            }
         }
 
         if (!changedInfos.isEmpty()) {
             da.save();
         }
 
-        return ok(editDataAcquisitionConfirm.render(dir, filename, da, changedInfos, true)); //sysUser.isDataManager()));
+        return ok(editDataAcquisitionConfirm.render(dir, filename, da, changedInfos, sysUser.isDataManager(),sysUser.getEmail()));
     }
 }

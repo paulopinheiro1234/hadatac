@@ -2,8 +2,12 @@ package org.hadatac.console.controllers.dataacquisitionmanagement;
 
 import org.apache.commons.io.FileUtils;
 //import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionmanagement.routes;
 //import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.DataAcquisitionForm;
 import org.hadatac.console.models.SysUser;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -46,18 +51,20 @@ public class DataAcquisitionManagement extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(int stateId) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(int stateId,Http.Request request) {
         List<STR> results = null;
         State state = new State(stateId);
-//        final SysUser user = AuthApplication.getLocalUser(session());
-//        if (user.isDataManager()) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+        if (user.isDataManager()) {
             results = STR.findAll(state);
-//        } else {
-//            String ownerUri = UserManagement.getUriByEmail(user.getEmail());
-//            results = STR.find(ownerUri, state);
-//        }
+        } else {
+            String ownerUri = UserManagement.getUriByEmail(user.getEmail());
+            results = STR.find(ownerUri, state);
+        }
 
         for (STR dataAcquisition : results) {
             dataAcquisition.setSchemaUri(URIUtils.replaceNameSpaceEx(dataAcquisition.getSchemaUri()));
@@ -69,18 +76,18 @@ public class DataAcquisitionManagement extends Controller {
             }
         });
 
-        return ok(dataAcquisitionManagement.render(state, results, true)); //TODO : fix this -- user.isDataManager()));
+        return ok(dataAcquisitionManagement.render(state, results, user.isDataManager(),application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(int stateId) {
-        return index(stateId);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(int stateId, Http.Request request) {
+        return index(stateId, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result newDataAcquisition() {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result newDataAcquisition(Http.Request request) {
 
-//        final SysUser sysUser = AuthApplication.getLocalUser(session());
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Map<String, String> nameList = new HashMap<String, String>();
         List<User> groups = UserGroup.find();
@@ -98,17 +105,17 @@ public class DataAcquisitionManagement extends Controller {
                 Deployment.find(new State(State.ACTIVE)),
                 nameList,
                 User.getUserEmails(),
-                true)); //TODO -- fix this sysUser.isDataManager()));
+                sysUser.isDataManager(),sysUser.getEmail()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postNewDataAcquisition() {
-        return newDataAcquisition();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postNewDataAcquisition(Http.Request request) {
+        return newDataAcquisition(request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(Http.Request request) {
-//        final SysUser sysUser = AuthApplication.getLocalUser(session());
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest(request);
         DataAcquisitionForm data = form.get();
@@ -126,9 +133,9 @@ public class DataAcquisitionManagement extends Controller {
         da.setSchemaUri(data.getNewSchema());
         da.setTriggeringEvent(TriggeringEvent.INITIAL_DEPLOYMENT);
         da.setParameter(data.getNewParameter());
-//        if (sysUser.isDataManager()) {
+        if (sysUser.isDataManager()) {
             da.setOwnerUri(data.getNewOwner());
-//        }
+        }
         da.setPermissionUri(data.getNewPermission());
         DateTimeFormatter isoFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm a");
         da.setStartedAt(isoFormat.parseDateTime(data.getNewStartDate()));
@@ -137,9 +144,9 @@ public class DataAcquisitionManagement extends Controller {
         return redirect(routes.DataAcquisitionManagement.index(State.ACTIVE));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result generateSTRFileFromForm(String dir, Http.Request request) {
-//        final SysUser sysUser = AuthApplication.getLocalUser(session());
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Form<DataAcquisitionForm> form = formFactory.form(DataAcquisitionForm.class).bindFromRequest(request);
         DataAcquisitionForm data = form.get();
@@ -190,7 +197,7 @@ public class DataAcquisitionManagement extends Controller {
             e.printStackTrace();
         }
 
-//        dataFile = DataFile.create(filename, "", AuthApplication.getLocalUser(session()).getEmail(), DataFile.FREEZED);
+        dataFile = DataFile.create(filename, "", AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail(), DataFile.FREEZED);
 
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, "."));
     }

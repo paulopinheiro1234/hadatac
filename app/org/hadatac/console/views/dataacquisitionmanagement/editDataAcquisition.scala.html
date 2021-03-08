@@ -5,7 +5,8 @@
   ownerOptions : List[String],
   schemas      : Map[String, String],
   bAdmin       : Boolean,
-  bChangeParam : Boolean)
+  bChangeParam : Boolean,
+  userName     : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -13,7 +14,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Change Data Stream Permission","","") {
+@main("Change Data Stream Permission","",userName) {
 	
 	<script type="text/javascript">
 		$(document).ready(function(){

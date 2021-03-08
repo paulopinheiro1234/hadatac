@@ -3,7 +3,8 @@
         da_uri           : String,
         measurements     : String,
         minDate          : String,
-        maxDate          : String)
+        maxDate          : String,
+        userName         : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -11,7 +12,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Time Series Data Visualization","","") {
+@main("Time Series Data Visualization","",userName) {
 
     <head>
         <meta charset="utf-8">
