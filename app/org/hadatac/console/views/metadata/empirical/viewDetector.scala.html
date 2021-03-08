@@ -1,14 +1,15 @@
 @(dir      : String,
   fileId   : String,
   da_uri   : String,
-  detector : org.hadatac.entity.pojo.Detector)
+  detector : org.hadatac.entity.pojo.Detector,
+  userName : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.metadata._
 @import org.hadatac.entity.pojo.DataFile
 @import java.net._
 
-@main("View detector","","") {
+@main("View detector","",userName) {
 
 <div>
   <h3>detector - @detector.getLabel()</h3>

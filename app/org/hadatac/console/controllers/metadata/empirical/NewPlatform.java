@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.metadata.empirical;
 import javax.inject.Inject;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -28,24 +30,25 @@ public class NewPlatform extends Controller {
 
 	@Inject
 	private FormFactory formFactory;
+	@Inject
+	Application application;
 
-	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
-	public Result index(String dir, String fileId, String da_uri) {
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result index(String dir, String fileId, String da_uri, Http.Request request) {
 
 		PlatformType platformType = new PlatformType();
 
-		return ok(newPlatform.render(dir, fileId, da_uri, platformType));
+		return ok(newPlatform.render(dir, fileId, da_uri, platformType, application.getUserEmail(request)));
 	}
 
-	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
-	public Result postIndex(String dir, String fileId, String da_uri) {
-		return index(dir, fileId, da_uri);
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result postIndex(String dir, String fileId, String da_uri, Http.Request request) {
+		return index(dir, fileId, da_uri, request);
 	}
 
-	//TODO: fix this
-	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
 	public Result processForm(String dir, String fileId, String da_uri, Http.Request request) {
-//		final SysUser sysUser = AuthApplication.getLocalUser(request.session());
+		final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
 		Form<PlatformForm> form = formFactory.form(PlatformForm.class).bindFromRequest(request);
 		PlatformForm data = form.get();
@@ -75,6 +78,6 @@ public class NewPlatform extends Controller {
 		System.out.println("Inserting new Platform from file. da : [" + URIUtils.replacePrefixEx(da_uri) + "]");
 		System.out.println("Inserting new Platform from file. Study URI : [" + plt.getUri() + "]");
 		// when a new study is created in the scope of a datafile, the new platform needs to be associated to the datafile's DA 
-		return ok(newPlatformConfirm.render(plt, dir, fileId, da_uri, 0));
+		return ok(newPlatformConfirm.render(plt, dir, fileId, da_uri, 0,sysUser.getEmail()));
 	}
 }

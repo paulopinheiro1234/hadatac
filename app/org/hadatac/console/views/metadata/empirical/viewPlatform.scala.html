@@ -1,14 +1,15 @@
 @(dir      : String,
   fileId   : String,
   da_uri   : String,
-  platform : org.hadatac.entity.pojo.Platform)
+  platform : org.hadatac.entity.pojo.Platform,
+  userName : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.metadata._
 @import org.hadatac.entity.pojo.DataFile
 @import java.net._
 
-@main("View Platform","","") {
+@main("View Platform","",userName) {
 
 <div>
   <h3>Platform - @platform.getLabel()</h3>

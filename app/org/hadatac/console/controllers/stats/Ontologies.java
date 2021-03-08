@@ -7,21 +7,29 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.stats.*;
+import org.pac4j.play.java.Secure;
+import org.w3c.dom.html.HTMLTableCaptionElement;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Controller;
 
-public class Ontologies extends Controller {
+import javax.inject.Inject;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index() {
+public class Ontologies extends Controller {
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(Http.Request request) {
     	
-        return ok(ontologies.render());
+        return ok(ontologies.render(application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(Http.Request request) {
+        return index(request);
     }
 }

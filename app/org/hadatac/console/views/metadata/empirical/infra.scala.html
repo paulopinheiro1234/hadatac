@@ -4,7 +4,8 @@
   da_uri         : String,
   platformJson   : String,
   instrumentJson : String,
-  detectorJson   : String)
+  detectorJson   : String,
+  userName       : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -15,7 +16,7 @@
 @import play.api.Play
 @import com.typesafe.config.ConfigFactory
 
-@main("Infrastructure Dashboard","","") {
+@main("Infrastructure Dashboard","",userName) {
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>

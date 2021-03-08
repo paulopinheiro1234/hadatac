@@ -6,13 +6,14 @@
   results   : org.hadatac.console.models.OtMSparqlQueryResults, 
   type_objs : List[org.hadatac.entity.pojo.HADatAcClass],
   labelUri  : String,
-  category  : String)
+  category  : String,
+  userName  : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.metadata._
 
-@main("Hierarchies","","") {
+@main("Hierarchies","",userName) {
 
     @empirical_navigation(dir, fileId, da_uri, category)
 
