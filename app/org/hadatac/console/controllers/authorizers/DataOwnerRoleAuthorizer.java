@@ -25,7 +25,7 @@ public class DataOwnerRoleAuthorizer extends ProfileAuthorizer<CommonProfile> {
             return false;
         }
         Set<String> roles = profile.getRoles();
-        System.out.println("Is DataOwnerRoleAuthorizer profile authorised was called:"+ roles.contains("Constants.DATA_OWNER_ROLE") +"\n"+roles);
+        System.out.println("Is DataOwnerRoleAuthorizer profile authorised was called:"+ roles.contains(Constants.DATA_OWNER_ROLE));
         return roles.contains(Constants.DATA_OWNER_ROLE);
     }
 

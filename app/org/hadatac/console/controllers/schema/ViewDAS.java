@@ -4,7 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 //import org.hadatac.console.views.schema.*;
@@ -12,11 +16,15 @@ import play.mvc.Result;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.PossibleValue;
 
+import javax.inject.Inject;
+
 
 public class ViewDAS extends Controller {
+    @Inject
+    Application application;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String das_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String das_uri, Http.Request request) {
         DataAcquisitionSchema das = null;
         try {
             if (das_uri != null) {
@@ -32,27 +40,27 @@ public class ViewDAS extends Controller {
             das = DataAcquisitionSchema.find(das_uri);
         }
 
-        return ok(org.hadatac.console.views.html.schema.viewDAS.render(das));
+        return ok(org.hadatac.console.views.html.schema.viewDAS.render(das,application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String das_uri) {
-        return index(das_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String das_uri,Http.Request request) {
+        return index(das_uri,request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result codebook(String schemaUri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result codebook(String schemaUri,Http.Request request) {
         DataAcquisitionSchema sdd = DataAcquisitionSchema.find(schemaUri);
         if (schemaUri != null) {
             List<PossibleValue> codes = PossibleValue.findBySchema(schemaUri);
-            return ok(org.hadatac.console.views.html.schema.viewCodeBook.render(sdd, codes));
+            return ok(org.hadatac.console.views.html.schema.viewCodeBook.render(sdd, codes, application.getUserEmail(request)));
         }
         return badRequest("Could not retrieve schema from provided uri");
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCodebook(String schemaUri) {
-        return codebook(schemaUri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postCodebook(String schemaUri, Http.Request request) {
+        return codebook(schemaUri,request);
     }
 
 }

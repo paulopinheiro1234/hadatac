@@ -22,7 +22,7 @@ public class FileViewerEditorAuthorizer extends ProfileAuthorizer<CommonProfile>
             return false;
         }
         Set<String> roles = profile.getRoles();
-        System.out.println("FileViewerEditorAuthorizer  profile authorised was called:"+ roles.contains("Constants.FILE_VIEWER_EDITOR_ROLE") +"\n"+roles);
+        System.out.println("FileViewerEditorAuthorizer  profile authorised was called:"+ roles.contains(Constants.FILE_VIEWER_EDITOR_ROLE));
         return roles.contains(Constants.FILE_VIEWER_EDITOR_ROLE);
     }
 

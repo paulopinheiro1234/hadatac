@@ -25,7 +25,7 @@ public class DataManagerRoleAuthorizer extends ProfileAuthorizer<CommonProfile> 
             return false;
         }
         Set<String> roles = profile.getRoles();
-        System.out.println("IsDataManagerRoleAuthorizer  profile authorised was called:"+ roles.contains("Constants.DATA_MANAGER_ROLE") +"\n"+roles);
+        System.out.println("IsDataManagerRoleAuthorizer  profile authorised was called:"+ roles.contains(Constants.DATA_MANAGER_ROLE));
         return roles.contains(Constants.DATA_MANAGER_ROLE);
     }
 

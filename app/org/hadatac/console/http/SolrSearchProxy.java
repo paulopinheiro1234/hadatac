@@ -9,6 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+import org.hadatac.Constants;
+import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ public class SolrSearchProxy extends Controller {
     @Inject
     private FormFactory formFactory;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getSolrSearch(String path) {
         InputStream is = null;
         URL url = null;
@@ -67,13 +69,13 @@ public class SolrSearchProxy extends Controller {
         }
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+   @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getIndicatorValueDownload(String lm) {
         File file = new File(lm);
         return ok(file);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getDataAcquisitionDownload(Http.Request request) {
         DynamicForm form = formFactory.form().bindFromRequest(request);
         String request_fl;
@@ -101,7 +103,7 @@ public class SolrSearchProxy extends Controller {
         return getSolrSearch(path).as("text/csv");
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getStudyAcquisitionDownload(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDY_ACQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];
@@ -109,7 +111,7 @@ public class SolrSearchProxy extends Controller {
         return getSolrSearch(path).as("text/csv");
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getStudyAcquisition(Http.Request request) {
         // get the request parameter from ajax call. for this case, we have only one parameter
         String queryStr = null;
@@ -126,28 +128,28 @@ public class SolrSearchProxy extends Controller {
         return getSolrSearch(path);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getAnalytesAcquisition(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES_ACQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];
         return getSolrSearch(path);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getMetadataDataAcquisition(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)
                 + "/select" + request.toString().split((request.path()))[1];
         return getSolrSearch(path);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getDataAcquisition(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_AQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];
         return getSolrSearch(path);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getSchemaAttributes(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.SA_ACQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];

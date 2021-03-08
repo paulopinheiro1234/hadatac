@@ -1,11 +1,11 @@
 @import org.hadatac.console.views.html.schema.DAS_entry
-@(results : List[org.hadatac.entity.pojo.DataAcquisitionSchema])
+@(results : List[org.hadatac.entity.pojo.DataAcquisitionSchema], userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Semantic Data Dictionary Management","","") {
+@main("Semantic Data Dictionary Management","",userName) {
 
     <h3>Semantic Data Dictionary Management</h3>
 

@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
@@ -20,9 +23,11 @@ public class DeleteDAS extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String das_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String das_uri, Http.Request request) {
 
         DataAcquisitionSchemaForm dasForm = new DataAcquisitionSchemaForm();
         DataAcquisitionSchema das = null;
@@ -42,18 +47,18 @@ public class DeleteDAS extends Controller {
             System.out.println("delete org.hadatac.data acquisition schema");
             dasForm.setUri(das_uri);
             dasForm.setLabel(das.getLabel());
-            return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm));
+            return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm,application.getUserEmail(request)));
         }
 
-        return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm));
+        return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm,application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String das_uri) {
-        return index(das_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String das_uri,Http.Request request) {
+        return index(das_uri, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String das_uri, Http.Request request) {
 
         DataAcquisitionSchema das = null;
@@ -81,9 +86,9 @@ public class DeleteDAS extends Controller {
         }
 
         if (form.hasErrors()) {
-            return badRequest(org.hadatac.console.views.html.schema.DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from form", data.getLabel()));
+            return badRequest(org.hadatac.console.views.html.schema.DASConfirm.render("ERROR Deleting Data Acquisition Schema ", "Error from form", data.getLabel(),application.getUserEmail(request)));
         } else {
-            return ok(org.hadatac.console.views.html.schema.DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel()));
+            return ok(org.hadatac.console.views.html.schema.DASConfirm.render("Deleted Data Acquisition Schema ", "", data.getLabel(),application.getUserEmail(request)));
         }
     }
 }
