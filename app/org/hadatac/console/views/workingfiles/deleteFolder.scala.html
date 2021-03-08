@@ -1,6 +1,7 @@
 @(dir   : String,
   path  : String,
-  empty : Boolean)
+  empty : Boolean,
+  userName : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -9,7 +10,7 @@
 @import org.hadatac.metadata.loader.URIUtils; 
 
 
-@main("Delete Folder","","") {
+@main("Delete Folder","",userName) {
 
 <div class="container">
 	<h4>Delete Folder</h4>

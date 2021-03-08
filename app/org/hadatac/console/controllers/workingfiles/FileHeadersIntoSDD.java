@@ -3,6 +3,10 @@ package org.hadatac.console.controllers.workingfiles;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URLEncoder;
+
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
@@ -15,26 +19,33 @@ import org.hadatac.entity.pojo.DataFile;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import org.pac4j.play.java.Secure;
 import play.mvc.*;
 import play.mvc.Result;
 
 import play.libs.Json;
 
+import javax.inject.Inject;
+
 public class FileHeadersIntoSDD extends Controller {
     public static String headerSheetColumn;
     public static String commentSheetColumn;
     public static DataFile dd_df;
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
 
-	public Result createHeaders(String dir, String dd_id) {
-//        final SysUser user = AuthApplication.getLocalUser(session());
+    @Inject
+    Application application;
+
+   @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+   public Result createHeaders(String dir, String dd_id, Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
     	DataFile dataFile = null;
-//        if (user.isDataManager()) {
+        if (user.isDataManager()) {
             dataFile = DataFile.findById(dd_id);
-//        } else {
-//            dataFile = DataFile.findByIdAndEmail(dd_id, user.getEmail());
-//        }
+        } else {
+            dataFile = DataFile.findByIdAndEmail(dd_id, user.getEmail());
+        }
 
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
@@ -45,15 +56,15 @@ public class FileHeadersIntoSDD extends Controller {
         getdd_df(dataFile);
         // dd_id=dataFile.getId();
         // System.out.println(dd_id);
-		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile,headerSheetColumn,commentSheetColumn));
+		return ok(fileHeadersIntoSDD.render(dir, dataFile.getFileName(), dirFile,headerSheetColumn,commentSheetColumn,user.getEmail()));
 	}
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreateHeaders(String dir, String dd_uri) {
-        return createHeaders(dir, dd_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postCreateHeaders(String dir, String dd_uri, Http.Request request) {
+        return createHeaders(dir, dd_uri,request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result createHeadersForm(String dir, String dd_uri, String sdd_uri) {
 
     	/* ADD THE DD CONTENT FROM DD_URI INTO THE SDD)URI  */
@@ -77,13 +88,13 @@ public class FileHeadersIntoSDD extends Controller {
     }
 
 
-    public Result getCheckedSDD(String sddFileName){
+    public Result getCheckedSDD(String sddFileName, Http.Request request){
         System.out.println("sdd filename: "+sddFileName);
-//        final SysUser user = AuthApplication.getLocalUser(session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         List<DataFile> files = null;
         String path = ConfigProp.getPathDownload();
 
-        files = DataFile.find("sheersha.kandwal@mssm.edu");//TODO: fix this -- user.getEmail());
+        files = DataFile.find(user.getEmail());
         String sdd_filename=sddFileName;
         DataFile sdd_dataFile = new DataFile("");
         for(DataFile df : files){

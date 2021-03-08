@@ -1,6 +1,6 @@
 @(fileTypes     : List[org.hadatac.console.models.FileType],
   templateTypes : List[String],
-  dir           : String)
+  dir           : String, userName : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
@@ -9,7 +9,7 @@
 @import org.hadatac.metadata.loader.URIUtils; 
 
 
-@main("New Metadata File","","") {
+@main("New Metadata File","",userName) {
 
 <script type="text/javascript">
 	   function checkform() {

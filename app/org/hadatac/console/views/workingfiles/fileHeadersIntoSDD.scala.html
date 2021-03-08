@@ -2,7 +2,8 @@
   dd_name            : String,
   dirFile            : org.hadatac.entity.pojo.DataFile,
   headerSheetColumn  : String,
-  commentSheetColumn : String
+  commentSheetColumn : String,
+  userName           : String
 )
 
 @import helper._
@@ -13,7 +14,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo._
 
-@main("Add File Headers into SDD","","") {
+@main("Add File Headers into SDD","",userName) {
  
 <script type="text/javascript">
 	   function checkform() {

@@ -19,6 +19,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -47,18 +49,20 @@ public class NewFile extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir) {
-        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir));
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir,Http.Request request) {
+        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir) {
-        return index(dir);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir,Http.Request request) {
+        return index(dir,request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, Http.Request request) {
         Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();

@@ -17,6 +17,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -42,18 +44,20 @@ public class Folder extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir) {
-        return index(dir);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, Http.Request request) {
+        return index(dir,request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir) {
-    	return ok(newFolder.render(dir));
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir,Http.Request request) {
+    	return ok(newFolder.render(dir,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, Http.Request request) {
         Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
@@ -72,8 +76,8 @@ public class Folder extends Controller {
         return redirect(routes.WorkingFiles.index(dir, ".",false));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result delete(String dir, String path) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result delete(String dir, String path,Http.Request request) {
     	if (dir == null || path == null || path.equals("/")) {
     		return redirect(routes.WorkingFiles.index(dir, ".",false));
     	}
@@ -84,15 +88,15 @@ public class Folder extends Controller {
         File[] listOfFiles = folder.listFiles();
         Boolean folderEmpty = listOfFiles == null || listOfFiles.length == 0;
 
-        return ok(deleteFolder.render(dir, path, folderEmpty));
+        return ok(deleteFolder.render(dir, path, folderEmpty, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postDelete(String dir, String path) {
-        return delete(dir, path);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postDelete(String dir, String path, Http.Request request) {
+        return delete(dir, path, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteForm(String dir, String path) {
     	if (dir == null || path == null || path.equals("/")) {
     		return redirect(routes.WorkingFiles.index(dir, ".",false));
