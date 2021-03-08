@@ -1,14 +1,15 @@
 @import org.hadatac.console.views.html.deployments.deploymentButton
 @(deployment      : org.hadatac.entity.pojo.Deployment,
         dataCollections : List[org.hadatac.entity.pojo.STR],
-        urlReturn       : String)
+        urlReturn       : String,
+        userName       : String)
 
 @import java.net._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.deployments._
 
-@main("View Deployment","","") {
+@main("View Deployment","",userName) {
     <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
     <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>

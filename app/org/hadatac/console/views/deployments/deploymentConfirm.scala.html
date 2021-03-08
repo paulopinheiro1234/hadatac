@@ -4,13 +4,14 @@
         dir      : String,
         filename : String,
         da_uri   : String,
-        page     : Integer)
+        page     : Integer,
+        userName : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.deployments._
 
-@main(message,"","") {
+@main(message,"",userName) {
     <h4>@message</h4>
 
     <ul>

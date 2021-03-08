@@ -3,7 +3,8 @@
         da_uri        : String,
         coordinates   : String,
         platformNames : String,
-        platformUris  : String)
+        platformUris  : String,
+        userName      : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -14,7 +15,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Deployment Browser - Georeferenced Platforms","","") {
+@main("Deployment Browser - Georeferenced Platforms","",userName) {
     <head>
         <style>
 

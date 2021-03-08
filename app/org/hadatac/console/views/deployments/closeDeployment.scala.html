@@ -1,4 +1,4 @@
-@(deployment_uri : String, deploy: org.hadatac.console.models.DeploymentForm)
+@(deployment_uri : String, deploy: org.hadatac.console.models.DeploymentForm, userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -27,7 +27,7 @@
     </script>
 </head>
 
-@main("Close Deployment","","") {
+@main("Close Deployment","",userName) {
     <div class="container">
         <h2>Close Deployment</h2>
 

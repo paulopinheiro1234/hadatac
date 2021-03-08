@@ -6,6 +6,8 @@ import java.util.Iterator;
 import javax.inject.Inject;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -25,9 +27,11 @@ public class DeleteDeployment extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String deployment_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String deployment_uri, Http.Request request) {
         DeploymentForm depForm = new DeploymentForm();
         Deployment dep = null;
 
@@ -60,17 +64,17 @@ public class DeleteDeployment extends Controller {
                 depForm.setEndDateTime(dep.getEndedAt());
             }
             System.out.println("delete deployment");
-            return ok(deleteDeployment.render(deployment_uri, depForm));
+            return ok(deleteDeployment.render(deployment_uri, depForm, application.getUserEmail(request)));
         }
-        return ok(deleteDeployment.render(deployment_uri, depForm));
+        return ok(deleteDeployment.render(deployment_uri, depForm,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String deployment_uri) {
-        return index(deployment_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String deployment_uri,Http.Request request) {
+        return index(deployment_uri,request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String deployment_uri, Http.Request request) {
         Deployment dep = null;
 
@@ -107,9 +111,9 @@ public class DeleteDeployment extends Controller {
         //Deployment deployment = DataFactory.closeDeployment(deploymentUri, endDateString);
         if (form.hasErrors()) {
             System.out.println("HAS ERRORS");
-            return badRequest(closeDeployment.render(deployment_uri, data));
+            return badRequest(closeDeployment.render(deployment_uri, data,application.getUserEmail(request)));
         } else {
-            return ok(deploymentConfirm.render("Delete Deployment", data, "/", "", "", 0));
+            return ok(deploymentConfirm.render("Delete Deployment", data, "/", "", "", 0,application.getUserEmail(request)));
         }
     }
 }

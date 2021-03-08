@@ -5,7 +5,10 @@ import java.net.URLDecoder;
 import java.util.List;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.deployments.*;
@@ -22,14 +25,18 @@ import org.hadatac.utils.State;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 
 public class ViewDeployment extends Controller {
+    @Inject
+    Application application;
 
     private static State allState = new State(State.ALL);
 
     // for /metadata HTTP GET requests
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String deployment_uri, String prev_plat_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String deployment_uri, String prev_plat_uri, Http.Request request) {
 
         //DeploymentForm dep = new DeploymentForm();
         Deployment deployment = null;
@@ -57,16 +64,16 @@ public class ViewDeployment extends Controller {
             urlReturn = prev_plat_uri;
         }
 
-        return ok(viewDeployment.render(deployment, dataCollections, urlReturn));
+        return ok(viewDeployment.render(deployment, dataCollections, urlReturn, application.getUserEmail(request)));
 
 
     }// /index()
 
 
     // for /metadata HTTP POST requests
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String deployment_uri, String prev_plat_uri) {
-        return index(deployment_uri, prev_plat_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String deployment_uri, String prev_plat_uri, Http.Request request) {
+        return index(deployment_uri, prev_plat_uri, request);
     }// /postIndex()
 
 }

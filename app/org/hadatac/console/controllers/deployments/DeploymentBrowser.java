@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.deployments.*;
@@ -23,8 +26,13 @@ import org.hadatac.utils.State;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 
 public class DeploymentBrowser extends Controller {
+
+    @Inject
+    Application application;
 
 
     public static String GEODEPLOYMENT = "GEODEPLOYMENT";
@@ -36,8 +44,8 @@ public class DeploymentBrowser extends Controller {
     private String dimensionsList = "[]";
     //private int totDeployments = -1;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String plat_uri, String previous_plt_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String plat_uri, String previous_plt_uri, Http.Request request) {
 
         // Looking for georeferenced platforms
         if (plat_uri == null || plat_uri.isEmpty()) {
@@ -45,11 +53,11 @@ public class DeploymentBrowser extends Controller {
             //System.out.println("geoCoordList: " + geoCoordList);
             //System.out.println("platformNameList: " + platformNameList);
             //System.out.println("platformUriList: " + platformUriList);
-            return ok(deploymentBrowser.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList));
+            return ok(deploymentBrowser.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList,application.getUserEmail(request)));
         }
         Platform platform = Platform.find(plat_uri);
         if (platform == null) {
-            return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]"));
+            return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]",application.getUserEmail(request)));
         }
         //System.out.println("Platform URI: " + platform.getUri());
         //System.out.println("Platform Layout: " + platform.getLayout());
@@ -57,22 +65,22 @@ public class DeploymentBrowser extends Controller {
             List<Deployment> dpls = Deployment.findByPlatformAndStatus(plat_uri, allState);
             //System.out.println("# Deployments: " + dpls.size());
             if (dpls.size() <= 0) {
-                return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]"));
+                return ok(deploymentBrowser.render(dir, filename, da_uri, "[]", "[]", "[]",application.getUserEmail(request)));
             }
             System.out.println("Deployment URI: " + dpls.get(0).getUri());
             ViewDeployment viewDpl = new ViewDeployment();
             if (previous_plt_uri == null || previous_plt_uri.isEmpty()) {
                 previous_plt_uri = GEODEPLOYMENT;
             }
-            return viewDpl.index(dpls.get(0).getUri(), previous_plt_uri);
+            return viewDpl.index(dpls.get(0).getUri(), previous_plt_uri, request);
         }
         platDeployments(platform);
-        return ok(deploymentBrowserWithPlatform.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList, platform, dimensionsList, plat_uri));
+        return ok(deploymentBrowserWithPlatform.render(dir, filename, da_uri, geoCoordList, platformNameList, platformUriList, platform, dimensionsList, plat_uri,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String plat_uri, String previous_plt_uri) {
-        return index(dir, filename, da_uri, plat_uri, previous_plt_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String plat_uri, String previous_plt_uri, Http.Request request) {
+        return index(dir, filename, da_uri, plat_uri, previous_plt_uri, request);
     }
 
     private void geoDeployments() {

@@ -5,7 +5,8 @@
         dir            : String,
         filename       : String,
         da_uri         : String,
-        page           : Integer)
+        page           : Integer,
+        userName       : String)
 
 @import play._
 @import helper._
@@ -18,7 +19,7 @@
 @import org.hadatac.metadata.loader.URIUtils
 @import com.typesafe.config.ConfigFactory
 
-@main("New Deployment","","") {
+@main("New Deployment","",userName) {
 
     <script type="text/javascript">
             function replaceAll(str, find, replace) {

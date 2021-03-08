@@ -6,7 +6,8 @@
         platformUris     : String,
         platform         : org.hadatac.entity.pojo.Platform,
         dimensions       : String,
-        previous_platUri : String)
+        previous_platUri : String,
+        userName         : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -18,7 +19,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Deployment Browser","","") {
+@main("Deployment Browser","",userName) {
     <head>
         <style>
 

@@ -2,14 +2,15 @@
 @(instruments         : List[org.hadatac.entity.pojo.Instrument],
         instrumentsDeployed : List[org.hadatac.entity.pojo.Instrument],
         detectors           : List[org.hadatac.entity.pojo.Detector],
-        detectorsDeployed   : List[org.hadatac.entity.pojo.Detector]
+        detectorsDeployed   : List[org.hadatac.entity.pojo.Detector],
+        userName            : String
 )
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Instrument/Detector Availability","","") {
+@main("Instrument/Detector Availability","",userName) {
 
     <div class="row">
         <div class="col-md-offset-1">

@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.deployments;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.text.DateFormat;
@@ -9,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.inject.Inject;
 
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -41,6 +43,8 @@ public class NewDeployment extends Controller {
 
     @Inject
     FormFactory formFactory;
+    @Inject
+    Application application;
 
     public static SparqlQueryResults getQueryResults(String tabName) {
         SparqlQuery query = new SparqlQuery();
@@ -56,8 +60,8 @@ public class NewDeployment extends Controller {
         return thePlatforms;
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String type, String dir, String filename, String da_uri, Integer page) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String type, String dir, String filename, String da_uri, Integer page, Http.Request request) {
 
         if (type.equalsIgnoreCase("regular")) {
             return ok(newDeployment.render(
@@ -68,7 +72,7 @@ public class NewDeployment extends Controller {
                     dir,
                     filename,
                     da_uri,
-                    page));
+                    page,application.getUserEmail(request)));
         }
         else if (type.equalsIgnoreCase("legacy")) {
             return ok(newDeployment.render(
@@ -79,21 +83,21 @@ public class NewDeployment extends Controller {
                     dir,
                     filename,
                     da_uri,
-                    page));
+                    page, application.getUserEmail(request)));
         }
 
         return badRequest("Invalid deployment type!");
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String type, String dir, String filename, String da_uri, Integer page) {
-        return index(type, dir, filename, da_uri, page);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String type, String dir, String filename, String da_uri, Integer page,Http.Request request) {
+        return index(type, dir, filename, da_uri, page, request);
     }
 
-    //TODO: fix this
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String da_uri, Integer page, Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Form<DeploymentForm> form = formFactory.form(DeploymentForm.class).bindFromRequest(request);
         if (form.hasErrors()) {
@@ -160,13 +164,13 @@ public class NewDeployment extends Controller {
             System.out.println("NewDeployment: Creating new DA : [" + dataAcquisitionUri + "]");
             STR dataAcquisition = DataFactory.createDataAcquisition(
                     triggeringEvent, dataAcquisitionUri, deploymentUri,
-                    param, UserManagement.getUriByEmail("sheersha.kandwal@mssm.edu"));//user.getEmail()));
+                    param, UserManagement.getUriByEmail(user.getEmail()));
 
             System.out.println("NewDeployment: Showing DA: " + dataAcquisition);
             deployment.saveToTripleStore();
             dataAcquisition.save();
         }
 
-        return ok(deploymentConfirm.render("New Deployment created.", data, dir, filename, da_uri, page));
+        return ok(deploymentConfirm.render("New Deployment created.", data, dir, filename, da_uri, page, user.getEmail()));
     }
 }
