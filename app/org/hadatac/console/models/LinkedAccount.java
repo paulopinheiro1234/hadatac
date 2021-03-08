@@ -83,9 +83,9 @@ public class LinkedAccount {
 		List<LinkedAccount> accounts = new ArrayList<LinkedAccount>();
 		SolrClient solrClient = new HttpSolrClient.Builder(
 		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_ACCOUNTS)).build();
-		System.out.println("solrClient: "+solrClient);
+//		System.out.println("solrClient: "+solrClient);
     	SolrQuery solrQuery = new SolrQuery("user_id_str:" + user.getId());
-    	System.out.println("solrQuery: "+solrQuery);
+//    	System.out.println("solrQuery: "+solrQuery);
 
     	try {
 			QueryResponse queryResponse = solrClient.query(solrQuery);

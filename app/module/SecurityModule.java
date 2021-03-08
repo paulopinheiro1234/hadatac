@@ -5,12 +5,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import org.hadatac.Constants;
-import org.hadatac.console.controllers.CustomAuthorizer;
+import org.hadatac.console.controllers.authorizers.DataManagerRoleAuthorizer;
+import org.hadatac.console.controllers.authorizers.DataOwnerRoleAuthorizer;
+import org.hadatac.console.controllers.authorizers.FileViewerEditorAuthorizer;
+import org.hadatac.console.views.html.error401;
+import org.hadatac.console.views.html.error403;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.CasProxyReceptor;
 import org.pac4j.cas.config.CasConfiguration;
-import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
-import org.pac4j.core.authorization.generator.AuthorizationGenerator;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
@@ -26,7 +28,6 @@ import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 //import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
-import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
@@ -180,16 +181,18 @@ public class SecurityModule extends AbstractModule {
                 indirectBasicAuthClient,
                 new AnonymousClient(), directFormClient);
 
-        PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.UNAUTHORIZED, unauthorized(org.hadatac.console.views.html.error401.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
-        PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.FORBIDDEN, forbidden(org.hadatac.console.views.html.error403.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
+        PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.UNAUTHORIZED, unauthorized(error401.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
+        PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.FORBIDDEN, forbidden(error403.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
 
         final Config config = new Config(clients);
-        config.addAuthorizer("Admin", new RequireAnyRoleAuthorizer<>(Constants.DATA_MANAGER_ROLE,Constants.DATA_OWNER_ROLE,Constants.FILE_VIEWER_EDITOR_ROLE));
-        config.addAuthorizer("custom", new CustomAuthorizer());
+        formClient.getCustomProperties();
+        config.addAuthorizer(Constants.DATA_OWNER_ROLE, new DataOwnerRoleAuthorizer());
+        config.addAuthorizer(Constants.DATA_MANAGER_ROLE, new DataManagerRoleAuthorizer());
+        config.addAuthorizer(Constants.FILE_VIEWER_EDITOR_ROLE, new FileViewerEditorAuthorizer());
         config.addMatcher("excludedPath", new PathMatcher().excludeRegex("^/facebook/notprotected\\.html$"));
         // for deadbolt:
         config.setHttpActionAdapter(PlayHttpActionAdapter.INSTANCE);
-//        System.out.println("Config:"+config.getClients());
+        config.getWebContextFactory();
         return config;
     }
 }

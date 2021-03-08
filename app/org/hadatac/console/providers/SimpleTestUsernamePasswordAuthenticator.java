@@ -1,5 +1,6 @@
 package org.hadatac.console.providers;
 
+import be.objectify.deadbolt.java.models.Role;
 import controllers.routes;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
@@ -22,9 +23,7 @@ import org.pac4j.core.util.Pac4jConstants;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import javax.security.auth.login.CredentialException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 //import util.SecurityPasswordEncoder;
 //import util.SecurityPasswordEncoder;
 import static play.mvc.Results.*;
@@ -52,9 +51,9 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
         SolrClient solrClient = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
         String query = "active_bool:true";
-        System.out.println("solrClient:"+solrClient);
+//        System.out.println("solrClient:"+solrClient);
         SolrQuery solrQuery = new SolrQuery(query);
-        System.out.println("solrQuery:"+solrQuery);
+//        System.out.println("solrQuery:"+solrQuery);
         List<SysUser> users = new ArrayList<SysUser>();
         //CHECK PASSWORD
         try{
@@ -73,19 +72,19 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
 //                } else {
                     for (final LinkedAccount acc : u.getLinkedAccounts()) {
                         if (checkPassword(acc.providerUserId, password)) {
-                            System.out.println("User logged in!:"+acc.providerUserId+"...."+ password);
+                            System.out.println("User logged in!:");// +acc.providerUserId+"...."+ password);
                             System.out.println(context.getSessionStore());
                             //TODO : customise the profile
                             final CommonProfile profile = new CommonProfile();
                             profile.setId(username);
                             profile.addAttribute(Pac4jConstants.USERNAME, username);
                             credentials.setUserProfile(profile);
-                            profile.addRole("Admin");
+                            profile.setRoles(getUserRoles(u));
                             profile.setRemembered(true);
-                            System.out.println(context.getSessionStore());
+                            System.out.println("Profile:"+profile);
                             break;
                         } else {
-                            System.out.println("User password invalid!"+acc.providerUserId+"...."+ password);
+//                            System.out.println("User password invalid!"+acc.providerUserId+"...."+ password);
                             throw new CredentialException("User password is invalid");
                         }
                     }
@@ -97,10 +96,20 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
 
     }
 
-    public boolean checkPassword(final String hashed, final String candidate) {
+    private boolean checkPassword(final String hashed, final String candidate) {
         if(hashed == null || candidate == null) {
             return false;
         }
         return BCrypt.checkpw(candidate, hashed);
+    }
+
+    private Set<String> getUserRoles(SysUser sysUser){
+        int rolesSize =sysUser.getRoles().size();
+        Set<String> roles = new HashSet<String> ();
+        while (rolesSize > 0){
+            roles.add(sysUser.getRoles().get(rolesSize-1).getName());
+            rolesSize--;
+        }
+        return roles;
     }
 }

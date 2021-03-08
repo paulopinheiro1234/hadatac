@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,39 +21,27 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 //import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
-import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.loader.AnnotationWorker;
-import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.GeneratorChain;
-import org.hadatac.data.loader.RecordFile;
-import org.hadatac.data.loader.SpreadsheetRecordFile;
-import org.hadatac.console.views.html.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
-import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.FileManager;
 import org.hadatac.utils.NameSpace;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.typesafe.config.ConfigException.Null;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import play.twirl.api.Html;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -72,7 +59,7 @@ public class AutoAnnotator extends Controller {
     @Inject
     Application application;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(String dir, String dest, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -151,12 +138,13 @@ public class AutoAnnotator extends Controller {
         return ok(autoAnnotator.render(newDir, folders, unprocFiles, procFiles, studyURIs, bStarted, true, user.getEmail()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(String dir, String dest, Http.Request request) {
         return index(dir, dest, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result assignFileOwner(String dir, String ownerEmail, String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
@@ -177,12 +165,12 @@ public class AutoAnnotator extends Controller {
                 dataFile.getFileName()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postAssignFileOwner(String dir, String ownerEmail, String fileId, Http.Request request) {
         return assignFileOwner(dir, ownerEmail, fileId, request);
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processOwnerForm(String dir, String ownerEmail, String fileId, Http.Request request) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         AssignOptionForm data = form.get();
@@ -208,7 +196,7 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result assignDataAcquisition(String dir, String dataAcquisitionUri, String fileId,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
@@ -233,12 +221,12 @@ public class AutoAnnotator extends Controller {
                 dataFile.getFileName()));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postAssignDataAcquisition(String dir, String dataAcquisitionUri, String fileId,Http.Request request) {
         return assignDataAcquisition(dir, dataAcquisitionUri, fileId, request);
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processDataAcquisitionForm(String dir, String dataAcquisitionUri, String fileId, Http.Request request) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         AssignOptionForm data = form.get();
@@ -268,7 +256,7 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result toggleAutoAnnotator(String dir) {
         if (ConfigProp.getPropertyValue("autoccsv.config", "auto").equals("on")) {
             ConfigProp.setPropertyValue("autoccsv.config", "auto", "off");
@@ -282,17 +270,17 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadTemplates(String dir) {
         return ok(download_templates.render(dir));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadTemplates(String dir) {
         return postDownloadTemplates(dir);
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkAnnotationLog(String dir, String fileId) {
         DataFile dataFile = DataFile.findById(fileId);
         if (fileId == null) {
@@ -309,7 +297,7 @@ public class AutoAnnotator extends Controller {
     }
 
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkErrorDictionary() {
         InputStream inputStream = getClass().getClassLoader()
                 .getResourceAsStream("error_dictionary.json");
@@ -344,7 +332,7 @@ public class AutoAnnotator extends Controller {
         return ok(Json.toJson(result));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result moveDataFile(String dir, String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
@@ -386,7 +374,7 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result moveDataFileToWorking(String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -423,7 +411,7 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index("/", "."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result activateDataFile(String dir, String fileId,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
@@ -444,7 +432,7 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteDataFile(String dir, String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -481,7 +469,7 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteDataFileOnly(String dir, String fileId,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -503,7 +491,7 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index(dir, "."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public static void deleteAddedTriples(File file, DataFile dataFile) {
         System.out.println("Deleting the added triples from the moving file ...");
 
@@ -518,7 +506,7 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    //    @Restrict(@Group(AuthApplication.FILE_VIEWER_EDITOR_ROLE))
+    @Secure(authorizers = Constants.FILE_VIEWER_EDITOR_ROLE)
     public Result downloadDataFile(String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -545,7 +533,7 @@ public class AutoAnnotator extends Controller {
         return ok(new File(Paths.get(ConfigProp.getPathProc(), "media", mediaFileName.replace("file://", "")).toString()));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result deleteFolder(String dir) {
         List<DataFile> dfs = DataFile.findInDir(dir,DataFile.PROCESSED);
         int totFiles;
@@ -567,12 +555,12 @@ public class AutoAnnotator extends Controller {
         return ok(deleteFolder.render(dir, !noSubFolders, totFiles, statusMsg));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postDeleteFolder(String dir) {
         return deleteFolder(dir);
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processDeleteFolder(String dir) {
         List<DataFile> dfs = DataFile.findInDir(dir, DataFile.PROCESSED);
         for (DataFile df : dfs) {
@@ -612,7 +600,7 @@ public class AutoAnnotator extends Controller {
         return redirect(routes.AutoAnnotator.index(dir, ".."));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result saveDataFile(Http.Request request) {
         System.out.println("Reached HERE!!");
         FilePart uploadedfile = request.body().asMultipartFormData().getFile("file");
@@ -656,7 +644,7 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result uploadDataFileByChunking(
             String resumableChunkNumber,
             String resumableChunkSize,
@@ -675,7 +663,7 @@ public class AutoAnnotator extends Controller {
         }
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postUploadDataFileByChunking(
             String resumableChunkNumber,
             String resumableChunkSize,
