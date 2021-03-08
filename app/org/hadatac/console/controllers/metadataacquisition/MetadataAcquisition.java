@@ -16,7 +16,9 @@ import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
-//import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.Pivot;
@@ -28,6 +30,7 @@ import java.util.*;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.Variable;
+import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
@@ -45,20 +48,26 @@ import com.typesafe.config.ConfigFactory;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 public class MetadataAcquisition extends Controller {
+
+	@Inject
+	Application application;
 	
 private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.class);
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         String collection = ConfigFactory.load().getString("hadatac.console.host_deploy")
                 + request.path() + "/solrsearch";
         List<String> indicators = getIndicators();
 
-        return ok(metadataacquisition.render(collection, indicators, true));//TODO: fix this -- user.isDataManager()));
+        return ok(metadataacquisition.render(collection, indicators, user.isDataManager(),user.getEmail()));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
@@ -472,14 +481,14 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
         return -1;
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result update() {
         updateStudy();
 
         return redirect(routes.MetadataAcquisition.index());
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postUpdate() {
         return update();
     }

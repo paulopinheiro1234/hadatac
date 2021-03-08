@@ -4,7 +4,8 @@
         study         : org.hadatac.entity.pojo.Study,
         studyType     : org.hadatac.entity.pojo.StudyType,
         organizations : List[org.hadatac.entity.pojo.Agent],
-        persons       : List[org.hadatac.entity.pojo.Agent])
+        persons       : List[org.hadatac.entity.pojo.Agent],
+        userName      : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -14,7 +15,7 @@
 @import org.hadatac.metadata.loader.URIUtils
 @import com.typesafe.config.ConfigFactory
 
-@main("Edit Study","","") {
+@main("Edit Study","",userName) {
     <script type="text/javascript">
             function checkform() {
                 var cansubmit = true;

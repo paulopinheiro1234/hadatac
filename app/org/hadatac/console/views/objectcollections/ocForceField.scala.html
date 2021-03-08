@@ -2,13 +2,14 @@
   dir         : String,
   filename    : String,
   da_uri      : String,
-  std_uri     : String)
+  std_uri     : String,
+  userName    : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.views.html.objectcollections._
 
-@main("Study Object Network","","") {
+@main("Study Object Network","", userName) {
     <div class="container-fluid container-spaced">
 
       <div class="row">

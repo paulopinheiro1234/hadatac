@@ -1,4 +1,4 @@
-@(study: org.hadatac.entity.pojo.Study, results : String)
+@(study: org.hadatac.entity.pojo.Study, results : String, userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,7 +8,7 @@
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.console.controllers.triplestore._
 
-@main("Delete Study","","") {
+@main("Delete Study","",userName) {
     <div class="container">
         <h4>Delete Study</h4>
 

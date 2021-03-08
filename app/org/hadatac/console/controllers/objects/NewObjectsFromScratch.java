@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -40,8 +41,8 @@ public class NewObjectsFromScratch extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
 
         try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");
@@ -64,15 +65,15 @@ public class NewObjectsFromScratch extends Controller {
             }
         }
 
-        return ok(newObjectsFromScratch.render(dir, filename, da_uri, study, oc, typeList, page));
+        return ok(newObjectsFromScratch.render(dir, filename, da_uri, study, oc, typeList, page, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
-        return index(dir, filename, da_uri, std_uri, oc_uri, page);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, oc_uri, page, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -148,10 +149,10 @@ public class NewObjectsFromScratch extends Controller {
             }
         }
         String message = "A total of " + quantity + " new object(s) have been Generated";
-        return ok(objectConfirm.render(message, dir, filename, da_uri, std_uri, oc_uri, page));
+        return ok(objectConfirm.render(message, dir, filename, da_uri, std_uri, oc_uri, page,sysUser.getEmail()));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processScopeForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
         try {
             oc_uri = URLDecoder.decode(oc_uri, "utf-8");
@@ -343,7 +344,7 @@ public class NewObjectsFromScratch extends Controller {
             std.increaseLastId(quantity);
         }
 
-        return ok(objectConfirm.render(message, dir, filename, da_uri, std_uri, oc_uri, page));
+        return ok(objectConfirm.render(message, dir, filename, da_uri, std_uri, oc_uri, page, sysUser.getEmail()));
     }
 
     private static void cartesianProduct(StudyObject[][] arr, int level, StudyObject[] cp, List<String> gens, List<List<StudyObject>> genOS) {

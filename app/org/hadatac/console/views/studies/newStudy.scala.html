@@ -2,7 +2,8 @@
         organizations : List[org.hadatac.entity.pojo.Agent],
         persons       : List[org.hadatac.entity.pojo.Agent],
         dir           : String,
-        file          : org.hadatac.entity.pojo.DataFile)
+        file          : org.hadatac.entity.pojo.DataFile,
+        userName      : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -12,7 +13,7 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("New Study","","") {
+@main("New Study","",userName) {
 
     <div class="container">
         <h2>New Study</h2>

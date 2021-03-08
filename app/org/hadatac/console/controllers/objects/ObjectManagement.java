@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -33,13 +34,13 @@ public class ObjectManagement extends Controller {
     
     public static int PAGESIZE = 20;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result indexNomsg(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
-        return index(dir, filename, da_uri, std_uri, oc_uri, page, "");
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result indexNomsg(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, oc_uri, page, "", request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, String message, Http.Request request) {
 
     	try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");
@@ -51,12 +52,12 @@ public class ObjectManagement extends Controller {
 
         Study study = Study.find(std_uri);
         if (study == null) {
-            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, oc_uri, page));
+            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, oc_uri, page, application.getUserEmail(request)));
         } 
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         if (oc == null) {
-            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc_uri, page));
+            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc_uri, page, application.getUserEmail(request)));
         } 
 
         List<String> objUriList = new ArrayList<String>(); 
@@ -69,16 +70,16 @@ public class ObjectManagement extends Controller {
         	}
         }
 
-        return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total, message));
+        return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total, message, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, String message) {
-        return index(dir, filename, da_uri, std_uri, oc_uri, page, message);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, String message, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, oc_uri, page, message, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result listURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result listURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
         
         try {
             std_uri = URLDecoder.decode(std_uri, "utf-8");
@@ -90,12 +91,12 @@ public class ObjectManagement extends Controller {
 
         Study study = Study.find(std_uri);
         if (study == null) {
-            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, oc_uri, page));
+            return badRequest(objectConfirm.render("Error listing object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, oc_uri, page, application.getUserEmail(request)));
         } 
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         if (oc == null) {
-            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc_uri, page));
+            return badRequest(objectConfirm.render("Error listing objectn: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc_uri, page, application.getUserEmail(request)));
         } 
 
         List<String> objUriList = new ArrayList<String>(); 
@@ -106,15 +107,15 @@ public class ObjectManagement extends Controller {
             objUriList.add(obj.getUri());
         }
 
-        return ok(listURIs.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total));
+        return ok(listURIs.render(dir, filename, da_uri, study, oc, objUriList, objects, page, total, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postListURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page) {
-        return listURIs(dir, filename, da_uri, std_uri, oc_uri, page);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postListURIs(String dir, String filename, String da_uri, String std_uri, String oc_uri, int page, Http.Request request) {
+        return listURIs(dir, filename, da_uri, std_uri, oc_uri, page, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result updateCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, int total, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -217,10 +218,10 @@ public class ObjectManagement extends Controller {
 
         System.out.println("Study URI leaving EditObject: " + study.getUri());
 
-        return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, newObjList, page, total, message));
+        return ok(objectManagement.render(dir, filename, da_uri, study, oc, objUriList, newObjList, page, total, message,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteCollectionObjects(String dir, String filename, String da_uri, String std_uri, String oc_uri, List<String> objUriList, int page, Http.Request request) {
 
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
@@ -287,6 +288,6 @@ public class ObjectManagement extends Controller {
             message = " no object was deleted";
         }
 
-        return index(dir, filename, da_uri, study.getUri(), oc.getUri(), page, message);
+        return index(dir, filename, da_uri, study.getUri(), oc.getUri(), page, message, request);
     }
 }

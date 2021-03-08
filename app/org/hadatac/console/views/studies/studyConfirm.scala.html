@@ -1,11 +1,11 @@
-@(message: String, std : org.hadatac.entity.pojo.Study)
+@(message: String, std : org.hadatac.entity.pojo.Study, userName: String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main(message,"","") {
+@main(message,"",userName) {
     <h4>@message</h4>
 
     <ul>

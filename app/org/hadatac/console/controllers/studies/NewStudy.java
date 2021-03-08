@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -35,16 +36,16 @@ public class NewStudy extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
         return indexFromFile("/", "", request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {return index(request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result indexFromFile(String dir, String fileId, Http.Request request) {
         List<Agent> organizations = Agent.findOrganizations();
         List<Agent> persons = Agent.findPersons();
@@ -57,16 +58,16 @@ public class NewStudy extends Controller {
             file = DataFile.findByIdAndEmail(fileId, ownerEmail);
         }
 
-        return ok(newStudy.render(studyType, organizations, persons, dir, file));
+        return ok(newStudy.render(studyType, organizations, persons, dir, file, ownerEmail));
 
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndexFromFile(String dir, String filename, Http.Request request) {
         return indexFromFile(dir, filename, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String da_uri, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -127,6 +128,6 @@ public class NewStudy extends Controller {
             }
         }
 
-        return ok(newStudyConfirm.render(std, dir, filename, da_uri));
+        return ok(newStudyConfirm.render(std, dir, filename, da_uri, sysUser.getEmail()));
     }
 }

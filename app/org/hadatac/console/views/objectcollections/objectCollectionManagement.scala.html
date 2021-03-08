@@ -3,13 +3,14 @@
   da_uri   : String,
   study    : org.hadatac.entity.pojo.Study,
   ocList   : List[org.hadatac.entity.pojo.ObjectCollection],
-  vcList   : List[org.hadatac.entity.pojo.VirtualColumn])
+  vcList   : List[org.hadatac.entity.pojo.VirtualColumn],
+  userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("SOC's Object Management","","") {
+@main("SOC's Object Management","",userName) {
 
   <div class="container-fluid">
     <h3>Management of Study <i><font color="darkBlue"> @study.getId()</font></i>'s SOCs </h3>

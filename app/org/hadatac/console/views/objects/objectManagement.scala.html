@@ -7,7 +7,8 @@
   objList    : List[org.hadatac.entity.pojo.StudyObject],
   page       : Integer,
   total      : Integer,
-  message    : String)
+  message    : String,
+  userName   : String)
 
 @import org.hadatac.console.controllers.objects.ObjectManagement
 @import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / ObjectManagement.PAGESIZE); var lastpage = (last + 1)
@@ -15,7 +16,7 @@
 @import org.hadatac.utils._
 @import java.net.URLEncoder
 
-@main("Object Management","","") {
+@main("Object Management","",userName) {
 
   <div>
     <input type="text" class="form-control col-sm-2" id="message" name="message" value="Message: @message" readonly>

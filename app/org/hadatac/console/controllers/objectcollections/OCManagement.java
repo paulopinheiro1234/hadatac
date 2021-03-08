@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.VirtualColumn;
@@ -14,13 +15,20 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.views.html.objectcollections.*;
+import org.pac4j.play.java.Secure;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Controller;
 
+import javax.inject.Inject;
+
 public class OCManagement extends Controller {
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri) {
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
 
         try {
             std_uri = URLDecoder.decode(std_uri, "UTF-8");
@@ -41,11 +49,11 @@ public class OCManagement extends Controller {
         }*/
 
 
-        return ok(objectCollectionManagement.render(dir, filename, da_uri, std, ocList, vcList));
+        return ok(objectCollectionManagement.render(dir, filename, da_uri, std, ocList, vcList, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
-        return index(dir, filename, da_uri, std_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, request);
     }
 }

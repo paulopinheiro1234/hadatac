@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -43,7 +44,7 @@ public class NewObjectsFromFile extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String da_uri, String oc_uri, int page, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -132,7 +133,7 @@ public class NewObjectsFromFile extends Controller {
         }
 
         String message = "Total objects created: " + rowCount;
-        return ok(objectConfirm.render(message, dir, filename, da_uri, study.getUri(), oc_uri, page));
+        return ok(objectConfirm.render(message, dir, filename, da_uri, study.getUri(), oc_uri, page, sysUser.getEmail()));
     }
 
     static private String formattedCounter (long value) {

@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -36,8 +37,8 @@ public class EditOC extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, Http.Request request) {
 
         try {
             std_uri = URLDecoder.decode(std_uri, "UTF-8");
@@ -48,12 +49,12 @@ public class EditOC extends Controller {
 
         Study study = Study.find(std_uri);
         if (study == null) {
-            return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, null));
+            return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, null, application.getUserEmail(request)));
         }
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         if (oc == null) {
-            return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc));
+            return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc, application.getUserEmail(request)));
         }
 
         List<ObjectCollectionType> typeList = ObjectCollectionType.find();
@@ -72,15 +73,15 @@ public class EditOC extends Controller {
             }
         }
 
-        return ok(editObjectCollection.render(dir, filename, da_uri, study, oc, domainList, locationList, timeList, typeList));
+        return ok(editObjectCollection.render(dir, filename, da_uri, study, oc, domainList, locationList, timeList, typeList, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri) {
-        return index(dir, filename, da_uri, std_uri, oc_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, oc_uri, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
         List<String> changedInfos = new ArrayList<String>();
@@ -181,7 +182,7 @@ public class EditOC extends Controller {
         oldOc.delete();
         newOc.save();
 
-        return ok(objectCollectionConfirm.render("New Object Collection has been Edited", dir, filename, da_uri, std_uri, newOc));
+        return ok(objectCollectionConfirm.render("New Object Collection has been Edited", dir, filename, da_uri, std_uri, newOc, sysUser.getEmail()));
     }
 
 }

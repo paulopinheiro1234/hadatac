@@ -1,5 +1,5 @@
 @(results : String,
-        numOfTriples : Int)
+        numOfTriples : Int, userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,7 +8,7 @@
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.console.controllers.triplestore._
 
-@main("Refresh Study","","") {
+@main("Refresh Study","",userName) {
     <div class="container">
         <h2>Refresh Study</h2>
         <div id="end-process-box" style="display:none;">

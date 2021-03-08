@@ -5,7 +5,8 @@
         oc              : org.hadatac.entity.pojo.ObjectCollection,
         objList         : List[org.hadatac.entity.pojo.StudyObject],
         page            : Integer,
-        total           : Integer)
+        total           : Integer,
+        userName        :String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -18,7 +19,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Study View","","") {
+@main("Study View","",userName) {
     <head>
     </head>
     <body>

@@ -4,7 +4,8 @@
   study       : org.hadatac.entity.pojo.Study,
   oc          : org.hadatac.entity.pojo.ObjectCollection,
   objTypeList : List[org.hadatac.entity.pojo.StudyObjectType],
-  page        : Integer)
+  page        : Integer,
+  userName    : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -14,7 +15,7 @@
 @import java.net.URLEncoder
 @import play._
 
-@main("New Objects","","") {
+@main("New Objects","",userName) {
 
   <div class="container">
     <h4>New Objects for Object Collection @oc.getLabel()</h4>

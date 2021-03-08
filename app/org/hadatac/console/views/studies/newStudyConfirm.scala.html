@@ -1,7 +1,8 @@
 @(std      : org.hadatac.entity.pojo.Study,
         dir      : String,
         fileId   : String,
-        da_uri   : String)
+        da_uri   : String,
+        userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -10,7 +11,7 @@
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("New Study","","") {
+@main("New Study","",userName) {
 
     <h2>Create Study</h2>
 

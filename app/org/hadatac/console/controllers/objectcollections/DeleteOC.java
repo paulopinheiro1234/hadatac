@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import com.google.inject.Inject;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -27,8 +28,8 @@ public class DeleteOC extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, String oc_uri, Http.Request request) {
 
         try {
             std_uri = URLDecoder.decode(std_uri, "UTF-8");
@@ -40,23 +41,23 @@ public class DeleteOC extends Controller {
 
         Study study = Study.find(std_uri);
         if (study == null) {
-            return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, null));
+            return badRequest(objectCollectionConfirm.render("Error deleting object collection: Study URI did not return valid URI", dir, filename, da_uri, std_uri, null, application.getUserEmail(request)));
         }
 
         ObjectCollection oc = ObjectCollection.find(oc_uri);
         if (oc == null) {
-            return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc));
+            return badRequest(objectCollectionConfirm.render("Error deleting object collection: ObjectCollection URI did not return valid object", dir, filename, da_uri, std_uri, oc, application.getUserEmail(request)));
         }
 
-        return ok(deleteObjectCollection.render(dir, filename, da_uri, std_uri, oc));
+        return ok(deleteObjectCollection.render(dir, filename, da_uri, std_uri, oc, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri) {
-        return index(dir, filename, da_uri, std_uri, oc_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, String oc_uri, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, oc_uri, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String dir, String filename, String da_uri, String std_uri, String oc_uri, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -69,6 +70,6 @@ public class DeleteOC extends Controller {
             oc.deleteFromTripleStore();;
         }
 
-        return ok(objectCollectionConfirm.render("Object Collection has been Deleted", dir, filename, da_uri, std_uri, oc));
+        return ok(objectCollectionConfirm.render("Object Collection has been Deleted", dir, filename, da_uri, std_uri, oc, sysUser.getEmail()));
     }
 }

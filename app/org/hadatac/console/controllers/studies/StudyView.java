@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.studies.*;
@@ -40,12 +43,16 @@ import org.hadatac.utils.NameSpaces;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 public class StudyView extends Controller {
 
+    @Inject
+    Application application;
     public static int PAGESIZE = 7;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String study_uri, String oc_uri, int page) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String study_uri, String oc_uri, int page, Http.Request request) {
 
         if (oc_uri != null && oc_uri.indexOf("STD-") > -1) {
             oc_uri = "";
@@ -87,11 +94,11 @@ public class StudyView extends Controller {
             total = StudyObject.getNumberStudyObjectsByCollection(oc_uri);
         }
 
-        return ok(studyView.render(graph.getTreeQueryResult().replace("\n", " "), study, agent, institution, oc, objects, page, total));
+        return ok(studyView.render(graph.getTreeQueryResult().replace("\n", " "), study, agent, institution, oc, objects, page, total,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String study_uri, String oc_uri, int page) {
-        return index(study_uri, oc_uri, page);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String study_uri, String oc_uri, int page, Http.Request request) {
+        return index(study_uri, oc_uri, page, request);
     }
 }

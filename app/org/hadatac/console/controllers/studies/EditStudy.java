@@ -15,6 +15,7 @@ import java.util.Map;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -48,8 +49,8 @@ public class EditStudy extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
 
         Study std = null;
         StudyType stdType = null;
@@ -76,15 +77,15 @@ public class EditStudy extends Controller {
             return badRequest("No URI is provided to retrieve Study");
         }
 
-        return ok(editStudy.render(dir, filename, da_uri, std, stdType, organizations, persons));
+        return ok(editStudy.render(dir, filename, da_uri, std, stdType, organizations, persons, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
-        return index(dir, filename, da_uri, std_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result processForm(String std_uri, Http.Request request) {
         final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -181,6 +182,6 @@ public class EditStudy extends Controller {
         // insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
         oldStudy.save();
 
-        return ok(studyConfirm.render("Edit Study", oldStudy));
+        return ok(studyConfirm.render("Edit Study", oldStudy,sysUser.getEmail()));
     }
 }

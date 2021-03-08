@@ -1,10 +1,10 @@
-@(studyList : List[org.hadatac.entity.pojo.Study])
+@(studyList : List[org.hadatac.entity.pojo.Study], userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Study Management","","") {
+@main("Study Management","",userName) {
 
     <h3>Study Management</h3>
 
