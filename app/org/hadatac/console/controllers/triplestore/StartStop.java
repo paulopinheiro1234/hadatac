@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.triplestore;
 import com.google.inject.Inject;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.*;
 import play.mvc.*;
 
@@ -18,7 +19,7 @@ public class StartStop extends Controller {
 	@Inject
 	Application application;
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
 	public Result index(String oper, String repository, Http.Request request) {
 		String message = Repository.startStopMetadataRepository(oper, repository);
 		if (message.equals("FAIL")) {
@@ -27,7 +28,7 @@ public class StartStop extends Controller {
 		return ok(clean.render("doneOk", application.getUserEmail(request)));
     }
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postIndex(String oper, String repository, Http.Request request) {
 		String message = Repository.startStopMetadataRepository(oper, repository);
 		if (message.equals("FAIL")) {

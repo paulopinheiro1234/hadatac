@@ -1,4 +1,4 @@
-@(oper: String, message : String)
+@(oper: String, message : String,userName:String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -6,7 +6,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Load Facts into Metadata Store","","") {
+@main("Load Facts into Metadata Store","",userName) {
  
      <script type="text/javascript">
         function checkform3() {

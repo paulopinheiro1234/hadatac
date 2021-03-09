@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.console.views.html.triplestore.*;
@@ -24,6 +25,7 @@ import com.typesafe.config.ConfigFactory;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.data.FormFactory;
 import play.libs.Files;
 import play.mvc.BodyParser;
@@ -39,23 +41,25 @@ public class LoadKB extends Controller {
 
 	@Inject
 	private FormFactory formFactory;
+	@Inject
+	Application application;
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
-	public Result loadKB(String oper) {
-		return ok(loadKB.render(oper, ""));
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+	public Result loadKB(String oper,Http.Request request) {
+		return ok(loadKB.render(oper, "",application.getUserEmail(request)));
 	}
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
-	public Result createInMemoryDataset(String oper) {
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+	public Result createInMemoryDataset(String oper,Http.Request request) {
 		Model model = SPARQLUtilsFacetSearch.createInMemoryModel();
 		String msg = "in-memory model created, with # of triples = " + model.size();
 		System.out.println(msg);
-		return ok(loadInMemory.render(msg));
+		return ok(loadInMemory.render(msg,application.getUserEmail(request)));
 	}
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
-	public Result postLoadKB(String oper) {
-		return ok(loadKB.render(oper, ""));
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+	public Result postLoadKB(String oper,Http.Request request) {
+		return ok(loadKB.render(oper, "",application.getUserEmail(request)));
 	}
 
 	public static String playLoadKB(String oper) {
@@ -76,7 +80,7 @@ public class LoadKB extends Controller {
 	}
 
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
 	@BodyParser.Of(value = BodyParser.MultipartFormData.class)
 	public Result uploadFile(String oper, Http.Request request) {
 		System.out.println("uploadFile CALLED!");
@@ -99,21 +103,21 @@ public class LoadKB extends Controller {
 					try {
 						isFile.close();
 					} catch (Exception e) {
-						return ok (loadKB.render("fail", "Could not save uploaded file."));
+						return ok (loadKB.render("fail", "Could not save uploaded file.",application.getUserEmail(request)));
 					}
 				} catch (Exception e) {
-					return ok (loadKB.render("fail", "Could not process uploaded file."));
+					return ok (loadKB.render("fail", "Could not process uploaded file.",application.getUserEmail(request)));
 				}
 			} catch (FileNotFoundException e1) {
-				return ok (loadKB.render("fail", "Could not find uploaded file"));
+				return ok (loadKB.render("fail", "Could not find uploaded file",application.getUserEmail(request)));
 			}
-			return ok(loadKB.render(oper, "File uploaded successfully."));
+			return ok(loadKB.render(oper, "File uploaded successfully.",application.getUserEmail(request)));
 		} else {
-			return ok (loadKB.render("fail", "Error uploading file. Please try again."));
+			return ok (loadKB.render("fail", "Error uploading file. Please try again.",application.getUserEmail(request)));
 		}
 	}
 
-	@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
 	@BodyParser.Of(value = BodyParser.MultipartFormData.class)
 	public Result uploadTurtleFile(String oper, Http.Request request) {
 		System.out.println("uploadTurtleFile CALLED!");
@@ -136,17 +140,17 @@ public class LoadKB extends Controller {
 					try {
 						isFile.close();
 					} catch (Exception e) {
-						return ok (loadKB.render("fail", "Could not save uploaded file."));
+						return ok (loadKB.render("fail", "Could not save uploaded file.",application.getUserEmail(request)));
 					}
 				} catch (Exception e) {
-					return ok (loadKB.render("fail", "Could not process uploaded file."));
+					return ok (loadKB.render("fail", "Could not process uploaded file.",application.getUserEmail(request)));
 				}
 			} catch (FileNotFoundException e1) {
-				return ok (loadKB.render("fail", "Could not find uploaded file"));
+				return ok (loadKB.render("fail", "Could not find uploaded file",application.getUserEmail(request)));
 			}
-			return ok(loadKB.render("turtle", "File uploaded successfully."));
+			return ok(loadKB.render("turtle", "File uploaded successfully.",application.getUserEmail(request)));
 		} else {
-			return ok (loadKB.render("fail", "Error uploading file. Please try again."));
+			return ok (loadKB.render("fail", "Error uploading file. Please try again.",application.getUserEmail(request)));
 		}
 	}
 }

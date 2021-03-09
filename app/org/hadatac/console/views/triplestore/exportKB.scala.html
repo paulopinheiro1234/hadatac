@@ -1,4 +1,5 @@
-@(oper: String, message : String)
+@import org.hadatac.metadata.loader.MetadataContext
+@(oper: String, message : String, userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -6,7 +7,7 @@
 @* @import org.hadatac.metadata.loader._ *@
 @import java.net._
 
-@main("Export Facts from Metadata Store","","") {
+@main("Export Facts from Metadata Store","",userName) {
 	
 	<script>
         function checkform1() {
@@ -26,7 +27,7 @@
 	         <h4>Export facts from org.hadatac.metadata store...</h4>
 
              <div id="rcorners">
-                 The org.hadatac.metadata store has MetadataContext.playTotalTriples() triples. <br> @* @MetadataContext.playTotalTriples() triples. <br> *@
+                 The org.hadatac.metadata store has MetadataContext.playTotalTriples() triples. <br>  @MetadataContext.playTotalTriples() triples. <br>
 				<!-- 
                  <form name="fileDownloadForm" id='download1' method="POST" enctype="multipart/form-org.hadatac.data" action="@org.hadatac.console.controllers.triplestore.routes.ExportKB.exportFile("load")">
                       <input type="file" class="btn btn-info" name="pic">  

@@ -6,6 +6,7 @@ import java.io.File;
 import com.google.inject.Inject;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.*;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -31,13 +32,13 @@ public class Clean extends Controller {
     @Inject
     Application application;
 
-//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result clean(String oper,Http.Request request) {
         System.out.println("oper");
         return ok(clean.render(oper, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postClean(String oper,Http.Request request) {
         return ok(clean.render(oper, application.getUserEmail(request)));
     }

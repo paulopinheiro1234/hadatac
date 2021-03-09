@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.jena.base.Sys;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.libs.Files.TemporaryFile;
 import play.mvc.*;
 import play.data.Form;
@@ -45,9 +46,8 @@ public class LoadOnt extends Controller {
     @Inject
     Application application;
 
-//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result loadOnt(String oper, Http.Request request) {
-//        System.out.println(Constants.DATA_MANAGER_ROLE);
 
         List<String> cacheList = new ArrayList<String>();
         File folder = new File(NameSpaces.CACHE_PATH);
@@ -78,7 +78,7 @@ public class LoadOnt extends Controller {
         return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postLoadOnt(String oper, Http.Request request) {
         return loadOnt(oper, request);
     }
@@ -93,7 +93,7 @@ public class LoadOnt extends Controller {
         return metadata.loadOntologies(Feedback.WEB, oper);
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result eraseCache(Http.Request request) {
         List<String> cacheList = new ArrayList<String>();
         File folder = new File(NameSpaces.CACHE_PATH);
@@ -111,7 +111,7 @@ public class LoadOnt extends Controller {
         return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result reloadNamedGraphFromRemote(String abbreviation) {
         NameSpace ns = NameSpaces.getInstance().getNamespaces().get(abbreviation);
         ns.deleteTriples();
@@ -125,7 +125,7 @@ public class LoadOnt extends Controller {
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result reloadNamedGraphFromCache(String abbreviation) {
         NameSpace ns = NameSpaces.getInstance().getNamespaces().get(abbreviation);
         ns.deleteTriples();
@@ -142,7 +142,7 @@ public class LoadOnt extends Controller {
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result deleteNamedGraph(String abbreviation) {
         NameSpace ns = NameSpaces.getInstance().getNamespaces().get(abbreviation);
         ns.deleteTriples();
@@ -151,7 +151,7 @@ public class LoadOnt extends Controller {
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result deleteAllNamedGraphs() {
         for (NameSpace ns : NameSpaces.getInstance().getNamespaces().values()) {
             ns.deleteTriples();
@@ -162,7 +162,7 @@ public class LoadOnt extends Controller {
     }
 
     @SuppressWarnings("unchecked")
-    //@Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result saveNamespaces(Http.Request request) {
         int original_size = NameSpace.findAll().size();
 
@@ -187,7 +187,7 @@ public class LoadOnt extends Controller {
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
 
-//    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result importNamespaces(Http.Request request) {
         System.out.println("importNamespaces is called");
@@ -243,7 +243,7 @@ public class LoadOnt extends Controller {
     }
 
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result exportNamespaces() {
         String path = ConfigProp.getPathDownload();
         File folder = new File(path);

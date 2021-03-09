@@ -1,6 +1,9 @@
 package org.hadatac.console.controllers.triplestore;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.utils.CollectionUtil;
+import org.pac4j.play.java.Secure;
 import play.mvc.*;
 
 import java.io.File;
@@ -18,21 +21,25 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 
+import javax.inject.Inject;
+
 public class ExportKB extends Controller {
+    @Inject
+    Application application;
 
     private static final String DOWNLOAD_FILE_NAME = "export_triples.ttl";
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String oper) {
-        return ok(exportKB.render(oper, ""));
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String oper,Http.Request request) {
+        return ok(exportKB.render(oper, "",application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String oper) {
-        return ok(exportKB.render(oper, ""));
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String oper,Http.Request request) {
+        return ok(exportKB.render(oper, "",application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result exportFile(String oper) {
         try {
             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +

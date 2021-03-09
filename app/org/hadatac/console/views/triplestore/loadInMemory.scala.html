@@ -1,4 +1,4 @@
-@(message : String)
+@(message : String, userName:String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -6,7 +6,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Create in-memory data model","","") {
+@main("Create in-memory data model","",userName) {
 
     <div class="container-fluid">
 

@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.models.*;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.*;
@@ -32,14 +37,8 @@ import org.apache.jena.riot.RDFDataMgr;
 //import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.http.PermissionQueries;
 import org.hadatac.console.http.SolrUtils;
-import org.hadatac.console.models.UserPreRegistrationForm;
 //import org.hadatac.console.models.GroupRegistrationForm;
-import org.hadatac.console.models.LinkedAccount;
-import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.models.TripleDocument;
 import org.hadatac.console.views.html.triplestore.*;
-import org.hadatac.console.models.SysUser;
-import org.hadatac.console.models.TokenAction;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.entity.pojo.UserGroup;
 import org.hadatac.metadata.loader.PermissionsContext;
@@ -67,13 +66,8 @@ public class UserManagement extends Controller {
 	
     @Inject
     private FormFactory formFactory;
-
-//    private final MyUsernamePasswordAuthProvider userPaswAuthProvider;
-
-//    @Inject
-//    public UserManagement(final MyUsernamePasswordAuthProvider userPaswAuthProvider) {
-//        this.userPaswAuthProvider = userPaswAuthProvider;
-//    }
+    @Inject
+    Application application;
 
     public static String getSpreadSheetPath(){
         return UPLOAD_NAME;
@@ -87,37 +81,37 @@ public class UserManagement extends Controller {
         return UPLOAD_NAME_JSON;
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result index(String oper) {
-        return ok(users.render(oper, "", User.find(), UserGroup.find(), ""));
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result index(String oper,Http.Request request) {
+        return ok(users.render(oper, "", User.find(), UserGroup.find(), "",application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result postIndex(String oper) {
-        return index(oper);
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postIndex(String oper,Http.Request request) {
+        return index(oper,request);
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result onLinePreRegistration(String oper) {
-        return ok(preregister.render(oper, UserGroup.find()));
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result onLinePreRegistration(String oper,Http.Request request) {
+        return ok(preregister.render(oper, UserGroup.find(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result postOnLinePreRegistration(String oper) {
-        return onLinePreRegistration(oper);
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postOnLinePreRegistration(String oper,Http.Request request) {
+        return onLinePreRegistration(oper,request);
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result onLineGroupRegistration(String oper) {
-        return ok(preregisterGroup.render(oper, UserGroup.find()));
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result onLineGroupRegistration(String oper,Http.Request request) {
+        return ok(preregisterGroup.render(oper, UserGroup.find(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result postOnLineGroupRegistration(String oper) {
-        return onLineGroupRegistration(oper);
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postOnLineGroupRegistration(String oper,Http.Request request) {
+        return onLineGroupRegistration(oper,request);
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result grantAdminPermission(String user_uri) {
         try {
             user_uri = URLDecoder.decode(user_uri, "UTF-8");
@@ -133,12 +127,12 @@ public class UserManagement extends Controller {
         return redirect(org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init"));
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postGrantAdminPermission(String user_uri) {
         return grantAdminPermission(user_uri);
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result revokeAdminPermission(String user_uri) {
         try {
             user_uri = URLDecoder.decode(user_uri, "UTF-8");
@@ -155,65 +149,65 @@ public class UserManagement extends Controller {
         return redirect(org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init"));
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postRevokeAdminPermission(String user_uri) {
         return revokeAdminPermission(user_uri);
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result assignUserAccessLevel(String user_uri, String group_uri) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result assignUserAccessLevel(String user_uri, String group_uri,Http.Request request) {
         User.changeAccessLevel(user_uri, group_uri);
-        return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+        return ok(users.render("init", "", User.find(), UserGroup.find(), "",application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result postAssignUserAccessLevel(String user_uri, String group_uri) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postAssignUserAccessLevel(String user_uri, String group_uri,Http.Request request) {
         User.changeAccessLevel(user_uri, group_uri);
-        return ok(users.render("init", "", User.find(), UserGroup.find(), ""));
+        return ok(users.render("init", "", User.find(), UserGroup.find(), "",application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result editGroup(String group_uri) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result editGroup(String group_uri,Http.Request request) {
         try {
             group_uri = URLDecoder.decode(group_uri, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         System.out.println(UserGroup.find().size());
-        return ok(editregisterGroup.render("edit", UserGroup.find(), UserGroup.find(group_uri)));
+        return ok(editregisterGroup.render("edit", UserGroup.find(), UserGroup.find(group_uri),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result postEditGroup(String group_uri) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postEditGroup(String group_uri,Http.Request request) {
         try {
             group_uri = URLDecoder.decode(group_uri, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return ok(editregisterGroup.render("edit", UserGroup.find(), UserGroup.find(group_uri)));
+        return ok(editregisterGroup.render("edit", UserGroup.find(), UserGroup.find(group_uri),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result editUser(String user_uri) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result editUser(String user_uri,Http.Request request) {
         try {
             user_uri = URLDecoder.decode(user_uri, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri)));
+        return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
-    public Result postEditUser(String user_uri) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postEditUser(String user_uri,Http.Request request) {
         try {
             user_uri = URLDecoder.decode(user_uri, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri)));
+        return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result deleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
         try {
             user_uri = URLDecoder.decode(user_uri, "UTF-8");
@@ -224,12 +218,12 @@ public class UserManagement extends Controller {
         return redirect(org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init"));
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postDeleteUser(String user_uri, boolean deleteAuth, boolean deleteMember) {
         return deleteUser(user_uri, deleteAuth, deleteMember);
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result backupUserAuthentication() {
         JSONArray sys_user = (JSONArray) JSONValue.parse(SysUser.outputAsJson());
         for (int i = 0; i < sys_user.size(); i++) {
@@ -265,7 +259,7 @@ public class UserManagement extends Controller {
         return ok(result);
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public String recoverUserAuthentication() {
         System.out.println("Recovering User Authentication ...");
         try {
@@ -303,48 +297,49 @@ public class UserManagement extends Controller {
         return "Successfully recovered user authentications! ";
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postBackupUserAuthentication() {
         return backupUserAuthentication();
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result backupUserGraph() {
         return ok(User.outputAsTurtle());
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postBackupUserGraph() {
         return backupUserGraph();
     }
-//TODO : fix it
-//    @Restrict(@Group("data_manager"))
-//    public Result sendInvitationEmail(String user_name, String user_email) {
+
+//    //TODO : fix it
+//    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+//    public Result sendInvitationEmail(String user_name, String user_email,Http.Request request) {
 //        this.userPaswAuthProvider.sendInvitationMailing(
-//                user_name, user_email, ctx());
+//                user_name, user_email, request);
 //        return redirect(routes.UserManagement.index("init"));
 //    }
-//TODO : fix it
-//    @Restrict(@Group("data_manager"))
+//    //TODO : fix it
+//    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
 //    public Result postSendInvitationEmail(String user_name, String user_email) {
 //        return sendInvitationEmail(user_name, user_email);
 //    }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result submitPreRegistrationForm(String oper, Http.Request request) {
         String msg = "";
         if (oper.equals("load_users")) {
             msg = commitUserPreRegistration("form", request);
         } else if (oper.equals("load_groups")) {
-            msg = commitGroupRegistration("form");
+            msg = commitGroupRegistration("form",request);
         } else {
             return badRequest("Invalid oper mode for submitting pre-registration form!");
         }
 
-        return ok(users.render(oper, msg, User.find(), UserGroup.find(), "form"));
+        return ok(users.render(oper, msg, User.find(), UserGroup.find(), "form",application.getUserEmail(request)));
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public String commitUserPreRegistration(String source, Http.Request request) {
         System.out.println("Adding pre-registered user...");
         int mode = Feedback.WEB;
@@ -386,8 +381,8 @@ public class UserManagement extends Controller {
         return message;
     }
 
-    @Restrict(@Group("data_manager"))
-    public String commitGroupRegistration(String source) {
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public String commitGroupRegistration(String source,Http.Request request) {
         System.out.println("Adding registered group...");
         int mode = Feedback.WEB;
         String oper = "load";
@@ -401,31 +396,30 @@ public class UserManagement extends Controller {
         if (source.equals("batch")) {
             message = SpreadsheetProcessing.generateTTL(mode, oper, rdf, UPLOAD_NAME);
         }
-        //TODO : fix it
-//        else if (source.equals("form")) {
-//            Form<GroupRegistrationForm> form = formFactory.form(GroupRegistrationForm.class).bindFromRequest();
-//            GroupRegistrationForm data = form.get();
-//            String group_uri = data.getGroupUri();
-//            String group_name = data.getGroupName();
-//            String comment = data.getComment();
-//            String homepage = data.getHomepage();
-//            String parent_group_uri = data.getParentGroupUri();
-//
-//            Map<String, String> pred_value_map = new HashMap<String, String>();
-//            pred_value_map.put("a", "foaf:Group, prov:Group");
-//            pred_value_map.put("foaf:name", group_name);
-//            pred_value_map.put("rdfs:comment", comment);
-//            pred_value_map.put("foaf:homepage", "<" + homepage + ">");
-//            pred_value_map.put("sio:SIO_000095", parent_group_uri);
-//
-//            User.deleteUser(group_uri, false, false);
-//
-//            message = generateTTL(mode, oper, rdf, group_uri, pred_value_map);
-//        }
+        else if (source.equals("form")) {
+            Form<GroupRegistrationForm> form = formFactory.form(GroupRegistrationForm.class).bindFromRequest(request);
+            GroupRegistrationForm data = form.get();
+            String group_uri = data.getGroupUri();
+            String group_name = data.getGroupName();
+            String comment = data.getComment();
+            String homepage = data.getHomepage();
+            String parent_group_uri = data.getParentGroupUri();
+
+            Map<String, String> pred_value_map = new HashMap<String, String>();
+            pred_value_map.put("a", "foaf:Group, prov:Group");
+            pred_value_map.put("foaf:name", group_name);
+            pred_value_map.put("rdfs:comment", comment);
+            pred_value_map.put("foaf:homepage", "<" + homepage + ">");
+            pred_value_map.put("sio:SIO_000095", parent_group_uri);
+
+            User.deleteUser(group_uri, false, false);
+
+            message = generateTTL(mode, oper, rdf, group_uri, pred_value_map);
+        }
         return message;
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public String commitUserGraphRegistration() {
         System.out.println("Adding pre-registered user...");
         int mode = Feedback.WEB;
@@ -461,7 +455,7 @@ public class UserManagement extends Controller {
         return message;
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public static String generateTTL(int mode, String oper, RDFContext rdf,
                                      String uri, Map<String, String> pred_value_map){
         String message = "";
@@ -531,7 +525,7 @@ public class UserManagement extends Controller {
         return message;
     }
 
-    @Restrict(@Group("data_manager"))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result uploadFile(String file_type, Http.Request request) {
         FilePart uploadedfile = request.body().asMultipartFormData().getFile("pic");
@@ -556,24 +550,24 @@ public class UserManagement extends Controller {
                 FileUtils.writeByteArrayToFile(newFile, byteFile);
                 fileInputStream.close();
             } catch (Exception e) {
-                return ok (users.render("fail", "Could not find uploaded file", User.find(), UserGroup.find(), ""));
+                return ok (users.render("fail", "Could not find uploaded file", User.find(), UserGroup.find(), "",application.getUserEmail(request)));
             }
             if(file_type.equals("ttl")) {
                 System.out.println("Uploaded turtle file!");
                 String msg = commitUserGraphRegistration();
-                return ok(users.render("loaded", msg, User.find(), UserGroup.find(), "turtle"));
+                return ok(users.render("loaded", msg, User.find(), UserGroup.find(), "turtle",application.getUserEmail(request)));
             }
             else if(file_type.equals("json")) {
                 System.out.println("Uploaded json file!");
                 String msg = recoverUserAuthentication();
-                return ok(users.render("loaded", msg, User.find(), UserGroup.find(), "json"));
+                return ok(users.render("loaded", msg, User.find(), UserGroup.find(), "json",application.getUserEmail(request)));
             }
             else {
-                return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch"));
+                return ok(users.render("loaded", "File uploaded successfully.", User.find(), UserGroup.find(), "batch",application.getUserEmail(request)));
             }
         }
         else {
-            return ok (users.render("fail", "Error uploading file. Please try again.", User.find(), UserGroup.find(), ""));
+            return ok (users.render("fail", "Error uploading file. Please try again.", User.find(), UserGroup.find(), "",application.getUserEmail(request)));
         }
     }
 
@@ -604,16 +598,15 @@ public class UserManagement extends Controller {
         return uri;
     }
 
-    //TODO: fix it
-//    public static String getCurrentUserUri() {
-//        String uri = null;
-//        final SysUser user = AuthApplication.getLocalUser(session());
-//        if(null == user){
-//            uri = null;
-//        }
-//        else{
-//            uri = UserManagement.getUriByEmail(user.getEmail());
-//        }
-//        return uri;
-//    }
+    public String getCurrentUserUri(Http.Request request) {
+        String uri = null;
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+        if(null == user){
+            uri = null;
+        }
+        else{
+            uri = UserManagement.getUriByEmail(user.getEmail());
+        }
+        return uri;
+    }
 }
