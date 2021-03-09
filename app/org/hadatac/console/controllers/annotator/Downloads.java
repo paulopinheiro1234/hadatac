@@ -7,6 +7,9 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.*;
 import play.mvc.Http.*;
 import play.mvc.Result;
@@ -23,7 +26,11 @@ import org.hadatac.utils.NameSpaces;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
 
+import javax.inject.Inject;
+
 public class Downloads extends Controller {
+    @Inject
+    Application application;
 
     /*
      *  Download operations
@@ -57,14 +64,14 @@ public class Downloads extends Controller {
     public static final String FRAG_IN_DATE_TIME_SUFFIX     = " <ts0>; ";
     public static final String FRAG_IN_DATE_TIME_STATEMENT  = "<ts0> hadatac:atColumn ";
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postGenerate(String handler_json, Http.Request request) {
 
         String oper = "";
 
         RequestBody body = request.body();
         if (body == null) {
-            return ok(completeAnnotation.render("Error processing form: form appears to be empty."));
+            return ok(completeAnnotation.render("Error processing form: form appears to be empty.",application.getUserEmail(request)));
         }
 
         String textBody = body.asText();
@@ -73,7 +80,7 @@ public class Downloads extends Controller {
             p.load(new StringReader(textBody));
         } catch (Exception e) {
             e.printStackTrace();
-            return ok(completeAnnotation.render("Error processing form: form appears to be empty."));
+            return ok(completeAnnotation.render("Error processing form: form appears to be empty.",application.getUserEmail(request)));
         }
 
         System.out.println("Selection: " + p.getProperty("submitButton"));
@@ -81,7 +88,7 @@ public class Downloads extends Controller {
             oper = p.getProperty("submitButton");
 
         if (oper.equals(OPER_FINISH)) {
-            return ok(completeAnnotation.render("Annotation operation finished."));
+            return ok(completeAnnotation.render("Annotation operation finished.",application.getUserEmail(request)));
         }
 
         String preamble = FRAG_START_PREAMBLE;
@@ -187,7 +194,7 @@ public class Downloads extends Controller {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            return ok(completeAnnotation.render("Error processing form. Please restart form."));
+            return ok(completeAnnotation.render("Error processing form. Please restart form.",application.getUserEmail(request)));
         }
 
         preamble += FRAG_END_PREAMBLE;
@@ -202,7 +209,7 @@ public class Downloads extends Controller {
                 preamble += FileUtils.readFileToString(newFile, "UTF-8");
             } catch (IOException e) {
                 e.printStackTrace();
-                return ok(completeAnnotation.render("Error reading cached CSV file. Please restart form."));
+                return ok(completeAnnotation.render("Error reading cached CSV file. Please restart form.",application.getUserEmail(request)));
             }
             return ok(preamble).as("text/turtle");
         }
@@ -213,22 +220,22 @@ public class Downloads extends Controller {
                 preamble += FileUtils.readFileToString(newFile, "UTF-8");
             } catch (IOException e) {
                 e.printStackTrace();
-                return ok(completeAnnotation.render("Error reading cached CSV file. Please restart form."));
+                return ok(completeAnnotation.render("Error reading cached CSV file. Please restart form.",application.getUserEmail(request)));
             }
 
             try {
                 FileUtils.writeStringToFile(new File(LoadCCSV.UPLOAD_NAME), preamble, "utf-8");
             } catch (IOException e) {
                 e.printStackTrace();
-                return ok(completeAnnotation.render("Error aving CCSV file locally. Please restart form."));
+                return ok(completeAnnotation.render("Error aving CCSV file locally. Please restart form.",application.getUserEmail(request)));
             }
 
             ParsingResult result = LoadCCSV.playLoadCCSV();
-            return ok(completeAnnotation.render(result.getMessage()));
+            return ok(completeAnnotation.render(result.getMessage(),application.getUserEmail(request)));
 
         }
 
-        return ok(completeAnnotation.render("Error processing form: unspecified download operation."));
+        return ok(completeAnnotation.render("Error processing form: unspecified download operation.",application.getUserEmail(request)));
     }
 
 }

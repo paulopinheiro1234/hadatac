@@ -2,7 +2,7 @@
         graphName : String,
         hierarchy   : org.hadatac.console.models.OtMSparqlQueryResults,
         loadedList : List[String],
-        f_id: String
+        f_id: String, userName:String
 )
 
 @import org.hadatac.console.views.html._
@@ -10,7 +10,7 @@
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("Browse Loaded Ontologies","","") {
+@main("Browse Loaded Ontologies","",userName) {
 
     <style>
 

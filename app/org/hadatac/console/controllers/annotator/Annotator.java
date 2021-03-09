@@ -1,6 +1,7 @@
 package org.hadatac.console.controllers.annotator;
 
-//import controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.http.DeploymentQueries;
 import org.hadatac.console.http.GetSparqlQuery;
 
@@ -15,7 +16,9 @@ import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.CSVAnnotationHandler;
 import org.hadatac.console.models.TripleDocument;
 
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.error_page;
@@ -23,9 +26,13 @@ import org.hadatac.console.views.html.annotator.*;
 import org.hadatac.data.api.DataFactory;
 import org.hadatac.entity.pojo.STR;
 
-public class Annotator extends Controller {
+import javax.inject.Inject;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+public class Annotator extends Controller {
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result selectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -49,7 +56,7 @@ public class Annotator extends Controller {
 
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postSelectDeployment() {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQuery query_submit = new GetSparqlQuery(query);
@@ -70,8 +77,8 @@ public class Annotator extends Controller {
         return ok();
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result uploadCSV(String uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result uploadCSV(String uri,Http.Request request) {
         CSVAnnotationHandler handler;
         try {
             if (uri != null) {
@@ -121,11 +128,11 @@ public class Annotator extends Controller {
             handler = new CSVAnnotationHandler(uri, "", "");
         }
 
-        return ok(uploadCSV.render(handler, "init",""));
+        return ok(uploadCSV.render(handler, "init","",application.getUserEmail(request)));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postUploadCSV(String uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postUploadCSV(String uri, Http.Request request) {
 
         CSVAnnotationHandler handler;
         try {
@@ -177,6 +184,6 @@ public class Annotator extends Controller {
             handler = new CSVAnnotationHandler(uri, "", "");
         }
 
-        return ok(uploadCSV.render(handler, "init",""));
+        return ok(uploadCSV.render(handler, "init","",application.getUserEmail(request)));
     }
 }

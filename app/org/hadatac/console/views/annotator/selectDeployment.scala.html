@@ -1,7 +1,8 @@
 @(dir               : String,
   fileId            : String,
   da_uri            : String,
-  deploymentOptions : List[org.hadatac.entity.pojo.Deployment])
+  deploymentOptions : List[org.hadatac.entity.pojo.Deployment],
+  userName          : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,7 +12,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.metadata.loader.URIUtils;
 
-@main("Select Deployment for " + URIUtils.replaceNameSpaceEx(da_uri),"","") {
+@main("Select Deployment for " + URIUtils.replaceNameSpaceEx(da_uri),"",userName) {
 
 <script type="text/javascript">
    function checkform() {

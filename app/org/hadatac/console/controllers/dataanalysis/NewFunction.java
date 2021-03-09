@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
@@ -33,7 +34,7 @@ public class NewFunction extends Controller {
 	@javax.inject.Inject
 	private Application application;
 	
-	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result index(Http.Request request) {
 		final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 		
@@ -41,15 +42,15 @@ public class NewFunction extends Controller {
     	Indicator indicator = new Indicator();
     	List<Aggregate> aggregates = Aggregate.find();
     	EntityCharacteristic entityCharacteristic = EntityCharacteristic.create(sysUser.getUri());
-    	return ok(newFunction.render(indicator, entityCharacteristic, aggregates));
+    	return ok(newFunction.render(indicator, entityCharacteristic, aggregates,sysUser.getEmail()));
     }
 	
-	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postIndex(Http.Request request) {
     	return index(request);
     }
 	
-	@Restrict(@Group(Constants.DATA_OWNER_ROLE))
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processForm(Http.Request request) {
 		
         Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest(request);
@@ -75,6 +76,6 @@ public class NewFunction extends Controller {
 		// insert the new indicator content inside of the triplestore
 		ind.save();
 		
-		return ok(newFunctionConfirm.render(ind));
+		return ok(newFunctionConfirm.render(ind,application.getUserEmail(request)));
     }
 }

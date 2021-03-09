@@ -1,7 +1,7 @@
 @(dir        : String,
   fileId  : String,
   da_uri     : String,
-  dasOptions : List[org.hadatac.entity.pojo.DataAcquisitionSchema])
+  dasOptions : List[org.hadatac.entity.pojo.DataAcquisitionSchema], userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,7 +11,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.metadata.loader.URIUtils;
 
-@main("Select Data Acquisition Schema (DAS) for " + da_uri,"","") {
+@main("Select Data Acquisition Schema (DAS) for " + da_uri,"",userName) {
 
 <script type="text/javascript">
    function checkform() {

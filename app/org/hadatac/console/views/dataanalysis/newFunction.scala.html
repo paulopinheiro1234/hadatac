@@ -1,6 +1,6 @@
 @(function     : org.hadatac.entity.pojo.Indicator,
   entityCharacteristic : org.hadatac.entity.pojo.facet.EntityCharacteristic,
-  aggregateList : List[org.hadatac.entity.pojo.Aggregate]) 
+  aggregateList : List[org.hadatac.entity.pojo.Aggregate], userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -9,7 +9,7 @@
 @import org.hadatac.entity.pojo.Indicator
 @import play._
 
-@main("New Function","","") {
+@main("New Function","",userName) {
   <div id="facets" data-facets="@entityCharacteristic.toJSON()"/>
 
   <div class="container">

@@ -1,12 +1,12 @@
 @import org.hadatac.console.models.CSVAnnotationHandler
-@(handler: CSVAnnotationHandler, oper: String, message : String)
+@(handler: CSVAnnotationHandler, oper: String, message : String, userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers.triplestore._
 @import java.net._
 
-@main("CSV Annotator","","") {
+@main("CSV Annotator","",userName) {
 
     <h2>CSV Annotator</h2>
 

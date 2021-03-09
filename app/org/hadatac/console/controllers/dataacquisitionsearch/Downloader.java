@@ -70,12 +70,12 @@ public class Downloader extends Controller {
         return ok(downloader.render(files, user.isDataManager(),user.getEmail()));
     }
 
-@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
 
-@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadDataFile(String fileId, Http.Request request) {
     final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
@@ -87,7 +87,7 @@ public class Downloader extends Controller {
         return ok(new File(dataFile.getAbsolutePath()));
     }
 
-@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteDataFile(String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
@@ -110,7 +110,7 @@ public class Downloader extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result assignFileOwner(String ownerEmail, String fileId,Http.Request request) {
         return ok(assignOption.render(User.getUserEmails(),
                 routes.Downloader.processOwnerForm(ownerEmail, fileId),

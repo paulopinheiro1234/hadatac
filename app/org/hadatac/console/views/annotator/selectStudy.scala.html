@@ -1,7 +1,7 @@
 @(dir          : String,
         fileId       : String,
         da_uri       : String,
-        studyOptions : List[org.hadatac.entity.pojo.Study])
+        studyOptions : List[org.hadatac.entity.pojo.Study], userName :String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -10,7 +10,7 @@
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
 
-@main("Select Study for " + da_uri,"","") {
+@main("Select Study for " + da_uri,"",userName) {
 
     <script type="text/javascript">
             function checkform() {

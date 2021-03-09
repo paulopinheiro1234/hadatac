@@ -3,6 +3,7 @@ package org.hadatac.console.controllers.metadataacquisition;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -40,17 +41,17 @@ public class Analytes extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         String collection = ConfigFactory.load().getString("hadatac.console.host_deploy") +
                 request.path() + "/solrsearch";
         List<String> indicators = getIndicators();
 
-        return ok(analytes.render(collection, indicators, user.isDataManager()));
+        return ok(analytes.render(collection, indicators, user.isDataManager(),user.getEmail()));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
@@ -197,14 +198,14 @@ public class Analytes extends Controller {
         return -1;
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result update() {
         updateAnalytes();
 
         return redirect(routes.Analytes.index());
     }
 
-    @Restrict(@Group(Constants.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postUpdate() {
         return update();
     }

@@ -1,12 +1,12 @@
 @(collection_url : String,
         indicatorList : List[String],
-        bAdmin : Boolean)
+        bAdmin : Boolean, userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import java.net._
 
-@main("DASA Browser Home","","") {
+@main("DASA Browser Home","",userName) {
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
@@ -147,7 +147,7 @@
         <div class="content">
             <div class="facet-view-simple"></div>
         </div>
-@*        <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>*@
+        <div id="download_url" style="visibility: hidden ;">@org.hadatac.console.http.routes.SolrSearchProxy.getStudyAcquisitionDownload()</div>
         <div id="myModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                     <!-- Modal content-->

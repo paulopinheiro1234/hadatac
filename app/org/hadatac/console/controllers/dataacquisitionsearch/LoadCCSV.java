@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.hadatac.console.controllers.Application;
 import play.mvc.*;
 import play.mvc.Http.MultipartFormData.FilePart;
 
@@ -17,19 +18,22 @@ import org.hadatac.data.loader.util.Arguments;
 import org.hadatac.data.loader.util.FileFactory;
 import org.hadatac.data.model.ParsingResult;
 
+import javax.inject.Inject;
+
 public class LoadCCSV extends Controller {
+    @Inject
+    Application application;
 
     static FileFactory files;
 
     public static final String UPLOAD_NAME = "uploads/latest.ccsv";
 
-    public Result loadCCSV(String oper) {
-        return ok(loadCCSV.render(oper, ""));
+    public Result loadCCSV(String oper,Http.Request request) {
+        return ok(loadCCSV.render(oper, "",application.getUserEmail(request)));
     }
 
-    public Result postLoadCCSV(String oper) {
-        return ok(loadCCSV.render(oper, ""));
-    }
+    public Result postLoadCCSV(String oper,Http.Request request) {
+        return ok(loadCCSV.render(oper, "",application.getUserEmail(request)));}
 
     public static ParsingResult playLoadCCSV() {
         int status = 0;
@@ -100,17 +104,17 @@ public class LoadCCSV extends Controller {
                     try {
                         isFile.close();
                     } catch (Exception e) {
-                        return ok(loadCCSV.render("fail", "Could not save uploaded file."));
+                        return ok(loadCCSV.render("fail", "Could not save uploaded file.",application.getUserEmail(request)));
                     }
                 } catch (Exception e) {
-                    return ok(loadCCSV.render("fail", "Could not process uploaded file."));
+                    return ok(loadCCSV.render("fail", "Could not process uploaded file.",application.getUserEmail(request)));
                 }
             } catch (FileNotFoundException e1) {
-                return ok(loadCCSV.render("fail", "Could not find uploaded file"));
+                return ok(loadCCSV.render("fail", "Could not find uploaded file",application.getUserEmail(request)));
             }
-            return ok(loadCCSV.render("loaded", "File uploaded successfully."));
+            return ok(loadCCSV.render("loaded", "File uploaded successfully.",application.getUserEmail(request)));
         } else {
-            return ok(loadCCSV.render("fail", "Error uploading file. Please try again."));
+            return ok(loadCCSV.render("fail", "Error uploading file. Please try again.",application.getUserEmail(request)));
         }
     }
 }

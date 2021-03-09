@@ -1,14 +1,15 @@
 @(oper       : String,
         entities   : org.hadatac.console.models.OtMSparqlQueryResults,
         attributes : org.hadatac.console.models.OtMSparqlQueryResults,
-        units      : org.hadatac.console.models.OtMSparqlQueryResults)
+        units      : org.hadatac.console.models.OtMSparqlQueryResults,
+        userName   : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("Browse Ontology","","") {
+@main("Browse Ontology","",userName) {
 
     <style>
 

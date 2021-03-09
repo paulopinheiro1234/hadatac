@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers.metadata;
 
+import org.hadatac.console.controllers.Application;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.console.http.GetSparqlQueryDynamic;
 
@@ -12,14 +13,20 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.OtMSparqlQueryResults;
 
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.metadata.metadata_browser;
 import org.hadatac.console.views.html.error_page;
 
+import javax.inject.Inject;
+
 public class MetadataEntry extends Controller {
 
-    public Result index(String tabName) {
+    @Inject
+    Application application;
+
+    public Result index(String tabName, Http.Request request) {
         SparqlQuery query = new SparqlQuery();
         GetSparqlQueryDynamic query_submit = new GetSparqlQueryDynamic(query);
         OtMSparqlQueryResults theResults;
@@ -38,14 +45,14 @@ public class MetadataEntry extends Controller {
         Map<String, String> indicators = DynamicFunctions.getIndicatorTypes();
         Map<String, List<String>> values = Indicator.getValuesJustLabels(indicators);
 
-        return ok(metadata_browser.render(theResults, tabName, values));
+        return ok(metadata_browser.render(theResults, tabName, values,application.getUserEmail(request)));
     }
 
-    public Result postIndex(String tabName) {
-        return index(tabName);
+    public Result postIndex(String tabName,Http.Request request) {
+        return index(tabName,request);
     }
 
-    public Result indexByUri(String uri) {
+    public Result indexByUri(String uri,Http.Request request) {
         System.out.println("Request indicator URI: " + uri);
 
         Indicator indicator = Indicator.find(uri);
@@ -55,10 +62,10 @@ public class MetadataEntry extends Controller {
 
         String tabName = indicator.getLabel().replace(" ", "");
 
-        return index(tabName);
+        return index(tabName,request);
     }
 
-    public Result postIndexByUri(String uri) {
-        return indexByUri(uri);
+    public Result postIndexByUri(String uri,Http.Request request) {
+        return indexByUri(uri,request);
     }
 }

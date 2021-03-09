@@ -1,7 +1,7 @@
 @(dir      : String,
   fileId   : String, 
   da       : org.hadatac.entity.pojo.STR, 
-  message  : String)
+  message  : String, userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,7 +11,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.metadata.loader.URIUtils;
 
-@main("Prepare Data Ingestion","","") {
+@main("Prepare Data Ingestion","",userName) {
 
   <style>
     .paddin0 {
@@ -54,7 +54,7 @@
     <div id="rcorners" class="paddin0 margin0" style="background-color: #DCF7FE">
       <center>
 	<input type="submit" class="btn btn-primary btn-sm" role="button" id="selectDA" value="Select Complete and Active Data Acquisition"
-@*	       formaction="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(dir, fileId, da.getUri())">*@
+	       formaction="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(dir, fileId, da.getUri())">
         </input>
     </div>
 
@@ -108,7 +108,7 @@
 		   <b>OR</b>
 
 		   <input type="submit" class="btn btn-primary btn-sm" role="button" id="createSTD" value="Create Study"
-@*			  formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.indexFromFile(dir, fileId)">*@
+			  formaction="@org.hadatac.console.controllers.studies.routes.NewStudy.indexFromFile(dir, fileId)">
                    </input>
 	       <center>
          } else {
@@ -117,7 +117,7 @@
                    <br>
 
 	           <input type="submit" class="btn btn-default btn-sm" role="button" id="editSTD" value="View/Edit"
-@*			  formaction="@org.hadatac.console.controllers.studies.routes.EditStudy.index(dir, fileId, da.getUri(),da.getStudyUri())">*@
+			  formaction="@org.hadatac.console.controllers.studies.routes.EditStudy.index(dir, fileId, da.getUri(),da.getStudyUri())">
 
 	           <input type="submit" class="btn btn-default btn-sm" role="button" id="removeSTD" value="Remove Association"
 		  	  formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.removeAssociation(dir, fileId, da.getUri(), "Study")">
@@ -154,7 +154,7 @@
           }
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScope"
-@*		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, fileId, da.getUri(), da.getStudyUri())" *@
+		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, fileId, da.getUri(), da.getStudyUri())"
 		 value="Create Study Objects">
           </input>
 
@@ -201,7 +201,7 @@
 	        <b>OR</b>
      
 	        <input type="submit" class="btn btn-primary btn-sm" role="button" id="createDPL" value="Create Deployment"
-@*		       formaction="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", dir, fileId, da.getUri(), 0)">*@
+		       formaction="@org.hadatac.console.controllers.deployments.routes.NewDeployment.index("legacy", dir, fileId, da.getUri(), 0)">
                 </input>
 	    </center>
 

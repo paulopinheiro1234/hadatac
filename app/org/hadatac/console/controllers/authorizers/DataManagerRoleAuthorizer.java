@@ -15,7 +15,7 @@ public class DataManagerRoleAuthorizer extends ProfileAuthorizer<CommonProfile> 
 
     @Override
     public boolean isAuthorized(final WebContext context, final List<CommonProfile> profiles) throws HttpAction {
-        System.out.println("Is  DataManagerRoleAuthorizer authorised was called:"+isAnyAuthorized(context, profiles));
+//        System.out.println("Is  DataManagerRoleAuthorizer authorised was called:"+isAnyAuthorized(context, profiles));
         return isAnyAuthorized(context, profiles);
     }
 
@@ -25,7 +25,7 @@ public class DataManagerRoleAuthorizer extends ProfileAuthorizer<CommonProfile> 
             return false;
         }
         Set<String> roles = profile.getRoles();
-        System.out.println("IsDataManagerRoleAuthorizer  profile authorised was called:"+ roles.contains(Constants.DATA_MANAGER_ROLE));
+//        System.out.println("IsDataManagerRoleAuthorizer  profile authorised was called:"+ roles.contains(Constants.DATA_MANAGER_ROLE));
         return roles.contains(Constants.DATA_MANAGER_ROLE);
     }
 

@@ -1,10 +1,8 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.utils.CollectionUtil;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -14,77 +12,49 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
-//import views.html.metadataacquisition.*;
+import org.hadatac.console.views.html.metadataacquisition.*;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
 
 import com.typesafe.config.ConfigFactory;
 
-import org.hadatac.console.views.html.metadataacquisition.schema_attributes;
-import java.util.Iterator;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
+import javax.inject.Inject;
 
 
 public class SchemaAttribute extends Controller {
+    @Inject
+    Application application;
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
-//        final SysUser user = AuthApplication.getLocalUser(request.session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         String collection = ConfigFactory.load().getString("hadatac.console.host_deploy") +
                 request.path() + "/solrsearch";
         List<String> indicators = getIndicators();
 
-        //TODO: remove: only for testing users
-        SolrClient solrClient = new HttpSolrClient.Builder(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
-        String query = "active_bool:true";
-        SolrQuery solrQuery = new SolrQuery(query);
-        List<SysUser> users = new ArrayList<SysUser>();
-
-        try {
-            QueryResponse queryResponse = solrClient.query(solrQuery);
-            solrClient.close();
-            SolrDocumentList list = queryResponse.getResults();
-            Iterator<SolrDocument> i = list.iterator();
-
-            while (i.hasNext()) {
-                System.out.println("User at i :"+i+i.next());
-//				SysUser user = SysUser.convertSolrDocumentToUser(i.next());
-//                System.out.println("Users:"+user);
-//				users.add(user);
-            }
-//            UpdateRequest updateRequest = new UpdateRequest();
-//            updateRequest.setAction( UpdateRequest.ACTION.COMMIT, false, false);
-//            SolrInputDocument doc3 = new SolrInputDocument();
-//
-//            doc3.addField( "id_str", "id2");
-//            doc3.addField( "email", "test@gmail.com");
-//            doc3.addField( "name_str", "doc3");
-//            doc3.addField("active_bool",true);
-//            solrClient.add(doc3);
-//            solrClient.commit();
-//            System.out.println("commit is done here");
-//            solrClient.close();
-
-        } catch (Exception e) {
-            System.out.println("[ERROR] User.getAuthUserFindSolr - Exception message: " + e.getMessage());
-        }
-
-        System.out.println("Users:"+users);
-
-        return ok(schema_attributes.render(collection, indicators, true)); //user.isDataManager()));
+        return ok(schema_attributes.render(collection, indicators, user.isDataManager(),user.getEmail()));
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
@@ -269,13 +239,13 @@ public class SchemaAttribute extends Controller {
         return -1;
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result update() {
         updateDASchemaAttributes();
         return redirect(routes.SchemaAttribute.index());
     }
 
-    //    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postUpdate() {
         return update();
     }

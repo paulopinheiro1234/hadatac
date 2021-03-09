@@ -6,7 +6,8 @@
   globalScope    : String,
   globalScopeUri : String,
   localScope     : List[String],
-  localScopeUri  : List[String])
+  localScopeUri  : List[String],
+  userName       : String)
 
 @import helper._
 @import java.net.URLDecoder
@@ -17,7 +18,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.metadata.loader.URIUtils;
 
-@main("Select Scope for " + da_uri,"","") {
+@main("Select Scope for " + da_uri,"",userName) {
 
 <script type="text/javascript">
       function checkform() {

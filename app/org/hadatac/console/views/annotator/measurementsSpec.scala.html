@@ -3,7 +3,7 @@
 @import org.hadatac.console.models.CSVAnnotationHandler
 @(handler: CSVAnnotationHandler,
         theEntities : SparqlQueryResults,
-        theUnits : SparqlQueryResults)
+        theUnits : SparqlQueryResults, userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -11,7 +11,7 @@
 
 @import org.hadatac.console.controllers.annotator.Downloads
 
-@main("CSV Annotator","","") {
+@main("CSV Annotator","",userName) {
 
     <h2>CSV Annotator</h2>
 

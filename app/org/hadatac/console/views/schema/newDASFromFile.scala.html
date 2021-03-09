@@ -1,6 +1,7 @@
 @(dir       : String,
   file_name : String,
-  labels    : String)
+  labels    : String,
+  userName  : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -9,7 +10,7 @@
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.console.controllers._
 
- @main("New SDD from File","","") {
+ @main("New SDD from File","",userName) {
 
   <div class="container">
     <h2>New SDD From File</h2>
@@ -27,9 +28,9 @@
         <p> The created SDD will be saved in the knowledge graph</p>
       </div>
       
-@*      <div class="form-group" class="col-sm-6 col-offset-3">*@
-@*	  <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Data File Management</a>*@
-@*      </div>*@
+      <div class="form-group" class="col-sm-6 col-offset-3">
+	  <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, ".")" class="btn btn-primary" role="button">Back to Data File Management</a>
+      </div>
       
     </form>
   </div>

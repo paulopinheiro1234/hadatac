@@ -1,12 +1,12 @@
 @import org.hadatac.console.views.html.metadata.metadata_entry
 @(results      : org.hadatac.console.models.OtMSparqlQueryResults,
         category     : String,
-        indicatorMap : Map[String,List[String]])
+        indicatorMap : Map[String,List[String]], userName:String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Hierarchies","","") {
+@main("Hierarchies","",userName) {
 
     @if(indicatorMap != null) {
         @for(indicatorKey <- indicatorMap.keySet()){

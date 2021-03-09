@@ -30,6 +30,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.ObjectDetails;
 
 import org.hadatac.entity.pojo.*;
+import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.concurrent.HttpExecutionContext;
@@ -96,7 +97,7 @@ public class DataAcquisitionSearch extends Controller {
         return objDetails;
     }
 
-    // @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(int page, int rows, Http.Request request) {
 
         //printMemoryStats();
@@ -117,17 +118,17 @@ public class DataAcquisitionSearch extends Controller {
         }
     }
 
-    // @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(int page, int rows, Http.Request request) {
         return index(page, rows, request);
     }
 
-    // @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result indexData(int page, int rows, Http.Request request) {
         return indexInternal(1, page, rows, request);
     }
 
-    // @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndexData(int page, int rows, Http.Request request) {
         return indexData(page, rows, request);
     }
@@ -269,7 +270,7 @@ public class DataAcquisitionSearch extends Controller {
         }
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result download(Http.Request request) {
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
@@ -303,7 +304,7 @@ public class DataAcquisitionSearch extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadAlignment(Http.Request request) {
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
@@ -383,12 +384,12 @@ public class DataAcquisitionSearch extends Controller {
         return ownerUri;
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownload(Http.Request request) {
         return download(request);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadAlignment(Http.Request request) {
         return downloadAlignment(request);
     }

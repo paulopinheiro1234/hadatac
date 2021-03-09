@@ -1,10 +1,10 @@
-@(functionList : List[org.hadatac.entity.pojo.Indicator])
+@(functionList : List[org.hadatac.entity.pojo.Indicator],userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Function Management","","") {
+@main("Function Management","",userName) {
 
     <h3>Function Management</h3>
     

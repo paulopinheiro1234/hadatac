@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.annotator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 //import controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.io.File;
@@ -16,6 +18,7 @@ import org.hadatac.console.models.SparqlQuery;
 import org.hadatac.console.models.SparqlQueryResults;
 import org.hadatac.console.models.CSVAnnotationHandler;
 
+import org.pac4j.play.java.Secure;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -27,8 +30,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hadatac.console.views.html.annotator.uploadCSV;
 import org.hadatac.console.views.html.annotator.measurementsSpec;
 
+import javax.inject.Inject;
+
 
 public class FileProcessing extends Controller {
+
+    @Inject
+    Application application;
 
     private static final String UPLOAD_PATH = "tmp/uploads/";
 
@@ -65,7 +73,7 @@ public class FileProcessing extends Controller {
         return theResults;
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result uploadFile(String handler_json, Http.Request request) {
         try {
@@ -80,7 +88,7 @@ public class FileProcessing extends Controller {
             handler = mapper.readValue(handler_json, CSVAnnotationHandler.class);
         } catch (Exception e) {
             e.printStackTrace();
-            return ok (uploadCSV.render(null, "fail", "Lost deployment information."));
+            return ok (uploadCSV.render(null, "fail", "Lost deployment information.",application.getUserEmail(request)));
         }
 
         FilePart uploadedfile = request.body().asMultipartFormData().getFile("pic");
@@ -108,17 +116,17 @@ public class FileProcessing extends Controller {
                     try {
                         isFile.close();
                     } catch (Exception e) {
-                        return ok (uploadCSV.render(null, "fail", "Could not save uploaded file."));
+                        return ok (uploadCSV.render(null, "fail", "Could not save uploaded file.",application.getUserEmail(request)));
                     }
                 } catch (Exception e) {
-                    return ok (uploadCSV.render(null, "fail", "Could not process uploaded file."));
+                    return ok (uploadCSV.render(null, "fail", "Could not process uploaded file.",application.getUserEmail(request)));
                 }
             } catch (FileNotFoundException e1) {
-                return ok (uploadCSV.render(null, "fail", "Could not find uploaded file"));
+                return ok (uploadCSV.render(null, "fail", "Could not find uploaded file",application.getUserEmail(request)));
             }
-            return ok(measurementsSpec.render(handler, getQueryResults("Entities"), getQueryResults("Units")));
+            return ok(measurementsSpec.render(handler, getQueryResults("Entities"), getQueryResults("Units"),application.getUserEmail(request)));
         } else {
-            return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again."));
+            return ok (uploadCSV.render(null, "fail", "Error uploading file. Please try again.",application.getUserEmail(request)));
         }
     }
 }

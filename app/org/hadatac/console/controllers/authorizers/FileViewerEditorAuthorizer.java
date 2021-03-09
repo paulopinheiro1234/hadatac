@@ -12,7 +12,7 @@ import java.util.Set;
 public class FileViewerEditorAuthorizer extends ProfileAuthorizer<CommonProfile> {
     @Override
     public boolean isAuthorized(final WebContext context, final List<CommonProfile> profiles) throws HttpAction {
-        System.out.println("Is  FileViewerEditorAuthorizer authorised was called:"+isAnyAuthorized(context, profiles));
+//        System.out.println("Is  FileViewerEditorAuthorizer authorised was called:"+isAnyAuthorized(context, profiles));
         return isAnyAuthorized(context, profiles);
     }
 
@@ -22,7 +22,7 @@ public class FileViewerEditorAuthorizer extends ProfileAuthorizer<CommonProfile>
             return false;
         }
         Set<String> roles = profile.getRoles();
-        System.out.println("FileViewerEditorAuthorizer  profile authorised was called:"+ roles.contains(Constants.FILE_VIEWER_EDITOR_ROLE));
+//        System.out.println("FileViewerEditorAuthorizer  profile authorised was called:"+ roles.contains(Constants.FILE_VIEWER_EDITOR_ROLE));
         return roles.contains(Constants.FILE_VIEWER_EDITOR_ROLE);
     }
 

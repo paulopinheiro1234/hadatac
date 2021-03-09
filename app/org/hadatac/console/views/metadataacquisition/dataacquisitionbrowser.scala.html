@@ -1,11 +1,11 @@
 @(collection_url : String,
         indicatorList : List[String],
-        bAdmin : Boolean)
+        bAdmin : Boolean, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Data Stream Browser Home","","") {
+@main("Data Stream Browser Home","",userName) {
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/1.7.1/jquery-1.7.1.min.js")"></script>
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/js/bootstrap.min.js")"></script>
