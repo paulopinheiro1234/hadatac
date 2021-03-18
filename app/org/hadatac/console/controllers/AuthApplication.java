@@ -11,6 +11,7 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
 
 import org.hadatac.console.providers.UserProvider;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Http.Session;
@@ -70,13 +71,13 @@ public class AuthApplication extends Controller {
         return AuthApplication.getAuthApplication().getUserProvider().getUser(username);
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result restricted(String username) {
         final SysUser localUser = this.userProvider.getUser(username);
         return ok(restricted.render(localUser));
     }
 
-//    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result profile(String username) {
         final SysUser localUser = userProvider.getUser(username);
         return ok(profile.render(localUser));

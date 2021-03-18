@@ -1,4 +1,5 @@
-@(f: Form[_], constraints: Boolean = false)(implicit messages: play.i18n.Messages)
+@import org.hadatac.console.views.html.twitterBootstrapBasic
+@(f: Form[_], constraints: Boolean = false)(implicit messagesProvider: MessagesProvider)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }

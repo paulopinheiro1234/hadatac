@@ -10,6 +10,7 @@ import be.objectify.deadbolt.java.actions.SubjectPresent;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.providers.MyUsernamePasswordAuthUser;
 import org.hadatac.console.providers.UserProvider;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.data.format.Formats.NonEmpty;
@@ -117,7 +118,7 @@ public class Account extends Controller {
 //        return ok(link.render(this.auth));
 //    }
 //
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers =Constants.DATA_OWNER_ROLE)
     public Result verifyEmail(Http.Request request) {
         final SysUser user = this.userProvider.getUser(application.getUserEmail(request));
         if (user.getEmailValidated()) {
@@ -133,23 +134,23 @@ public class Account extends Controller {
         return redirect(routes.AuthApplication.profile(user.getEmail()));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result changePassword(Http.Request request) {
         final SysUser u = this.userProvider.getUser(application.getUserEmail(request));
 
         if (!u.getEmailValidated()) {
             return ok(unverified.render()).withHeader("Cache-Control", "no-cache");
         } else {
-            return ok(password_change.render(PASSWORD_CHANGE_FORM)).withHeader("Cache-Control", "no-cache");
+            return ok(password_change.render(PASSWORD_CHANGE_FORM,application.getUserEmail(request),msg.preferred(request))).withHeader("Cache-Control", "no-cache");
         }
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result doChangePassword(Http.Request request) {
         final Form<Account.PasswordChange> filledForm = PASSWORD_CHANGE_FORM.bindFromRequest(request);
         if (filledForm.hasErrors()) {
-            // User did not select whether to link or not link
-            return badRequest(password_change.render(filledForm));
+            // User did not select whether to link or not linkx
+            return badRequest(password_change.render(filledForm,application.getUserEmail(request),msg.preferred(request)));
         } else {
             final SysUser user = this.userProvider.getUser(application.getUserEmail(request));
             final String newPassword = filledForm.get().password;

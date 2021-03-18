@@ -106,8 +106,7 @@ public class Signup {
     //TODO : fix this
     public Result forgotPassword(Http.Request request) {
         Form<MyUsernamePasswordAuthProvider.MyIdentity> form = FORGOT_PASSWORD_FORM;
-        System.out.println("msg.preferred "+msg.preferred(request));
-        return ok(password_forgot.render(form, request,msg.preferred(request))).withHeader("Cache-Control", "no-cache");
+        return ok(password_forgot.render(form,msg.preferred(request))).withHeader("Cache-Control", "no-cache");
     }
 
     //TODO : fix this
@@ -177,7 +176,7 @@ public class Signup {
                 .bindFromRequest(request);
         if (filledForm.hasErrors()) {
             // User did not fill in his/her email
-            return badRequest(password_forgot.render(filledForm, request, msg.preferred(request))).withHeader("Cache-Control", "no-cache");
+            return badRequest(password_forgot.render(filledForm, msg.preferred(request))).withHeader("Cache-Control", "no-cache");
         } else {
             // The email address given *BY AN UNKNWON PERSON* to the form - we
             // should find out if we actually have a user with this email

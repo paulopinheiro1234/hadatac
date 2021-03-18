@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hadatac.Constants;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -43,7 +45,7 @@ public class ObjectView extends Controller {
 
     public static int PAGESIZE = 7;
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(String obj_uri, boolean autorefresh) {
 
         try {
@@ -67,7 +69,7 @@ public class ObjectView extends Controller {
         return ok(org.hadatac.console.views.html.objects.objectView.render(graph, obj, obj_uri, autorefresh));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(String obj_uri, boolean autorefresh) {
         return index(obj_uri, autorefresh);
     }

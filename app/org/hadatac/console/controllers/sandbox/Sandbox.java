@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.*;
 import play.mvc.Result;
@@ -32,7 +33,7 @@ public class Sandbox extends Controller {
     @Inject
     private Application application;
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         System.out.println("USER :"+user);
@@ -60,12 +61,12 @@ public class Sandbox extends Controller {
         return badRequest("Internal errors occurred for Sandbox Management!");
     }
 
-//    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
 
-//    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result startSandboxMode(Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -83,7 +84,7 @@ public class Sandbox extends Controller {
         return redirect(org.hadatac.console.controllers.sandbox.routes.Sandbox.index());
     }
 
-//    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result exitSandboxMode(Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 

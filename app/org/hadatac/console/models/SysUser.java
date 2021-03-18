@@ -492,7 +492,7 @@ public class SysUser implements Subject {
 			sys_user.emailValidated = true;
 
 			String admin_uri = ConfigFactory.load().getString("hadatac.console.kb") + "/users#admin";
-			SysUser user = new SysUser();
+			User user = new User();
 			user.setName(sys_user.name);
 			user.setEmail(sys_user.email);
 			user.setUri(admin_uri);
@@ -503,8 +503,9 @@ public class SysUser implements Subject {
 			else{
 				sys_user.uri = uri;
 			}
-			System.out.println("sys_user before save uri admin: " + admin_uri);
-//			user.save();
+			System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
+			user.save();
+			System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
 			sys_user.save();
 
 			return sys_user;
@@ -579,7 +580,7 @@ public class SysUser implements Subject {
 			sys_user.emailValidated = true;
 
 			String admin_uri = ConfigFactory.load().getString("hadatac.console.kb") + "/users#admin";
-			SysUser user = new SysUser();
+			User user = new User();
 			user.setName(sys_user.name);
 			user.setEmail(sys_user.email);
 			user.setUri(admin_uri);
@@ -591,7 +592,7 @@ public class SysUser implements Subject {
 				sys_user.uri = uri;
 			}
 			System.out.println("sys_user before save uri admin: " + admin_uri);
-//			user.save(); -- possible duplication
+			user.save();
 			sys_user.save();
 
 			return sys_user;

@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.kg;
 
+import org.hadatac.Constants;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.console.views.html.kg.knowledgeGraphBrowser;
@@ -22,7 +24,7 @@ import org.hadatac.utils.NameSpaces;
 
 public class KnowledgeGraphBrowser extends Controller {
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers=Constants.DATA_OWNER_ROLE)
     public Result index(boolean autoRefresh, boolean includeOntologies, boolean includeIndicators, boolean includeDeployments, boolean includeSDDs, boolean includeDASpecs) {
 
         KGForceFieldGraph graph = new KGForceFieldGraph(includeOntologies, includeIndicators, includeDeployments, includeSDDs, includeDASpecs);
@@ -30,7 +32,7 @@ public class KnowledgeGraphBrowser extends Controller {
         return ok(knowledgeGraphBrowser.render(graph, autoRefresh, includeOntologies, includeIndicators, includeDeployments, includeSDDs, includeDASpecs));
     }
 
-//    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers=Constants.DATA_OWNER_ROLE)
     public Result postIndex(boolean autoRefresh, boolean includeOntologies, boolean includeIndicators, boolean includeDeployments, boolean includeSDDs, boolean includeDASpecs) {
         return index(autoRefresh, includeOntologies, includeIndicators, includeDeployments, includeSDDs, includeDASpecs);
     }

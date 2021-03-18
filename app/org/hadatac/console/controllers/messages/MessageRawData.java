@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -38,7 +39,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class MessageRawData extends Controller {
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction, boolean show) {
         STR stream = null;
         MessageTopic topic = null;
@@ -87,7 +88,7 @@ public class MessageRawData extends Controller {
         return ok(messageRawData.render(dir, filename, da_uri, offset, str_uri, tpc_uri, topic_label, results, postAction, show));
     }
 
-    @Restrict(@Group(Constants.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, String postAction, boolean show) {
         return index(dir, filename, da_uri, offset, stream_uri, topic_uri, postAction, show);
     }
