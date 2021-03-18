@@ -288,7 +288,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             return DataAcquisitionSchemaObject.getCache().get(uri);
         }
 
-        //System.out.println("Looking for org.hadatac.data acquisition schema object with uri: " + uri);
+//        System.out.println("Looking for org.hadatac.data acquisition schema object with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -305,7 +305,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   OPTIONAL { <" + uri + "> dcterms:alternativeName ?alternativeName } . \n" +
                 "}";
 
-        //System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
+//        System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
                 CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -334,8 +334,8 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 labelStr = FirstLabel.getPrettyLabel(uri);
 
                 try {
-                    if (soln.getResource("org/hadatac/entity") != null && soln.getResource("org/hadatac/entity").getURI() != null) {
-                        entityStr = soln.getResource("org/hadatac/entity").getURI();
+                    if (soln.getResource("entity") != null && soln.getResource("entity").getURI() != null) {
+                        entityStr = soln.getResource("entity").getURI();
                     }
                 } catch (Exception e1) {
                     entityStr = "";
