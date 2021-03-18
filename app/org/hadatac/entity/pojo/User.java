@@ -153,6 +153,8 @@ public class User implements Comparable<User> {
         insert += " foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "<" + this.getUri() + ">  ";
         insert += " sio:SIO_000095 " + "\"Public\" . ";
+        insert += "<" + this.getUri() + ">  ";
+        insert += " foaf:name " + "\"" + this.name + "\" . ";
         insert += "}  ";
         System.out.println("!!!! INSERT USER");
 

@@ -321,8 +321,8 @@ public class UserManagement extends Controller {
 //    }
 //    //TODO : fix it
 //    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-//    public Result postSendInvitationEmail(String user_name, String user_email) {
-//        return sendInvitationEmail(user_name, user_email);
+//    public Result postSendInvitationEmail(String user_name, String user_email, Http.Request request) {
+//        return sendInvitationEmail(user_name, user_email,request);
 //    }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
