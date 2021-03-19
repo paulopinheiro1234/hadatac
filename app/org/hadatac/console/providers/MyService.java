@@ -2,9 +2,10 @@ package org.hadatac.console.providers;
 
 import akka.actor.Cancellable;
 import com.feth.play.module.mail.Mailer;
-import com.google.inject.Inject;
 import play.api.libs.mailer.MailerClient;
 import play.libs.mailer.Email;
+
+import javax.inject.Inject;
 
 
 public class MyService {

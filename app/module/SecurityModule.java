@@ -2,7 +2,6 @@ package module;
 
 import be.objectify.deadbolt.java.cache.HandlerCache;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
 import com.google.inject.Provides;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.authorizers.DataManagerRoleAuthorizer;
@@ -48,6 +47,8 @@ import java.util.Optional;
 import org.pac4j.http.client.direct.DirectFormClient;
 import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
 import org.hadatac.utils.Utils;
+
+import javax.inject.Inject;
 
 import static play.mvc.Results.forbidden;
 import static play.mvc.Results.unauthorized;

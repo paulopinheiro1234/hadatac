@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.AuthApplication;
-import com.google.inject.Inject;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
@@ -33,6 +32,8 @@ import org.hadatac.utils.FirstLabel;
 import org.hadatac.entity.pojo.Ontology;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QueryParseException;
+
+import javax.inject.Inject;
 
 public class SDDEditorV2 extends Controller {
     URIUtils aURI;

@@ -4,7 +4,6 @@ import java.awt.desktop.AppForegroundListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import com.google.inject.Inject;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.pac4j.play.java.Secure;
@@ -22,6 +21,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.controllers.AuthApplication;
+
+import javax.inject.Inject;
 
 public class DeleteOC extends Controller {
 

@@ -3,7 +3,6 @@ package org.hadatac.console.controllers.triplestore;
 import java.util.List;
 import java.io.File;
 
-import com.google.inject.Inject;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.pac4j.play.java.Secure;
@@ -26,6 +25,8 @@ import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+
+import javax.inject.Inject;
 
 public class Clean extends Controller {
 

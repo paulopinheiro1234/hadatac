@@ -1,6 +1,5 @@
 package org.hadatac.console.controllers.triplestore;
 
-import com.google.inject.Inject;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.pac4j.play.java.Secure;
@@ -13,6 +12,8 @@ import org.hadatac.utils.Repository;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+
+import javax.inject.Inject;
 
 public class StartStop extends Controller {
 

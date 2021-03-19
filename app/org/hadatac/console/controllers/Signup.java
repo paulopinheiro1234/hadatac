@@ -80,7 +80,7 @@ public class Signup {
 
     private final Logger logger = LoggerFactory.getLogger(getClass()) ;
 
-    @com.google.inject.Inject
+    @Inject
     MailerClient mailerClient;
 
     //TODO : fix this
