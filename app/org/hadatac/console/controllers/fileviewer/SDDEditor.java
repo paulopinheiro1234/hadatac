@@ -43,7 +43,7 @@ public class SDDEditor extends Controller {
         
         List<DataFile> files = null;
 
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.DD_UNPROCESSED);

@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
 import org.hadatac.Constants;
@@ -31,6 +33,16 @@ import org.hadatac.console.models.ObjectDetails;
 
 import org.hadatac.entity.pojo.*;
 import org.pac4j.play.java.Secure;
+import org.hadatac.annotations.SearchActivityAnnotation;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.models.*;
+import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
+import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
+import org.hadatac.data.model.AcquisitionQueryResult;
+import org.hadatac.entity.pojo.Measurement;
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.concurrent.HttpExecutionContext;
@@ -38,13 +50,13 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
-import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
-import org.hadatac.data.model.AcquisitionQueryResult;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-
+@SearchActivityAnnotation()
 public class DataAcquisitionSearch extends Controller {
 
     private static final Logger log = LoggerFactory.getLogger(DataAcquisitionSearch.class);
@@ -63,6 +75,7 @@ public class DataAcquisitionSearch extends Controller {
     public static FacetsWithCategories cluster_facets = new FacetsWithCategories();
     public static SpatialQueryResults query_results = new SpatialQueryResults();
 
+    // looks like no one is calling this
     public static List<String> getPermissions(String permissions) {
         List<String> result = new ArrayList<String>();
 
@@ -223,7 +236,7 @@ public class DataAcquisitionSearch extends Controller {
         ), databaseExecutionContext);
 
         List<String> fileNames = Measurement.getFieldNames();
-        log.info("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.debug("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         List<ObjectCollection> objs = null;
         try {
@@ -242,17 +255,11 @@ public class DataAcquisitionSearch extends Controller {
             e.printStackTrace();
         }
 
-        log.info("---> ObjectCollection.findAllFacetSearch() + Measurement.findAsync() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
-
-        //System.out.println("OwnerURI: " + ownerUri);
-        // startTime = System.currentTimeMillis();
-        // results = Measurement.find(ownerUri, page, rows, facets);
-        // results = Measurement.findAsync(ownerUri, page, rows, facets, databaseExecutionContext);
-        // log.info("---> Measurement.find() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.debug("---> ObjectCollection.findAllFacetSearch() + Measurement.findAsync() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         startTime = System.currentTimeMillis();
         ObjectDetails objDetails = getObjectDetails(results);
-        log.info("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.debug("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         //System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
 
@@ -324,7 +331,7 @@ public class DataAcquisitionSearch extends Controller {
 
         long startTime = System.currentTimeMillis();
         AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
-        log.info("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
+        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
@@ -348,7 +355,7 @@ public class DataAcquisitionSearch extends Controller {
 
         promiseOfResult.whenComplete(
                 (result, exeception) -> {
-                    log.info("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
+                    log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
                 });
 
         try {

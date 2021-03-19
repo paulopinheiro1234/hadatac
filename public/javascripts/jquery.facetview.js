@@ -1532,7 +1532,7 @@ search box - the end user will not know they are happening.
             thefacetview += '<div class="span12" id="facetview_rightcol">';
         }
         thefacetview += '<div class="facetview_plots_container"><div id="line_chart"/><div id="dendrogram"/></div>';
-        thefacetview += '<div class="facetview_search_options_container">';
+        thefacetview += '<div class="facetview_search_options_container" style="display: none;">';
         thefacetview += '<div class="btn-group" style="display:inline-block; margin-right:5px;"> \
             <a class="btn btn-small" title="clear all search settings and start again" href=""><i class="icon-remove"></i></a> \
             <a class="btn btn-small facetview_learnmore" title="click to view search help information" href="#"><b>?</b></a> \

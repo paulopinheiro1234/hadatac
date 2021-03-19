@@ -47,7 +47,7 @@
                         <span class="glyphicon glyphicon-search"></span>&nbsp;&nbsp; Search Data & Request Dataset</a>
                 </div>
                 <div class="col-md-5 text-center">
-                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()"
+                    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
                        id="downloader" class="btn btn-xl btn-primary btn-block" role="button">
                         <span class="glyphicon glyphicon-download"></span>&nbsp;&nbsp; Retrieve Datasets/Codebooks</a>
                 </div>
@@ -62,12 +62,12 @@
                 </div>
                 <div class="col-md-2 text-center">
                     <div class="dashNumber">@DataContext.playTotalDataAcquisitions()</div>
-                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block" role="button">Data Acquisitions</a>
+                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Data Acquisitions</a>
                     <br>
                 </div>
                 <div class="col-md-2 text-center">
                     <div class="dashNumber">@DataAcquisitionSchemaAttribute.getNumberDASAs()</div>
-                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block" role="button">Variables</a>
+                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block disabled" role="button">Variables</a>
                     <br>
                 </div>
                 <div class="col-md-2  text-center">

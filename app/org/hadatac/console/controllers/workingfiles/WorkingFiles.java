@@ -104,14 +104,14 @@ public class WorkingFiles extends Controller {
         }
 
         if (user.isDataManager()) {
-            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
-
-            String basePath = targetDir;
+        	wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
+        	
+        	String basePath = targetDir;
             if (basePath.startsWith("/")) {
                 basePath = basePath.substring(1, basePath.length());
             }
-
-            // DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
+            
+        	// DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
         } else {
             // since we can see other users' download, we don't send it email anymore
             wkFiles = DataFile.findDownloadedFilesInDir(targetDir, /*user.getEmail(), */ DataFile.CREATING);
@@ -209,7 +209,6 @@ public class WorkingFiles extends Controller {
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result moveDataFile(String dir, String fileId,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
-
         DataFile dataFile = null;
         if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
@@ -440,7 +439,6 @@ public class WorkingFiles extends Controller {
         return ok(shareFile.render(dir, sharedlink, dataFile,user.getEmail()));
     }
 
-    @SuppressWarnings("unchecked")
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result saveViewerEmails(Http.Request request) throws Exception {
         Form form = formFactory.form().bindFromRequest(request);

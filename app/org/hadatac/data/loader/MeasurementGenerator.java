@@ -676,7 +676,7 @@ public class MeasurementGenerator extends BaseGenerator {
                     String inRelationToDasoValue = record.getValueByColumnIndex(inRelationToDaso.getTempPositionInt());
                     if (possibleValues.containsKey(inRelationToUri)) {
                         if (possibleValues.get(inRelationToUri).containsKey(inRelationToDasoValue.toLowerCase())) {
-                        	System.out.println("in possible values");
+                        	// System.out.println("in possible values");
                             measurement.setInRelationToUri(possibleValues.get(inRelationToUri).get(inRelationToDasoValue.toLowerCase()));
                         }
                     }

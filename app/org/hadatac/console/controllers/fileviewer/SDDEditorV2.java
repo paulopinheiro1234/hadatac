@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hadatac.Constants;
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.entity.pojo.DataFile;
@@ -18,6 +18,7 @@ import org.hadatac.utils.ConfigProp;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.pac4j.play.java.Secure;
+import org.w3c.dom.html.HTMLTableCaptionElement;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -54,14 +55,14 @@ public class SDDEditorV2 extends Controller {
     int indicatorVal;
 
     @Inject
-    private Application application;
+    Application application;
 
 
     // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(String fileId, boolean bSavable, int indicator, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
-
+        //System.out.println(user);
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
 
@@ -86,8 +87,8 @@ public class SDDEditorV2 extends Controller {
 
         } else if (indicator == 0) {
             List<DataFile> files = null;
-            String path = ConfigProp.getPathDownload();
-            files = DataFile.find( user.getEmail());
+            String path = ConfigProp.getPathWorking();
+            files = DataFile.find(user.getEmail());
             String dd_filename=dataFile.getFileName();
             dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
             DataFile dd_dataFile = new DataFile(""); // This is being used in place of null but we might want to come up with a better way
@@ -101,15 +102,15 @@ public class SDDEditorV2 extends Controller {
 
         dataFile.updatePermissionByUserEmail(user.getEmail());
         if (!dataFile.getAllowEditing()) {
-            return ok(sdd_editor_v2.render(dataFile, finalDF, false, loadedList, this,user.getEmail()));
+            return ok(sdd_editor_v2.render(dataFile, finalDF, false, loadedList, this,application.getUserEmail(request)));
         }
 
-        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable, loadedList, this,user.getEmail()));
+        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable, loadedList, this,application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postIndex(String fileId, boolean bSavable,int indicator, Http.Request request) {
-        return index(fileId, bSavable,indicator, request);
+    public Result postIndex(String fileId, boolean bSavable,int indicator,Http.Request request) {
+        return index(fileId, bSavable,indicator,request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
@@ -298,6 +299,9 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(isValid));
 
     }
-
+    
+    public Result getUserName(Http.Request request) {
+    	return ok(Json.toJson(AuthApplication.getLocalUser(application.getUserEmail(request)).getName()));
+    }
 
 }

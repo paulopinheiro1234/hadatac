@@ -135,15 +135,16 @@
             <a class="btn btn-primary" role="button" id="save-viewer-changes" onclick="submitViewerTableAsForm()" disabled>Save Changes</a>
          </div><br>
 
-         <table id="editor-table" class="table table-striped table-bordered editor-table" style="width:100%">
+         <table id="editor-table" class="table table-striped table-bordered editor-table" style="width:100%" style="display: none;">
+
           <thead>
-            <tr>
+            <tr style="display:none">
               <th style="width: 50px;" scope="col">#</th>
               <th style="width: 200px;" scope="col">Editor Emails</th>
               <th style="width: 220px;" scope="col">Actions</th>
             </tr>
           </thead>
-          <tbody id="editor-table-body">
+          <tbody id="editor-table-body" style="display:none">
           @for((email, i) <- dataFile.getEditorEmails().zipWithIndex) {
               <tr>
                 <td style="word-break: break-all;">@(i+1)</td>
@@ -157,8 +158,8 @@
           }
           </tbody>
          </table>
-
-         <div>
+         
+         <div style="display:none">
             <button type="button" class="btn btn-info add-new-editor"><i class="fa fa-plus"></i> Add New Editor</button>
             <button type="button" class="btn btn-danger delete-all-editors"><i class="fa fa-remove"></i> Delete All Editors</button>
             <a class="btn btn-primary" role="button" id="save-editor-changes" onclick="submitEditorTableAsForm()" disabled>Save Changes</a>

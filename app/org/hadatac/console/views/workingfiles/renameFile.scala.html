@@ -34,7 +34,10 @@
 		action="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.processRenameDataFileForm(dir, dataFile.getId())">
 	
 			<div class="form-group">
-				<label>In folder: @dir</label> 
+				<label>In folder:
+					@(if(dir.indexOf("/download")>=0) {
+						dir.substring(dir.indexOf("/download"));
+					} else { "/"; })</label>
 			</div>
 	
 			<div class="form-group">

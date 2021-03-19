@@ -6,6 +6,9 @@ import org.hadatac.entity.pojo.PossibleValue;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
+import org.hadatac.utils.NameSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.String;
 import java.text.Normalizer;
@@ -21,7 +24,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;  
 
 public class PVGenerator extends BaseGenerator {
-	
+
+	private static final Logger log = LoggerFactory.getLogger(PVGenerator.class);
+
 	final String kbPrefix = ConfigProp.getKbPrefix();
 	String startTime = "";
 	String SDDName = "";
@@ -176,7 +181,7 @@ public class PVGenerator extends BaseGenerator {
     	}
     }
 
-    private static void generateOther(String uri, String harmonizedCode, PossibleValue pv) {
+    private static void generateOther(String uri, String harmonizedCode, PossibleValue pv, String graphName) {
     	if (pv.getHasOtherFor() == null || pv.getHasOtherFor().isEmpty()) {
     		return;
     	}
@@ -186,6 +191,7 @@ public class PVGenerator extends BaseGenerator {
     	attr.setSuperUri(pv.getHasOtherFor());
     	attr.setHasDCTerms(generateDCTerms(pv.getHasVariable(), pv.getHasCode()));
     	attr.setHasSkosNotation(harmonizedCode);
+    	attr.setNamedGraph(graphName);
     	attr.saveAttribute();
     	
     }
@@ -229,11 +235,12 @@ public class PVGenerator extends BaseGenerator {
 		            //System.out.println("      new uri        [" + newUri + "]");  
 		            
 		            // generate the 'other' class
-		            generateOther(newUri, harmonizedCode, code);
+		            generateOther(newUri, harmonizedCode, code, sddUri);
 					logger.println("        - created 'other' class " + newUri + " as a subclass of " + code.getHasOtherFor());
 		            
 		            // associate the new 'other' class to the codebook element for the class
 		            code.setHasClass(newUri);
+		            code.setNamedGraph(sddUri);
 		            code.saveHasClass();
 		        } 
 		        // For specifying wrong message digest algorithms  

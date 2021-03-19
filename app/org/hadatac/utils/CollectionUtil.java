@@ -67,6 +67,8 @@ public class CollectionUtil {
         AUTHENTICATE_ROLES ("/security_role"),
         AUTHENTICATE_TOKENS ("/token_action"),
         AUTHENTICATE_PERMISSIONS ("/user_permission"),
+        SEARCH_ACTIVITIES ("/user_search_activities"),
+        DOWNLOAD_ACTIVITIES ("/user_download_activities"),
 
         // permissions
         PERMISSIONS_SPARQL ("/store_users/query"),
@@ -89,6 +91,8 @@ public class CollectionUtil {
         if (Arrays.asList(
                 Collection.OPERATION_MODE.get(),
                 Collection.AUTHENTICATE_ACCOUNTS.get(),
+                Collection.SEARCH_ACTIVITIES.get(),
+                Collection.DOWNLOAD_ACTIVITIES.get(),
                 Collection.AUTHENTICATE_USERS.get(),
                 Collection.AUTHENTICATE_ROLES.get(),
                 Collection.AUTHENTICATE_TOKENS.get(),
@@ -137,41 +141,43 @@ public class CollectionUtil {
     public static String getCollectionPath(Collection collection) {
         String collectionName = null;
         switch (collection) {
-            case METADATA_SPARQL:
-            case METADATA_UPDATE:
-            case METADATA_GRAPH :
-                collectionName = getConfigCache().get("hadatac.solr.triplestore") + getCollectionName(collection.get());
-                break;
-            case AUTHENTICATE_USERS:
-            case AUTHENTICATE_ACCOUNTS:
-            case AUTHENTICATE_ROLES:
-            case AUTHENTICATE_TOKENS:
-            case AUTHENTICATE_PERMISSIONS:
-                collectionName = getConfigCache().get("hadatac.solr.users") + collection.get();
-                break;
-            case PERMISSIONS_SPARQL:
-            case PERMISSIONS_UPDATE:
-            case PERMISSIONS_GRAPH :
-                collectionName = getConfigCache().get("hadatac.solr.permissions") + collection.get();
-                break;
-            case DATA_COLLECTION:
-            case DATA_ACQUISITION:
-            case METADATA_AQUISITION:
-            case SA_ACQUISITION :
-            case CONSOLE_STORE:
-            case STUDIES:
-            case ANALYTES:
-            case ANNOTATION_LOG:
-            case OPERATION_MODE:
-            case NAMESPACE:
-            case CSV_DATASET:
-            case URI_GENERATOR :
-            case STUDY_ACQUISITION:
-            case METADATA_DA:
-            case ANALYTES_ACQUISITION:
-            case SCHEMA_ATTRIBUTES:
-                collectionName = getConfigCache().get("hadatac.solr.data") + getCollectionName(collection.get());
-                break;
+        case METADATA_SPARQL:
+        case METADATA_UPDATE:
+        case METADATA_GRAPH :          
+            collectionName = getConfigCache().get("hadatac.solr.triplestore") + getCollectionName(collection.get());
+        break;
+        case AUTHENTICATE_USERS:
+        case AUTHENTICATE_ACCOUNTS:
+        case SEARCH_ACTIVITIES:
+        case DOWNLOAD_ACTIVITIES:
+        case AUTHENTICATE_ROLES: 
+        case AUTHENTICATE_TOKENS:
+        case AUTHENTICATE_PERMISSIONS: 
+            collectionName = getConfigCache().get("hadatac.solr.users") + collection.get();
+        break;
+        case PERMISSIONS_SPARQL:
+        case PERMISSIONS_UPDATE:
+        case PERMISSIONS_GRAPH :       
+            collectionName = getConfigCache().get("hadatac.solr.permissions") + collection.get();
+        break;
+        case DATA_COLLECTION:
+        case DATA_ACQUISITION:
+        case METADATA_AQUISITION:
+        case SA_ACQUISITION :
+        case CONSOLE_STORE:
+        case STUDIES:
+        case ANALYTES:
+        case ANNOTATION_LOG:
+        case OPERATION_MODE:
+        case NAMESPACE:
+        case CSV_DATASET:
+        case URI_GENERATOR :
+        case STUDY_ACQUISITION:
+        case METADATA_DA:
+        case ANALYTES_ACQUISITION:
+        case SCHEMA_ATTRIBUTES:        
+            collectionName = getConfigCache().get("hadatac.solr.data") + getCollectionName(collection.get());
+        break;
         }
 
         return collectionName;

@@ -827,7 +827,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         result.setDocumentSize(docSize);
 
-        log.info("findAsync takes: " + (System.currentTimeMillis()-startTime));
+        log.debug("findAsync takes: " + (System.currentTimeMillis()-startTime));
 
         return result;
         //});
@@ -846,11 +846,11 @@ public class Measurement extends HADatAcThing implements Runnable {
         FacetHandler retFacetHandler = new FacetHandler();
         retFacetHandler.loadFacetsFromString(facets);
 
-        log.info("findAsync -> getAllFacetStatsWrapper-1: " + (System.currentTimeMillis()-startTime));
+        log.debug("findAsync -> getAllFacetStatsWrapper-1: " + (System.currentTimeMillis()-startTime));
 
         startTime = System.currentTimeMillis();
         getAllFacetStatsAsync(facetHandler, retFacetHandler, result, true, databaseExecutionContext);
-        log.info("findAsync -> getAllFacetStatsWrapper-2: " + (System.currentTimeMillis()-startTime));
+        log.debug("findAsync -> getAllFacetStatsWrapper-2: " + (System.currentTimeMillis()-startTime));
 
         return result;
 
@@ -870,7 +870,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotS = getFacetStats(fTreeS, 
                 retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET), 
                 facetHandler);
-        log.info("getFacetStats(fTreeS = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreeS = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         FacetTree fTreeOC = new FacetTree();
         fTreeOC.setTargetFacet(StudyObjectType.class);
@@ -880,7 +880,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotOC = getFacetStats(fTreeOC, 
                 retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET), 
                 facetHandler);
-        log.info("getFacetStats(fTreeOC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreeOC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         /*
          *  The facet tree EC computes the org.hadatac.entity-attribute indicators for indicators based on property's main attribute
@@ -896,7 +896,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotEC = getFacetStats(fTreeEC, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), 
                 facetHandler);
-        log.info("getFacetStats(fTreeEC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreeEC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
 
         /*
@@ -913,7 +913,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotEC2 = getFacetStats(fTreeEC2, 
                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2), 
                 facetHandler);
-        log.info("getFacetStats(fTreeEC2 = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreeEC2 = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         /*
          *  Merging the computation result of pivotEC2 into pivotEC
@@ -950,7 +950,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotU = getFacetStats(fTreeU, 
                 retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
                 facetHandler);
-        log.info("getFacetStats(fTreeU = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreeU = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         FacetTree fTreeT = new FacetTree();
         fTreeT.setTargetFacet(TimeInstance.class);
@@ -959,7 +959,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotT = getFacetStats(fTreeT, 
                 retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
                 facetHandler);
-        log.info("getFacetStats(fTreeT = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreeT = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         FacetTree fTreePI = new FacetTree();
         fTreePI.setTargetFacet(STR.class);
@@ -969,7 +969,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivotPI = getFacetStats(fTreePI, 
                 retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
                 facetHandler);
-        log.info("getFacetStats(fTreePI = " + (System.currentTimeMillis()-startTime) + " sms to finish");
+        log.debug("getFacetStats(fTreePI = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
         if (bAddToResults) {
             result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
@@ -1003,7 +1003,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     if (bAddToResults) {
                         result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
                     }
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreeS = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeS = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreeS;
                 }
         ), databaseExecutionContext);
@@ -1021,7 +1021,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     if (bAddToResults) {
                         result.extra_facets.put(FacetHandler.OBJECT_COLLECTION_FACET, pivotOC);
                     }
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreeOC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeOC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreeOC;
                 }
         ), databaseExecutionContext);
@@ -1043,7 +1043,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                         result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivotEC);
                     }
                     pEC.set(pivotEC);
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreeEC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeEC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreeEC;
                 }
         ), databaseExecutionContext);
@@ -1062,7 +1062,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                             retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2),
                             facetHandler);
                     pEC2.set(pivotEC2);
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreeEC2 = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeEC2 = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreeEC2;
                 }
         ), databaseExecutionContext);
@@ -1082,7 +1082,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     if (bAddToResults) {
                         result.extra_facets.put(FacetHandler.UNIT_FACET, pivotU);
                     }
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreeU = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeU = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreeU;
                 }
         ), databaseExecutionContext);
@@ -1099,7 +1099,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     if (bAddToResults) {
                         result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
                     }
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreeT = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeT = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreeT;
                 }
         ), databaseExecutionContext);
@@ -1117,7 +1117,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                     if (bAddToResults) {
                         result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
                     }
-                    log.info("getAllFacetStatsAsync - getFacetStats(fTreePI = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreePI = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                     return fTreePI;
                 }
         ),databaseExecutionContext);
@@ -1138,7 +1138,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //pivotEC.addChildrenFromPivot(pivotEC2);
             //pivotEC.normalizeCategoricalVariableLabels(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
 
-            log.info("getAllFacetStatsAsync - final stage: " + (System.currentTimeMillis()-currentTime));
+            log.debug("getAllFacetStatsAsync - final stage: " + (System.currentTimeMillis()-currentTime));
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -1156,7 +1156,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         Pivot pivot = new Pivot();
         fTree.retrieveFacetData(0, facet, facetHandler, pivot);
         pivot.recomputeStats();
-        log.info("***** bottom getFacetStats:" + (System.currentTimeMillis()-startTime));
+        log.debug("***** bottom getFacetStats:" + (System.currentTimeMillis()-startTime));
         return pivot;
     }
 
@@ -1617,7 +1617,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 	    startTime = System.currentTimeMillis();
                 		alignObjs = Alignment.alignmentObjects(m.getEntryObjectUri(), selecteedRoles, m.getOriginalId());
                 		duration = System.currentTimeMillis() - startTime;
-                        if ( duration > threshold ) log.info("DOWNLOAD: alignment.alignmentObject: " + duration);
+                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.alignmentObject: " + duration);
 
                 		if (alignObjs != null) {
                 			alignCache.put(m.getEntryObjectUri(),alignObjs);
@@ -1649,7 +1649,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                         startTime = System.currentTimeMillis();
                 		referenceObj = alignment.getObject(currentAlignmentObjectUri);
                         duration = System.currentTimeMillis() - startTime;
-                        if ( duration > threshold ) log.info("DOWNLOAD: alignment.getObject: " + duration);
+                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.getObject: " + duration);
 
                         if (referenceObj == null || !referenceObj.getUri().equals(currentAlignmentObjectUri)) {
 	                    	//System.out.println("Phase I: Reading object [" + currentAlignmentObjectUri + "]");
@@ -1657,7 +1657,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                             startTime = System.currentTimeMillis();
 	                        referenceObj = StudyObject.findFacetSearch(currentAlignmentObjectUri);
                             duration = System.currentTimeMillis() - startTime;
-                            if ( duration > threshold ) log.info("DOWNLOAD: studyObject.find: " + duration);
+                            if ( duration > threshold ) log.debug("DOWNLOAD: studyObject.find: " + duration);
 
                             if (referenceObj != null) {
 	                        	//System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
@@ -1675,14 +1675,14 @@ public class Measurement extends HADatAcThing implements Runnable {
                                 startTime = System.currentTimeMillis();
 	                	        Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
                                 duration = System.currentTimeMillis() - startTime;
-                                if ( duration > threshold ) log.info("DOWNLOAD: alignment.getEntity: " + duration);
+                                if ( duration > threshold ) log.debug("DOWNLOAD: alignment.getEntity: " + duration);
 
                                 if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
 
                                     startTime = System.currentTimeMillis();
 	                	        	referenceObjEntity = Entity.facetSearchFind(referenceObj.getTypeUri());
                                     duration = System.currentTimeMillis() - startTime;
-                                    if ( duration > threshold ) log.info("DOWNLOAD: Entity.find: " + duration);
+                                    if ( duration > threshold ) log.debug("DOWNLOAD: Entity.find: " + duration);
 
                                     if (referenceObjEntity == null) {
 	                	                System.out.println("[ERROR] Measurement: retrieving entity " + referenceObj.getTypeUri());
@@ -1726,7 +1726,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                         startTime = System.currentTimeMillis();
 	                	String key = alignment.measurementKey(m);
                         duration = System.currentTimeMillis() - startTime;
-                        if ( duration > threshold ) log.info("DOWNLOAD: alignment.measurementKey " + duration);
+                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.measurementKey " + duration);
 
 	                	//System.out.println("Phase I: computed measurement key [" + key + "]");
 	                	if (key != null) {
@@ -1742,7 +1742,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	                				    startTime = System.currentTimeMillis();
 	                					String code = Attribute.findHarmonizedCode(m.getValueClass());
                                         duration = System.currentTimeMillis() - startTime;
-                                        if ( duration > threshold ) log.info("DOWNLOAD: Attribute.findHarmonizedcode: " + duration);
+                                        if ( duration > threshold ) log.debug("DOWNLOAD: Attribute.findHarmonizedcode: " + duration);
 
                                         //System.out.println("Phase I: new harmonized Code [" + code + "] for URI-value [" + m.getValueClass() + "]");
 	                					if (code != null && !code.equals("")) {
@@ -1878,28 +1878,27 @@ public class Measurement extends HADatAcThing implements Runnable {
                     dataFile.delete();
                     return;
                 }
+
+                // Write harmonized code book
+                alignment.getCodeBook();
+                if (categoricalOption.equals(WITH_CODE_BOOK)) {
+                    fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                }
+
+                // Write DOI list of sources
+                outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+
+                // finalize the main download file
                 dataFile.setCompletionPercentage(100);
                 dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
                 dataFile.setStatus(DataFile.CREATED);
                 dataFile.save();
                 fileCreated = true;
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        alignment.getCodeBook();
-        if (dataFile != null && fileCreated) {
-        	// Write harmonized code book
-        	if (categoricalOption.equals(WITH_CODE_BOOK)) {
-        		fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail());
-        	}
-        }
-
-        if (dataFile != null && fileCreated) {
-        	// Write DOI list of sources
-        	outputProvenance(alignment, file, dataFile.getOwnerEmail());
-        }    	
 
     }
 
@@ -1912,7 +1911,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         return true;
     }
 
-    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail) {        
+    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail, String dataDir) {
       boolean fileCreated = false; 
 	  try {
 	    //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
@@ -1922,7 +1921,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    //DataFile dataFile = new DataFile(codeBookFile.getName());
 	    //dataFile.setOwnerEmail(ownerEmail);
 	    //dataFile.setStatus(DataFile.CREATING);
-	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+	    DataFile dataFile = DataFile.create(fileName, dataDir, ownerEmail, DataFile.CREATING);
 	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 	    dataFile.save();
 
@@ -2001,11 +2000,11 @@ public class Measurement extends HADatAcThing implements Runnable {
 	  	return fileCreated;
     }
 
-    public static void outputProvenance(Alignment alignment, File file, String ownerEmail) {        
+    public static void outputProvenance(Alignment alignment, File file, String ownerEmail, String dataDir) {
 	try {
 	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
 	    Date date = new Date();
-	    DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+	    DataFile dataFile = DataFile.create(fileName, dataDir, ownerEmail, DataFile.CREATING);
 	    dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
 	    dataFile.save();
 

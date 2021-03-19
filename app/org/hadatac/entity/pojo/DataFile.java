@@ -380,7 +380,7 @@ public class DataFile implements Cloneable {
     }
     public void setDir(String dir) {
         dir = Paths.get(dir).toString();
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
         this.dir = dir;
@@ -906,7 +906,7 @@ public class DataFile implements Cloneable {
 
     public static List<DataFile> findDownloadedFilesInDir(String dir, String userEmail, String status) {
 
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
 
@@ -915,16 +915,15 @@ public class DataFile implements Cloneable {
                 + "AND ( owner_email_str:\"%s\" OR viewer_email_str_multi:\"%s\" OR editor_email_str_multi:\"%s\" ) "
                 + "AND (status_str:\"%s\" OR status_str:\"%s\")", dir, userEmail, userEmail, userEmail, status, "CREATED"));
         query.set("rows", "10000000");
-
         return findByQuery(query);
     }
 
     public static List<DataFile> findDownloadedFilesInDir(String dir, String status) {
 
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
-
+        
         SolrQuery query = new SolrQuery();
         query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "(status_str:\"" + status + "\" OR status_str:\"CREATED\")");
         query.set("rows", "10000000");

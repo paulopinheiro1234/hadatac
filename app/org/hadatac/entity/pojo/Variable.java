@@ -24,6 +24,11 @@ public class Variable {
 	public static final String LABEL_SEPARATOR = "|";
 	public static final String VARIABLE_SEPARATOR = ";";
 	public static final String VARIABLE_EMPTY_LABEL = "**";
+	public static final String HIERARCHICAL_FACET_SEPARATOR = ",";
+	public static final String EMPTY_CONTENT = "n/a";
+
+	// patch for multi-valued attributes
+	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
 
 	private Entity ent;
     private String role;
@@ -153,17 +158,7 @@ public class Variable {
         return aux.replaceAll(" ","-").replaceAll("[()]","");
     }
 
-    public static List<String> retrieveStudyVariablesWithLabels(String studyUri) {
-
-		/*"params":{
-			"q":"*:*",
-					"facet.pivot":"study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str",
-					"indent":"on",
-					"rows":"1",
-					"facet":"on",
-					"wt":"json",
-					"_":"1608051191814"}},
-			*/
+	public static List<String> retrieveStudySearchFacetResult(String studyUri) {
 
 		// default the search to all studies
 		String queryString = "*:*";
@@ -188,68 +183,14 @@ public class Variable {
 			/*parsedPivotResult.forEach((s) -> {
 				System.out.println(s);
 			});*/
-			List<String> pivotResultWithLabels = retrieveLabelsForPivotResult(parsedPivotResult);
-			pivotResultWithLabels.forEach( s -> System.out.println(s) );
-			return pivotResultWithLabels;
+			return parsedPivotResult;
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage());
 		}
-    	return null;
+		return null;
 	}
 
-	private static List<String> retrieveLabelsForPivotResult(List<String> parsedPivotResult) {
-
-		List<String> result = new ArrayList<>();
-		if ( parsedPivotResult == null || parsedPivotResult.size() == 0 ) return result;
-
-		// study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str
-		parsedPivotResult.forEach( line -> {
-
-			String tmpLabel = VARIABLE_EMPTY_LABEL;
-			String[] items = line.split(",");
-			StringBuffer sb = new StringBuffer();
-
-			if ( items == null || items.length != 6 ) {
-				log.warn("Study search parsing pivot facet issue:" + line);
-			} else {
-				sb.append(items[SolrPivotFacet.STUDY_URI_STR.ordinal()]).append(VARIABLE_SEPARATOR).append(items[SolrPivotFacet.ROLE_STR.ordinal()]).append(VARIABLE_SEPARATOR);
-				if ( "n/a".equalsIgnoreCase(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
-					tmpLabel = VARIABLE_EMPTY_LABEL;
-				} else {
-					tmpLabel = FirstLabel.getPrettyLabel(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
-					if (tmpLabel == null || tmpLabel.length() == 0) tmpLabel = VARIABLE_EMPTY_LABEL;
-				}
-				sb.append(items[SolrPivotFacet.ENTITY_URI_STR.ordinal()]).append("(").append(tmpLabel).append(")").append(VARIABLE_SEPARATOR);
-				sb.append(items[SolrPivotFacet.DASA_URI_STR.ordinal()]).append("(");
-				String indicatorLabel = retrieveIndicatorAndAttributeLabel(items[SolrPivotFacet.DASA_URI_STR.ordinal()]);
-				if ( indicatorLabel == null || indicatorLabel.length() == 0 || (VARIABLE_EMPTY_LABEL+LABEL_SEPARATOR+VARIABLE_EMPTY_LABEL).equalsIgnoreCase(indicatorLabel)) {
-					indicatorLabel = retrieveIndicatorAndAttributeLabel(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
-				}
-				if ( indicatorLabel == null || indicatorLabel.length() == 0 || (VARIABLE_EMPTY_LABEL+LABEL_SEPARATOR+VARIABLE_EMPTY_LABEL).equalsIgnoreCase(indicatorLabel) ) {
-					log.warn("Study search parsing pivot facet issue - cannot find indicator label:" + line);
-				}
-				sb.append(indicatorLabel).append(")").append(VARIABLE_SEPARATOR);
-				if ( "n/a".equalsIgnoreCase(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
-					tmpLabel = VARIABLE_EMPTY_LABEL;
-				} else {
-					tmpLabel = FirstLabel.getPrettyLabel(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
-					if (tmpLabel == null || tmpLabel.length() == 0) tmpLabel = VARIABLE_EMPTY_LABEL;
-				}
-				sb.append(items[SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]).append("(").append(tmpLabel).append(")").append(VARIABLE_SEPARATOR);
-				if ( "n/a".equalsIgnoreCase(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
-					tmpLabel = VARIABLE_EMPTY_LABEL;
-				} else {
-					tmpLabel = FirstLabel.getPrettyLabel(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
-					if (tmpLabel == null || tmpLabel.length() == 0) tmpLabel = VARIABLE_EMPTY_LABEL;
-				}
-				sb.append(items[SolrPivotFacet.NAMED_TIME_STR.ordinal()]).append("(").append(tmpLabel).append(")");
-				result.add(sb.toString());
-			}
-		});
-
-		return result;
-	}
 
 	private static List<String> parsePivotResult(final NamedList<List<PivotField>> pivotEntryList) {
 		final Set<String> outputItems = new HashSet<>();
@@ -266,7 +207,6 @@ public class Variable {
 
 	private static void renderOutput(final StringBuilder sb, final PivotField field, final Set<String> outputItems) {
 
-		final String HIERARCHICAL_FACET_SEPARATOR = ",", EMPTY_CONTENT = "n/a";
 		final String fieldValue = field.getValue() != null ? ((String) field.getValue()).trim() : null;
 		final StringBuilder outputBuilder = new StringBuilder(sb);
 		if (field.getPivot() != null) {
@@ -289,41 +229,69 @@ public class Variable {
 		}
 	}
 
-	public static String retrieveIndicatorAndAttributeLabel(String targetUri) {
+	static public boolean constainsStandardTestScore(List<Pair<String, String>> indicators) {
+    	for ( Pair<String, String> pair: indicators ) {
+			for ( int i = 0; i < multiAttributeTag.length; i++ ) {
+				if ( multiAttributeTag[i].equalsIgnoreCase(FirstLabel.getPrettyLabel(pair.getLeft())) ) return true;
+			}
+		}
+		return false;
+	}
+
+	static public String retrieveTestScoreLabel(List<Pair<String, String>> indicators) {
+    	for ( Pair<String, String> pair: indicators ) {
+			for ( int i = 0; i < multiAttributeTag.length; i++ ) {
+				if ( multiAttributeTag[i].equalsIgnoreCase(FirstLabel.getPrettyLabel(pair.getLeft())) ) {
+					return FirstLabel.getPrettyLabel(pair.getLeft());
+				}
+			}
+		}
+		return null;
+	}
+
+	/*
+		Pair<String, String> would be something like this: <attributeUri, indicatorUri>
+		for example, <http://purl.obolibrary.org/obo/CMO_0000105, http://purl.org/twc/HHEAR_00029>
+	 */
+	public static List<Pair<String, String>> computeIndicatorList(String variableUri) {
 
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?indicatorLabel ?attributeLabel " +
+				"SELECT DISTINCT  ?attributeUri ?indicator " +
 				"WHERE { \n" +
-				"   <" + targetUri + "> ?x ?attributeUri . \n" +
-				"   ?attributeUri rdfs:label ?attributeLabel . \n" +
+				"   <" + variableUri + "> (hasco:hasAttribute | hasco:hasEntity) | rdfs:subClassOf  | \n" +
+				"   (<http://semanticscience.org/resource/SIO_000668> / hasco:hasEntity) ?attributeUri . \n" +
 				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
-				"	?indicator rdfs:label ?indicatorLabel . \n" +
-				"   #FILTER(lang(?attributeLabel) != 'en') . \n" +
 				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
 				"} \n";
 
-		/*String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-				"SELECT DISTINCT  ?indicatorLabel " +
-				"WHERE { \n" +
-				"   <" + targetUri + "> ?x ?attributeUri . \n" +
-				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
-				"	?indicator rdfs:label ?indicatorLabel . \n" +
-				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +
-				"} \n";*/
+		Set<String> seen = new HashSet<>();
+		List<Pair<String, String>> labelPairs = new ArrayList<>();  // <attributeUri, indicatorUri> is the pair
 
-		String attributeLabel = VARIABLE_EMPTY_LABEL, indicatorLabel = VARIABLE_EMPTY_LABEL;
 		try {
 
 			ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
 					CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
 
 			while (resultsrw.hasNext()) {
+
 				QuerySolution soln = resultsrw.next();
-				if (soln.contains("indicatorLabel")) {
-					indicatorLabel = FirstLabel.getPrettyLabel(soln.get("indicatorLabel").toString());
+
+				if (soln.contains("indicator") == false ) {
+					log.warn("Study Search: this variable [" + variableUri + "], does not have a indicator URI");
+					continue;
 				}
-				if ( soln.contains("attributeLabel")) {
-					attributeLabel = FirstLabel.getPrettyLabel(soln.get("attributeLabel").toString());
+
+				if ( soln.contains("attributeUri") == false ) {
+					log.warn("Study Search: this variable [" + variableUri + "], does not have a attribute URI");
+					continue;
+				}
+
+				final String attributeUri = soln.get("attributeUri").toString();
+				final String indicatorUri = soln.get("indicator").toString();
+
+				if ( !seen.contains(attributeUri.toLowerCase() + "-" + indicatorUri.toLowerCase()) ) {
+					labelPairs.add(new Pair<String, String>(attributeUri, indicatorUri));
+					seen.add(attributeUri.toLowerCase() + "-" + indicatorUri.toLowerCase().toLowerCase());
 				}
 			}
 
@@ -331,7 +299,7 @@ public class Variable {
 			e.printStackTrace();
 		}
 
-		return attributeLabel + LABEL_SEPARATOR + indicatorLabel;
+		return labelPairs;
 
 	}
 

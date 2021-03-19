@@ -69,7 +69,7 @@ public class FileHeadersIntoSDD extends Controller {
 
     	/* ADD THE DD CONTENT FROM DD_URI INTO THE SDD)URI  */
 
-    	return redirect(routes.WorkingFiles.index(dir, ".",false));
+    	return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
     public Result getdd_df(DataFile d){
         dd_df=d;
@@ -92,7 +92,7 @@ public class FileHeadersIntoSDD extends Controller {
         System.out.println("sdd filename: "+sddFileName);
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         List<DataFile> files = null;
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         files = DataFile.find(user.getEmail());
         String sdd_filename=sddFileName;
