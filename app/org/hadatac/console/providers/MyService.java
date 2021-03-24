@@ -2,6 +2,7 @@ package org.hadatac.console.providers;
 
 import akka.actor.Cancellable;
 import com.feth.play.module.mail.Mailer;
+import com.typesafe.config.ConfigFactory;
 import play.api.libs.mailer.MailerClient;
 import play.libs.mailer.Email;
 
@@ -18,7 +19,7 @@ public class MyService {
                       .setSubject(subject)
                       .setBodyText(body.getText())
                        .setBodyHtml(body.getHtml())
-                       .setFrom("user21email@gmail.com") //TODO : update this
+                       .setFrom(ConfigFactory.load().getString("hadatac.community.contact_email"))
                        .addTo(recipient);
         return sendMail(email);//new Mailer.Mail(subject, body, recipient));
     }

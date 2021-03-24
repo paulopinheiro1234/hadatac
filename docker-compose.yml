@@ -11,6 +11,8 @@ services:
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
             - hadatac-solr:/opt/solr/server
+            - /Users/kandws01/Documents/solr-home:/opt/solr/server/solr/mycores
+#            - hadatac-solr-cores:/opt/solr/server/mycores
         networks:
             hadatac:
                 aliases:
@@ -69,6 +71,9 @@ volumes:
     hadatac-blazegraph:
     hadatac-csvs:
     hadatac-conf:
+#    hadatac-solr-cores:
+#        external:
+#            name: /Users/kandws01/Documents/solr-home
 
 networks:
     hadatac:

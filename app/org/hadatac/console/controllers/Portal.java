@@ -10,9 +10,12 @@ import org.hadatac.console.views.html.dashboard;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.Repository;
 
-public class Portal extends Controller {
+import javax.inject.Inject;
 
-    public Result index() {
+public class Portal extends Controller {
+    @Inject Application application;
+
+    public Result index(Http.Request request) {
         if (!Repository.operational(Repository.METADATA)) {
             return ok(main.render("Results", "","",
                     new Html("<div class=\"container-fluid\"><h4>"
@@ -32,11 +35,16 @@ public class Portal extends Controller {
                             + "The namespace store is set to be without quads. Ask Administrator for further information. "
                             + "</h4></div>")));
         }
+        SysUser user = AuthApplication.getAuthApplication().getUserProvider().getUser(application.getUserEmail(request));
 
-        return ok(portal.render());
+        if (user == null) {
+            return ok(dashboard.render(application.getUserEmail(request)));
+        } else {
+            return ok(portal.render());
+        }
     }
 
-    public Result postIndex() {
+    public Result postIndex(){
         return ok(portal.render());
     }
 }

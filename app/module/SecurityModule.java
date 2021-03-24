@@ -99,7 +99,7 @@ public class SecurityModule extends AbstractModule {
 
     @Provides
     protected FormClient provideFormClient() {
-        return new FormClient(baseUrl + "/loginForm", new SimpleTestUsernamePasswordAuthenticator());
+        return new FormClient(baseUrl + "/hadatac/login", new SimpleTestUsernamePasswordAuthenticator());
     }
 
     @Provides
