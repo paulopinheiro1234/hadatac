@@ -40,11 +40,10 @@ public class Portal extends Controller {
         if (user == null) {
             return ok(dashboard.render(application.getUserEmail(request)));
         } else {
-            return ok(portal.render());
+            return ok(portal.render(application.getUserEmail(request)));
         }
     }
 
-    public Result postIndex(){
-        return ok(portal.render());
-    }
+    public Result postIndex(Http.Request request){
+        return ok(portal.render(application.getUserEmail(request)));}
 }

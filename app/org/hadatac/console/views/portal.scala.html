@@ -1,106 +1,63 @@
-@import java.lang.System.console
-@()
+@(userName:String)
 
-@import helper._
-@import org.hadatac.utils._
-@import views.html._
-@import org.hadatac.console.controllers._
-@import be.objectify.deadbolt.java.views.html._
-@import be.objectify.deadbolt.java.utils.TemplateUtils._
-@import play.api.Play
-@import com.typesafe.config.ConfigFactory
-@main("HADatAc: Human-Aware Data Acquisition Framework","","") {
+    @import helper._
+    @import org.hadatac.utils._
+    @import org.hadatac.console.views.html._
+    @import org.hadatac.console.controllers._
+    @import be.objectify.deadbolt.java.views.html._
+    @import be.objectify.deadbolt.java.utils.TemplateUtils._
+    @import play.api.Play
+    @import com.typesafe.config.ConfigFactory
 
-    <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
+    @main("HADatAc: Human-Aware Data Acquisition Framework","",userName) {
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-1 col-xs-0"></div>
-            <div class="col-md-8 col-xs-0">
-                <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")'s Human-Aware Data Acquisition Framework</font></h3>
-                @ConfigFactory.load().getString("hadatac.community.description")
-                <hr>
+        <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                <div id="textTitle" class="col-md-8 col-xs-0">
+                    <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+                    <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+                    <hr>
+                </div>
+                <div class="col-md-1 col-xs-0"></div>
             </div>
-            <div class="col-md-1 col-xs-0"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-1 col-xs-0"></div>
-            <div class="col-md-3 col-xs-2">
-                <h4>Data/Metadata Search</h4>
-                <a href="@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(false, false, false, false, false, false)"
-                 id="kg" class="btn btn-primary btn-block disabled" role="button">Knowledge Graph Browsing</a>
-                <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()"
-                id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Study Search</a>
-                <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()"
-                id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Data Stream Search</a>
-                <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()"
-                id="data" class="btn btn-primary btn-block disabled" role="button">Data Faceted Search</a>
-                <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index("/", "", "", "", "")"
-                id="spatial" class="btn btn-primary btn-block disabled" role="button">Data Spatial Search</a>
-                <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()"
-                id="variables" class="btn btn-primary btn-block disabled" role="button">Variable Search</a>
-                <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()"
-                class="btn btn-primary btn-block " role="button">Browse Ontologies and Metadata</a>
-                <a href="@org.hadatac.console.controllers.routes.URILookup.index("", "")"
-                id="urilookup" class="btn btn-primary btn-block " role="button">URI Lookup</a>
-                <h4>Data/Metadata Retrieve and Download</h4>
-                <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.index()"
-                id="downloader" class="btn btn-primary btn-block disabled" role="button">Data Download</a>
-                <a href="@org.hadatac.console.controllers.restapi.routes.ExampleCalls.index()"
-                id="apicall" class="btn btn-primary btn-block disabled" role="button">RESTFul API Calls</a>
-            </div>
-            <div class="col-md-3 col-xs-2">
-                <h4>Metadata Recording and Data Upload</h4>
-                @defining("") { filename => @defining("") { da_uri =>
-                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", ".")"
-                    id="autoannotate" class="btn btn-primary btn-block disabled" role="button">Ingest Files</a>
-                @defining(0) { page =>
-                    <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index("/", filename, da_uri, page, false)"
-                    id="messages" class="btn btn-primary btn-block disabled" role="button">Ingest Messages</a>
+
+                @defining(AuthApplication.getAuthApplication().getUserProvider().getUser(userName)) { user =>
+                    @if(user.isDataManager){
+                       @portalAdmin()
+                    } else {
+                       @portalNonAdmin()
+                   }
                 }
-                    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
-                    id="workingfiles" class="btn btn-primary btn-block disabled" role="button">Manage Working Files</a>
-                    <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()"
-                    id="studies" class="btn btn-primary btn-block disabled" role="button">Manage Studies [STD/SSD]</a>
-                    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.index("/", filename, da_uri)"
-                    id="infra" class="btn btn-primary btn-block disabled" role="button">Manage Instrument Infrastructure [DPL]</a>
-                @defining(0) { page =>
-                    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri, page, 0)"
-                    id="deployments" class="btn btn-primary btn-block disabled" role="button">Manage Deployments [DPL]</a>
-                }
-                    <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
-                    id="dataacquisitions" class="btn btn-primary btn-block disabled" role="button">Manage Data Stream Specs [STR]</a>
-                    <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()"
-                    id="DAS" class="btn btn-primary btn-block disabled" role="button">Manage Semantic Data Dictionaries [SDD]</a>
-                    <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()"
-                    id="indicators" class="btn btn-primary btn-block disabled" role="button">Manage Indicators</a>
-                }}
-            </div>
-            <div class="col-md-1 col-xs-0"></div>
-        </div>
 
-@*      @restrict(roles = anyOf(allOf("!data_manager"))) {
-//        @portalNonAdmin()
-//      }*@
-
-        <div class="row">
-            <div class="col-md-1 col-xs-0"></div>
-            <div class="col-md-8 col-xs-0">
-                <hr>
-                <h4>Documentation</h4>
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                <div class="col-md-8 col-xs-0">
+                    <hr>
+                    <h4>Documentation</h4>
+                </div>
+                <div class="col-md-1 col-xs-0"></div>
             </div>
-            <div class="col-md-1 col-xs-0"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-1 col-xs-0"></div>
-            @* <div class="col-md-3 col-xs-0">
-            <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
-            </div> *@
-            <div class="col-md-3 col-xs-0">
-                <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-User-Guide" class="btn btn-warning btn-block" role="button">User Guide</a>
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                @* <div class="col-md-3 col-xs-0">
+                <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
+                </div> *@
+                <div class="col-md-3 col-xs-0">
+                    <a href="@ConfigFactory.load().getString("hadatac.community.user_guide")" class="btn btn-warning btn-block" role="button">User Guide</a>
+                </div>
+                <div class="col-md-2 col-xs-0"></div>
             </div>
-            <div class="col-md-2 col-xs-0"></div>
-        </div>
-    </div>
 
-}
+            <script type="text/javascript">
+                    $( document ).ready(function() {
+                        var noUser = (@AuthApplication.getAuthApplication().getUserProvider().getUser(userName) == "");
+                        if (noUser) {
+                            window.location.replace("@org.hadatac.console.controllers.routes.Portal.index()");
+                        }
+                    });
+            </script>
+
+    }

@@ -6,7 +6,7 @@
 GET         /loginForm                                     org.hadatac.console.controllers.Application.loginForm()
 GET         /hadatac                                      org.hadatac.console.controllers.Portal.index(request: Request)
 GET         /hadatac/                                      org.hadatac.console.controllers.Portal.index(request: Request)
-POST        /hadatac/                                      org.hadatac.console.controllers.Portal.postIndex()
+POST        /hadatac/                                      org.hadatac.console.controllers.Portal.postIndex(request: Request)
 GET         /hadatac/login                             org.hadatac.console.controllers.Application.loginForm()
 GET         /hadatac/form/index.html                       org.hadatac.console.controllers.Application.formIndex(request: Request)
 GET     /hadatac/sandbox                                  org.hadatac.console.controllers.sandbox.Sandbox.index(request: Request)

@@ -63,8 +63,8 @@ public class AuthApplication extends Controller {
         return userProvider;
     }
 
-    public Result index() {
-        return ok(portal.render());
+    public Result index(Http.Request request) {
+        return ok(portal.render(application.getUserEmail(request )));
     }
 
     public static SysUser getLocalUser( String username) {

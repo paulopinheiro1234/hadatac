@@ -11,7 +11,7 @@ services:
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
             - hadatac-solr:/opt/solr/server
-            - /Users/kandws01/Documents/solr-home:/opt/solr/server/solr/mycores
+            - /Users/kandws01/Documents/merge3/solr-home:/opt/solr/server/solr/mycores
 #            - hadatac-solr-cores:/opt/solr/server/mycores
         networks:
             hadatac:
@@ -38,6 +38,7 @@ services:
             JAVA_XMX: 4g
         volumes:
             - hadatac-blazegraph:/var/lib/jetty
+            - /Users/kandws01/Documents/merge3/blazegraph/bigdata.jnl:/var/lib/jetty/bigdata.jnl
 
     # The primary hadatac web app
     hadatac:
@@ -55,10 +56,12 @@ services:
             # Creates a volume to store the various csv files. This allows the data
             #   to be persisted when the container is removed or when Hadatac is rebuilt.
             # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
-            - hadatac-csvs:/root/app/csvs
+#            - hadatac-csvs:/root/app/csvs
+            - /Users/kandws01/Documents/merge3/local:/root/app/csvs
             # Creates a volume for the config files. This way configuration file changes
             #   are persisted when the container is removed or rebuilt.
-            - hadatac-conf:/root/app/conf
+#            - hadatac-conf:/root/app/conf
+            - /Users/kandws01/Documents/merge3/conf:/root/app/conf
         links:
             - blazegraph
             - solr
