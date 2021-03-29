@@ -6,6 +6,7 @@ import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SignUp;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
+import org.hadatac.console.views.html.triplestore.notRegistered;
 import org.pac4j.core.exception.TechnicalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +54,11 @@ public class WidgetController extends Controller {
     @SubjectNotPresent
     public Result createUser(Http.Request request) throws TechnicalException {
         final Form<MyUsernamePasswordAuthProvider> boundForm = form.bindFromRequest(request);
-//        if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
-//            if (!UserManagement.isPreRegistered(boundForm.get().getEmail())) {
-//                return ok(notRegistered.render());
-//            }
-//        }
+        if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
+            if (!UserManagement.isPreRegistered(boundForm.get().getEmail())) {
+                return ok(notRegistered.render());
+            }
+        }
 
         if (boundForm.hasErrors()) {
             logger.error("errors = {}", boundForm.errors());
@@ -70,35 +71,7 @@ public class WidgetController extends Controller {
                         .flashing("error",data.validate());
             }
             signUps.add(new SignUp(data.getName(), data.getEmail(), data.getPassword(), data.getRepeatPassword()));
-//            //Adding to DB
-//            SolrClient solrClient = new HttpSolrClient.Builder(
-//                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_USERS)).build();
-//            String query = "active_bool:true";
-//            SolrQuery solrQuery = new SolrQuery(query);
-//            List<SysUser> users = new ArrayList<SysUser>();
-//
             try {
-//                QueryResponse queryResponse = solrClient.query(solrQuery);
-////                solrClient.close();
-//                SolrDocumentList list = queryResponse.getResults();
-//                Iterator<SolrDocument> i = list.iterator();
-//
-//                while (i.hasNext()) {
-//                    System.out.println("User at i :"+i.next());
-//                    if(i.next().containsValue(data.getEmail()))
-//                    System.out.println("Email already validated");
-////				SysUser user = SysUser.convertSolrDocumentToUser(i.next());
-////                System.out.println("Users:"+user);
-////				users.add(user);
-//	    			}
-//            SolrInputDocument newUser = new SolrInputDocument();
-//            newUser.addField( "id_str", UUID.randomUUID().toString());
-//            newUser.addField( "email", data.getEmail());
-//            newUser.addField( "name_str", data.getName());
-//            newUser.addField("active_bool",true);
-//            newUser.addField("email_validated_bool", true);
-//            solrClient.add(newUser);
-//            solrClient.commit();
                 LinkedAccount linkedAccount = new LinkedAccount();
                 linkedAccount.providerKey ="password"; //TODO : generalize later
                 linkedAccount.providerUserId=data.getHashedPassword();

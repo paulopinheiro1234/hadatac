@@ -5,35 +5,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
 import org.hadatac.Constants;
-import org.hadatac.console.controllers.Application;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.controllers.workingfiles.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.concurrent.CompletableFuture;
-
-import javax.inject.Inject;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
-import org.hadatac.console.models.FacetFormData;
-import org.hadatac.console.models.FacetHandler;
-import org.hadatac.console.models.FacetsWithCategories;
-import org.hadatac.console.models.SpatialQueryResults;
-import org.hadatac.console.models.SysUser;
-import org.hadatac.console.models.ObjectDetails;
-
-import org.hadatac.entity.pojo.*;
-import org.pac4j.play.java.Secure;
 import org.hadatac.annotations.SearchActivityAnnotation;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.*;
@@ -43,6 +16,7 @@ import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.concurrent.HttpExecutionContext;
@@ -64,8 +38,8 @@ public class DataAcquisitionSearch extends Controller {
     @Inject HttpExecutionContext ec;
     @Inject
     DatabaseExecutionContext databaseExecutionContext;
-    @javax.inject.Inject
-    private Application application;
+    @Inject
+    Application application;
 
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
@@ -110,8 +84,8 @@ public class DataAcquisitionSearch extends Controller {
         return objDetails;
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result index(int page, int rows, Http.Request request) {
+    // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(int page, int rows,Http.Request request) {
 
         //printMemoryStats();
         /*long startTime = System.currentTimeMillis();
@@ -125,23 +99,23 @@ public class DataAcquisitionSearch extends Controller {
 
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.concurrency")) ) {
             log.debug("using async calls for facet search....");
-            return indexInternalAsync(0, page, rows, request);
+            return indexInternalAsync(0, page, rows,request);
         } else {
-            return indexInternal(0, page, rows, request);
+            return indexInternal(0, page, rows,request);
         }
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(int page, int rows, Http.Request request) {
         return index(page, rows, request);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result indexData(int page, int rows, Http.Request request) {
         return indexInternal(1, page, rows, request);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndexData(int page, int rows, Http.Request request) {
         return indexData(page, rows, request);
     }
@@ -184,11 +158,11 @@ public class DataAcquisitionSearch extends Controller {
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    Measurement.getFieldNames(), objectCollections, application.getUserEmail(request)));
+                    Measurement.getFieldNames(), objectCollections,application.getUserEmail(request)));
         } else {
             return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    Measurement.getFieldNames(), objectCollections, application.getUserEmail(request)));
+                    Measurement.getFieldNames(), objectCollections,application.getUserEmail(request)));
         }
     }
 
@@ -209,7 +183,7 @@ public class DataAcquisitionSearch extends Controller {
 
         long startTime = System.currentTimeMillis();
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
-        log.info("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        log.debug("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         if (null == user) {
             ownerUri = "Public";
@@ -269,15 +243,15 @@ public class DataAcquisitionSearch extends Controller {
         if (mode == 0) {
             return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    fileNames, objs, application.getUserEmail(request)));
+                    fileNames, objs,application.getUserEmail(request)));
         } else {
             return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
                     results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    fileNames, objs, application.getUserEmail(request)));
+                    fileNames, objs,application.getUserEmail(request)));
         }
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result download(Http.Request request) {
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
@@ -311,7 +285,7 @@ public class DataAcquisitionSearch extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadAlignment(Http.Request request) {
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
@@ -391,12 +365,12 @@ public class DataAcquisitionSearch extends Controller {
         return ownerUri;
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownload(Http.Request request) {
         return download(request);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadAlignment(Http.Request request) {
         return downloadAlignment(request);
     }

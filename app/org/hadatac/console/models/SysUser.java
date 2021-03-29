@@ -860,7 +860,8 @@ public class SysUser implements Subject {
 			final boolean create) {
 		changePasswordSolr(authUser, create);
 	}
-//	//todo :generalize this
+
+	//todo :generalize this: current implementation only for password
 	public void changePasswordSolr(final MyUsernamePasswordAuthUser authUser,
 			final boolean create) {
 		LinkedAccount account = this.getAccountByProvider("password");

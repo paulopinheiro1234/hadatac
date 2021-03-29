@@ -17,6 +17,8 @@ import play.api.i18n.Messages;
 import play.api.i18n.MessagesApi;
 import play.api.libs.mailer.MailerClient;
 import play.api.mvc.RequestHeader;
+import play.data.Form;
+import play.data.FormFactory;
 import play.data.validation.Constraints;
 import play.mvc.Http;
 import com.feth.play.module.mail.Mailer.Mail.Body;
@@ -146,12 +148,17 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         return BCrypt.hashpw(clearString, BCrypt.gensalt());
     }
 
-
     public void sendPasswordResetMailing(final SysUser user, final Http.Request request) {
         final String token = generatePasswordResetRecord(user);
         final String subject = getPasswordResetMailingSubject(user, request);
         final Body body = getPasswordResetMailingBody(token, user, request);
         myService.sendMail(subject, body, getEmailName(user));
+    }
+
+    public void sendInvitationMailing(String user_name, String user_email, final Http.Request request) {
+        final String subject = ConfigFactory.load().getString("hadatac.community.email_subject_line");
+        final Body body = getInvitationMailingBody(user_name, user_email, request);
+        myService.sendMail(subject, body, user_email);
     }
 
 
@@ -223,7 +230,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
     protected Body getPasswordResetMailingBody(final String token,
                                                final SysUser user, final Http.Request request) {
 
-        final boolean isSecure = true; //getConfiguration().getBoolean(Constants.SETTING_KEY_PASSWORD_RESET_LINK_SECURE);
+        final boolean isSecure = false; //getConfiguration().getBoolean(Constants.SETTING_KEY_PASSWORD_RESET_LINK_SECURE);//ToDO : this being true makes it https
         final String url = routes.Signup.resetPassword(token).absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
@@ -239,6 +246,28 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
 
         return new Body(text, html);
     }
+    //TODO: test this
+    protected Body getInvitationMailingBody(String user_name, String user_email, final Http.Request request) {
+        final boolean isSecure = false;// getConfiguration().getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE); //ToDO : this being true makes it https
+        final String url = routes.Signup.createUser().absoluteURL(
+                isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
+//        final String url = routes.AuthApplication.signup().absoluteURL(
+//                isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
+
+//        final Lang lang = this.messagesApi.preferred(request.acceptLanguages()).lang();
+        final String langCode = "en";//lang.code();
+
+        final String html = getEmailTemplate(
+                "org.hadatac.console.views.html.account.signup.email.invitation_email", langCode, url,
+                "", user_name, user_email);
+        final String text = getEmailTemplate(
+                "org.hadatac.console.views.txt.account.signup.email.invitation_email", langCode, url,
+                "", user_name, user_email);
+
+        return new Body(text, html);
+    }
+
+
     private String getEmailName(final SysUser user) {
         return Mailer.getEmailName(user.getEmail(), user.getName());
     }
@@ -257,7 +286,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
     protected Body getVerifyEmailMailingBodyAfterSignup(final String token,
                                                         final SysUser user, final Http.Request request) {
 
-        final boolean isSecure = true;//getConfiguration().getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE);
+        final boolean isSecure = false;//true;//getConfiguration().getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE); //ToDO : this being true makes it https
         final String url = routes.Signup.verify(token).absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 

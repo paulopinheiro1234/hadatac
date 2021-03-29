@@ -99,7 +99,7 @@ public class AuthApplication extends Controller {
 //    }
 //
 //    public Result signup() {
-//        return ok(signup.render(this.auth, this.provider.getSignupForm()));
+//        return ok(signup.render(this.provider.getSignupForm()));
 //    }
 
     //TODO: test this

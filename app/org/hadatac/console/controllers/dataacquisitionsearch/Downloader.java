@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
-//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
@@ -30,8 +29,8 @@ import org.hadatac.utils.Feedback;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
-import org.pac4j.play.java.Secure;
 import org.hadatac.utils.FileManager;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -42,15 +41,16 @@ import play.mvc.Result;
 
 public class Downloader extends Controller {
 
-	public static final String ALIGNMENT_SUBJECT = "SUBJECT";
-	public static final String ALIGNMENT_TIME = "TIME";
+    public static final String ALIGNMENT_SUBJECT = "SUBJECT";
+    public static final String ALIGNMENT_TIME = "TIME";
 
     @Inject
     FormFactory formFactory;
     @Inject
     Application application;
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -68,17 +68,17 @@ public class Downloader extends Controller {
 
         DataFile.filterNonexistedFiles(path, files);
 
-        return ok(downloader.render(files, user.isDataManager(),user.getEmail()));
+        return ok(downloader.render(files, user.isDataManager(),application.getUserEmail(request)));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(Http.Request request) {
         return index(request);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result downloadDataFile(String fileId, Http.Request request) {
-    final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result downloadDataFile(String fileId,Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
 
         if (null == dataFile) {
@@ -88,8 +88,8 @@ public class Downloader extends Controller {
         return ok(new File(dataFile.getAbsolutePath()));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result deleteDataFile(String fileId, Http.Request request) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result deleteDataFile(String fileId,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
         if (user.isDataManager()) {
@@ -111,8 +111,8 @@ public class Downloader extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result assignFileOwner(String ownerEmail, String fileId,Http.Request request) {
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result assignFileOwner(String ownerEmail, String fileId, Http.Request request) {
         return ok(assignOption.render(User.getUserEmails(),
                 routes.Downloader.processOwnerForm(ownerEmail, fileId),
                 "Owner",
@@ -120,13 +120,13 @@ public class Downloader extends Controller {
                 fileId,application.getUserEmail(request)));
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result postAssignFileOwner(String ownerEmail, String fileId, Http.Request request) {
-        return assignFileOwner(ownerEmail, fileId, request);
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postAssignFileOwner(String ownerEmail, String fileId,Http.Request request) {
+        return assignFileOwner(ownerEmail, fileId,request);
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result processOwnerForm(String ownerEmail, String fileId, Http.Request request) {
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result processOwnerForm(String ownerEmail, String fileId,Http.Request request) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         AssignOptionForm data = form.get();
 
@@ -148,8 +148,8 @@ public class Downloader extends Controller {
         }
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result checkAnnotationLog(String fileId, Http.Request request) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result checkAnnotationLog(String fileId,Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
         if (DataFile.findById(fileId) == null) {
             return ok(annotation_log.render(Feedback.print(Feedback.WEB,""),
@@ -222,6 +222,7 @@ public class Downloader extends Controller {
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
         System.out.println("Created download " + fileName);
+
         String absolutePath = dataFile.getAbsolutePath();
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
@@ -254,4 +255,3 @@ public class Downloader extends Controller {
         return 0;
     }
 }
-

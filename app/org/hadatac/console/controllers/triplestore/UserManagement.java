@@ -21,6 +21,7 @@ import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.*;
+import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
@@ -63,11 +64,16 @@ public class UserManagement extends Controller {
     private static final String UPLOAD_NAME = ConfigProp.getTmp() + "uploads/users-spreadsheet.xls";
 	private static final String UPLOAD_NAME_TTL = ConfigProp.getTmp() + "uploads/user-graph.ttl";
 	private static final String UPLOAD_NAME_JSON = ConfigProp.getTmp() + "uploads/user-auth.json";
+    private final MyUsernamePasswordAuthProvider userPaswAuthProvider;
 	
     @Inject
     private FormFactory formFactory;
     @Inject
     Application application;
+    @Inject
+    public UserManagement(final MyUsernamePasswordAuthProvider userPaswAuthProvider) {
+        this.userPaswAuthProvider = userPaswAuthProvider;
+    }
 
     public static String getSpreadSheetPath(){
         return UPLOAD_NAME;
@@ -313,17 +319,17 @@ public class UserManagement extends Controller {
     }
 
 //    //TODO : fix it
-//    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-//    public Result sendInvitationEmail(String user_name, String user_email,Http.Request request) {
-//        this.userPaswAuthProvider.sendInvitationMailing(
-//                user_name, user_email, request);
-//        return redirect(routes.UserManagement.index("init"));
-//    }
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result sendInvitationEmail(String user_name, String user_email,Http.Request request) {
+        this.userPaswAuthProvider.sendInvitationMailing(
+                user_name, user_email, request);
+        return redirect(routes.UserManagement.index("init"));
+    }
 //    //TODO : fix it
-//    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-//    public Result postSendInvitationEmail(String user_name, String user_email, Http.Request request) {
-//        return sendInvitationEmail(user_name, user_email,request);
-//    }
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postSendInvitationEmail(String user_name, String user_email, Http.Request request) {
+        return sendInvitationEmail(user_name, user_email,request);
+    }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result submitPreRegistrationForm(String oper, Http.Request request) {

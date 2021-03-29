@@ -290,6 +290,7 @@ POST	/hadatac/dataacquisitions/new     	           org.hadatac.console.controlle
 POST	/hadatac/dataacquisitions/new/form             org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.processForm(request : Request)
 POST    /hadatac/dataacquisitions/new/form/str         org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionManagement.generateSTRFileFromForm(dir : String, request : Request)
 GET	    /hadatac/dataacquisitions/create	           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.create(dir : String, file_id : String, da_uri: String, request : Request)
+
 POST	/hadatac/dataacquisitions/create     	       org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.postCreate(dir : String, file_id : String, da_uri: String, request : Request)
 GET	    /hadatac/dataacquisitions/view		           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.view(dir : String, file_id : String, da_uri: String, request : Request)
 POST	/hadatac/dataacquisitions/view     	           org.hadatac.console.controllers.dataacquisitionmanagement.DataAcquisitionScope.postView(dir : String, file_id : String, da_uri: String, request : Request)
@@ -571,8 +572,8 @@ POST	/hadatac/perm/backupauth     		           org.hadatac.console.controllers.t
 GET	    /hadatac/perm/backupgraph		               org.hadatac.console.controllers.triplestore.UserManagement.backupUserGraph()
 POST	/hadatac/perm/backupgraph     		           org.hadatac.console.controllers.triplestore.UserManagement.postBackupUserGraph()
 #TODO add this
-#GET	    /hadatac/perm/invite		                   org.hadatac.console.controllers.triplestore.UserManagement.sendInvitationEmail(user_name: String, user_email: String)
-#POST	/hadatac/perm/invite     		               org.hadatac.console.controllers.triplestore.UserManagement.postSendInvitationEmail(user_name: String, user_email: String)
+GET	    /hadatac/perm/invite		                   org.hadatac.console.controllers.triplestore.UserManagement.sendInvitationEmail(user_name: String, user_email: String, request: Request)
+POST	/hadatac/perm/invite     		               org.hadatac.console.controllers.triplestore.UserManagement.postSendInvitationEmail(user_name: String, user_email: String, request: Request)
 
 
 # REST API (query)
