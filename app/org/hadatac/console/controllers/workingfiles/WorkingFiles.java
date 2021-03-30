@@ -69,7 +69,7 @@ public class WorkingFiles extends Controller {
     @Inject
     FormFactory formFactory;
     @Inject
-    private Application application;
+    Application application;
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -104,14 +104,14 @@ public class WorkingFiles extends Controller {
         }
 
         if (user.isDataManager()) {
-        	wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
-        	
-        	String basePath = targetDir;
+            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
+
+            String basePath = targetDir;
             if (basePath.startsWith("/")) {
                 basePath = basePath.substring(1, basePath.length());
             }
-            
-        	// DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
+
+            // DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
         } else {
             // since we can see other users' download, we don't send it email anymore
             wkFiles = DataFile.findDownloadedFilesInDir(targetDir, /*user.getEmail(), */ DataFile.CREATING);
@@ -125,17 +125,17 @@ public class WorkingFiles extends Controller {
         if ( folders.contains("download/") ) {
             folders.remove("..");
         }
-        return ok(workingFiles.render(targetDir, folders, wkFiles, user.isDataManager(),user.getEmail()));
+        return ok(workingFiles.render(targetDir, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
 
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postIndex(String dir, String dest, Http.Request request) {
-        return index(dir, dest, false, request);
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String dest,Http.Request request) {
+        return index(dir, dest, false,request);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result renameDataFile(String dir, String fileId, Http.Request request) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result renameDataFile(String dir, String fileId,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
@@ -152,13 +152,13 @@ public class WorkingFiles extends Controller {
         return ok(renameFile.render(dir, dataFile,user.getEmail()));
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result postRenameDataFile(String dir, String fileId, Http.Request request) {
-        return renameDataFile(dir, fileId,request);
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postRenameDataFile(String dir, String fileId,Http.Request request) {
+        return renameDataFile(dir, fileId, request);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result processRenameDataFileForm(String dir, String fileId, Http.Request request) throws Exception {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processRenameDataFileForm(String dir, String fileId,Http.Request request) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
@@ -177,7 +177,7 @@ public class WorkingFiles extends Controller {
 
         if (form.hasErrors()) {
             System.out.println("HAS ERRORS");
-            return badRequest(renameFile.render(dir, dataFile,user.getEmail()));
+            return badRequest(renameFile.render(dir, dataFile, application.getUserEmail(request)));
         } else {
             String newFileName = Paths.get(data.getNewName()).getFileName().toString();
 
@@ -206,9 +206,10 @@ public class WorkingFiles extends Controller {
         }
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result moveDataFile(String dir, String fileId,Http.Request request) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result moveDataFile(String dir, String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+
         DataFile dataFile = null;
         if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
@@ -223,16 +224,16 @@ public class WorkingFiles extends Controller {
         DataFile dirFile = new DataFile(dir);
         dirFile.setStatus(DataFile.WORKING);
 
-        return ok(moveFile.render(dir, dataFile, dirFile,user.getEmail()));
+        return ok(moveFile.render(dir, dataFile, dirFile, user.getEmail()));
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postMoveDataFile(String dir, String fileId, Http.Request request) {
         return moveDataFile(dir, fileId, request);
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result processMoveDataFileForm(String dir, String fileId,Http.Request request) throws Exception {
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result processMoveDataFileForm(String dir, String fileId, Http.Request request) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         DataFile dataFile = null;
@@ -292,7 +293,7 @@ public class WorkingFiles extends Controller {
         }
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result moveDataFiles(String dir,Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -325,15 +326,15 @@ public class WorkingFiles extends Controller {
         DataFile dirFile = new DataFile(dir);
         dirFile.setStatus(DataFile.WORKING);
 
-        return ok(moveFiles.render(dir, dataFiles, dirFile,user.getEmail()));
+        return ok(moveFiles.render(dir, dataFiles, dirFile, user.getEmail()));
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postMoveDataFiles(String dir, Http.Request request) {
-        return moveDataFiles(dir,request);
+        return moveDataFiles(dir, request);
     }
 
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processMoveDataFilesForm(String dir, Http.Request request) throws Exception {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -411,7 +412,7 @@ public class WorkingFiles extends Controller {
         }
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result shareDataFile(String dir, String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -436,10 +437,11 @@ public class WorkingFiles extends Controller {
         String sharedlink = ConfigFactory.load().getString("hadatac.console.host_deploy") +
                 org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.fromViewableLink(viewableId).toString();
 
-        return ok(shareFile.render(dir, sharedlink, dataFile,user.getEmail()));
+        return ok(shareFile.render(dir, sharedlink, dataFile, user.getEmail()));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @SuppressWarnings("unchecked")
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result saveViewerEmails(Http.Request request) throws Exception {
         Form form = formFactory.form().bindFromRequest(request);
         Map<String, String> data = form.rawData();
@@ -472,7 +474,7 @@ public class WorkingFiles extends Controller {
     }
 
     @SuppressWarnings("unchecked")
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result saveEditorEmails(Http.Request request) throws Exception {
         Form form = formFactory.form().bindFromRequest(request);
         Map<String, String> data = form.rawData();
@@ -503,17 +505,17 @@ public class WorkingFiles extends Controller {
 
         return redirect(routes.WorkingFiles.shareDataFile(dir, fileId));
     }
-
+    
     /*
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {	
         return ok(workingFiles.render(User.getUserEmails(), routes.WorkingFiles.processOwnerForm(dir, ownerEmail, selectedFile), "Owner", "Selected File", selectedFile));
     }
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postAssignFileOwner(String dir, String ownerEmail, String selectedFile) {
         return assignFileOwner(dir, ownerEmail, selectedFile);
-    }
-    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    } 
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processOwnerForm(String dir, String ownerEmail, String selectedFile) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
         AssignOptionForm data = form.get();
@@ -536,25 +538,25 @@ public class WorkingFiles extends Controller {
             file.save();
             return redirect(routes.WorkingFiles.index(dir, "."));
         }
-    }
+    } 
     */
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadTemplates(String dir, Http.Request request) {
-        return ok(download_templates.render(dir,application.getUserEmail(request)));
+        return ok(download_templates.render(dir, application.getUserEmail(request)));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadTemplates(String dir) {
         return postDownloadTemplates(dir);
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkAnnotationLog(String dir, String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
         return ok(annotation_log.render(Feedback.print(Feedback.WEB,
                 DataFile.findById(fileId).getLog()),
-                routes.WorkingFiles.index(dir, "/", false).url(),application.getUserEmail(request)));
+                routes.WorkingFiles.index(dir, "/", false).url(), application.getUserEmail(request)));
     }
 
     public Result getAnnotationStatus(String fileId) {
@@ -577,7 +579,7 @@ public class WorkingFiles extends Controller {
         return ok(Json.toJson(result));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteDataFile(String dir, String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -599,8 +601,8 @@ public class WorkingFiles extends Controller {
         return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result deleteDataFiles(String dir,Http.Request request) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result deleteDataFiles(String dir, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
@@ -634,7 +636,7 @@ public class WorkingFiles extends Controller {
         return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadDataFile(String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = DataFile.findById(fileId);
@@ -645,10 +647,11 @@ public class WorkingFiles extends Controller {
                         && !dataFile.getEditorEmails().contains(user.getEmail()))) {
             return badRequest("You do NOT have the permission to download this file!");
         }
+
         return ok(new File(dataFile.getAbsolutePath())).withHeader("Content-disposition", String.format("attachment; filename=%s", dataFile.getFileName()));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result ingestDataFile(String fileId, Http.Request request) {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
@@ -691,8 +694,8 @@ public class WorkingFiles extends Controller {
         return redirect(org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", "."));
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result verifyDataFile(String fileId,Http.Request request) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result verifyDataFile(String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findByIdAndStatus(fileId, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
 
@@ -711,9 +714,9 @@ public class WorkingFiles extends Controller {
         }
 
         return ok(annotation_log.render(Feedback.print(Feedback.WEB, strLog),
-                routes.WorkingFiles.index("/", ".", false).url(),application.getUserEmail(request)));
+                routes.WorkingFiles.index("/", ".", false).url(), application.getUserEmail(request)));
     }
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result verifyDataFileTemp(String file_id) {
         DataFile dataFile = DataFile.findByIdAndStatus(file_id, DataFile.WORKING);
         File file = new File(dataFile.getAbsolutePath());
@@ -736,7 +739,7 @@ public class WorkingFiles extends Controller {
 
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result uploadDataFileByChunking(
             String resumableChunkNumber,
             String resumableChunkSize,
@@ -757,7 +760,7 @@ public class WorkingFiles extends Controller {
         }
     }
 
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postUploadDataFileByChunking(
             String resumableChunkNumber,
             String resumableChunkSize,

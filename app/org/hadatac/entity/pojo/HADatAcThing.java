@@ -54,7 +54,7 @@ public abstract class HADatAcThing implements Facetable {
 
     String namedGraph = "";
 
-    // delete the object or not when deleting the org.hadatac.data file it was generated from
+    // delete the object or not when deleting the data file it was generated from
     boolean deletable = true;
 
     public Map<Facetable, List<Facetable>> getTargetFacets(

@@ -110,7 +110,7 @@ public class MetadataContext implements RDFContext {
     }
 
     /*
-     *   contentType correspond to the mime type required for curl to process the org.hadatac.data provided. For example, application/rdf+xml is
+     *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
      *   used to process rdf/xml content.
      */
     public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {

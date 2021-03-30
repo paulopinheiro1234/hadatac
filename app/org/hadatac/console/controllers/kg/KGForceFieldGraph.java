@@ -52,7 +52,7 @@ public class KGForceFieldGraph {
 
         // Ontologies need to be added before than studies
         if (includeOntologies) {
-            System.out.println("=========================================== ONTOLOGIES");
+            //System.out.println("=========================================== ONTOLOGIES");
             ontologies = NameSpaces.getInstance().getOrderedNamespacesAsList();
             if (ontologies != null && ontologies.size() > 0) {
                 for (NameSpace ont: ontologies) {
@@ -239,7 +239,7 @@ public class KGForceFieldGraph {
 
         // add study itself and its attributes
         String nameNode = daspec.getLabel();
-        nameNode += " (" + daspec.getNumberDataPoints() + " org.hadatac.data values)";
+        nameNode += " (" + daspec.getNumberDataPoints() + " data values)";
 
         OCNode daspecNode = new OCNode(nameNode, daspec.getUri(), OCNode.DASPEC, daspecHtml(daspec), new ArrayList<>());
         nodes.add(daspecNode);
@@ -452,7 +452,7 @@ public class KGForceFieldGraph {
             object.put("dependedOnBy", new JSONArray());
             ndstudy.put(tmpObject.getName(),object);
         }
-        dag.put("org.hadatac.data", ndstudy);
+        dag.put("data", ndstudy);
 
         dag.put("errors", new JSONArray());
 

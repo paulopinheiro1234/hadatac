@@ -471,7 +471,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             return sdd;
         }
 
-        //System.out.println("Looking for org.hadatac.data acquisition schema " + schemaUri);
+        //System.out.println("Looking for data acquisition schema " + schemaUri);
 
         if (schemaUri == null || schemaUri.equals("")) {
             System.out.println("[ERROR] DataAcquisitionSchema URI blank or null.");

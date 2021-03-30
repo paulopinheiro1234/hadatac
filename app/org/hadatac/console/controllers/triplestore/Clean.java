@@ -35,7 +35,6 @@ public class Clean extends Controller {
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result clean(String oper,Http.Request request) {
-        System.out.println("oper");
         return ok(clean.render(oper, application.getUserEmail(request)));
     }
 

@@ -44,7 +44,7 @@ public class DeleteDAS extends Controller {
 
         if (!das_uri.equals("")) {
             das = DataAcquisitionSchema.find(das_uri);
-            System.out.println("delete org.hadatac.data acquisition schema");
+//            System.out.println("delete data acquisition schema");
             dasForm.setUri(das_uri);
             dasForm.setLabel(das.getLabel());
             return ok(org.hadatac.console.views.html.schema.deleteDAS.render(das_uri, dasForm,application.getUserEmail(request)));

@@ -36,7 +36,7 @@ public class DeleteDASA extends Controller {
 
 		if (!dasa_uri.equals("")) {
 			dasa = DataAcquisitionSchemaAttribute.find(dasa_uri);
-			System.out.println("delete org.hadatac.data acquisition schema attribute");
+//			System.out.println("delete data acquisition schema attribute");
 			return ok(org.hadatac.console.views.html.schema.deleteDASA.render(dasa));
 		}
 		return ok(org.hadatac.console.views.html.schema.deleteDASA.render(dasa));

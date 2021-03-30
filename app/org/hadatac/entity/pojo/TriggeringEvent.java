@@ -15,10 +15,10 @@ public class TriggeringEvent {
     public static final String CHANGED_CONFIGURATION_NAME     = "Changed Configuration";     // to show changed configuration
     public static final String CHANGED_OWNERSHIP_NAME         = "Changed Ownership";         // to show previous owner
     public static final String AUTO_CALIBRATION_NAME          = "Auto Calibration";          // to show calibration date/time
-    public static final String SUSPEND_DATA_ACQUISITION_NAME  = "Suspend org.hadatac.data acquisition";  // to show reason for suspension
+    public static final String SUSPEND_DATA_ACQUISITION_NAME  = "Suspend data acquisition";  // to show reason for suspension
     // e.g., lost of operation conditions
     // e.g., lost of measurement conditions
-    public static final String RESUME_DATA_ACQUISITION_NAME   = "Resume org.hadatac.data acquisition";   // to show reason for suspension
+    public static final String RESUME_DATA_ACQUISITION_NAME   = "Resume data acquisition";   // to show reason for suspension
 
     public String getName(int event_id) {
         String label = "";

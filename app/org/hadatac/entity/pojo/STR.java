@@ -108,10 +108,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
     /*
      * Possible values for message status:
-     * ACTIVE:     It is not closed and it is collecting org.hadatac.data
-     * SUSPENDED:  It is not closed but it is not collecting org.hadatac.data
-     * CLOSED:     It is not collecting org.hadatac.data. It is no longer available
-     *             for org.hadatac.data collection
+     * ACTIVE:     It is not closed and it is collecting data
+     * SUSPENDED:  It is not closed but it is not collecting data
+     * CLOSED:     It is not collecting data. It is no longer available
+     *             for data collection
      */
     @Field("message_status_str")
     private String messageStatus;
@@ -1203,7 +1203,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         List<STR> listDA = findByQuery(query);
 
         if (active == true) {
-            // Filter out inactive org.hadatac.data acquisition
+            // Filter out inactive data acquisition
             Iterator<STR> iterDA = listDA.iterator();
             while (iterDA.hasNext()) {
                 STR dataAcquisition = iterDA.next();

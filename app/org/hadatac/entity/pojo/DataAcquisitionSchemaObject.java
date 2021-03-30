@@ -288,7 +288,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             return DataAcquisitionSchemaObject.getCache().get(uri);
         }
 
-//        System.out.println("Looking for org.hadatac.data acquisition schema object with uri: " + uri);
+//        System.out.println("Looking for data acquisition schema object with uri: " + uri);
 
         DataAcquisitionSchemaObject object = null;
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -418,7 +418,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static List<String> findUriBySchema(String schemaUri) {
-        //System.out.println("Looking for org.hadatac.data acquisition schema objects for <" + schemaUri + ">");
+        //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
 
         List<String> objectUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -453,7 +453,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
     }
 
     public static List<DataAcquisitionSchemaObject> findBySchema(String schemaUri) {
-        //System.out.println("Looking for org.hadatac.data acquisition schema objects for <" + schemaUri + ">");
+        //System.out.println("Looking for data acquisition schema objects for <" + schemaUri + ">");
 
         List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +

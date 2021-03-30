@@ -253,6 +253,7 @@ public class DataAcquisitionSearch extends Controller {
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result download(Http.Request request) {
+        System.out.println("inside download");
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
 

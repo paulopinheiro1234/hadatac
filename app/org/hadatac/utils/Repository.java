@@ -11,8 +11,8 @@ import com.typesafe.config.ConfigFactory;
 
 public class Repository {
 
-    public static final String METADATA = "org/hadatac/metadata";
-    public static final String DATA     = "org/hadatac/data";
+    public static final String METADATA = "metadata";
+    public static final String DATA     = "data";
 
     public static final String START = "start";
     public static final String STOP  = "stop";

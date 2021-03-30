@@ -27,7 +27,7 @@ public class Arguments {
     @Option(name="-m",required=true,usage="input type",metaVar="input_type")
     private String inputType;
 
-    @Option(name="-s",required=false,usage="what to parse: both/org.hadatac.data/org.hadatac.metadata",metaVar="what_to_parse")
+    @Option(name="-s",required=false,usage="what to parse: both/data/metadata",metaVar="what_to_parse")
     private String steps = "both";
 
     @Option(name="-v",required=false,usage="verbose mode")

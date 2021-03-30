@@ -69,6 +69,7 @@
                         });
 
                         $("#alignmentDialogForm").submit(function(eventObj) {
+                            console.log("this:"+this);
                             $('<input />').attr('type', 'hidden')
                                     .attr('name', "facets")
                                     .attr('value', getSelectedFacets())

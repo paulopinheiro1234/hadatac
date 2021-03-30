@@ -23,7 +23,6 @@ public class DASManagement extends Controller {
   @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     @SubjectPresent(forceBeforeAuthCheck = true)
     public Result index(Http.Request request) {
-      System.out.println("DASManagement index");
         List<DataAcquisitionSchema> sdds = DataAcquisitionSchema.findAll();
         return ok(org.hadatac.console.views.html.schema.DASManagement.render(sdds,application.getUserEmail(request)));
     }

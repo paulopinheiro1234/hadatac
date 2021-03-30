@@ -126,7 +126,7 @@ public class UserManagement extends Controller {
         }
         SysUser su = SysUser.findByEmail(User.find(user_uri).getEmail());
         if(su != null){
-            su.addSecurityRole("data_manager");
+            su.addSecurityRole(Constants.DATA_MANAGER_ROLE);
             su.save();
         }
 
@@ -148,7 +148,7 @@ public class UserManagement extends Controller {
 
         SysUser su = SysUser.findByEmail(User.find(user_uri).getEmail());
         if(su != null){
-            su.removeSecurityRole("data_manager");
+            su.removeSecurityRole(Constants.DATA_MANAGER_ROLE);
             su.save();
         }
 
