@@ -1,5 +1,5 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
-  bSavable : Boolean)
+  bSavable : Boolean, userName:String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,7 +8,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Excel File Preview","",""){
+@main("Excel File Preview","",userName){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
     <script src="https://unpkg.com/canvas-datagrid/dist/canvas-datagrid.js"></script>
 

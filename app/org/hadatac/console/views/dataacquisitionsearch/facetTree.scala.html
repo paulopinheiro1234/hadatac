@@ -15,152 +15,150 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="/hadatac/assets/javascripts/measurement.js"></script>
 <style>
-        .goog-tooltip {
-            z-index: 999;
-        }
+.goog-tooltip {
+    z-index: 999;
+}
 </style>
 <script>
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawCharts);
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
 
-        function checkParentNodes(tree, root_id, child_id) {
-            if (tree.getAllSubItems(root_id).split(",").includes(child_id.toString())) {
-                tree.setCheck(root_id, true);
-            }
-
-            var subitems = tree.getSubItems(root_id);
-            if (subitems.length > 0) {
-                subitems.split(",").forEach(function(element) {
-                    checkParentNodes(tree, element, child_id);
-                });
-            }
+    function checkParentNodes(tree, root_id, child_id) {
+        if (tree.getAllSubItems(root_id).split(",").includes(child_id.toString())) {
+            tree.setCheck(root_id, true);
         }
 
-        function refreshTreeCheckStatus(tree, id) {
-            var hasCheckedSubitems = false;
-            var subitems = tree.getSubItems(id);
-            if (subitems.length > 0) {
-                subitems.split(",").forEach(function(element) {
-                    refreshTreeCheckStatus(tree, element);
-                    if (tree.isItemChecked(element)) {
-                        hasCheckedSubitems = true;
-                    }
-                });
-
-                if (!hasCheckedSubitems) {
-                    tree.setCheck(id, false);
-                }
-            }
-        }
-
-        function loadTree(tree, data) {
-            tree.enableCheckBoxes(true, true);
-            tree.enableThreeStateCheckboxes(false);
-            tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
-            tree.setDataMode("json");
-            tree.setOnRightClickHandler(function(id) {
-                console.log("query to retrieve this clicked node: \n\n" + this.getUserData(id, "query"));
-                return false;
+        var subitems = tree.getSubItems(root_id);
+        if (subitems.length > 0) {
+            subitems.split(",").forEach(function(element) {
+                checkParentNodes(tree, element, child_id);
             });
-            tree.attachEvent("onCheck", function(id) {
-                tree.setSubChecked(id, tree.isItemChecked(id));
-                if (tree.isItemChecked(id)) {
-                    checkParentNodes(tree, 0, id);
-                    getSelectedFacets();
-                } else {
-                    refreshTreeCheckStatus(tree, 0);
+        }
+    }
+
+    function refreshTreeCheckStatus(tree, id) {
+        var hasCheckedSubitems = false;
+        var subitems = tree.getSubItems(id);
+        if (subitems.length > 0) {
+            subitems.split(",").forEach(function(element) {
+                refreshTreeCheckStatus(tree, element);
+                if (tree.isItemChecked(element)) {
+                    hasCheckedSubitems = true;
                 }
             });
-            tree.parse(data, "json");
-        }
 
-        var jsonTree, selected_elems;
-        selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
-        var dataTreeEC = parseSolrFacetToMergedTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
-        // var dataTreeEC = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
-        var treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox", "100%", "100%", 0);
-        loadTree(treeEC, dataTreeEC);
-
-        selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
-        var dataTreeS = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
-        // console.log("dataTree: " + JSON.stringify(dataTree));
-        var treeS = new dhtmlXTreeObject("treeStudyBox", "100%", "100%", 0);
-        loadTree(treeS, dataTreeS);
-
-        selected_elems = JSON.parse('@handler.values(FacetHandler.OBJECT_COLLECTION_FACET)'.replace(/&quot;/g,'"'));
-        var dataTreeOC = parseSolrFacetToTree('@FacetHandler.OBJECT_COLLECTION_FACET', selected_elems);
-        // console.log("dataTree: " + JSON.stringify(dataTree));
-        var treeOC = new dhtmlXTreeObject("treeObjectCollectionBox", "100%", "100%", 0);
-        loadTree(treeOC, dataTreeOC);
-
-        selected_elems = JSON.parse('@handler.values(FacetHandler.UNIT_FACET)'.replace(/&quot;/g,'"'));
-        var dataTreeU = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
-        var treeU = new dhtmlXTreeObject("treeUnitBox", "100%", "100%", 0);
-        loadTree(treeU, dataTreeU);
-
-        selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
-        var dataTreeT = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
-        var treeT = new dhtmlXTreeObject("treeTimeBox", "100%", "100%", 0);
-        loadTree(treeT, dataTreeT);
-
-        selected_elems = JSON.parse('@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)'.replace(/&quot;/g,'"'));
-        var dataTreePI = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
-        var treePI = new dhtmlXTreeObject("treePlatformInstrumentBox", "100%", "100%", 0);
-        loadTree(treePI, dataTreePI);
-
-        function drawCharts() {
-            addPieChart("chartStudy", dataTreeS.item);
-            addPieChart("chartObjectCollection", dataTreeOC.item);
-            addPieChart("chartEntityCharacteristic", dataTreeEC.item);
-            addPieChart("chartUnit", dataTreeU.item);
-            addPieChart("chartTime", dataTreeT.item);
-            addPieChart("chartPlatformInstrument", dataTreePI.item);
-        }
-
-        function addPieChart(elementId, data) {
-            var element = document.getElementById(elementId);
-            if (element == null) {
-                return;
+            if (!hasCheckedSubitems) {
+                tree.setCheck(id, false);
             }
-
-            var dataTable = google.visualization.arrayToDataTable(getDataArray(data));
-
-            var options = {
-                legend: {
-                    position: 'top',
-                    alignment: 'start',
-                    maxLines: 100,
-                    textStyle: { fontSize: 12 }
-                }
-            };
-
-            $("#" + elementId).height(400);
-
-            var chart = new google.visualization.PieChart(element);
-
-            chart.draw(dataTable, options);
         }
+    }
 
-        function getDataArray(data) {
-            var dataArray = [];
-            dataArray.push(["Facet", "Count"]);
-            for (var i = 0; i < data.length; i++) {
-                var x = data[i].label;
-                var y = data[i].count;
-                dataArray.push([x, y]);
-            }
-
-            return dataArray;
-        }
-
-        $("#toggleCharts").click(function () {
-            $("div[name='charts']").toggle();
-            if ($(this).text() == "Show Charts") {
-                $(this).text("Hide Charts");
-            } else {
-                $(this).text("Show Charts");
-            };
+    function loadTree(tree, data) {
+        tree.enableCheckBoxes(true, true);
+        tree.enableThreeStateCheckboxes(false);
+        tree.setImagePath("@controllers.routes.Assets.versioned("lib/dhtmlx/imgs/dhxtree_skyblue/")");
+        tree.setDataMode("json");
+        tree.setOnRightClickHandler(function(id) {
+            console.log("query to retrieve this clicked node: \n\n" + this.getUserData(id, "query"));
+            return false;
         });
+        tree.attachEvent("onCheck", function(id) {
+            tree.setSubChecked(id, tree.isItemChecked(id));
+            if (tree.isItemChecked(id)) {
+                checkParentNodes(tree, 0, id);
+                getSelectedFacets();
+            } else {
+                refreshTreeCheckStatus(tree, 0);
+            }
+        });
+        tree.parse(data, "json");
+    }
+
+    var jsonTree, selected_elems;
+    selected_elems = JSON.parse('@handler.values(FacetHandler.ENTITY_CHARACTERISTIC_FACET)'.replace(/&quot;/g,'"'));
+    var dataTreeEC = parseSolrFacetToMergedTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    // var dataTreeEC = parseSolrFacetToTree('@FacetHandler.ENTITY_CHARACTERISTIC_FACET', selected_elems);
+    var treeEC = new dhtmlXTreeObject("treeEntityCharacteristicBox", "100%", "100%", 0);
+    loadTree(treeEC, dataTreeEC);
+
+    selected_elems = JSON.parse('@handler.values(FacetHandler.STUDY_FACET)'.replace(/&quot;/g,'"'));
+    var dataTreeS = parseSolrFacetToTree('@FacetHandler.STUDY_FACET', selected_elems);
+    // console.log("dataTree: " + JSON.stringify(dataTree));
+    var treeS = new dhtmlXTreeObject("treeStudyBox", "100%", "100%", 0);
+    loadTree(treeS, dataTreeS);
+
+    selected_elems = JSON.parse('@handler.values(FacetHandler.OBJECT_COLLECTION_FACET)'.replace(/&quot;/g,'"'));
+    var dataTreeOC = parseSolrFacetToTree('@FacetHandler.OBJECT_COLLECTION_FACET', selected_elems);
+    // console.log("dataTree: " + JSON.stringify(dataTree));
+    var treeOC = new dhtmlXTreeObject("treeObjectCollectionBox", "100%", "100%", 0);
+    loadTree(treeOC, dataTreeOC);
+
+    selected_elems = JSON.parse('@handler.values(FacetHandler.UNIT_FACET)'.replace(/&quot;/g,'"'));
+    var dataTreeU = parseSolrFacetToTree('@FacetHandler.UNIT_FACET', selected_elems);
+    var treeU = new dhtmlXTreeObject("treeUnitBox", "100%", "100%", 0);
+    loadTree(treeU, dataTreeU);
+
+    selected_elems = JSON.parse('@handler.values(FacetHandler.TIME_FACET)'.replace(/&quot;/g,'"'));
+    var dataTreeT = parseSolrFacetToTree('@FacetHandler.TIME_FACET', selected_elems);
+    var treeT = new dhtmlXTreeObject("treeTimeBox", "100%", "100%", 0);
+    loadTree(treeT, dataTreeT);
+
+    selected_elems = JSON.parse('@handler.values(FacetHandler.PLATFORM_INSTRUMENT_FACET)'.replace(/&quot;/g,'"'));
+    var dataTreePI = parseSolrFacetToTree('@FacetHandler.PLATFORM_INSTRUMENT_FACET', selected_elems);
+    var treePI = new dhtmlXTreeObject("treePlatformInstrumentBox", "100%", "100%", 0);
+    loadTree(treePI, dataTreePI);
+
+    function drawCharts() {
+        addPieChart("chartStudy", dataTreeS.item);
+        addPieChart("chartObjectCollection", dataTreeOC.item);
+        addPieChart("chartEntityCharacteristic", dataTreeEC.item);
+        addPieChart("chartUnit", dataTreeU.item);
+        addPieChart("chartTime", dataTreeT.item);
+        addPieChart("chartPlatformInstrument", dataTreePI.item);
+    }
+
+    function addPieChart(elementId, data) {
+        var element = document.getElementById(elementId);
+        if (element == null) {
+            return;
+        }
+
+        var dataTable = google.visualization.arrayToDataTable(getDataArray(data));
+
+        var options = {
+            legend: {
+                position: 'top',
+                alignment: 'start',
+                maxLines: 100,
+                textStyle: { fontSize: 12 }
+            }
+        };
+
+        $("#" + elementId).height(400);
+
+        var chart = new google.visualization.PieChart(element);
+
+        chart.draw(dataTable, options);
+    }
+
+    function getDataArray(data) {
+        var dataArray = [];
+        dataArray.push(["Facet", "Count"]);
+        for (var i = 0; i < data.length; i++) {
+            var x = data[i].label;
+            var y = data[i].count;
+            dataArray.push([x, y]);
+        }
+
+        return dataArray;
+    }
+
+    $("#toggleCharts").click(function () {
+        $("div[name='charts']").toggle();
+        if ($(this).text() == "Show Charts") {
+            $(this).text("Hide Charts");
+        } else {
+            $(this).text("Show Charts");
+        };
+    });
 </script>
-
-

@@ -15,168 +15,168 @@
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
 @main("Change Data Stream Permission","",userName) {
-	
+
 	<script type="text/javascript">
-		$(document).ready(function(){
-	    	checkform();
-		});
-		
-		function checkform() {
-		  var cansubmit = true;
-		  if (document.getElementById('newParameter').value == '@da.getParameter()') {
-		  	cansubmit = false;
-		  }
-		  if (document.getElementById('div_acquisition_uri').style.display == "") {
-		  	if (document.getElementById('newStartDate').value == "") {
-	        	cansubmit = false;
-	      	}
-		  }
-	      if (cansubmit) {
-	          document.getElementById('submitbutton').disabled = false;
-	      } else {
-	          document.getElementById('submitbutton').disabled = 'disabled';
-	      }
-	    }
-	    
-	    function onConfirm() {
-	      if (document.getElementById('newParameter').value != '@da.getParameter()') {
-	      	if (document.getElementById('div_acquisition_uri').style.display == "none") {
-	    		if(confirm('Parameter has been changed. Do you want to create a new data acquisition?')) {
-	    			$('#div_acquisition_uri').show();
-		     		$('#div_startdate').show();
-		     		$('#div_enddate').show();
-		     		document.getElementById('newDataAcquisitionUri').value = '@da.getUri()';
-		     		checkform();
-		     		return false;
-	    		}
-	    	}
-		  }
-		}
+			$(document).ready(function(){
+				checkform();
+			});
+
+			function checkform() {
+				var cansubmit = true;
+				if (document.getElementById('newParameter').value == '@da.getParameter()') {
+					cansubmit = false;
+				}
+				if (document.getElementById('div_acquisition_uri').style.display == "") {
+					if (document.getElementById('newStartDate').value == "") {
+						cansubmit = false;
+					}
+				}
+				if (cansubmit) {
+					document.getElementById('submitbutton').disabled = false;
+				} else {
+					document.getElementById('submitbutton').disabled = 'disabled';
+				}
+			}
+
+			function onConfirm() {
+				if (document.getElementById('newParameter').value != '@da.getParameter()') {
+					if (document.getElementById('div_acquisition_uri').style.display == "none") {
+						if(confirm('Parameter has been changed. Do you want to create a new data acquisition?')) {
+							$('#div_acquisition_uri').show();
+							$('#div_startdate').show();
+							$('#div_enddate').show();
+							document.getElementById('newDataAcquisitionUri').value = '@da.getUri()';
+							checkform();
+							return false;
+						}
+					}
+				}
+			}
 	</script>
 
-    <h2>Edit Data Stream</h2>
-    
-    <div class="container-fluid">
-       <ul>
-       <li><b>URI:</b> @da.getUri()</li>
-       <li><b>Status:</b> @da.getStatus()</li>
-       <li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
-       <li><b>Platform:</b> @da.getPlatformName()</li>
-       <li><b>Instrument:</b> @da.getInstrumentModel()</li>
-       <li><b>Study URI:</b> @da.getStudyUri()</li>
-       <li><b>Start Date/Time:</b> @da.getStartedAt()</li>
-       <li><b>End Date/Time:</b> @da.getEndedAt()</li>
-       <li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
-       <li><b>Current Parameter:</b> @da.getParameter()</li>
-       @if(bAdmin) {
-       <li><b>Current Owner:</b> @da.getOwnerUri()</li>
-       }
-       <li><b>Current Permission:</b> @da.getPermissionUri()</li>
+	<h2>Edit Data Stream</h2>
 
-       <form class="form-horizontal" name="editForm" method="post" 
-	     action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(dir, fileId, da.getUri(), bChangeParam)">
-       
-       @if(!bChangeParam) {
-       	 @if(bAdmin) {
-		   <div class="form-group">
-              <label>Set Owner</label>
-              <select class="form-control col-sm-6" id="newOwner" name="newOwner" >
-              <option value=""></option>
-              @for(opt <- ownerOptions) {
-                @if(opt.equals(da.getOwnerUri())){
-              	 	<option selected value="@opt">@opt</option>
-              	} else {
-              	 	<option value="@opt">@opt</option>
-              	}
-              }
-              </select>
-           </div>
-         }
-           
-           <div class="form-group">
-              <label>Set Permission</label>
-              <select class="form-control col-sm-6" id="newPermission" name="newPermission" >
-              	 @if(da.getPermissionUri() != "Public"){
-              		<option value="Public">Public</option> 
-              	 }         
-                 @for((permUri, permName) <- permissions){
-                    @if(permUri.equals(da.getPermissionUri())) {
-                    	<option selected value="@permUri">@permName</option>
-              	 	} else {
-              	 		<option value="@permUri">@permName</option>
-              	 	}
-                 }
-              </select>
-           </div>
-           
-           <div class="form-group">
-              <label>Set Schema</label>
-              <select class="form-control col-sm-6" id="newSchema" name="newSchema" >
-              	<option value=""></option>
-		@if(schemas != null && schemas.size() > 0) {
-                    @for((schemaUri, abbrvUri) <- schemas){
-                        @if(da.getSchemaUri() != null && da.getSchemaUri().equals(schemaUri)) {
-                    	   <option selected value="@schemaUri">@abbrvUri</option>
-              	 	} else {
-              	 		<option value="@schemaUri">@abbrvUri</option>
-              	 	}
-                    }
-                }
-              </select>
-           </div>
-		} else {
-           <div class="form-group">
-              <label>Set Parameter</label>
-              <input type="text" value="@da.getParameter()" class="form-control" name="newParameter" id="newParameter" oninput="checkform()" >
-           </div>
-           
-           <div id="div_acquisition_uri" class="form-group" style="display : none">
-		   	  <label>Stream Specification URI:</label>
- 			  <input type="text" class="form-control col-sm-6" name="newDataAcquisitionUri" id="newDataAcquisitionUri" >
- 		   </div>
- 		   
-	 	  <div id="div_startdate" class="form-group" style="display : none">
-	         <label for="startdate">Start Date/Time</label><br> 
-	         <div class="row">
-	             <div class='col-sm-3'>
-	                  <div class='input-group date' id='startdate' onclick="$('#startdate').datetimepicker(); checkform();">
-	                    <input type='text' name="newStartDate" id="newStartDate" class="form-control" oninput="checkform()" />
-	                    <span class="input-group-addon">
-	                       <span class="glyphicon glyphicon-calendar"></span>
-	                    </span>
-	                  </div>
-	             </div>
-	         </div>
-	      </div>
-	      
-	      <div id="div_enddate" class="form-group" style="display : none">
-	         <label for="enddate">End Date/Time</label><br> 
-	         <div class="row">
-	             <div class='col-sm-3'>
-	                  <div class='input-group date' id='enddate' onclick="$('#enddate').datetimepicker(); checkform();">
-	                    <input type='text' name="newEndDate" id="newEndDate" class="form-control" oninput="checkform()" />
-	                    <span class="input-group-addon">
-	                       <span class="glyphicon glyphicon-calendar"></span>
-	                    </span>
-	                  </div>
-	             </div>
-	         </div>
-	      </div>
-	     }
+	<div class="container-fluid">
+		<ul>
+			<li><b>URI:</b> @da.getUri()</li>
+			<li><b>Status:</b> @da.getStatus()</li>
+			<li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
+			<li><b>Platform:</b> @da.getPlatformName()</li>
+			<li><b>Instrument:</b> @da.getInstrumentModel()</li>
+			<li><b>Study URI:</b> @da.getStudyUri()</li>
+			<li><b>Start Date/Time:</b> @da.getStartedAt()</li>
+			<li><b>End Date/Time:</b> @da.getEndedAt()</li>
+			<li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
+			<li><b>Current Parameter:</b> @da.getParameter()</li>
+			@if(bAdmin) {
+				<li><b>Current Owner:</b> @da.getOwnerUri()</li>
+			}
+			<li><b>Current Permission:</b> @da.getPermissionUri()</li>
 
-         <div id="question-box">
-            <input class="btn btn-success" id="submitbutton" role="button" type="submit" value="Confirm editing" onclick="return onConfirm();"/>
-         </div>
-       </form>
+			<form class="form-horizontal" name="editForm" method="post"
+			action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.EditDataAcquisition.processForm(dir, fileId, da.getUri(), bChangeParam)">
 
-       <br>
-       @if(fileId != null && !fileId.equals("")) {
-            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da.getUri())" 
-	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
-       } else {
-            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 
-	       class="btn btn-primary" role="button">Back to Data Stream Management</a>
-       }
-    </div>
-    </ul>
+				@if(!bChangeParam) {
+					@if(bAdmin) {
+						<div class="form-group">
+							<label>Set Owner</label>
+							<select class="form-control col-sm-6" id="newOwner" name="newOwner" >
+								<option value=""></option>
+								@for(opt <- ownerOptions) {
+									@if(opt.equals(da.getOwnerUri())){
+										<option selected value="@opt">@opt</option>
+									} else {
+										<option value="@opt">@opt</option>
+									}
+								}
+							</select>
+						</div>
+					}
+
+					<div class="form-group">
+						<label>Set Permission</label>
+						<select class="form-control col-sm-6" id="newPermission" name="newPermission" >
+							@if(da.getPermissionUri() != "Public"){
+								<option value="Public">Public</option>
+							}
+							@for((permUri, permName) <- permissions){
+								@if(permUri.equals(da.getPermissionUri())) {
+									<option selected value="@permUri">@permName</option>
+								} else {
+									<option value="@permUri">@permName</option>
+								}
+							}
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label>Set Schema</label>
+						<select class="form-control col-sm-6" id="newSchema" name="newSchema" >
+							<option value=""></option>
+							@if(schemas != null && schemas.size() > 0) {
+								@for((schemaUri, abbrvUri) <- schemas){
+									@if(da.getSchemaUri() != null && da.getSchemaUri().equals(schemaUri)) {
+										<option selected value="@schemaUri">@abbrvUri</option>
+									} else {
+										<option value="@schemaUri">@abbrvUri</option>
+									}
+								}
+							}
+						</select>
+					</div>
+				} else {
+					<div class="form-group">
+						<label>Set Parameter</label>
+						<input type="text" value="@da.getParameter()" class="form-control" name="newParameter" id="newParameter" oninput="checkform()" >
+					</div>
+
+					<div id="div_acquisition_uri" class="form-group" style="display : none">
+						<label>Stream Specification URI:</label>
+						<input type="text" class="form-control col-sm-6" name="newDataAcquisitionUri" id="newDataAcquisitionUri" >
+					</div>
+
+					<div id="div_startdate" class="form-group" style="display : none">
+						<label for="startdate">Start Date/Time</label><br>
+						<div class="row">
+							<div class='col-sm-3'>
+								<div class='input-group date' id='startdate' onclick="$('#startdate').datetimepicker(); checkform();">
+									<input type='text' name="newStartDate" id="newStartDate" class="form-control" oninput="checkform()" />
+									<span class="input-group-addon">
+										<span class="glyphicon glyphicon-calendar"></span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="div_enddate" class="form-group" style="display : none">
+						<label for="enddate">End Date/Time</label><br>
+						<div class="row">
+							<div class='col-sm-3'>
+								<div class='input-group date' id='enddate' onclick="$('#enddate').datetimepicker(); checkform();">
+									<input type='text' name="newEndDate" id="newEndDate" class="form-control" oninput="checkform()" />
+									<span class="input-group-addon">
+										<span class="glyphicon glyphicon-calendar"></span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+
+				<div id="question-box">
+					<input class="btn btn-success" id="submitbutton" role="button" type="submit" value="Confirm editing" onclick="return onConfirm();"/>
+				</div>
+			</form>
+
+			<br>
+			@if(fileId != null && !fileId.equals("")) {
+				<a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da.getUri())"
+				class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+			} else {
+				<a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
+				class="btn btn-primary" role="button">Back to Data Stream Management</a>
+			}
+	</div>
+	</ul>
 }

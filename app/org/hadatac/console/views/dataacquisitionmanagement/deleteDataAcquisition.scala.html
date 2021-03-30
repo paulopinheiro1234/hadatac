@@ -12,53 +12,53 @@
 @main("Delete Data Stream","",userName) {
 
     <h2>Delete Data Stream</h2>
-    
+
     <div class="container-fluid">
-       <ul>
-			<li><b>URI:</b> @da.getUri()</li>
-       		<li><b>Status:</b> @da.getStatus()</li>
-       		<li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
-       		<li><b>Platform:</b> @da.getPlatformName()</li>
-       		<li><b>Instrument:</b> @da.getInstrumentModel()</li>
-       		<li><b>Start Date/Time:</b> @da.getStartedAt()</li>
-       		<li><b>End Date/Time:</b> @da.getEndedAt()</li>
-       		<li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
-       		<li><b>Current Parameter:</b> @da.getParameter()</li>
-       		@if(bAdmin) {
-       			<li><b>Current Owner:</b> @da.getOwnerUri()</li>
-       		}
-       		<li><b>Current Permission:</b> @da.getPermissionUri()</li>
-       </ul>
+        <ul>
+            <li><b>URI:</b> @da.getUri()</li>
+            <li><b>Status:</b> @da.getStatus()</li>
+            <li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
+            <li><b>Platform:</b> @da.getPlatformName()</li>
+            <li><b>Instrument:</b> @da.getInstrumentModel()</li>
+            <li><b>Start Date/Time:</b> @da.getStartedAt()</li>
+            <li><b>End Date/Time:</b> @da.getEndedAt()</li>
+            <li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
+            <li><b>Current Parameter:</b> @da.getParameter()</li>
+            @if(bAdmin) {
+                <li><b>Current Owner:</b> @da.getOwnerUri()</li>
+            }
+            <li><b>Current Permission:</b> @da.getPermissionUri()</li>
+        </ul>
     </div>
- 
+
     @if(oper=="init") {
         <div id="question-box">
-           Are your sure you want to delete this data stream? 
-           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", da.getUri())" class="btn btn-success" role="button">Confirm</a>
-           <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", da.getUri())" class="btn btn-danger" role="button">Cancel</a>
+            Are your sure you want to delete this data stream?
+            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("confirmed", da.getUri())" class="btn btn-success" role="button">Confirm</a>
+            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DeleteDataAcquisition.index("cancelled", da.getUri())" class="btn btn-danger" role="button">Cancel</a>
         </div>
     }
 
     <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-         
+
     @if(oper=="cancelled") {
         <div id="cancel-box">
-          <h4>Operation [Delete Data Stream] has been cancelled.</h4>
-          Press OK button to return to Data Stream Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
-	    </div>
+            <h4>Operation [Delete Data Stream] has been cancelled.</h4>
+            Press OK button to return to Data Stream Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
+        </div>
     }
 
-             
-     <div id="end-process-box" style="display:none;">
-          Press OK button to return to Data Stream Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
-	 </div>
 
-	 @if(oper=="confirmed") {
-         <script> 
-            var msg = "@DeleteDataAcquisition.delete(da.getUri())";
-            $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
-            document.getElementById('end-process-box').style.display = 'inline';
-         </script>
-	 }
+    <div id="end-process-box" style="display:none;">
+        Press OK button to return to Data Stream Management page <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" class="btn btn-primary" role="button">Ok</a>
+    </div>
+
+    @if(oper=="confirmed") {
+        <script>
+                var msg = "@DeleteDataAcquisition.delete(da.getUri())";
+                $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                document.getElementById('end-process-box').style.display = 'inline';
+        </script>
+    }
 
 }

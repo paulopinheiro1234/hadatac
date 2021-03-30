@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.*;
 
 import javax.inject.Inject;
 import java.time.ZoneId;
@@ -78,7 +77,6 @@ public class SearchActivityAnnotationAction extends Action<SearchActivityAnnotat
         String id_s = userSearchActivity.getId_s();
         request.session().adding("user_search_id", id_s);
 
-
     }
 
     private void processDownloadActivity(Http.Request request) {
@@ -87,11 +85,9 @@ public class SearchActivityAnnotationAction extends Action<SearchActivityAnnotat
         String timeStr = ZonedDateTime.now(ZoneId.systemDefault()).toString();
 
         // get the reference id from session, this is the id representing the last search of the current user
-        Optional<String> userSearchIdRefOptional = null;
         String userSearchIdRef = null;
         if ( request != null && request.session() != null ) {
-            userSearchIdRefOptional = request.session().get("user_search_id");
-            userSearchIdRef= userSearchIdRefOptional.get();
+            userSearchIdRef = String.valueOf(request.session().get("user_search_id"));
         }
 
         // if there is no id in the session, ignore this one

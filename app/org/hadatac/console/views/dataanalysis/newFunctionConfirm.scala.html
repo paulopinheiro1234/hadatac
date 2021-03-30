@@ -10,20 +10,20 @@
 @main("New Function","",userName) {
 
     <h2>Create Function</h2>
-    
+
     <h3>Listing below shows values for new Function</h3>
 
     <div class="container-fluid">
-       <ul>
-         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(function.getUri())</li>
-         <li><b>Label:</b> @function.getLabel()</li>
-         <li><b>Comment:</b> @function.getComment()</li>
-       </ul>
-       
-       <br>
-       <a href="@org.hadatac.console.controllers.dataanalysis.routes.FunctionManagement.index()" class="btn btn-primary" role="button">Back to Function Management</a>
-       
+        <ul>
+            <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(function.getUri())</li>
+            <li><b>Label:</b> @function.getLabel()</li>
+            <li><b>Comment:</b> @function.getComment()</li>
+        </ul>
+
+        <br>
+        <a href="@org.hadatac.console.controllers.dataanalysis.routes.FunctionManagement.index()" class="btn btn-primary" role="button">Back to Function Management</a>
+
     </div>
-    
-    }
+
+}
     

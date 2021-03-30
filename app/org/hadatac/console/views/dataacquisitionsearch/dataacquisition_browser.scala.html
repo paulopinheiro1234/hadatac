@@ -2,6 +2,9 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.models.FacetHandler
 
+@import org.hadatac.console.views.html.dataacquisitionsearch.facetTree
+@import org.hadatac.console.views.html.dataacquisitionsearch.downloadDialog
+@import org.hadatac.console.views.html.dataacquisitionsearch.table_acquisition
 @(	page : Int,
         rows : Int,
         ownerUri : String,
@@ -95,5 +98,3 @@
 
     @facetTree(page, rows, facets, resultsSize, results, documentJson, handler, objDetails)
 }
-
-

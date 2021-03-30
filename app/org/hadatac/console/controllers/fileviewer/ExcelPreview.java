@@ -29,17 +29,17 @@ public class ExcelPreview extends Controller {
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = DataFile.findById(fileId);
         if (null == dataFile) {
-            return ok(excel_preview.render(dataFile, false));
+            return ok(excel_preview.render(dataFile, false, user.getEmail()));
         }
         
         dataFile.updatePermissionByUserEmail(user.getEmail());
         
         if (dataFile.getAllowEditing()) {
-            return ok(excel_preview.render(dataFile, bSavable));
+            return ok(excel_preview.render(dataFile, bSavable, user.getEmail()));
         }
         
         if (dataFile.getAllowViewing()) {
-            return ok(excel_preview.render(dataFile, false));
+            return ok(excel_preview.render(dataFile, false, user.getEmail()));
         }
         
         return badRequest("No perview permission!");
@@ -62,7 +62,7 @@ public class ExcelPreview extends Controller {
             return badRequest("You don't have permission to view this file!");
         }
         
-        return ok(excel_preview.render(dataFile, false));
+        return ok(excel_preview.render(dataFile, false,user.getEmail()));
     }
 
     @Secure(authorizers = Constants.FILE_VIEWER_EDITOR_ROLE)
@@ -71,18 +71,18 @@ public class ExcelPreview extends Controller {
     }
 
     @Secure(authorizers = Constants.FILE_VIEWER_EDITOR_ROLE)
-    public Result fromEditableLink(String editableId) {
+    public Result fromEditableLink(String editableId, Http.Request request) {
         DataFile dataFile = DataFile.findByViewableId(editableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
         
-        return ok(excel_preview.render(dataFile, false));
+        return ok(excel_preview.render(dataFile, false,application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.FILE_VIEWER_EDITOR_ROLE)
-    public Result postFromEditableLink(String editableId) {
-        return fromEditableLink(editableId);
+    public Result postFromEditableLink(String editableId, Http.Request request) {
+        return fromEditableLink(editableId, request);
     }
 }
 

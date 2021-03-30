@@ -9,126 +9,126 @@
 	@import java.net._
 
 	@main("Download Management","",userName) {
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
-		<script type="text/javascript">
-				$(document).ready(function() {
-					function checkCompletion() {
-						// console.log("calling checkCompletion...");
-						$("#download_files tbody tr").each(function () {
-							var row = $(this);
-							var status;
+	<script type="text/javascript">
+			$(document).ready(function() {
+				function checkCompletion() {
+					// console.log("calling checkCompletion...");
+					$("#download_files tbody tr").each(function () {
+						var row = $(this);
+						var status;
+						@if(bAdmin) {
+						status = row.find("td:nth-child(6)").html();
+						} else {
+						status = row.find("td:nth-child(5)").html();
+						}
+
+						if (status == "CREATED") {
 							@if(bAdmin) {
-							status = row.find("td:nth-child(6)").html();
+							row.find("td:nth-child(7) [name='download']").removeClass("disabled");
+							row.find("td:nth-child(7) [name='assign_owner']").removeClass("disabled");
 							} else {
-							status = row.find("td:nth-child(5)").html();
+							row.find("td:nth-child(6) [name='download']").removeClass("disabled");
+							row.find("td:nth-child(6) [name='assign_owner']").removeClass("disabled");
+							row.find("td:nth-child(6) [name='to_my_workspace']").removeClass("disabled");
 							}
 
-							if (status == "CREATED") {
+							return;
+						}
+
+						@if(bAdmin) {
+						row.find("td:nth-child(7) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
+						row.find("td:nth-child(7) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
+						} else {
+						row.find("td:nth-child(6) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
+						row.find("td:nth-child(6) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
+						row.find("td:nth-child(6) [name='to_my_workspace']").attr('class', 'btn btn-xs btn-primary disabled');
+						}
+						console.log(row.find("td:nth-child(1)").html().toString());
+						console.log(row.find("td:nth-child(2)").html().toString());
+						//console.log(row.find("td:nth-child(3)").html().toString());
+						//console.log(row.find("td:nth-child(4)").html().toString());
+
+						$.ajax({
+							type: 'GET',
+							url: '/hadatac/downloader/checkcompletion',
+							data: { 'file_id': row.find("td:nth-child(1)").html().toString() },
+							dataType: 'json',
+							success: function (data) {
 								@if(bAdmin) {
-								row.find("td:nth-child(7) [name='download']").removeClass("disabled");
-								row.find("td:nth-child(7) [name='assign_owner']").removeClass("disabled");
+								row.find("td:nth-child(4)").html(data['CompletionTime']);
+								row.find("td:nth-child(5)").html(data['CompletionPercentage'] + '%');
+								row.find("td:nth-child(6)").html(data['Status']);
 								} else {
-								row.find("td:nth-child(6) [name='download']").removeClass("disabled");
-								row.find("td:nth-child(6) [name='assign_owner']").removeClass("disabled");
-								row.find("td:nth-child(6) [name='to_my_workspace']").removeClass("disabled");
+								row.find("td:nth-child(3)").html(data['CompletionTime']);
+								row.find("td:nth-child(4)").html(data['CompletionPercentage'] + '%');
+								row.find("td:nth-child(5)").html(data['Status']);
 								}
-
-								return;
-							}
-
-							@if(bAdmin) {
-							row.find("td:nth-child(7) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
-							row.find("td:nth-child(7) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
-							} else {
-							row.find("td:nth-child(6) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
-							row.find("td:nth-child(6) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
-							row.find("td:nth-child(6) [name='to_my_workspace']").attr('class', 'btn btn-xs btn-primary disabled');
-							}
-							console.log(row.find("td:nth-child(1)").html().toString());
-							console.log(row.find("td:nth-child(2)").html().toString());
-							//console.log(row.find("td:nth-child(3)").html().toString());
-							//console.log(row.find("td:nth-child(4)").html().toString());
-
-							$.ajax({
-								type: 'GET',
-								url: '/hadatac/downloader/checkcompletion',
-								data: { 'file_id': row.find("td:nth-child(1)").html().toString() },
-								dataType: 'json',
-								success: function (data) {
-									@if(bAdmin) {
-									row.find("td:nth-child(4)").html(data['CompletionTime']);
-									row.find("td:nth-child(5)").html(data['CompletionPercentage'] + '%');
-									row.find("td:nth-child(6)").html(data['Status']);
-									} else {
-									row.find("td:nth-child(3)").html(data['CompletionTime']);
-									row.find("td:nth-child(4)").html(data['CompletionPercentage'] + '%');
-									row.find("td:nth-child(5)").html(data['Status']);
-									}
-									console.log("completionPercentage = " + data['CompletionPercentage']);
-									if( data['CompletionPercentage'] >= 100 ) {
-										console.log("stopping the scheduled query since download is done...");
-										setTimeout(() => { clearInterval(timerId); }, 0);
-									}
+								console.log("completionPercentage = " + data['CompletionPercentage']);
+								if( data['CompletionPercentage'] >= 100 ) {
+									console.log("stopping the scheduled query since download is done...");
+									setTimeout(() => { clearInterval(timerId); }, 0);
 								}
-							});
+							}
 						});
-					}
-					let timerId = setInterval(checkCompletion, 1000);
-				});
-		</script>
-
-		<div class="container-fluid">
-			<table class="table" id="download_files">
-				<thead>
-					<tr>
-						<th>Data Files</th>
-						@if(bAdmin) {
-							<th>Owner Email</th>
-						}
-						<th>Submission Time</th>
-						<th>Completion Time</th>
-						<th>Progress</th>
-						<th>Status</th>
-						<th>Operations</th>
-					</tr>
-				</thead>
-				<tbody>
-				@for(file <- files){
-					<tr>
-						<td>@file.getFileName()</td>
-						@if(bAdmin) {
-							<td>@file.getOwnerEmail()</td>
-						}
-						<td>@file.getSubmissionTime()</td>
-						<td>@file.getCompletionTime()</td>
-						<td>@file.getCompletionPercentage().toInt%</td>
-						<td>@file.getStatus()</td>
-						<td>
-							<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.downloadDataFile(file.getId())"
-							class="btn btn-xs btn-primary" name="download" role="button">Download</a>
-							<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.deleteDataFile(file.getId())"
-							class="btn btn-xs btn-primary" name="delete" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
-							@if(bAdmin) {
-								<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getId())"
-								class="btn btn-xs btn-primary" name="assign_owner" role="button">Assign Owner</a>
-							}
-							<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
-							class="btn btn-xs btn-primary" name="to_my_workspace" role="button">to my workspace</a>
-							<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getId())"
-							class="btn btn-xs btn-primary" name="logs" role="button">Logs</a>
-						</td>
-					</tr>
+					});
 				}
-				</tbody>
-			</table>
-			@if(files.isEmpty()) {
-				<p>No records for downloading/downloaded files</p>
+				let timerId = setInterval(checkCompletion, 1000);
+			});
+	</script>
+
+	<div class="container-fluid">
+		<table class="table" id="download_files">
+			<thead>
+				<tr>
+					<th>Data Files</th>
+					@if(bAdmin) {
+						<th>Owner Email</th>
+					}
+					<th>Submission Time</th>
+					<th>Completion Time</th>
+					<th>Progress</th>
+					<th>Status</th>
+					<th>Operations</th>
+				</tr>
+			</thead>
+			<tbody>
+			@for(file <- files){
+				<tr>
+					<td>@file.getFileName()</td>
+					@if(bAdmin) {
+						<td>@file.getOwnerEmail()</td>
+					}
+					<td>@file.getSubmissionTime()</td>
+					<td>@file.getCompletionTime()</td>
+					<td>@file.getCompletionPercentage().toInt%</td>
+					<td>@file.getStatus()</td>
+					<td>
+						<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.downloadDataFile(file.getId())"
+						class="btn btn-xs btn-primary" name="download" role="button">Download</a>
+						<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.deleteDataFile(file.getId())"
+						class="btn btn-xs btn-primary" name="delete" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
+						@if(bAdmin) {
+							<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.assignFileOwner(file.getOwnerEmail(), file.getId())"
+							class="btn btn-xs btn-primary" name="assign_owner" role="button">Assign Owner</a>
+						}
+						<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
+						class="btn btn-xs btn-primary" name="to_my_workspace" role="button">to my workspace</a>
+						<a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Downloader.checkAnnotationLog(file.getId())"
+						class="btn btn-xs btn-primary" name="logs" role="button">Logs</a>
+					</td>
+				</tr>
 			}
+			</tbody>
+		</table>
+		@if(files.isEmpty()) {
+			<p>No records for downloading/downloaded files</p>
+		}
 
-			<br>
+		<br>
 
-			<br><br>
-			<a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Page</a>
-		</div>
-	}
+		<br><br>
+		<a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Page</a>
+	</div>
+}

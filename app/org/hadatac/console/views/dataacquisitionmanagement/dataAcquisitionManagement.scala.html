@@ -1,4 +1,5 @@
-@(state   : org.hadatac.utils.State, 
+@import org.hadatac.console.views.html.dataacquisitionmanagement.dataacquisition_entry
+@(state   : org.hadatac.utils.State,
   results : List[org.hadatac.entity.pojo.STR],
   bAdmin  : Boolean,
   userName : String)
@@ -11,54 +12,54 @@
 @main("Data Stream Management","",userName) {
 
     <h2>Data Stream Management</h2>
-    
+
     <h3>Management Options</h3>
 
     <div class="container-fluid">
-      <div class="row">
-         <div class="navbar-collapse collapse navbar-secondary">
-        	@if(state.getCurrent() == State.ACTIVE) {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active Streams</a>
-            } else {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active Streams</a>
-            }
-            @if(state.getCurrent() == State.CHANGED) {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-warning disabled" role="button">Changed Streams</a>
-            } else {
-            	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-primary" role="button">Changed Streams</a>
-            }
-        	@if(state.getCurrent() == State.CLOSED) {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed Streams</a>
-            } else {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-primary" role="button">Closed Streams</a>
-            }
-        	@if(state.getCurrent() == State.ALL) {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-warning disabled" role="button">All Streams</a>
-            } else {
-             	<a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-primary" role="button">All Streams</a>
-            }
-            <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.newDataAcquisition()' class="btn-sm btn-primary" role="button">Create New Data Stream</a>
-         </div>
-      </div>
-   </div>
+        <div class="row">
+            <div class="navbar-collapse collapse navbar-secondary">
+                @if(state.getCurrent() == State.ACTIVE) {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-warning disabled" role="button">Active Streams</a>
+                } else {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)' class="btn-sm btn-primary" role="button">Active Streams</a>
+                }
+                @if(state.getCurrent() == State.CHANGED) {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-warning disabled" role="button">Changed Streams</a>
+                } else {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CHANGED)' class="btn-sm btn-primary" role="button">Changed Streams</a>
+                }
+                @if(state.getCurrent() == State.CLOSED) {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-warning disabled" role="button">Closed Streams</a>
+                } else {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.CLOSED)' class="btn-sm btn-primary" role="button">Closed Streams</a>
+                }
+                @if(state.getCurrent() == State.ALL) {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-warning disabled" role="button">All Streams</a>
+                } else {
+                    <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ALL)' class="btn-sm btn-primary" role="button">All Streams</a>
+                }
+                <a href='@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.newDataAcquisition()' class="btn-sm btn-primary" role="button">Create New Data Stream</a>
+            </div>
+        </div>
+    </div>
 
-   <hr>
-   
-   @if(state.getCurrent() == State.ACTIVE) {
+    <hr>
+
+    @if(state.getCurrent() == State.ACTIVE) {
         <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(userName).getName()'s Active Streams</h3>
-   }
-   @if(state.getCurrent() == State.CLOSED) {
+    }
+    @if(state.getCurrent() == State.CLOSED) {
         <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(userName).getName()'s Closed Streams</h3>
-   }
-   @if(state.getCurrent() == State.ALL) {
+    }
+    @if(state.getCurrent() == State.ALL) {
         <h3>@AuthApplication.getAuthApplication.getUserProvider().getUser(userName).getName()'s Active and Closed Streams</h3>
-   }
+    }
 
-   
+
     <div class="container-fluid">
         <table class="table">
             <thead>
-                 <tr>
+                <tr>
                     <th>Study</th>
                     <th>Name</th>
                     <th>Platform</th>
@@ -70,16 +71,16 @@
                     <th># of Data Points</th>
                     <th>Schema</th>
                     @if(bAdmin) {
-                    	<th>Owner</th>
+                        <th>Owner</th>
                     }
                     <th>Permission</th>
                     <th>Operations</th>
-                 </tr>
+                </tr>
             </thead>
             <tbody>
-              @for(dataCollection <- results){
-                  @dataacquisition_entry(state, dataCollection, bAdmin)
-              }
+            @for(dataCollection <- results){
+                @dataacquisition_entry(state, dataCollection, bAdmin)
+            }
             </tbody>
         </table>
         @mainButton(false)
