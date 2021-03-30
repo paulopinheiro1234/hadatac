@@ -5,7 +5,8 @@
   oc_uri      : String,
   headers     : List[String],
   preview     : ArrayList[ArrayList[String]], 
-  page        : Integer
+  page        : Integer,
+  userName : String
 )
 
 @import helper._
@@ -16,7 +17,7 @@
 @import org.hadatac.entity.pojo.DataFile;
 @import java.net._
 
-@main("CSV Preview","",""){
+@main("CSV Preview","",userName){
    <style>
      .col-selected { background: #AED6F1; }
    </style>

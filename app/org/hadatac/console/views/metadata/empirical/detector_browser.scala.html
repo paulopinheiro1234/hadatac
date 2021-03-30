@@ -6,7 +6,8 @@
    da_uri       : String,
    results      : org.hadatac.console.models.SparqlQueryResults,
    perspectives : org.hadatac.console.models.SparqlQueryResults,
-   category     : String)
+   category     : String,
+   userName     : String)
 
 @*****************************
 	public TreeMap<String,TripleDocument> results.sparqlResults;
@@ -18,7 +19,7 @@
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("Hierarchies","","") {
+@main("Hierarchies","",userName) {
     @empirical_navigation(dir, filename, da_uri, category)
     <div class="container-fluid container-spaced">
       <div class="row">

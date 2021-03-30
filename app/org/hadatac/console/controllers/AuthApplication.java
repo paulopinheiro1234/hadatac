@@ -74,7 +74,7 @@ public class AuthApplication extends Controller {
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result restricted(String username) {
         final SysUser localUser = this.userProvider.getUser(username);
-        return ok(restricted.render(localUser));
+        return ok(restricted.render(localUser,localUser.getEmail()));
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)

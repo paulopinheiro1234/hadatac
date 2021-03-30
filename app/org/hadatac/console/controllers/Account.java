@@ -139,7 +139,7 @@ public class Account extends Controller {
         final SysUser u = this.userProvider.getUser(application.getUserEmail(request));
 
         if (!u.getEmailValidated()) {
-            return ok(unverified.render()).withHeader("Cache-Control", "no-cache");
+            return ok(unverified.render(application.getUserEmail(request))).withHeader("Cache-Control", "no-cache");
         } else {
             return ok(password_change.render(PASSWORD_CHANGE_FORM,application.getUserEmail(request),msg.preferred(request))).withHeader("Cache-Control", "no-cache");
         }

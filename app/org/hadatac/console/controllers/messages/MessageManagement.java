@@ -65,37 +65,37 @@ public class MessageManagement extends Controller {
     Application application;
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result index(String dir, String filename, String da_uri, int offset, boolean topics) {
+    public Result index(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
 
         // get an updated list of stream
         List<STR> results = STRStore.getInstance().findCachedOpenStreams();
 
         // get an updated list of studies
         List<String> studyIdList = Study.findIds();
-        return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results, topics));
+        return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results, topics, application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics) {
-        return index(dir, filename, da_uri, offset, topics);
+    public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
+    public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
 
         // get an updated list of stream
         STRStore.getInstance().refreshStore();
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset, topics, request);
 
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
-        return refreshCache(dir, filename, da_uri, offset, topics);
+    public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
+        return refreshCache(dir, filename, da_uri, offset, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
 
         // retrieve stream
         String uri = null;
@@ -119,16 +119,16 @@ public class MessageManagement extends Controller {
             //subscription.exec(stream);
         }
 
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return subscribe(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        return subscribe(dir, filename, da_uri, offset, stream_uri, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
 
         // retrieve stream
         String uri = null;
@@ -150,16 +150,16 @@ public class MessageManagement extends Controller {
             }
         }
 
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
 
         // retrieve stream
         String uri = null;
@@ -181,12 +181,12 @@ public class MessageManagement extends Controller {
             }
         }
 
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return close(dir, filename, da_uri, offset, stream_uri, topics);
+    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        return close(dir, filename, da_uri, offset, stream_uri, topics, request);
     }
 
     /*

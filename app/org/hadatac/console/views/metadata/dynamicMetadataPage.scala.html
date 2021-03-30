@@ -1,4 +1,4 @@
-@()
+@(userName :String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
@@ -9,7 +9,7 @@
 @import be.objectify.deadbolt.java.utils.TemplateUtils._
 @import play.api.Play
 
-@main("Dynamic Metadata Generator","","") {
+@main("Dynamic Metadata Generator","",userName) {
     <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/rdf.js")"></script>
         
     <div class="row">

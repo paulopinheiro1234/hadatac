@@ -1,7 +1,8 @@
 @(dataFile : org.hadatac.entity.pojo.DataFile,
 bSavable : Boolean,
 dir: String,
-dirFile: org.hadatac.entity.pojo.DataFile
+dirFile: org.hadatac.entity.pojo.DataFile,
+userName: String
 
 )
 
@@ -17,7 +18,7 @@ dirFile: org.hadatac.entity.pojo.DataFile
 @import org.hadatac.console.controllers._
 @import org.hadatac.entity.pojo._
 
-@main("Edit DD_2","",""){
+@main("Edit DD_2","",userName){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
 

@@ -4,7 +4,8 @@
         page        : Integer,
         studyList   : List[String],
         results     : List[org.hadatac.entity.pojo.STR],
-        show        : Boolean)
+        show        : Boolean,
+userName : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
@@ -12,7 +13,7 @@
 @import play.api.Play._
 @import java.net.URLEncoder
 
-@main("Message Stream Ingestion","","") {
+@main("Message Stream Ingestion","",userName) {
 
     <h2>Message Stream Ingestion</h2>
 

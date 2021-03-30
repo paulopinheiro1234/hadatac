@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.CSVParser;
 import java.nio.charset.StandardCharsets;
 
+import org.hadatac.console.controllers.Application;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.FileManager;
 import org.hadatac.console.views.html.fileviewer.*;
@@ -17,13 +18,19 @@ import java.util.Map;
 import java.util.ArrayList;
 
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
+
+import javax.inject.Inject;
 
 public class CSVPreview extends Controller{
 
 	private static String pathProc = ConfigProp.getPathProc();
 	private static String pathUnproc = ConfigProp.getPathUnproc();
 	private static String pathWorking = ConfigProp.getPathWorking();
+
+	@Inject
+	Application application;
 
 	public static ArrayList<String> getCSVHeaders(String folder, String fileId) {
 	    ArrayList<String> headerList = null;
@@ -88,13 +95,13 @@ public class CSVPreview extends Controller{
 		return previewList;
 	}
 
-	public Result getCSVPreview(String folder, String dir, String fileId, 
-	        String da_uri, String oc_uri, int numRows, int page) {
+	public Result getCSVPreview(String folder, String dir, String fileId,
+								String da_uri, String oc_uri, int numRows, int page, Http.Request request) {
 		if (da_uri != null && !da_uri.equals("")) {
-			return ok(csv_preview.render("selectCol", dir, fileId, da_uri, oc_uri, getCSVHeaders(folder, fileId), getCSVPreview(folder, dir, fileId, numRows), page));
+			return ok(csv_preview.render("selectCol", dir, fileId, da_uri, oc_uri, getCSVHeaders(folder, fileId), getCSVPreview(folder, dir, fileId, numRows), page, application.getUserEmail(request)));
 		}
 		
-		return ok(csv_preview.render("preview", dir, fileId, da_uri, oc_uri, getCSVHeaders(folder, fileId), getCSVPreview(folder, dir, fileId, numRows), page));
+		return ok(csv_preview.render("preview", dir, fileId, da_uri, oc_uri, getCSVHeaders(folder, fileId), getCSVPreview(folder, dir, fileId, numRows), page, application.getUserEmail(request)));
 	}
 
 	public static ArrayList<String> getColumn(String ownerEmail, String fileId, int selectedCol) {

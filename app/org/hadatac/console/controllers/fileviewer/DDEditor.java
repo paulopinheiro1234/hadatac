@@ -40,7 +40,7 @@ public class DDEditor extends Controller {
         dirFile.setStatus(DataFile.WORKING);
         if (null == dataFile) {
 
-            return ok(dd_editor.render(dataFile,false,dir,dirFile));
+            return ok(dd_editor.render(dataFile,false,dir,dirFile,user.getEmail()));
         }
         
         
@@ -63,7 +63,7 @@ public class DDEditor extends Controller {
         
 
         
-        return ok(dd_editor.render(dataFile, bSavable,dir,dirFile));
+        return ok(dd_editor.render(dataFile, bSavable,dir,dirFile,user.getEmail()));
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
@@ -72,18 +72,18 @@ public class DDEditor extends Controller {
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result fromViewableLink(String viewableId, String dir) {
+    public Result fromViewableLink(String viewableId, String dir, Http.Request request) {
         DataFile dataFile = DataFile.findByViewableId(viewableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile, false,dir,dirFile));
+        return ok(dd_editor.render(dataFile, false,dir,dirFile,application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postFromViewableLink(String viewableId, String dir) {
-        return fromViewableLink(viewableId, dir);
+    public Result postFromViewableLink(String viewableId, String dir, Http.Request request) {
+        return fromViewableLink(viewableId, dir,request);
     }
     public Result getdd_df(DataFile d){
         dd_df=d;
@@ -122,17 +122,17 @@ public class DDEditor extends Controller {
        return ok(Json.toJson(sdd_id));
     }
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result fromEditableLink(String editableId, String dir) {
+    public Result fromEditableLink(String editableId, String dir,Http.Request request) {
         DataFile dataFile = DataFile.findByEditableId(editableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
 
-        return ok(dd_editor.render(dataFile, false, dir,dirFile));
+        return ok(dd_editor.render(dataFile, false, dir,dirFile,application.getUserEmail(request)));
     }
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result postFromEditableLink(String editableId, String dir) {
-        return fromEditableLink(editableId, dir);
+    public Result postFromEditableLink(String editableId, String dir,Http.Request request) {
+        return fromEditableLink(editableId, dir, request);
     }
 }

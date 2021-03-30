@@ -1,9 +1,9 @@
 @import play.api.i18n.Messages.implicitMessagesProviderToMessages
-@(localUser: org.hadatac.console.models.SysUser = null) (implicit messages: play.i18n.Messages)
+@(localUser: org.hadatac.console.models.SysUser = null, userName: String) (implicit messages: play.i18n.Messages)
 
 @import org.hadatac.console.views.html._
 
-@main("Restricted page", "restricted","") {
+@main("Restricted page", "restricted",userName) {
 
     <h1>"Restricted page"</h1>
     <p>
