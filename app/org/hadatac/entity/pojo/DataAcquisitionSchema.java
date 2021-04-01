@@ -1,6 +1,15 @@
 package org.hadatac.entity.pojo;
 
-import org.hadatac.console.http.SPARQLUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -8,12 +17,13 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
-
-import java.util.*;
+import org.hadatac.utils.FirstLabel;
+import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
+import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 
 public class DataAcquisitionSchema extends HADatAcThing {
     public static String INDENT1 = "     ";
@@ -24,17 +34,17 @@ public class DataAcquisitionSchema extends HADatAcThing {
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "DAS-";
     public static List<String> METADASA = Arrays.asList(
-            "hasco:TimeStamp",
-            "sio:SIO_000418",
-            "hasco:namedTime",
-            "hasco:originalID",
-            "hasco:uriId",
-            "hasco:hasMetaEntity",
-            "hasco:hasMetaEntityURI",
-            "hasco:hasMetaAttribute",
-            "hasco:hasMetaAttributeURI",
-            "hasco:hasMetaUnit",
-            "hasco:hasMetaUnitURI",
+            "hasco:TimeStamp", 
+            "sio:SIO_000418", 
+            "hasco:namedTime", 
+            "hasco:originalID", 
+            "hasco:uriId", 
+            "hasco:hasMetaEntity", 
+            "hasco:hasMetaEntityURI", 
+            "hasco:hasMetaAttribute", 
+            "hasco:hasMetaAttributeURI", 
+            "hasco:hasMetaUnit", 
+            "hasco:hasMetaUnitURI", 
             "sio:SIO_000668",
             "hasco:hasLOD",
             "hasco:hasCalibration",
@@ -47,7 +57,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private List<DataAcquisitionSchemaAttribute> attributesCache = new ArrayList<DataAcquisitionSchemaAttribute>();
     private List<DataAcquisitionSchemaObject> objectsCache = new ArrayList<DataAcquisitionSchemaObject>();
     private Map<String, Map<String, String>> possibleValuesCache = new HashMap<String, Map<String, String>>();
-
+    
     private String uri = "";
     private String label = "";
     private String version = "";
@@ -63,7 +73,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String lodLabel = "";
     private String groupLabel = "";
     private String matchingLabel = "";
-
+    
     private List<String> attributes = new ArrayList<String>();
     private List<String> objects = new ArrayList<String>();
     private List<String> events = new ArrayList<String>();
@@ -71,8 +81,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     private static Map<String, DataAcquisitionSchema> getCache() {
         if (DASCache == null) {
-            DASCache = new HashMap<String, DataAcquisitionSchema>();
-        }
+            DASCache = new HashMap<String, DataAcquisitionSchema>(); 
+        } 
         return DASCache;
     }
 
@@ -303,9 +313,9 @@ public class DataAcquisitionSchema extends HADatAcThing {
                     setMatchingLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema MatchingLabel: " + dasa.getLabel());
                 }
-                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:originalID"))
-                        || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:SIO_000115"))
-                        || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttributes())) {
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:originalID")) 
+                        || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:SIO_000115")) 
+                        || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttributes())) { 
                     setOriginalIdLabel(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
                 }
@@ -390,7 +400,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         	auxcsv++;
         }
         */
-
+        
         // Assign DASA positions by label matching
         if (listDasa != null && listDasa.size() > 0) {
             // reset temporary positions
@@ -465,7 +475,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public static DataAcquisitionSchema find(String schemaUri) {
         if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
-
+        	
             DataAcquisitionSchema sdd = DataAcquisitionSchema.getCache().get(schemaUri);
             sdd.getAttributes();
             return sdd;
@@ -478,8 +488,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
             return null;
         }
 
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?version WHERE { " +
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?version WHERE { " + 
                 "   <" + schemaUri + "> a hasco:DASchema . " +
                 "   <" + schemaUri + "> hasco:hasVersion ?version . } ";
 
@@ -501,7 +511,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             }
         } else {
             System.out.println("[WARNING] DataAcquisitionSchema. Could not find schema for uri: <" + schemaUri + ">");
-            return null;
+        	return null;
         }
 
         //schema.setVersion("1.0");
@@ -525,8 +535,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
     public static List<DataAcquisitionSchema> findAll() {
         List<DataAcquisitionSchema> schemas = new ArrayList<DataAcquisitionSchema>();
 
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?uri WHERE { " +
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+                "SELECT ?uri WHERE { " + 
                 "   ?uri a hasco:DASchema . } ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -534,7 +544,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            if (soln != null && soln.getResource("uri").getURI() != null) {
+            if (soln != null && soln.getResource("uri").getURI() != null) { 
                 DataAcquisitionSchema schema = DataAcquisitionSchema.find(soln.getResource("uri").getURI());
                 schemas.add(schema);
             }

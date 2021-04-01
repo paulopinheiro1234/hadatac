@@ -723,7 +723,7 @@ public class Study extends HADatAcThing {
                 "{  " +
                 "  { " +
                 "	{  " +
-                // Study 
+                // Study
                 "   ?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?s a ?subUri . " +
                 "  	?s ?p ?o . " +
@@ -731,7 +731,7 @@ public class Study extends HADatAcThing {
                 "  	} " +
                 "    MINUS " +
                 "    { " +
-                // Other Studies 
+                // Other Studies
                 "   ?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?s a ?subUri . " +
                 "  	?s ?p ?o . " +
@@ -913,7 +913,7 @@ public class Study extends HADatAcThing {
                 "   UNION " +
                 "   { " +
                 "  	  {  " +
-                // Attribute References 
+                // Attribute References
                 "    ?subUri rdfs:subClassOf* hasco:Study . " +
                 "    ?study a ?subUri . " +
                 "    ?data hasco:isDatasetOf ?study . " +
@@ -1178,3 +1178,4 @@ public class Study extends HADatAcThing {
     }
 
 }
+

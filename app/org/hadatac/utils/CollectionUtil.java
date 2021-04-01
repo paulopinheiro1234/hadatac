@@ -177,6 +177,7 @@ public class CollectionUtil {
         case ANALYTES_ACQUISITION:
         case SCHEMA_ATTRIBUTES:        
             collectionName = getConfigCache().get("hadatac.solr.data") + getCollectionName(collection.get());
+            System.out.println("collectionName :"+collectionName);
         break;
         }
 

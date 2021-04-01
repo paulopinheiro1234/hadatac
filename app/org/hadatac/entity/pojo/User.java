@@ -1,14 +1,16 @@
 package org.hadatac.entity.pojo;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-//import controllers.triplestore.UserManagement;
-import org.hadatac.console.models.LinkedAccount;
-import org.hadatac.console.models.SysUser;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -26,10 +28,10 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-//import controllers.triplestore.UserManagement;
+import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.SPARQLUtils;
-//import org.hadatac.console.models.LinkedAccount;
-//import org.hadatac.console.models.SysUser;
+import org.hadatac.console.models.LinkedAccount;
+import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
@@ -153,14 +155,12 @@ public class User implements Comparable<User> {
         insert += " foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "<" + this.getUri() + ">  ";
         insert += " sio:SIO_000095 " + "\"Public\" . ";
-        insert += "<" + this.getUri() + ">  ";
-        insert += " foaf:name " + "\"" + this.name + "\" . ";
         insert += "}  ";
         System.out.println("!!!! INSERT USER");
 
         try {
             UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
@@ -182,24 +182,24 @@ public class User implements Comparable<User> {
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), query);
         Model model = qexec.execConstruct();
 
-//        File ttl_file = new File(UserManagement.getTurtlePath());
+        File ttl_file = new File(UserManagement.getTurtlePath());
         FileOutputStream outputStream = null;
-//        try {
-//            outputStream = new FileOutputStream(ttl_file);
-//        } catch (FileNotFoundException e) {
-//            System.out.println(e.getMessage());
-//        }
+        try {
+            outputStream = new FileOutputStream(ttl_file);
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
         RDFDataMgr.write(outputStream, model, Lang.TURTLE);
 
         String result = "";
-//        try {
-//            result = new String(Files.readAllBytes(
-//                    Paths.get(UserManagement.getTurtlePath())));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            result = new String(Files.readAllBytes(
+                    Paths.get(UserManagement.getTurtlePath())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        return null ;// return result;
+        return result;
     }
 
     public static List<String> getUserEmails() {
@@ -222,13 +222,13 @@ public class User implements Comparable<User> {
 
     public static List<User> find() {
         List<User> users = new ArrayList<User>();
-        String queryString =
+        String queryString = 
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
                         "SELECT ?uri WHERE { " +
                         "  ?uri a foaf:Person . " +
                         "} ";
-
+        
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
 
@@ -238,13 +238,13 @@ public class User implements Comparable<User> {
             if(null != user){
                 users.add(user);
             }
-        }
+        }			
 
         java.util.Collections.sort((List<User>) users);
         return users;
     }
 
-    public static User find(String uri) {
+    public static User find(String uri) {	
         User user = null;
 
         boolean bHasEmail = false;
@@ -255,7 +255,7 @@ public class User implements Comparable<User> {
 
         Model modelPrivate = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
                 CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
-
+        
         if (!modelPrivate.isEmpty()) {
             user = new User();
         }
@@ -303,8 +303,8 @@ public class User implements Comparable<User> {
         }
 
         Model modelPublic = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
-                CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);        
+        
         if (!modelPublic.isEmpty() && user == null) {
             user = new User();
         }
@@ -356,9 +356,9 @@ public class User implements Comparable<User> {
 
     public static void deleteUser(String uri, boolean deleteAuth, boolean deleteMember) {
         if (deleteMember) {
-//            for(User user : UserGroup.findMembers(uri)){
-//                changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
-//            }
+            for(User user : UserGroup.findMembers(uri)){
+                changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
+            }
         }
 
         if (deleteAuth){
