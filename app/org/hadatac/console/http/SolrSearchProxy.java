@@ -33,7 +33,7 @@ public class SolrSearchProxy extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getSolrSearch(String path) {
         InputStream is = null;
         URL url = null;
@@ -72,13 +72,13 @@ public class SolrSearchProxy extends Controller {
         }
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getIndicatorValueDownload(String lm) {
         File file = new File(lm);
         return ok(file);
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getDataAcquisitionDownload(Http.Request request) {
         DynamicForm form = formFactory.form().bindFromRequest(request);
         String request_fl;
@@ -106,7 +106,7 @@ public class SolrSearchProxy extends Controller {
         return getSolrSearch(path).as("text/csv");
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getStudyAcquisitionDownload(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDY_ACQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];
@@ -114,7 +114,7 @@ public class SolrSearchProxy extends Controller {
         return getSolrSearch(path).as("text/csv");
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getStudyAcquisition(Http.Request request) {
         // get the request parameter from ajax call. for this case, we have only one parameter
         String queryStr = null;
@@ -132,21 +132,21 @@ public class SolrSearchProxy extends Controller {
         return getSolrSearch(path);
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getAnalytesAcquisition(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES_ACQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];
         return getSolrSearch(path);
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getMetadataDataAcquisition(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)
                 + "/select" + request.toString().split((request.path()))[1];
         return getSolrSearch(path);
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result getDataAcquisition(Http.Request request) {
         String path = CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_AQUISITION)
                 + "/select" + request.toString().split((request.path()))[1];

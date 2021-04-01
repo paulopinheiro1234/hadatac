@@ -2,7 +2,13 @@ package org.hadatac.metadata.loader;
 
 import org.apache.jena.query.DatasetAccessor;
 import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -89,7 +95,7 @@ public class PermissionsContext implements RDFContext {
     }
 
     /*
-     *   contentType correspond to the mime type required for curl to process the org.hadatac.data provided. For example, application/rdf+xml is
+     *   contentType correspond to the mime type required for curl to process the data provided. For example, application/rdf+xml is
      *   used to process rdf/xml content.
      *
      */
@@ -118,5 +124,4 @@ public class PermissionsContext implements RDFContext {
         return (newTotal - total);
     }
 
-}	
-	
+}

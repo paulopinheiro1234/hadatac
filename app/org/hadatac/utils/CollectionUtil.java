@@ -126,7 +126,7 @@ public class CollectionUtil {
     }
 
     public static boolean isSandboxMode() {
-	    // disable sandbox for now
+        // disable sandbox for now
         /*List<OperationMode> modes = OperationMode.findAll();
         if (modes.size() > 0) {
             OperationMode mode = modes.get(0);
@@ -134,51 +134,50 @@ public class CollectionUtil {
                 return true;
             }
         }*/
-        
+
         return false;
     }
 
     public static String getCollectionPath(Collection collection) {
         String collectionName = null;
         switch (collection) {
-        case METADATA_SPARQL:
-        case METADATA_UPDATE:
-        case METADATA_GRAPH :          
-            collectionName = getConfigCache().get("hadatac.solr.triplestore") + getCollectionName(collection.get());
-        break;
-        case AUTHENTICATE_USERS:
-        case AUTHENTICATE_ACCOUNTS:
-        case SEARCH_ACTIVITIES:
-        case DOWNLOAD_ACTIVITIES:
-        case AUTHENTICATE_ROLES: 
-        case AUTHENTICATE_TOKENS:
-        case AUTHENTICATE_PERMISSIONS: 
-            collectionName = getConfigCache().get("hadatac.solr.users") + collection.get();
-        break;
-        case PERMISSIONS_SPARQL:
-        case PERMISSIONS_UPDATE:
-        case PERMISSIONS_GRAPH :       
-            collectionName = getConfigCache().get("hadatac.solr.permissions") + collection.get();
-        break;
-        case DATA_COLLECTION:
-        case DATA_ACQUISITION:
-        case METADATA_AQUISITION:
-        case SA_ACQUISITION :
-        case CONSOLE_STORE:
-        case STUDIES:
-        case ANALYTES:
-        case ANNOTATION_LOG:
-        case OPERATION_MODE:
-        case NAMESPACE:
-        case CSV_DATASET:
-        case URI_GENERATOR :
-        case STUDY_ACQUISITION:
-        case METADATA_DA:
-        case ANALYTES_ACQUISITION:
-        case SCHEMA_ATTRIBUTES:        
-            collectionName = getConfigCache().get("hadatac.solr.data") + getCollectionName(collection.get());
-            System.out.println("collectionName :"+collectionName);
-        break;
+            case METADATA_SPARQL:
+            case METADATA_UPDATE:
+            case METADATA_GRAPH :
+                collectionName = getConfigCache().get("hadatac.solr.triplestore") + getCollectionName(collection.get());
+                break;
+            case AUTHENTICATE_USERS:
+            case AUTHENTICATE_ACCOUNTS:
+            case SEARCH_ACTIVITIES:
+            case DOWNLOAD_ACTIVITIES:
+            case AUTHENTICATE_ROLES:
+            case AUTHENTICATE_TOKENS:
+            case AUTHENTICATE_PERMISSIONS:
+                collectionName = getConfigCache().get("hadatac.solr.users") + collection.get();
+                break;
+            case PERMISSIONS_SPARQL:
+            case PERMISSIONS_UPDATE:
+            case PERMISSIONS_GRAPH :
+                collectionName = getConfigCache().get("hadatac.solr.permissions") + collection.get();
+                break;
+            case DATA_COLLECTION:
+            case DATA_ACQUISITION:
+            case METADATA_AQUISITION:
+            case SA_ACQUISITION :
+            case CONSOLE_STORE:
+            case STUDIES:
+            case ANALYTES:
+            case ANNOTATION_LOG:
+            case OPERATION_MODE:
+            case NAMESPACE:
+            case CSV_DATASET:
+            case URI_GENERATOR :
+            case STUDY_ACQUISITION:
+            case METADATA_DA:
+            case ANALYTES_ACQUISITION:
+            case SCHEMA_ATTRIBUTES:
+                collectionName = getConfigCache().get("hadatac.solr.data") + getCollectionName(collection.get());
+                break;
         }
 
         return collectionName;

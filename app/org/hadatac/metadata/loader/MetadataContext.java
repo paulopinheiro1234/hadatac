@@ -49,7 +49,7 @@ public class MetadataContext implements RDFContext {
                 false);
         return metadata.totalTriples();
     }
-//
+
     public Long totalTriples() {
         try {
             String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
