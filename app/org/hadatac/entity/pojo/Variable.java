@@ -54,11 +54,11 @@ public class Variable {
 	}
 
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
-        this(entRole, attrInRel, null, null);
+    	this(entRole, attrInRel, null, null);
     }
 
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit) {
-        this(entRole, attrInRel, unit, null);
+    	this(entRole, attrInRel, unit, null);
     }
 
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
@@ -75,7 +75,7 @@ public class Variable {
     }
 
     public Entity getEntity() {
-        return ent;
+    	return ent;
     }
 
     public String getEntityStr() {
@@ -110,7 +110,7 @@ public class Variable {
     }
 
     public Entity getInRelationTo() {
-        return inRelationTo;
+    	return inRelationTo;
     }
 
     public String getInRelationToStr() {
@@ -121,7 +121,7 @@ public class Variable {
     }
 
     public Unit getUnit() {
-        return unit;
+    	return unit;
     }
 
     public String getUnitStr() {
@@ -132,7 +132,7 @@ public class Variable {
     }
 
     public Attribute getTime() {
-        return timeAttr;
+    	return timeAttr;
     }
 
     public String getTimeStr() {
@@ -143,19 +143,19 @@ public class Variable {
     }
 
     public static String upperCase(String orig) {
-        String[] words = orig.split(" ");
-        StringBuffer sb = new StringBuffer();
+    	String[] words = orig.split(" ");
+    	StringBuffer sb = new StringBuffer();
 
-        for (int i = 0; i < words.length; i++) {
-            sb.append(Character.toUpperCase(words[i].charAt(0)))
-                    .append(words[i].substring(1)).append(" ");
-        }
-        return sb.toString().trim();
-    }
+    	for (int i = 0; i < words.length; i++) {
+    		sb.append(Character.toUpperCase(words[i].charAt(0)))
+    		.append(words[i].substring(1)).append(" ");
+    	}          
+    	return sb.toString().trim();
+    }      
 
     public String prep(String orig) {
-        String aux = upperCase(orig);
-        return aux.replaceAll(" ","-").replaceAll("[()]","");
+    	String aux = upperCase(orig);
+    	return aux.replaceAll(" ","-").replaceAll("[()]","");
     }
 
 	public static List<String> retrieveStudySearchFacetResult(String studyUri) {
@@ -180,9 +180,10 @@ public class Variable {
 			solr.close();
 			NamedList<List<PivotField>> facetPivot = queryResponse.getFacetPivot();
 			List<String> parsedPivotResult = parsePivotResult(facetPivot);
-			/*parsedPivotResult.forEach((s) -> {
-				System.out.println(s);
-			});*/
+			log.info("\n\n\nStudy Search Update result:");
+			parsedPivotResult.forEach((s) -> {
+				log.info(s);
+			});
 			return parsedPivotResult;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -258,7 +259,7 @@ public class Variable {
 		String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
 				"SELECT DISTINCT  ?attributeUri ?indicator " +
 				"WHERE { \n" +
-				"   <" + variableUri + "> (hasco:hasAttribute | hasco:hasEntity) | rdfs:subClassOf  | \n" +
+				"   <" + variableUri + "> (hasco:hasAttribute/rdf:rest*/rdf:first | hasco:hasEntity) | rdfs:subClassOf  | \n" +
 				"   (<http://semanticscience.org/resource/SIO_000668> / hasco:hasEntity) ?attributeUri . \n" +
 				"   ?attributeUri rdfs:subClassOf* ?indicator . \n" +
 				"   { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n" +

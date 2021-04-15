@@ -7,8 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.metadata.api.MetadataFactory;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
@@ -231,8 +237,11 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         rows.clear();
         List<String> column_name = new ArrayList<String>();
         int rowNumber = 0;
+
         for (Record record : records) {
-            if (getAttribute(record)  == null || getAttribute(record).equals("")){
+
+            String attr = getAttribute(record);
+            if ( attr  == null || attr.equals("")){
                 if (column_name.contains(getLabel(record))){
                     rows.add(createRelationRow(record, ++rowNumber));
                 }
@@ -246,7 +255,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             }
         }
 
-        if (mergedEA != null && mergedEA.keySet().size() > 0) {
+        /*if (mergedEA != null && mergedEA.keySet().size() > 0) {
             for (String attr : mergedEA.keySet()) {
                 if (attr.length() > 0) {
                     rows.add(createMergeEAAttrRow(attr, mergedEA));
@@ -259,7 +268,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                     rows.add(createMergeAAAttrRow(attr, mergedAA));
                 }
             }
-        }
+        }*/
     }
 
     public List<String> createUris() throws Exception {
@@ -281,10 +290,20 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         Map<String, Object> row = new HashMap<String, Object>();
         List<String> tmp = new ArrayList<String>();
 
+        /* this makes sure columns that are related to mergedEA will not be repeatedly processed.
+           for example:
+           MSLvrTscore	Visual Reception: T score	ncit:C120401	??visual_reception1
+           ??visual_reception1		                cogat:03171 	??child
+           MSLvrTscore is processed since ??visual_reception1 is in mergedEA, i.e., processing
+           ??visual_reception1 is the same as processing MSLvrTscore. So when we scan the original file
+           and reach MSLvrTscore, we should skip it. This tmp map is to make sure we can skip things like
+           these correctly
+         */
         for (String i : mergedEA.keySet()) {
             tmp.add(mergedEA.get(i).get(0));
         }
 
+        String lineLabel = getLabel(rec);
         if (mergedEA.containsKey(getLabel(rec))) {
             logger.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)));
             row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
@@ -307,7 +326,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                     row.put("hasco:Relation", "sio:SIO_000668");
                 }
             }
-            row.put("hasco:hasAttribute", getAttribute(rec));
+            row.put("hasco:hasAttribute", retrieveAttributes(rec, lineLabel));
             row.put("hasco:hasUnit", mergedEA.get(getLabel(rec)).get(2));
             if (mergedEA.get(getLabel(rec)).get(3).length()>0){
                 //row.put("hasco:hasEvent", kbPrefix + "DASE-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(3).trim().replace(" ","").replace("_","-").replace("??", "").replace(":", "-"));
@@ -323,8 +342,9 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         } else if (!tmp.contains(getLabel(rec))) {
             if (mergedAA.containsKey(getLabel(rec))) {
                 logger.println("[Derived Attribute] : " + getLabel(rec) + " ---> " + mergedAA.get(getLabel(rec)));
-                row.put("hasco:isAttributeOf", getAttributeOf(mergedAA.get(getLabel(rec)).get(2)));
-                row.put("hasco:hasAttribute", getAttribute(rec)); 
+                List<String> attributes = mergedAA.get(getLabel((rec)));
+                row.put("hasco:isAttributeOf", getAttributeOf(attributes.get(attributes.size()-1)));
+                row.put("hasco:hasAttribute", attributes);
                 //row.put("hasco:hasAttribute", URIUtils.replacePrefixEx(mergedAA.get(getLabel(rec)).get(1)));
             } else {
                 row.put("hasco:isAttributeOf", getAttributeOf(rec));
@@ -363,6 +383,22 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         }
 
         return row;
+    }
+
+    private List<String> retrieveAttributes(Record record, String columnLabel) {
+
+        List<String> attributes = new ArrayList<>();
+        if ( !mergedEA.containsKey(columnLabel) ) return attributes;
+
+        // note starting from [4] is the list of attributes
+        // attributes.add(getAttribute(record));
+        List<String> items = mergedEA.get(columnLabel);
+        for ( int i = items.size()-1; i >= 4; i-- ) {
+            attributes.add(items.get(i));
+        }
+        attributes.add("end"); // a dummy one to be consistent with mergeAA
+
+        return attributes;
     }
 
     Map<String, Object> createRelationRow(Record rec, int rowNumber) throws Exception {
@@ -415,4 +451,11 @@ public class DASchemaAttrGenerator extends BaseGenerator {
     public String getErrorMsg(Exception e) {
         return "Error in DASchemaAttrGenerator: " + e.getMessage();
     }
+
+    @Override
+    public void deleteRowsFromTripleStore(List<Map<String, Object>> rows) {
+        // doing nothing here because the SDD itself has been deleted already
+        return;
+    }
+
 }
