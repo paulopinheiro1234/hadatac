@@ -694,7 +694,7 @@
     <requestParsers enableRemoteStreaming="true"
                     multipartUploadLimitInKB="2048000"
                     enableStreamBody="true"
-                    formdataUploadLimitInKB="2048"
+                    formdataUploadLimitInKB="204800"
                     addHttpRequestToContext="false"/>
 
     <!-- HTTP Caching
