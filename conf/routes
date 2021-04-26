@@ -3,6 +3,7 @@
 # ~~~~
 
 # Home page
+GET         /                                         org.hadatac.console.controllers.Portal.index(request: Request)
 GET         /loginForm                                     org.hadatac.console.controllers.Application.loginForm()
 GET         /hadatac                                      org.hadatac.console.controllers.Portal.index(request: Request)
 GET         /hadatac/                                      org.hadatac.console.controllers.Portal.index(request: Request)
