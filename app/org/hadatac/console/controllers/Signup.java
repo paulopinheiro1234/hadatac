@@ -13,6 +13,7 @@ import org.hadatac.console.providers.UserProvider;
 import org.hadatac.console.views.html.account.signup.no_token_or_invalid;
 import org.hadatac.console.views.html.account.signup.password_forgot;
 import org.hadatac.console.views.html.account.signup.password_reset;
+import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.triplestore.notRegistered;
 import org.pac4j.core.exception.TechnicalException;
 import org.slf4j.Logger;
@@ -252,20 +253,19 @@ public class Signup {
 
     @SubjectNotPresent
     public Result createUser(Http.Request request) throws TechnicalException {
+        System.out.println("inside create user");
         final Form<MyUsernamePasswordAuthProvider> boundForm = form.bindFromRequest(request);
-        if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
-            if (!UserManagement.isPreRegistered(boundForm.get().getEmail())) {
-                return ok(notRegistered.render());
-            }
-        }
-
         if (boundForm.hasErrors()) {
-            logger.error("errors = {}", boundForm.errors());
-            return badRequest(org.hadatac.console.views.html.listWidgets.render(asScala(signUps), boundForm, request, messagesApi.preferred(request)));
+            return redirect(org.hadatac.console.controllers.routes.WidgetController.listWidgets())
+                    .flashing("error", String.valueOf(boundForm.errors()));
         } else {
+            if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
+                if (!UserManagement.isPreRegistered(boundForm.get().getEmail())) {
+                    return ok(notRegistered.render());
+                }
+            }
             MyUsernamePasswordAuthProvider data = boundForm.get();
             if (data.validate()!=null){
-//                messagesApi.preferred(request).at("Your e-mail has already been validated.");
                 return redirect(org.hadatac.console.controllers.routes.WidgetController.listWidgets())
                         .flashing("error",data.validate());
             }

@@ -4,11 +4,11 @@
 
 # Home page
 GET         /                                         org.hadatac.console.controllers.Portal.index(request: Request)
-GET         /loginForm                                     org.hadatac.console.controllers.Application.loginForm()
+#GET         /loginForm                                     org.hadatac.console.controllers.Application.loginForm(request: Request)
 GET         /hadatac                                      org.hadatac.console.controllers.Portal.index(request: Request)
 GET         /hadatac/                                      org.hadatac.console.controllers.Portal.index(request: Request)
 POST        /hadatac/                                      org.hadatac.console.controllers.Portal.postIndex(request: Request)
-GET         /hadatac/login                             org.hadatac.console.controllers.Application.loginForm()
+GET         /hadatac/login                             org.hadatac.console.controllers.Application.loginForm(request: Request)
 GET         /hadatac/form/index.html                       org.hadatac.console.controllers.Application.formIndex(request: Request)
 GET     /hadatac/sandbox                                  org.hadatac.console.controllers.sandbox.Sandbox.index(request: Request)
 POST    /hadatac/sandbox                                  org.hadatac.console.controllers.sandbox.Sandbox.postIndex(request: Request)
@@ -130,7 +130,7 @@ GET     /hadatac/login/password/forgot                     org.hadatac.console.c
 POST    /hadatac/login/password/forgot		               org.hadatac.console.controllers.Signup.doForgotPassword(request: Request)
 GET     /hadatac/accounts/password/reset/:token            org.hadatac.console.controllers.Signup.resetPassword(token: String, request: Request)
 GET     /hadatac/profile                                   org.hadatac.console.controllers.AuthApplication.profile(username : String)
-#GET     /hadatac/accounts/unverified                   org.hadatac.console.controllers.Signup.unverified
+POST     /hadatac/accounts/unverified                       org.hadatac.console.controllers.Application.unverified
 #GET     /hadatac/authenticate/:provider/denied         org.hadatac.console.controllers.Signup.oAuthDenied(provider: String)
 GET     /hadatac/accounts/verify/:token                org.hadatac.console.controllers.Signup.verify(token: String,request : Request)
 #GET     /hadatac/accounts/exists                       org.hadatac.console.controllers.Signup.exists
@@ -572,7 +572,6 @@ GET	    /hadatac/perm/backupauth		               org.hadatac.console.controllers
 POST	/hadatac/perm/backupauth     		           org.hadatac.console.controllers.triplestore.UserManagement.postBackupUserAuthentication()
 GET	    /hadatac/perm/backupgraph		               org.hadatac.console.controllers.triplestore.UserManagement.backupUserGraph()
 POST	/hadatac/perm/backupgraph     		           org.hadatac.console.controllers.triplestore.UserManagement.postBackupUserGraph()
-#TODO add this
 GET	    /hadatac/perm/invite		                   org.hadatac.console.controllers.triplestore.UserManagement.sendInvitationEmail(user_name: String, user_email: String, request: Request)
 POST	/hadatac/perm/invite     		               org.hadatac.console.controllers.triplestore.UserManagement.postSendInvitationEmail(user_name: String, user_email: String, request: Request)
 

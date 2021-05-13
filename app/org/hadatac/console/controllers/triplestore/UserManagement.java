@@ -318,14 +318,13 @@ public class UserManagement extends Controller {
         return backupUserGraph();
     }
 
-//    //TODO : fix it
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result sendInvitationEmail(String user_name, String user_email,Http.Request request) {
         this.userPaswAuthProvider.sendInvitationMailing(
                 user_name, user_email, request);
         return redirect(routes.UserManagement.index("init"));
     }
-//    //TODO : fix it
+
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postSendInvitationEmail(String user_name, String user_email, Http.Request request) {
         return sendInvitationEmail(user_name, user_email,request);

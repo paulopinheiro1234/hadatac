@@ -1,37 +1,44 @@
 package org.hadatac.console.providers;
 
-import be.objectify.deadbolt.java.models.Role;
-import controllers.routes;
+import com.feth.play.module.mail.Mailer;
+import com.typesafe.config.ConfigFactory;
+import org.hadatac.console.controllers.routes;
 import org.hadatac.console.models.LinkedAccount;
 import org.hadatac.console.models.SysUser;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-//import org.hadatac.console.views.html.error_page;
+//import org.hadatac.console.views.account.signup.unverified;
+import org.hadatac.console.models.TokenAction;
 import org.hadatac.utils.CollectionUtil;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.password.PasswordEncoder;
+import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.Pac4jConstants;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import play.Logger;
+import play.api.libs.mailer.Email;
+import play.api.libs.mailer.MailerClient;
+//import play.libs.Mail;
 
+import javax.inject.Inject;
 import javax.security.auth.login.CredentialException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 //import util.SecurityPasswordEncoder;
 //import util.SecurityPasswordEncoder;
+import static org.hadatac.Constants.EMAIL_TEMPLATE_FALLBACK_LANGUAGE;
 import static play.mvc.Results.*;
 
 
 public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<UsernamePasswordCredentials> {
 
-    //    SecurityPasswordEncoder securityPasswordEncoder;
     PasswordEncoder passwordEncoder;
 
     @Override
@@ -42,10 +49,10 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
         String username = credentials.getUsername();
         String password = credentials.getPassword();
         if (CommonHelper.isBlank(username)) {
-            throw new CredentialsException("Username cannot be blank");
+            throw new BadCredentialsException("Username cannot be blank");
         }
         if (CommonHelper.isBlank(password)) {
-            throw new CredentialsException("Password cannot be blank");
+            throw new BadCredentialsException("Password cannot be blank");
         }
         //Querying from DB
         SolrClient solrClient = new HttpSolrClient.Builder(
@@ -56,23 +63,21 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
 //        System.out.println("solrQuery:"+solrQuery);
         List<SysUser> users = new ArrayList<SysUser>();
         //CHECK PASSWORD
-        try{
-            System.out.println(context);
             final SysUser u = SysUser.findByEmailSolr(username);
             System.out.println(context.getSessionStore());
             if (u == null) {
                 System.out.println("User not found!");
-                redirect(org.hadatac.console.controllers.routes.Application.loginForm())
+                redirect(routes.Application.loginForm())
                         .flashing("error", "user does not exist");
-            } else {
-                //TODO : email validation implementation
-//                if (!u.getEmailValidated()) {
-//                    System.out.println("User unverified!");
-//                    throw new CredentialException("User is not verified");
-//                } else {
+            }
+            int userValidated = u.getEmailValidated()? 1:0;
+            switch (userValidated) {
+                case 0:
+                    throw new CredentialsException("User email is not unverified");
+                case 1:
                     for (final LinkedAccount acc : u.getLinkedAccounts()) {
                         if (checkPassword(acc.providerUserId, password)) {
-                            System.out.println("User logged in!:");// +acc.providerUserId+"...."+ password);
+                            System.out.println("User logged in!:");
                             System.out.println(context.getSessionStore());
                             //TODO : customise the profile
                             final CommonProfile profile = new CommonProfile();
@@ -84,16 +89,17 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
                             System.out.println("Profile:"+profile);
                             break;
                         } else {
-//                            System.out.println("User password invalid!"+acc.providerUserId+"...."+ password);
-                            throw new CredentialException("User password is invalid");
+                            try {
+                                throw new CredentialException("User password is invalid");
+                            } catch (CredentialException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-//                }
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + userValidated);
             }
-        } catch (Exception e) {
-            System.out.println("[ERROR] SimpleTestUsernamePasswordAuthenticator - Exception message: " + e.getMessage());
-        }
-
     }
 
     private boolean checkPassword(final String hashed, final String candidate) {
