@@ -454,15 +454,15 @@ public class SysUser implements Subject {
 				.create(acc));
 
 		if (authUser.getEmail()!=null && !authUser.getEmail().isEmpty()) {
-			System.out.println("authUser instanceof EmailIdentity");
+			// System.out.println("authUser instanceof EmailIdentity");
 			sys_user.email = authUser.getEmail();
 			sys_user.emailValidated = false;
 		}
 
 		if (authUser.getName()!=null && !authUser.getName().isEmpty()) {
-			System.out.println("authUser instanceof NameIdentity");
+			// System.out.println("authUser instanceof NameIdentity");
 			final String name = authUser.getName();
-			System.out.println("name: " + name);
+			// System.out.println("name: " + name);
 			if (name != null) {
 				sys_user.name = name;
 			}
@@ -486,7 +486,7 @@ public class SysUser implements Subject {
 		sys_user.id_s = UUID.randomUUID().toString();
 
 		if (!SysUser.existsSolr()) {
-			System.out.println("existsSolr: " );
+			// System.out.println("existsSolr: " );
 			sys_user.roles.add(SecurityRole
 					.findByRoleNameSolr("data_manager"));
 			sys_user.emailValidated = true;
@@ -503,9 +503,9 @@ public class SysUser implements Subject {
 			else{
 				sys_user.uri = uri;
 			}
-			System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
+			// System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
 			user.save();
-			System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
+			// System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
 			sys_user.save();
 
 			return sys_user;
@@ -516,7 +516,7 @@ public class SysUser implements Subject {
 		} else {
 			sys_user.uri = uri;
 		}
-		System.out.println("sys_user before save uri other: " + sys_user.uri);
+		// System.out.println("sys_user before save uri other: " + sys_user.uri);
 		sys_user.save();
 
 		return sys_user;
@@ -535,7 +535,7 @@ public class SysUser implements Subject {
 				.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
-			System.out.println("authUser instanceof EmailIdentity");
+			// System.out.println("authUser instanceof EmailIdentity");
 			final EmailIdentity identity = (EmailIdentity) authUser;
 			// Remember, even when getting them from FB & Co., emails should be
 			// verified within the application as a security breach there might
@@ -545,22 +545,22 @@ public class SysUser implements Subject {
 		}
 
 		if (authUser instanceof NameIdentity) {
-			System.out.println("authUser instanceof NameIdentity");
+			// System.out.println("authUser instanceof NameIdentity");
 			final NameIdentity identity = (NameIdentity) authUser;
 			final String name = identity.getName();
-			System.out.println("name: " + name);
+			// System.out.println("name: " + name);
 			if (name != null) {
 				sys_user.name = name;
 			}
 		}
 
 		if (authUser instanceof FirstLastNameIdentity) {
-			System.out.println("authUser instanceof FirstLastNameIdentity");
+			// System.out.println("authUser instanceof FirstLastNameIdentity");
 			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
 			final String firstName = identity.getFirstName();
 			final String lastName = identity.getLastName();
-			System.out.println("firstName: " + firstName);
-			System.out.println("lastName: " + lastName);
+			// System.out.println("firstName: " + firstName);
+			// System.out.println("lastName: " + lastName);
 			if (firstName != null) {
 				sys_user.firstName = firstName;
 			}
@@ -572,7 +572,7 @@ public class SysUser implements Subject {
 		sys_user.id_s = UUID.randomUUID().toString();
 
 		if (!SysUser.existsSolr()) {
-			System.out.println("existsSolr: " );
+			// System.out.println("existsSolr: " );
 			sys_user.roles.add(SecurityRole
 					.findByRoleNameSolr("data_manager"));
 			sys_user.emailValidated = true;
@@ -589,7 +589,7 @@ public class SysUser implements Subject {
 			else{
 				sys_user.uri = uri;
 			}
-			System.out.println("sys_user before save uri admin: " + admin_uri);
+			// System.out.println("sys_user before save uri admin: " + admin_uri);
 			user.save();
 			sys_user.save();
 
@@ -601,7 +601,7 @@ public class SysUser implements Subject {
 		} else {
 			sys_user.uri = uri;
 		}
-		System.out.println("sys_user before save uri other: " + sys_user.uri);
+		// System.out.println("sys_user before save uri other: " + sys_user.uri);
 		sys_user.save();
 
 		return sys_user;
@@ -679,7 +679,7 @@ public class SysUser implements Subject {
 		User user = new User();
 		user.setName(sys_user.name);
 		user.setEmail(sys_user.email);
-		System.out.println("SysUser.existsSolr():"+SysUser.existsSolr());
+		// System.out.println("SysUser.existsSolr():"+SysUser.existsSolr());
 
 		if (SysUser.existsSolr() == false) {
 			sys_user.roles.add(SecurityRole
@@ -774,15 +774,15 @@ public class SysUser implements Subject {
 
 	public static SysUser findByEmailSolr(final String email) {
 		if(email.isEmpty()){
-			System.out.println("Email is empty");
+			// System.out.println("Email is empty");
 			return null;
 		}
 		List<SysUser> users = getEmailUserFindSolr(email);
 		if (users.size() == 1) {
-			System.out.println("USER found:"+users.get(0));
+			// System.out.println("USER found:"+users.get(0));
 			return users.get(0);
 		} else {
-			System.out.println("USER NOT found:");
+			// System.out.println("USER NOT found:");
 			return null;
 		}
 	}
