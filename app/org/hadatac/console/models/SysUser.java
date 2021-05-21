@@ -531,8 +531,6 @@ public class SysUser implements Subject {
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = Instant.now().toString();
-//		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
-//				.create(authUser));
 		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(authUser));
 

@@ -2,15 +2,26 @@ package org.hadatac.console.controllers;
 
 import be.objectify.deadbolt.java.actions.SubjectPresent;
 import javax.inject.Inject;
+
+import com.feth.play.module.mail.Mailer;
+import com.typesafe.config.ConfigFactory;
+import org.apache.commons.configuration2.Configuration;
 import org.hadatac.console.models.JsonContent;
 import module.SecurityModule;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.providers.AuthUser;
+import org.hadatac.console.providers.MyService;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
+import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
+import org.hadatac.console.views.html.account.signup.unverified;
+import org.hadatac.console.views.html.account.errorLogin;
+import org.hadatac.console.views.html.error401;
 import org.hadatac.console.views.html.loginForm;
 import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
@@ -24,8 +35,12 @@ import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import play.Logger;
 import play.api.data.Form;
 import play.api.libs.Files;
+import play.api.libs.mailer.MailerClient;
+import play.libs.mailer.Email;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -34,9 +49,16 @@ import play.twirl.api.Content;
 import org.hadatac.utils.Utils;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import play.libs.Files.TemporaryFile;
+
+import static org.hadatac.Constants.EMAIL_TEMPLATE_FALLBACK_LANGUAGE;
 
 public class Application extends Controller {
 
@@ -46,7 +68,8 @@ public class Application extends Controller {
 
     @Inject
     private PlaySessionStore playSessionStore;
-
+    @Inject
+    private MailerClient mailerClient;
 
     private List<CommonProfile> getProfiles(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
@@ -159,10 +182,20 @@ public class Application extends Controller {
         return ok(org.hadatac.console.views.html.csrf.render(getProfiles(request)));
     }
 
-    public Result loginForm() throws TechnicalException {
+    public Result loginForm(Http.Request request) throws TechnicalException {
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
-        return ok(loginForm.render(formClient.getCallbackUrl()));
-    }
+            Optional<String> username = request.queryString("username");
+            Optional<String> error = request.queryString("error");
+            if (!error.isEmpty() && error.get().equalsIgnoreCase("CredentialsException") && !username.isEmpty()) {
+                SysUser sysUser = AuthApplication.getAuthApplication().getUserProvider().getUser(username.get());
+                sendVerifyEmailMailingAfterSignup(sysUser);
+                return unverified();
+            }
+            else if(!error.isEmpty() && error.get().equalsIgnoreCase("BadCredentialsException")) {
+             return ok(errorLogin.render());
+        }
+            return ok(loginForm.render(formClient.getCallbackUrl()));
+        }
 
     public Result jwt(Http.Request request) {
         final List<CommonProfile> profiles = getProfiles(request);
@@ -183,5 +216,86 @@ public class Application extends Controller {
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }
+    }
+
+    public Result unverified() throws TechnicalException {
+        return (ok(unverified.render())).withHeader("Cache-Control", "no-cache");
+    }
+
+    public void sendVerifyEmailMailingAfterSignup(final SysUser sysUser) {
+    final String subject = "Confirm your e-mail address";
+    final String token = generateVerificationRecord(sysUser);
+    final Mailer.Mail.Body body = getVerifyEmailMailingBodyAfterSignup(token, sysUser);
+    String recipient = Mailer.getEmailName(sysUser.getEmail(), sysUser.getName());
+    Email email = new Email()
+            .setSubject(subject)
+            .setBodyText(body.getText())
+            .setBodyHtml(body.getHtml())
+            .setFrom(ConfigFactory.load().getString("hadatac.community.contact_email"))
+            .addTo(recipient);
+    mailerClient.send(email);
+    }
+
+    protected String generateVerificationRecord(final SysUser user) {
+        final String token = UUID.randomUUID().toString();
+        TokenAction.create(TokenAction.Type.EMAIL_VERIFICATION, token, user);
+        return token;
+    }
+
+    protected Mailer.Mail.Body getVerifyEmailMailingBodyAfterSignup(final String token, final SysUser user) {
+        final boolean isSecure = false;
+        final String url = routes.Signup.verify(token).absoluteURL(
+                isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
+        final String langCode = "en";//lang.code();
+        final String html = getEmailTemplate(
+                "org.hadatac.console.views.html.account.signup.email.verify_email", langCode, url, token,
+                user.getName(), user.getEmail());
+        final String text = getEmailTemplate(
+                "org.hadatac.console.views.txt.account.signup.email.verify_email", langCode, url, token,
+                user.getName(), user.getEmail());
+
+        return new Mailer.Mail.Body(text, html);
+    }
+    protected String getEmailTemplate(final String template,
+                                      final String langCode, final String url, final String token,
+                                      final String name, final String email) {
+        Class<?> cls = null;
+        String ret = null;
+        try {
+            cls = Class.forName(template + "_" + langCode);
+        } catch (ClassNotFoundException e) {
+            Logger.warn("Template: '"
+                    + template
+                    + "_"
+                    + langCode
+                    + "' was not found! Trying to use English fallback template instead.");
+        }
+        if (cls == null) {
+            try {
+                cls = Class.forName(template + "_"
+                        + EMAIL_TEMPLATE_FALLBACK_LANGUAGE);
+            } catch (ClassNotFoundException e) {
+                Logger.error("Fallback template: '" + template + "_"
+                        + EMAIL_TEMPLATE_FALLBACK_LANGUAGE
+                        + "' was not found either!");
+            }
+        }
+        if (cls != null) {
+            Method htmlRender = null;
+            try {
+                htmlRender = cls.getMethod("render", String.class,
+                        String.class, String.class, String.class);
+                ret = htmlRender.invoke(null, url, token, name, email)
+                        .toString();
+
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
     }
 }
