@@ -176,7 +176,6 @@ public class SecurityModule extends AbstractModule {
     @Provides
     protected Config provideConfig(FormClient formClient, IndirectBasicAuthClient indirectBasicAuthClient, DirectFormClient directFormClient) {
 
-        //casClient.getConfiguration().setProxyReceptor(casProxyReceptor);
 
         final Clients clients = new Clients(baseUrl + "/callback", formClient,
                 indirectBasicAuthClient,
@@ -186,7 +185,6 @@ public class SecurityModule extends AbstractModule {
         PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.FORBIDDEN, forbidden(error403.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
 
         final Config config = new Config(clients);
-        formClient.getCustomProperties();
         config.addAuthorizer(Constants.DATA_OWNER_ROLE, new DataOwnerRoleAuthorizer());
         config.addAuthorizer(Constants.DATA_MANAGER_ROLE, new DataManagerRoleAuthorizer());
         config.addAuthorizer(Constants.FILE_VIEWER_EDITOR_ROLE, new FileViewerEditorAuthorizer());

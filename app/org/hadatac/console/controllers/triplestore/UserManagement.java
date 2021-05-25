@@ -62,10 +62,10 @@ import org.hadatac.utils.ConfigProp;
 public class UserManagement extends Controller {
 
     private static final String UPLOAD_NAME = ConfigProp.getTmp() + "uploads/users-spreadsheet.xls";
-	private static final String UPLOAD_NAME_TTL = ConfigProp.getTmp() + "uploads/user-graph.ttl";
-	private static final String UPLOAD_NAME_JSON = ConfigProp.getTmp() + "uploads/user-auth.json";
+    private static final String UPLOAD_NAME_TTL = ConfigProp.getTmp() + "uploads/user-graph.ttl";
+    private static final String UPLOAD_NAME_JSON = ConfigProp.getTmp() + "uploads/user-auth.json";
     private final MyUsernamePasswordAuthProvider userPaswAuthProvider;
-	
+
     @Inject
     private FormFactory formFactory;
     @Inject
@@ -318,14 +318,13 @@ public class UserManagement extends Controller {
         return backupUserGraph();
     }
 
-//    //TODO : fix it
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result sendInvitationEmail(String user_name, String user_email,Http.Request request) {
         this.userPaswAuthProvider.sendInvitationMailing(
                 user_name, user_email, request);
         return redirect(routes.UserManagement.index("init"));
     }
-//    //TODO : fix it
+
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postSendInvitationEmail(String user_name, String user_email, Http.Request request) {
         return sendInvitationEmail(user_name, user_email,request);

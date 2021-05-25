@@ -134,13 +134,16 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
     }
 
     public String validate() {
-			if (password == null || !password.equals(repeatPassword)) {
-				return "Passwords do not match";
-			}
-			return null;
-		}
+        if (password == null || !password.equals(repeatPassword)) {
+            return "Passwords do not match";
+        }
+        if (name ==null || email== null || password ==null|| repeatPassword==null){
+            return "All fields are mandatory";
+        }
+        return null;
+    }
 
-	public String getHashedPassword() {
+    public String getHashedPassword() {
         return createPassword(this.password);
     }
 
@@ -160,8 +163,6 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         final Body body = getInvitationMailingBody(user_name, user_email, request);
         myService.sendMail(subject, body, user_email);
     }
-
-
 
     private static String generateToken() {
         return UUID.randomUUID().toString();
@@ -251,9 +252,6 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         final boolean isSecure = false;// getConfiguration().getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE); //ToDO : this being true makes it https
         final String url = routes.Signup.createUser().absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
-//        final String url = routes.AuthApplication.signup().absoluteURL(
-//                isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
-
 //        final Lang lang = this.messagesApi.preferred(request.acceptLanguages()).lang();
         final String langCode = "en";//lang.code();
 
@@ -282,7 +280,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         myService.sendMail(subject, body, getEmailName(user));
     }
 
-        //TODO : fix it
+    //TODO : fix it
     protected Body getVerifyEmailMailingBodyAfterSignup(final String token,
                                                         final SysUser user, final Http.Request request) {
 
@@ -294,21 +292,21 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         final String langCode = "en";//lang.code();
 
         final String html = getEmailTemplate(
-                "org.hadatac.console.views.html.account.email.verify_email", langCode, url, token,
+                "org.hadatac.console.views.html.account.signup.email.verify_email", langCode, url, token,
                 user.getName(), user.getEmail());
         final String text = getEmailTemplate(
-                "org.hadatac.console.views.txt.account.email.verify_email", langCode, url, token,
+                "org.hadatac.console.views.txt.account.signup.email.verify_email", langCode, url, token,
                 user.getName(), user.getEmail());
 
         return new Body(text, html);
     }
 
-        protected String getVerifyEmailMailingSubjectAfterSignup(final SysUser user,
+    protected String getVerifyEmailMailingSubjectAfterSignup(final SysUser user,
                                                              final Http.Request request) {
-        return "Confirm your e-mail addressConfirm your e-mail address";
+        return "Confirm your e-mail address";
     }
 
-        //TODO: fix it
+    //TODO: fix it
 
     protected String generateVerificationRecord(
             final MyUsernamePasswordAuthUser user) {
@@ -326,4 +324,15 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         TokenAction.create(TokenAction.Type.EMAIL_VERIFICATION, token, user);
         return token;
     }
+
+    protected String getVerifyEmailMailingSubject(
+            final MyUsernamePasswordAuthUser user, final Http.Request request) {
+        return "Complete your signup";
+    }
+
+//    @Override
+//    protected Call userUnverified(final UsernamePasswordAuthUser authUser) {
+//        return routes.Signup.unverified();
+//    }
+
 }
