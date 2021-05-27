@@ -313,6 +313,10 @@ public abstract class BaseGenerator {
 
     public boolean deleteObjectsFromTripleStore(List<HADatAcThing> objects) {
         for (HADatAcThing obj : objects) {
+            if ( obj.getNamedGraph() == null || obj.getNamedGraph().length() == 0 ) {
+                obj.setNamedGraph(getNamedGraphUri());
+                // System.out.println("setting the name graph: " + getNamedGraphUri());
+            }
             if (obj.getDeletable()) {
                 obj.deleteFromTripleStore();
             }
