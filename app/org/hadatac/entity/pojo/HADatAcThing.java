@@ -509,14 +509,27 @@ public abstract class HADatAcThing implements Facetable {
         }
 
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += " DELETE WHERE { \n";
-        if (getUri().startsWith("http")) {
-            query += "<" + this.getUri() + ">";
+        if ( this.getNamedGraph() != null && this.getNamedGraph().length() > 0 ) {
+            query += "DELETE WHERE { \n" + " " +
+                    "    GRAPH <" + this.getNamedGraph() + "> { \n";
+            if (getUri().startsWith("http")) {
+                query += "<" + this.getUri() + ">";
+            } else {
+                query += this.getUri();
+            }
+            query += " ?p ?o . } \n";
+            query += " } ";
         } else {
-            query += this.getUri();
+            // if ( getUri().contains("3539947") ) System.out.println("find 3539947!!!! delete without namespace!!!");
+            query += " DELETE WHERE { \n";
+            if (getUri().startsWith("http")) {
+                query += "<" + this.getUri() + ">";
+            } else {
+                query += this.getUri();
+            }
+            query += " ?p ?o . \n";
+            query += " } ";
         }
-        query += " ?p ?o . \n";
-        query += " } ";
 
         //System.out.println("Delete from triplestore query: " + query);
 
