@@ -2,6 +2,7 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
@@ -31,7 +32,8 @@ public class VirtualColumnGenerator extends BaseGenerator {
     }
 
     private String getStudyUri(Record rec) {
-        return rec.getValueByColumnName(mapCol.get("studyUri"));
+        studyUri = URIUtils.replacePrefixEx(rec.getValueByColumnName(mapCol.get("studyUri")));
+        return studyUri;
     }
 
     private String getSOCReference(Record rec) {
