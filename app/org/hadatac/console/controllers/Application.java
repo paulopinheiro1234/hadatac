@@ -14,10 +14,9 @@ import org.hadatac.console.providers.AuthUser;
 import org.hadatac.console.providers.MyService;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
+import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.account.errorLogin;
-import org.hadatac.console.views.html.error401;
-import org.hadatac.console.views.html.loginForm;
 import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
@@ -99,11 +98,11 @@ public class Application extends Controller {
     private Result protectedIndexView(Http.Request request) {
 //        getUserEmail(request);
 //        getProfiles(request);
-        return ok(org.hadatac.console.views.html.protectedIndex.render(getProfiles(request),getUserEmail(request)));
+          return ok(protectedIndex.render(getProfiles(request),getUserEmail(request)));
     }
 
     private Result notProtectedIndexView(Http.Request request) {
-        return ok(org.hadatac.console.views.html.notprotectedIndex.render(getProfiles(request)));
+        return ok(notprotectedIndex.render(getProfiles(request)));
     }
 
     public Result facebookNotProtectedIndex(Http.Request request) {
@@ -133,7 +132,12 @@ public class Application extends Controller {
 
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
-        return protectedIndexView(request);
+        SysUser user = SysUser.findByEmail(getUserEmail(request));
+//        System.out.println("user is Admin :"+ user.isDataManager());
+        if(null != user && user.isDataManager()){
+            return protectedIndexView(request);
+        }
+        return ok(dashboard.render(getUserEmail(request)));
     }
 
     @Secure(clients = "IndirectBasicAuthClient")
