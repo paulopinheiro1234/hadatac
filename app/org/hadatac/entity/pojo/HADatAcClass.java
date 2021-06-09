@@ -422,7 +422,6 @@ public class HADatAcClass extends HADatAcThing {
     @Override
     public void deleteFromTripleStore() {
         // TODO Auto-generated method stub
-        super.deleteFromTripleStore();
 
     }
 
