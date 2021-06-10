@@ -2,6 +2,7 @@ package org.hadatac.data.loader;
 
 import java.lang.String;
 
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
