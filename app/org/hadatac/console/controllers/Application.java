@@ -137,7 +137,7 @@ public class Application extends Controller {
         if(null != user && user.isDataManager()){
             return protectedIndexView(request);
         }
-        return ok(dashboard.render(getUserEmail(request)));
+        return ok(portal.render(getUserEmail(request)));
     }
 
     @Secure(clients = "IndirectBasicAuthClient")
