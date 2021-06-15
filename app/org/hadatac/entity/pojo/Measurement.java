@@ -1575,6 +1575,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         Alignment alignment = new Alignment();
         Map<String, List<String>> alignCache = new HashMap<String, List<String>>();
 
+        Map<String, List<String>> studyMap = getSourceStudies(measurements);
+
         try {
             // Write empty string to create the file
             FileUtils.writeStringToFile(file, "", "utf-8", true);
@@ -1597,6 +1599,14 @@ public class Measurement extends HADatAcThing implements Runnable {
             //System.out.println("Align-Debug: Measurement size is " + total);
         	//System.out.println("Phase I: before Measurement loop");
             for (Measurement m : measurements) {
+
+                // debug
+                if ( m.getObjectUri().contains("3539947") ) {
+                    String tmp1 = m.getEntryObjectUri();
+                    int x = 1;
+                }
+                // end of debug
+
             	//System.out.println("Phase I: start of Measurement loop");
                 StudyObject referenceObj = null;
 
@@ -1655,7 +1665,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	                    	//System.out.println("Phase I: Reading object [" + currentAlignmentObjectUri + "]");
 
                             startTime = System.currentTimeMillis();
-	                        referenceObj = StudyObject.findFacetSearch(currentAlignmentObjectUri);
+	                        referenceObj = StudyObject.findFacetSearch(currentAlignmentObjectUri, m.getStudyUri());
                             duration = System.currentTimeMillis() - startTime;
                             if ( duration > threshold ) log.debug("DOWNLOAD: studyObject.find: " + duration);
 
@@ -1852,7 +1862,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 if (results.containsKey(obj.getUri())) {
                     Map<String, List<String>> row = results.get(obj.getUri());
                     // write study id
-                    FileUtils.writeStringToFile(file, "\"" + alignment.getStudyId(obj.getIsMemberOf()) + "\"", "utf-8", true);
+                    FileUtils.writeStringToFile(file, "\"" + getRelatedStudies(studyMap,obj.getUri()) + "\"", "utf-8", true);
                     for (Variable aa : aaList) {
                     	values = row.get(aa.toString());
                 		FileUtils.writeStringToFile(file, ",", "utf-8", true);
@@ -1900,6 +1910,30 @@ public class Measurement extends HADatAcThing implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    private static Map<String, List<String>> getSourceStudies(List<Measurement> measurements) {
+
+        Map<String, List<String>> map = new HashMap<>();
+        if ( measurements == null || measurements.size() == 0 ) return map;
+
+        for ( Measurement measurement : measurements ) {
+            String studyId = measurement.getStudyUri();
+            if ( studyId.contains("STD-")) studyId = studyId.substring(studyId.indexOf("STD-")+"STD-".length());
+            List<String> list = map.getOrDefault(measurement.getObjectUri(), new ArrayList<>());
+            if ( !list.contains(studyId) ) list.add(studyId);
+            map.put(measurement.getObjectUri(), list);
+        }
+
+        return map;
+    }
+
+    private static String getRelatedStudies(Map<String, List<String>> studyMap, String subject) {
+        if ( studyMap == null || studyMap.size() == 0 ) return "";
+        if ( subject == null || subject.length() == 0 ) return "";
+        if ( studyMap.containsKey(subject) == false ) return "";
+        String ans = studyMap.get(subject).toString();
+        return ans.substring(1, ans.length()-1);
     }
 
     // helper function to check if a give string has all digital and ","

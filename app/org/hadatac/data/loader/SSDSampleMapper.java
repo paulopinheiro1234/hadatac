@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
@@ -156,7 +157,9 @@ public class SSDSampleMapper extends BaseGenerator {
         List<String> spaceScopeUris = new ArrayList<String>();
         String pid = getOriginalPID(record);
         if (!pid.isEmpty()) {
-            scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
+            if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+                scopeUris.add(kbPrefix + "SBJ-" + pid);
+            } else scopeUris.add(kbPrefix + "SBJ-" + pid + "-" + study_id);
         }
         if (!getTimeScopeUri(record).isEmpty()){
         	timeScopeUris.add(kbPrefix + "TIME-" + getTimeScopeUri(record) + "-" + study_id);

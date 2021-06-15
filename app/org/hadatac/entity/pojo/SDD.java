@@ -260,6 +260,7 @@ public class SDD {
         }
 
         for (Record record : file.getRecords()) {
+            String columnCell = record.getValueByColumnIndex(0);
             if (checkCellValue(record.getValueByColumnIndex(0))) {
                 if (record.getValueByColumnName("Attribute") != null
                         && record.getValueByColumnName("Attribute").length() > 0) {
@@ -295,62 +296,91 @@ public class SDD {
 
                     if (dasaContent.containsKey(attributeOfCell)) {
 
+                        // location [0] in the list
                         if (columnCell != null) {
                             listEAmerge.add(columnCell);
                         } else {
                             listEAmerge.add("");
                         }
 
+                        // location [1] in the list
                         if (labelCell != null) {
                             listEAmerge.add(labelCell);
                         } else {
                             listEAmerge.add("");
                         }
 
+                        // location [2] in the list
                         if (unitCell != null) {
                             listEAmerge.add(unitCell);
                         } else {
                             listEAmerge.add("");
                         }
 
+                        // location [3] in the list
                         if (timeCell != null) {
                             listEAmerge.add(timeCell);
                         } else {
                             listEAmerge.add("");
                         }
 
+                        // starting from location [4] in the list: attributes
                         if (attrCell != null) {
                             listEAmerge.add(attrCell);
                         } else {
                             listEAmerge.add("");
                         }
 
+                        // continue to check/allow arbitrary level of attributeOf
+                        String currentAttributeOfCell = attributeOfCell;
+                        while ( dasaContent.containsKey(currentAttributeOfCell) ) {
+                            if (dasaContent.get(currentAttributeOfCell).get(0) != null) {
+                                listEAmerge.add(dasaContent.get(currentAttributeOfCell).get(0));
+                            } else {
+                                listEAmerge.add("");
+                            }
+                            currentAttributeOfCell = dasaContent.get(currentAttributeOfCell).get(1);
+                        }
+
+                        // done with the current one
                         mapEAmerge.put(attributeOfCell, listEAmerge);
+
                     }
                     //System.out.println("listEAmerge :" + listEAmerge);
                 } else if (dasaContent.containsKey(columnCell)) {
 
                     List<String> listAAmerge = new ArrayList<String>();
+                    String currentAttributeOfCell = attributeOfCell;
 
-                    if (dasaContent.containsKey(attributeOfCell)) {
+                    if (dasaContent.containsKey(currentAttributeOfCell)) {
 
-                        if (attributeOfCell != null) {
-                            listAAmerge.add(attributeOfCell);
-                        } else {
-                            listAAmerge.add("");
+                        listAAmerge.add(attrCell);  // add the starting attribute first
+
+                        // allowing arbitrary levels
+                        while ( dasaContent.containsKey(currentAttributeOfCell) ) {
+
+                            /*if (attributeOfCell != null) {
+                                listAAmerge.add(currentAttributeOfCell);
+                            } else {
+                                listAAmerge.add("");
+                            }*/
+
+                            if (dasaContent.get(currentAttributeOfCell).get(0) != null) {
+                                listAAmerge.add(dasaContent.get(currentAttributeOfCell).get(0));
+                            } else {
+                                listAAmerge.add("");
+                            }
+
+                            /*if (dasaContent.get(currentAttributeOfCell).get(1) != null) {
+                                listAAmerge.add(dasaContent.get(currentAttributeOfCell).get(1));
+                            } else {
+                                listAAmerge.add("");
+                            }*/
+
+                            currentAttributeOfCell = dasaContent.get(currentAttributeOfCell).get(1);
                         }
-
-                        if (dasaContent.get(attributeOfCell).get(0) != null) {
-                            listAAmerge.add(dasaContent.get(attributeOfCell).get(0));
-                        } else {
-                            listAAmerge.add("");
-                        }
-
-                        if (dasaContent.get(attributeOfCell).get(1) != null) {
-                            listAAmerge.add(dasaContent.get(attributeOfCell).get(1));
-                        } else {
-                            listAAmerge.add("");
-                        }
+                        // add the final entity (after arbitrary levels) this DASA applies to
+                        listAAmerge.add(currentAttributeOfCell);
 
                         mapAAmerge.put(columnCell, listAAmerge);
                     }

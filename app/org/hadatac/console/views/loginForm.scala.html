@@ -23,14 +23,7 @@
 			<p />
 			<input type="submit" name="submit" value="Login now" />
 		</form>
-@*				@if(loginForm.hasGlobalErrors) {*@
-@*					@loginForm.globalErrors.asScala.map { error: play.data.validation.ValidationError =>*@
-@*						<div>*@
-@*							@error.key: @error.message*@
-@*						</div>*@
-@*					}*@
-@*				}*@
-@*			</div>*@
+
 			<a href="@org.hadatac.console.controllers.routes.Signup.forgotPassword()">Forgot your password?</a><br>
 			</div>
 		</div>
