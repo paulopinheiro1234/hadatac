@@ -589,7 +589,7 @@ public class StudyObject extends HADatAcThing {
         return obj;
     }
 
-    public static StudyObject findFacetSearch(String obj_uri) {
+    public static StudyObject findFacetSearch(String obj_uri, String studyId) {
 
         StudyObject obj = null;
         if (obj_uri == null || obj_uri.trim().equals("")) {
@@ -619,6 +619,12 @@ public class StudyObject extends HADatAcThing {
         String isMemberOfStr = "";
         String commentStr = "";
 
+        String studyTag = "";
+        if ( studyId.contains("STD-") ) {
+            studyTag = studyId.substring(studyId.indexOf("STD-") + "STD-".length());
+        }
+
+        boolean matchFound = false;
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null) {
@@ -642,6 +648,7 @@ public class StudyObject extends HADatAcThing {
                 try {
                     if (soln.getResource("isMemberOf") != null && soln.getResource("isMemberOf").getURI() != null) {
                         isMemberOfStr = soln.getResource("isMemberOf").getURI();
+                        if ( isMemberOfStr != null && isMemberOfStr.contains(studyTag) ) matchFound = true;
                     }
                 } catch (Exception e1) {
                     isMemberOfStr = "";
@@ -655,15 +662,18 @@ public class StudyObject extends HADatAcThing {
                     commentStr = "";
                 }
 
-                obj = new StudyObject(obj_uri,
-                        typeStr,
-                        originalIdStr,
-                        FirstLabel.getLabelFacetSearch(obj_uri),
-                        isMemberOfStr,
-                        commentStr,
-                        retrieveScopeUrisFacetSearch(obj_uri),
-                        retrieveTimeScopeUrisFacetSearch(obj_uri),
-                        retrieveSpaceScopeUrisFacetSearch(obj_uri));
+                if ( matchFound ) {
+                    obj = new StudyObject(obj_uri,
+                            typeStr,
+                            originalIdStr,
+                            FirstLabel.getLabelFacetSearch(obj_uri),
+                            isMemberOfStr,
+                            commentStr,
+                            retrieveScopeUrisFacetSearch(obj_uri),
+                            retrieveTimeScopeUrisFacetSearch(obj_uri),
+                            retrieveSpaceScopeUrisFacetSearch(obj_uri));
+                    break;
+                }
             }
         }
 
