@@ -66,9 +66,9 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
         final SysUser u = SysUser.findByEmailSolr(username);
         System.out.println(context.getSessionStore());
         if (u == null) {
-            System.out.println("User not found!");
-            redirect(routes.Application.loginForm())
-                    .flashing("error", "user does not exist");
+//            System.out.println("User is null!");
+            throw new BadCredentialsException("User not found in the system");
+//            redirect(routes.Application.loginForm()).flashing("error", "user does not exist");
         }
         int userValidated = u.getEmailValidated()? 1:0;
         switch (userValidated) {
