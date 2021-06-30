@@ -17,6 +17,8 @@ import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.account.errorLogin;
+import org.hadatac.console.views.html.error401;
+import org.hadatac.console.views.html.loginForm;
 import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;

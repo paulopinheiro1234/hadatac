@@ -20,9 +20,14 @@ import org.hadatac.annotations.PropertyField;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Attribute extends HADatAcClass implements Comparable<Attribute> {
+
+    private static final Logger log = LoggerFactory.getLogger(Attribute.class);
 
     static String className = "sio:SIO_000614";
 
@@ -197,9 +202,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
-                attribute.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
                 attribute.setSuperUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://purl.org/dc/terms/identifier")) {
                 attribute.setHasDCTerms(object.asLiteral().getString());
@@ -207,6 +210,9 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
                 attribute.setHasSkosNotation(object.asLiteral().getString());
             }
         }
+
+        // get label now
+        attribute.setLabel(FirstLabel.getPrettyLabel(uri));
 
         attribute.setUri(uri);
         attribute.setLocalName(uri.substring(uri.indexOf('#') + 1));
