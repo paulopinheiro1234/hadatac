@@ -231,7 +231,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
     protected Body getPasswordResetMailingBody(final String token,
                                                final SysUser user, final Http.Request request) {
 
-        final boolean isSecure = false; //getConfiguration().getBoolean(Constants.SETTING_KEY_PASSWORD_RESET_LINK_SECURE);//ToDO : this being true makes it https
+        final boolean isSecure = ConfigFactory.load().getBoolean("hadatac.https.enable");
         final String url = routes.Signup.resetPassword(token).absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
@@ -249,7 +249,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
     }
     //TODO: test this
     protected Body getInvitationMailingBody(String user_name, String user_email, final Http.Request request) {
-        final boolean isSecure = false;// getConfiguration().getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE); //ToDO : this being true makes it https
+        final boolean isSecure = ConfigFactory.load().getBoolean("hadatac.https.enable");
         final String url = routes.Signup.createUser().absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 //        final Lang lang = this.messagesApi.preferred(request.acceptLanguages()).lang();
@@ -280,11 +280,11 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         myService.sendMail(subject, body, getEmailName(user));
     }
 
-        //TODO : fix it
+
     protected Body getVerifyEmailMailingBodyAfterSignup(final String token,
                                                         final SysUser user, final Http.Request request) {
 
-        final boolean isSecure = false;//true;//getConfiguration().getBoolean(SETTING_KEY_VERIFICATION_LINK_SECURE); //ToDO : this being true makes it https
+        final boolean isSecure = ConfigFactory.load().getBoolean("hadatac.https.enable");
         final String url = routes.Signup.verify(token).absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
 
