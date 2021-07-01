@@ -4,27 +4,27 @@
 @import org.hadatac.console.providers.MyUsernamePasswordAuthProvider
 @import play.mvc.Http.Request
 @(url: String)
-	@main("Login", "login","") {
-		<div class="row">
-			<div class="col-xs-6 col-xs-offset-1 col-sm-4">
-				<h1>Login</h1>
-			</div>
+@main("Login", "login","") {
+	<div class="row">
+		<div class="col-xs-6 col-xs-offset-1 col-sm-4">
+			<h1>Login</h1>
 		</div>
+	</div>
 
-		<div id="login" class="row">
+	<div id="login" class="row">
 
-			<div class="col-xs-6 col-xs-offset-1 col-sm-4">
-		<form action="@url?client_name=FormClient" method="POST">
-			<b>User Name</b></br>
-			<input type="text" name="username" value="" />
-			<p /><p />
-			<b>Password</b></br>
-			<input type="password" name="password" value="" />
-			<p />
-			<input type="submit" name="submit" value="Login now" />
-		</form>
+		<div class="col-xs-6 col-xs-offset-1 col-sm-4">
+			<form action="@url?client_name=FormClient" method="POST">
+				<b>User Name</b></br>
+				<input type="text" name="username" value="" />
+				<p /><p />
+				<b>Password</b></br>
+				<input type="password" name="password" value="" />
+				<p />
+				<input type="submit" name="submit" value="Login now" />
+			</form>
 
 			<a href="@org.hadatac.console.controllers.routes.Signup.forgotPassword()">Forgot your password?</a><br>
-			</div>
 		</div>
-	}
+	</div>
+}

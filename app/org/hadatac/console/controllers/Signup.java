@@ -216,7 +216,7 @@ public class Signup {
                     System.out.println("I AM HERE: user not verfyied");
                     provider.sendVerifyEmailMailingAfterSignup(user, request);
                     return redirect(routes.Portal.index()).flashing(Constants.FLASH_MESSAGE_KEY,
-                           "Your account has not been verified, yet. An e-mail including instructions on how to verify it has been sent out. Retry resetting your password afterwards.");
+                            "Your account has not been verified, yet. An e-mail including instructions on how to verify it has been sent out. Retry resetting your password afterwards.");
 
                 }
             }

@@ -134,16 +134,16 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
     }
 
     public String validate() {
-			if (password == null || !password.equals(repeatPassword)) {
-				return "Passwords do not match";
-			}
-			if (name ==null || email== null || password ==null|| repeatPassword==null){
-			    return "All fields are mandatory";
-            }
-			return null;
-		}
+        if (password == null || !password.equals(repeatPassword)) {
+            return "Passwords do not match";
+        }
+        if (name ==null || email== null || password ==null|| repeatPassword==null){
+            return "All fields are mandatory";
+        }
+        return null;
+    }
 
-	public String getHashedPassword() {
+    public String getHashedPassword() {
         return createPassword(this.password);
     }
 
@@ -280,7 +280,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         myService.sendMail(subject, body, getEmailName(user));
     }
 
-        //TODO : fix it
+    //TODO : fix it
     protected Body getVerifyEmailMailingBodyAfterSignup(final String token,
                                                         final SysUser user, final Http.Request request) {
 
@@ -301,12 +301,12 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         return new Body(text, html);
     }
 
-        protected String getVerifyEmailMailingSubjectAfterSignup(final SysUser user,
+    protected String getVerifyEmailMailingSubjectAfterSignup(final SysUser user,
                                                              final Http.Request request) {
         return "Confirm your e-mail address";
     }
 
-        //TODO: fix it
+    //TODO: fix it
 
     protected String generateVerificationRecord(
             final MyUsernamePasswordAuthUser user) {
