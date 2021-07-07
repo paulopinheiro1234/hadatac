@@ -77,56 +77,57 @@ public class WorkingFiles extends Controller {
     public Result index(String dir, String dest, Boolean stayAtRoot, Http.Request request) {
 
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+        final Path pathWorking = Paths.get(ConfigProp.getPathWorking());
 
-        String targetDir = null;
-        List<DataFile> wkFiles = null;
-        String pathWorking = ConfigProp.getPathWorking();
-
+        // Determine working path
+        Path targetDir = null;
         if ( stayAtRoot ) {
             targetDir = pathWorking;
         } else {
-            if ("/".equals(dest)) {
-                targetDir = pathWorking + "download/" + user.getEmail();
+            if (dest.equals(File.separator)) {
+                targetDir = Paths.get(pathWorking.toString(), "download", user.getEmail());
             } else {
-                targetDir = Paths.get(dir, dest).normalize().toString();
+                targetDir = Paths.get(dir, dest).normalize();
             }
         }
 
-        if ( targetDir.startsWith(pathWorking.substring(0, pathWorking.length()-1)) == false )  {
-            targetDir = Paths.get(pathWorking, targetDir).normalize().toString();
+        // This code switches to the target directory on the current path if the target is not an absolute path
+        // This also ensures that users cant access the entire file system
+        if(!targetDir.startsWith(pathWorking)){
+           targetDir = Paths.get(pathWorking.toString(), targetDir.toString()).normalize();
         }
 
-        // List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString(), false);
-        List<String> folders = DataFile.findFolders(targetDir, false);
-        Collections.sort(folders);
-        if (!"/".equals(targetDir)) {
-            folders.add(0, "..");
+        // Get Folders from OS
+        List<String> folders = DataFile.findFolders(targetDir.toString(), false);
+
+        // Solr stores the relative path so show only search relative path files
+        // This does mean that the context of the search matters becasue base directory
+        // will show for all working files even if they don't actually exist
+        // String relativePath = targetDir.replace(pathWorking, "");
+        String relativePath = pathWorking.relativize(targetDir).toString();
+        if(relativePath.equals("")){ // we are at base directory aka pathWorking
+           relativePath = File.separator; // this is needed for upload files to work
+        }
+        else{
+           folders.add(0, ".."); // if were not at base add the ability to go up a directory
         }
 
-        if (user.isDataManager()) {
-            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
-
-            String basePath = targetDir;
-            if (basePath.startsWith("/")) {
-                basePath = basePath.substring(1, basePath.length());
-            }
-
-            // DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
-        } else {
-            // since we can see other users' download, we don't send it email anymore
-            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, /*user.getEmail(), */ DataFile.CREATING);
-        }
-
-        // DataFile.filterNonexistedFiles(pathWorking, wkFiles);
-
-        DataFile.updatePermission(wkFiles, user.getEmail());
-
-        // once we reach the level that contains download, we don't want to allow the use to nevigate back to upper level
+        // once we reach the level that contains download, we don't want to allow the user to navigate back to upper level
+        // This needs some added controls with this working files will get stuck in the download folder...
+        // However this requires a major overhaul
         if ( folders.contains("download/") ) {
             folders.remove("..");
         }
-        return ok(workingFiles.render(targetDir, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
+        Collections.sort(folders);
 
+        // Get files in working directory
+        List<DataFile> wkFiles = new ArrayList<DataFile>();
+        wkFiles.addAll(DataFile.findDownloadedFilesInDir(relativePath, DataFile.CREATING));
+        wkFiles.addAll(DataFile.findDownloadedFilesInDir(relativePath, DataFile.WORKING));
+        DataFile.updatePermission(wkFiles, user.getEmail());
+
+        // The rest of the functions expect a relative path from the base
+        return ok(workingFiles.render(relativePath, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
     }
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
@@ -223,7 +224,6 @@ public class WorkingFiles extends Controller {
 
         DataFile dirFile = new DataFile(dir);
         dirFile.setStatus(DataFile.WORKING);
-
         return ok(moveFile.render(dir, dataFile, dirFile, user.getEmail()));
     }
 
@@ -505,16 +505,16 @@ public class WorkingFiles extends Controller {
 
         return redirect(routes.WorkingFiles.shareDataFile(dir, fileId));
     }
-    
+
     /*
     @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {	
+    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {
         return ok(workingFiles.render(User.getUserEmails(), routes.WorkingFiles.processOwnerForm(dir, ownerEmail, selectedFile), "Owner", "Selected File", selectedFile));
     }
     @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postAssignFileOwner(String dir, String ownerEmail, String selectedFile) {
         return assignFileOwner(dir, ownerEmail, selectedFile);
-    } 
+    }
     @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processOwnerForm(String dir, String ownerEmail, String selectedFile) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
@@ -538,7 +538,7 @@ public class WorkingFiles extends Controller {
             file.save();
             return redirect(routes.WorkingFiles.index(dir, "."));
         }
-    } 
+    }
     */
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)

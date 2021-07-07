@@ -110,11 +110,15 @@ public class ConfigProp {
     }
 
 	public static String getPathWorking() {
+        // This normalizes the config path (removes trailing /, allows speical path chars such as ..)
+        // We should probably do this everywhere
+        String path = Paths.get(ConfigFactory.load().getString("hadatac.autoccsv.path_working")).normalize().toString();
+
 	    if (CollectionUtil.isSandboxMode()) {
-	    	return ConfigFactory.load().getString("hadatac.autoccsv.path_working") + Sandbox.SUFFIX;
+	    	return path + Sandbox.SUFFIX;
 	        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working") + Sandbox.SUFFIX;
 	    }
-	    return ConfigFactory.load().getString("hadatac.autoccsv.path_working");
+	    return path;
 		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working");
 	}
 	public static String getAuto() {
