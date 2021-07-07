@@ -249,7 +249,7 @@ public class Application extends Controller {
     }
 
     protected Mailer.Mail.Body getVerifyEmailMailingBodyAfterSignup(final String token, final SysUser user) {
-        final boolean isSecure = false;
+        final boolean isSecure = ConfigFactory.load().getBoolean("hadatac.https.enable");
         final String url = routes.Signup.verify(token).absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
         final String langCode = "en";//lang.code();
