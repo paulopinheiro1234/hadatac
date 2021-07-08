@@ -519,24 +519,54 @@ public abstract class HADatAcThing implements Facetable {
             }
             query += " ?p ?o . } \n";
             query += " } ";
+            UpdateRequest request = UpdateFactory.create(query);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
         } else {
             // if ( getUri().contains("3539947") ) System.out.println("find 3539947!!!! delete without namespace!!!");
-            query += " DELETE WHERE { \n";
+
+            String query1 = query+ " DELETE WHERE { \n";
             if (getUri().startsWith("http")) {
-                query += "<" + this.getUri() + ">";
+                query1 += "<" + this.getUri() + ">";
             } else {
-                query += this.getUri();
+                query1 += this.getUri();
             }
-            query += " ?p ?o . \n";
-            query += " } ";
+            query1 += " ?p ?o . \n";
+            query1 += " } ";
+            UpdateRequest request = UpdateFactory.create(query1);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
+
+            // Added for deleting Virtual Columns
+            String query2 = query +" DELETE WHERE { \n";
+            query2 += " ?o ?p ";
+            if (getUri().startsWith("http")) {
+                query2 += "<" + this.getUri() + ">";
+            } else {
+                query2 += this.getUri();
+            }
+            query2 += " } ";
+            request = UpdateFactory.create(query2);
+             processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
+
+            // Added for deleting triples on empty graph
+            String query3 = query+ " DELETE WHERE { \n";
+            if (getUri().startsWith("http")) {
+                query3 += "<" + this.getUri() + ">";
+            } else {
+                query3 += this.getUri();
+            }
+            query3 += " ?p ?o \n";
+            query3 += " } ";
+            request = UpdateFactory.create(query3);
+            processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
         }
-
-        //System.out.println("Delete from triplestore query: " + query);
-
-        UpdateRequest request = UpdateFactory.create(query);
-        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
-                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-        processor.execute();
 
         //System.out.println("Deleted <" + getUri() + "> from triple store");
     }
