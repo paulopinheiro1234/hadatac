@@ -217,7 +217,7 @@ public class Downloader extends Controller {
         String fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
         // will use the user email address as the directory
-        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "download/"+ ownerEmail, ownerEmail, DataFile.CREATING);
+        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "/" + DataFile.DS_GENERATION + "/"+ ownerEmail, ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
