@@ -79,7 +79,7 @@ public class FirstLabel {
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if ( soln.get("graph") == null ) continue;
-            if ( soln.get("graph").toString().toLowerCase().contains(namedGraph.toLowerCase()) == false ) continue;
+            if ( soln.get("graph").toString().toLowerCase().contains(namedGraph.toLowerCase()) == false && resultsrw.hasNext() ) continue;
             if (soln.get("label") != null) {
                 labelStr = soln.get("label").toString();
             }
