@@ -63,6 +63,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Http.MultipartFormData.FilePart;
+import play.libs.Files.DelegateTemporaryFile;
 
 
 public class AutoAnnotator extends Controller {
@@ -647,10 +648,18 @@ public class AutoAnnotator extends Controller {
 
          InputStream fileInputStream;
          try {
+            DelegateTemporaryFile tf = (DelegateTemporaryFile)uploadedfile.getRef();
+            tf.moveFileTo(file, true);
+            /*
             fileInputStream = new FileInputStream((File)uploadedfile.getRef());
+            System.out.println("Opened input stream");
             byte[] byteFile = IOUtils.toByteArray(fileInputStream);
+            System.out.println("convert file");
             FileUtils.writeByteArrayToFile(file, byteFile);
+            System.out.println("write file");
             fileInputStream.close();
+            System.out.println("Save completed");
+            */
          } catch (Exception e) {
             return ok("<a style=\"color:#cc3300; font-size: large;\">Error uploading file. Please try again.</a>");
          }
