@@ -164,6 +164,7 @@ public class AnnotationWorker {
                 if (study.isEmpty()) {
                     new_path = pathProc;
                 } else {
+                    study = !study.contains("SSD") ? study : study.replace("SSD","STD");
                     new_path = Paths.get(pathProc, study).toString();
                 }
 

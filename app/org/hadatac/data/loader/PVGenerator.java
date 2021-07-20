@@ -169,7 +169,7 @@ public class PVGenerator extends BaseGenerator {
     	return variable + "||||" + code;
     }
     
-    private static void generateOtherOther(String superUri, PossibleValue pv) {
+    private static void generateOtherOther(String superUri, PossibleValue pv, String graphName) {
     	if (pv.getHasClass() == null || pv.getHasClass().isEmpty()) {
     		return;
     	}
@@ -177,6 +177,7 @@ public class PVGenerator extends BaseGenerator {
     	if (attr != null) {
     		attr.setHasDCTerms(generateDCTerms(pv.getHasVariable(), pv.getHasCode()));
     		attr.setSuperUri(superUri);
+			attr.setNamedGraph(graphName);
     		attr.updateAttribute();
     	}
     }
@@ -216,7 +217,7 @@ public class PVGenerator extends BaseGenerator {
 						}
 						
 						// update the class inside vc as a subclass of super
-						generateOtherOther(code.getHasOtherFor(),vc);
+						generateOtherOther(code.getHasOtherFor(),vc,sddUri);
 						logger.println("        - added " + vc.getHasClass() + " as a subclass of " + code.getHasOtherFor());
 					}
 				}

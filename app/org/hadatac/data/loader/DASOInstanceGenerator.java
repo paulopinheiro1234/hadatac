@@ -134,6 +134,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         logger.println("DASOInstanceGenerator: (1/10) ======== INITIALLY AVAILABLE SOCs ========");
+        studyUri = studyUri!=null && studyUri.contains("STD") ? studyUri.replace("STD","SSD") : studyUri;
         socsList = ObjectCollection.findByStudyUri(studyUri);
         if (socsList == null) {
             logger.println("DASOInstanceGenerator: no SOC is available");
@@ -645,8 +646,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         //  Create a SOC when existing SOCs can be associated
-        if (associatedSOC == null) { 
-            String newSOCUri = studyUri.replace("STD","SOC") + "-" + daso.getLabel().replace("??","");
+        if (associatedSOC == null) {
+            String newSOCUri = studyUri.contains("STD") ? studyUri.replace("STD","SOC") + "-" + daso.getLabel().replace("??","") : studyUri.replace("SSD","SOC") + "-" + daso.getLabel().replace("??","");;
             String scopeUri = "";
             if (daso != null) {
                 ObjectCollection scopeObj = socFromTargetDaso(daso, socsList);
@@ -690,7 +691,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
             logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
         }
-
+        associatedSOC.setNamedGraph(str.getUri());
         return true;
     }
 

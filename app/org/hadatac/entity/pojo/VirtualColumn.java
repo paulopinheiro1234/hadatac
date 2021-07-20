@@ -50,7 +50,14 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
             String hasGroundingLabel,
             String hasSOCReference) {
         super(className);
-        this.setUri(studyUri.replace("STD", "VC") + "-" + hasSOCReference.replace("??", ""));
+        String vcUri="";
+        if(studyUri.contains("SSD")){
+            vcUri = studyUri.replace("SSD", "VC") + "-" + hasSOCReference.replace("??", "");
+        }
+        if (studyUri.contains("STD")){
+            vcUri = studyUri.replace("STD", "VC") + "-" + hasSOCReference.replace("??", "");
+        }
+        this.setUri(vcUri);
         this.setStudyUri(studyUri);
         this.setGroundingLabel(hasGroundingLabel);
         this.setSOCReference(hasSOCReference);
@@ -128,7 +135,6 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
                 "SELECT ?uri WHERE { \n" + 
                 "   <" + studyUri + "> hasco:hasVirtualColumn ?uri . \n" +
                 " } ";
-
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -173,7 +179,13 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
     }
 
     public static VirtualColumn find(String studyUri, String SOCReference) {
-        String vcUri = studyUri.replace("STD", "VC") + "-" + SOCReference.replace("??", "");
+        String vcUri="";
+        if(studyUri.contains("SSD")){
+            vcUri = studyUri.replace("SSD", "VC") + "-" + SOCReference.replace("??", "");
+        }
+        if (studyUri.contains("STD")){
+            vcUri = studyUri.replace("STD", "VC") + "-" + SOCReference.replace("??", "");
+        }
         return VirtualColumn.find(vcUri);
     }
     

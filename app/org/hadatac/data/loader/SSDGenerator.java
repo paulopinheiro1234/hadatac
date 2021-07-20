@@ -63,7 +63,7 @@ public class SSDGenerator extends BaseGenerator {
     }
 
     private String getVirtualColumnUri(Record rec) {
-        return getStudyUri().replace("STD", "VC") + "-" + getSOCReference(rec).replace("??", "");
+        return getStudyUri().replace("SSD", "VC") + "-" + getSOCReference(rec).replace("??", "");
     }
     
     private String getSOCReference(Record rec) {
@@ -160,7 +160,7 @@ public class SSDGenerator extends BaseGenerator {
                 URIUtils.replacePrefixEx(typeUri),
                 getLabel(record),
                 getLabel(record),
-                getStudyUri(record),
+                getStudyUri(),
                 getVirtualColumnUri(record),
                 getRoleLabel(record),
                 URIUtils.replacePrefixEx(getHasScopeUri(record)),
