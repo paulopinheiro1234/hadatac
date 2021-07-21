@@ -1,5 +1,6 @@
 package org.hadatac.data.loader;
 
+import com.typesafe.config.ConfigFactory;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
@@ -922,6 +923,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
             labelPrefix = "SBJ ";
         } else {
             labelPrefix = "SPL ";
+        }
+        if ( labelPrefix.contains("SBJ") && "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+            return labelPrefix + originalID;
         }
         return labelPrefix + originalID + " - " + socIdFromUri(soc.getUri());
 
