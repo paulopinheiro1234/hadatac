@@ -675,13 +675,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
             if (newVc == null) {
                 newVc = new VirtualColumn(studyUri, "", daso.getLabel());
-                newVc.setNamedGraph(str.getUri());
+                newVc.setNamedGraph(studyUri);
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
             ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
             		newVc.getUri(), "", scopeUri, null, null, null, "0");
-            newSoc.setNamedGraph(str.getUri());
+            newSoc.setNamedGraph(studyUri);
             newSoc.saveToTripleStore();
             // addObject(newSoc);
 
@@ -691,7 +691,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
             logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
         }
-        associatedSOC.setNamedGraph(str.getUri());
+        if (associatedSOC!=null) {associatedSOC.setNamedGraph(studyUri);}
         return true;
     }
 
