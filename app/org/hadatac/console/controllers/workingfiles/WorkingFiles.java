@@ -85,7 +85,7 @@ public class WorkingFiles extends Controller {
             targetDir = pathWorking;
         } else {
             if (dest.equals(File.separator)) {
-                targetDir = Paths.get(pathWorking.toString(), "download", user.getEmail());
+                targetDir = Paths.get(pathWorking.toString(), DataFile.DS_GENERATION, user.getEmail());
             } else {
                 targetDir = Paths.get(dir, dest).normalize();
             }
@@ -115,7 +115,7 @@ public class WorkingFiles extends Controller {
         // once we reach the level that contains download, we don't want to allow the user to navigate back to upper level
         // This needs some added controls with this working files will get stuck in the download folder...
         // However this requires a major overhaul
-        if ( folders.contains("download/") ) {
+        if ( folders.contains(DataFile.DS_GENERATION + "/") ) {
             folders.remove("..");
         }
         Collections.sort(folders);
@@ -128,6 +128,62 @@ public class WorkingFiles extends Controller {
 
         // The rest of the functions expect a relative path from the base
         return ok(workingFiles.render(relativePath, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
+    }
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index_datasetGeneration(String dir, String dest, Boolean stayAtRoot, Http.Request request) {
+
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+
+        String targetDir = null;
+        List<DataFile> wkFiles = null;
+        String pathWorking = ConfigProp.getPathWorking();
+
+        if ( stayAtRoot ) {
+            targetDir = pathWorking;
+        } else {
+            if ("/".equals(dest)) {
+                targetDir = pathWorking + "/"+ DataFile.DS_GENERATION + "/" + user.getEmail();
+            } else {
+                targetDir = Paths.get(dir, dest).normalize().toString();
+            }
+        }
+
+        if ( targetDir.startsWith(pathWorking.substring(0, pathWorking.length()-1)) == false )  {
+            targetDir = Paths.get(pathWorking, targetDir).normalize().toString();
+        }
+
+        // List<String> folders = DataFile.findFolders(Paths.get(pathWorking, newDir).toString(), false);
+        List<String> folders = DataFile.findFolders(targetDir, false);
+        Collections.sort(folders);
+        if (!"/".equals(targetDir)) {
+            folders.add(0, "..");
+        }
+
+        if (user.isDataManager()) {
+            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, DataFile.CREATING);
+
+            String basePath = targetDir;
+            if (basePath.startsWith("/")) {
+                basePath = basePath.substring(1, basePath.length());
+            }
+
+            // DataFile.includeUnrecognizedFiles(Paths.get(pathWorking, newDir).toString(), basePath, wkFiles, user.getEmail(), DataFile.WORKING);
+        } else {
+            // since we can see other users' download, we don't send it email anymore
+            wkFiles = DataFile.findDownloadedFilesInDir(targetDir, /*user.getEmail(), */ DataFile.CREATING);
+        }
+
+        // DataFile.filterNonexistedFiles(pathWorking, wkFiles);
+
+        DataFile.updatePermission(wkFiles, user.getEmail());
+
+        // once we reach the level that contains download, we don't want to allow the use to nevigate back to upper level
+        if ( folders.contains(DataFile.DS_GENERATION + "/") || targetDir.endsWith(DataFile.DS_GENERATION)) {
+            folders.remove("..");
+        }
+
+        return ok(datasetGeneration.render(targetDir, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
     }
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
@@ -203,6 +259,10 @@ public class WorkingFiles extends Controller {
                 }
             }
 
+            // if this is dataset generation, then use its own entry point
+            if ( dir.indexOf(DataFile.DS_GENERATION) >= 0 ) {
+                return redirect(routes.WorkingFiles.index_datasetGeneration(dir, ".", false));
+            }
             return redirect(routes.WorkingFiles.index(dir, ".", false));
         }
     }
@@ -554,6 +614,12 @@ public class WorkingFiles extends Controller {
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkAnnotationLog(String dir, String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
+        // for dataset generation, dir should contain the word "download" and it should go to its own entry point
+        if ( dir != null && dir.contains(DataFile.DS_GENERATION) ) {
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB,
+                    DataFile.findById(fileId).getLog()),
+                    routes.WorkingFiles.index_datasetGeneration(dir, "/", false).url(), application.getUserEmail(request)));
+        }
         return ok(annotation_log.render(Feedback.print(Feedback.WEB,
                 DataFile.findById(fileId).getLog()),
                 routes.WorkingFiles.index(dir, "/", false).url(), application.getUserEmail(request)));
@@ -598,6 +664,10 @@ public class WorkingFiles extends Controller {
         file.delete();
         dataFile.delete();
 
+        // if this is dataset generation, we will need to use its own entry point
+        if ( dir.indexOf(DataFile.DS_GENERATION) >= 0) {
+            return redirect(routes.WorkingFiles.index_datasetGeneration(dir, ".", false));
+        }
         return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 

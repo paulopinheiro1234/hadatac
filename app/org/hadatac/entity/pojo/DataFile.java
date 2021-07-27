@@ -52,6 +52,9 @@ public class DataFile implements Cloneable {
     public static final String DD_PROCESSED = "DD_PROCESSED";
     public static final String DD_FREEZED = "DD_FREEZED";
 
+    // constant used for dataset generation
+    public static final String DS_GENERATION = "download";
+
     @Field("id")
     private String id;
     @Field("viewable_id_str")
