@@ -62,10 +62,10 @@ import org.hadatac.utils.ConfigProp;
 public class UserManagement extends Controller {
 
     private static final String UPLOAD_NAME = ConfigProp.getTmp() + "uploads/users-spreadsheet.xls";
-	private static final String UPLOAD_NAME_TTL = ConfigProp.getTmp() + "uploads/user-graph.ttl";
-	private static final String UPLOAD_NAME_JSON = ConfigProp.getTmp() + "uploads/user-auth.json";
+    private static final String UPLOAD_NAME_TTL = ConfigProp.getTmp() + "uploads/user-graph.ttl";
+    private static final String UPLOAD_NAME_JSON = ConfigProp.getTmp() + "uploads/user-auth.json";
     private final MyUsernamePasswordAuthProvider userPaswAuthProvider;
-	
+
     @Inject
     private FormFactory formFactory;
     @Inject

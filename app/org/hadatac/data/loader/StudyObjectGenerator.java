@@ -107,7 +107,10 @@ public class StudyObjectGenerator extends BaseGenerator {
         } else {
             auxstr = auxstr.replaceAll("-","");
         }
-        
+
+        if ( auxstr.contains("SBJ") && "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+            return auxstr + " " + originalID;
+        }
         return auxstr + " " + originalID + " - " + study_id;
     }
 
