@@ -111,13 +111,6 @@ public class WorkingFiles extends Controller {
         else{
            folders.add(0, ".."); // if were not at base add the ability to go up a directory
         }
-
-        // once we reach the level that contains download, we don't want to allow the user to navigate back to upper level
-        // This needs some added controls with this working files will get stuck in the download folder...
-        // However this requires a major overhaul
-        if ( folders.contains(DataFile.DS_GENERATION + "/") ) {
-            folders.remove("..");
-        }
         Collections.sort(folders);
 
         // Get files in working directory
