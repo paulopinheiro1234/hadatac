@@ -1555,7 +1555,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption) {
+    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption, boolean keepSameValue) {
 
         String roles = ConfigFactory.load().getString("hadatac.download.alignment");
         List<String> selecteedRoles = new ArrayList<>();
@@ -1601,7 +1601,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             for (Measurement m : measurements) {
 
                 // debug
-                if ( m.getObjectUri().contains("3539947") ) {
+                if ( m.getObjectUri().contains("1459288") ) {
                     String tmp1 = m.getEntryObjectUri();
                     int x = 1;
                 }
@@ -1783,7 +1783,10 @@ public class Measurement extends HADatAcThing implements Runnable {
 	                 				values = new ArrayList<String>();
 	                 				values.add(finalValue);
 	                			} else {
-	                				values.add(finalValue);
+                                    /*if ( m.getObjectUri().contains("1459288") ) {
+                                        System.out.println("this is 1459288, and here is the values: " + values.get(0));
+                                    }*/
+                                    if ( values.contains(finalValue) == false || keepSameValue ) values.add(finalValue);
 	                			}
 	                			results.get(referenceObj.getUri()).put(key, values);
 	                			//System.out.println("Phase I: final value [" + finalValue + "]");
