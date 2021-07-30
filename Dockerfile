@@ -12,6 +12,10 @@ RUN \
   apt-get update && \
   apt-get install sbt rpm -y
 
+##if Install Sbt fails -- comment out previous RUN command entirely & use below 2 RUN commands:
+#RUN wget -qO - "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" >/tmp/sbt.tgz
+#RUN tar xzf /tmp/sbt.tgz  --strip-components=1
+
 WORKDIR /tmp/build
 
 # Copy over the basic configuration files
