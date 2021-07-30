@@ -5,7 +5,11 @@ ENV BLAZEGRAPH_NAME blazegraph
 ENV BLAZEGRAPH_VERSION 2_1_4
 ENV BLAZEGRAPH_VERSION_URL https://github.com/blazegraph/database/releases/download/BLAZEGRAPH_RELEASE_${BLAZEGRAPH_VERSION}/blazegraph.war
 
-RUN apk --no-cache add openssl curl
+RUN apk update \
+ && apk add ca-certificates wget \
+ && update-ca-certificates \
+ && apk --no-cache add openssl curl
+#RUN apk --no-cache add openssl curl
 RUN mkdir -p ${JETTY_WEBAPPS}/${BLAZEGRAPH_NAME}/ && wget -O ${JETTY_WEBAPPS}/${BLAZEGRAPH_NAME}.war $BLAZEGRAPH_VERSION_URL
 
 RUN unzip ${JETTY_WEBAPPS}/${BLAZEGRAPH_NAME}.war -d ${JETTY_WEBAPPS}/${BLAZEGRAPH_NAME}/ && rm ${JETTY_WEBAPPS}/${BLAZEGRAPH_NAME}.war

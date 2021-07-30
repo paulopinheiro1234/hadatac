@@ -63,43 +63,43 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
 //        System.out.println("solrQuery:"+solrQuery);
         List<SysUser> users = new ArrayList<SysUser>();
         //CHECK PASSWORD
-            final SysUser u = SysUser.findByEmailSolr(username);
-            System.out.println(context.getSessionStore());
-            if (u == null) {
-                // System.out.println("User not found!");
-                redirect(org.hadatac.console.controllers.routes.Application.loginForm())
-                        .flashing("error", "user does not exist");
-            }
-            int userValidated = u.getEmailValidated()? 1:0;
-            switch (userValidated) {
-                case 0:
-                    throw new CredentialsException("User email is not unverified");
-                case 1:
-                    for (final LinkedAccount acc : u.getLinkedAccounts()) {
-                        if (checkPassword(acc.providerUserId, password)) {
-                            System.out.println("User logged in!:");
-                            System.out.println(context.getSessionStore());
-                            //TODO : customise the profile
-                            final CommonProfile profile = new CommonProfile();
-                            profile.setId(username);
-                            profile.addAttribute(Pac4jConstants.USERNAME, username);
-                            credentials.setUserProfile(profile);
-                            profile.setRoles(getUserRoles(u));
-                            profile.setRemembered(true);
-                            System.out.println("Profile:"+profile);
-                            break;
-                        } else {
-                            try {
-                                throw new CredentialException("User password is invalid");
-                            } catch (CredentialException e) {
-                                e.printStackTrace();
-                            }
+        final SysUser u = SysUser.findByEmailSolr(username);
+        System.out.println(context.getSessionStore());
+        if (u == null) {
+//            System.out.println("User is null!");
+            throw new BadCredentialsException("User not found in the system");
+//            redirect(routes.Application.loginForm()).flashing("error", "user does not exist");
+        }
+        int userValidated = u.getEmailValidated()? 1:0;
+        switch (userValidated) {
+            case 0:
+                throw new CredentialsException("User email is not unverified");
+            case 1:
+                for (final LinkedAccount acc : u.getLinkedAccounts()) {
+                    if (checkPassword(acc.providerUserId, password)) {
+                        System.out.println("User logged in!:");
+                        System.out.println(context.getSessionStore());
+                        //TODO : customise the profile
+                        final CommonProfile profile = new CommonProfile();
+                        profile.setId(username);
+                        profile.addAttribute(Pac4jConstants.USERNAME, username);
+                        credentials.setUserProfile(profile);
+                        profile.setRoles(getUserRoles(u));
+                        profile.setRemembered(true);
+                        System.out.println("Profile:"+profile);
+                        break;
+                    } else {
+                        try {
+                            throw new CredentialException("User password is invalid");
+                        } catch (CredentialException e) {
+                            e.printStackTrace();
                         }
                     }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + userValidated);
-            }
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + userValidated);
+        }
     }
 
     private boolean checkPassword(final String hashed, final String candidate) {

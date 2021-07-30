@@ -14,6 +14,7 @@ import org.hadatac.console.providers.AuthUser;
 import org.hadatac.console.providers.MyService;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
+import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.account.errorLogin;
 import org.hadatac.console.views.html.error401;
@@ -99,11 +100,11 @@ public class Application extends Controller {
     private Result protectedIndexView(Http.Request request) {
 //        getUserEmail(request);
 //        getProfiles(request);
-        return ok(org.hadatac.console.views.html.protectedIndex.render(getProfiles(request),getUserEmail(request)));
+          return ok(protectedIndex.render(getProfiles(request),getUserEmail(request)));
     }
 
     private Result notProtectedIndexView(Http.Request request) {
-        return ok(org.hadatac.console.views.html.notprotectedIndex.render(getProfiles(request)));
+        return ok(notprotectedIndex.render(getProfiles(request)));
     }
 
     public Result facebookNotProtectedIndex(Http.Request request) {
@@ -133,7 +134,12 @@ public class Application extends Controller {
 
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
-        return protectedIndexView(request);
+        SysUser user = SysUser.findByEmail(getUserEmail(request));
+//        System.out.println("user is Admin :"+ user.isDataManager());
+        if(null != user && user.isDataManager()){
+            return protectedIndexView(request);
+        }
+        return ok(portal.render(getUserEmail(request)));
     }
 
     @Secure(clients = "IndirectBasicAuthClient")
@@ -184,18 +190,18 @@ public class Application extends Controller {
 
     public Result loginForm(Http.Request request) throws TechnicalException {
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
-            Optional<String> username = request.queryString("username");
-            Optional<String> error = request.queryString("error");
-            if (!error.isEmpty() && error.get().equalsIgnoreCase("CredentialsException") && !username.isEmpty()) {
-                SysUser sysUser = AuthApplication.getAuthApplication().getUserProvider().getUser(username.get());
-                sendVerifyEmailMailingAfterSignup(sysUser);
-                return unverified();
-            }
-            else if(!error.isEmpty() && error.get().equalsIgnoreCase("BadCredentialsException")) {
-             return ok(errorLogin.render());
+        Optional<String> username = request.queryString("username");
+        Optional<String> error = request.queryString("error");
+        if (!error.isEmpty() && error.get().equalsIgnoreCase("CredentialsException") && !username.isEmpty()) {
+            SysUser sysUser = AuthApplication.getAuthApplication().getUserProvider().getUser(username.get());
+            sendVerifyEmailMailingAfterSignup(sysUser);
+            return unverified();
         }
-            return ok(loginForm.render(formClient.getCallbackUrl()));
+        else if(!error.isEmpty() && error.get().equalsIgnoreCase("BadCredentialsException")) {
+            return ok(errorLogin.render());
         }
+        return ok(loginForm.render(formClient.getCallbackUrl()));
+    }
 
     public Result jwt(Http.Request request) {
         final List<CommonProfile> profiles = getProfiles(request);
@@ -223,17 +229,17 @@ public class Application extends Controller {
     }
 
     public void sendVerifyEmailMailingAfterSignup(final SysUser sysUser) {
-    final String subject = "Confirm your e-mail address";
-    final String token = generateVerificationRecord(sysUser);
-    final Mailer.Mail.Body body = getVerifyEmailMailingBodyAfterSignup(token, sysUser);
-    String recipient = Mailer.getEmailName(sysUser.getEmail(), sysUser.getName());
-    Email email = new Email()
-            .setSubject(subject)
-            .setBodyText(body.getText())
-            .setBodyHtml(body.getHtml())
-            .setFrom(ConfigFactory.load().getString("hadatac.community.contact_email"))
-            .addTo(recipient);
-    mailerClient.send(email);
+        final String subject = "Confirm your e-mail address";
+        final String token = generateVerificationRecord(sysUser);
+        final Mailer.Mail.Body body = getVerifyEmailMailingBodyAfterSignup(token, sysUser);
+        String recipient = Mailer.getEmailName(sysUser.getEmail(), sysUser.getName());
+        Email email = new Email()
+                .setSubject(subject)
+                .setBodyText(body.getText())
+                .setBodyHtml(body.getHtml())
+                .setFrom(ConfigFactory.load().getString("hadatac.community.contact_email"))
+                .addTo(recipient);
+        mailerClient.send(email);
     }
 
     protected String generateVerificationRecord(final SysUser user) {
@@ -243,7 +249,7 @@ public class Application extends Controller {
     }
 
     protected Mailer.Mail.Body getVerifyEmailMailingBodyAfterSignup(final String token, final SysUser user) {
-        final boolean isSecure = false;
+        final boolean isSecure = ConfigFactory.load().getBoolean("hadatac.https.enable");
         final String url = routes.Signup.verify(token).absoluteURL(
                 isSecure, ConfigFactory.load().getString("hadatac.console.base_url"));
         final String langCode = "en";//lang.code();
