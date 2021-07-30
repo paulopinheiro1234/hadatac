@@ -1,16 +1,7 @@
 # The first part of this Dockerfile is inspired by an existing Dockerfile hosted at https://github.com/mozilla/docker-sbt/blob/main/Dockerfile
 # The important parts have been copied over to remove a dependency on two public Docker containers
-FROM openjdk:11
-
-ENV SBT_VERSION 1.3.10
-
-# Install sbt
-RUN \
-  curl -L -o sbt-$SBT_VERSION.deb https://scala.jfrog.io/artifactory/debian/sbt-$SBT_VERSION.deb && \
-  dpkg -i sbt-$SBT_VERSION.deb && \
-  rm sbt-$SBT_VERSION.deb && \
-  apt-get update && \
-  apt-get install sbt rpm -y
+#FROM openjdk:11
+FROM hseeberger/scala-sbt:11.0.12_1.5.5_2.12.14
 
 WORKDIR /tmp/build
 
