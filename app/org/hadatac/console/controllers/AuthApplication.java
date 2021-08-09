@@ -33,25 +33,19 @@ public class AuthApplication extends Controller {
     private Application application;
 
     private static AuthApplication authApplication = null;
-////    private final PlayAuthenticate auth;
     private final MyUsernamePasswordAuthProvider provider;
     private final UserProvider userProvider;
-////    private final Authenticate authenticate;
-//
+
     public static String formatTimestamp(final long t) {
         return new SimpleDateFormat("yyyy-dd-MM HH:mm:ss").format(new Date(t));
     }
 
     @Inject
-    public AuthApplication(//final PlayAuthenticate auth,
-                           final MyUsernamePasswordAuthProvider provider,
+    public AuthApplication(final MyUsernamePasswordAuthProvider provider,
                            final UserProvider userProvider
-////            ,final Authenticate authenticate
             ) {
-////        this.auth = auth;
         this.provider = provider;
         this.userProvider = userProvider;
-////        this.authenticate = authenticate;
         authApplication = this;
     }
 
@@ -82,25 +76,6 @@ public class AuthApplication extends Controller {
         final SysUser localUser = userProvider.getUser(username);
         return ok(profile.render(localUser));
     }
-//
-//    public Result login() {
-//        return ok(login.render(this.provider.getLoginForm()));
-//    }
-//
-//    public Result doLogin() {
-//        com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-//        final Form<MyLogin> filledForm = this.provider.getLoginForm()
-//                .bindFromRequest();
-//        if (filledForm.hasErrors()) {
-//            return badRequest(login.render(filledForm));
-//        } else {
-//            return this.provider.handleLogin(ctx());
-//        }
-//    }
-//
-//    public Result signup() {
-//        return ok(signup.render(this.provider.getSignupForm()));
-//    }
 
     //TODO: test this
     public Result jsRoutes() {
@@ -108,28 +83,4 @@ public class AuthApplication extends Controller {
                 routes.javascript.Signup.forgotPassword()))
                 .as("text/javascript");
     }
-//
-//    public Result doSignup() {
-//        com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-//        final Form<MySignup> filledForm = this.provider.getSignupForm().bindFromRequest();
-//        if (filledForm.hasErrors()) {
-//            // User did not fill everything properly
-//            return badRequest(signup.render(this.auth, filledForm));
-//        } else {
-//            if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
-//                if (!UserManagement.isPreRegistered(filledForm.get().email)) {
-//                    return ok(notRegistered.render());
-//                }
-//            }
-//
-//            // Everything was filled
-//            // do something with your part of the form before handling the user
-//            // signup
-//            return this.provider.handleSignup(ctx());
-//        }
-//    }
-//
-//    public Result doSignout() {
-//        return this.authenticate.logout();
-//    }
 }

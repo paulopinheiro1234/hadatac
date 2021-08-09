@@ -13,32 +13,11 @@ import javax.inject.Inject;
  * Service layer for User DB entity
  */
 public class UserProvider {
-//
-////    private final PlayAuthenticate auth;
-//
-////    @Inject
-////    public UserProvider(final PlayAuthenticate auth) {
-////        this.auth = auth;
-////    }
-//
-//    @Nullable
-//    public SysUser getUser(UsernamePasswordCredentials credentials) {
-//                final MyUsernamePasswordAuthProvider currentAuthUser = credentials.getUsername();
-//        SysUser localUser = SysUser.findByAuthUserIdentity(currentAuthUser);
-//
-//        return localUser;
-//    }
+
     @Nullable
     public SysUser getUser(String username) {
         SysUser localUser = SysUser.findByEmail(username);
         return localUser;
     }
-
-//    @Nullable
-//    public SysUser getUser(String sessionId) {
-//        final MyUsernamePasswordAuthProvider currentAuthUser = getUser(sessionId);
-//        SysUser localUser = SysUser.findByEmail(username);
-//        return localUser;
-//    }
 
 }
