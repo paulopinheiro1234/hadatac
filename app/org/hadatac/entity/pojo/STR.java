@@ -1284,6 +1284,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
     @Override
     public void deleteFromTripleStore() {
+        super.deleteFromTripleStore();
     }
 
 }
