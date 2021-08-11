@@ -210,7 +210,7 @@ public class Downloader extends Controller {
     }
 
     public static int generateCSVFileBySubjectAlignment(List<Measurement> measurements,
-                                                        String facets, String ownerEmail, String categoricalOption) {
+                                                        String facets, String ownerEmail, String categoricalOption, boolean keepSameValue) {
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
@@ -227,7 +227,7 @@ public class Downloader extends Controller {
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
 
-        Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption);
+        Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption, keepSameValue);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;

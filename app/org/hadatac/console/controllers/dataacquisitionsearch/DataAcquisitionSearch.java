@@ -295,6 +295,8 @@ public class DataAcquisitionSearch extends Controller {
         String objectType = "";
         String categoricalValues = "";
         String timeResolution = "";
+        String sameValueSelection = "";
+
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         if (name_map != null) {
@@ -302,6 +304,7 @@ public class DataAcquisitionSearch extends Controller {
             objectType = name_map.get("selObjectType")[0].toString();
             categoricalValues = name_map.get("selCatValue")[0].toString();
             timeResolution = name_map.get("selTimeRes")[0].toString();
+            sameValueSelection = name_map.get("selDupOpt")[0].toString();
         }
 
         long startTime = System.currentTimeMillis();
@@ -311,6 +314,7 @@ public class DataAcquisitionSearch extends Controller {
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
+        final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection)? false : true;
         //System.out.println("Object type inside alignment: " + objectType);
 
         CompletionStage<Integer> promiseOfResult = null;
@@ -319,7 +323,7 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    results.getDocuments(), finalFacets, email, categoricalOption),
+                    results.getDocuments(), finalFacets, email, categoricalOption, keepSameValue),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
