@@ -4,16 +4,11 @@ import be.objectify.deadbolt.java.models.Permission;
 import be.objectify.deadbolt.java.models.Role;
 import be.objectify.deadbolt.java.models.Subject;
 
-//import com.feth.play.module.pa.providers.oauth2.BasicOAuth2AuthUser;
-//import com.feth.play.module.pa.providers.oauth2.google.GoogleAuthUser;
-//import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.typesafe.config.ConfigFactory;
 import org.hadatac.console.providers.*;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.entity.pojo.User;
-//import com.feth.play.module.pa.user.SessionAuthUser;
 
-//import controllers.AuthApplication;
 import org.hadatac.console.models.TokenAction.Type;
 import org.hadatac.utils.CollectionUtil;
 import play.data.validation.Constraints;
@@ -260,22 +255,6 @@ public class SysUser implements Subject {
 		return this.permissions;
 	}
 
-//	public static boolean existsByAuthUserIdentity(
-//			final AuthUserIdentity identity) {
-//		return existsByAuthUserIdentitySolr(identity);
-//	}
-
-//	public static boolean existsByAuthUserIdentitySolr(
-//			final AuthUserIdentity identity) {
-//		final List<SysUser> users;
-//		if (identity instanceof UsernamePasswordAuthUser) {
-//			users = getUsernamePasswordAuthUserFindSolr((UsernamePasswordAuthUser) identity);
-//		} else {
-//			users = getAuthUserFindSolr(identity);
-//		}
-//		return !users.isEmpty();
-//	}
-
 	private static List<SysUser> getAuthUserFindSolr(
 			final MyAuthUserIdentity identity) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
@@ -308,28 +287,6 @@ public class SysUser implements Subject {
 		if (identity == null) {
 			return null;
 		}
-
-//		if (identity instanceof MyUsernamePasswordAuthProvider){
-//		    SysUser retUser = findByUsernamePasswordIdentitySolr((MyUsernamePasswordAuthProvider) identity);
-//            return retUser;
-//		}
-//		else if (identity instanceof GoogleAuthUser) {
-//		    SysUser retUser = findByEmailSolr(((GoogleAuthUser)identity).getEmail());
-//		    return retUser;
-//		} else if (identity instanceof SessionAuthUser) {
-//            List<LinkedAccount> linkedAccounts = LinkedAccount.findByProviderUserIdSolr(
-//                    ((SessionAuthUser)identity).getId());
-//
-//            SysUser retUser = null;
-//            for (LinkedAccount account : linkedAccounts) {
-//                retUser = SysUser.findByUserIdSolr(account.getUserId());
-//                if (null != retUser) {
-//                    break;
-//                }
-//            }
-//
-//            return retUser;
-//        }
         else {
 			List<SysUser> users = getAuthUserFindSolr(identity);
 			if (users.size() == 1) {
@@ -339,37 +296,6 @@ public class SysUser implements Subject {
 			}
 		}
 	}
-
-//	public static SysUser findByUsernamePasswordIdentity(
-//			final MyUsernamePasswordAuthProvider identity) {
-//		return findByUsernamePasswordIdentitySolr(identity);
-//	}
-
-//	public static SysUser findByUsernamePasswordIdentitySolr(
-//			final MyUsernamePasswordAuthProvider identity) {
-//		List<SysUser> users = getUsernamePasswordAuthUserFindSolr(identity);
-//		if (users.size() == 1) {
-//			return users.get(0);
-//		} else {
-//			return null;
-//		}
-//	}
-
-// TODO : original
-//	public static SysUser findByUsernamePasswordIdentity(
-//			final UsernamePasswordAuthUser identity) {
-//		return findByUsernamePasswordIdentitySolr(identity);
-//	}
-//
-//	public static SysUser findByUsernamePasswordIdentitySolr(
-//			final UsernamePasswordAuthUser identity) {
-//		List<SysUser> users = getUsernamePasswordAuthUserFindSolr(identity);
-//		if (users.size() == 1) {
-//			return users.get(0);
-//		} else {
-//			return null;
-//		}
-//	}
 
 	public static SysUser findByIdSolr(final String id) {
 		SolrClient solrClient = new HttpSolrClient.Builder(
@@ -412,15 +338,6 @@ public class SysUser implements Subject {
 
         return user;
     }
-//	private static List<SysUser> getUsernamePasswordAuthUserFindSolr(
-//			final MyUsernamePasswordAuthProvider identity) {
-//		return getEmailUserFindSolr(identity.getEmail(), identity.getProvider());
-//	}
-// Todo : original
-//	private static List<SysUser> getUsernamePasswordAuthUserFindSolr(
-//			final UsernamePasswordAuthUser identity) {
-//		return getEmailUserFindSolr(identity.getEmail(), identity.getProvider());
-//	}
 
 	public void merge(final SysUser otherUser) {
 		mergeSolr(otherUser);
@@ -438,7 +355,6 @@ public class SysUser implements Subject {
 		otherUser.save();
 	}
 
-	//TODO: test
 	public static SysUser create(final MyUsernamePasswordAuthProvider authUser, String uri, LinkedAccount acc) {
 		final SysUser sys_user = new SysUser();
 
@@ -448,8 +364,6 @@ public class SysUser implements Subject {
 		sys_user.permissions = new ArrayList<UserPermission>();
 		sys_user.active = true;
 		sys_user.lastLogin = Instant.now().toString();
-//		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
-//				.create(authUser));
 		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
 				.create(acc));
 
@@ -467,21 +381,6 @@ public class SysUser implements Subject {
 				sys_user.name = name;
 			}
 		}
-//TODO: to be implemented in UI too
-//		if (authUser instanceof FirstLastNameIdentity) {
-//			System.out.println("authUser instanceof FirstLastNameIdentity");
-//			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-//			final String firstName = identity.getFirstName();
-//			final String lastName = identity.getLastName();
-//			System.out.println("firstName: " + firstName);
-//			System.out.println("lastName: " + lastName);
-//			if (firstName != null) {
-//				sys_user.firstName = firstName;
-//			}
-//			if (lastName != null) {
-//				sys_user.lastName = lastName;
-//			}
-//		}
 
 		sys_user.id_s = UUID.randomUUID().toString();
 
@@ -506,91 +405,6 @@ public class SysUser implements Subject {
 			// System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
 			user.save();
 			// System.out.println("sys_user before save uri admin: " + admin_uri+ user.getName());
-			sys_user.save();
-
-			return sys_user;
-		}
-
-		if(null == uri) {
-			sys_user.uri = "";
-		} else {
-			sys_user.uri = uri;
-		}
-		// System.out.println("sys_user before save uri other: " + sys_user.uri);
-		sys_user.save();
-
-		return sys_user;
-	}
-	//TODO: original
-	public static SysUser create(final AuthUser authUser, String uri) {
-		final SysUser sys_user = new SysUser();
-
-		sys_user.roles.add(SecurityRole.findByRoleNameSolr("data_owner"));
-		sys_user.roles.add(SecurityRole.findByRoleNameSolr("file_viewer_editor"));
-
-		sys_user.permissions = new ArrayList<UserPermission>();
-		sys_user.active = true;
-		sys_user.lastLogin = Instant.now().toString();
-		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
-				.create(authUser));
-
-		if (authUser instanceof EmailIdentity) {
-			// System.out.println("authUser instanceof EmailIdentity");
-			final EmailIdentity identity = (EmailIdentity) authUser;
-			// Remember, even when getting them from FB & Co., emails should be
-			// verified within the application as a security breach there might
-			// break your security as well!
-			sys_user.email = identity.getEmail();
-			sys_user.emailValidated = false;
-		}
-
-		if (authUser instanceof NameIdentity) {
-			// System.out.println("authUser instanceof NameIdentity");
-			final NameIdentity identity = (NameIdentity) authUser;
-			final String name = identity.getName();
-			// System.out.println("name: " + name);
-			if (name != null) {
-				sys_user.name = name;
-			}
-		}
-
-		if (authUser instanceof FirstLastNameIdentity) {
-			// System.out.println("authUser instanceof FirstLastNameIdentity");
-			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-			final String firstName = identity.getFirstName();
-			final String lastName = identity.getLastName();
-			// System.out.println("firstName: " + firstName);
-			// System.out.println("lastName: " + lastName);
-			if (firstName != null) {
-				sys_user.firstName = firstName;
-			}
-			if (lastName != null) {
-				sys_user.lastName = lastName;
-			}
-		}
-
-		sys_user.id_s = UUID.randomUUID().toString();
-
-		if (!SysUser.existsSolr()) {
-			// System.out.println("existsSolr: " );
-			sys_user.roles.add(SecurityRole
-					.findByRoleNameSolr("data_manager"));
-			sys_user.emailValidated = true;
-
-			String admin_uri = ConfigFactory.load().getString("hadatac.console.kb") + "/users#admin";
-			User user = new User();
-			user.setName(sys_user.name);
-			user.setEmail(sys_user.email);
-			user.setUri(admin_uri);
-
-			if(null == uri){
-				sys_user.uri = admin_uri;
-			}
-			else{
-				sys_user.uri = uri;
-			}
-			// System.out.println("sys_user before save uri admin: " + admin_uri);
-			user.save();
 			sys_user.save();
 
 			return sys_user;
@@ -624,74 +438,6 @@ public class SysUser implements Subject {
 		}
 
 		return false;
-	}
-//TODO : orginal
-	public static SysUser create(final AuthUser authUser) {
-		final SysUser sys_user = new SysUser();
-
-		sys_user.roles.add(SecurityRole.findByRoleNameSolr(
-                "file_viewer_editor"));
-
-		sys_user.permissions = new ArrayList<UserPermission>();
-		sys_user.active = true;
-		sys_user.lastLogin = Instant.now().toString();
-		sys_user.linkedAccounts = java.util.Collections.singletonList(LinkedAccount
-				.create(authUser));
-
-		if (authUser instanceof EmailIdentity) {
-			final EmailIdentity identity = (EmailIdentity) authUser;
-			// Remember, even when getting them from FB & Co., emails should be
-			// verified within the application as a security breach there might
-			// break your security as well!
-			sys_user.email = identity.getEmail();
-			sys_user.emailValidated = false;
-		}
-
-		if (authUser instanceof NameIdentity) {
-			final NameIdentity identity = (NameIdentity) authUser;
-			final String name = identity.getName();
-			if (name != null) {
-				sys_user.name = name;
-			}
-		}
-
-		if (authUser instanceof FirstLastNameIdentity) {
-			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-			final String firstName = identity.getFirstName();
-			final String lastName = identity.getLastName();
-			if (firstName != null) {
-				sys_user.firstName = firstName;
-			}
-			if (lastName != null) {
-				sys_user.lastName = lastName;
-			}
-		}
-
-//		if (authUser instanceof BasicOAuth2AuthUser) {
-//		    sys_user.emailValidated = true;
-//		} else {
-//		    sys_user.roles.add(SecurityRole.findByRoleNameSolr(
-//	                "data_owner"));
-//		}
-
-		sys_user.id_s = UUID.randomUUID().toString();
-
-		User user = new User();
-		user.setName(sys_user.name);
-		user.setEmail(sys_user.email);
-		// System.out.println("SysUser.existsSolr():"+SysUser.existsSolr());
-
-		if (SysUser.existsSolr() == false) {
-			sys_user.roles.add(SecurityRole
-					.findByRoleNameSolr("data_manager"));
-			sys_user.emailValidated = true;
-			user.setUri(ConfigFactory.load().getString("hadatac.console.kb") + "/users#admin");
-		}
-
-		user.save();
-		sys_user.save();
-
-		return sys_user;
 	}
 
 	public void save() {
@@ -733,15 +479,6 @@ public class SysUser implements Subject {
 		return -1;
 	}
 
-//	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
-//		mergeSolr(oldUser, newUser);
-//	}
-
-//	public static void mergeSolr(final AuthUser oldUser, final AuthUser newUser) {
-//		SysUser.findByAuthUserIdentitySolr(oldUser).merge(
-//				SysUser.findByAuthUserIdentitySolr(newUser));
-//	}
-
 	public Set<String> getProviders() {
 		final Set<String> providerKeys = new HashSet<String>(
 				this.linkedAccounts.size());
@@ -750,23 +487,6 @@ public class SysUser implements Subject {
 		}
 		return providerKeys;
 	}
-
-//	public static void addLinkedAccount(final AuthUser oldUser,
-//			final AuthUser newUser) {
-//		final SysUser u = SysUser.findByAuthUserIdentity(oldUser);
-//		if (null != u) {
-//			u.linkedAccounts.add(LinkedAccount.create(newUser));
-//			u.save();
-//		}
-//	}
-
-//	public static void setLastLoginDate(final AuthUser knownUser) {
-//		final SysUser u = SysUser.findByAuthUserIdentity(knownUser);
-//		if (null != u) {
-//			u.lastLogin = Instant.now().toString();
-//			u.save();
-//		}
-//	}
 
 	public static SysUser findByEmail(final String email) {
 		return findByEmailSolr(email);
