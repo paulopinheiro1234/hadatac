@@ -176,9 +176,9 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += DELETE_LINE1;
-        query += "GRAPH <"+getNamedGraph()+"> { " + oc_uri + "  ";
+        query += " " + oc_uri + "  ";
         query += DELETE_LINE4;
-        query += LINE_LAST+LINE_LAST;
+        query += LINE_LAST;
 
         UpdateRequest request = UpdateFactory.create(query);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
@@ -1081,6 +1081,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 "   ?uri a ?ocType . \n" +
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
+
+        //System.out.println("queryString: " + queryString);
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
@@ -1339,7 +1341,6 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         if (uri == null || uri.equals("")) {
             return;
         }
-        String studyUri= uri.contains("SOC") && this.getStudyUri()!=null ? this.getStudyUri().replace("STD","SSD"):this.getStudyUri();
 
         this.hasRoleLabel = label;
         String insert = "";
@@ -1347,14 +1348,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
         if (uri.startsWith("http")) {
-            insert += "graph  <"+studyUri+"> { " ;
             insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
 
         } else {
-            insert += "graph  <"+studyUri+"> { " ;
             insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
         }
-        insert += LINE_LAST+LINE_LAST;
+        insert += LINE_LAST;
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));

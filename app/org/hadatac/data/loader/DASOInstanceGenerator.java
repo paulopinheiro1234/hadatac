@@ -135,7 +135,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         logger.println("DASOInstanceGenerator: (1/10) ======== INITIALLY AVAILABLE SOCs ========");
-        studyUri = studyUri!=null && studyUri.contains("STD") ? studyUri.replace("STD","SSD") : studyUri;
         socsList = ObjectCollection.findByStudyUri(studyUri);
         if (socsList == null) {
             logger.println("DASOInstanceGenerator: no SOC is available");
@@ -647,8 +646,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
         }
 
         //  Create a SOC when existing SOCs can be associated
-        if (associatedSOC == null) {
-            String newSOCUri = studyUri.contains("STD") ? studyUri.replace("STD","SOC") + "-" + daso.getLabel().replace("??","") : studyUri.replace("SSD","SOC") + "-" + daso.getLabel().replace("??","");;
+        if (associatedSOC == null) { 
+            String newSOCUri = studyUri.replace("STD","SOC") + "-" + daso.getLabel().replace("??","");
             String scopeUri = "";
             if (daso != null) {
                 ObjectCollection scopeObj = socFromTargetDaso(daso, socsList);
@@ -676,13 +675,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
             if (newVc == null) {
                 newVc = new VirtualColumn(studyUri, "", daso.getLabel());
-                newVc.setNamedGraph(studyUri);
+                newVc.setNamedGraph(str.getUri());
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
             ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
             		newVc.getUri(), "", scopeUri, null, null, null, "0");
-            newSoc.setNamedGraph(studyUri);
+            newSoc.setNamedGraph(str.getUri());
             newSoc.saveToTripleStore();
             // addObject(newSoc);
 
@@ -692,7 +691,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
             logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
         }
-        if (associatedSOC!=null) {associatedSOC.setNamedGraph(studyUri);}
+
         return true;
     }
 

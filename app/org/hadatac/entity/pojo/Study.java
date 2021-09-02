@@ -526,15 +526,6 @@ public class Study extends HADatAcThing {
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        if (resultsrw.size() <1){
-            queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                    "DESCRIBE ?objUri WHERE { \n" +
-                    "  ?objUri hasco:isMemberOf ?socUri . \n" +
-                    "  ?socUri hasco:isMemberOf <" + getUri().replace("STD","SSD") + "> . \n" +
-                    "}";
-            resultsrw = SPARQLUtils.select(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        }
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
