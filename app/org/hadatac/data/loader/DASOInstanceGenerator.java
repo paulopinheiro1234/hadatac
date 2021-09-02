@@ -74,10 +74,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
         mainLabel = "";
         String origId = sdd.getOriginalIdLabel(); 
         String id = sdd.getIdLabel(); 
+        String id2 = sdd.getId2Label();
         if (origId != null && !origId.equals("")) {
             mainLabel = origId;
         } else if (id != null && !id.equals("")) {
             mainLabel = id;
+        } else if (id2 != null && !id2.equals("")) {
+            mainLabel = id2;
         }
 
         if (fileName == null || fileName.equals("")) {
@@ -757,6 +760,10 @@ public class DASOInstanceGenerator extends BaseGenerator {
         		System.out.println("DASOInstanceGenerator:          Obj Original ID=[" + id + "]   SOC=[" + currentSoc.getUri() + "] =>  Obj URI=[" + currentObjUri + "]");
         	}
 
+            if (currentObjUri == null || currentObjUri.equals("")) {
+                currentObjUri = createStudyObject2(currentSoc, id);
+            }
+
         	/* 
              *   Test if there is Grounding Path. If so, replace ID of a main SOC's object by the ID of 
              *   the corresponding grounding scope object of the main SOC's object
@@ -849,6 +856,40 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
         return objMapList;
     }// /generateRowInstances
+
+    private String createStudyObject2(ObjectCollection soc, String id) {
+        String newUri = createObjectUri(id, soc.getUri(), soc.getTypeUri());
+        String newLabel = createObjectLabel(id, soc);
+        String newTypeUri = "";
+        DataAcquisitionSchemaObject daso = dasoFromSoc(soc, dasos);
+        if (daso == null || daso.getEntity() == null || daso.getEntity().equals("")) {
+            if (soc.getTypeUri().equals(ObjectCollection.MATCHING_COLLECTION)) {
+                newTypeUri = URIUtils.replacePrefixEx(StudyObjectMatching.className);
+            } else if (soc.getTypeUri().equals(ObjectCollection.SUBJECT_COLLECTION)) {
+                newTypeUri = URIUtils.replacePrefixEx(SIO_OBJECT);
+            } else {
+                newTypeUri = URIUtils.replacePrefixEx(SIO_SAMPLE);
+            }
+        } else {
+            newTypeUri = daso.getEntity();
+        }
+        List<String> newScopeUris = new ArrayList<String>();
+        List<String> newTimeScopeUris = new ArrayList<String>();
+        List<String> newSpaceScopeUris = new ArrayList<String>();
+        //newScopeUris.add(soc.getUri());
+
+        StudyObject newObj = new StudyObject(newUri, newTypeUri, id, newLabel, soc.getUri(), "Automatically generated",
+                newScopeUris, newTimeScopeUris, newSpaceScopeUris);
+        newObj.setNamedGraph(str.getUri());
+        newObj.setDeletable(false);
+        addObjectToCache(newObj, soc.getUri());
+
+        if (DEBUG_MODE) { 
+        	System.out.println("DASOInstanceGenerator:          Created Obj with URI=[" + newUri + "]   Type=[" + newTypeUri + "]");
+        }
+
+        return newObj.getUri();
+    }
 
     /*
      *   CREATE next object in the path if it does not exist
