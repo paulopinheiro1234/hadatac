@@ -48,6 +48,7 @@ public class MeasurementGenerator extends BaseGenerator {
     private int posTimeInstant = -1;
     private int posNamedTime = -1;
     private int posId = -1;
+    private int posId2 = -1;
     private int posOriginalId = -1;
     private int posEntity = -1;
     private int posUnit = -1;
@@ -159,6 +160,10 @@ public class MeasurementGenerator extends BaseGenerator {
             posId = schema.tempPositionOfLabel(schema.getIdLabel());
             //System.out.println("posId: " + posId);
         }
+        if (!schema.getId2Label().equals("")) {
+            posId2 = schema.tempPositionOfLabel(schema.getId2Label());
+            //System.out.println("posId2: " + posId2);
+        }
         if (!schema.getOriginalIdLabel().equals("")) {
             posOriginalId = schema.tempPositionOfLabel(schema.getOriginalIdLabel());
             //System.out.println("posOriginalId: " + posOriginalId);
@@ -236,6 +241,8 @@ public class MeasurementGenerator extends BaseGenerator {
                 id = record.getValueByColumnIndex(posOriginalId);
             } else if (!schema.getIdLabel().equals("")) {
                 id = record.getValueByColumnIndex(posId);
+            } else if (!schema.getId2Label().equals("")) {
+                id = record.getValueByColumnIndex(posId2);
             }
             objList = dasoiGen.generateRowInstances(id);
             groundObj = dasoiGen.retrieveGroundObject(id);
@@ -464,6 +471,8 @@ public class MeasurementGenerator extends BaseGenerator {
                     id = record.getValueByColumnIndex(posOriginalId);
                 } else if (!schema.getIdLabel().equals("")) {
                     id = record.getValueByColumnIndex(posId);
+                } else if (!schema.getId2Label().equals("")) {
+                    id = record.getValueByColumnIndex(posId2);
                 }
 
                 if (!id.equals("")) {

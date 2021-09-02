@@ -38,6 +38,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
             "sio:SIO_000418", 
             "hasco:namedTime", 
             "hasco:originalID", 
+            "hasco:id",
             "hasco:uriId", 
             "hasco:hasMetaEntity", 
             "hasco:hasMetaEntityURI", 
@@ -66,6 +67,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
     private String namedTimeLabel = "";
     private String idLabel = "";
     private String originalIdLabel = "";
+    private String id2Label = "";
     private String elevationLabel = "";
     private String entityLabel = "";
     private String unitLabel = "";
@@ -180,6 +182,14 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public void setOriginalIdLabel(String originalIdLabel) {
         this.originalIdLabel = originalIdLabel;
+    }
+
+    public String getId2Label() {
+        return id2Label;
+    }
+
+    public void setId2Label(String id2Label) {
+        this.id2Label = id2Label;
     }
 
     public String getLODLabel() {
@@ -317,6 +327,12 @@ public class DataAcquisitionSchema extends HADatAcThing {
                         || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:SIO_000115")) 
                         || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:originalID")).contains(dasa.getAttributes())) { 
                     setOriginalIdLabel(dasa.getLabel());
+                    //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
+                }
+                if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:id")) 
+                        || dasa.getAttributes().equals(URIUtils.replacePrefixEx("sio:SIO_000115")) 
+                        || Entity.getSubclasses(URIUtils.replacePrefixEx("hasco:id")).contains(dasa.getAttributes())) { 
+                    setId2Label(dasa.getLabel());
                     //System.out.println("[OK] DataAcquisitionSchema IdLabel: " + dasa.getLabel());
                 }
                 if (dasa.getAttributes().contains(URIUtils.replacePrefixEx("hasco:hasEntity"))) {
