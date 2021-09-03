@@ -1339,7 +1339,6 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         if (uri == null || uri.equals("")) {
             return;
         }
-        String studyUri= uri.contains("SOC") && this.getStudyUri()!=null ? this.getStudyUri().replace("STD","SSD"):this.getStudyUri();
 
         this.hasRoleLabel = label;
         String insert = "";
@@ -1347,11 +1346,11 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
         if (uri.startsWith("http")) {
-            insert += "graph  <"+studyUri+"> { " ;
+            insert += "graph  <"+getNamedGraph()+"> { " ;
             insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
 
         } else {
-            insert += "graph  <"+studyUri+"> { " ;
+            insert += "graph  <"+getNamedGraph()+"> { " ;
             insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
         }
         insert += LINE_LAST+LINE_LAST;

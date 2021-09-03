@@ -135,7 +135,6 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         logger.println("DASOInstanceGenerator: (1/10) ======== INITIALLY AVAILABLE SOCs ========");
-        studyUri = studyUri!=null && studyUri.contains("STD") ? studyUri.replace("STD","SSD") : studyUri;
         socsList = ObjectCollection.findByStudyUri(studyUri);
         if (socsList == null) {
             logger.println("DASOInstanceGenerator: no SOC is available");
@@ -645,6 +644,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 }
             }
         }
+         namedGraphUri = (!(studyUri==null) && studyUri.contains("STD")) ? studyUri.replace("STD","SSD") : "";
 
         //  Create a SOC when existing SOCs can be associated
         if (associatedSOC == null) {
@@ -676,13 +676,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
             if (newVc == null) {
                 newVc = new VirtualColumn(studyUri, "", daso.getLabel());
-                newVc.setNamedGraph(studyUri);
+                newVc.setNamedGraph(namedGraphUri);
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
             ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
             		newVc.getUri(), "", scopeUri, null, null, null, "0");
-            newSoc.setNamedGraph(studyUri);
+            newSoc.setNamedGraph(namedGraphUri);
             newSoc.saveToTripleStore();
             // addObject(newSoc);
 
@@ -692,7 +692,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
             logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
         }
-        if (associatedSOC!=null) {associatedSOC.setNamedGraph(studyUri);}
+        if (associatedSOC!=null) {associatedSOC.setNamedGraph(namedGraphUri);}
         return true;
     }
 

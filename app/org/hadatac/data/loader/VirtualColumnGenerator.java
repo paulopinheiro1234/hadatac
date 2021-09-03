@@ -32,7 +32,8 @@ public class VirtualColumnGenerator extends BaseGenerator {
     }
 
     private String getStudyUri(Record rec) {
-        String studyUri = URIUtils.replacePrefixEx(rec.getValueByColumnName(mapCol.get("studyUri"))).replaceAll("STD","SSD");
+//        return rec.getValueByColumnName(mapCol.get("studyUri"));
+        String studyUri = URIUtils.replacePrefixEx(rec.getValueByColumnName(mapCol.get("studyUri")));
         return (studyUri);
     }
 
