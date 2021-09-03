@@ -530,7 +530,7 @@ public class Study extends HADatAcThing {
             queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                     "DESCRIBE ?objUri WHERE { \n" +
                     "  ?objUri hasco:isMemberOf ?socUri . \n" +
-                    "  ?socUri hasco:isMemberOf <" + getUri().replace("STD","SSD") + "> . \n" +
+                    "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
                     "}";
             resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
