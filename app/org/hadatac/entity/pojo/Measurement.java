@@ -1600,13 +1600,6 @@ public class Measurement extends HADatAcThing implements Runnable {
         	//System.out.println("Phase I: before Measurement loop");
             for (Measurement m : measurements) {
 
-                // debug
-                if ( m.getObjectUri().contains("1459288") ) {
-                    String tmp1 = m.getEntryObjectUri();
-                    int x = 1;
-                }
-                // end of debug
-
             	//System.out.println("Phase I: start of Measurement loop");
                 StudyObject referenceObj = null;
 
@@ -1672,6 +1665,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                             if (referenceObj != null) {
 	                        	//System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
 	                            alignment.addObject(referenceObj);
+                                addToStudyMap(studyMap, alignment, referenceObj); // we need to add the studyId to the studyMap collection
 	                        }
 	                    }
 	                    
@@ -1912,6 +1906,17 @@ public class Measurement extends HADatAcThing implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private static void addToStudyMap(Map<String, List<String>> studyMap, Alignment alignment, StudyObject referenceObj) {
+
+        if ( studyMap == null || alignment == null || referenceObj == null ) return;
+
+        String studyId = alignment.getStudyId(referenceObj.getIsMemberOf());
+        List<String> list = studyMap.getOrDefault(referenceObj.getUri(), new ArrayList<>());
+        if ( !list.contains(studyId) ) list.add(studyId);
+        studyMap.put(referenceObj.getUri(), list);
 
     }
 
