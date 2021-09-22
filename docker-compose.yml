@@ -8,6 +8,8 @@ services:
             dockerfile: Dockerfile
         container_name: hadatac_solr
         restart: always
+        environment:
+            SOLR_JAVA_MEM: "-Xms1g -Xmx1g"
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
             - hadatac-solr:/opt/solr/server
@@ -51,6 +53,9 @@ services:
             hadatac:
                 aliases:
                     - hadatac
+        environment:
+            JAVA_XMS: 2g
+            JAVA_XMX: 12g
         volumes:
             # Creates a volume to store the various csv files. This allows the data
             #   to be persisted when the container is removed or when Hadatac is rebuilt.
