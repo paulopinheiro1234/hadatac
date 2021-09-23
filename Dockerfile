@@ -3,6 +3,7 @@
 #FROM openjdk:11
 FROM hseeberger/scala-sbt:11.0.12_1.5.5_2.12.14
 
+ENV JAVA_OPTS="-Xms6048m -Xmx10000m"
 WORKDIR /tmp/build
 
 # Copy over the basic configuration files
