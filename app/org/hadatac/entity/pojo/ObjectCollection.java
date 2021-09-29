@@ -1345,15 +1345,19 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
-        if (uri.startsWith("http")) {
+        if(!getNamedGraph().isEmpty()){
             insert += "graph  <"+getNamedGraph()+"> { " ;
+        }
+        if (uri.startsWith("http")) {
             insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
 
         } else {
-            insert += "graph  <"+getNamedGraph()+"> { " ;
             insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
         }
-        insert += LINE_LAST+LINE_LAST;
+        insert += LINE_LAST;
+        if(!getNamedGraph().isEmpty()){
+            insert += LINE_LAST;
+        }
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
