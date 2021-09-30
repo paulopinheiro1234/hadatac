@@ -1,4 +1,4 @@
-@(indicator : org.hadatac.entity.pojo.Indicator)
+@(indicator : org.hadatac.entity.pojo.Indicator, userName: String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -7,23 +7,23 @@
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("New Indicator") {
+@main("New Indicator","",userName) {
 
     <h2>Create Indicator</h2>
-    
+
     <h3>Listing below shows values for new Indicator</h3>
 
     <div class="container-fluid">
-       <ul>
-         <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(indicator.getUri())</li>
-         <li><b>Label:</b> @indicator.getLabel()</li>
-         <li><b>Comment:</b> @indicator.getComment()</li>
-       </ul>
-       
-       <br>
-       <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
-       
+        <ul>
+            <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(indicator.getUri())</li>
+            <li><b>Label:</b> @indicator.getLabel()</li>
+            <li><b>Comment:</b> @indicator.getComment()</li>
+        </ul>
+
+        <br>
+        <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()" class="btn btn-primary" role="button">Back to Indicator Management</a>
+
     </div>
-    
-    }
-    
+
+}
+

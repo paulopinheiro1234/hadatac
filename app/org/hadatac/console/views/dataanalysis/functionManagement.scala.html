@@ -1,47 +1,47 @@
-@(functionList : List[org.hadatac.entity.pojo.Indicator])
+@(functionList : List[org.hadatac.entity.pojo.Indicator],userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Function Management") {
+@main("Function Management","",userName) {
 
     <h3>Function Management</h3>
-    
+
     <h4>Management options</h4>
 
     <div class="container-fluid">
-      <div class="row">
-         <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.dataanalysis.routes.NewFunction.index()" class="btn btn-primary" role="button">Create Function</a>
-         </div>
-      </div>
-   </div>
+        <div class="row">
+            <div class="navbar-collapse collapse navbar-secondary">
+                <a href="@org.hadatac.console.controllers.dataanalysis.routes.NewFunction.index()" class="btn btn-primary" role="button">Create Function</a>
+            </div>
+        </div>
+    </div>
 
-   <hr>
+    <hr>
 
-   <h4>Functions</h4>
-   
+    <h4>Functions</h4>
+
     <div class="container-fluid">
         <table class="table">
             <thead>
-              <tr>
-                <th>Function URI</th>
-                <th>Label</th>
-                <th>Comment</th>
-                <th>Operations</th>
-              </tr>
+                <tr>
+                    <th>Function URI</th>
+                    <th>Label</th>
+                    <th>Comment</th>
+                    <th>Operations</th>
+                </tr>
             </thead>
             <tbody>
-              @for(function <- functionList){
-	         	@function_entry(function)
-              }
+            @for(function <- functionList){
+                @function_entry(function)
+            }
             </tbody>
         </table>
-	
+
         @mainButton(false)
-	
+
     </div>
- 
+
 
 }

@@ -6,6 +6,7 @@ function checkRecs (L,R,checker){
     var colIndex=0;
     var rowIndex=0;
     var isVirtual=0;
+    console.log("Check Recs");
     for (var i=0;i<R;i++){
       for(var j=1;j<L;j++){
         //cdg.data[i][j]=cdg.data[i][j]+" * ";
@@ -14,7 +15,8 @@ function checkRecs (L,R,checker){
         var colval=cdg.schema[colIndex].title;
         colval=colval.charAt(0).toLowerCase() + colval.slice(1);
         var rowval=cdg.data[rowIndex][0];
-
+	//console.log(cdg);
+	//console.log(cdg.schema);
         if(checker==1){
           if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
             isVirtual=0;
@@ -98,7 +100,7 @@ function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
       //cdg.draw();
       if(sheetName=="Dictionary Mapping"){
         drawCheck(rowIndex,colIndex);
-        autoPopulateSDD(menuoptns,rowIndex,colIndex);
+        //autoPopulateSDD(menuoptns,rowIndex,colIndex);
       }
     }
 
@@ -161,7 +163,7 @@ function storeAutoVal(topchoice,rowIndex,colIndex){
 
     sheetStorage[rowIndex][colIndex]=cdg.data[rowIndex][colIndex];
     var finalLab=convertToLabel(topchoice);
-  sheetStorage[rowIndex][colIndex]=finalLab
+    sheetStorage[rowIndex][colIndex]=finalLab
 
 
 
@@ -219,20 +221,23 @@ function getDescription(cval){
 
   console.log(cval)
   var cellVal=cval.trim();
+  console.log(cellVal);
+  console.log(JSON.stringify({iricode: cellVal}));
   var ret;
       $.ajax({
-        type : 'POST',
+        type : 'GET',
         url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
-        data : {
-          iricode:cellVal
-        },
-        async: false,
+        data : {iricode: cellVal},
         success : function(data) {
           console.log(data);
-         ret=data
-        }
+          ret=data
+	  return data;
+        },
+	error : function(xhr, textStatus, errorThrown) {
+                console.log("FAIL: " + xhr + " " + textStatus + " " + errorThrown);
+        	console.log(xhr);
+	}
       });
-      return ret;
 }
 function drawCheck(rowIndex,colIndex){
 
@@ -244,7 +249,8 @@ function drawCheck(rowIndex,colIndex){
         }
     }
   });
-  var d='https://www.starfall.com/h/_images/green-corner-triangle.png'
+  var d=imgPath + 'blue-corner-triangle.png';
+  //'https://www.starfall.com/h/_images/green-corner-triangle.png'
   cdg.addEventListener('afterrendercell', function (e) {
 
     var i, contextGrid = this;
@@ -252,7 +258,7 @@ function drawCheck(rowIndex,colIndex){
              && e.cell.rowIndex > -1) {
         // if we haven't already made an image for this, do it now
         if (!imgs[d]) {
-            // create a new image object and store it in the imgs object
+            // create a new image object and store it in the imgs objiect
             i = imgs[d] = new Image();
             // get the image path from the cell's value
             i.src = d;
@@ -268,7 +274,6 @@ function drawCheck(rowIndex,colIndex){
         if (i.width !== 0) {
             i.targetHeight = e.cell.height/2;
             i.targetWidth = (e.cell.height * (i.width / i.height))/2;
-
             e.ctx.drawImage(i, e.cell.x, e.cell.y, i.targetWidth, i.targetHeight);
         }
     }
@@ -423,29 +428,93 @@ function revertRow(){
 
 
 
-function indicateApproval(){
-  for(var prop in approvalList){
-    var r= approvalList[prop][0];
-    var c= approvalList[prop][1];
-
-    if(approvalList[prop][2]==0 && prop == cdg.data[r-1][c]){
-
-      cdg.data[r-1][c]+=" + ";
+function indicateApproval(r,c,prop){
+  //console.log("INDICATION");
+  var imgs2={};
+  //for(var prop in approvalList){
+    //var r= approvalList[prop][0][1];
+    //var c= approvalList[prop][0][2];
+    if( prop == cdg.data[r][c]){
+      /*cdg.data[r][c]+=" + ";
+      cdg.draw();*/
+      //console.log(r);
+      //console.log(c);
+      //var imgs2={};
+      cdg.addEventListener('rendertext', function (e) {
+      	if (e.cell.rowIndex > -1 && sheetName==="Dictionary Mapping") {
+      		if (e.cell.rowIndex === r && e.cell.columnIndex=== c) {
+			e.cell.formattedValue = e.cell.value ? '' : 'No Image';
+		}
+      	}
+      });
+      var d= imgPath + 'green-corner-triangle.png';
       cdg.draw();
+      cdg.addEventListener('afterrendercell', function (e) {
+	//console.log("afterrender");
+      	var i, contextGrid = this;
+	//console.log(e.cell.rowIndex);
+	//console.log(r);
+	//console.log(e.cell.columnIndex);
+	//console.log(c);
+	//console.log(sheetName==="Dictionary Mapping");
+	//console.log(e.cell.rowIndex === r);
+        //console.log(e.cell.columnIndex===c);
+	//console.log(e.cell.rowIndex > -1);
+	if (sheetName==="Dictionary Mapping"&& e.cell.rowIndex === r && e.cell.columnIndex===c
+	             && e.cell.rowIndex > -1) {
+		//console.log("HERE");
+		// if we haven't already made an image for this, do it now
+	        if (!imgs2[d]) {
+	            // create a new image object and store it in the imgs object
+	            i = imgs2[d] = new Image();
+	            // get the image path from the cell's value
+	            i.src = d;
+	            // when the image finally loads
+	            // call draw() again to run the else path
+	            i.onload = function (parentNode) {
+	               contextGrid.draw();
+		       /*if (i.width !== 0) {
+                         i.targetHeight = e.cell.height/2;
+                         i.targetWidth = (e.cell.height * (i.width / i.height))/2;
+
+                         e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
+                       }*/
+	            };
+	            //return;
+	        }
+	        // if we have an image already, draw it.
+	        i = imgs2[d];
+	        if (i.width !== 0 && approvalList[r][c]!="") {
+	            i.targetHeight = e.cell.height/2;
+	            i.targetWidth = (e.cell.height * (i.width / i.height))/2;
+		    //if(approvalList[r][c]==""){
+			//e.ctx.globalCompositeOperation = "destination-out";
+		    //}
+	            e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
+	        }
+		else if(approvalList[r][c]=="") {
+		     // e.ctx.globalCompositeOperation = "xor";
+		     //e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
+		    e.ctx.fillStyle = "rgba(0, 0, 0, 0)";
+		    e.ctx.fillRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
+		    //e.ctx.clearRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);		   
+		}
+      	}
+      });
 
     }
-  }
+  //}
 
 }
 function acceptApproval(val,r,c){
-
-  for(var prop in approvalList){
-
-    if(approvalList[prop][2]==1){
+  console.log(val);
+  //for(var prop in approvalList){
+	//console.log(prop);
+    //if(approvalList[prop][0][3]==1){
 
       cdg.data[r][c]=val;
 
-    }
-  }
+    //}
+  //}
 
 }

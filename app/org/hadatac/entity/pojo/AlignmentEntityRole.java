@@ -8,24 +8,24 @@ public class AlignmentEntityRole {
     private String role;
 
     public AlignmentEntityRole(Entity ent, String role) {
-	this.ent = ent;
-	this.role = role;
+        this.ent = ent;
+        this.role = role;
     }
 
     public String getKey() {
-	return role + ent.getLabel();
+        return role + ent.getLabel();
     }
 
     public Entity getEntity() {
-	return ent;
+        return ent;
     }
 
     public String getRole() {
-	return role;
+        return role;
     }
 
     public String toString() {
-	return role + "-" + ent.getLabel();
+        return role + "-" + ent.getLabel();
     }
 
 }

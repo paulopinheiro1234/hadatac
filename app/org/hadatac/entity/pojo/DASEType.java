@@ -9,15 +9,18 @@ import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DASEType extends HADatAcThing implements Comparable<DASEType> {
+
+    private static final Logger log = LoggerFactory.getLogger(DASEType.class);
 
     public DASEType() {}
 
@@ -44,7 +47,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
-        
+
         String valueConstraint = "";
         if (!facet.getFacetValuesByField("dase_type_uri_str").isEmpty()) {
             valueConstraint += " VALUES ?daseTypeUri { " + stringify(
@@ -72,7 +75,7 @@ public class DASEType extends HADatAcThing implements Comparable<DASEType> {
         
         Map<Facetable, List<Facetable>> mapTypeToInstanceList = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();

@@ -1,22 +1,9 @@
-# The first part of this Dockerfile is inspired by an existing Dockerfile hosted at https://github.com/tthaomo/docker-scala-play
+# The first part of this Dockerfile is inspired by an existing Dockerfile hosted at https://github.com/mozilla/docker-sbt/blob/main/Dockerfile
 # The important parts have been copied over to remove a dependency on two public Docker containers
-FROM anapsix/alpine-java:jdk8
+#FROM openjdk:11
+FROM hseeberger/scala-sbt:11.0.12_1.5.5_2.12.14
 
-ENV SBT_VERSION 0.13.15
-ENV CHECKSUM 18b106d09b2874f2a538c6e1f6b20c565885b2a8051428bd6d630fb92c1c0f96
-
-# Install sbt
-RUN apk add --update --no-cache ca-certificates curl git openssl && \
-    curl -L -o /tmp/sbt.zip https://dl.bintray.com/sbt/native-packages/sbt/${SBT_VERSION}/sbt-${SBT_VERSION}.zip && \
-    openssl dgst -sha256 /tmp/sbt.zip | grep ${CHECKSUM} || (echo 'shasum mismatch' && false) && \
-    mkdir -p /opt/sbt && \
-    unzip /tmp/sbt.zip -d /opt/sbt && \
-    rm /tmp/sbt.zip && \
-    chmod +x /opt/sbt/sbt/bin/sbt && \
-    ln -s /opt/sbt/sbt/bin/sbt /usr/bin/sbt && \
-    rm -rf /tmp/* /var/cache/apk/* && \
-    apk del ca-certificates curl openssl
-
+ENV JAVA_OPTS="-Xms6048m -Xmx10000m"
 WORKDIR /tmp/build
 
 # Copy over the basic configuration files
@@ -56,6 +43,8 @@ RUN sbt compile && sbt test:compile
 
 # Expose the port the play app runs on
 EXPOSE 9000
+EXPOSE 8080
+EXPOSE 8983
 
 # Run the app when starting up the Docker container
 ENTRYPOINT ["sbt"]

@@ -1,11 +1,12 @@
 @(thePlatforms   : List[org.hadatac.entity.pojo.Platform],
-  theInstruments : List[org.hadatac.entity.pojo.Instrument],
-  theDetectors   : List[org.hadatac.entity.pojo.Detector],
-  deploymentType : String,
-  dir            : String,
-  filename       : String,
-  da_uri         : String,
-  page           : Integer)
+        theInstruments : List[org.hadatac.entity.pojo.Instrument],
+        theDetectors   : List[org.hadatac.entity.pojo.Detector],
+        deploymentType : String,
+        dir            : String,
+        filename       : String,
+        da_uri         : String,
+        page           : Integer,
+        userName       : String)
 
 @import play._
 @import helper._
@@ -18,189 +19,189 @@
 @import org.hadatac.metadata.loader.URIUtils
 @import com.typesafe.config.ConfigFactory
 
-@main("New Deployment") {
+@main("New Deployment","",userName) {
 
-	<script type="text/javascript">
-           function replaceAll(str, find, replace) {
-              while (str.indexOf(find) > -1) {
-                 str = str.replace(find, replace);
-              }
-              return str;
-           }
-       
-	   function checkform() {
-	      var cansubmit = true;
-	
-	      if (document.getElementById('newLabel').value.length == 0) {
-	          cansubmit = false;
-	      }
-	      else {
-	          var nameInUri = document.getElementById('newLabel').value;
-                  nameInUri = replaceAll(nameInUri," ","-");
-	          nameInUri = replaceAll(nameInUri,"<","");
-                  nameInUri = replaceAll(nameInUri,">","");
-                  nameInUri = replaceAll(nameInUri,"?","");
-                  nameInUri = replaceAll(nameInUri,".","");
-                  nameInUri = replaceAll(nameInUri,"!","");
-                  nameInUri = replaceAll(nameInUri,"?","");
-                  nameInUri = replaceAll(nameInUri,"'","");
-                  nameInUri = replaceAll(nameInUri,"#","");
-                  nameInUri = replaceAll(nameInUri,"&","");
-                  nameInUri = replaceAll(nameInUri,";","");
-                  nameInUri = replaceAll(nameInUri,",","");
-                  var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" + 
-                               "-kb:DPL-" + nameInUri; 
- 	    	  document.getElementById('uri').value = newUri;
-	      }
-	
-	      if (document.getElementById('dataAcquisitionUri').value.length == 0) {
-	          cansubmit = false;
-	      }
-	      
-	      if (document.getElementById('platform').value.length == 0) {
-	         cansubmit = false;
-	      }
-	         
-	      if (document.getElementById('instrument').value.length == 0) { 
-	         cansubmit = false;
-	         var instrumentSelector = document.getElementById('detector');
-	         instrumentSelector.disabled = 'disabled';
-	         for (var i = 0, l = instrumentSelector.length; i < l; i++) {
-	                instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
-			 }      
-		  } else {
-	         document.getElementById('detector').disabled = false;
-	      }
-	                
-	      if (document.getElementById('startdatetime').value.length == 0) {
-	         cansubmit = false;
-	      }
-	
-	      if (cansubmit) {
-	          document.getElementById('submitbutton').disabled = false;
-	      } else {
-	          document.getElementById('submitbutton').disabled = 'disabled';
-	      }
-	   }
-	</script>
-
-  <div class="container">
- 
-    @* Filename: @filename <br>
-       da_uri: @da_uri <br> *@
-
-    <h3>
-    @if(da_uri != null && !da_uri.equals("")) {
-         New Deployment for Stream Specification @URIUtils.replaceNameSpaceEx(da_uri)
-    } else {
-         New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment
-    }
-    </h3>
-
-   <hr>
-
-   <h4>Operations</h4>
-    <div class="row">
-      <div class="navbar-collapse collapse navbar-secondary">
-	    <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_PLATFORM, dir, filename, da_uri, 0)" 
-	       class="btn btn-primary" role="button">Manage Platforms</a>
-        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_INSTRUMENT, dir, filename, da_uri, 0)" 
-	       class="btn btn-primary" role="button">Manage Instruments</a>
-        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_DETECTOR, dir, filename, da_uri, 0)" 
-	       class="btn btn-primary" role="button">Manage Detectors</a>
-      </div>
-    </div>
-    <br>
-
-    <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm(dir, filename, da_uri, page)">
-	
-	<div class="form-group">
-		<label>URI:</label>
- 		<input type="text" class="form-control col-sm-6" name="uri" id="uri" readonly>
- 	</div>
- 	<div class="form-group">
-		<label>Stream Specification URI:</label>
- 		<input type="text" name="dataAcquisitionUri" id="dataAcquisitionUri" 
-		       @if(da_uri != null && !da_uri.equals("")) {
-		          class="form-control col-sm-6 disabled"  value="@URIUtils.replaceNameSpaceEx(da_uri)" readonly
-		       } else {
-		          class="form-control col-sm-6" 
-		       }
-		       >
- 	</div>
- 	<div class="form-group">
-		<label>Short Name</label>
- 		<input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="checkform()" >
- 	</div>
- 	<div class="form-group">
-		<label>Initial Parameters: (optional)</label>
- 		<input type="text" class="form-control col-sm-6" name="initialParameter" id="initialParameter" onchange="checkform()" >
- 	</div>
-    <div class="form-group">
-         <label>Platform</label> 
-         <select class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
-            <option value=""></option>
-            @for(platform <- thePlatforms) {
-                <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
+    <script type="text/javascript">
+            function replaceAll(str, find, replace) {
+                while (str.indexOf(find) > -1) {
+                    str = str.replace(find, replace);
+                }
+                return str;
             }
-         </select>
-     </div>
-	 <div class="form-group">
-         <label>Instrument</label>
-         <select class="form-control col-sm-6" id="instrument" name="instrument" onchange="checkform()" >
-            <option value=""></option>         
-            @for(instrument <- theInstruments){
-                <option value="@instrument.getUri()">@instrument.getLabel()  @if(instrument.getSerialNumber() != null) { (SN: @instrument.getSerialNumber()) }</option>         
+
+            function checkform() {
+                var cansubmit = true;
+
+                if (document.getElementById('newLabel').value.length == 0) {
+                    cansubmit = false;
+                }
+                else {
+                    var nameInUri = document.getElementById('newLabel').value;
+                    nameInUri = replaceAll(nameInUri," ","-");
+                    nameInUri = replaceAll(nameInUri,"<","");
+                    nameInUri = replaceAll(nameInUri,">","");
+                    nameInUri = replaceAll(nameInUri,"?","");
+                    nameInUri = replaceAll(nameInUri,".","");
+                    nameInUri = replaceAll(nameInUri,"!","");
+                    nameInUri = replaceAll(nameInUri,"?","");
+                    nameInUri = replaceAll(nameInUri,"'","");
+                    nameInUri = replaceAll(nameInUri,"#","");
+                    nameInUri = replaceAll(nameInUri,"&","");
+                    nameInUri = replaceAll(nameInUri,";","");
+                    nameInUri = replaceAll(nameInUri,",","");
+                    var newUri = "@ConfigFactory.load().getString("hadatac.community.ont_prefix")" +
+                            "-kb:DPL-" + nameInUri;
+                    document.getElementById('uri').value = newUri;
+                }
+
+                if (document.getElementById('dataAcquisitionUri').value.length == 0) {
+                    cansubmit = false;
+                }
+
+                if (document.getElementById('platform').value.length == 0) {
+                    cansubmit = false;
+                }
+
+                if (document.getElementById('instrument').value.length == 0) {
+                    cansubmit = false;
+                    var instrumentSelector = document.getElementById('detector');
+                    instrumentSelector.disabled = 'disabled';
+                    for (var i = 0, l = instrumentSelector.length; i < l; i++) {
+                        instrumentSelector[i].selected = instrumentSelector[i].defaultSelected;
+                    }
+                } else {
+                    document.getElementById('detector').disabled = false;
+                }
+
+                if (document.getElementById('startdatetime').value.length == 0) {
+                    cansubmit = false;
+                }
+
+                if (cansubmit) {
+                    document.getElementById('submitbutton').disabled = false;
+                } else {
+                    document.getElementById('submitbutton').disabled = 'disabled';
+                }
             }
-         </select>
-     </div>
-	 <div class="form-group">
-         <label>Detector(s)</label>
-         <select class="form-control col-sm-6" id="detector" multiple="multiple" name="detector[]" onchange="checkform()" disabled='disabled' >
-            @for((detector) <- theDetectors){
-                <option value="@detector.getUri()">@detector.getLabel()  @if(detector.getSerialNumber() != null) { (SN: @detector.getSerialNumber()) }</option>         
-            }
-         </select>
-     </div>
-     
-	 <div class="form-group">
-         <label for="startdate">Start Date/Time</label><br> 
-         <div class="container">
-            <div class="row">
-               <div class='col-sm-3'>
-                 <div class="form-group">
-                    <div class='input-group date' id='startdate' onchange="checkform()" >
-                       <input type='text' name="startDateTime" id="startdatetime" class="form-control" />
-                       <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                       </span>
-                    </div>
-                 </div>
-               </div>
-               <script type="text/javascript">
-                 $(function () {
-                     $('#startdate').datetimepicker();
-                     $('#startdate').on('dp.change', function (e) { checkform(); });
-                 });
-               </script>
+    </script>
+
+    <div class="container">
+
+        @* Filename: @filename <br>
+        da_uri: @da_uri <br> *@
+
+        <h3>
+        @if(da_uri != null && !da_uri.equals("")) {
+            New Deployment for Stream Specification @URIUtils.replaceNameSpaceEx(da_uri)
+        } else {
+            New @deploymentType.substring(0, 1).toUpperCase().concat(deploymentType.substring(1).toLowerCase()) Deployment
+        }
+        </h3>
+
+        <hr>
+
+        <h4>Operations</h4>
+        <div class="row">
+            <div class="navbar-collapse collapse navbar-secondary">
+                <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_PLATFORM, dir, filename, da_uri, 0)"
+                class="btn btn-primary" role="button">Manage Platforms</a>
+                <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_INSTRUMENT, dir, filename, da_uri, 0)"
+                class="btn btn-primary" role="button">Manage Instruments</a>
+                <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.findWithPages(Infra.INFRA_DETECTOR, dir, filename, da_uri, 0)"
+                class="btn btn-primary" role="button">Manage Detectors</a>
             </div>
-         </div>
-     </div>
-     
-     <div class="form-group" hidden="true">
-     	<input id="type" name="type" type="text" class="form-control" value="@deploymentType" hidden="true" />
-     </div>
+        </div>
+        <br>
 
-      <div class="form-group" class="col-sm-6 col-offset-3">
-          <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
-          <p> The created deployment will be saved in the knowledge graph</p>
-      </div>
-      
-      <div class="form-group" class="col-sm-6 col-offset-3">
-           @deploymentButton(false, dir, filename, da_uri, page) 
-      </div>
+        <form class="form-horizontal" name="newDeployment" method="post" action="@org.hadatac.console.controllers.deployments.routes.NewDeployment.processForm(dir, filename, da_uri, page)">
 
-   </form>
-  </div>
+            <div class="form-group">
+                <label>URI:</label>
+                <input type="text" class="form-control col-sm-6" name="uri" id="uri" readonly>
+            </div>
+            <div class="form-group">
+                <label>Stream Specification URI:</label>
+                <input type="text" name="dataAcquisitionUri" id="dataAcquisitionUri"
+                    @if(da_uri != null && !da_uri.equals("")) {
+                        class="form-control col-sm-6 disabled"  value="@URIUtils.replaceNameSpaceEx(da_uri)" readonly
+                    } else {
+                        class="form-control col-sm-6"
+                        }
+                >
+            </div>
+            <div class="form-group">
+                <label>Short Name</label>
+                <input type="text" class="form-control col-sm-6" name="newLabel" id="newLabel" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>Initial Parameters: (optional)</label>
+                <input type="text" class="form-control col-sm-6" name="initialParameter" id="initialParameter" onchange="checkform()" >
+            </div>
+            <div class="form-group">
+                <label>Platform</label>
+                <select class="form-control col-sm-6" id="platform" name="platform" onchange="checkform()" >
+                    <option value=""></option>
+                    @for(platform <- thePlatforms) {
+                        <option value="@platform.getUri()">@platform.getLabel() @if(platform.getSerialNumber() != null) { (SN: @platform.getSerialNumber()) }</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Instrument</label>
+                <select class="form-control col-sm-6" id="instrument" name="instrument" onchange="checkform()" >
+                    <option value=""></option>
+                    @for(instrument <- theInstruments){
+                        <option value="@instrument.getUri()">@instrument.getLabel()  @if(instrument.getSerialNumber() != null) { (SN: @instrument.getSerialNumber()) }</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Detector(s)</label>
+                <select class="form-control col-sm-6" id="detector" multiple="multiple" name="detector[]" onchange="checkform()" disabled='disabled' >
+                @for((detector) <- theDetectors){
+                    <option value="@detector.getUri()">@detector.getLabel()  @if(detector.getSerialNumber() != null) { (SN: @detector.getSerialNumber()) }</option>
+                }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="startdate">Start Date/Time</label><br>
+                <div class="container">
+                    <div class="row">
+                        <div class='col-sm-3'>
+                            <div class="form-group">
+                                <div class='input-group date' id='startdate' onchange="checkform()" >
+                                    <input type='text' name="startDateTime" id="startdatetime" class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                                $(function () {
+                                    $('#startdate').datetimepicker();
+                                    $('#startdate').on('dp.change', function (e) { checkform(); });
+                                });
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" hidden="true">
+                <input id="type" name="type" type="text" class="form-control" value="@deploymentType" hidden="true" />
+            </div>
+
+            <div class="form-group" class="col-sm-6 col-offset-3">
+                <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Create" disabled="disabled" />
+                <p> The created deployment will be saved in the knowledge graph</p>
+            </div>
+
+            <div class="form-group" class="col-sm-6 col-offset-3">
+            @deploymentButton(false, dir, filename, da_uri, page)
+            </div>
+
+        </form>
+    </div>
 
 }

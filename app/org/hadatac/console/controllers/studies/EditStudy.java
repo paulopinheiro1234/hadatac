@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.studies;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.text.DateFormat;
@@ -13,7 +15,9 @@ import java.util.Map;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import play.data.*;
@@ -42,11 +46,13 @@ public class EditStudy extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    private Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, String std_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
 
-    	Study std = null;
+        Study std = null;
         StudyType stdType = null;
         List<Agent> organizations = null;
         List<Agent> persons = null;
@@ -71,19 +77,19 @@ public class EditStudy extends Controller {
             return badRequest("No URI is provided to retrieve Study");
         }
 
-        return ok(editStudy.render(dir, filename, da_uri, std, stdType, organizations, persons));
+        return ok(editStudy.render(dir, filename, da_uri, std, stdType, organizations, persons, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
-        return index(dir, filename, da_uri, std_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
+        return index(dir, filename, da_uri, std_uri, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String std_uri) {
-        final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processForm(String std_uri, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
-        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest();
+        Form<StudyForm> form = formFactory.form(StudyForm.class).bindFromRequest(request);
         StudyForm data = form.get();
         List<String> changedInfos = new ArrayList<String>();
 
@@ -172,10 +178,10 @@ public class EditStudy extends Controller {
         oldStudy.setAgentUri(newAgent);
         oldStudy.setStartedAt(newStartDateTime);
         oldStudy.setEndedAt(newEndDateTime);
-	
+
         // insert the new Study content inside of the triplestore regardless of any change -- the previous content has already been deleted
         oldStudy.save();
-	
-        return ok(studyConfirm.render("Edit Study", oldStudy));
+
+        return ok(studyConfirm.render("Edit Study", oldStudy,sysUser.getEmail()));
     }
 }

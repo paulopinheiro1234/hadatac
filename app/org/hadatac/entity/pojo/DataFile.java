@@ -1,27 +1,8 @@
 package org.hadatac.entity.pojo;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import play.mvc.Controller;
-import play.mvc.Result;
-import play.data.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -33,7 +14,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.controllers.sandbox.Sandbox;
-import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.TreeNode;
 import org.hadatac.data.loader.CSVRecordFile;
@@ -43,10 +23,15 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpaces;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.typesafe.config.ConfigFactory;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class DataFile implements Cloneable {
@@ -277,7 +262,7 @@ public class DataFile implements Cloneable {
         } else if (getStatus().equals(WORKING)) {
             return Paths.get(ConfigProp.getPathWorking(), getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(CREATED, CREATING, DELETED).contains(getStatus())) {
-            return Paths.get(ConfigProp.getPathDownload(), getDir(), getStorageFileName()).toString();
+            return Paths.get(getDir(), getStorageFileName()).toString();
         } else if (Arrays.asList(DD_UNPROCESSED, DD_PROCESSED, DD_FREEZED).contains(getStatus())) {
             return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getStorageFileName()).toString();
         }
@@ -395,7 +380,7 @@ public class DataFile implements Cloneable {
     }
     public void setDir(String dir) {
         dir = Paths.get(dir).toString();
-        if (dir.startsWith("/")) {
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
         this.dir = dir;
@@ -862,7 +847,10 @@ public class DataFile implements Cloneable {
             DataFile file = iterFile.next();
             try {
                 Path p = Paths.get(path, file.getDir(), file.getStorageFileName());
-                if (!Files.exists(p) || Files.isHidden(p)) {
+                if (!Files.exists(p) ) {
+                    iterFile.remove();
+                }
+                if (Files.isHidden(p)) {
                     iterFile.remove();
                 }
             } catch (IOException e) {
@@ -894,13 +882,13 @@ public class DataFile implements Cloneable {
         if (dir.startsWith("/")) {
             dir = dir.substring(1, dir.length());
         }
-        
+
         SolrQuery query = new SolrQuery();
         query.set("q", String.format("dir_str:\"%s\" "
                 + "AND ( owner_email_str:\"%s\" OR viewer_email_str_multi:\"%s\" OR editor_email_str_multi:\"%s\" ) "
                 + "AND status_str:\"%s\"", dir, userEmail, userEmail, userEmail, status));
         query.set("rows", "10000000");
-        
+
         return findByQuery(query);
     }
 
@@ -908,9 +896,37 @@ public class DataFile implements Cloneable {
         if (dir.startsWith("/")) {
             dir = dir.substring(1, dir.length());
         }
-        
+
         SolrQuery query = new SolrQuery();
         query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "status_str:\"" + status + "\"");
+        query.set("rows", "10000000");
+
+        return findByQuery(query);
+    }
+
+    public static List<DataFile> findDownloadedFilesInDir(String dir, String userEmail, String status) {
+
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
+            dir = dir.substring(1, dir.length());
+        }
+
+        SolrQuery query = new SolrQuery();
+        query.set("q", String.format("dir_str:\"%s\" "
+                + "AND ( owner_email_str:\"%s\" OR viewer_email_str_multi:\"%s\" OR editor_email_str_multi:\"%s\" ) "
+                + "AND (status_str:\"%s\" OR status_str:\"%s\")", dir, userEmail, userEmail, userEmail, status, "CREATED"));
+        query.set("rows", "10000000");
+        
+        return findByQuery(query);
+    }
+
+    public static List<DataFile> findDownloadedFilesInDir(String dir, String status) {
+
+        if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
+            dir = dir.substring(1, dir.length());
+        }
+        
+        SolrQuery query = new SolrQuery();
+        query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "(status_str:\"" + status + "\" OR status_str:\"CREATED\")");
         query.set("rows", "10000000");
         
         return findByQuery(query);
@@ -925,14 +941,16 @@ public class DataFile implements Cloneable {
     }
     
     public static List<String> findFolders(String dir, boolean ignoreEmptyFolders) {
+
         List<String> results = new ArrayList<String>();
 
-        File folder = new File(dir);
-        if (!folder.exists()) {
+        if ( !Files.isDirectory(Paths.get(dir))) {
+            // if the path does not exist
             return results;
         }
 
-        File[] listOfFiles = folder.listFiles();
+        // now we know the directory exists, we can do the following
+        File[] listOfFiles = (new File(dir)).listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isDirectory() && !listOfFiles[i].getName().equals(Sandbox.SUFFIX)) {
                 if (ignoreEmptyFolders) {

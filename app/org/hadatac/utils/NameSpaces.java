@@ -15,11 +15,11 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
-
+import org.hadatac.utils.ConfigProp;
 
 public class NameSpaces {
 
-    public static String CACHE_PATH   = "tmp/cache/";
+    public static String CACHE_PATH   = ConfigProp.getTmp() + "cache/";
     public static String CACHE_PREFIX = "copy-";
 
     private ConcurrentHashMap<String, NameSpace> table = new ConcurrentHashMap<String, NameSpace>();
@@ -64,7 +64,7 @@ public class NameSpaces {
         List<NameSpace> list = new ArrayList<NameSpace>(table.values());
         for (NameSpace ns: list) {
             if (ns.getNumberOfLoadedTriples() > 0) {
-            	loadedOntologies.put(ns.getAbbreviation(), ns.getNumberOfLoadedTriples());
+                loadedOntologies.put(ns.getAbbreviation(), ns.getNumberOfLoadedTriples());
             }
         }
         return loadedOntologies;
@@ -112,7 +112,7 @@ public class NameSpaces {
                                 tmpNS.setPriority(priority);
                             }
                             catch(NumberFormatException e){
-                               System.err.println("Bad priority value for " + nsAbbrev + ". Expected an integer and got " + tmpList[3]);
+                                System.err.println("Bad priority value for " + nsAbbrev + ". Expected an integer and got " + tmpList[3]);
                             }
                         }
                     }
@@ -245,11 +245,11 @@ public class NameSpaces {
 
         // Get URIs
         List<String> loadedList = new ArrayList<String>();
-        
+
         for(NameSpace n: namespaceList){
             loadedList.add(n.getAbbreviation().toString());
-           
-           
+
+
         }
         return loadedList;
     }
@@ -272,11 +272,11 @@ public class NameSpaces {
         // Get URIs
         List<String> loadedList = new ArrayList<String>();
         for(NameSpace n: namespaceList){
-            
-           loadedList.addAll(n.getOntologyURIs());
-           
+
+            loadedList.addAll(n.getOntologyURIs());
+
         }
-        
+
         return loadedList;
     }
 

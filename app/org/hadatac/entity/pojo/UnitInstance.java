@@ -19,8 +19,6 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 
-import com.typesafe.config.ConfigFactory;
-
 public class UnitInstance extends HADatAcThing implements Comparable<UnitInstance> {
 
     static String className = "uo:0000000";

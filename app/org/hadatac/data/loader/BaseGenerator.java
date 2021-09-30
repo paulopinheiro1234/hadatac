@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -309,10 +313,17 @@ public abstract class BaseGenerator {
 
         RepositoryConnection con = repo.getConnection();
         con.remove(model);
+
+        String namedGraph = !this.getNamedGraphUri().isEmpty() ? this.getNamedGraphUri() : this.getStudyUri();
+        dropGraph(namedGraph);
     }
 
     public boolean deleteObjectsFromTripleStore(List<HADatAcThing> objects) {
         for (HADatAcThing obj : objects) {
+            if ( obj.getNamedGraph() == null || obj.getNamedGraph().length() == 0 ) {
+                obj.setNamedGraph(getNamedGraphUri());
+                // System.out.println("setting the name graph: " + getNamedGraphUri());
+            }
             if (obj.getDeletable()) {
                 obj.deleteFromTripleStore();
             }
@@ -330,6 +341,8 @@ public abstract class BaseGenerator {
                 }
             }
         }
+        String namedGraph = !this.getNamedGraphUri().isEmpty() ? this.getNamedGraphUri() : this.getStudyUri();
+        dropGraph(namedGraph);
 
         return true;
     }
@@ -340,5 +353,14 @@ public abstract class BaseGenerator {
         }
 
         return true;
+    }
+
+    private void dropGraph(String namedGraphUri)
+    {
+        String dropGraph="DROP GRAPH <"+namedGraphUri+ ">";
+        UpdateRequest request = UpdateFactory.create(dropGraph);
+        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+        processor.execute();
     }
 }

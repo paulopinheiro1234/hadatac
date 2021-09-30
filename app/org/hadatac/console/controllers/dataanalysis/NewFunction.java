@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.dataanalysis;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.views.html.dataanalysis.*;
 
 import java.util.List;
@@ -18,36 +20,40 @@ import com.google.inject.Inject;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 public class NewFunction extends Controller {
 	
 	@Inject
 	FormFactory formFactory;
+	@javax.inject.Inject
+	private Application application;
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {
-		final SysUser sysUser = AuthApplication.getLocalUser(session());
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result index(Http.Request request) {
+		final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 		
     	// may need addressing
     	Indicator indicator = new Indicator();
     	List<Aggregate> aggregates = Aggregate.find();
     	EntityCharacteristic entityCharacteristic = EntityCharacteristic.create(sysUser.getUri());
-    	return ok(newFunction.render(indicator, entityCharacteristic, aggregates));
+    	return ok(newFunction.render(indicator, entityCharacteristic, aggregates,sysUser.getEmail()));
     }
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-    	return index();
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postIndex(Http.Request request) {
+    	return index(request);
     }
 	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm() {
+	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result processForm(Http.Request request) {
 		
-        Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest();
+        Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest(request);
         IndicatorForm data = form.get();
         
         if (form.hasErrors()) {
@@ -70,6 +76,6 @@ public class NewFunction extends Controller {
 		// insert the new indicator content inside of the triplestore
 		ind.save();
 		
-		return ok(newFunctionConfirm.render(ind));
+		return ok(newFunctionConfirm.render(ind,application.getUserEmail(request)));
     }
 }

@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hadatac.Constants;
+import org.hadatac.console.views.html.studies.studyViewGraph;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.studies.*;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.Study;
@@ -27,9 +29,9 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.objectcollections.OCForceFieldGraph;
-import org.hadatac.console.controllers.triplestore.UserManagement;
+//import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.objectcollections.OCForceFieldGraph;
+//import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.utils.CollectionUtil;
@@ -40,17 +42,17 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 public class StudyViewGraph extends Controller {
-	
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+
+@Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result index(String study_uri, boolean autoRefresh, int maxObjPerSOC) {
 
-        StudyForceFieldGraph graph = new StudyForceFieldGraph(study_uri, maxObjPerSOC);        
-        
+        StudyForceFieldGraph graph = new StudyForceFieldGraph(study_uri, maxObjPerSOC);
+
         return ok(studyViewGraph.render(study_uri, graph, autoRefresh, maxObjPerSOC));
     }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+@Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndex(String study_uri, boolean autoRefresh, int maxObjPerSOC) {
-		return index(study_uri, autoRefresh, maxObjPerSOC);
-	}
+        return index(study_uri, autoRefresh, maxObjPerSOC);
+    }
 }

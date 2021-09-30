@@ -6,10 +6,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -23,9 +19,13 @@ import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class StudyObjectType extends HADatAcClass implements Comparable<StudyObjectType> {
+
+    private static final Logger log = LoggerFactory.getLogger(StudyObjectType.class);
 
     static String className = "hasco:StudyObject";
 
@@ -125,14 +125,14 @@ public class StudyObjectType extends HADatAcClass implements Comparable<StudyObj
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
                 QuerySolution soln = resultsrw.next();
                 StudyObjectType studyObjectType = new StudyObjectType();
                 studyObjectType.setUri(soln.get("studyObjType").toString());
-                studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("studyObjType").toString())));
+                studyObjectType.setLabel(WordUtils.capitalize(HADatAcThing.getFacetSearchShortestLabel(soln.get("studyObjType").toString())));
                 studyObjectType.setQuery(query);
                 studyObjectType.setField("entity_uri_str");
 

@@ -1,7 +1,7 @@
 @(dir      : String,
   fileId   : String, 
   da       : org.hadatac.entity.pojo.STR, 
-  message  : String)
+  message  : String, userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,7 +11,7 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.metadata.loader.URIUtils;
 
-@main("Prepare Data Ingestion") {
+@main("Prepare Data Ingestion","",userName) {
 
   <style>
     .paddin0 {
@@ -80,7 +80,7 @@
                          }>
                   </input>
 		  <input type="submit" class="btn btn-success btn-sm" role="button" id="completeDA" value="Confirm Complete" 
-			 formmethod="post" formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.completeDataAcquisition(dir, fileId, da.getUri())" 
+			 formmethod="post" formaction="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.completeDataAcquisition(dir, fileId, da.getUri())"
 			 @if(da.getStudyUri() == null || da.getStudyUri().equals("") || 
 			    da.getDeploymentUri() == null || da.getDeploymentUri().equals("") ||
 			    da.getSchemaUri() == null || da.getSchemaUri().equals("")) {
@@ -154,7 +154,7 @@
           }
 
 	  <input type="submit" class="btn btn-primary btn-sm disabled" role="button"  id="createScope"
-		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, fileId, da.getUri(), da.getStudyUri())" 
+		 formaction="@org.hadatac.console.controllers.objectcollections.routes.OCManagement.index(dir, fileId, da.getUri(), da.getStudyUri())"
 		 value="Create Study Objects">
           </input>
 

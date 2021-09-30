@@ -2,7 +2,8 @@
   filename : String,
   da_uri   : String,
   std_uri  : String, 
-  oc       : org.hadatac.entity.pojo.ObjectCollection)
+  oc       : org.hadatac.entity.pojo.ObjectCollection,
+  userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -11,7 +12,7 @@
 @import org.hadatac.console.controllers.schema._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("Delete Object Collection") {
+@main("Delete Object Collection","",userName) {
 
    <div class="container">
       <h4>Delete SOC</h4>

@@ -1,12 +1,12 @@
 @(oper: String,
-  theGroups: List[org.hadatac.entity.pojo.User])
+  theGroups: List[org.hadatac.entity.pojo.User],userName:String)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-@main("Add Preregistered User") {
+@main("Add Preregistered User","",userName) {
 
 	<script type="text/javascript">
 		function checkform() {

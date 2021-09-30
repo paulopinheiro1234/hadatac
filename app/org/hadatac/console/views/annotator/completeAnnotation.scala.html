@@ -1,22 +1,22 @@
-@(message : String)
+@(message : String,userName :String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 
-@main("CSV Annotator") {
+@main("CSV Annotator","",userName) {
 
-    <h2>Create CCSV from CSV</h2>
-    
-    <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-  
-    <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()" class="btn btn-primary" role="button">Back to Creat CCSV from CSV</a>
-   
-    <script> 
-       $(document).ready(function() {       
-           var msg = "@message";
-           var msg2 = decodeURIComponent(msg).replace(/&amp;/g,'&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-           $('#msgarea').html(msg2);
-        });
-    </script> 
+<h2>Create CCSV from CSV</h2>
+
+<p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+
+ <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.selectDeployment()" class="btn btn-primary" role="button">Back to Creat CCSV from CSV</a>
+
+<script>
+    $(document).ready(function() {
+        var msg = "@message";
+        var msg2 = decodeURIComponent(msg).replace(/&amp;/g,'&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        $('#msgarea').html(msg2);
+    });
+</script>
 
 }

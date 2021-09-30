@@ -1,326 +1,329 @@
-@(oper: String, 
-  cacheList : List[String],
-  namespaces : List[org.hadatac.utils.NameSpace]
+@(oper: String,
+        cacheList : List[String],
+        namespaces : List[org.hadatac.utils.NameSpace],
+        userName: String
 )
 
-@import helper._
-@import org.hadatac.console.views.html._
-@import org.hadatac.console.controllers.triplestore._
-@import org.hadatac.metadata.loader._
-@import java.net._
+    @import helper._
+    @import org.hadatac.console.views.html._
+    @import org.hadatac.console.controllers.triplestore._
+    @import org.hadatac.metadata.loader._
+    @import java.net._
 
-@main("Load Ontologies into Metadata Store") {
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<style type="text/css">
-    body {
-        color: #404E67;
-        background: #F5F7FA;
-        font-family: 'Open Sans', sans-serif;
-    }
-    .table-wrapper {
-        width: 700px;
-        margin: 30px auto;
-        background: #fff;
-        padding: 20px;  
-        box-shadow: 0 1px 1px rgba(0,0,0,.05);
-    }
-    .table-title {
-        padding-bottom: 10px;
-        margin: 0 0 10px;
-    }
-    .table-title h2 {
-        margin: 6px 0 0;
-        font-size: 22px;
-    }
-    .table-title .add-new {
-        float: right;
-        height: 30px;
-        font-weight: bold;
-        font-size: 12px;
-        text-shadow: none;
-        min-width: 100px;
-        border-radius: 50px;
-        line-height: 13px;
-    }
-    .table-title .add-new i {
-        margin-right: 4px;
-    }
-    table.table {
-        table-layout: fixed;
-    }
-    table.table tr th, table.table tr td {
-        border-color: #e9e9e9;
-    }
-    table.table th i {
-        font-size: 13px;
-        margin: 0 5px;
-        cursor: pointer;
-    }
-    table.table th:last-child {
-        width: 100px;
-    }
-    table.table td a {
-        cursor: pointer;
-        display: inline-block;
-        margin: 0 5px;
-        min-width: 24px;
-    }    
-    table.table td a.add {
-        color: #27C46B;
-    }
-    table.table td a.edit {
-        color: #FFC107;
-    }
-    table.table td a.delete {
-        color: #E34724;
-    }
-    table.table td i {
-        font-size: 19px;
-    }
-    table.table td a.add i {
-        font-size: 24px;
-        margin-right: -1px;
-        position: relative;
-        top: 3px;
-    }    
-    table.table .form-control {
-        height: 32px;
-        line-height: 32px;
-        box-shadow: none;
-        border-radius: 2px;
-    }
-    table.table .form-control.error {
-        border-color: #f50000;
-    }
-    table.table td .add {
-        display: none;
-    }
-</style>
- 
-    <div class="container-fluid">
-      
-      <div class="row">
+    @main("Load Ontologies into Metadata Store","",userName) {
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <style type="text/css">
+                body {
+                    color: #404E67;
+                    background: #F5F7FA;
+                    font-family: 'Open Sans', sans-serif;
+                }
+                .table-wrapper {
+                    width: 700px;
+                    margin: 30px auto;
+                    background: #fff;
+                    padding: 20px;
+                    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+                }
+                .table-title {
+                    padding-bottom: 10px;
+                    margin: 0 0 10px;
+                }
+                .table-title h2 {
+                    margin: 6px 0 0;
+                    font-size: 22px;
+                }
+                .table-title .add-new {
+                    float: right;
+                    height: 30px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-shadow: none;
+                    min-width: 100px;
+                    border-radius: 50px;
+                    line-height: 13px;
+                }
+                .table-title .add-new i {
+                    margin-right: 4px;
+                }
+                table.table {
+                    table-layout: fixed;
+                }
+                table.table tr th, table.table tr td {
+                    border-color: #e9e9e9;
+                }
+                table.table th i {
+                    font-size: 13px;
+                    margin: 0 5px;
+                    cursor: pointer;
+                }
+                table.table th:last-child {
+                    width: 100px;
+                }
+                table.table td a {
+                    cursor: pointer;
+                    display: inline-block;
+                    margin: 0 5px;
+                    min-width: 24px;
+                }
+                table.table td a.add {
+                    color: #27C46B;
+                }
+                table.table td a.edit {
+                    color: #FFC107;
+                }
+                table.table td a.delete {
+                    color: #E34724;
+                }
+                table.table td i {
+                    font-size: 19px;
+                }
+                table.table td a.add i {
+                    font-size: 24px;
+                    margin-right: -1px;
+                    position: relative;
+                    top: 3px;
+                }
+                table.table .form-control {
+                    height: 32px;
+                    line-height: 32px;
+                    box-shadow: none;
+                    border-radius: 2px;
+                }
+                table.table .form-control.error {
+                    border-color: #f50000;
+                }
+                table.table td .add {
+                    display: none;
+                }
+        </style>
 
-        <div class="col-md-10 col-md-offset-1">
+        <div class="container-fluid">
 
-	     <h4>Load Ontologies into Metadata Store</h4>
-        
-             @if(oper=="init") {
-                 The metadata store has <b>@MetadataContext.playTotalTriples() triples.</b> <br><br>
+            <div class="row">
 
-                 <p>HADatAc associated ontologies provide the concepts required for the framework to acquire and manage scientific data. Associated ontologies
-                 may be loaded staright from the web, or may be cached locally in case they need to be reloaded afterwards, when connectivity may be unavailable.
-                 Associated ontologies that are currently cached are listed below.</p>
+                <div class="col-md-10 col-md-offset-1">
+                    </br>
+                    </br>
+                    </br>
 
-                 <div id="question-box">
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmed")" class="btn btn-primary" role="button">Load Ontologies from the Web</a>
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmedCache")" class="btn btn-primary" role="button">Load Cached Ontologies</a>
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("cache")" class="btn btn-primary" role="button">Cache Ontologies from the Web</a>
-                     <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.eraseCache()" class="btn btn-primary" role="button">Erase Cached Ontologies</a>
-                 </div>
-                 
-                 <p><br>Note: Ontologies are cached locally when loaded straight from the web.</p>
-             }
-             
-         <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-         
-           <div id="end-process-box" style="display:none;">
-                  <h4>Load Ontologies complete -- check the results above to see if the clean was successful.</h4>
-                  <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" class="btn btn-primary" role="button">Back to Load Ontologies</a>
-	       </div>
+                    <h4>Load Ontologies into Metadata Store</h4>
 
-	     @if(oper=="confirmed" || oper=="confirmedCache" || oper=="cache") {
-			<script> 
-			    var msg = "@LoadOnt.playLoadOntologies(oper)";
-			    $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
-			    document.getElementById('end-process-box').style.display = 'inline';
-			</script>
-	     }
+                    @if(oper=="init") {
+                        The metadata store has <b>@MetadataContext.playTotalTriples() triples.</b> <br><br>
 
-         <hr>
+                        <p>HADatAc associated ontologies provide the concepts required for the framework to acquire and manage scientific data. Associated ontologies
+                            may be loaded staright from the web, or may be cached locally in case they need to be reloaded afterwards, when connectivity may be unavailable.
+                            Associated ontologies that are currently cached are listed below.</p>
 
-         @if(oper=="init") {         
-	         <h4>Cached Ontologies</h4>
-             <ul>
-                 @for(cachedFile <- cacheList) {
-                     <li>@cachedFile</li>
-                 }
-             </ul>
-        
-             <hr>
-             
-         <div class="table-title">
-           <div class="row">
-               <div class="col-sm-8"><h2>Namespace Management</h2>
-               <form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.importNamespaces()" onchange="checkform()">
-               <b>Load namespaces from file</b> <input type="file" class="btn btn-info" name="ttl"> 
-                <div id='submit-div' style="display:none;" >
-                    <input type="submit" class="btn-sm btn-success" value="Parse and Load">
+                        <div id="question-box">
+                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmed")" class="btn btn-primary" role="button">Load Ontologies from the Web</a>
+                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("confirmedCache")" class="btn btn-primary" role="button">Load Cached Ontologies</a>
+                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("cache")" class="btn btn-primary" role="button">Cache Ontologies from the Web</a>
+                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.eraseCache()" class="btn btn-primary" role="button">Erase Cached Ontologies</a>
+                        </div>
+
+                        <p><br>Note: Ontologies are cached locally when loaded straight from the web.</p>
+                    }
+
+                    <p style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+
+                    <div id="end-process-box" style="display:none;">
+                        <h4>Load Ontologies complete -- check the results above to see if the clean was successful.</h4>
+                        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")" class="btn btn-primary" role="button">Back to Load Ontologies</a>
+                    </div>
+
+                    @if(oper=="confirmed" || oper=="confirmedCache" || oper=="cache") {
+                        <script>
+                                var msg = "@LoadOnt.playLoadOntologies(oper)";
+                                $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));
+                                document.getElementById('end-process-box').style.display = 'inline';
+                        </script>
+                    }
+
+                    <hr>
+
+                    @if(oper=="init") {
+                        <h4>Cached Ontologies</h4>
+                        <ul>
+                        @for(cachedFile <- cacheList) {
+                            <li>@cachedFile</li>
+                        }
+                        </ul>
+
+                        <hr>
+
+                        <div class="table-title">
+                            <div class="row">
+                                <div class="col-sm-8"><h2>Namespace Management</h2>
+                                    <form name="fileUploadForm" id='upload' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.importNamespaces()" onchange="checkform()">
+                                        <b>Load namespaces from file</b> <input type="file" class="btn btn-info" name="ttl">
+                                        <div id='submit-div' style="display:none;" >
+                                            <input type="submit" class="btn-sm btn-success" value="Parse and Load">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <table id="ns-table" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;" scope="col">#</th>
+                                    <th style="width: 100px;" scope="col">Abbreviation</th>
+                                    <th style="width: 300px;" scope="col">Definition (mandatory)</th>
+                                    <th style="width: 150px;" scope="col">Mime Type (only for loaded ontologies)</th>
+                                    <th style="width: 300px;" scope="col">Loading URL (only for loaded ontologies)</th>
+                                    <th style="width: 80px;" scope="col">No. of Triples Loaded</th>
+                                    <th style="width: 220px;" scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ns-table-body">
+                            @for((ns, i) <- namespaces.zipWithIndex) {
+                                <tr>
+                                    <td style="word-break: break-all;">@(i+1)</td>
+                                    <td style="word-break: break-all;" axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
+                                    <td style="word-break: break-all;" axis="nsName@(i+1)">@ns.getName()</td>
+                                    <td style="word-break: break-all;" axis="nsType@(i+1)">@ns.getType()</td>
+                                    <td style="word-break: break-all;" axis="nsURL@(i+1)">@ns.getURL()</td>
+                                    <td style="word-break: break-all;" axis="nsTripleSize@(i+1)">@ns.getNumberOfLoadedTriples()</td>
+                                    <td style="word-break: break-all;">
+                                        <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+                                        <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                                        <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                                        @if(ns.getNumberOfLoadedTriples() > 0) {
+                                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.deleteNamedGraph(ns.getAbbreviation())" class="delete-triples" title="Delete Triples" data-toggle="tooltip" onclick="return confirm('Do you really want to delete triples of the namespace in this row?')" ><i class="material-icons">&#xe92b;</i></a>
+                                        }
+                                        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.reloadNamedGraphFromRemote(ns.getAbbreviation())" class="reload-triples-from-remote" title="Reload Triples from Remote" data-toggle="tooltip" onclick="return confirm('Do you really want to reload triples of the namespace in this row?')" ><i class="material-icons">&#xe2c0;</i></a>
+                                        <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.reloadNamedGraphFromCache(ns.getAbbreviation())" class="reload-triples-from-cache" title="Reload Triples from Cache" data-toggle="tooltip" onclick="return confirm('Do you really want to reload triples of the namespace in this row?')" ><i class="material-icons">&#xe86a;</i></a>
+                                        @if(ns.getNumberOfLoadedTriples() > 0) {
+                                            <a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.graphIndex("ent", ns.getAbbreviation())" class="browse" title="Browse" data-toggle="tooltip"><i class="material-icons">&#xe8b6;</i></a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        <div>
+                            <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+                            <button type="button" class="btn btn-danger delete-all"><i class="fa fa-remove"></i> Delete All Rows</button>
+                        </div><br>
+                        <div id="ns-oper">
+                            <a class="btn btn-primary" role="button" id="save-changes" onclick="submitTableAsForm()" disabled>Save Changes</a>
+                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.deleteAllNamedGraphs()" class="btn btn-primary" role="button">Delete All Ontology Triples</a>
+                            <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.exportNamespaces()" class="btn btn-primary" role="button">Export Namespace</a>
+                        </div>
+                        <br>
+                        <div>
+                            <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
+                        </div>
+                    }
                 </div>
-               </form>
-               </div>
-           </div>
-         </div>
-         <table id="ns-table" class="table table-striped table-bordered" style="width:100%">
-          <thead>
-            <tr>
-              <th style="width: 50px;" scope="col">#</th>
-              <th style="width: 100px;" scope="col">Abbreviation</th>
-              <th style="width: 300px;" scope="col">Definition (mandatory)</th>
-              <th style="width: 150px;" scope="col">Mime Type (only for loaded ontologies)</th>
-              <th style="width: 300px;" scope="col">Loading URL (only for loaded ontologies)</th>
-              <th style="width: 80px;" scope="col">No. of Triples Loaded</th>
-              <th style="width: 220px;" scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="ns-table-body">
-          @for((ns, i) <- namespaces.zipWithIndex) {
-              <tr>
-                <td style="word-break: break-all;">@(i+1)</td>
-                <td style="word-break: break-all;" axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
-                <td style="word-break: break-all;" axis="nsName@(i+1)">@ns.getName()</td>
-                <td style="word-break: break-all;" axis="nsType@(i+1)">@ns.getType()</td>
-                <td style="word-break: break-all;" axis="nsURL@(i+1)">@ns.getURL()</td>
-                <td style="word-break: break-all;" axis="nsTripleSize@(i+1)">@ns.getNumberOfLoadedTriples()</td>
-                <td style="word-break: break-all;">
-	                <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
-	                <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
-	                <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
-	                @if(ns.getNumberOfLoadedTriples() > 0) {
-	                    <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.deleteNamedGraph(ns.getAbbreviation())" class="delete-triples" title="Delete Triples" data-toggle="tooltip" onclick="return confirm('Do you really want to delete triples of the namespace in this row?')" ><i class="material-icons">&#xe92b;</i></a>
-	                }
-	                <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.reloadNamedGraphFromRemote(ns.getAbbreviation())" class="reload-triples-from-remote" title="Reload Triples from Remote" data-toggle="tooltip" onclick="return confirm('Do you really want to reload triples of the namespace in this row?')" ><i class="material-icons">&#xe2c0;</i></a>
-	                <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.reloadNamedGraphFromCache(ns.getAbbreviation())" class="reload-triples-from-cache" title="Reload Triples from Cache" data-toggle="tooltip" onclick="return confirm('Do you really want to reload triples of the namespace in this row?')" ><i class="material-icons">&#xe86a;</i></a>
-	                @if(ns.getNumberOfLoadedTriples() > 0) {
-	                    <a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.graphIndex("ent", ns.getAbbreviation())" class="browse" title="Browse" data-toggle="tooltip"><i class="material-icons">&#xe8b6;</i></a>
-	                }
-                </td>
-              </tr>
-          }
-          </tbody>
-         </table>
-         <div>
-            <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
-            <button type="button" class="btn btn-danger delete-all"><i class="fa fa-remove"></i> Delete All Rows</button>
-         </div><br>
-         <div id="ns-oper">
-           <a class="btn btn-primary" role="button" id="save-changes" onclick="submitTableAsForm()" disabled>Save Changes</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.deleteAllNamedGraphs()" class="btn btn-primary" role="button">Delete All Ontology Triples</a>
-           <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.exportNamespaces()" class="btn btn-primary" role="button">Export Namespace</a>
-         </div>
-         <br>
-         <div>
-           <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Menu</a>
-         </div>
-         }
-	   </div>
-      </div>
-    </div>
-    
-<script>
-$(document).ready(function() {
-    $('[data-toggle="tooltip"]').tooltip();
-    var actions = $("table td:last-child").html();
-    
-    checkRowCounts();
-    
-    // Append table with add row form on add new button click
-    $(".add-new").click(function(){
-        $(this).attr("disabled", "disabled");
-        var index = $("table tbody tr:last-child").index();
-        var row = '<tr>' +
-            '<td>' + (index + 2) + '</td>' +
-            '<td axis="nsAbbrev' + (index + 2) + '"><input type="text" class="form-control"</td>' +
-            '<td axis="nsName' + (index + 2) + '"><input type="text" class="form-control"></td>' +
-            '<td axis="nsType' + (index + 2) + '"><input type="text" class="form-control"></td>' +
-            '<td axis="nsURL' + (index + 2) + '"><input type="text" class="form-control"></td>' +
-            '<td></td>' +
-            '<td>' + actions + '</td>' +
-        '</tr>';
-        $("table").append(row);     
-        $("table tbody tr").eq(index + 1).find(".add, .delete").show();
-        $("table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples-from-remote .reload-triples-from-cache").hide();
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-    
-    // Delete all rows on delete all button click
-    $(".delete-all").click(function(){
-        $(this).attr("disabled", "disabled");
-        $("table").children("tbody").remove();
-        $("#save-changes").removeAttr("disabled");
-        checkRowCounts();
-    });
-    
-    // Add row on add button click
-    $(document).on("click", ".add", function(){
-        var empty = false;
-        var input = $(this).parents("tr").find('input[type="text"]');
-        $(this).parents("tr").find(".error").first().focus();
-        if(!empty){
-            input.each(function(){
-                $(this).parent("td").html($(this).val());
-            });         
-            $(this).parents("tr").find(".add, .edit").toggle();
-            $(this).parents("tr").find(".reload-triples-from-remote .reload-triples-from-cache").show();
-            $(".add-new").removeAttr("disabled");
-            $("#save-changes").removeAttr("disabled");
-        }   
-        checkRowCounts();
-    });
-    
-    // Edit row on edit button click
-    $(document).on("click", ".edit", function(){        
-        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
-            $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-        });     
-        $(this).parents("tr").find(".add, .edit").toggle();
-        $(".add-new").attr("disabled", "disabled");
-    });
-    
-    // Delete row on delete button click
-    $(document).on("click", ".delete", function(){
-        $(this).parents("tr").remove();
-        $(".add-new").removeAttr("disabled");
-        $("#save-changes").removeAttr("disabled");
-        checkRowCounts();
-    });
-});
+            </div>
+        </div>
 
-function submitTableAsForm() {
-	var form = document.createElement("form");
-	form.method = "post";
-	form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
-	$("#ns-table-body").find("tr").each(function() {
-	   $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
-		   var input = document.createElement("input");
-		   input.type = "text";
-		   input.name = this.axis;
-		   input.value = $(this).html();
-		   form.appendChild(input);
-       });
-    });
-    document.body.appendChild(form);
-	form.submit();
-	$("#save-changes").attr("disabled", "disabled");
-}
+        <script>
+                $(document).ready(function() {
+                    $('[data-toggle="tooltip"]').tooltip();
+                    var actions = $("table td:last-child").html();
 
-function checkform() {
-    if(document.getElementById('upload').value != "") {
-        document.getElementById('submit-div').style.display = 'inline';
+                    checkRowCounts();
+
+                    // Append table with add row form on add new button click
+                    $(".add-new").click(function(){
+                        $(this).attr("disabled", "disabled");
+                        var index = $("table tbody tr:last-child").index();
+                        var row = '<tr>' +
+                                '<td>' + (index + 2) + '</td>' +
+                                '<td axis="nsAbbrev' + (index + 2) + '"><input type="text" class="form-control"</td>' +
+                                '<td axis="nsName' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+                                '<td axis="nsType' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+                                '<td axis="nsURL' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+                                '<td></td>' +
+                                '<td>' + actions + '</td>' +
+                                '</tr>';
+                        $("table").append(row);
+                        $("table tbody tr").eq(index + 1).find(".add, .delete").show();
+                        $("table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples-from-remote .reload-triples-from-cache").hide();
+                        $('[data-toggle="tooltip"]').tooltip();
+                    });
+
+                    // Delete all rows on delete all button click
+                    $(".delete-all").click(function(){
+                        $(this).attr("disabled", "disabled");
+                        $("table").children("tbody").remove();
+                        $("#save-changes").removeAttr("disabled");
+                        checkRowCounts();
+                    });
+
+                    // Add row on add button click
+                    $(document).on("click", ".add", function(){
+                        var empty = false;
+                        var input = $(this).parents("tr").find('input[type="text"]');
+                        $(this).parents("tr").find(".error").first().focus();
+                        if(!empty){
+                            input.each(function(){
+                                $(this).parent("td").html($(this).val());
+                            });
+                            $(this).parents("tr").find(".add, .edit").toggle();
+                            $(this).parents("tr").find(".reload-triples-from-remote .reload-triples-from-cache").show();
+                            $(".add-new").removeAttr("disabled");
+                            $("#save-changes").removeAttr("disabled");
+                        }
+                        checkRowCounts();
+                    });
+
+                    // Edit row on edit button click
+                    $(document).on("click", ".edit", function(){
+                        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
+                            $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+                        });
+                        $(this).parents("tr").find(".add, .edit").toggle();
+                        $(".add-new").attr("disabled", "disabled");
+                    });
+
+                    // Delete row on delete button click
+                    $(document).on("click", ".delete", function(){
+                        $(this).parents("tr").remove();
+                        $(".add-new").removeAttr("disabled");
+                        $("#save-changes").removeAttr("disabled");
+                        checkRowCounts();
+                    });
+                });
+
+                function submitTableAsForm() {
+                    var form = document.createElement("form");
+                    form.method = "post";
+                    form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
+                    $("#ns-table-body").find("tr").each(function() {
+                        $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+                            var input = document.createElement("input");
+                            input.type = "text";
+                            input.name = this.axis;
+                            input.value = $(this).html();
+                            form.appendChild(input);
+                        });
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                    $("#save-changes").attr("disabled", "disabled");
+                }
+
+                function checkform() {
+                    if(document.getElementById('upload').value != "") {
+                        document.getElementById('submit-div').style.display = 'inline';
+                    }
+                }
+
+                function checkRowCounts() {
+                    var rows = $('table tbody tr').length;
+                    if (rows == 0) {
+                        $(".delete-all").attr("disabled", "disabled");
+                    } else {
+                        $(".delete-all").removeAttr("disabled");
+                    }
+                }
+        </script>
     }
-}
-
-function checkRowCounts() {
-    var rows = $('table tbody tr').length;
-    if (rows == 0) {
-        $(".delete-all").attr("disabled", "disabled");
-    } else {
-        $(".delete-all").removeAttr("disabled");
-    }
-}
-</script>
-}
-   

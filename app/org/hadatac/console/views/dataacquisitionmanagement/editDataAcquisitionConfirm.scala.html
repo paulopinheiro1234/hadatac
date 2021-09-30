@@ -2,7 +2,8 @@
   fileId      : String,
   da          : org.hadatac.entity.pojo.STR,
   changedInfo : List[String],
-  bAdmin      : Boolean)
+  bAdmin      : Boolean,
+  userName    : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -10,53 +11,53 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.console.controllers.dataacquisitionmanagement._
 
-@main("Change Data Stream Permission") {
+@main("Change Data Stream Permission","",userName) {
 
     <h2>Change Data Stream Permission</h2>
-    
+
     <h3>Listing below shows new permission</h3>
 
     <div class="container-fluid">
-       <ul>
-           <li><b>URI:</b> @da.getUri()</li>
-           <li><b>Status:</b> @da.getStatus()</li>
-       	   <li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
-           <li><b>Platform:</b> @da.getPlatformName()</li>
-           <li><b>Instrument:</b> @da.getInstrumentModel()</li>
-           <li><b>Start Date/Time:</b> @da.getStartedAt()</li>
-           <li><b>End Date/Time:</b> @da.getEndedAt()</li>
-           <li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
-           @if(changedInfo.contains(da.getParameter())) {
-           		<li><b>Current Parameter:</b> <b><font color="blue">@da.getParameter()</font></b></li>
-           } else {
-           		<li><b>Current Parameter:</b> @da.getParameter()</li>
-           }
-           @if(bAdmin) {
-           @if(changedInfo.contains(da.getOwnerUri())) {
-           		<li><b>Current Owner:</b> <b><font color="blue">@da.getOwnerUri()</font></b></li>
-           } else {
-           		<li><b>Current Owner:</b> @da.getOwnerUri()</li>
-           }}
-           @if(changedInfo.contains(da.getPermissionUri())) {
-           		<li><b>Current Permission:</b> <b><font color="blue">@da.getPermissionUri()</font></b></li>
-           } else {
-           		<li><b>Current Permission:</b> @da.getPermissionUri()</li>
-           }
-           @if(changedInfo.contains(da.getSchemaUri())) {
-           		<li><b>Current Schema:</b> <b><font color="blue">@da.getSchemaUri()</font></b></li>
-           } else {
-           		<li><b>Current Schema:</b> @da.getSchemaUri()</li>
-           }
-       </ul>
+        <ul>
+            <li><b>URI:</b> @da.getUri()</li>
+            <li><b>Status:</b> @da.getStatus()</li>
+            <li><b>Triggering Event:</b> @da.getTriggeringEventName()</li>
+            <li><b>Platform:</b> @da.getPlatformName()</li>
+            <li><b>Instrument:</b> @da.getInstrumentModel()</li>
+            <li><b>Start Date/Time:</b> @da.getStartedAt()</li>
+            <li><b>End Date/Time:</b> @da.getEndedAt()</li>
+            <li><b># of Data Points:</b> @da.getNumberDataPoints()</li>
+            @if(changedInfo.contains(da.getParameter())) {
+                <li><b>Current Parameter:</b> <b><font color="blue">@da.getParameter()</font></b></li>
+            } else {
+                <li><b>Current Parameter:</b> @da.getParameter()</li>
+            }
+            @if(bAdmin) {
+                @if(changedInfo.contains(da.getOwnerUri())) {
+                    <li><b>Current Owner:</b> <b><font color="blue">@da.getOwnerUri()</font></b></li>
+                } else {
+                    <li><b>Current Owner:</b> @da.getOwnerUri()</li>
+                }}
+            @if(changedInfo.contains(da.getPermissionUri())) {
+                <li><b>Current Permission:</b> <b><font color="blue">@da.getPermissionUri()</font></b></li>
+            } else {
+                <li><b>Current Permission:</b> @da.getPermissionUri()</li>
+            }
+            @if(changedInfo.contains(da.getSchemaUri())) {
+                <li><b>Current Schema:</b> <b><font color="blue">@da.getSchemaUri()</font></b></li>
+            } else {
+                <li><b>Current Schema:</b> @da.getSchemaUri()</li>
+            }
+        </ul>
 
-       <br>
-       @if(fileId == null || fileId.equals("")) {
-          <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)" 
-	     class="btn btn-primary" role="button">Back to Data Stream Management</a>
-       } else {
-    	  <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da.getUri())" 
-	     class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
-       }
+        <br>
+        @if(fileId == null || fileId.equals("")) {
+            <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
+            class="btn btn-primary" role="button">Back to Data Stream Management</a>
+        } else {
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da.getUri())"
+            class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+        }
     </div>
 
 }

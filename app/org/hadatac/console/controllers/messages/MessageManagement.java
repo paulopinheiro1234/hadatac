@@ -1,6 +1,8 @@
 package org.hadatac.console.controllers.messages;
 
 import org.apache.commons.io.FileUtils;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.DataAcquisitionForm;
@@ -17,8 +19,10 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.FormFactory;
 
@@ -56,135 +60,137 @@ import be.objectify.deadbolt.java.actions.Restrict;
 public class MessageManagement extends Controller {
 
     @Inject
-	private FormFactory formFactory;
-    	
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri, int offset, boolean topics) {
+    private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    	// get an updated list of stream
-    	List<STR> results = STRStore.getInstance().findCachedOpenStreams();
-    	
-    	// get an updated list of studies
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
+
+        // get an updated list of stream
+        List<STR> results = STRStore.getInstance().findCachedOpenStreams();
+
+        // get an updated list of studies
         List<String> studyIdList = Study.findIds();
-    	return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results, topics));
+        return ok(messageManagement.render(dir, filename, da_uri, offset, studyIdList, results, topics, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics) {
-        return index(dir, filename, da_uri, offset, topics);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result refreshCache(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
 
-    	// get an updated list of stream
-    	STRStore.getInstance().refreshStore();
-        return index(dir, filename, da_uri, offset, topics);
-    	
+        // get an updated list of stream
+        STRStore.getInstance().refreshStore();
+        return index(dir, filename, da_uri, offset, topics, request);
+
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics) {
-        return refreshCache(dir, filename, da_uri, offset, topics);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postRefreshCache(String dir, String filename, String da_uri, int offset, boolean topics, Http.Request request) {
+        return refreshCache(dir, filename, da_uri, offset, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-    	
-    	// retrieve stream
-    	String uri = null;
-    	try {
-    		uri = URLDecoder.decode(stream_uri, "utf-8");
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-    	STR stream = STRStore.getInstance().findCachedByUri(uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result subscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+
+        // retrieve stream
+        String uri = null;
+        try {
+            uri = URLDecoder.decode(stream_uri, "utf-8");
+        } catch (Exception e) {
+            System.out.println("error decoding [" + stream_uri + "]");
+        }
+        STR stream = STRStore.getInstance().findCachedByUri(uri);
 
         // call operation
         if (stream != null) {
-        	if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
-        		MqttMessageAnnotation.subscribeMessageStream(stream);
-        	} else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
-        		HttpMessageAnnotation.subscribeMessageStream(stream);
-        	} else {
+            if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
+                MqttMessageAnnotation.subscribeMessageStream(stream);
+            } else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
+                HttpMessageAnnotation.subscribeMessageStream(stream);
+            } else {
                 return badRequest("Message Protocol is neither MQTT or HTTP");
-        	}
-        	//MessageAnnotationSubscribe subscription = new MessageAnnotationSubscribe();
-        	//subscription.exec(stream);
+            }
+            //MessageAnnotationSubscribe subscription = new MessageAnnotationSubscribe();
+            //subscription.exec(stream);
         }
-        
-        return index(dir, filename, da_uri, offset, topics);
+
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return subscribe(dir, filename, da_uri, offset, stream_uri, topics);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postSubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        return subscribe(dir, filename, da_uri, offset, stream_uri, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-    	
-    	// retrieve stream
-    	String uri = null;
-    	try {
-    		uri = URLDecoder.decode(stream_uri, "utf-8");
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-    	STR stream = STRStore.getInstance().findCachedByUri(uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result unsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+
+        // retrieve stream
+        String uri = null;
+        try {
+            uri = URLDecoder.decode(stream_uri, "utf-8");
+        } catch (Exception e) {
+            System.out.println("error decoding [" + stream_uri + "]");
+        }
+        STR stream = STRStore.getInstance().findCachedByUri(uri);
 
         // call action
         if (stream != null) {
-        	if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
-        		MqttMessageAnnotation.unsubscribeMessageStream(stream);
-        	} else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
-        		HttpMessageAnnotation.unsubscribeMessageStream(stream);
-        	} else {
+            if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
+                MqttMessageAnnotation.unsubscribeMessageStream(stream);
+            } else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
+                HttpMessageAnnotation.unsubscribeMessageStream(stream);
+            } else {
                 return badRequest("Message Protocol is neither MQTT or HTTP");
-        	}
+            }
         }
-        
-        return index(dir, filename, da_uri, offset, topics);
+
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postUnsubscribe(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        return unsubscribe(dir, filename, da_uri, offset, stream_uri, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result close(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
 
-    	// retrieve stream
-    	String uri = null;
-    	try {
-    		uri = URLDecoder.decode(stream_uri, "utf-8");
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-    	STR stream = STRStore.getInstance().findCachedByUri(uri);
+        // retrieve stream
+        String uri = null;
+        try {
+            uri = URLDecoder.decode(stream_uri, "utf-8");
+        } catch (Exception e) {
+            System.out.println("error decoding [" + stream_uri + "]");
+        }
+        STR stream = STRStore.getInstance().findCachedByUri(uri);
 
-    	// call action
+        // call action
         if (stream != null) {
-        	if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
-        		MqttMessageAnnotation.closeMessageStream(stream);
-        	} else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
-        		HttpMessageAnnotation.closeMessageStream(stream);
-        	} else {
+            if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.MQTT)) {
+                MqttMessageAnnotation.closeMessageStream(stream);
+            } else if (stream.getMessageProtocol() != null && stream.getMessageProtocol().equals(STR.HTTP)) {
+                HttpMessageAnnotation.closeMessageStream(stream);
+            } else {
                 return badRequest("Message Protocol is neither MQTT or HTTP");
-        	}
+            }
         }
 
-        return index(dir, filename, da_uri, offset, topics);
+        return index(dir, filename, da_uri, offset, topics, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-        return close(dir, filename, da_uri, offset, stream_uri, topics);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postClose(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        return close(dir, filename, da_uri, offset, stream_uri, topics, request);
     }
 
     /*
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteData(String dir, String filename, String da_uri, int offset, String stream_uri) {
 
     	// retrieve stream
@@ -203,127 +209,127 @@ public class MessageManagement extends Controller {
     	return ok(deleteData.render(dir, filename, da_uri, offset, stream));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDeleteData(String dir, String filename, String da_uri, int offset, String stream_uri) {
         return deleteData(dir, filename, da_uri, offset, stream_uri);
     }
     */
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-    	if (stream_uri == null) {
-    		stream_uri = "";
-    	}
-    	String uri = null;
-    	STR stream = null;
-    	try {
-    		uri = URLDecoder.decode(stream_uri, "utf-8");
-        	System.out.println("looking log for [" + uri + "]");
-        	stream = STRStore.getInstance().findCachedByUri(uri);
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-    	if (stream == null || stream.getMessageLogger() == null || stream.getMessageLogger().getLog() == null) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""), 
-                    routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
-    	}
-        return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                stream.getMessageLogger().getLog()), 
-                routes.MessageManagement.index(dir, filename, da_uri, offset, topics ).url()));
-    }
- 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
-    	
-    	String uri = null;
-    	String streamName = "";
-        List<String> results = new ArrayList<String>();
-    	try {
-    		uri = URLDecoder.decode(stream_uri, "utf-8");
-        	STR stream = STRStore.getInstance().findCachedByUri(uri);
-            //STR stream = STR.findByUri(uri);
-            if (stream != null) {
-            	streamName = stream.getLabel();
-                results = MqttSubscribe.testConnection(stream);
-            }
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-        
-    	return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamName, results, topics));
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result checkAnnotationLog(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics, Http.Request request) {
+        if (stream_uri == null) {
+            stream_uri = "";
+        }
+        String uri = null;
+        STR stream = null;
+        try {
+            uri = URLDecoder.decode(stream_uri, "utf-8");
+            System.out.println("looking log for [" + uri + "]");
+            stream = STRStore.getInstance().findCachedByUri(uri);
+        } catch (Exception e) {
+            System.out.println("error decoding [" + stream_uri + "]");
+        }
+        if (stream == null || stream.getMessageLogger() == null || stream.getMessageLogger().getLog() == null) {
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB, ""),
+                    routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url(),application.getUserEmail(request)));
+        }
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB,
+                stream.getMessageLogger().getLog()),
+                routes.MessageManagement.index(dir, filename, da_uri, offset, topics ).url(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result testConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
+
+        String uri = null;
+        String streamName = "";
+        List<String> results = new ArrayList<String>();
+        try {
+            uri = URLDecoder.decode(stream_uri, "utf-8");
+            STR stream = STRStore.getInstance().findCachedByUri(uri);
+            //STR stream = STR.findByUri(uri);
+            if (stream != null) {
+                streamName = stream.getLabel();
+                results = MqttSubscribe.testConnection(stream);
+            }
+        } catch (Exception e) {
+            System.out.println("error decoding [" + stream_uri + "]");
+        }
+
+        return ok(testConnection.render(dir, filename, da_uri, offset, uri, streamName, results, topics));
+    }
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postTestConnection(String dir, String filename, String da_uri, int offset, String stream_uri, boolean topics) {
         return testConnection(dir, filename, da_uri, offset, stream_uri, topics);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result testTopics(String dir, String filename, String da_uri, int offset, String stream_uri, boolean show) {
-    	
-    	String streamName = "";
+
+        String streamName = "";
         List<String> results = new ArrayList<String>();
         List<String> specified = new ArrayList<String>();
-    	try {
-    		stream_uri = URLDecoder.decode(stream_uri, "utf-8");
+        try {
+            stream_uri = URLDecoder.decode(stream_uri, "utf-8");
             //STR stream = STR.findByUri(stream_uri);
-        	STR stream = STRStore.getInstance().findCachedByUri(stream_uri);
+            STR stream = STRStore.getInstance().findCachedByUri(stream_uri);
             if (stream != null) {
-            	streamName = stream.getLabel();
-            	results = MqttSubscribe.testTopics(stream);
-            	Collections.sort(results);
+                streamName = stream.getLabel();
+                results = MqttSubscribe.testTopics(stream);
+                Collections.sort(results);
             }
             List<MessageTopic> topics = stream.getTopicsList();
             if (topics != null) {
-            	for (MessageTopic tpc : topics) {
-            		specified.add(tpc.getLabel());
-            	}
+                for (MessageTopic tpc : topics) {
+                    specified.add(tpc.getLabel());
+                }
             }
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + stream_uri + "]");
-    	}
-        
-    	return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamName, results, specified, show));
+        } catch (Exception e) {
+            System.out.println("error decoding [" + stream_uri + "]");
+        }
+
+        return ok(testTopics.render(dir, filename, da_uri, offset, stream_uri, streamName, results, specified, show));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postTestTopics(String dir, String filename, String da_uri, int offset, String topic_uri, boolean topics) {
         return testTopics(dir, filename, da_uri, offset, topic_uri, topics);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result testLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, boolean topics) {
-    	
-    	String tpc_uri = null;
-    	String streamName = "";
-    	String topicLabel = "";
+
+        String tpc_uri = null;
+        String streamName = "";
+        String topicLabel = "";
         List<String> results = new ArrayList<String>();
         List<String> specified = new ArrayList<String>();
-    	try {
-    		tpc_uri = URLDecoder.decode(topic_uri, "utf-8");
+        try {
+            tpc_uri = URLDecoder.decode(topic_uri, "utf-8");
             MessageTopic topic = MessageTopic.find(tpc_uri);
             if (topic != null) {
-            	topicLabel = topic.getLabel();
-            	STR stream = topic.getStream();
-            	if (stream != null) {
-            		streamName = stream.getLabel();
-            		results = MqttSubscribe.testLabels(stream,topic);
-            	}
-            	Collections.sort(results);
-            	if (stream != null && stream.getSchema() != null) {
-            		for (DataAcquisitionSchemaAttribute dasa : stream.getSchema().getAttributes()) {
-            			specified.add(dasa.getLabel().toLowerCase());
-            		}
-            	}
+                topicLabel = topic.getLabel();
+                STR stream = topic.getStream();
+                if (stream != null) {
+                    streamName = stream.getLabel();
+                    results = MqttSubscribe.testLabels(stream,topic);
+                }
+                Collections.sort(results);
+                if (stream != null && stream.getSchema() != null) {
+                    for (DataAcquisitionSchemaAttribute dasa : stream.getSchema().getAttributes()) {
+                        specified.add(dasa.getLabel().toLowerCase());
+                    }
+                }
             }
-    	} catch (Exception e) {
-        	System.out.println("error decoding [" + topic_uri + "]");
-    	}
-    	return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamName, topicLabel, results, specified,
-    			routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
+        } catch (Exception e) {
+            System.out.println("error decoding [" + topic_uri + "]");
+        }
+        return ok(testLabels.render(dir, filename, da_uri, offset, tpc_uri, streamName, topicLabel, results, specified,
+                routes.MessageManagement.index(dir, filename, da_uri, offset, topics).url()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result postTestLabels(String dir, String filename, String da_uri, int offset, String stream_uri, String topic_uri, boolean topics) {
         return testLabels(dir, filename, da_uri, offset, stream_uri, topic_uri, topics);
     }

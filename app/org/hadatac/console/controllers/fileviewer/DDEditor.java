@@ -3,6 +3,9 @@ package org.hadatac.console.controllers.fileviewer;
 import java.util.List;
 import java.util.ArrayList;
 
+//import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
@@ -11,11 +14,14 @@ import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import play.libs.Json;
 
+import javax.inject.Inject;
 
 
 public class DDEditor extends Controller {
@@ -23,20 +29,24 @@ public class DDEditor extends Controller {
     public static String commentSheetColumn;
     DataFile dirFile = new DataFile("/");
     public static DataFile dd_df;
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))    
-    public Result index(String fileId, boolean bSavable,String dir) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String fileId, boolean bSavable, String dir, Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         dirFile.setStatus(DataFile.WORKING);
         if (null == dataFile) {
 
-            return ok(dd_editor.render(dataFile,false,dir,dirFile));
+            return ok(dd_editor.render(dataFile,false,dir,dirFile,user.getEmail()));
         }
         
         
         getdd_df(dataFile);
         List<DataFile> files = null;
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         files = DataFile.find(user.getEmail());
 
@@ -53,27 +63,27 @@ public class DDEditor extends Controller {
         
 
         
-        return ok(dd_editor.render(dataFile, bSavable,dir,dirFile));
+        return ok(dd_editor.render(dataFile, bSavable,dir,dirFile,user.getEmail()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String fileId, boolean bSavable,String dir) {
-        return index(fileId, bSavable,dir);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String fileId, boolean bSavable,String dir,Http.Request request) {
+        return index(fileId, bSavable,dir,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result fromViewableLink(String viewableId, String dir) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result fromViewableLink(String viewableId, String dir, Http.Request request) {
         DataFile dataFile = DataFile.findByViewableId(viewableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(dd_editor.render(dataFile, false,dir,dirFile));
+        return ok(dd_editor.render(dataFile, false,dir,dirFile,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postFromViewableLink(String viewableId, String dir) {
-        return fromViewableLink(viewableId, dir);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postFromViewableLink(String viewableId, String dir, Http.Request request) {
+        return fromViewableLink(viewableId, dir,request);
     }
     public Result getdd_df(DataFile d){
         dd_df=d;
@@ -92,11 +102,11 @@ public class DDEditor extends Controller {
     }
    
     
-    public Result getCheckedSDD(String sddFileName){
+    public Result getCheckedSDD(String sddFileName,Http.Request request){
         System.out.println("sdd filename: "+sddFileName);
-        final SysUser user = AuthApplication.getLocalUser(session());
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         List<DataFile> files = null;
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         files = DataFile.find(user.getEmail());
         String sdd_filename=sddFileName;
@@ -111,18 +121,18 @@ public class DDEditor extends Controller {
        System.out.println("sdd fileid: "+sdd_id);
        return ok(Json.toJson(sdd_id));
     }
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result fromEditableLink(String editableId, String dir) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result fromEditableLink(String editableId, String dir,Http.Request request) {
         DataFile dataFile = DataFile.findByEditableId(editableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
 
-        return ok(dd_editor.render(dataFile, false, dir,dirFile));
+        return ok(dd_editor.render(dataFile, false, dir,dirFile,application.getUserEmail(request)));
     }
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postFromEditableLink(String editableId, String dir) {
-        return fromEditableLink(editableId, dir);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postFromEditableLink(String editableId, String dir,Http.Request request) {
+        return fromEditableLink(editableId, dir, request);
     }
 }

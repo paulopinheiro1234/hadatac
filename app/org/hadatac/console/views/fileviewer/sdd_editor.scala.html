@@ -1,5 +1,5 @@
 @(files  : List[org.hadatac.entity.pojo.DataFile],
-  bAdmin : Boolean)
+  bAdmin : Boolean, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -8,7 +8,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("SDD Editor"){
+@main("SDD Editor","",userName){
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
 

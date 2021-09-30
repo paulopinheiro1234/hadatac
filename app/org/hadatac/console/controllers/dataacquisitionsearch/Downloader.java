@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.dataacquisitionsearch.routes;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
@@ -27,28 +29,34 @@ import org.hadatac.utils.Feedback;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.hadatac.utils.FileManager;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 
 public class Downloader extends Controller {
 
-	public static final String ALIGNMENT_SUBJECT = "SUBJECT";
-	public static final String ALIGNMENT_TIME = "TIME";
-	
+    public static final String ALIGNMENT_SUBJECT = "SUBJECT";
+    public static final String ALIGNMENT_TIME = "TIME";
+
     @Inject
     FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {		
-        final SysUser user = AuthApplication.getLocalUser(session());
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         List<DataFile> files = null;
 
-        String path = ConfigProp.getPathDownload();
+        String path = ConfigProp.getPathWorking();
 
         if (user.isDataManager()) {
             files = DataFile.findByStatus(DataFile.CREATED);
@@ -60,36 +68,36 @@ public class Downloader extends Controller {
 
         DataFile.filterNonexistedFiles(path, files);
 
-        return ok(downloader.render(files, user.isDataManager()));
+        return ok(downloader.render(files, user.isDataManager(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(Http.Request request) {
+        return index(request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result downloadDataFile(String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result downloadDataFile(String fileId,Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
-        
+
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to download this file! fileId: " + fileId + "   user.email: " + user.getEmail());
         }
-        
+
         return ok(new File(dataFile.getAbsolutePath()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result deleteDataFile(String fileId) {
-        final SysUser user = AuthApplication.getLocalUser(session());
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result deleteDataFile(String fileId,Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
         DataFile dataFile = null;
         if (user.isDataManager()) {
             dataFile = DataFile.findById(fileId);
         } else {
             dataFile = DataFile.findByIdAndEmail(fileId, user.getEmail());
         }
-        
+
         if (null == dataFile) {
             return badRequest("You do NOT have the permission to operate this file!");
         }
@@ -103,23 +111,23 @@ public class Downloader extends Controller {
         return redirect(routes.Downloader.index());
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result assignFileOwner(String ownerEmail, String fileId) {	
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result assignFileOwner(String ownerEmail, String fileId, Http.Request request) {
         return ok(assignOption.render(User.getUserEmails(),
                 routes.Downloader.processOwnerForm(ownerEmail, fileId),
-                "Owner", 
-                "Selected File", 
-                fileId));
+                "Owner",
+                "Selected File",
+                fileId,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postAssignFileOwner(String ownerEmail, String fileId) {
-        return assignFileOwner(ownerEmail, fileId);
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postAssignFileOwner(String ownerEmail, String fileId,Http.Request request) {
+        return assignFileOwner(ownerEmail, fileId,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result processOwnerForm(String ownerEmail, String fileId) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+    @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result processOwnerForm(String ownerEmail, String fileId,Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         AssignOptionForm data = form.get();
 
         if (form.hasErrors()) {
@@ -128,35 +136,47 @@ public class Downloader extends Controller {
                     routes.Downloader.processOwnerForm(ownerEmail, fileId),
                     "Owner",
                     "Selected File",
-                    fileId));
+                    fileId,application.getUserEmail(request)));
         } else {
             DataFile file = DataFile.findByIdAndEmail(fileId, ownerEmail);
             if (file != null) {
                 file.setOwnerEmail(data.getOption());
                 file.save();
             }
-            
+
             return redirect(routes.Downloader.index());
         }
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result checkAnnotationLog(String fileId) {
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result checkAnnotationLog(String fileId,Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
-    	if (DataFile.findById(fileId) == null) {
-        	return ok(annotation_log.render(Feedback.print(Feedback.WEB,""), 
-                    routes.Downloader.index().url()));
-    	}
-    	return ok(annotation_log.render(Feedback.print(Feedback.WEB, 
-                DataFile.findById(fileId).getLog()), 
-                routes.Downloader.index().url()));
+        if (DataFile.findById(fileId) == null) {
+            return ok(annotation_log.render(Feedback.print(Feedback.WEB,""),
+                    routes.Downloader.index().url(),application.getUserEmail(request)));
+        }
+        return ok(annotation_log.render(Feedback.print(Feedback.WEB,
+                DataFile.findById(fileId).getLog()),
+                routes.Downloader.index().url(),application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkCompletion(String fileId) {
+
         Map<String, Object> result = new HashMap<String, Object>();
 
-        DataFile dataFile = DataFile.findById(fileId);
+        if ( fileId == null || fileId.indexOf("object_alignment") < 0 ) {
+            return ok(Json.toJson(result));
+        }
+        if ( fileId.startsWith("object_alignment") == false ) {
+            fileId = fileId.substring(fileId.indexOf("object_alignment"));
+        }
+
+        DataFile dataFile = DataFile.findByNameAndStatus(fileId, DataFile.CREATING);
+        if ( dataFile == null ) {
+            dataFile = DataFile.findByNameAndStatus(fileId, DataFile.CREATED);
+        }
+
         if (dataFile != null) {
             result.put("CompletionPercentage", dataFile.getCompletionPercentage());
             result.put("Status", dataFile.getStatus());
@@ -170,8 +190,8 @@ public class Downloader extends Controller {
         return ok(Json.toJson(result));
     }
 
-    public static int generateCSVFile(List<Measurement> measurements, 
-            String facets, List<String> selectedFields, String ownerEmail) {
+    public static int generateCSVFile(List<Measurement> measurements,
+                                      String facets, List<String> selectedFields, String ownerEmail) {
         Date date = new Date();
         String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
@@ -180,7 +200,7 @@ public class Downloader extends Controller {
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Selected Fields: " + selectedFields));
         dataFile.save();
-        
+
         File file = new File(dataFile.getAbsolutePath());
 
         Measurement.outputAsCSV(measurements, selectedFields, file, dataFile.getId());
@@ -189,29 +209,32 @@ public class Downloader extends Controller {
         return 0;
     }
 
-    public static int generateCSVFileBySubjectAlignment(List<Measurement> measurements, 
-		  String facets, String ownerEmail, String categoricalOption) {
+    public static int generateCSVFileBySubjectAlignment(List<Measurement> measurements,
+                                                        String facets, String ownerEmail, String categoricalOption, boolean keepSameValue) {
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
         String fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
-        DataFile dataFile = DataFile.create(fileName, "", ownerEmail, DataFile.CREATING);
+        // will use the user email address as the directory
+        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "download/"+ ownerEmail, ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
         System.out.println("Created download " + fileName);
-        
-        File file = new File(dataFile.getAbsolutePath());
 
-        Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption);
-        System.out.println("Generated CSV files ...");
+        String absolutePath = dataFile.getAbsolutePath();
+        System.out.println("downloaded file... absolute path = " + absolutePath);
+        File file = new File(absolutePath);
+
+        Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption, keepSameValue);
+        System.out.println("download finished, CSV files are generated...");
 
         return 0;
     }
 
-    public static int generateCSVFileByTimeAlignment(List<Measurement> measurements, 
-		  String facets, String ownerEmail, String categoricalOption, String timeResolution) {
+    public static int generateCSVFileByTimeAlignment(List<Measurement> measurements,
+                                                     String facets, String ownerEmail, String categoricalOption, String timeResolution) {
         System.out.println("Invoked CSV generation with timestamp alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         System.out.println("TimeResolution option: [" + timeResolution + "]");
@@ -223,7 +246,7 @@ public class Downloader extends Controller {
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
         System.out.println("Created download " + fileName);
-        
+
         File file = new File(dataFile.getAbsolutePath());
 
         Measurement.outputAsCSVByTimeAlignment(measurements, file, dataFile.getId(), categoricalOption, timeResolution);
@@ -232,4 +255,3 @@ public class Downloader extends Controller {
         return 0;
     }
 }
-

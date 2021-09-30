@@ -6,10 +6,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -20,18 +16,18 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Platform extends HADatAcThing implements Comparable<Platform> {
 
-	public static String LAT = "http://semanticscience.org/resource/Latitude";
+    private static final Logger log = LoggerFactory.getLogger(Platform.class);
+    public static String LAT = "http://semanticscience.org/resource/Latitude";
 	public static String LONG = "http://semanticscience.org/resource/Longitude";
 	
 	public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -402,7 +398,7 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
             
             while (resultsrw.hasNext()) {

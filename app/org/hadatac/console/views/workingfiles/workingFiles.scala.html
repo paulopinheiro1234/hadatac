@@ -1,7 +1,8 @@
 @(dir              : String,
   folders          : List[String],
   workingFiles     : List[org.hadatac.entity.pojo.DataFile],
-  bAdmin           : Boolean)
+  bAdmin           : Boolean,
+  userName         : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -13,26 +14,98 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Working Files Management") {
+@main("Working Files Management","",userName) {
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
 
+    <script type="text/javascript">
+            $(document).ready(function() {
+                function checkCompletion() {
+                    // console.log("calling checkCompletion...");
+                    $("#download_files tbody tr").each(function () {
+                        var row = $(this);
+                        var status;
+                        @if(bAdmin) {
+                            status = row.find("td:nth-child(4)").html();
+                        } else {
+                            status = row.find("td:nth-child(3)").html();
+                        }
+
+                        if (status == "CREATED") {
+                            @if(bAdmin) {
+                            row.find("td:nth-child(7) [name='download']").removeClass("disabled");
+                            row.find("td:nth-child(7) [name='assign_owner']").removeClass("disabled");
+                            } else {
+                            row.find("td:nth-child(6) [name='download']").removeClass("disabled");
+                            row.find("td:nth-child(6) [name='assign_owner']").removeClass("disabled");
+                            row.find("td:nth-child(6) [name='to_my_workspace']").removeClass("disabled");
+                            }
+
+                            return;
+                        }
+
+                        @if(bAdmin) {
+                        row.find("td:nth-child(7) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
+                        row.find("td:nth-child(7) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
+                        } else {
+                        row.find("td:nth-child(6) [name='download']").attr('class', 'btn btn-xs btn-primary disabled');
+                        row.find("td:nth-child(6) [name='assign_owner']").attr('class', 'btn btn-xs btn-primary disabled');
+                        row.find("td:nth-child(6) [name='to_my_workspace']").attr('class', 'btn btn-xs btn-primary disabled');
+                        }
+
+                        $.ajax({
+                            type: 'GET',
+                            url: '/hadatac/downloader/checkcompletion',
+                            data: { 'file_id': row.find("td:nth-child(1)").html().toString() },
+                            dataType: 'json',
+                            success: function (data) {
+                                @if(bAdmin) {
+                                    if ( typeof data['CompletionPercentage'] !== 'undefined')
+                                        row.find("td:nth-child(4)").html(data['CompletionPercentage'] + '%');
+                                } else {
+                                    if ( typeof data['CompletionPercentage'] !== 'undefined' )
+                                        row.find("td:nth-child(3)").html(data['CompletionPercentage'] + '%');
+                                }
+                                console.log("completionPercentage = " + data['CompletionPercentage']);
+                                if( data['CompletionPercentage'] >= 100 && data['Status'] == 'CREATED') {
+                                    console.log("stopping the scheduled query since download is done...");
+                                    setTimeout(() => { clearInterval(timerId); }, 0);
+                                    row.find("td:nth-child(3)").html('CREATED');
+                                    // reload the whole page after a short delay
+                                    var delayInMilliseconds = 0;
+                                    setTimeout(function() { location = window.location;}, delayInMilliseconds);
+                                    // enable the keys
+                                    row.find("td:nth-child(4) [name='preview_file']").removeClass("disabled");
+                                }
+                            }
+                        });
+                    });
+                }
+                let timerId = setInterval(checkCompletion, 500);
+            });
+    </script>
+
     <div class="container-fluid">
 
-	<a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" class="btn btn-primary" role="button">Blank Metadata File</a>
-	<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
-	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.index(dir)" class="btn btn-primary" role="button">Create Folder</a>
-	<a href="" class="btn btn-primary" role="button" disabled>Delete Current Folder</a>
+    @if(bAdmin) {
+	    <a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" class="btn btn-primary" role="button">Blank Metadata File</a>
+	    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
+        <a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.index(dir)" class="btn btn-primary" role="button">
+            Create Folder</a>
+        <a href="" class="btn btn-primary" role="button" disabled>Delete Current Folder</a>
+    }
 
 	<div id="frame">
     <div class="resumable-error">
       Your browser, unfortunately, is not supported by Resumable.js.
     </div>
 
-    <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
-      <h4>Working File Uploader</h4>
-      Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
-    </div>
+    @if(bAdmin) {
+        <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
+            <h4>Working File Uploader</h4>
+            Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
+        </div>
+
 
     <br>
     <div class="resumable-progress">
@@ -57,7 +130,13 @@
     </script>
     <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
 
-    <h4>Current Working Files Folder: <font color="Green">@dir</font></h4>
+    }
+
+
+    <h4>Current Working Files Folder: <font color="Green">
+        @(if(dir.indexOf("/download")>=0) {
+            dir.substring(dir.indexOf("/download"));
+        } else { "/"; })</font></h4>
 
     <form id="fileListForm" method="post">
     @if(!workingFiles.isEmpty()) {
@@ -66,7 +145,7 @@
         <button class="btn btn-primary btn-sm" id="delete_selection" style="display:none;" onclick="return confirm('Are you sure to delete?')">Delete Selection</button>
         <!-- <button class="btn btn-primary btn-sm" id="download_selection" role="button" style="display:none;">Download Selection</button> -->   
     }
- 	<table class="table">
+ 	<table class="table" id="download_files">
     <thead>
          <tr>
             <th><font color="Green">Working Files</font></th>
@@ -74,6 +153,7 @@
                 <th>Owner Email</th>
             }
             <th>Time Uploaded</th>
+            <th>Status</th>
             <th>View/Edit Operations</th>
             <th>File Operations</th>
             <th>Semantic Operations</th>
@@ -89,9 +169,10 @@
               }
               <td></td>
               <td></td>
+              <td></td>
               <td>
               @if(folder != "..") {
-              	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.delete(dir, folder)" class="btn btn-xs btn-primary" role="button">Delete</a>
+              	<a href="@org.hadatac.console.controllers.workingfiles.routes.Folder.delete(dir, folder)" class="btn btn-xs btn-primary disabled" role="button">Delete</a>
 			  }
               </td>
               <td></td>
@@ -111,10 +192,11 @@
                     <td>@file.getOwnerEmail()</td>
                 }
                 <td>@file.getSubmissionTime()</td>
+                <td>@file.getStatus()</td>
                 <td>
                 @if(file.getAllowViewing()) {
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls") || file.getFileName().endsWith(".csv")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button">Preview File</a>
+                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn btn-xs btn-primary" role="button" name="preview_file">Preview File</a>
                     @if(((file.getFileName().endsWith(".xlsx"))&&(!file.getFileName().startsWith("SDD")))){
                         <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), true)" class="btn btn-xs btn-primary" role="button" id="edit">Edit</a>
                     }
@@ -134,10 +216,11 @@
                 @if(file.getAllowRenaming()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.renameDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="rename">Rename</a>
                 }
-                
+
+                    @*
                 @if(file.getAllowMoving()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.moveDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="move">Move</a>
-                }
+                } *@
                 
                 @if(file.getAllowDeleting()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
@@ -197,7 +280,7 @@
     </form>
 
     <br><br>
-    <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
+    <a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Page</a>
 	</div>
 
 	<script type="text/javascript">

@@ -1,41 +1,30 @@
 @(code_version                 : String,
-  base_ontology                : String,
-  loaded_base_ontology         : String,
-  loaded_base_ontology_version : String,
-  propfile                     : String)
+        base_ontology                : String,
+        loaded_base_ontology         : String,
+        loaded_base_ontology_version : String,
+        propfile                     : String)
 
 
-@import helper._
-@import org.hadatac.utils.NameSpaces
-@import org.hadatac.console.views.html._
-@import org.hadatac.console.controllers._
-@import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute
-@import org.hadatac.entity.pojo.HADatAcClass
-@import org.hadatac.entity.pojo.HADatAcThing
-@import org.hadatac.entity.pojo.Study
-@import org.hadatac.entity.pojo.StudyObject
-@import org.hadatac.data.loader.DataContext
-@import be.objectify.deadbolt.java.views.html._
-@import be.objectify.deadbolt.java.utils.TemplateUtils._
-@import play.api.Play
+@import views.html._
 @import com.typesafe.config.ConfigFactory
 
-@main("Version") {
+@main("Version","","") {
 
-   <div class="container-fluid">
-     <div class="row">
-       <div class="col-md-1"></div>
-       <div class="col-md-8">
-         <ul>
-            <li><b>Installation short name: <font color="blue">@ConfigFactory.load().getString("hadatac.community.shortname")</font></b></li>
-		 	<li><b>HADatAc code's version: <font color="blue">@code_version</font></b></li>
-	     	<li><b>Latest loaded namespace.properties file: <font color="blue">@propfile</font></b></li>
-		 	<li><b>Base Ontology Prefix: <font color="blue">@base_ontology</font></b></li>
-		 	<li><b>Loaded Base Ontology: <font color="blue">@loaded_base_ontology</font></b></li>
-		 	<li><b>Loaded Base Ontology's version: <font color="blue">@loaded_base_ontology_version</font></b></li>
-	     </ul>		 
-       </div>
-       <div class="col-md-1"></div>
-     </div>
-   
- }
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-8">
+                <ul>
+                    <li><b>Installation short name: <font color="blue">@ConfigFactory.load().getString("hadatac.community.shortname")</font></b></li>
+                    <li><b>HADatAc code's version: <font color="blue">@code_version</font></b></li>
+                    <li><b>Latest loaded namespace.properties file: <font color="blue">@propfile</font></b></li>
+                    <li><b>Base Ontology Prefix: <font color="blue">@base_ontology</font></b></li>
+                    <li><b>Loaded Base Ontology: <font color="blue">@loaded_base_ontology</font></b></li>
+                    <li><b>Loaded Base Ontology's version: <font color="blue">@loaded_base_ontology_version</font></b></li>
+                </ul>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+
+}

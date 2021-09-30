@@ -9,6 +9,8 @@ var _target = document.getElementById('drop');
 var _file = document.getElementById('file');
 var _grid = document.getElementById('grid');
 
+var _gridcopy=document.getElementById("gridcopy");
+
 /** Spinner **/
 var spinner;
 
@@ -65,14 +67,25 @@ var make_buttons = function(sheetnames, cb) {
   buttons.innerHTML = "";
   sheetnames.forEach(function(s,idx) {
     var btn = document.createElement('button');
-    btn.style.height='35px';
-    btn.style.padding='5px 5px 5px 5px';
+    btn.style.height='40px';
+
+    btn.style.display="inline-block";
+    btn.style.padding="3px 3px 3px 3px"
+    btn.style.fontSize='9pt';
+    btn.style.fontFamily= 'Arial, Helvetica, sans-serif';
+    btn.style.border="border:1px solid black";
+    btn.style.marginTop="0px";
+    btn.style.backgroundColor="lightgrey";
+    btn.style.textAlign="center";
     btn.type = 'button';
     btn.name = 'btn' + idx;
-    btn.text = s;
-    var txt = document.createElement('h5');
-    txt.innerText = s;
-    btn.appendChild(txt);
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext("2d");
+    ctx.font = "9pt Arial";
+    var width = ctx.measureText(s).width;
+    width+=10;
+    btn.style.width=width;
+    btn.innerHTML = s;
 
     btn.addEventListener('click', function() {
       sheetName=s;
@@ -98,6 +111,15 @@ function _resize() {
 _resize();
 
 window.addEventListener('resize', _resize);
+
+// variable declaration for data copying
+var cdgcopy = canvasDatagrid({
+  parentNode: _gridcopy
+});
+cdgcopy.style.height = '100%';
+
+cdgcopy.style.width = '100%';
+
 var click_ctr=0;
 var headerMap = new Map();
 
@@ -109,7 +131,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   make_buttons(sheetnames, select_sheet_cb);
 
   /* show grid */
-  _grid.style.display = "block";
+  _grid.style.display = "inline-block";
   _resize();
 
 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hadatac.utils.CollectionUtil;
 import play.mvc.Controller;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
@@ -16,7 +17,6 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.metadata.loader.*;
-import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpace;
 
 
@@ -47,19 +47,19 @@ public class DynamicFunctions extends Controller {
         }
         return label;
     }
-    
+
     public static List<String> getIndicatorURIs() {
         List<String> indicatorURIs = new ArrayList<String>();
-        
+
         Map<String, String> indicatorTypes = getIndicatorTypes();
         Map<String, Map<String, String>> valueMapWithLabels = Indicator.getValuesAndLabels(indicatorTypes);
-        
+
         for (String key : valueMapWithLabels.keySet()) {
             for (String k : valueMapWithLabels.get(key).keySet()) {
                 indicatorURIs.add(URIUtils.replacePrefixEx(k));
             }
         }
-        
+
         return indicatorURIs;
     }
 
@@ -67,18 +67,19 @@ public class DynamicFunctions extends Controller {
         Map<String, String> indicatorTypes = getIndicatorTypes();
         Map<String, Map<String, String>> valueMapWithLabels = Indicator.getValuesAndLabels(indicatorTypes);
         
-        System.out.println("valueMapWithLabels: " + valueMapWithLabels);
+        // System.out.println("valueMapWithLabels: " + valueMapWithLabels);
         
         String uri = "";
         for (String key : valueMapWithLabels.keySet() ){
             for (String k : valueMapWithLabels.get(key).keySet()) {
-                if (tabName.equals(valueMapWithLabels.get(key).get(k).replace(" ", "").replace(",", ""))) {
+                String targetStr = valueMapWithLabels.get(key).get(k).replace(" ", "");
+                if (tabName.equalsIgnoreCase(targetStr)) {
                     uri = k;
                     return uri;
                 }
             }
         }
-        
+
         return uri;
     }
 
@@ -93,13 +94,13 @@ public class DynamicFunctions extends Controller {
     }
 
     public static Map<String, String> getIndicatorTypes() {
-        String indicatorQuery= getPrefixes() 
+        String indicatorQuery= getPrefixes()
                 + "SELECT DISTINCT ?indicatorType ?label ?comment WHERE { "
                 + "?indicatorType rdfs:subClassOf hasco:Indicator . "
                 + "?indicatorType rdfs:label ?label . "
                 + "}";
         Map<String, String> indicatorMap = new HashMap<String, String>();
-        try {			
+        try {
             ResultSetRewindable resultsrwIndc = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), indicatorQuery);
 
@@ -124,18 +125,18 @@ public class DynamicFunctions extends Controller {
     public static Map<String, Map<String,String>> findStudy(String study_uri) {
         String studyQueryString = "";
         studyQueryString = getPrefixes() +
-                "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
-                " WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
-                "                       ?studyUri a ?subUri . " + 
-                "           ?studyUri rdfs:label ?studyLabel  . " + 
+                "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " +
+                " WHERE {        ?subUri rdfs:subClassOf hasco:Study . " +
+                "                       ?studyUri a ?subUri . " +
+                "           ?studyUri rdfs:label ?studyLabel  . " +
                 "			FILTER ( ?studyUri = " + study_uri + " ) . " +
                 "		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-                "        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
-                "        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-                "        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
-                "                                   ?agent foaf:name ?agentName } . " + 
-                "        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-                "                                 ?institution foaf:name ?institutionName} . " + 
+                "        OPTIONAL { ?studyUri skos:definition ?studyDef } . " +
+                "        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " +
+                "        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " +
+                "                                   ?agent foaf:name ?agentName } . " +
+                "        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " +
+                "                                 ?institution foaf:name ?institutionName} . " +
                 "                             }" ;
         Map<String, Map<String,String>> studyResult = new HashMap<String, Map<String,String>>();
         Map<String,String> values = new HashMap<String, String>();
@@ -172,19 +173,19 @@ public class DynamicFunctions extends Controller {
         Map<String,String> values = new HashMap<String, String>();
         String studyQueryString = "";
         studyQueryString = getPrefixes() +
-                "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " + 
-                " WHERE {        ?subUri rdfs:subClassOf hasco:Study . " + 
-                "                       ?studyUri a ?subUri . " + 
-                "           ?studyUri rdfs:label ?studyLabel  . " + 
+                "SELECT ?studyUri ?studyLabel ?proj ?studyDef ?studyComment ?agentName ?institutionName " +
+                " WHERE {        ?subUri rdfs:subClassOf hasco:Study . " +
+                "                       ?studyUri a ?subUri . " +
+                "           ?studyUri rdfs:label ?studyLabel  . " +
                 "		 OPTIONAL {?studyUri hasco:hasProject ?proj} . " +
-                "        OPTIONAL { ?studyUri skos:definition ?studyDef } . " + 
-                "        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " + 
-                "        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " + 
-                "                                   ?agent foaf:name ?agentName } . " + 
-                "        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " + 
-                "                                 ?institution foaf:name ?institutionName} . " + 
+                "        OPTIONAL { ?studyUri skos:definition ?studyDef } . " +
+                "        OPTIONAL { ?studyUri rdfs:comment ?studyComment } . " +
+                "        OPTIONAL { ?studyUri hasco:hasAgent ?agent . " +
+                "                                   ?agent foaf:name ?agentName } . " +
+                "        OPTIONAL { ?studyUri hasco:hasInstitution ?institution . " +
+                "                                 ?institution foaf:name ?institutionName} . " +
                 "                             }" ;
-        try {			
+        try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
 
@@ -214,7 +215,7 @@ public class DynamicFunctions extends Controller {
     public static Map<String, Map<String,String>> findSubjects() {
         Map<String, Map<String,String>> subjectResult = new HashMap<String, Map<String,String>>();
         Map<String,String> values = new HashMap<String, String>();
-        String subjectQueryString = "";		
+        String subjectQueryString = "";
         subjectQueryString = getPrefixes() +
                 "SELECT ?subjectUri ?subjectType ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel " +
                 "			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
@@ -253,7 +254,7 @@ public class DynamicFunctions extends Controller {
     public static Map<String, Map<String,String>> findSubject(String subject_uri) {
         Map<String, Map<String,String>> subjectResult = new HashMap<String, Map<String,String>>();
         Map<String,String> values = new HashMap<String, String>();
-        String subjectQueryString = "";		
+        String subjectQueryString = "";
         subjectQueryString = getPrefixes() +
                 "SELECT ?subjectUri ?subjectType ?subjectTypeLabel ?subjectLabel ?cohortLabel ?studyLabel " +
                 "			 WHERE {        ?subjectUri hasco:isSubjectOf* ?cohort . " +
@@ -296,6 +297,6 @@ public class DynamicFunctions extends Controller {
     }
 
     public Result postIndex() {
-        return index();   
+        return index();
     }
 }

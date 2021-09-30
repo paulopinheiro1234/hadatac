@@ -1,3 +1,5 @@
+@import org.hadatac.console.views.html.metadata.empirical.empirical_navigation
+@import org.hadatac.console.views.html.metadata.empirical.instance_entry
 @(dir      : String,
   fileId   : String,
   da_uri   : String,
@@ -5,13 +7,14 @@
   pagesize : Integer,
   page     : Integer,
   results  : List[org.hadatac.entity.pojo.GenericInstance],
-  concept  : String)
+  concept  : String,
+  userName : String)
 
 @import helper._; var current = (page + 1); var next = (page + 1); var prev = (page - 1); var last = (total / pagesize); var lastpage = (last + 1)
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main(concept + " Management") {
+@main(concept + " Management","",userName) {
 
    @empirical_navigation(dir, fileId, da_uri, concept)
 

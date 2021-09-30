@@ -8,12 +8,19 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.State;
-import org.hadatac.console.views.html.annotator.*;
+import org.hadatac.console.views.html.annotator.prepareIngestion;
+import org.hadatac.console.views.html.annotator.selectStudy;
+import org.hadatac.console.views.html.annotator.selectDeployment;
+import org.hadatac.console.views.html.annotator.selectScope;
+import org.hadatac.console.views.html.annotator.selectSchema;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SelectScopeForm;
-import org.hadatac.console.controllers.AuthApplication;
+//import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.FileProcessing;
 import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.models.SysUser;
@@ -28,6 +35,7 @@ import org.hadatac.metadata.loader.URIUtils;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.mvc.*;
 import play.mvc.Result;
@@ -37,18 +45,20 @@ public class PrepareIngestion extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result create(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result create(String dir, String fileId, String da_uri, Http.Request request) {
         final String kbPrefix = ConfigProp.getKbPrefix();
-        String ownerEmail = AuthApplication.getLocalUser(session()).getEmail();
+        String ownerEmail = AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail();
         STR da = null;
 
         DataFile dataFile = DataFile.findByIdAndEmail(fileId, ownerEmail);
         if (dataFile == null) {
             return badRequest("[ERROR] Could not update file records with new DA information");
         }
-        
+
         System.out.println("DataFile's Dataset URI : [" + dataFile.getDatasetUri() + "]");
 
         // Load associated DA
@@ -57,7 +67,7 @@ public class PrepareIngestion extends Controller {
             //System.out.println("Row scope: [" + da.getRowScopeUri() + "]  hasScope: " + da.hasScope());
 
             if (da != null) {
-                return ok(prepareIngestion.render(dir, fileId, da, "DA associated with file has been retrieved"));
+                return ok(prepareIngestion.render(dir, fileId, da, "DA associated with file has been retrieved",ownerEmail));
             } else {
                 String message = "[ERROR] Could not load assigned DA from DA's URI : " + da_uri;
                 return badRequest(message);
@@ -65,7 +75,7 @@ public class PrepareIngestion extends Controller {
         }
 
         // OR create a new DA if the file is not associated with any existing DA
-        
+
         String da_label = "";
         String new_da_uri = "";
 
@@ -95,26 +105,26 @@ public class PrepareIngestion extends Controller {
         dataFile.setDataAcquisitionUri(da.getUri());
         dataFile.save();
 
-        return ok(prepareIngestion.render(dir, fileId, da, "New data acquisition has been created to support file ingestion"));
+        return ok(prepareIngestion.render(dir, fileId, da, "New data acquisition has been created to support file ingestion",ownerEmail));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postCreate(String dir, String fileId, String da_uri) {
-        return create(dir, fileId, da_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postCreate(String dir, String fileId, String da_uri, Http.Request request) {
+        return create(dir, fileId, da_uri, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result reconfigure(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result reconfigure(String dir, String fileId, String da_uri, Http.Request request) {
         STR dataAcquisition = STR.findByUri(da_uri);
         if (null != dataAcquisition) {
             dataAcquisition.setStatus(0);
             dataAcquisition.save();
         }
-        return create(dir, fileId, da_uri);
+        return create(dir, fileId, da_uri, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result refine(String dir, String fileId, String da_uri, String message) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result refine(String dir, String fileId, String da_uri, String message, Http.Request request) {
 
         STR da = null;
 
@@ -122,7 +132,7 @@ public class PrepareIngestion extends Controller {
         if (da_uri != null && !da_uri.equals("")) {
             da = STR.findByUri(da_uri);
             if (da != null) {
-                return ok(prepareIngestion.render(dir, fileId, da, message));
+                return ok(prepareIngestion.render(dir, fileId, da, message,application.getUserEmail(request)));
             } else {
                 System.out.println("[ERROR] Could not load assigned DA from DA's URI");
             }
@@ -130,21 +140,21 @@ public class PrepareIngestion extends Controller {
         return badRequest("[ERROR] In PrepareIngestion.refine, cannot retrieve DA from provided URI");
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postRefine(String dir, String fileId, String da_uri, String message) {
-        return refine(dir, fileId, da_uri, message);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postRefine(String dir, String fileId, String da_uri, String message, Http.Request request) {
+        return refine(dir, fileId, da_uri, message, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectStudy(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result selectStudy(String dir, String fileId, String da_uri, Http.Request request) {
 
         List<Study> studies = Study.find();
 
-        return ok(selectStudy.render(dir, fileId, da_uri, studies));
+        return ok(selectStudy.render(dir, fileId, da_uri, studies, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectScope(String dir, String fileId, String da_uri, String std_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result selectScope(String dir, String fileId, String da_uri, String std_uri, Http.Request request) {
 
         String[] fields = null;
         String rowScope = null;
@@ -185,31 +195,31 @@ public class PrepareIngestion extends Controller {
         List<ObjectCollection> ocList = ObjectCollection.findDomainByStudyUri(std_uri);
         System.out.println("Collection list size: " + ocList.size());
 
-        return ok(selectScope.render(dir, fileId, da_uri, ocList, Arrays.asList(fields), 
-                rowScope, rowScopeUri, cellScope, cellScopeUri));
+        return ok(selectScope.render(dir, fileId, da_uri, ocList, Arrays.asList(fields),
+                rowScope, rowScopeUri, cellScope, cellScopeUri, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectDeployment(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result selectDeployment(String dir, String fileId, String da_uri,Http.Request request) {
 
         State active = new State(State.ACTIVE);
 
         List<Deployment> deployments = Deployment.find(active);
 
-        return ok(selectDeployment.render(dir, fileId, da_uri, deployments));
+        return ok(selectDeployment.render(dir, fileId, da_uri, deployments, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result selectSchema(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result selectSchema(String dir, String fileId, String da_uri,Http.Request request) {
 
         List<DataAcquisitionSchema> schemas = DataAcquisitionSchema.findAll();
 
-        return ok(selectSchema.render(dir, fileId, da_uri, schemas));
+        return ok(selectSchema.render(dir, fileId, da_uri, schemas,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectStudy(String dir, String fileId, String da_uri) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processSelectStudy(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         String message = "";
         AssignOptionForm data = form.get();
         String std_uri = data.getOption();
@@ -220,29 +230,29 @@ public class PrepareIngestion extends Controller {
             Study std = Study.find(std_uri);
             if (std == null) {
                 message = "ERROR - Could not retrieve study from its URI.";
-                return refine(dir, fileId, da_uri, message);
+                return refine(dir, fileId, da_uri, message,request);
             }
 
             STR da = STR.findByUri(da_uri);
             if (da == null) {
                 message = "ERROR - Could not retrieve Stream Specification from its URI.";
-                return refine(dir, fileId, da_uri, message);
+                return refine(dir, fileId, da_uri, message,request);
             }
 
             da.setStudyUri(std_uri);
 
             da.saveToSolr();
 
-            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
+            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information",application.getUserEmail(request)));
         }
 
         message = "DA is now associated with study " + std_uri;
-        return refine(dir, fileId, da_uri, message);
+        return refine(dir, fileId, da_uri, message,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectScope(String dir, String fileId, String da_uri) {
-        Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processSelectScope(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<SelectScopeForm> form = formFactory.form(SelectScopeForm.class).bindFromRequest(request);
         String message = "";
         SelectScopeForm data = form.get();
         String rowScopeUri = data.getNewRowScopeUri();
@@ -264,7 +274,7 @@ public class PrepareIngestion extends Controller {
         STR da = STR.findByUri(da_uri);
         if (da == null) {
             message = "ERROR - Could not retrieve Stream Specification from its URI.";
-            return refine(dir, fileId, da_uri, message);
+            return refine(dir, fileId, da_uri, message,request);
         }
 
         //da.setRowScopeUri(rowScopeUri);
@@ -272,12 +282,12 @@ public class PrepareIngestion extends Controller {
 
         da.saveToSolr();
 
-        return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with scope information"));
+        return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with scope information",application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectDeployment(String dir, String fileId, String da_uri) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processSelectDeployment(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         String message = "";
         AssignOptionForm data = form.get();
         String dep_uri = data.getOption();
@@ -288,29 +298,29 @@ public class PrepareIngestion extends Controller {
             Deployment dep = Deployment.find(dep_uri);
             if (dep == null) {
                 message = "ERROR - Could not retrieve Deployment from its URI.";
-                return refine(dir, fileId, da_uri, message);
+                return refine(dir, fileId, da_uri, message,request);
             }
 
             STR da = STR.findByUri(da_uri);
             if (da == null) {
                 message = "ERROR - Could not retrieve Stream Specification from its URI.";
-                return refine(dir, fileId, da_uri, message);
+                return refine(dir, fileId, da_uri, message,request);
             }
 
             da.setDeploymentUri(dep_uri);
 
             da.saveToSolr();
-            
-            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information"));
+
+            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with deployment information",application.getUserEmail(request)));
         }
 
         message = "DA is now associated with deployment " + dep_uri;
-        return refine(dir, fileId, da_uri, message);
+        return refine(dir, fileId, da_uri, message,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processSelectSchema(String dir, String fileId, String da_uri) {
-        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processSelectSchema(String dir, String fileId, String da_uri, Http.Request request) {
+        Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest(request);
         String message = "";
         AssignOptionForm data = form.get();
         String das_uri = data.getOption();
@@ -321,83 +331,83 @@ public class PrepareIngestion extends Controller {
             DataAcquisitionSchema das = DataAcquisitionSchema.find(das_uri);
             if (das == null) {
                 message = "ERROR - Could not retrieve Stream Specification Schema from its URI.";
-                return refine(dir, fileId, da_uri, message);
+                return refine(dir, fileId, da_uri, message,request);
             }
 
             STR da = STR.findByUri(da_uri);
             if (da == null) {
                 message = "ERROR - Could not retrieve Stream Specification from its URI.";
-                return refine(dir, fileId, da_uri, message);
+                return refine(dir, fileId, da_uri, message,request);
             }
 
             da.setSchemaUri(das_uri);
 
             da.saveToSolr();
-            
-            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with data acquisition schema information"));
+
+            return ok(prepareIngestion.render(dir, fileId, da, "Updated Stream Specification with data acquisition schema information",application.getUserEmail(request)));
         }
 
         message = "DA is now associated with data acquisition schema " + das_uri;
-        return refine(dir, fileId, da_uri, message);
+        return refine(dir, fileId, da_uri, message,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result removeAssociation(String dir, String fileId, String da_uri, String daComponent) {
+@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result removeAssociation(String dir, String fileId, String da_uri, String daComponent,Http.Request request) {
 
         String message = "";
         STR da = STR.findByUri(da_uri);
         if (da == null) {
             message = "ERROR - Could not retrieve Stream Specification from its URI.";
-            return refine(dir, fileId, da_uri, message);
+            return refine(dir, fileId, da_uri, message,request);
         }
 
         switch (daComponent) {
 
-        // removing a study's relationship also removes scope information
-        case "Study":  
-            da.setStudyUri("");
-            //da.setRowScopeUri("");
-            //da.setRowScopeName("");
-            da.setCellScopeUri(new ArrayList<String>());
-            da.setCellScopeName(new ArrayList<String>());
-            break;
+            // removing a study's relationship also removes scope information
+            case "Study":
+                da.setStudyUri("");
+                //da.setRowScopeUri("");
+                //da.setRowScopeName("");
+                da.setCellScopeUri(new ArrayList<String>());
+                da.setCellScopeName(new ArrayList<String>());
+                break;
 
-        case "Scope":  
-            //da.setRowScopeUri("");
-            //da.setRowScopeName("");
-            da.setCellScopeUri(new ArrayList<String>());
-            da.setCellScopeName(new ArrayList<String>());
-            break;
+            case "Scope":
+                //da.setRowScopeUri("");
+                //da.setRowScopeName("");
+                da.setCellScopeUri(new ArrayList<String>());
+                da.setCellScopeName(new ArrayList<String>());
+                break;
 
-        case "Deployment":  
-            da.setDeploymentUri("");
-            break;
+            case "Deployment":
+                da.setDeploymentUri("");
+                break;
 
-        case "Schema":  
-            da.setSchemaUri("");
+            case "Schema":
+                da.setSchemaUri("");
         }
 
         da.saveToSolr();
-            
+
         message = "Association with " + daComponent + " removed from the Stream Specification.";
-        return ok(prepareIngestion.render(dir, fileId, da, message));
+        return ok(prepareIngestion.render(dir, fileId, da, message,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result completeDataAcquisition(String dir, String fileId, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result completeDataAcquisition(String dir, String fileId, String da_uri,Http.Request request) {
         String message = "";
         STR da = STR.findByUri(da_uri);
         if (da == null) {
             message = "ERROR - Could not retrieve Stream Specification from its URI.";
-            return refine(dir, fileId, da_uri, message);
+            return refine(dir, fileId, da_uri, message,request);
         }
 
         da.setStatus(9999);
-        
+
         da.saveToSolr();
-        
+
         message = "Stream Specification set as complete";
-        return ok(prepareIngestion.render(dir, fileId, da, message));
+        return ok(prepareIngestion.render(dir, fileId, da, message,application.getUserEmail(request)));
     }
 }
 

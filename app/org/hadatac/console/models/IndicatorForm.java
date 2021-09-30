@@ -8,31 +8,31 @@ public class IndicatorForm {
     public String newUri;
     public String newLabel;
     public String newComment;
-    
+
     public IndicatorForm () {
     }
-    
+
     public String getNewUri() {
-	return newUri;
+        return newUri;
     }
-    
+
     public void setNewUri(String uri) {
-	this.newUri = uri;
+        this.newUri = uri;
     }
-    
+
     public String getNewLabel() {
-	return newLabel;
+        return newLabel;
     }
-    
+
     public void setNewLabel(String label) {
-	this.newLabel = label;
+        this.newLabel = label;
     }
-        
+
     public String getNewComment() {
-	return newComment;
+        return newComment;
     }
-    
+
     public void setNewComment(String comment) {
-	this.newComment = comment;
+        this.newComment = comment;
     }
 }

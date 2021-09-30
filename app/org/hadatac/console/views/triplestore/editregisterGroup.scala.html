@@ -1,13 +1,13 @@
 @(oper: String,
   theGroups: List[org.hadatac.entity.pojo.User],
-  cur_group: org.hadatac.entity.pojo.User)
+  cur_group: org.hadatac.entity.pojo.User, userName:String)
 
 @import helper._
 @import org.hadatac.utils._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-@main("Add Access Level") {
+@main("Add Access Level","",userName) {
 
 	<script type="text/javascript">
 		function checkform() {

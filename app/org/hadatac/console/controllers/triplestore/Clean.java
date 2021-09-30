@@ -3,6 +3,9 @@ package org.hadatac.console.controllers.triplestore;
 import java.util.List;
 import java.io.File;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.*;
 
 import org.hadatac.console.controllers.AuthApplication;
@@ -23,16 +26,21 @@ import org.hadatac.entity.pojo.Measurement;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 public class Clean extends Controller {
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result clean(String oper) {
-        return ok(clean.render(oper));
+    @Inject
+    Application application;
+
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result clean(String oper,Http.Request request) {
+        return ok(clean.render(oper, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
-    public Result postClean(String oper) {
-        return ok(clean.render(oper));
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
+    public Result postClean(String oper,Http.Request request) {
+        return ok(clean.render(oper, application.getUserEmail(request)));
     }
 
     public static String playClean(String oper) {

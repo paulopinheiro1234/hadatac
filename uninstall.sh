@@ -49,13 +49,13 @@ else
 fi
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
-SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
+SOLR8_HOME=$HADATAC_SOLR/solr-8.6.1
 JETTY_NAME=jetty-distribution-9.4.12.v20180830
 
-echo "=== Stopping Apache Solr 6.5.0..."
-sh $HADATAC_SOLR/run_solr6.sh stop
+echo "=== Stopping Apache Solr 8.6.1..."
+sh $HADATAC_SOLR/run_solr8.sh stop
 
-echo "=== Deleting Apache Solr 6.5.0..."
+echo "=== Deleting Apache Solr 8.6.1..."
 rm -rf $HADATAC_SOLR
 
 echo "=== Stopping Blazegraph..."

@@ -22,7 +22,7 @@ public class Ontology extends HADatAcThing {
     static String className = "owl:Ontology";
 
     private String version = "";
-    
+
     public Ontology() {
         setUri("");
         setLabel("");
@@ -36,13 +36,13 @@ public class Ontology extends HADatAcThing {
     }
 
     public String getVersion() {
-    	return version;
+        return version;
     }
-    
+
     public void setVersion(String version) {
-    	this.version = version;
+        this.version = version;
     }
-    
+
     public static Ontology find(String uri) {
         Ontology ontology = null;
         Model model;
@@ -70,7 +70,7 @@ public class Ontology extends HADatAcThing {
                 ontology.setComment(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2002/07/owl#versionIRI")) {
                 ontology.setVersion(object.asResource().getURI());
-            } 
+            }
         }
 
         ontology.setUri(uri);
@@ -79,27 +79,27 @@ public class Ontology extends HADatAcThing {
     }
 
     public static String getVersionFromAbbreviation(String abbr) {
-    	NameSpaces nss = NameSpaces.getInstance();
-    	String uri = nss.getNameByAbbreviation(abbr).replace("#", "");    	
-    	System.out.println("OntVersion: " + uri);
-    	if (uri == null || uri.isEmpty()) {
-    		return "";
-    	}
-    	Ontology ont = Ontology.find(uri);
-    	if (ont == null || ont.getVersion() == null) {
-        	System.out.println("OntVersion ont: is null");
-    		return "";
-    	}
-    	System.out.println("OntVersion is [" + ont.getVersion() + "]");
-    	return ont.getVersion();
+        NameSpaces nss = NameSpaces.getInstance();
+        String uri = nss.getNameByAbbreviation(abbr).replace("#", "");
+        System.out.println("OntVersion: " + uri);
+        if (uri == null || uri.isEmpty()) {
+            return "";
+        }
+        Ontology ont = Ontology.find(uri);
+        if (ont == null || ont.getVersion() == null) {
+            System.out.println("OntVersion ont: is null");
+            return "";
+        }
+        System.out.println("OntVersion is [" + ont.getVersion() + "]");
+        return ont.getVersion();
     }
-    
+
     public static List<Ontology> find() {
         List<Ontology> ontologies = new ArrayList<Ontology>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?ont rdfs:subClassOf* owl:Ontology . " + 
-                " ?uri a ?ont ." + 
+                " ?ont rdfs:subClassOf* owl:Ontology . " +
+                " ?uri a ?ont ." +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -109,21 +109,21 @@ public class Ontology extends HADatAcThing {
             QuerySolution soln = resultsrw.next();
             Ontology ontology = find(soln.getResource("uri").getURI());
             ontologies.add(ontology);
-        }			
+        }
 
         return ontologies;
     }
-    
-    @Override
-	public boolean saveToSolr() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public int deleteFromSolr() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public boolean saveToSolr() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
 }

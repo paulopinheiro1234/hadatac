@@ -6,7 +6,8 @@
   ocDomainList  : List[org.hadatac.entity.pojo.ObjectCollection],
   ocSpaceList   : List[org.hadatac.entity.pojo.ObjectCollection],
   ocTimeList    : List[org.hadatac.entity.pojo.ObjectCollection],
-  ocTypeList    : List[org.hadatac.entity.pojo.ObjectCollectionType])
+  ocTypeList    : List[org.hadatac.entity.pojo.ObjectCollectionType],
+  userName      : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -17,7 +18,7 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("Edit SOC") {
+@main("Edit SOC","",userName) {
 
   <div class="container">
     <h4>Edit SOC for Study @study.getLabel()</h4>

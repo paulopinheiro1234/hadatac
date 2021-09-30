@@ -2,7 +2,8 @@
   fileId         : String,
   da_uri         : String,
   cellScope      : List[String],
-  cellScopeUri   : List[String])
+  cellScopeUri   : List[String],
+  userName       : String)
 
 @import helper._
 @import java.net.URLDecoder
@@ -13,50 +14,50 @@
 @import org.hadatac.console.controllers._
 @import org.hadatac.metadata.loader.URIUtils;
 
-@main("View Scope of " + da_uri) {
+@main("View Scope of " + da_uri,"",userName) {
 
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-1 col-xs-0"></div>
-      <div class="col-md-10 col-xs-8">
-        <h2>View Data Stream's Scope</h2> 
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-1 col-xs-0"></div>
+            <div class="col-md-10 col-xs-8">
+                <h2>View Data Stream's Scope</h2>
 
-        <h3>Selected Data Stream</h3> 
-           <ul>
-              <li>@URIUtils.replaceNameSpaceEx(da_uri)</li>
-           </ul>
-    
-        <h4>Cell Scope</h4> 
-           @if(cellScope == null || cellScopeUri == null || cellScope.size() <= 0 || cellScopeUri.size() <= 0) {
-               <ul>
-                  <li><b>NO DEFINED CELL SCOPE OBJECTS</b></li>
-               </ul>
-           } else {
-            <table class="table">
-                Cell scope is positional.
-                <thead>
-                    <tr>
-                       <th>Position</th>
-                       <th>Name</th>
-                       <th>URI</th>
-                    </tr>
-                </thead>
-                <tbody>
-		    @for(index <- 0 until cellScopeUri.size) {
-		        <tr>
-	                   <td>@index</td>
-         	           <td>@if(cellScope != null && cellScope(index) != null) { @cellScope(index) }</td>
-	                   <td>@if(cellScopeUri != null && cellScopeUri(index) != null) { @URIUtils.replaceNameSpaceEx(cellScopeUri(index)) }</td> 
-           	        </tr>
-                    }
-                </tbody>
-            </table>
-           }
-    	    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)" 
-	       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
-      </div>
+                <h3>Selected Data Stream</h3>
+                <ul>
+                    <li>@URIUtils.replaceNameSpaceEx(da_uri)</li>
+                </ul>
+
+                <h4>Cell Scope</h4>
+                @if(cellScope == null || cellScopeUri == null || cellScope.size() <= 0 || cellScopeUri.size() <= 0) {
+                    <ul>
+                        <li><b>NO DEFINED CELL SCOPE OBJECTS</b></li>
+                    </ul>
+                } else {
+                    <table class="table">
+                        Cell scope is positional.
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Name</th>
+                                <th>URI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(index <- 0 until cellScopeUri.size) {
+                            <tr>
+                                <td>@index</td>
+                                <td>@if(cellScope != null && cellScope(index) != null) { @cellScope(index) }</td>
+                                <td>@if(cellScopeUri != null && cellScopeUri(index) != null) { @URIUtils.replaceNameSpaceEx(cellScopeUri(index)) }</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)"
+                class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+            </div>
+        </div>
     </div>
-  </div>
-  
+
 }
   

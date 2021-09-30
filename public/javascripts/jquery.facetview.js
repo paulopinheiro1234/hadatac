@@ -1287,6 +1287,7 @@ search box - the end user will not know they are happening.
         //Solr Search
         var solrsearchquery = function() {
             // set default URL params
+            console.log("solrsearchquery function invoked");
             var urlparams = "wt=json&";
             for (var item in options.default_url_params) {
                 urlparams += item + "=" + options.default_url_params[item] + "&";
@@ -1353,6 +1354,7 @@ search box - the end user will not know they are happening.
 	};
         // execute a search
         var dosearch = function() {
+            console.log("dosearch function invoked");
             jQuery('.notify_loading').show();
             // update the options with the latest q value
             if ( options.searchbox_class.length == 0 ) {
@@ -1375,10 +1377,9 @@ search box - the end user will not know they are happening.
                 window.history.pushState("","search",currurl);
             };
             $.ajax({
-                type: "get",
+                type: "post",
                 url: url_1,
-                data: qrystr,
-                processData: false,
+                data: {"qrystr" : qrystr},
                 dataType: options.datatype,
                 jsonp: "json.wrf",
                 success: showresults
@@ -1472,6 +1473,7 @@ search box - the end user will not know they are happening.
         
         // adjust the search field focus
         var searchfield = function(event) {
+            console.log("searchfile function invoked");
             event.preventDefault();
             options.paging.from = 0;
             dosearch();
@@ -1530,7 +1532,7 @@ search box - the end user will not know they are happening.
             thefacetview += '<div class="span12" id="facetview_rightcol">';
         }
         thefacetview += '<div class="facetview_plots_container"><div id="line_chart"/><div id="dendrogram"/></div>';
-        thefacetview += '<div class="facetview_search_options_container">';
+        thefacetview += '<div class="facetview_search_options_container" style="display: none;">';
         thefacetview += '<div class="btn-group" style="display:inline-block; margin-right:5px;"> \
             <a class="btn btn-small" title="clear all search settings and start again" href=""><i class="icon-remove"></i></a> \
             <a class="btn btn-small facetview_learnmore" title="click to view search help information" href="#"><b>?</b></a> \
@@ -1630,8 +1632,9 @@ search box - the end user will not know they are happening.
             // check for remote config options, then do first search
             if (options.config_file) {
                 $.ajax({
-                    type: "get",
+                    type: "post",
                     url: options.config_file,
+                    data: qrystr,
                     dataType: "jsonp",
                     success: function(data) {
                         options = $.extend(options, data);

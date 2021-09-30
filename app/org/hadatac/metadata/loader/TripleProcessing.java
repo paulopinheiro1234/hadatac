@@ -37,6 +37,7 @@ import org.hadatac.entity.pojo.TriggeringEvent;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.ConfigProp;
 import org.joda.time.format.DateTimeFormat;
 
 import org.hadatac.data.model.ParsingResult;
@@ -46,7 +47,7 @@ public class TripleProcessing {
 	
 	public static final String KB_FORMAT = "text/turtle";
 	
-	public static final String TTL_DIR = "tmp/ttl/";
+	public static final String TTL_DIR = ConfigProp.getTmp() + "ttl/";
 	
 	public static int count;
 	

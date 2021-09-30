@@ -1,4 +1,4 @@
-@(oper: String)
+@(oper: String, userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -11,8 +11,8 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-@main("Repository Management") {
- 
+@main("Repository Management","",userName) {
+
     <div class="container-fluid">
       
       <div class="row">
@@ -37,7 +37,7 @@
   						<div class="col-md-4">
                       		Unprocessed Files Folder: <b><font color="blue">@ConfigProp.getPathUnproc()</font></b> <br>  
                       		Processed Files Folder: <b><font color="blue">@ConfigProp.getPathProc()</font></b> <br>  
-                      		Download Reports Folder: <b><font color="blue">@ConfigProp.getPathDownload()</font></b> <br>  
+                      		Download Reports Folder: <b><font color="blue">@ConfigProp.getPathWorking()</font></b> <br>
                       		Working Files Folder: <b><font color="blue">@ConfigProp.getPathWorking()</font></b> <br>  
   						</div>	  						
   						<div class="col-md-3">
@@ -142,7 +142,7 @@
          @if(oper=="init") {
 
              <br>
-             <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Menu</a>
+             <a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
              
          }
 
@@ -153,4 +153,4 @@
     </div>
 
 }
-   
+

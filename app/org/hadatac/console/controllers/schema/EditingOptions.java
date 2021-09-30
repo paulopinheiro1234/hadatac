@@ -3,26 +3,23 @@ package org.hadatac.console.controllers.schema;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import org.hadatac.console.views.html.schema.*;
-import org.hadatac.console.controllers.AuthApplication;
+//import views.html.schema.*;
+//import controllers.AuthApplication;
 import org.hadatac.console.models.OtMSparqlQueryResults;
 import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.Attribute;
 import org.hadatac.entity.pojo.Unit;
 import org.hadatac.utils.Hierarchy;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-
 
 public class EditingOptions extends Controller {
 
 	public Result entityOptions() {
-		return ok(entityOptions.render(getEntities()));
+		return ok(org.hadatac.console.views.html.schema.entityOptions.render(getEntities()));
 	}
 
 	public Result postEntityOptions() {
-		return ok(entityOptions.render(getEntities()));
+		return ok(org.hadatac.console.views.html.schema.entityOptions.render(getEntities()));
 	}
 
 	public static OtMSparqlQueryResults getEntities() {

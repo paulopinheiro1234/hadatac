@@ -265,9 +265,8 @@ public class STRFileGenerator extends BaseGenerator {
         
 	    if (!isFileStreamValid(str)) {
             throw new Exception();
-	    } 
-	   
-	    return str;
+	    }
+        return str;
     }
 
     public boolean isFileStreamValid(STR str) {
@@ -277,8 +276,6 @@ public class STRFileGenerator extends BaseGenerator {
         //String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
 
         //dataFile.getLogger().println("Study ID found: " + studyName);
-        //dataFile.getLogger().println("Study URI found: " + studyUri);
-
         List<VirtualColumn> vcList = VirtualColumn.findByStudyUri(str.getStudy().getUri());
         // map of SOCReference and grounding label
         Map<String, String> refList = new HashMap<String, String>();
@@ -321,7 +318,7 @@ public class STRFileGenerator extends BaseGenerator {
         }
         dataFile.getLogger().println("DASOs requiring role assignments: " + roles.toString());
         //System.out.println("Existing mappings " + refList.toString());
-        
+        String dasUri ="";
         for (DataAcquisitionSchemaObject daso : dasos) {
         	//System.out.println("---->>> Processing DASO " + daso.getUri());
         	if (null == daso) {
@@ -336,6 +333,7 @@ public class STRFileGenerator extends BaseGenerator {
             	dataFile.getLogger().println("PATH: " + daso.getLabel() + " has role \"" + refList.get(daso.getLabel()) + "\"");
             	//System.out.println("DASO skipped");
             } else {
+                dasUri = (daso!=null && daso.getPartOfSchema()!=null) ? daso.getPartOfSchema():"";
             	queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                     		"SELECT ?vc ?soc ?socRef ?vcLabel ?role WHERE { " +
                 	    "   <" + daso.getUri() + "> rdfs:label ?vcLabel . " +
@@ -477,8 +475,9 @@ public class STRFileGenerator extends BaseGenerator {
             String insert = "";
             insert += NameSpaces.getInstance().printSparqlNameSpaceList();
             insert += "INSERT DATA {  ";
+            insert += "graph  <"+dasUri+"> { " ;
             insert += "<" + uri + ">" + " hasco:hasRoleLabel  \"" + dasoPL.get(uri) + "\" . ";
-            insert += "} ";
+            insert += "}} ";
 
             try {
                 UpdateRequest request = UpdateFactory.create(insert);

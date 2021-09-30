@@ -3,6 +3,8 @@ package org.hadatac.console.controllers.metadata.empirical;
 import java.util.List;
 import java.util.Map;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.entity.pojo.DetectorType;
 import org.hadatac.entity.pojo.GenericInstance;
 import org.hadatac.entity.pojo.HADatAcClass;
@@ -20,10 +22,16 @@ import org.hadatac.console.models.OtMSparqlQueryResults;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.views.html.metadata.empirical.*;
 import org.hadatac.console.views.html.error_page;
+import org.pac4j.play.java.Secure;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Controller;
 
+import javax.inject.Inject;
+
 public class Infra extends Controller {
+    @Inject
+    Application application;
 
 	final static int PAGESIZE = 12;
 
@@ -34,21 +42,21 @@ public class Infra extends Controller {
 	public static String INFRA_DETECTOR_TYPE = "DetectorType";
 	public static String INFRA_DETECTOR = "Detector";
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir, String filename, String da_uri) {
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, String filename, String da_uri, Http.Request request) {
 		String platformJson = GenericInstance.jsonInstanceStatisticsByType("vstoi:" + Infra.INFRA_PLATFORM); 
 		String instrumentJson = GenericInstance.jsonInstanceStatisticsByType("vstoi:" + Infra.INFRA_INSTRUMENT); 
 		String detectorJson = GenericInstance.jsonInstanceStatisticsByType("vstoi:" + Infra.INFRA_DETECTOR); 
-        return ok(infra.render(dir, filename, da_uri, platformJson, instrumentJson, detectorJson));
+        return ok(infra.render(dir, filename, da_uri, platformJson, instrumentJson, detectorJson, application.getUserEmail(request)));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String dir, String filename, String da_uri) {
-        return index(dir, filename, da_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result postIndex(String dir, String filename, String da_uri, Http.Request request) {
+        return index(dir, filename, da_uri, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result hierarchy(String tabName, String dir, String filename, String da_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result hierarchy(String tabName, String dir, String filename, String da_uri, Http.Request request) {
         //SparqlQuery query = new SparqlQuery();
         //GetSparqlQueryDynamic query_submit = new GetSparqlQueryDynamic(query);
         OtMSparqlQueryResults results;
@@ -84,24 +92,24 @@ public class Infra extends Controller {
         } catch (IllegalStateException | NullPointerException e1) {
             return internalServerError(error_page.render(e1.toString(), tabName));
         }
-        return ok(infra_browser.render(dir, filename, da_uri, results, objects, labelUri, tabName));
+        return ok(infra_browser.render(dir, filename, da_uri, results, objects, labelUri, tabName, application.getUserEmail(request)));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postHierarchy(String concept, String dir, String filename, String da_uri) {
-        return hierarchy(concept, dir, filename, da_uri);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result postHierarchy(String concept, String dir, String filename, String da_uri, Http.Request request) {
+        return hierarchy(concept, dir, filename, da_uri, request);
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result findWithPages(String concept, String dir, String filename, String da_uri, int offset) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result findWithPages(String concept, String dir, String filename, String da_uri, int offset, Http.Request request) {
     	List<GenericInstance> instances = GenericInstance.findGenericWithPages("vstoi:" + concept, PAGESIZE, offset * PAGESIZE);
     	int total = GenericInstance.getNumberGenericInstances("vstoi:" + concept);
-        return ok(instanceManagement.render(dir, filename, da_uri, total, PAGESIZE, offset, instances, concept));
+        return ok(instanceManagement.render(dir, filename, da_uri, total, PAGESIZE, offset, instances, concept, application.getUserEmail(request)));
     }
     
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postFindWithPages(String concept, String dir, String filename, String da_uri, int offset) {
-        return findWithPages(concept, dir, filename, da_uri, offset);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result postFindWithPages(String concept, String dir, String filename, String da_uri, int offset, Http.Request request) {
+        return findWithPages(concept, dir, filename, da_uri, offset, request);
     }
 
 }

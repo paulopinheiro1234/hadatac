@@ -8,9 +8,12 @@ services:
             dockerfile: Dockerfile
         container_name: hadatac_solr
         restart: always
+        environment:
+            SOLR_JAVA_MEM: "-Xms1g -Xmx1g"
         # Mount a volume in the mycores directory to persist data that is ingested.
         volumes:
             - hadatac-solr:/opt/solr/server
+#            - /path in host server/solr-home:/opt/solr/server/solr/mycores   # Uncomment this option to use external binding
         networks:
             hadatac:
                 aliases:
@@ -36,6 +39,7 @@ services:
             JAVA_XMX: 4g
         volumes:
             - hadatac-blazegraph:/var/lib/jetty
+#            - /path in host server/blazegraph/bigdata.jnl:/var/lib/jetty/bigdata.jnl # Uncomment this option to use external binding
 
     # The primary hadatac web app
     hadatac:
@@ -49,14 +53,23 @@ services:
             hadatac:
                 aliases:
                     - hadatac
+        environment:
+            JAVA_XMS: 2g
+            JAVA_XMX: 12g
         volumes:
             # Creates a volume to store the various csv files. This allows the data
             #   to be persisted when the container is removed or when Hadatac is rebuilt.
             # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
+
+            # Comment out this option to use external binding
             - hadatac-csvs:/root/app/csvs
+#            - /Users/kandws01/Documents/merge3/local:/root/app/csvs  # Uncomment this option to use external binding
             # Creates a volume for the config files. This way configuration file changes
             #   are persisted when the container is removed or rebuilt.
+
+            # Comment out this option to use external binding
             - hadatac-conf:/root/app/conf
+#            - /path in host server/conf:/root/app/conf # Uncomment this option to use external binding
         links:
             - blazegraph
             - solr

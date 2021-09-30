@@ -1,5 +1,6 @@
 package org.hadatac.data.loader;
 
+import com.typesafe.config.ConfigFactory;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
@@ -12,7 +13,6 @@ import org.hadatac.entity.pojo.StudyObjectMatching;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.data.loader.Cache;
 
 import java.lang.String;
 import java.util.concurrent.ConcurrentHashMap;
@@ -644,10 +644,11 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 }
             }
         }
+         namedGraphUri = (!(studyUri==null) && studyUri.contains("STD")) ? studyUri.replace("STD","SSD") : "";
 
         //  Create a SOC when existing SOCs can be associated
-        if (associatedSOC == null) { 
-            String newSOCUri = studyUri.replace("STD","SOC") + "-" + daso.getLabel().replace("??","");
+        if (associatedSOC == null) {
+            String newSOCUri = studyUri.contains("STD") ? studyUri.replace("STD","SOC") + "-" + daso.getLabel().replace("??","") : studyUri.replace("SSD","SOC") + "-" + daso.getLabel().replace("??","");;
             String scopeUri = "";
             if (daso != null) {
                 ObjectCollection scopeObj = socFromTargetDaso(daso, socsList);
@@ -675,13 +676,13 @@ public class DASOInstanceGenerator extends BaseGenerator {
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
             if (newVc == null) {
                 newVc = new VirtualColumn(studyUri, "", daso.getLabel());
-                newVc.setNamedGraph(str.getUri());
+                newVc.setNamedGraph(namedGraphUri);
                 newVc.saveToTripleStore();
                 // addObject(newVc);
             }
             ObjectCollection newSoc = new ObjectCollection(newSOCUri, collectionType, newLabel, newLabel, studyUri, 
             		newVc.getUri(), "", scopeUri, null, null, null, "0");
-            newSoc.setNamedGraph(str.getUri());
+            newSoc.setNamedGraph(namedGraphUri);
             newSoc.saveToTripleStore();
             // addObject(newSoc);
 
@@ -691,7 +692,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
             }
             logger.println("DASOInstanceGenerator: Reference: " + daso.getLabel() + "   Created SOC : " + newSOCUri + "    with hasScope: " + scopeUri);
         }
-
+        if (associatedSOC!=null) {associatedSOC.setNamedGraph(namedGraphUri);}
         return true;
     }
 
@@ -923,6 +924,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
         } else {
             labelPrefix = "SPL ";
         }
+        if ( labelPrefix.contains("SBJ") && "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+            return labelPrefix + originalID;
+        }
         return labelPrefix + originalID + " - " + socIdFromUri(soc.getUri());
 
     }
@@ -1107,7 +1111,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
 
     	obj = getCachedObject(currentObjUri);
         if (obj == null) {
-            System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve Study Object for URI=[" + currentObjUri + "]");
+            //System.out.println("DASOInstanceGenerator: [ERROR] Could not retrieve Study Object for ID=[" + id + "]");
             return null;
         }
         groundObj.put(StudyObject.STUDY_OBJECT_URI, obj.getUri());

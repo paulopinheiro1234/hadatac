@@ -62,7 +62,7 @@ public class RestApi extends Controller {
     private final static int OBJ = 0;
     private final static int DPL = 1;
 
-//****************
+    //****************
 // UTILITY METHODS
 //****************
     // Utility methods for formatting the "values ?class { <stuff> }" part of the blazegraph queries
@@ -77,7 +77,7 @@ public class RestApi extends Controller {
         if(uri == null) return null;
         else return "<" + uri + "> ";
     }
-    
+
     // Utilty method for parsing blazegraph query results
     private List<String> parsePivotForVars (Pivot p) {
         List<String> results = new ArrayList<String>();
@@ -91,7 +91,7 @@ public class RestApi extends Controller {
     }// /parsePivotForVars()
 
 
-//*******************
+    //*******************
 // SOLR QUERY METHODS
 //*******************
     // query solr to see for what variables we have measurements
@@ -107,7 +107,7 @@ public class RestApi extends Controller {
                 + "vars:{ "
                 + "type: terms, "
                 + "field: characteristic_uri_str, "
-            // limit is important - the default is only 10 facets (variables) if this is left out
+                // limit is important - the default is only 10 facets (variables) if this is left out
                 + "limit: 1000}}");
         // parse results
         List<String> uris = new ArrayList<String>();
@@ -138,7 +138,7 @@ public class RestApi extends Controller {
                 + "vars:{ "
                 + "type: terms, "
                 + "field: characteristic_uri_str, "
-            // limit is important - the default is only 10 facets (variables) if this is left out
+                // limit is important - the default is only 10 facets (variables) if this is left out
                 + "limit: 5000}}");
         //System.out.println("[getAllUsedVars] solrQuery = " + solrQuery);
         // parse results
@@ -159,7 +159,7 @@ public class RestApi extends Controller {
         return uris;
     }// getAllUsedVars
 
-//"study_uri_str":"http://hadatac.org/kb/hbgd#STD-CPP"
+    //"study_uri_str":"http://hadatac.org/kb/hbgd#STD-CPP"
 //"dasa_uri_str":"http://hadatac.org/kb/hbgd#DASA-HBGD-SUBJ-APGAR1"
 // need to get the actual variable URI....
     // getting measurements from solr!
@@ -168,8 +168,8 @@ public class RestApi extends Controller {
         SolrDocumentList results = null;
         // build Solr query!
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" + 
-                           "AND characteristic_uri_str:\"" + variableUri + "\"");
+        solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                "AND characteristic_uri_str:\"" + variableUri + "\"");
         solrQuery.setRows(10000000);
         // make Solr query!
         try {
@@ -191,23 +191,23 @@ public class RestApi extends Controller {
         SolrDocumentList results = null;
         // build Solr query!
         SolrQuery solrQuery = new SolrQuery();
-	if (obj_dpl == OBJ) {
-	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND study_object_uri_str:\"" + objUri + "\"" +
-			       "AND characteristic_uri_str:\"" + variableUri + "\"");
-	} else {
-	    SolrDocumentList strResult = getSolrSTRs(objUri);
-	    if (strResult == null) {
-		return null;
-	    } 
-	    String strStr = parseSTRs(strResult);
-	    if (strStr == null || strStr.equals("")) {
-		return null;
-	    }
-	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND " +  strStr + " " + 
-			       "AND characteristic_uri_str:\"" + variableUri + "\"");
-	}
+        if (obj_dpl == OBJ) {
+            solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                    "AND study_object_uri_str:\"" + objUri + "\"" +
+                    "AND characteristic_uri_str:\"" + variableUri + "\"");
+        } else {
+            SolrDocumentList strResult = getSolrSTRs(objUri);
+            if (strResult == null) {
+                return null;
+            }
+            String strStr = parseSTRs(strResult);
+            if (strStr == null || strStr.equals("")) {
+                return null;
+            }
+            solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                    "AND " +  strStr + " " +
+                    "AND characteristic_uri_str:\"" + variableUri + "\"");
+        }
         solrQuery.setRows(10000);
         System.out.println("[RestAPI] solr query: " + solrQuery);
         // make Solr query!
@@ -231,25 +231,25 @@ public class RestApi extends Controller {
         SolrDocumentList results = null;
         // build Solr query!
         SolrQuery solrQuery = new SolrQuery();
-	if (obj_dpl == OBJ) {
-	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND study_object_uri_str:\"" + objUri + "\"" +
-			       "AND characteristic_uri_str:\"" + variableUri + "\"" + 
-			       "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
-	} else {
-	    SolrDocumentList strResult = getSolrSTRs(objUri);
-	    if (strResult == null) {
-		return null;
-	    } 
-	    String strStr = parseSTRs(strResult);
-	    if (strStr == null || strStr.equals("")) {
-		return null;
-	    }
-	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND " + strStr  + " " + 
-			       "AND characteristic_uri_str:\"" + variableUri + "\"" + 
-			       "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
-	}
+        if (obj_dpl == OBJ) {
+            solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                    "AND study_object_uri_str:\"" + objUri + "\"" +
+                    "AND characteristic_uri_str:\"" + variableUri + "\"" +
+                    "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
+        } else {
+            SolrDocumentList strResult = getSolrSTRs(objUri);
+            if (strResult == null) {
+                return null;
+            }
+            String strStr = parseSTRs(strResult);
+            if (strStr == null || strStr.equals("")) {
+                return null;
+            }
+            solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                    "AND " + strStr  + " " +
+                    "AND characteristic_uri_str:\"" + variableUri + "\"" +
+                    "AND timestamp_date:[" + fromdatetime + " TO " + todatetime + "]");
+        }
         solrQuery.setRows(10000);
         System.out.println("[RestAPI] solr query: " + solrQuery);
         // make Solr query!
@@ -268,32 +268,32 @@ public class RestApi extends Controller {
     }// /getSolrMeasurements()
 
     private String getSolrMeasurementsTimeRange(int obj_dpl, String studyUri, String variableUri, String objUri){
-	String firstTime = null;
-	String lastTime = null;
+        String firstTime = null;
+        String lastTime = null;
         SolrDocumentList results = null;
         // build first Solr query!
         SolrQuery solrQuery = new SolrQuery();
-	if (obj_dpl == OBJ) {
-	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND study_object_uri_str:\"" + objUri + "\"" +
-			       "AND characteristic_uri_str:\"" + variableUri + "\"" );
-	} else {
-	    SolrDocumentList strResult = getSolrSTRs(objUri);
-	    if (strResult == null) {
-		return null;
-	    } 
-	    String strStr = parseSTRs(strResult);
-	    if (strStr == null || strStr.equals("")) {
-		return null;
-	    }
-	    solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
-			       "AND " +  strStr + " " + 
-			       "AND characteristic_uri_str:\"" + variableUri + "\"");
-	}
+        if (obj_dpl == OBJ) {
+            solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                    "AND study_object_uri_str:\"" + objUri + "\"" +
+                    "AND characteristic_uri_str:\"" + variableUri + "\"" );
+        } else {
+            SolrDocumentList strResult = getSolrSTRs(objUri);
+            if (strResult == null) {
+                return null;
+            }
+            String strStr = parseSTRs(strResult);
+            if (strStr == null || strStr.equals("")) {
+                return null;
+            }
+            solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"" +
+                    "AND " +  strStr + " " +
+                    "AND characteristic_uri_str:\"" + variableUri + "\"");
+        }
         solrQuery.setRows(1);
-	solrQuery.setSort("timestamp_date",SolrQuery.ORDER.asc);
+        solrQuery.setSort("timestamp_date",SolrQuery.ORDER.asc);
         System.out.println("[RestAPI] solr query: " + solrQuery);
-	SolrClient solr = null;
+        SolrClient solr = null;
         QueryResponse queryResponse = null;
         // make Solr queries!
         try {
@@ -306,10 +306,10 @@ public class RestApi extends Controller {
             results = queryResponse.getResults();
         } catch (Exception e) {
             System.out.println("[RestAPI.getMeasurements] ERROR: " + e.getMessage());
-	    return "ERROR: no initial time for selection";
+            return "ERROR: no initial time for selection";
         }
         firstTime = parseMeasurementTimeStamp(results);
-	solrQuery.setSort("timestamp_date",SolrQuery.ORDER.desc);
+        solrQuery.setSort("timestamp_date",SolrQuery.ORDER.desc);
         try {
             solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
@@ -320,13 +320,13 @@ public class RestApi extends Controller {
             results = queryResponse.getResults();
         } catch (Exception e) {
             System.out.println("[RestAPI.getMeasurements] ERROR: " + e.getMessage());
-	    return "ERROR: no final time for selection";
+            return "ERROR: no final time for selection";
         }
         lastTime = parseMeasurementTimeStamp(results);
-	if (firstTime != null && !firstTime.equals("") && lastTime != null && !lastTime.equals("")) {
-	    return "[" + firstTime + ";" + lastTime + "]";
-	}
-	return "ERROR";
+        if (firstTime != null && !firstTime.equals("") && lastTime != null && !lastTime.equals("")) {
+            return "[" + firstTime + ";" + lastTime + "]";
+        }
+        return "ERROR";
     }// /getSolrMeasurementsTimeRange()
 
     // getting STRs from solr!
@@ -350,113 +350,113 @@ public class RestApi extends Controller {
         return results;
     }// /getSolrSTRs()
 
-//*************************
+    //*************************
 // BLAZEGRAPH QUERY METHODS
 //*************************
-    // given one or more variable attribute URI's, query blazegraph for 
+    // given one or more variable attribute URI's, query blazegraph for
     // the details on those variables and construct JSON array from results
     private ArrayNode variableQuery(String classes){
         if(classes == null){
-            return null; 
+            return null;
         }
-        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "select distinct ?class ?label ?dasa ?unit ?shortname ?unitlabel ?itype ?itypelabel where {" + 
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "select distinct ?class ?label ?dasa ?unit ?shortname ?unitlabel ?itype ?itypelabel where {" +
                 "?class rdfs:label ?label ." +
-                "?dasa hasco:hasAttribute ?class ." + 
-                "?dasa hasco:hasUnit ?unit . " + 
-                "OPTIONAL { ?dasa rdfs:label ?shortname .} " + 
+                "?dasa hasco:hasAttribute ?class ." +
+                "?dasa hasco:hasUnit ?unit . " +
+                "OPTIONAL { ?dasa rdfs:label ?shortname .} " +
                 "OPTIONAL { ?unit rdfs:label ?unitlabel . } " +
                 "OPTIONAL { ?class rdfs:subClassOf+ ?itype . " +
                 "           ?itype rdfs:subClassOf hasco:StudyIndicator . " +
                 "           ?itype rdfs:label ?itypelabel . }" +
                 "} values ?class { " + classes + "} ";
-        
+
         System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
-		
-		ResultSetRewindable resultsrw = SPARQLUtils.select(
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[VariableQuery] No variables found in blazegraph!");
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
         while(resultsrw.hasNext()){
             ObjectNode temp = mapper.createObjectNode();
-			QuerySolution soln = resultsrw.next();
-			if (soln.get("class") != null) {
-				temp.put("uri", soln.get("class").toString());
-			} else {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("class") != null) {
+                temp.put("uri", soln.get("class").toString());
+            } else {
                 System.out.println("[VariableQuery] ERROR: Result returned without URI? Skipping....");
                 continue;
             }
-			if (soln.get("label") != null) {
-				temp.put("label", soln.get("label").toString());
-			}
-			if (soln.get("dasa") != null) {
-				temp.put("dasa", soln.get("dasa").toString());
-			}
-			if (soln.get("unit") != null) {
-				temp.put("unit", soln.get("unit").toString());
-			}
-			if (soln.get("unitlabel") != null) {
-				temp.put("unitlabel", soln.get("unitlabel").toString());
-			}
-			if (soln.get("shortname") != null) {
-				temp.put("shortname", soln.get("shortname").toString());
-			}
-			if (soln.get("itype") != null) {
-				temp.put("indicatortype", soln.get("itype").toString());
-			}
-			if (soln.get("itypelabel") != null) {
-				temp.put("indicatortypelabel", soln.get("itypelabel").toString());
-			}
+            if (soln.get("label") != null) {
+                temp.put("label", soln.get("label").toString());
+            }
+            if (soln.get("dasa") != null) {
+                temp.put("dasa", soln.get("dasa").toString());
+            }
+            if (soln.get("unit") != null) {
+                temp.put("unit", soln.get("unit").toString());
+            }
+            if (soln.get("unitlabel") != null) {
+                temp.put("unitlabel", soln.get("unitlabel").toString());
+            }
+            if (soln.get("shortname") != null) {
+                temp.put("shortname", soln.get("shortname").toString());
+            }
+            if (soln.get("itype") != null) {
+                temp.put("indicatortype", soln.get("itype").toString());
+            }
+            if (soln.get("itypelabel") != null) {
+                temp.put("indicatortypelabel", soln.get("itypelabel").toString());
+            }
             anode.add(temp);
         }// /parse sparql results
         System.out.println("[VariableQuery] parsed " + anode.size() + " results into array");
-        return anode;        
+        return anode;
     }// /variableQuery()
 
     // Given one or more variables, gets details on the indicator types for each of those variables
     private ArrayNode indicatorQuery(String classes){
         if(classes == null){
-            return null; 
+            return null;
         }
-        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "select distinct ?indicator ?label where {" + 
-                "?class rdfs:subClassOf+ ?indicator . " + 
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "select distinct ?indicator ?label where {" +
+                "?class rdfs:subClassOf+ ?indicator . " +
                 "?indicator rdfs:subClassOf hasco:StudyIndicator ." +
-                "?indicator rdfs:label ?label ." + 
+                "?indicator rdfs:label ?label ." +
                 "} values ?class { " + classes + "} ";
         System.out.println("[VariableQuery] sparql query\n" + sparqlQueryString);
-		
-		ResultSetRewindable resultsrw = SPARQLUtils.select(
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if(resultsrw.size() == 0){
             System.out.println("[IndicatorQuery] No indicators found in blazegraph!");
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
         while(resultsrw.hasNext()){
             ObjectNode temp = mapper.createObjectNode();
-			QuerySolution soln = resultsrw.next();
-			if (soln.get("indicator") != null) {
-				temp.put("uri", soln.get("indicator").toString());
-			} else {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("indicator") != null) {
+                temp.put("uri", soln.get("indicator").toString());
+            } else {
                 System.out.println("[IndicatorQuery] ERROR: Result returned without URI? Skipping....");
                 continue;
             }
-			if (soln.get("label") != null) {
-				temp.put("label", soln.get("label").toString());
-			}
-			if (soln.get("class") != null) {
-				temp.put("varclass", soln.get("class").toString());
-			}
+            if (soln.get("label") != null) {
+                temp.put("label", soln.get("label").toString());
+            }
+            if (soln.get("class") != null) {
+                temp.put("varclass", soln.get("class").toString());
+            }
             anode.add(temp);
         }// /parse sparql results
         System.out.println("[IndicatorQuery] parsed " + anode.size() + " results into array");
@@ -466,44 +466,44 @@ public class RestApi extends Controller {
     // handles blazegraph query and result parsing for unit details
     private ArrayNode unitsQuery(String classes){
         if(classes == null){
-            return null; 
+            return null;
         }
-        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "select distinct ?uri ?label ?short where {" + 
-                "?dasa hasco:hasAttribute ?class ." + 
-                "?dasa hasco:hasUnit ?uri . " + 
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "select distinct ?uri ?label ?short where {" +
+                "?dasa hasco:hasAttribute ?class ." +
+                "?dasa hasco:hasUnit ?uri . " +
                 "?uri rdfs:label ?label ." +
                 "OPTIONAL { ?uri obo:hasExactSynonym ?short . }" +
                 "} values ?class { " + classes + "} ";
 
         //System.out.println("[unitsQuery] sparql query\n" + sparqlQueryString);
-		
-		ResultSetRewindable resultsrw = SPARQLUtils.select(
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[unitsQuery] No units found in blazegraph!");
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
 
         while(resultsrw.hasNext()){
             ObjectNode temp = mapper.createObjectNode();
-			QuerySolution soln = resultsrw.next();
-			if (soln.get("uri") != null) {
-				temp.put("uri", soln.get("uri").toString());
-			} else {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("uri") != null) {
+                temp.put("uri", soln.get("uri").toString());
+            } else {
                 System.out.println("[unitsQuery] ERROR: Result returned without URI? Skipping....");
                 continue;
             }
-			if (soln.get("label") != null) {
-				temp.put("label", soln.get("label").toString());
-			}
-			if (soln.get("short") != null) {
-				temp.put("shortlabel", soln.get("short").toString());
-			}
+            if (soln.get("label") != null) {
+                temp.put("label", soln.get("label").toString());
+            }
+            if (soln.get("short") != null) {
+                temp.put("shortlabel", soln.get("short").toString());
+            }
             anode.add(temp);
         }// /parse sparql results
         System.out.println("[unitsQuery] parsed " + anode.size() + " results into array");
@@ -512,40 +512,40 @@ public class RestApi extends Controller {
 
     // handles blazegraph query and result parsing for deployment details
     private ArrayNode deploymentsQuery(){
-        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-	    "select ?dpl ?plt ?ins where { " + 
-	    "?dpl a vstoi:Deployment . " + 
-	    "?dpl vstoi:hasPlatform ?plt . " + 
-	    "?dpl hasco:hasInstrument ?ins . " +
-	    "}";
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "select ?dpl ?plt ?ins where { " +
+                "?dpl a vstoi:Deployment . " +
+                "?dpl vstoi:hasPlatform ?plt . " +
+                "?dpl hasco:hasInstrument ?ins . " +
+                "}";
         //System.out.println("[deploymentsQuery] sparql query\n" + sparqlQueryString);
-	
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
-		  CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[deploymentsQuery] No deployments found in blazegraph!");
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
 
         while(resultsrw.hasNext()){
             ObjectNode temp = mapper.createObjectNode();
-	    QuerySolution soln = resultsrw.next();
-	    if (soln.get("dpl") != null) {
-		temp.put("uri", soln.get("dpl").toString());
-	    } else {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("dpl") != null) {
+                temp.put("uri", soln.get("dpl").toString());
+            } else {
                 System.out.println("[deploymentsQuery] ERROR: Result returned without URI? Skipping....");
                 continue;
             }
-	    if (soln.get("plt") != null) {
-		temp.put("platform", soln.get("plt").toString());
-	    }
-	    if (soln.get("ins") != null) {
-		temp.put("instrument", soln.get("ins").toString());
-	    }
+            if (soln.get("plt") != null) {
+                temp.put("platform", soln.get("plt").toString());
+            }
+            if (soln.get("ins") != null) {
+                temp.put("instrument", soln.get("ins").toString());
+            }
             anode.add(temp);
         }// /parse sparql results
         System.out.println("[deploymentsQuery] parsed " + anode.size() + " results into array");
@@ -553,117 +553,117 @@ public class RestApi extends Controller {
     }// /deploymentsQuery
 
     private ArrayNode platformsQuery(){
-    	List<Platform> plats = Platform.find();
+        List<Platform> plats = Platform.find();
         if (plats.size() == 0) {
             System.out.println("[platformsQuery] No platforms found in blazegraph!");
             return null;
         }
-        
-    	List<FieldOfView> fovs = FieldOfView.find();
 
-    	ObjectMapper mapper = new ObjectMapper();
+        List<FieldOfView> fovs = FieldOfView.find();
+
+        ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
 
         for (Platform plat : plats) {
             ObjectNode temp = mapper.createObjectNode();
             if (plat.getUri() != null) {
-            	temp.put("uri", plat.getUri());
+                temp.put("uri", plat.getUri());
             }
             if (plat.getLabel() != null && !plat.getLabel().isEmpty()) {
-            	temp.put("label", plat.getLabel());
+                temp.put("label", plat.getLabel());
             }
             if (plat.getFirstCoordinate() != null) {
-            	temp.put("coord1", plat.getFirstCoordinate().toString());
+                temp.put("coord1", plat.getFirstCoordinate().toString());
             }
             if (plat.getFirstCoordinateUnitLabel() != null && !plat.getFirstCoordinateUnitLabel().isEmpty()) {
-            	temp.put("coord1Unit", plat.getFirstCoordinateUnitLabel());
+                temp.put("coord1Unit", plat.getFirstCoordinateUnitLabel());
             }
             if (plat.getFirstCoordinateCharacteristicLabel() != null && !plat.getFirstCoordinateCharacteristicLabel().isEmpty()) {
-            	temp.put("coord1Char", plat.getFirstCoordinateCharacteristicLabel());
+                temp.put("coord1Char", plat.getFirstCoordinateCharacteristicLabel());
             }
             if (plat.getSecondCoordinate() != null) {
-            	temp.put("coord2", plat.getSecondCoordinate().toString());
+                temp.put("coord2", plat.getSecondCoordinate().toString());
             }
             if (plat.getSecondCoordinateUnitLabel() != null && !plat.getSecondCoordinateUnitLabel().isEmpty()) {
-            	temp.put("coord2Unit", plat.getSecondCoordinateUnitLabel());
+                temp.put("coord2Unit", plat.getSecondCoordinateUnitLabel());
             }
             if (plat.getSecondCoordinateCharacteristicLabel() != null && !plat.getSecondCoordinateCharacteristicLabel().isEmpty()) {
-            	temp.put("coord2Char", plat.getSecondCoordinateCharacteristicLabel());
+                temp.put("coord2Char", plat.getSecondCoordinateCharacteristicLabel());
             }
             if (plat.getThirdCoordinate() != null) {
-            	temp.put("coord3", plat.getThirdCoordinate().toString());
+                temp.put("coord3", plat.getThirdCoordinate().toString());
             }
             if (plat.getThirdCoordinateUnitLabel() != null && !plat.getThirdCoordinateUnitLabel().isEmpty()) {
-            	temp.put("coord3Unit", plat.getThirdCoordinateUnitLabel());
+                temp.put("coord3Unit", plat.getThirdCoordinateUnitLabel());
             }
             if (plat.getThirdCoordinateCharacteristicLabel() != null && !plat.getThirdCoordinateCharacteristicLabel().isEmpty()) {
-            	temp.put("coord3Char", plat.getThirdCoordinateCharacteristicLabel());
+                temp.put("coord3Char", plat.getThirdCoordinateCharacteristicLabel());
             }
             if (plat.getPartOf() != null && !plat.getPartOf().isEmpty()) {
-            	temp.put("partOf", plat.getPartOf());
+                temp.put("partOf", plat.getPartOf());
             }
             if (plat.getReferenceLayout() != null && !plat.getReferenceLayout().isEmpty()) {
-            	temp.put("refLayout" , plat.getReferenceLayout());
+                temp.put("refLayout" , plat.getReferenceLayout());
             }
             if (plat.getLayout() != null && !plat.getLayout().isEmpty()) {
-            	temp.put("layout", plat.getLayout());
+                temp.put("layout", plat.getLayout());
             }
             if (plat.getWidth() != null) {
-            	temp.put("layoutWidth", plat.getWidth());
+                temp.put("layoutWidth", plat.getWidth());
             }
             if (plat.getWidthUnit() != null && !plat.getWidthUnit().isEmpty()) {
-            	temp.put("layoutWidthUnit", plat.getWidthUnitLabel());
+                temp.put("layoutWidthUnit", plat.getWidthUnitLabel());
             }
             if (plat.getDepth() != null) {
-            	temp.put("layoutDepth" , plat.getDepth());
+                temp.put("layoutDepth" , plat.getDepth());
             }
             if (plat.getDepthUnit() != null && !plat.getDepthUnit().isEmpty()) {
-            	temp.put("layoutDepthUnit", plat.getDepthUnitLabel());
+                temp.put("layoutDepthUnit", plat.getDepthUnitLabel());
             }
             if (plat.getHeight() != null) {
-            	temp.put("layoutHeight", plat.getHeight());
+                temp.put("layoutHeight", plat.getHeight());
             }
             if (plat.getHeightUnit() != null && !plat.getHeightUnit().isEmpty()) {
-            	temp.put("layoutHeightUnit", plat.getHeightUnitLabel());
-            }            
+                temp.put("layoutHeightUnit", plat.getHeightUnitLabel());
+            }
             boolean cont = true;
             Iterator<FieldOfView> fovIterator = fovs.iterator();
-    		while (fovIterator.hasNext() && cont) {
-    			FieldOfView fov = fovIterator.next();
-            	if (fov.getIsFOVOf() != null && fov.getIsFOVOf().equals(plat.getUri())) {
+            while (fovIterator.hasNext() && cont) {
+                FieldOfView fov = fovIterator.next();
+                if (fov.getIsFOVOf() != null && fov.getIsFOVOf().equals(plat.getUri())) {
                     if (fov.getGeometry() != null && !fov.getGeometry().isEmpty()) {
-                    	temp.put("fovgeometry" , fov.getGeometry());
+                        temp.put("fovgeometry" , fov.getGeometry());
                     }
                     if (fov.getFirstParameter() != null) {
-                    	temp.put("fovparam1", fov.getFirstParameter().toString());
+                        temp.put("fovparam1", fov.getFirstParameter().toString());
                     }
                     if (fov.getFirstParameterUnitLabel() != null && !fov.getFirstParameterUnitLabel().isEmpty()) {
-                    	temp.put("fovparam1Unit", fov.getFirstParameterUnitLabel());
+                        temp.put("fovparam1Unit", fov.getFirstParameterUnitLabel());
                     }
                     if (fov.getFirstParameterCharacteristicLabel() != null && !fov.getFirstParameterCharacteristicLabel().isEmpty()) {
-                    	temp.put("fovparam1Char", fov.getFirstParameterCharacteristicLabel());
+                        temp.put("fovparam1Char", fov.getFirstParameterCharacteristicLabel());
                     }
                     if (fov.getSecondParameter() != null) {
-                    	temp.put("fovparam2", fov.getSecondParameter().toString());
+                        temp.put("fovparam2", fov.getSecondParameter().toString());
                     }
                     if (fov.getSecondParameterUnitLabel() != null && !fov.getSecondParameterUnitLabel().isEmpty()) {
-                    	temp.put("fovparam2Unit", fov.getSecondParameterUnitLabel());
+                        temp.put("fovparam2Unit", fov.getSecondParameterUnitLabel());
                     }
                     if (fov.getSecondParameterCharacteristicLabel() != null && !fov.getSecondParameterCharacteristicLabel().isEmpty()) {
-                    	temp.put("fovparam2Char", fov.getSecondParameterCharacteristicLabel());
+                        temp.put("fovparam2Char", fov.getSecondParameterCharacteristicLabel());
                     }
                     if (fov.getThirdParameter() != null) {
-                    	temp.put("fovparam3", fov.getThirdParameter().toString());
+                        temp.put("fovparam3", fov.getThirdParameter().toString());
                     }
                     if (fov.getThirdParameterUnitLabel() != null && !fov.getThirdParameterUnitLabel().isEmpty()) {
-                    	temp.put("fovparam3Unit", fov.getThirdParameterUnitLabel());
+                        temp.put("fovparam3Unit", fov.getThirdParameterUnitLabel());
                     }
                     if (fov.getThirdParameterCharacteristicLabel() != null && !fov.getThirdParameterCharacteristicLabel().isEmpty()) {
-                    	temp.put("fovparam3Char", fov.getThirdParameterCharacteristicLabel());
+                        temp.put("fovparam3Char", fov.getThirdParameterCharacteristicLabel());
                     }
                     cont = false;
-            	}
-    		}
+                }
+            }
             anode.add(temp);
         }
         System.out.println("[platformsQuery] parsed " + anode.size() + " results into array");
@@ -671,55 +671,55 @@ public class RestApi extends Controller {
     }// /platformsQuery
 
     private ArrayNode fieldsOfViewQuery(){
-    	List<FieldOfView> fovs = FieldOfView.find();
+        List<FieldOfView> fovs = FieldOfView.find();
         if (fovs.size() == 0) {
             System.out.println("[fieldsofviewQuery] No fields of view found in blazegraph!");
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
 
         for (FieldOfView fov : fovs) {
             ObjectNode temp = mapper.createObjectNode();
             if (fov.getUri() != null) {
-            	temp.put("uri", fov.getUri());
+                temp.put("uri", fov.getUri());
             }
             if (fov.getLabel() != null && !fov.getLabel().isEmpty()) {
-            	temp.put("label", fov.getLabel());
+                temp.put("label", fov.getLabel());
             }
             if (fov.getIsFOVOf() != null && !fov.getIsFOVOf().isEmpty()) {
-            	temp.put("platform_uri", fov.getIsFOVOf());
+                temp.put("platform_uri", fov.getIsFOVOf());
             }
             if (fov.getGeometry() != null && !fov.getGeometry().isEmpty()) {
-            	temp.put("geometry" , fov.getGeometry());
+                temp.put("geometry" , fov.getGeometry());
             }
             if (fov.getFirstParameter() != null) {
-            	temp.put("param1", fov.getFirstParameter().toString());
+                temp.put("param1", fov.getFirstParameter().toString());
             }
             if (fov.getFirstParameterUnitLabel() != null && !fov.getFirstParameterUnitLabel().isEmpty()) {
-            	temp.put("param1Unit", fov.getFirstParameterUnitLabel());
+                temp.put("param1Unit", fov.getFirstParameterUnitLabel());
             }
             if (fov.getFirstParameterCharacteristicLabel() != null && !fov.getFirstParameterCharacteristicLabel().isEmpty()) {
-            	temp.put("param1Char", fov.getFirstParameterCharacteristicLabel());
+                temp.put("param1Char", fov.getFirstParameterCharacteristicLabel());
             }
             if (fov.getSecondParameter() != null) {
-            	temp.put("param2", fov.getSecondParameter().toString());
+                temp.put("param2", fov.getSecondParameter().toString());
             }
             if (fov.getSecondParameterUnitLabel() != null && !fov.getSecondParameterUnitLabel().isEmpty()) {
-            	temp.put("param2Unit", fov.getSecondParameterUnitLabel());
+                temp.put("param2Unit", fov.getSecondParameterUnitLabel());
             }
             if (fov.getSecondParameterCharacteristicLabel() != null && !fov.getSecondParameterCharacteristicLabel().isEmpty()) {
-            	temp.put("param2Char", fov.getSecondParameterCharacteristicLabel());
+                temp.put("param2Char", fov.getSecondParameterCharacteristicLabel());
             }
             if (fov.getThirdParameter() != null) {
-            	temp.put("param3", fov.getThirdParameter().toString());
+                temp.put("param3", fov.getThirdParameter().toString());
             }
             if (fov.getThirdParameterUnitLabel() != null && !fov.getThirdParameterUnitLabel().isEmpty()) {
-            	temp.put("param3Unit", fov.getThirdParameterUnitLabel());
+                temp.put("param3Unit", fov.getThirdParameterUnitLabel());
             }
             if (fov.getThirdParameterCharacteristicLabel() != null && !fov.getThirdParameterCharacteristicLabel().isEmpty()) {
-            	temp.put("param3Char", fov.getThirdParameterCharacteristicLabel());
+                temp.put("param3Char", fov.getThirdParameterCharacteristicLabel());
             }
             anode.add(temp);
         }
@@ -729,43 +729,43 @@ public class RestApi extends Controller {
 
     private ArrayNode ocQuery(String ocUri){
         if(ocUri == null){
-            return null; 
+            return null;
         }
-        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?objUri ?typeUri ?studyUri WHERE { " + 
+        String sparqlQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?objUri ?typeUri ?studyUri WHERE { " +
                 "   ?objUri hasco:isMemberOf  <" + ocUri + "> . " +
                 "   ?objUri a ?typeUri . " +
                 "   <" + ocUri + "> hasco:isMemberOf  ?studyUri . " +
                 " } ";
 
         System.out.println("[ocQuery] sparql query\n" + sparqlQueryString);
-		
-		ResultSetRewindable resultsrw = SPARQLUtils.select(
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), sparqlQueryString);
 
         if (resultsrw.size() == 0) {
             System.out.println("[ocQuery] No objects found in collection " + ocUri);
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode anode = mapper.createArrayNode();
 
         while(resultsrw.hasNext()){
             ObjectNode temp = mapper.createObjectNode();
-			QuerySolution soln = resultsrw.next();
-			if (soln.get("objUri") != null) {
-				temp.put("objectUri", soln.get("objUri").toString());
-			} else {
+            QuerySolution soln = resultsrw.next();
+            if (soln.get("objUri") != null) {
+                temp.put("objectUri", soln.get("objUri").toString());
+            } else {
                 System.out.println("[ocQuery] ERROR: Result returned without URI? Skipping....");
                 continue;
             }
-			if (soln.get("typeUri") != null) {
-				temp.put("typeUri", soln.get("typeUri").toString());
-			}
+            if (soln.get("typeUri") != null) {
+                temp.put("typeUri", soln.get("typeUri").toString());
+            }
             if (soln.get("studyUri") != null) {
-				temp.put("studyUri", soln.get("studyUri").toString());
-			}
+                temp.put("studyUri", soln.get("studyUri").toString());
+            }
             anode.add(temp);
         }// /parse sparql results
         System.out.println("[ocUri] parsed " + anode.size() + " objects into array");
@@ -773,11 +773,11 @@ public class RestApi extends Controller {
     }// /getAllOCs
 
     private STR getSTR(String strUri) {
-	if (strUri == null || strUri.equals("")) {
-	    return null;
-	}
-	STR str = STR.findByUri(strUri);
-	return str;
+        if (strUri == null || strUri.equals("")) {
+            return null;
+        }
+        STR str = STR.findByUri(strUri);
+        return str;
     }// /getSTR
 
 // ********
@@ -945,7 +945,7 @@ public class RestApi extends Controller {
         System.out.println("[RestAPI] type: " + result.getTypeUri());
         if(result == null || result.getTypeUri() == null || result.getTypeUri() == ""){
             return notFound(ApiUtil.createResponse("Study with name/ID " + studyUri + " not found", false));
-        } 
+        }
         // get the list of variables in that study
         // serialize the Study object first as ObjectNode
         //   as JsonNode is immutable and meant to be read-only
@@ -1023,25 +1023,25 @@ public class RestApi extends Controller {
         if (studyUri == null) {
             return badRequest(ApiUtil.createResponse("No study specified", false));
         }
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?uri ?ocType WHERE { \n" + 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri ?ocType WHERE { \n" +
                 "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . \n" +
                 "   ?uri a ?ocType . \n" +
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         ArrayNode anode = mapper.createArrayNode();
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             ObjectNode temp = mapper.createObjectNode();
-            if (soln.getResource("uri").getURI() != null && soln.getResource("ocType") != null) { 
-    			temp.put("uri", soln.get("uri").toString());
-    			temp.put("ocType", soln.get("ocType").toString());
-    		} else {
+            if (soln.getResource("uri").getURI() != null && soln.getResource("ocType") != null) {
+                temp.put("uri", soln.get("uri").toString());
+                temp.put("ocType", soln.get("ocType").toString());
+            } else {
                 System.out.println("[GetUnitsInStudy] ERROR: Result returned without URI? Skipping....");
                 continue;
             }
@@ -1050,7 +1050,7 @@ public class RestApi extends Controller {
 
         System.out.println("[getOCListInStudy] parsed " + anode.size() + " results into array");
         System.out.println("[getOCListInStudy] done");
-        
+
         if(anode.size() < 1){
             return notFound(ApiUtil.createResponse("No object collections found for study " + studyUri, false));
         } else {
@@ -1058,9 +1058,9 @@ public class RestApi extends Controller {
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getOCsInStudy
- 
+
 //*************
-//GET SPECIFIC: 
+//GET SPECIFIC:
 //*************
 
     // ******
@@ -1149,7 +1149,7 @@ public class RestApi extends Controller {
     private JsonNode parseMeasurements(SolrDocumentList solrResults) {
 
         ObjectMapper mapper = new ObjectMapper();
-	Map<String, STR> strMap = new HashMap<String, STR>();
+        Map<String, STR> strMap = new HashMap<String, STR>();
 
         // parse results
         ArrayNode anode = mapper.createArrayNode();
@@ -1157,16 +1157,16 @@ public class RestApi extends Controller {
         while (i.hasNext()) {
 
             SolrDocument doc = i.next();
-	    STR str = null;
-	    String strUri = SolrUtils.getFieldValue(doc, "acquisition_uri_str");
-	    if (!strMap.containsKey(strUri)) {
-		str = getSTR(strUri);
-		if (str != null) {
-		    strMap.put(strUri, str);
-		}
-	    } else {
-		str = strMap.get(strUri);
-	    }
+            STR str = null;
+            String strUri = SolrUtils.getFieldValue(doc, "acquisition_uri_str");
+            if (!strMap.containsKey(strUri)) {
+                str = getSTR(strUri);
+                if (str != null) {
+                    strMap.put(strUri, str);
+                }
+            } else {
+                str = strMap.get(strUri);
+            }
             ObjectNode temp = mapper.createObjectNode();
             temp.put("measurementuri", SolrUtils.getFieldValue(doc, "uri"));
             temp.put("studyuri", SolrUtils.getFieldValue(doc, "study_uri_str"));
@@ -1177,29 +1177,29 @@ public class RestApi extends Controller {
             temp.put("timeValue", SolrUtils.getFieldValue(doc, "time_value_double"));
             temp.put("timeUnit", SolrUtils.getFieldValue(doc, "time_value_unit_uri_str"));
             temp.put("timestamp", SolrUtils.getFieldValue(doc, "timestamp_date"));
-	    if (str == null || str.getDeployment() == null) {
-		temp.put("platform", "");
-		temp.put("instrument", "");
-	    } else {
-		if (str.getDeployment() != null && str.getDeployment().getPlatform() != null) {
-		    if (str.getDeployment().getPlatform().getLabel() != null) {
-			temp.put("platform", str.getDeployment().getPlatform().getLabel());
-		    } else {
-			temp.put("platform", str.getDeployment().getPlatform().getUri());
-		    }
-		} else {
-		    temp.put("platform", "");
-		}
-		if (str.getDeployment() != null && str.getDeployment().getInstrument() != null) {
-		    if (str.getDeployment().getInstrument().getLabel() != null) {
-			temp.put("instrument", str.getDeployment().getInstrument().getLabel());
-		    } else {
-			temp.put("instrument", str.getDeployment().getInstrument().getUri());
-		    }
-		} else {
-		    temp.put("instrument", "");
-		}
-	    }
+            if (str == null || str.getDeployment() == null) {
+                temp.put("platform", "");
+                temp.put("instrument", "");
+            } else {
+                if (str.getDeployment() != null && str.getDeployment().getPlatform() != null) {
+                    if (str.getDeployment().getPlatform().getLabel() != null) {
+                        temp.put("platform", str.getDeployment().getPlatform().getLabel());
+                    } else {
+                        temp.put("platform", str.getDeployment().getPlatform().getUri());
+                    }
+                } else {
+                    temp.put("platform", "");
+                }
+                if (str.getDeployment() != null && str.getDeployment().getInstrument() != null) {
+                    if (str.getDeployment().getInstrument().getLabel() != null) {
+                        temp.put("instrument", str.getDeployment().getInstrument().getLabel());
+                    } else {
+                        temp.put("instrument", str.getDeployment().getInstrument().getUri());
+                    }
+                } else {
+                    temp.put("instrument", "");
+                }
+            }
 
             anode.add(temp);
         }// /parse solr results
@@ -1217,35 +1217,35 @@ public class RestApi extends Controller {
             SolrDocument doc = i.next();
             return SolrUtils.getFieldValue(doc, "timestamp_date");
         }
-	return null;
+        return null;
     }
 
     private String parseSTRs(SolrDocumentList solrResults) {
         Iterator<SolrDocument> i = solrResults.iterator();
-	List<String> uris = new ArrayList<String>();
+        List<String> uris = new ArrayList<String>();
         while (i.hasNext()) {
             SolrDocument doc = i.next();
-	    uris.add(SolrUtils.getFieldValue(doc, "uri"));
+            uris.add(SolrUtils.getFieldValue(doc, "uri"));
         }
-	String str = "";
-	if (uris.size() == 1) {
-	    str = "acquisition_uri_str:\"" + uris.get(0) + "\"";
-	    return str;
-	} 
+        String str = "";
+        if (uris.size() == 1) {
+            str = "acquisition_uri_str:\"" + uris.get(0) + "\"";
+            return str;
+        }
 
-	if (uris.size() > 0) {
-	    str = "( ";
-	    for (int uri = 0; uri < uris.size(); uri++) {
-		str += "acquisition_uri_str:\"" + uris.get(uri) + "\"";
-		if (uri < (uris.size() - 1)) {
-		    str += " OR ";
-		}
-	    }
-	    str += ")";
-	    return str;
-	}
+        if (uris.size() > 0) {
+            str = "( ";
+            for (int uri = 0; uri < uris.size(); uri++) {
+                str += "acquisition_uri_str:\"" + uris.get(uri) + "\"";
+                if (uri < (uris.size() - 1)) {
+                    str += " OR ";
+                }
+            }
+            str += ")";
+            return str;
+        }
 
-	return null;
+        return null;
     }
 
     // :study_uri/:variable_uri/

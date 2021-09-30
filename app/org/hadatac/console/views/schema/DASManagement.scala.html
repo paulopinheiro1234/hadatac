@@ -1,38 +1,39 @@
-@(results : List[org.hadatac.entity.pojo.DataAcquisitionSchema])
+@import org.hadatac.console.views.html.schema.DAS_entry
+@(results : List[org.hadatac.entity.pojo.DataAcquisitionSchema], userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Semantic Data Dictionary Management") {
+@main("Semantic Data Dictionary Management","",userName) {
 
-   <h3>Semantic Data Dictionary Management</h3>
-    
-   <hr>
+    <h3>Semantic Data Dictionary Management</h3>
 
-   <h4>Existing Semantic Data Dictionaries</h4>
-   
+    <hr>
+
+    <h4>Existing Semantic Data Dictionaries</h4>
+
     <div class="container-fluid">
         <table class="table">
             <thead>
-                 <tr>
+                <tr>
                     <th>Name</th>
-		            <th>Version</th>
-		            <th>No. Attributes</th>
+                    <th>Version</th>
+                    <th>No. Attributes</th>
                     <th>No. Assoc. Object</th>
                     <th>Operations</th>
-                 </tr>
+                </tr>
             </thead>
             <tbody>
-              @for(das <- results){
-                  @DAS_entry(das)
-              }
+            @for(das <- results){
+                @DAS_entry(das)
+            }
             </tbody>
         </table>
- 
+
         @mainButton(false)
 
     </div>
- 
+
 
 }

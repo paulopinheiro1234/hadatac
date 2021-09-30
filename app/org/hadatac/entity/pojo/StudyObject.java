@@ -6,17 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.ByteArrayOutputStream;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -32,7 +23,6 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
-import org.hadatac.metadata.loader.URIUtils;
 
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
@@ -316,6 +306,34 @@ public class StudyObject extends HADatAcThing {
         return retrievedUris;
     }
 
+    public static List<String> retrieveScopeUrisFacetSearch(String obj_uri) {
+
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?scopeUri WHERE { " +
+                " <" + obj_uri + "> hasco:hasObjectScope ?scopeUri . " +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("scopeUri") != null && soln.getResource("scopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("scopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
     public static List<String> retrieveUrisScopedByThisUri(String obj_uri) {
         List<String> retrievedUris = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -355,6 +373,34 @@ public class StudyObject extends HADatAcThing {
         //System.out.println("Study.retrieveTimeScopeUris() queryString: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("timeScopeUri") != null && soln.getResource("timeScopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("timeScopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveTimeScopeUrisFacetSearch(String obj_uri) {
+
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?timeScopeUri WHERE { " +
+                " <" + obj_uri + "> hasco:hasTimeObjectScope ?timeScopeUri . " +
+                "}";
+
+       ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
@@ -414,6 +460,34 @@ public class StudyObject extends HADatAcThing {
         //System.out.println("Study.retrieveSpaceScopeUris() queryString: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            return retrievedUris;
+        }
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                try {
+                    if (soln.getResource("spaceScopeUri") != null && soln.getResource("spaceScopeUri").getURI() != null) {
+                        retrievedUris.add(soln.getResource("spaceScopeUri").getURI());
+                    }
+                } catch (Exception e1) {
+                }
+            }
+        }
+        return retrievedUris;
+    }
+
+    public static List<String> retrieveSpaceScopeUrisFacetSearch(String obj_uri) {
+
+        List<String> retrievedUris = new ArrayList<String>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?spaceScopeUri WHERE { " +
+                " <" + obj_uri + "> hasco:hasSpaceObjectScope ?spaceScopeUri . " +
+                "}";
+
+       ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
@@ -514,7 +588,98 @@ public class StudyObject extends HADatAcThing {
 
         return obj;
     }
-    
+
+    public static StudyObject findFacetSearch(String obj_uri, String studyId) {
+
+        StudyObject obj = null;
+        if (obj_uri == null || obj_uri.trim().equals("")) {
+            return obj;
+        }
+        obj_uri = obj_uri.trim();
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT  ?objType ?originalId ?isMemberOf ?hasLabel ?hasComment WHERE { \n" +
+                "    <" + obj_uri + "> a ?objType . \n" +
+                "    <" + obj_uri + "> hasco:isMemberOf ?isMemberOf . \n" +
+                "    OPTIONAL { <" + obj_uri + "> hasco:originalID ?originalId } . \n" +
+                "    OPTIONAL { <" + obj_uri + "> rdfs:label ?hasLabel } . \n" +
+                "    OPTIONAL { <" + obj_uri + "> rdfs:comment ?hasComment } . \n" +
+                "}";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            //System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: <" + obj_uri + ">");
+            return obj;
+        }
+
+        String typeStr = "";
+        String originalIdStr = "";
+        String isMemberOfStr = "";
+        String commentStr = "";
+
+        String studyTag = "";
+        if ( studyId.contains("STD-") ) {
+            studyTag = studyId.substring(studyId.indexOf("STD-") + "STD-".length());
+        }
+
+        boolean matchFound = false;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+
+                try {
+                    if (soln.getResource("objType") != null && soln.getResource("objType").getURI() != null) {
+                        typeStr = soln.getResource("objType").getURI();
+                    }
+                } catch (Exception e1) {
+                    typeStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("originalId") != null && soln.getLiteral("originalId").getString() != null) {
+                        originalIdStr = soln.getLiteral("originalId").getString();
+                    }
+                } catch (Exception e1) {
+                    originalIdStr = "";
+                }
+
+                try {
+                    if (soln.getResource("isMemberOf") != null && soln.getResource("isMemberOf").getURI() != null) {
+                        isMemberOfStr = soln.getResource("isMemberOf").getURI();
+                        if ( isMemberOfStr != null && isMemberOfStr.contains(studyTag) ) matchFound = true;
+                    }
+                } catch (Exception e1) {
+                    isMemberOfStr = "";
+                }
+
+                try {
+                    if (soln.getLiteral("hasComment") != null && soln.getLiteral("hasComment").getString() != null) {
+                        commentStr = soln.getLiteral("hasComment").getString();
+                    }
+                } catch (Exception e1) {
+                    commentStr = "";
+                }
+
+                if ( matchFound ) {
+                    obj = new StudyObject(obj_uri,
+                            typeStr,
+                            originalIdStr,
+                            FirstLabel.getLabelFacetSearch(obj_uri),
+                            isMemberOfStr,
+                            commentStr,
+                            retrieveScopeUrisFacetSearch(obj_uri),
+                            retrieveTimeScopeUrisFacetSearch(obj_uri),
+                            retrieveSpaceScopeUrisFacetSearch(obj_uri));
+                    break;
+                }
+            }
+        }
+
+        return obj;
+    }
+
     public static Map<String, String> buildCachedUriByOriginalId() {
         Map<String, String> cache = new HashMap<String, String>();
         
@@ -592,6 +757,102 @@ public class StudyObject extends HADatAcThing {
         //System.out.println("buildCachedObjectBySocAndOriginalId: " + cache.size());
 
         return cache;
+    }
+
+    /*
+     * Function: Retrieves role of Study Object's SOC 
+     * Return: SOC's role 
+     */
+    public static String findSocRole(String objUri) {
+    	//System.out.println("Inside StudyObject.findSocRole");
+    	if (objUri == null || objUri.isEmpty()) {
+    		return null;
+    	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        		" select * where { " +
+        		" <" + objUri + "> hasco:isMemberOf ?obj . " +
+        		" ?obj hasco:hasRoleLabel ?role . " +
+        	  	" } ";
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        if (resultsrw.size() >= 1) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("role").toString() != null) {
+                    return soln.get("role").toString();
+                }
+            }
+        } else {
+            System.out.println("[WARNING] StudyObject. Could not find SOC's Role ofr OBJ URI [" + objUri + "]");
+        }
+        return null;
+    }
+
+    /*
+     * Function: Retrieves upstream SOC's from a given Study Object's URI, if any.
+     *           A Study Object belonging to a grounded SOC, i.e., a SOC that is not
+     *           the scope of any other SOC, would not have any upstream SOC. 
+     * Return: List of pairs <SOC's URI, SOC's role> 
+     */
+    public static List<Map<String,String>> findUpstreamSocs(String objUri) {
+    	//System.out.println("Inside StudyObject.findUpstreamSocs");
+    	List<Map<String,String>> resp = new ArrayList<Map<String,String>>();
+    	if (objUri == null || objUri.isEmpty()) {
+    		return resp;
+    	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        	  " select * where { " +
+        	  " <" + objUri + "> hasco:hasObjectScope+ ?obj . " +
+        	  " ?obj hasco:isMemberOf ?soc . " +
+        	  " ?soc hasco:hasRoleLabel ?role . " +
+        	  " } ";
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("obj") != null && soln.get("soc") != null && soln.get("role") != null) {
+                    Map<String,String> entry = new HashMap<String,String>();
+                    entry.put(soln.get("obj").toString(),soln.get("role").toString());
+                    resp.add(entry);
+                }
+            }
+        }        
+        return resp;
+    }
+
+    /*
+     * Function: Retrieves downstream SOC's from a given Study Object's URI, if any. 
+     *           A Study Object belonging to a leaf SOC, i.e., a SOC that is not in 
+     *           the scope of any other SOC, would not have any upstream SOC. 
+     * Return: List of pairs <SOC's URI, SOC's role> 
+     */
+    public static List<Map<String,String>> findDownstreamSocs(String objUri, String originalId, String alignmentType) {
+    	//System.out.println("Inside StudyObject.findDownstreamSocs");
+    	List<Map<String,String>> resp = new ArrayList<Map<String,String>>();
+    	if (objUri == null || objUri.isEmpty()) {
+    		return resp;
+    	}
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
+        		" select * where { " +
+        		" ?obj hasco:hasObjectScope+ <" + objUri + "> . " +
+        		" ?obj hasco:isMemberOf ?soc . " +
+        		" ?soc hasco:hasRoleLabel \"" + alignmentType + "\" ." +
+        	  	" } ";
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null) {
+                if (soln.get("obj") != null) {
+                    Map<String,String> entry = new HashMap<String,String>();
+                    entry.put(soln.get("obj").toString(),alignmentType);
+                    resp.add(entry);
+                    return resp;
+                }
+            }
+        }
+        return resp;
     }
 
     public static String findUriBySocAndOriginalId(String socUri, String original_id) {
@@ -1026,3 +1287,4 @@ public class StudyObject extends HADatAcThing {
         return 0;
     }
 }
+

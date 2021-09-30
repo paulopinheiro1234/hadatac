@@ -4,202 +4,208 @@
 @import org.hadatac.console.controllers.dataacquisitionsearch.Downloader
 
 @(	page         : Int,
-	rows         : Int,
-	facets       : String,
-	resultsSize  : Long,
-	results      : org.hadatac.data.model.AcquisitionQueryResult,
-	documentJson : String,
-	objDetails   : String,
-	objFields    : List[String],
-	objOCs       : List[org.hadatac.entity.pojo.ObjectCollection]
+        rows         : Int,
+        facets       : String,
+        resultsSize  : Long,
+        results      : org.hadatac.data.model.AcquisitionQueryResult,
+        documentJson : String,
+        objDetails   : String,
+        objFields    : List[String],
+        objOCs       : List[org.hadatac.entity.pojo.ObjectCollection]
 )
 
 <div id="myModalDownload" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal">&times;</button>
-	<h4 class="modal-title">Download</h4>
-      </div>
-      <div class="modal-body">
-        
-	<form id="downloadDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download()">
-	  <table class="table">
-	    <thead>
-	      <tr>
-     	      <th>Select Fields</th>
-	    	  <th>
-		         <label><input type="checkbox" id="select_all" onchange="toggleAll(this)" checked> Select All</label>
-		      </th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      @for(field <- objFields) {
-	          <tr>
-	             <td><input type="checkbox" name="@field" id="@field" checked></td>
-	             <td>@if(field != null) { @field }</td>
-	          </tr>
-	      }
-	    </tbody>
-	  </table>
-	  <input class="btn btn-info" type="submit" value="Confirm" />
-	</form>
-	
-	<script type="text/javascript">
-          function toggleAll(source) {
-             var names = [];
-             @if(objFields != null) {
-                @for(id <- objFields) {
-                   names.push('@id');
-                }
-             }
-             
-             var i;
-             for(i = 0; i < names.length; i++) {
-                document.getElementById(names[i]).checked = source.checked;
-             }
-	   }
-				    
-	   $("#downloadDialogForm").submit(function(eventObj) {
-               $('<input />').attr('type', 'hidden')
-			    .attr('name', "facets")
-			    .attr('value', getSelectedFacets())
-			    .appendTo(this);
-			    return true;
-			    });
-				    
-       $("#alignmentDialogForm").submit(function(eventObj) {
-		    $('<input />').attr('type', 'hidden')
-		    .attr('name', "facets")
-		    .attr('value', getSelectedFacets())
-		    .appendTo(this);
-		    return true;
-		    });
-	</script>
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Download</h4>
+            </div>
+            <div class="modal-body">
+
+                <form id="downloadDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.download()">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Select Fields</th>
+                                <th>
+                                    <label><input type="checkbox" id="select_all" onchange="toggleAll(this)" checked> Select All</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(field <- objFields) {
+                            <tr>
+                                <td><input type="checkbox" name="@field" id="@field" checked></td>
+                                <td>@if(field != null) { @field }</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    <input class="btn btn-info" type="submit" value="Confirm" />
+                </form>
+
+                <script type="text/javascript">
+                        function toggleAll(source) {
+                            var names = [];
+                            @if(objFields != null) {
+                            @for(id <- objFields) {
+                            names.push('@id');
+                            }
+                            }
+
+                            var i;
+                            for(i = 0; i < names.length; i++) {
+                                document.getElementById(names[i]).checked = source.checked;
+                            }
+                        }
+
+                        $("#downloadDialogForm").submit(function(eventObj) {
+                            $('<input />').attr('type', 'hidden')
+                                    .attr('name', "facets")
+                                    .attr('value', getSelectedFacets())
+                                    .appendTo(this);
+                            return true;
+                        });
+
+                        $("#alignmentDialogForm").submit(function(eventObj) {
+                            console.log("this:"+this);
+                            $('<input />').attr('type', 'hidden')
+                                    .attr('name', "facets")
+                                    .attr('value', getSelectedFacets())
+                                    .appendTo(this);
+                            return true;
+                        });
+                </script>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div id="myModalAlignment" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal">&times;</button>
-	<h4 class="modal-title">Alignment</h4>
-      </div>
-      <div class="modal-body">
-	<form id="alignmentDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadAlignment()">
-	  <!--label for="selType">Alignment criteria:</label>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Alignment</h4>
+            </div>
+            <div class="modal-body">
+                <form id="alignmentDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadAlignment()">
+                        <!--label for="selType">Alignment criteria:</label>
 	  <select class="form-control" name="selType" id="selType" onchange="criteriaChange()">
 	    <option value="timestamp">Timestamp</option>
 	    <option value="object">Object</option>
 	  </select-->
-	  <label for="selOC">Alignment type:</label>
-	  <select class="form-control" name="selObjectType" id="selObjectType">
-	    <option value="@Downloader.ALIGNMENT_SUBJECT">BY SUBJECT</option>
-	    <option value="@Downloader.ALIGNMENT_TIME">BY TIME</option>
-	  </select>
-	  <label for="selCatVal">Categorical Values:</label>
-	  <select class="form-control" name="selCatValue" id="selCatValue">
-	    <option value="withCodeBook">Use Codes and Generate Code Book</option>
-	    <option value="withCodes">Use Codes Without Generating Code Book</option>
-	    <option value="withValues">Use Values</option>
-	  </select>
-	  <label for="selTimeRes">Time Resolution (for time alignment):</label>
-	  <select class="form-control" name="selTimeRes" id="selTimeRes">
-	    <option value="yyyy-MM-dd HH:mm:ss.SSS">yyyy-MM-dd HH:mm:ss.SSS</option>
-	    <option value="yyyy-MM-dd HH:mm:ss.SS">yyyy-MM-dd HH:mm:ss.SS</option>
-	    <option value="yyyy-MM-dd HH:mm:ss.S">yyyy-MM-dd HH:mm:ss.S</option>
-	    <option value="yyyy-MM-dd HH:mm:ss">yyyy-MM-dd HH:mm:ss</option>
-	  </select>
-          <br>
-	  <input class="btn btn-info" type="submit" id="submitAlignment" value="Confirm" />
-	</form>
-	<script type="text/javascript">
-	  $("#alignmentDialogForm").submit(function(eventObj) {
-	  $('<input />').attr('type', 'hidden')
-	  .attr('name', "facets")
-	  .attr('value', getSelectedFacets())
-	  .appendTo(this);
-	  return true;
-	  });
-	</script>
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
+                    <label for="selOC">Alignment type:</label>
+                    <select class="form-control" name="selObjectType" id="selObjectType">
+                        <option value="@Downloader.ALIGNMENT_SUBJECT">BY SUBJECT</option>
+                        <option value="@Downloader.ALIGNMENT_TIME">BY TIME</option>
+                    </select>
+                    <label for="selCatVal">Categorical Values:</label>
+                    <select class="form-control" name="selCatValue" id="selCatValue">
+                        <option value="withCodeBook">Use Codes and Generate Code Book</option>
+                        <option value="withCodes">Use Codes Without Generating Code Book</option>
+                        <option value="withValues">Use Values</option>
+                    </select>
+                    <label for="selTimeRes">Time Resolution (for time alignment):</label>
+                    <select class="form-control" name="selTimeRes" id="selTimeRes">
+                        <option value="yyyy-MM-dd HH:mm:ss.SSS">yyyy-MM-dd HH:mm:ss.SSS</option>
+                        <option value="yyyy-MM-dd HH:mm:ss.SS">yyyy-MM-dd HH:mm:ss.SS</option>
+                        <option value="yyyy-MM-dd HH:mm:ss.S">yyyy-MM-dd HH:mm:ss.S</option>
+                        <option value="yyyy-MM-dd HH:mm:ss">yyyy-MM-dd HH:mm:ss</option>
+                    </select>
+                    <label for="selDupOpt">For duplicated values:</label>
+                    <select class="form-control" name="selDupOpt" id="selDupOpt">
+                        <option value="eliminateDuplication">Eliminate Duplicated Values</option>
+                        <option value="keepDuplication">Keep Duplicated Values</option>
+                    </select>
+                    <br>
+                    <input class="btn btn-info" type="submit" id="submitAlignment" value="Confirm" />
+                </form>
+                <script type="text/javascript">
+                        $("#alignmentDialogForm").submit(function(eventObj) {
+                            $('<input />').attr('type', 'hidden')
+                                    .attr('name', "facets")
+                                    .attr('value', getSelectedFacets())
+                                    .appendTo(this);
+                            return true;
+                        });
+                </script>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div id="myModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal">&times;</button>
-	<h4 class="modal-title">Download</h4>
-      </div>
-      <div class="modal-body">
-	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalDownload" data-dismiss="modal">One Value per Row</button>
-	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Multiple Values per Row</button>
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Download</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalDownload" data-dismiss="modal">One Value per Row</button>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Multiple Values per Row</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script type="text/javascript">
-    function checkform() {
-		var cansubmit = true;
+        function checkform() {
+            var cansubmit = true;
 
-		if (cansubmit) {
-			document.getElementById('submitAlignment').disabled = false;
-		} else {
-			document.getElementById('submitAlignment').disabled = true;
-		}
-	}
+            if (cansubmit) {
+                document.getElementById('submitAlignment').disabled = false;
+            } else {
+                document.getElementById('submitAlignment').disabled = true;
+            }
+        }
 
-	function replaceAll(str, find, replace) {
-		while (str.indexOf(find) > -1) {
-			str = str.replace(find, replace);
-		}
-		return str;
-	}
-    
-	function criteriaChange() {
-		var selType = document.getElementById('selType');
-		var selObjectType = document.getElementById('selObjectType');
-		var selAttribute = document.getElementById('selAttribute');
-		var submitAlignment = document.getElementById('submitAlignment');
-		if (selType.options[selType.selectedIndex].value == 'timestamp') {
-			selObjectType.disabled = true;
-			selAttribute.disabled = true;
-			submitAlignment.disabled = true;
-		}
-		else {
-			selObjectType.disabled = false;
-			selAttribute.disabled = false;
-			submitAlignment.disabled = false;
-		}
-	}
-	
-	function ocChange() {
-		var selAttribute = document.getElementById('selAttribute');
-		removeOptions(selAttribute);
-	}
-    
-	function removeOptions(selectbox)
-	{
-		var i;
-		for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
-		{
-			selectbox.remove(i);
-		}
-	}
-  </script>
+        function replaceAll(str, find, replace) {
+            while (str.indexOf(find) > -1) {
+                str = str.replace(find, replace);
+            }
+            return str;
+        }
+
+        function criteriaChange() {
+            var selType = document.getElementById('selType');
+            var selObjectType = document.getElementById('selObjectType');
+            var selAttribute = document.getElementById('selAttribute');
+            var submitAlignment = document.getElementById('submitAlignment');
+            if (selType.options[selType.selectedIndex].value == 'timestamp') {
+                selObjectType.disabled = true;
+                selAttribute.disabled = true;
+                submitAlignment.disabled = true;
+            }
+            else {
+                selObjectType.disabled = false;
+                selAttribute.disabled = false;
+                submitAlignment.disabled = false;
+            }
+        }
+
+        function ocChange() {
+            var selAttribute = document.getElementById('selAttribute');
+            removeOptions(selAttribute);
+        }
+
+        function removeOptions(selectbox)
+        {
+            var i;
+            for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+            {
+                selectbox.remove(i);
+            }
+        }
+</script>

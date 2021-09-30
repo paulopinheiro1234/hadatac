@@ -1,6 +1,8 @@
 package org.hadatac.console.controllers.metadata;
 
+import org.hadatac.console.controllers.Application;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import org.hadatac.console.views.html.metadata.*;
 import org.hadatac.console.controllers.schema.EditingOptions;
@@ -18,21 +20,27 @@ import org.hadatac.console.views.html.workingfiles.*;
 import org.hadatac.entity.pojo.DataFile;
 import play.libs.Json;
 
+import javax.inject.Inject;
+
+
 public class BrowseOntology extends Controller {
+    @Inject
+    Application application;
+
     String file_id;
-    public Result index(String oper) {
-	return ok(browseOntology.render(oper, EditingOptions.getEntities(), EditingOptions.getAttributes(), EditingOptions.getUnits()));
+    public Result index(String oper, Http.Request request) {
+        return ok(browseOntology.render(oper, EditingOptions.getEntities(), EditingOptions.getAttributes(), EditingOptions.getUnits(),application.getUserEmail(request)));
     }
 
-    public Result postIndex(String oper) {
-	return index(oper);
+    public Result postIndex(String oper,Http.Request request) {
+        return index(oper,request);
     }
 
-    public Result graphIndex(String oper, String className) {
-        
-    //System.out.println(className);
-    //System.out.println(EditingOptions.getHierarchy(className));
-    return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(),getF_ID()));
+    public Result graphIndex(String oper, String className,Http.Request request) {
+
+        //System.out.println(className);
+        //System.out.println(EditingOptions.getHierarchy(className));
+        return ok(browseKnowledgeGraph.render(oper, className, EditingOptions.getHierarchy(className), getLoadedList(),getF_ID(),application.getUserEmail(request)));
     }
 
 
@@ -46,7 +54,7 @@ public class BrowseOntology extends Controller {
             System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
             try{
                 folder.mkdir();
-            } 
+            }
             catch(SecurityException se){
                 System.out.println("Failed to create directory.");
             }
@@ -76,7 +84,7 @@ public class BrowseOntology extends Controller {
         file_id=fileid;
         return new Result(200);
     }
-    
+
 
     public String getF_ID(){
         return file_id;

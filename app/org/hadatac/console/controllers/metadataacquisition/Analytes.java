@@ -1,6 +1,11 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.hadatac.console.controllers.AuthApplication;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -15,7 +20,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
 import org.hadatac.console.models.SysUser;
@@ -30,26 +34,30 @@ import com.typesafe.config.ConfigFactory;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
+import javax.inject.Inject;
+
 
 public class Analytes extends Controller {
+    @Inject
+    private Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index() {
-        final SysUser user = AuthApplication.getLocalUser(session());
-        String collection = ConfigFactory.load().getString("hadatac.console.host_deploy") + 
-                request().path() + "/solrsearch";
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+        String collection = ConfigFactory.load().getString("hadatac.console.host_deploy") +
+                request.path() + "/solrsearch";
         List<String> indicators = getIndicators();
 
-        return ok(analytes.render(collection, indicators, user.isDataManager()));
+        return ok(analytes.render(collection, indicators, user.isDataManager(),user.getEmail()));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex() {
-        return index();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(Http.Request request) {
+        return index(request);
     }
 
     public static List<String> getIndicators() {
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() 
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT DISTINCT ?indicatorLabel WHERE { "
                 + " ?subTypeUri rdfs:subClassOf* hasco:Study . "
                 + " ?studyUri a ?subTypeUri . "
@@ -58,8 +66,8 @@ public class Analytes extends Controller {
                 + " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
                 + " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
                 + " ?indicator rdfs:subClassO hhear:TargetedAnalyte . "
-                + " ?indicator rdfs:label ?indicatorLabel . " 
-                + " ?attribute rdfs:subClassOf+ ?indicator . " 
+                + " ?indicator rdfs:label ?indicatorLabel . "
+                + " ?attribute rdfs:subClassOf+ ?indicator . "
                 + " ?attribute rdfs:label ?attributeLabel . "
                 + " }";
 
@@ -73,12 +81,12 @@ public class Analytes extends Controller {
         }
         java.util.Collections.sort(results);
 
-        return results; 
+        return results;
     }
 
     @SuppressWarnings("unchecked")
     public static boolean updateAnalytes() {
-        String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList() 
+        String strQuery = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT DISTINCT ?studyUri ?studyLabel ?proj ?studyTitle ?studyComment "
                 + " ?indicatorLabel ?attributeLabel ?agentName ?institutionName WHERE { "
                 + " ?subTypeUri rdfs:subClassOf* hasco:Study . "
@@ -88,9 +96,9 @@ public class Analytes extends Controller {
                 + " ?schemaAttribute hasco:partOfSchema ?schemaUri . "
                 + " ?schemaAttribute hasco:hasAttribute|hasco:hasEntity ?attribute . "
                 + " ?indicator rdfs:subClassOf hhear:TargetedAnalyte . "
-                + " ?indicator rdfs:label ?indicatorLabel . " 
-                + " ?attribute rdfs:subClassOf+ ?indicator . " 
-                + " ?attribute rdfs:label ?attributeLabel . " 
+                + " ?indicator rdfs:label ?indicatorLabel . "
+                + " ?attribute rdfs:subClassOf+ ?indicator . "
+                + " ?attribute rdfs:label ?attributeLabel . "
                 + " OPTIONAL{ ?studyUri rdfs:label ?studyLabel } . "
                 + " OPTIONAL{ ?studyUri hasco:hasProject ?proj } . "
                 + " OPTIONAL{ ?studyUri skos:definition ?studyTitle } . "
@@ -102,7 +110,7 @@ public class Analytes extends Controller {
                 + " } ";
 
         System.out.println("updateAnalytes strQuery: " + strQuery);
-        
+
         ResultSetRewindable resultsrwStudy = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), strQuery);
 
@@ -121,8 +129,8 @@ public class Analytes extends Controller {
 
             if (soln.contains("studyLabel") && !studyInfo.containsKey("studyLabel_str")) {
                 studyInfo.put("studyLabel_str", "<a href=\""
-                        + ConfigFactory.load().getString("hadatac.console.host_deploy") 
-                        + "/hadatac/metadataacquisitions/viewStudy?study_uri=" 
+                        + ConfigFactory.load().getString("hadatac.console.host_deploy")
+                        + "/hadatac/metadataacquisitions/viewStudy?study_uri="
                         + URIUtils.replaceNameSpaceEx(studyInfo.get("studyUri").toString()) + "\">"
                         + soln.get("studyLabel").toString() + "</a>");
             }
@@ -158,7 +166,7 @@ public class Analytes extends Controller {
                 }
             }
         }
-        
+
         deleteFromSolr();
 
         List<JSONObject> results = new ArrayList<JSONObject>();
@@ -167,7 +175,7 @@ public class Analytes extends Controller {
         }
 
         return SolrUtils.commitJsonDataToSolr(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES), 
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.ANALYTES),
                 results.toString());
     }
 
@@ -190,14 +198,14 @@ public class Analytes extends Controller {
         return -1;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result update() {
         updateAnalytes();
 
         return redirect(routes.Analytes.index());
     }
 
-    @Restrict(@Group(AuthApplication.DATA_MANAGER_ROLE))
+    @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postUpdate() {
         return update();
     }

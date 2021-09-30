@@ -18,7 +18,11 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.Environment;
 import play.data.*;
@@ -45,20 +49,22 @@ public class NewFile extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir) {
-        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir));
-    }
-    
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir) {
-        return index(dir);
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir,Http.Request request) {
+        return ok(newFile.render(FileType.FILETYPES, FileTemplate.TEMPLATETYPES, dir, application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir) {
-        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir,Http.Request request) {
+        return index(dir,request);
+    }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processForm(String dir, Http.Request request) {
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
 
         if (form.hasErrors()) {
@@ -72,26 +78,26 @@ public class NewFile extends Controller {
 
         FileType fileType = FileType.find(newType);
         FileTemplate fileTemplate = FileTemplate.find(newType, newTemplate);
-        
+
         try  {
             String fileName = newType + "-" + newName + fileType.getSuffix();
-            
+
             DataFile dataFile = new DataFile(fileName);
             dataFile.setDir(dir);
-            dataFile.setOwnerEmail(AuthApplication.getLocalUser(session()).getEmail());
+            dataFile.setOwnerEmail(AuthApplication.getLocalUser(application.getUserEmail(request)).getEmail());
             dataFile.setStatus(DataFile.WORKING);
             dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-            
+
             String url = ConfigFactory.load().getString("hadatac.console.host") + fileTemplate.getPath();
-            
+
             File newFile = new File(dataFile.getAbsolutePath());
             FileUtils.copyURLToFile(new URL(url), newFile);
-            
+
             dataFile.save();
         } catch(Exception e) {
             e.printStackTrace();
         }
-        
-        return redirect(routes.WorkingFiles.index(dir, "."));
+
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 }

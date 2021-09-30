@@ -6,7 +6,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 
@@ -25,89 +29,91 @@ import org.hadatac.console.controllers.AuthApplication;
 
 public class EditIndicator extends Controller {
 
-	@Inject
-	private FormFactory formFactory;
+    @Inject
+    private FormFactory formFactory;
+    @Inject
+    private Application application;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String ind_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String ind_uri,Http.Request request) {
 
-		Indicator indicator = null;
+        Indicator indicator = null;
 
-		try {
-			if (ind_uri != null) {
-				ind_uri = URLDecoder.decode(ind_uri, "UTF-8");
-			} else {
-				ind_uri = "";
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        try {
+            if (ind_uri != null) {
+                ind_uri = URLDecoder.decode(ind_uri, "UTF-8");
+            } else {
+                ind_uri = "";
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-		if (!ind_uri.equals("")) {
-			indicator = Indicator.find(ind_uri);
-		} else {
-			return badRequest("No URI is provided to retrieve Indicator");
-		}
+        if (!ind_uri.equals("")) {
+            indicator = Indicator.find(ind_uri);
+        } else {
+            return badRequest("No URI is provided to retrieve Indicator");
+        }
 
-		return ok(editIndicator.render(indicator));
-	}
+        return ok(editIndicator.render(indicator,application.getUserEmail(request)));
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String ind_uri) {
-		return index(ind_uri);
-	}
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String ind_uri,Http.Request request) {
+        return index(ind_uri,request);
+    }
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String ind_uri) {
-		final SysUser sysUser = AuthApplication.getLocalUser(session());
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processForm(String ind_uri, Http.Request request) {
+        final SysUser sysUser = AuthApplication.getLocalUser(application.getUserEmail(request));
 
-		Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest();
-		IndicatorForm data = form.get();
-		List<String> changedInfos = new ArrayList<String>();
+        Form<IndicatorForm> form = formFactory.form(IndicatorForm.class).bindFromRequest(request);
+        IndicatorForm data = form.get();
+        List<String> changedInfos = new ArrayList<String>();
 
-		if (form.hasErrors()) {
-			return badRequest("The submitted form has errors!");
-		}
+        if (form.hasErrors()) {
+            return badRequest("The submitted form has errors!");
+        }
 
-		// store new values
-		String newURI = URIUtils.replacePrefixEx(data.getNewUri());
-		if (newURI == null || newURI.equals("")) {
-			return badRequest("[ERROR] New URI cannot be empty.");
-		}
-		String newLabel = data.getNewLabel();
-		String newComment = data.getNewComment();
+        // store new values
+        String newURI = URIUtils.replacePrefixEx(data.getNewUri());
+        if (newURI == null || newURI.equals("")) {
+            return badRequest("[ERROR] New URI cannot be empty.");
+        }
+        String newLabel = data.getNewLabel();
+        String newComment = data.getNewComment();
 
-		// retrieve old Indicator and corresponding DAS
-		Indicator oldIndicator = Indicator.find(ind_uri);
+        // retrieve old Indicator and corresponding DAS
+        Indicator oldIndicator = Indicator.find(ind_uri);
 
-		// set changes
-		if (oldIndicator != null) {
+        // set changes
+        if (oldIndicator != null) {
 
-			if (oldIndicator.getUri() != null && !oldIndicator.getUri().equals(newURI)) {
-				changedInfos.add(newURI);
-			}
-			if (oldIndicator.getLabel() != null && !oldIndicator.getLabel().equals(newLabel)) {
-				changedInfos.add(newLabel);
-			}
-			if (oldIndicator.getComment() == null || !oldIndicator.getComment().equals(newComment)) {
-				changedInfos.add(newComment);
-			}
-			// delete previous state of the Indicator in the triplestore
-			if (oldIndicator != null) {
-				oldIndicator.delete();
-			}
-		} else {
-			return badRequest("[ERRO] Failed locating existing Indicator.\n");
-		}
+            if (oldIndicator.getUri() != null && !oldIndicator.getUri().equals(newURI)) {
+                changedInfos.add(newURI);
+            }
+            if (oldIndicator.getLabel() != null && !oldIndicator.getLabel().equals(newLabel)) {
+                changedInfos.add(newLabel);
+            }
+            if (oldIndicator.getComment() == null || !oldIndicator.getComment().equals(newComment)) {
+                changedInfos.add(newComment);
+            }
+            // delete previous state of the Indicator in the triplestore
+            if (oldIndicator != null) {
+                oldIndicator.delete();
+            }
+        } else {
+            return badRequest("[ERRO] Failed locating existing Indicator.\n");
+        }
 
-		// insert current state of the Indicator
-		oldIndicator.setUri(newURI);
-		oldIndicator.setLabel(newLabel);
-		oldIndicator.setComment(newComment);
-		// insert the new Indicator content inside of the triplestore regardless of any change -- the previous content has already been deleted
-		oldIndicator.save();
-		
+        // insert current state of the Indicator
+        oldIndicator.setUri(newURI);
+        oldIndicator.setLabel(newLabel);
+        oldIndicator.setComment(newComment);
+        // insert the new Indicator content inside of the triplestore regardless of any change -- the previous content has already been deleted
+        oldIndicator.save();
 
-		return ok(indicatorConfirm.render("Edit Indicator", oldIndicator));
-	}
+
+        return ok(indicatorConfirm.render("Edit Indicator", oldIndicator, sysUser.getEmail()));
+    }
 }

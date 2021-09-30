@@ -1,7 +1,8 @@
-@(dir           : String, 
-  hasSubFolders : Boolean,
-  numberFiles   : Integer,
-  status        : String)
+@(dir           : String,
+        hasSubFolders : Boolean,
+        numberFiles   : Integer,
+        status        : String,
+        userName      : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -9,30 +10,30 @@
 @import org.hadatac.console.views.html.schema._
 @import org.hadatac.console.controllers.schema._
 
-@main("Delete Processed Folder") {
-<div class="container">
-   <h4>Delete Processed Folder</h4>
+@main("Delete Processed Folder","",userName) {
+    <div class="container">
+        <h4>Delete Processed Folder</h4>
 
-    <div class="container-fluid">
-      <div class="row">
-	    <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.processDeleteFolder(dir)">
+        <div class="container-fluid">
+            <div class="row">
+                <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.processDeleteFolder(dir)">
 
-           <div class="form-group">
-              <label>Folder: </label> @dir <br>         
-              <label>Has Subfolder(s): </label> @hasSubFolders <br>         
-              <label>Number of files to be deleted: </label> @numberFiles <br>         
-              <label>Status: </label> @status <br>         
-           </div>
-     
-     	   @if(!hasSubFolders) {
-	       		<input class="btn btn-danger" role="button" type="submit" value="Confirm Folder Deletion" /> OR    
-	       }     
-	       <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir,".")" class="btn btn-primary" role="button">Go back to Data File Management</a>
-	       
-        </form>
-      </div>
+                    <div class="form-group">
+                        <label>Folder: </label> @dir <br>
+                        <label>Has Subfolder(s): </label> @hasSubFolders <br>
+                        <label>Number of files to be deleted: </label> @numberFiles <br>
+                        <label>Status: </label> @status <br>
+                    </div>
+
+                    @if(!hasSubFolders) {
+                        <input class="btn btn-danger" role="button" type="submit" value="Confirm Folder Deletion" /> OR
+                    }
+                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir,".")" class="btn btn-primary" role="button">Go back to Data File Management</a>
+
+                </form>
+            </div>
+        </div>
+
     </div>
-
-</div>
 
 }

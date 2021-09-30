@@ -3,213 +3,212 @@
   theDeployments : List[org.hadatac.entity.pojo.Deployment],
   permissions    : Map[String, String], 
   ownerOptions   : List[String], 
-  bAdmin         : Boolean)
+  bAdmin         : Boolean,
+  userName       : String)
 
 @import helper._ 
 @import org.hadatac.utils._ 
 @import org.hadatac.console.views.html._
-@import org.hadatac.console.views.html.deployments._
-@import org.hadatac.console.controllers.deployments._ 
 @import org.hadatac.console.controllers._ 
 @import org.hadatac.metadata.loader.URIUtils; 
 
 
-@main("New Data Stream") {
+@main("New Data Stream","",userName) {
 
-<script type="text/javascript">
-	   function checkform() {
-	      var cansubmit = true;
-	      
-	      if (document.getElementById('studyId').value.length == 0) {
-              cansubmit = false;
-          }
-	
-	      if (document.getElementById('daName').value.length == 0) {
-	          cansubmit = false;
-	      }
-	
-	      if (document.getElementById('deploymentUri').value.length == 0) {
-	          cansubmit = false;
-	      }
+	<script type="text/javascript">
+			function checkform() {
+				var cansubmit = true;
 
-	      if (document.getElementById('sddName').value.length == 0) {
-	          cansubmit = false;
-	      }
+				if (document.getElementById('studyId').value.length == 0) {
+					cansubmit = false;
+				}
 
-	      @*
-	      if (document.getElementById('cellScope').value.length == 0) {
-	          cansubmit = false;
-	      }
-	                
-	      if (document.getElementById('ownerEmail').value.length == 0) {
-	    	  cansubmit = false;
-	      }
-	      
-	      if (document.getElementById('permissionUri').value.length == 0) {
-	    	  cansubmit = false;
-	      }
-	      *@
-	      
-	      if (cansubmit) {
-	          document.getElementById('submitbutton').disabled = false;
-	      } else {
-	          document.getElementById('submitbutton').disabled = 'disabled';
-	      }
-	   }
+				if (document.getElementById('daName').value.length == 0) {
+					cansubmit = false;
+				}
+
+				if (document.getElementById('deploymentUri').value.length == 0) {
+					cansubmit = false;
+				}
+
+				if (document.getElementById('sddName').value.length == 0) {
+					cansubmit = false;
+				}
+
+				@*
+                if (document.getElementById('cellScope').value.length == 0) {
+                    cansubmit = false;
+                }
+
+                if (document.getElementById('ownerEmail').value.length == 0) {
+                    cansubmit = false;
+                }
+
+                if (document.getElementById('permissionUri').value.length == 0) {
+                    cansubmit = false;
+                }
+                *@
+
+				if (cansubmit) {
+					document.getElementById('submitbutton').disabled = false;
+				} else {
+					document.getElementById('submitbutton').disabled = 'disabled';
+				}
+			}
 	</script>
 
-<div class="container">
-	<h2>New Data Stream</h2>
+	<div class="container">
+		<h2>New Data Stream</h2>
 
-	<form class="form-horizontal" name="newDataAcquisition" method="post"
+		<form class="form-horizontal" name="newDataAcquisition" method="post"
 		action="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.generateSTRFileFromForm("/")">
 
-		<div class="form-group">
-			<label>Study ID</label> <select class="form-control col-sm-6"
-				id="studyId" name="studyId" onchange="checkform()">
-				<option value=""></option> 
+			<div class="form-group">
+				<label>Study ID</label> <select class="form-control col-sm-6"
+			id="studyId" name="studyId" onchange="checkform()">
+				<option value=""></option>
 				@for(study <- theStudies) {
-				  <option value="@study.getId()">@study.getId()</option>
+					<option value="@study.getId()">@study.getId()</option>
 				}
 			</select>
-			<!--  <input type="text"
+					<!--  <input type="text"
 				class="form-control col-sm-6" name="studyId" id="studyId"
 				onchange="checkform()">  -->
-		</div>
+			</div>
 
-		<div class="form-group">
-			<label>Data Acquisition Name</label> (Write the prefix to be used to match a data file to a data acquisition. Please be sure to not include <b>DA-</b> in the prefix)<input type="text"
-				class="form-control col-sm-6" name="daName" id="daName"
-				onchange="checkform()">
-		</div>
+			<div class="form-group">
+				<label>Data Acquisition Name</label> (Write the prefix to be used to match a data file to a data acquisition. Please be sure to not include <b>DA-</b> in the prefix)<input type="text"
+			class="form-control col-sm-6" name="daName" id="daName"
+			onchange="checkform()">
+			</div>
 
-		<div class="form-group">
-			<label>SDD Name</label> <select class="form-control col-sm-6"
-				id="sddName" name="sddName" onchange="checkform()">
-				<option value=""></option> 
+			<div class="form-group">
+				<label>SDD Name</label> <select class="form-control col-sm-6"
+			id="sddName" name="sddName" onchange="checkform()">
+				<option value=""></option>
 				@for(sdd <- theSdds) {
-				  <option value="@sdd.getLabel()">@sdd.getLabel()</option>
+					<option value="@sdd.getLabel()">@sdd.getLabel()</option>
 				}
 			</select>
-			
-			<!--  <input type="text"
+
+					<!--  <input type="text"
 				class="form-control col-sm-6" name="sddName" id="sddName"
 				onchange="checkform()">  -->
-		</div>
+			</div>
 
-		<div class="form-group">
-			<label>Deployment URI</label> <select class="form-control col-sm-6"
-				id="deploymentUri" name="deploymentUri" onchange="checkform()">
+			<div class="form-group">
+				<label>Deployment URI</label> <select class="form-control col-sm-6"
+			id="deploymentUri" name="deploymentUri" onchange="checkform()">
 				<option value=""></option> @for(deployment <- theDeployments) {
 				<option value="@deployment.getUri()">@URIUtils.replaceNameSpaceEx(deployment.getUri())</option>
-				}
+			}
 			</select>
-		</div>
+			</div>
 
-		<div class="form-group">
-			<label>Cell Scope</label> <input type="text"
-				class="form-control col-sm-6" name="cellScope" id="cellScope"
-				onchange="checkform()">
-		</div>
-		
-		@*
-		<div class="form-group">
+			<div class="form-group">
+				<label>Cell Scope</label> <input type="text"
+			class="form-control col-sm-6" name="cellScope" id="cellScope"
+			onchange="checkform()">
+			</div>
+
+			@*
+			<div class="form-group">
 			<label>Stream Specification URI</label> <input type="text"
-				class="form-control col-sm-6" name="newUri" id="newUri"
-				onchange="checkform()">
-		</div>
+			class="form-control col-sm-6" name="newUri" id="newUri"
+			onchange="checkform()">
+			</div>
 
-		<div class="form-group">
+			<div class="form-group">
 			<label>Schema</label> <select class="form-control col-sm-6"
-				id="newSchema" name="newSchema" onchange="checkform()">
-				<option value=""></option> @for(schema <- theSchemas) {
-				<option value="@schema.getUri()">@schema.getUri()</option> }
+			id="newSchema" name="newSchema" onchange="checkform()">
+			<option value=""></option> @for(schema <- theSchemas) {
+			<option value="@schema.getUri()">@schema.getUri()</option> }
 			</select>
-		</div>
+			</div>
 
-		<div class="form-group">
+			<div class="form-group">
 			<label>Parameters: (optional)</label> <input type="text"
-				class="form-control col-sm-6" name="newParameter" id="newParameter"
-				onchange="checkform()">
-		</div>
-		*@
+			class="form-control col-sm-6" name="newParameter" id="newParameter"
+			onchange="checkform()">
+			</div>
+			*@
 
-		<div class="form-group">
-			<label>Owner Email</label> <select class="form-control col-sm-6"
-				id="ownerEmail" name="ownerEmail" onchange="checkform()">
+			<div class="form-group">
+				<label>Owner Email</label> <select class="form-control col-sm-6"
+			id="ownerEmail" name="ownerEmail" onchange="checkform()">
 				<option value=""></option> @for(opt <- ownerOptions) {
 				<option value="@opt">@opt</option> }
 			</select>
-		</div>
+			</div>
 
-		<div class="form-group">
-			<label>Permission URI</label> <select class="form-control col-sm-6"
-				id="permissionUri" name="permissionUri" onchange="checkform()">
+			<div class="form-group">
+				<label>Permission URI</label> <select class="form-control col-sm-6"
+			id="permissionUri" name="permissionUri" onchange="checkform()">
 				<option value=""></option>
 				<option value="Public">Public</option> @for((permUri, permName) <-
-				permissions){
+					permissions){
 				<option value="@permUri">@permName</option> }
 			</select>
-		</div>
+			</div>
 
-        @*
-		<div class="form-group">
+			@*
+			<div class="form-group">
 			<label for="startdate">Start Date/Time</label><br>
 			<div class="container">
-				<div class="row">
-					<div class='col-sm-3'>
-						<div class="form-group">
-							<div class='input-group date' id='startdate'
-								onchange="checkform()">
-								<input type='text' name="newStartDate" id="newStartDate"
-									class="form-control" /> <span class="input-group-addon">
-									<span class="glyphicon glyphicon-calendar"></span>
-								</span>
-							</div>
-						</div>
-					</div>
-					<script type="text/javascript">
-	               $(function () {
-	                   $('#startdate').datetimepicker();
-	                   $('#startdate').on('dp.change', function (e) { checkform(); });
-	               });
-	             </script>
-				</div>
+			<div class="row">
+			<div class='col-sm-3'>
+			<div class="form-group">
+			<div class='input-group date' id='startdate'
+			onchange="checkform()">
+			<input type='text' name="newStartDate" id="newStartDate"
+			class="form-control" /> <span class="input-group-addon">
+			<span class="glyphicon glyphicon-calendar"></span>
+			</span>
 			</div>
-		</div>
+			</div>
+			</div>
+			<script type="text/javascript">
+			$(function () {
+			$('#startdate').datetimepicker();
+			$('#startdate').on('dp.change', function (e) { checkform(); });
+			});
+			</script>
+			</div>
+			</div>
+			</div>
 
-		<div class="form-group">
+			<div class="form-group">
 			<label for="enddate">End Date/Time</label><br>
 			<div class="container">
-				<div class="row">
-					<div class='col-sm-3'>
-						<div class="form-group">
-							<div class='input-group date' id='enddate' onchange="checkform()">
-								<input type='text' name="newEndDate" id="newEndDate"
-									class="form-control" /> <span class="input-group-addon">
-									<span class="glyphicon glyphicon-calendar"></span>
-								</span>
-							</div>
-						</div>
-					</div>
-					<script type="text/javascript">
-	               $(function () {
-	                   $('#enddate').datetimepicker();
-	                   $('#enddate').on('dp.change', function (e) { checkform(); });
-	               });
-	             </script>
-				</div>
+			<div class="row">
+			<div class='col-sm-3'>
+			<div class="form-group">
+			<div class='input-group date' id='enddate' onchange="checkform()">
+			<input type='text' name="newEndDate" id="newEndDate"
+			class="form-control" /> <span class="input-group-addon">
+			<span class="glyphicon glyphicon-calendar"></span>
+			</span>
 			</div>
-		</div>
-		*@
+			</div>
+			</div>
+			<script type="text/javascript">
+			$(function () {
+			$('#enddate').datetimepicker();
+			$('#enddate').on('dp.change', function (e) { checkform(); });
+			});
+			</script>
+			</div>
+			</div>
+			</div>
+			*@
 
-		<div class="form-group" class="col-sm-6 col-offset-3">
-			<input class="btn btn-primary" role="button" id="submitbutton"
+			<div class="form-group" class="col-sm-6 col-offset-3">
+				<input class="btn btn-primary" role="button" id="submitbutton"
 				type="submit" value="Create stream file and Submit to Auto-Annotator"
 				disabled="disabled" /> <a
-				href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
-				class="btn btn-primary" role="button">Cancel</a>
-		</div>
-	</form>
-</div>
+			href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
+			class="btn btn-primary" role="button">Cancel</a>
+			</div>
+		</form>
+	</div>
 }

@@ -32,7 +32,7 @@ public class StudyType extends HADatAcClass implements Comparable<StudyType> {
         List<StudyType> studyTypes = new ArrayList<StudyType>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* " + className + " . " + 
+                " ?uri rdfs:subClassOf* " + className + " . " +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -42,7 +42,7 @@ public class StudyType extends HADatAcClass implements Comparable<StudyType> {
             QuerySolution soln = resultsrw.next();
             StudyType studyType = find(soln.getResource("uri").getURI());
             studyTypes.add(studyType);
-        }			
+        }
 
         java.util.Collections.sort((List<StudyType>) studyTypes);
         return studyTypes;
@@ -52,14 +52,14 @@ public class StudyType extends HADatAcClass implements Comparable<StudyType> {
     public static Map<String,String> getMap() {
         List<StudyType> list = find();
         Map<String,String> map = new HashMap<String,String>();
-        for (StudyType typ: list) 
+        for (StudyType typ: list)
             map.put(typ.getUri(),typ.getLabel());
         return map;
     }
 
     public static StudyType find(String uri) {
         StudyType studyType = null;
-        
+
         Statement statement;
         RDFNode object;
 

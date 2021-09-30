@@ -16,8 +16,8 @@ import be.objectify.deadbolt.java.actions.Restrict;
 
 public class ExampleCalls extends Controller {
 
-	public Result index() {
-        return ok(examplecalls.render()); 
+    public Result index() {
+        return ok(examplecalls.render());
     }
 
     public Result postIndex() {

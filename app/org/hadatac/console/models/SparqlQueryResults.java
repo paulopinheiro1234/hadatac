@@ -7,20 +7,22 @@ import java.util.TreeMap;
 import java.util.Iterator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hadatac.console.models.TreeNode;
+import org.hadatac.console.models.TripleDocument;
 
 public class SparqlQueryResults{
     public TreeMap<String,TripleDocument> sparqlResults;
     public String treeResults;
     public String json;
-    
+
     private ArrayList<String> vars = new ArrayList<String>();
     private TreeNode newTree;
-    
+
 	public SparqlQueryResults() {}
 
 	public SparqlQueryResults(String json_result, boolean usingURIs){
         this.json = json_result;
-        
+
         // create an ObjectMapper instance.
         ObjectMapper mapper = new ObjectMapper();
         // use the ObjectMapper to read the json string and create a tree
@@ -38,7 +40,7 @@ public class SparqlQueryResults{
 		header = header.get("vars");
 		JsonNode bindings = node.get("results");
 		bindings = bindings.get("bindings");
-		
+
 		// parse the head, and record the bindings
 		Iterator<JsonNode> parseHead = header.iterator();
 		String var = "";
@@ -50,23 +52,23 @@ public class SparqlQueryResults{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 		Iterator<JsonNode> parseResults = bindings.iterator();
-		
+
 		// build TreeQueryResults:
         if(vars.contains("modelName") && vars.contains("superModelName"))
             buildTreeQueryResults(bindings, usingURIs);
-		else this.treeResults = "";    
-		
+		else this.treeResults = "";
+
         // NOW BUILD THE SPARQLQUERYRESULTS:
-        this.sparqlResults = new TreeMap<String,TripleDocument>();
+        this.sparqlResults = new TreeMap<String, TripleDocument>();
         while (parseResults.hasNext()){
             try {
                 JsonNode doc = parseResults.next();
                 TripleDocument triple = new TripleDocument(doc, vars);
                 //System.out.println(triple);
                 // One of the fields in the TripleDocument should function as a primary key for rendering purposes
-                if (triple.has("sn")) { 
+                if (triple.has("sn")) {
                     this.sparqlResults.put(triple.get("sn"),triple);
                     //System.out.println("Adding to results [sn]: " + triple.get("sn"));
                 }
@@ -84,7 +86,7 @@ public class SparqlQueryResults{
 		    }
 		}
 	}
-	
+
 	private void buildTreeQueryResults(JsonNode bindings, boolean usingURIs){
         this.newTree = null;
         Iterator<JsonNode> elements = bindings.elements();
@@ -131,19 +133,19 @@ public class SparqlQueryResults{
                     }
                 }
             }
-        //System.out.println("model Name = <"+ modelN + " , " + superN + ">"); 
+        //System.out.println("model Name = <"+ modelN + " , " + superN + ">");
         }// /while
-        if (newTree == null) 
+        if (newTree == null)
             this.treeResults = "";
         else
             this.treeResults = newTree.toJson(0);
 	}
-	
+
 	public TripleDocument getTriple (String key){
 	    TripleDocument item = this.sparqlResults.get(key);
 	    return item;
 	}
-	
+
 	public ArrayList<TripleDocument> getMatching (String prop, String value){
         ArrayList<TripleDocument> results = new ArrayList<TripleDocument>();
         TripleDocument doc;

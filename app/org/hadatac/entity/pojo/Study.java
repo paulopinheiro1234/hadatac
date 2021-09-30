@@ -36,9 +36,13 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Study extends HADatAcThing {
+
+    private static final Logger log = LoggerFactory.getLogger(Study.class);
 
     private static String className = "hasco:Study";
 
@@ -81,10 +85,10 @@ public class Study extends HADatAcThing {
     @Field("agentName_str")
     @PropertyField(uri="hasco:hasAgent", valueType=PropertyValueType.URI)
     private String agentUri;
-    
+
     @PropertyField(uri="hasco:hasLastId")
     private String lastId;
-    
+
     private DateTime startedAt;
 
     private DateTime endedAt;
@@ -98,17 +102,17 @@ public class Study extends HADatAcThing {
     private Agent institution;
 
     public Study(String id,
-		 String studyUri,
-		 String studyType,
-		 String label,
-		 String title,
-		 String project,
-		 String comment,
-		 String externalSource,
-		 String institutionUri,
-		 String agentUri,
-		 String startDateTime,
-		 String endDateTime) {
+                 String studyUri,
+                 String studyType,
+                 String label,
+                 String title,
+                 String project,
+                 String comment,
+                 String externalSource,
+                 String institutionUri,
+                 String agentUri,
+                 String startDateTime,
+                 String endDateTime) {
         this.id = id;
         this.studyUri = studyUri;
         this.typeUri = studyType;
@@ -209,8 +213,8 @@ public class Study extends HADatAcThing {
     public static int getNumberStudies() {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
-        query += " select (count(?study) as ?tot) where { " + 
-                " ?studyType rdfs:subClassOf* hasco:Study . " +  
+        query += " select (count(?study) as ?tot) where { " +
+                " ?studyType rdfs:subClassOf* hasco:Study . " +
                 " ?study a ?studyType . " +
                 " }";
 
@@ -249,7 +253,7 @@ public class Study extends HADatAcThing {
     public String getEndedAtXsd() {
         DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
         return formatter.withZone(DateTimeZone.UTC).print(endedAt);
-    }    
+    }
 
     // set Methods
     public void setId(String id) {
@@ -303,7 +307,7 @@ public class Study extends HADatAcThing {
     public void increaseLastId(long quantity) {
         if (quantity > 0) {
             long l = Long.parseLong(this.lastId);
-            long newL = l + quantity; 
+            long newL = l + quantity;
             this.lastId = Long.toString(newL);
             save();
         }
@@ -386,7 +390,7 @@ public class Study extends HADatAcThing {
     public int hashCode() {
         return getUri().hashCode();
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
@@ -417,7 +421,7 @@ public class Study extends HADatAcThing {
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
@@ -488,9 +492,9 @@ public class Study extends HADatAcThing {
         Map<String, StudyObject> resp = new HashMap<String, StudyObject>();
         String queryString = "";
         queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?objUri " + 
-                " WHERE {  ?objUri hasco:isMemberOf ?socUri . " + 
-                "          ?socUri hasco:isMemberOf <" + getUri() + "> . " +  
+                "SELECT ?objUri " +
+                " WHERE {  ?objUri hasco:isMemberOf ?socUri . " +
+                "          ?socUri hasco:isMemberOf <" + getUri() + "> . " +
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -499,40 +503,49 @@ public class Study extends HADatAcThing {
         StudyObject obj = null;
         while (resultsrw.hasNext()){
             QuerySolution soln = resultsrw.next();
-            if (soln != null && soln.getResource("objUri").getURI()!= null) { 
+            if (soln != null && soln.getResource("objUri").getURI()!= null) {
                 obj = StudyObject.find(soln.get("objUri").toString());
                 //System.out.println("StudyObject URI: " + soln.get("objUri").toString());
                 if (obj != null) {
-                	resp.put(obj.getUri(), obj);
+                    resp.put(obj.getUri(), obj);
                 }
             }
         }
 
         return resp;
     }
-    
+
     public Map<String, StudyObject> getObjectsMapInBatch() {
         Map<String, StudyObject> results = new HashMap<String, StudyObject>();
-        
+
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "DESCRIBE ?objUri WHERE { \n" +
-                "  ?objUri hasco:isMemberOf ?socUri . \n" + 
-                "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +  
+                "  ?objUri hasco:isMemberOf ?socUri . \n" +
+                "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        if (resultsrw.size() <1){
+            queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                    "DESCRIBE ?objUri WHERE { \n" +
+                    "  ?objUri hasco:isMemberOf ?socUri . \n" +
+                    "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
+                    "}";
+            resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+        }
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             String uri = soln.get("subject").toString();
             if (soln != null && uri!= null) {
                 if (!results.containsKey(uri)) {
-                	StudyObject tmpObj = new StudyObject();
-                	tmpObj.setUri(uri);
+                    StudyObject tmpObj = new StudyObject();
+                    tmpObj.setUri(uri);
                     results.put(uri, tmpObj);
                 }
-                
+
                 results.get(uri).fromQuerySolution(soln);
             }
         }
@@ -542,7 +555,7 @@ public class Study extends HADatAcThing {
              System.out.println("getObjectsMapInBatch(): Key = " + entry.getKey() + ", Value = " + ((StudyObject)entry.getValue()).getUri());
         }
         */
-        
+
         return results;
     }
 
@@ -551,8 +564,8 @@ public class Study extends HADatAcThing {
         //System.out.println("study_uri: " + study_uri);
         List<String> ocList = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?oc_uri  WHERE {  " + 
-                "      ?oc_uri hasco:isMemberOf " + study_uri + " . " + 
+                "SELECT ?oc_uri  WHERE {  " +
+                "      ?oc_uri hasco:isMemberOf " + study_uri + " . " +
                 " } ";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -574,8 +587,8 @@ public class Study extends HADatAcThing {
     private static List<String> findDataAcquisitionUris(String study_uri) {
         List<String> daList = new ArrayList<String>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?da_uri  WHERE {  " + 
-                "      ?da_uri hasco:isDataAcquisitionOf " + study_uri + " . " + 
+                "SELECT ?da_uri  WHERE {  " +
+                "      ?da_uri hasco:isDataAcquisitionOf " + study_uri + " . " +
                 " } ";
         try {
             ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -605,19 +618,19 @@ public class Study extends HADatAcThing {
             adjustedUri = "<" + adjustedUri + ">";
         }
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT DISTINCT ?id ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" + 
-                " WHERE {  \n" + 
-                "      ?studyType rdfs:subClassOf* hasco:Study . \n" + 
-                "      " + adjustedUri + " a ?studyType . \n" + 
-                "      OPTIONAL { " + adjustedUri + " hasco:hasId ?id } . \n" + 
-                "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . \n" + 
+                "SELECT DISTINCT ?id ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" +
+                " WHERE {  \n" +
+                "      ?studyType rdfs:subClassOf* hasco:Study . \n" +
+                "      " + adjustedUri + " a ?studyType . \n" +
+                "      OPTIONAL { " + adjustedUri + " hasco:hasId ?id } . \n" +
+                "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . \n" +
                 "      OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . \n" +
                 "      OPTIONAL { " + adjustedUri + " hasco:hasProject ?proj } . \n" +
-                "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . \n" + 
-                "      OPTIONAL { " + adjustedUri + " hasco:hasExternalSource ?external } . \n" + 
+                "      OPTIONAL { " + adjustedUri + " rdfs:comment ?studyComment } . \n" +
+                "      OPTIONAL { " + adjustedUri + " hasco:hasExternalSource ?external } . \n" +
                 "      OPTIONAL { " + adjustedUri + " hasco:hasAgent ?agentUri } . \n" +
-                "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . \n" + 
-                "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . \n" + 
+                "      OPTIONAL { " + adjustedUri + " hasco:hasInstitution ?institutionUri } . \n" +
+                "      OPTIONAL { " + adjustedUri + " hasco:hasLastId ?lastId } . \n" +
                 " } \n";
 
         try {
@@ -650,10 +663,10 @@ public class Study extends HADatAcThing {
                 }
                 if (soln.contains("studyComment")) {
                     returnStudy.setComment(soln.get("studyComment").toString());
-                } 
+                }
                 if (soln.contains("external")) {
                     returnStudy.setExternalSource(soln.get("external").toString());
-                } 
+                }
                 if (soln.contains("agentUri")) {
                     returnStudy.setAgentUri(soln.get("agentUri").toString());
                 }
@@ -673,16 +686,16 @@ public class Study extends HADatAcThing {
     }// /find(studyUri)
 
     public static Study findById(String id) {
-    	if (id == null || id.isEmpty()) {
-    		return null;
-    	}
-    	String queryString = "";
+        if (id == null || id.isEmpty()) {
+            return null;
+        }
+        String queryString = "";
         queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?uri " + 
-                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "          ?uri a ?subUri . " +  
+                "SELECT ?uri " +
+                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " +
+                "          ?uri a ?subUri . " +
                 "          ?uri hasco:hasId ?id .  " +
-                "        FILTER (?id=\"" + id + "\"^^xsd:string)  . " +  
+                "        FILTER (?id=\"" + id + "\"^^xsd:string)  . " +
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -692,7 +705,7 @@ public class Study extends HADatAcThing {
         Study study = null;
         if (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            if (soln != null && soln.get("uri") != null) { 
+            if (soln != null && soln.get("uri") != null) {
                 uri = soln.get("uri").toString();
             }
             study = Study.find(uri);
@@ -708,7 +721,7 @@ public class Study extends HADatAcThing {
         }
         Study returnStudy = new Study();
         String queryUri = URIUtils.replacePrefixEx(kbPrefix + "STD-" + studyName);
-        
+
         return find(queryUri);
     }
 
@@ -719,46 +732,46 @@ public class Study extends HADatAcThing {
                 "{  " +
                 "  { " +
                 "	{  " +
-                // Study 
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+                // Study
+                "   ?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?s a ?subUri . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?s = " + study + ") " +
                 "  	} " +
                 "    MINUS " +
                 "    { " +
-                // Other Studies 
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+                // Other Studies
+                "   ?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?s a ?subUri . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?s != " + study + ") " +
                 "    }  " +
                 "  } " +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "	{  " +
                 //  Data Acquisitions, Cohort
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+                "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?study = " + study + ") " +
                 "  	} " +
                 "    MINUS " +
                 "    {  " +
                 // Other Data Acquisitions, Cohort
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " + 
+                "  	?s hasco:isDataAcquisitionOf|hasco:isCohortOf ?study . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?study != " + study + ") " +
                 "  	} " +
                 "  } " +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "	{  " +
                 //  Cohort Subjects
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
                 "  	?cohort hasco:isCohortOf ?study . " +
                 "	?s hasco:isSubjectOf ?cohort . " +
@@ -768,7 +781,7 @@ public class Study extends HADatAcThing {
                 "    MINUS " +
                 "    {  " +
                 // Other Cohort Subjects
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
                 "  	?cohort hasco:isCohortOf ?study . " +
                 "	?s hasco:isSubjectOf ?cohort . " +
@@ -776,13 +789,13 @@ public class Study extends HADatAcThing {
                 "  	FILTER (?study != " + study + ") " +
                 "  	} " +
                 "  } " +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "	{  " +
                 //  Data Acquisition Schema and Deployment
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "  	?da hasco:isDataAcquisitionOf ?study . " + 
+                "  	?da hasco:isDataAcquisitionOf ?study . " +
                 "   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?study = " + study + ") " +
@@ -790,61 +803,61 @@ public class Study extends HADatAcThing {
                 "    MINUS " +
                 "    {  " +
                 // Other Data Acquisition Schema and Deployment
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "  	?da hasco:isDataAcquisitionOf ?study . " + 
+                "  	?da hasco:isDataAcquisitionOf ?study . " +
                 "   ?da hasco:hasSchema|hasco:hasDeployment ?s . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?study != " + study + ") " +
                 "  	} " +
                 "  } " +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "    { " +
                 // Sample Collections
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf ?study . " + 
+                "   ?s hasco:isMemberOf ?study . " +
                 "   ?s ?p ?o . " +
                 "  FILTER (?study = " + study + ") " +
                 "    } " +
                 "    MINUS " +
                 "    { " +
                 // Other Sample Collections
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf ?study . " + 
+                "   ?s hasco:isMemberOf ?study . " +
                 "   ?s ?p ?o . " +
                 "  	FILTER (?study != " + study + ") " +
                 "    } " +
                 "  } "  +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "    { " +
                 // Sample Collection Samples
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf* ?study . " + 
+                "   ?s hasco:isMemberOf* ?study . " +
                 "   ?s ?p ?o . " +
                 "  FILTER (?study = " + study + ") " +
                 "    } " +
                 "    MINUS " +
                 "    { " +
                 // Other Sample Collection Samples
-                "  	?subUri rdfs:subClassOf* hasco:Study . " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study . " +
                 "  	?study a ?subUri . " +
-                "   ?s hasco:isMemberOf* ?study . " + 
+                "   ?s hasco:isMemberOf* ?study . " +
                 "   ?s ?p ?o . " +
                 "  	FILTER (?study != " + study + ") " +
                 "    } " +
                 "  } "  +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "    { " +
                 // Deployment - Platform, Instrument, detector
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study .  " +
                 "  	?study a ?subUri . " +
-                "   ?da hasco:isDataAcquisitionOf ?study . " + 
+                "   ?da hasco:isDataAcquisitionOf ?study . " +
                 "  	?da hasco:hasDeployment ?deploy .  " +
                 "	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
                 "  	?s ?p ?o . " +
@@ -853,20 +866,20 @@ public class Study extends HADatAcThing {
                 "    MINUS " +
                 "    { " +
                 // Other Deployment - Platform, Instrument, detector
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study .  " +
                 "  	?study a ?subUri . " +
-                "   ?da hasco:isDataAcquisitionOf ?study . " + 
+                "   ?da hasco:isDataAcquisitionOf ?study . " +
                 "  	?da hasco:hasDeployment ?deploy .  " +
                 "	?deploy vstoi:hasPlatform|hasco:hasInstrument|hasco:hasDetector ?s . " +
                 "  	?s ?p ?o . " +
                 "  	FILTER (?study != " + study + ") " +
                 "    } " +
                 "  } " +
-                "  UNION " + 
+                "  UNION " +
                 "  { " +
                 "    { " +
                 // DA Schema Attribute
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study .  " +
                 "  	?study a ?subUri . " +
                 "  	?da hasco:isDataAcquisitionOf ?study . " +
                 "   ?da hasco:hasSchema ?schema . " +
@@ -877,7 +890,7 @@ public class Study extends HADatAcThing {
                 "    MINUS " +
                 "    { " +
                 // Other DA Schema Attribute
-                "  	?subUri rdfs:subClassOf* hasco:Study .  " + 
+                "  	?subUri rdfs:subClassOf* hasco:Study .  " +
                 "  	?study a ?subUri . " +
                 "  	?da hasco:isDataAcquisitionOf ?study . " +
                 "   ?da hasco:hasSchema ?schema . " +
@@ -890,7 +903,7 @@ public class Study extends HADatAcThing {
                 "  { " +
                 "  	 {  " +
                 // Datasets
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+                "   ?subUri rdfs:subClassOf* hasco:Study . " +
                 "   ?study a ?subUri . " +
                 "   ?s hasco:isDatasetOf ?study . " +
                 "   ?s ?p ?o . " +
@@ -899,18 +912,18 @@ public class Study extends HADatAcThing {
                 "    MINUS " +
                 "    {  " +
                 // Other Datasets
-                "   ?subUri rdfs:subClassOf* hasco:Study . " + 
+                "   ?subUri rdfs:subClassOf* hasco:Study . " +
                 "   ?study a ?subUri . " +
                 "   ?s hasco:isDatasetOf ?study . " +
                 "   ?s ?p ?o . " +
                 "   FILTER (?study != " + study + ") " +
                 "     } " +
                 "   } " +
-                "   UNION " + 
+                "   UNION " +
                 "   { " +
                 "  	  {  " +
-                // Attribute References 
-                "    ?subUri rdfs:subClassOf* hasco:Study . " + 
+                // Attribute References
+                "    ?subUri rdfs:subClassOf* hasco:Study . " +
                 "    ?study a ?subUri . " +
                 "    ?data hasco:isDatasetOf ?study . " +
                 "    ?s hasco:isAttributeReferenceOf ?data . " +
@@ -920,7 +933,7 @@ public class Study extends HADatAcThing {
                 "    MINUS " +
                 "    {  " +
                 // Other Attribute References
-                "    ?subUri rdfs:subClassOf* hasco:Study . " + 
+                "    ?subUri rdfs:subClassOf* hasco:Study . " +
                 "    ?study a ?subUri . " +
                 "    ?data hasco:isDatasetOf ?study . " +
                 "     ?s hasco:isAttributeReferenceOf ?data . " +
@@ -955,18 +968,18 @@ public class Study extends HADatAcThing {
         List<Study> studies = new ArrayList<Study>();
         String queryString = "";
         queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?studyUri ?subUri " + 
-                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "          ?studyUri a ?subUri . " +  
+                "SELECT ?studyUri ?subUri " +
+                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " +
+                "          ?studyUri a ?subUri . " +
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-        
+
         Study study = null;
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            if (soln != null && soln.getResource("studyUri").getURI()!= null) { 
+            if (soln != null && soln.getResource("studyUri").getURI()!= null) {
                 study = Study.find(soln.get("studyUri").toString());
                 //System.out.println("Study URI: " + soln.get("studyUri").toString());
             }
@@ -980,10 +993,10 @@ public class Study extends HADatAcThing {
         List<String> studies = new ArrayList<String>();
         String queryString = "";
         queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT ?studyUri ?id " + 
-                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " + 
-                "          ?studyUri a ?subUri . " +  
-                "          ?studyUri hasco:hasId ?id . " +  
+                "SELECT ?studyUri ?id " +
+                " WHERE {  ?subUri rdfs:subClassOf* hasco:Study . " +
+                "          ?studyUri a ?subUri . " +
+                "          ?studyUri hasco:hasId ?id . " +
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -992,7 +1005,7 @@ public class Study extends HADatAcThing {
         String studyId = null;
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            if (soln != null && soln.get("id") != null) { 
+            if (soln != null && soln.get("id") != null) {
                 studyId = soln.get("id").toString();
                 //System.out.println("Study URI: " + soln.get("studyUri").toString());
             }
@@ -1029,20 +1042,20 @@ public class Study extends HADatAcThing {
 
     @Override
     public void delete() {
-    	
-    	// Delete associated DAs and their measurements
-    	deleteMeasurements();
-    	deleteDataAcquisitions();
-    	
-    	// Delete associated SOCs 
-    	for (String oc_uri : this.objectCollectionUris) {
-    		ObjectCollection oc = ObjectCollection.find(oc_uri);
-    		if (oc != null) {
-    			oc.deleteFromTripleStore();
-    		}
-    	}
-    	
-    	// Delete study itself
+
+        // Delete associated DAs and their measurements
+        deleteMeasurements();
+        deleteDataAcquisitions();
+
+        // Delete associated SOCs
+        for (String oc_uri : this.objectCollectionUris) {
+            ObjectCollection oc = ObjectCollection.find(oc_uri);
+            if (oc != null) {
+                oc.deleteFromTripleStore();
+            }
+        }
+
+        // Delete study itself
         deleteFromTripleStore();
         deleteFromSolr();
     }
@@ -1050,10 +1063,10 @@ public class Study extends HADatAcThing {
 
     @Override
     public void deleteFromTripleStore() {
-    	super.deleteFromTripleStore();
+        super.deleteFromTripleStore();
     }
 
-    	@Override
+    @Override
     public int deleteFromSolr() {
         SolrClient study_solr = new HttpSolrClient.Builder(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.STUDIES)).build();
@@ -1110,6 +1123,67 @@ public class Study extends HADatAcThing {
         }
 
         return -1;
+    }
+
+    public static Map<String,Map<String,String>> retrieveStudiesAndAtttributes() {
+
+        Map<String, Map<String, String>> result = new HashMap<>();
+
+        String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT DISTINCT ?studyId ?studyUri ?studyLabel ?proj ?studyTitle ?agentName ?institutionName " +
+                "WHERE { \n" +
+                "   ?studyUri a ?subUri . \n" +
+                "   ?studyUri hasco:hasId ?studyId . \n" +
+                "   ?subUri rdfs:subClassOf* hasco:Study . \n" +
+                "   OPTIONAL { ?studyUri rdfs:label ?studyLabel } . \n" +
+                "   OPTIONAL { ?studyUri hasco:hasProject ?proj } . \n" +
+                "   OPTIONAL { ?studyUri skos:definition ?studyTitle } . \n" +
+                "   OPTIONAL { ?studyUri rdfs:comment ?studyComment  } . \n" +
+                "   OPTIONAL { ?studyUri hasco:hasAgent ?agent . ?agent foaf:name ?agentName } . \n" +
+                "   OPTIONAL { ?studyUri hasco:hasInstitution ?institution . ?institution foaf:name ?institutionName } . \n" +
+                " } \n";
+
+        try {
+
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), studyQueryString);
+
+            while (resultsrw.hasNext()) {
+
+                QuerySolution soln = resultsrw.next();
+                if (!soln.contains("studyUri")) continue;
+
+                String studyUri = soln.get("studyUri").toString();
+                Map<String, String> study = result.getOrDefault(studyUri, new HashMap<>());
+
+                if (soln.contains("studyId")) {
+                    study.put("studyId", soln.get("studyId").toString());
+                }
+                if (soln.contains("studyLabel")) {
+                    study.put("studyLabel", soln.get("studyLabel").toString());
+                }
+                if (soln.contains("proj")) {
+                    study.put("proj", soln.get("proj").toString());
+                }
+                if (soln.contains("studyTitle")) {
+                    study.put("studyTitle", soln.get("studyTitle").toString());
+                }
+                if (soln.contains("agentName")) {
+                    study.put("agentName", soln.get("agentName").toString());
+                }
+                if (soln.contains("institutionName")) {
+                    study.put("institutionName", soln.get("institutionName").toString());
+                }
+
+                result.put(studyUri, study);
+            }
+
+        } catch (QueryExceptionHTTP e) {
+            e.printStackTrace();
+        }
+
+        return result;
+
     }
 
 }

@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import play.mvc.Http;
 import play.mvc.Http.Request;
 
 public class ResumableUpload {
@@ -68,7 +69,7 @@ public class ResumableUpload {
         String resumableRelativePath = request.getQueryString("resumableRelativePath");
 
         // Here we add a ".temp" to every upload file to indicate NON-FINISHED
-        System.out.println("base_dir: " + base_dir);
+        // System.out.println("base_dir: " + base_dir);
         File folder = new File(base_dir);
         if (!folder.exists()) {
             folder.mkdirs();

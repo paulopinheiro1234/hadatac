@@ -1,8 +1,9 @@
-@()
+ @import org.springframework.test.web.servlet.result.MockMvcResultMatchers.request
+ @()
 
-@import org.hadatac.console.views.html._
+ @import org.hadatac.console.views.html._
 
-@main(Messages("playauthenticate.token.error.title")) {
-	<h1>@Messages("playauthenticate.token.error.title")</h1>
-	<p>@Messages("playauthenticate.token.error.message")</p>
+ @main("Token error","","") {
+	<h1>Token error</h1>
+	<p>The given token has either expired or does not exist.</p>
 }

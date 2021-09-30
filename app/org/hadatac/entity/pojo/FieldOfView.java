@@ -28,8 +28,8 @@ import org.hadatac.console.models.Facetable;
 
 public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView> {
 
-	private String geometry;
-	private String isFOVOf;
+    private String geometry;
+    private String isFOVOf;
     private Float firstParameter;
     private String firstParameterUnit;
     private String firstParameterCharacteristic;
@@ -41,9 +41,9 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
     private String thirdParameterCharacteristic;
 
     public FieldOfView(String uri,
-            String typeUri,
-            String label,
-            String comment) {
+                       String typeUri,
+                       String label,
+                       String comment) {
         this.uri = uri;
         this.typeUri = typeUri;
         this.label = label;
@@ -82,7 +82,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
     }
     public String getFirstParameterUnitLabel() {
         if (firstParameterUnit == null || firstParameterUnit.isEmpty()) {
-        	return "";
+            return "";
         }
         return FirstLabel.getPrettyLabel(firstParameterUnit);
     }
@@ -97,7 +97,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
 
     public String getFirstParameterCharacteristicLabel() {
         if (firstParameterCharacteristic == null || firstParameterCharacteristic.isEmpty()) {
-        	return "";
+            return "";
         }
         return FirstLabel.getPrettyLabel(firstParameterCharacteristic);
     }
@@ -120,7 +120,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
 
     public String getSecondParameterUnitLabel() {
         if (secondParameterUnit == null || secondParameterUnit.isEmpty()) {
-        	return "";
+            return "";
         }
         return FirstLabel.getPrettyLabel(secondParameterUnit);
     }
@@ -135,7 +135,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
 
     public String getSecondParameterCharacteristicLabel() {
         if (secondParameterCharacteristic == null || secondParameterCharacteristic.isEmpty()) {
-        	return "";
+            return "";
         }
         return FirstLabel.getPrettyLabel(secondParameterCharacteristic);
     }
@@ -158,7 +158,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
 
     public String getThirdParameterUnitLabel() {
         if (thirdParameterUnit == null || thirdParameterUnit.isEmpty()) {
-        	return "";
+            return "";
         }
         return FirstLabel.getPrettyLabel(thirdParameterUnit);
     }
@@ -173,7 +173,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
 
     public String getThirdParameterCharacteristicLabel() {
         if (thirdParameterCharacteristic == null || thirdParameterCharacteristic.isEmpty()) {
-        	return "";
+            return "";
         }
         return FirstLabel.getPrettyLabel(thirdParameterCharacteristic);
     }
@@ -195,13 +195,13 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
     public int hashCode() {
         return getUri().hashCode();
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacets(
             Facet facet, FacetHandler facetHandler) {
         return getTargetFacetsFromTripleStore(facet, facetHandler);
     }
-    
+
     @Override
     public Map<Facetable, List<Facetable>> getTargetFacetsFromTripleStore(
             Facet facet, FacetHandler facetHandler) {
@@ -252,10 +252,10 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdParameter")) {
                 fov.setThirdParameter(object.asLiteral().getFloat());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdParameterUnit")) {
-            	fov.setThirdParameterUnit(object.asResource().getURI());
+                fov.setThirdParameterUnit(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdParameterCharacteristic")) {
-            	fov.setThirdParameterCharacteristic(object.asResource().getURI());
-            } 
+                fov.setThirdParameterCharacteristic(object.asResource().getURI());
+            }
         }
 
         fov.setUri(uri);
@@ -267,7 +267,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
         List<FieldOfView> fovs = new ArrayList<FieldOfView>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri a hasco:FieldOfView ." + 
+                " ?uri a hasco:FieldOfView ." +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -277,7 +277,7 @@ public class FieldOfView extends HADatAcThing implements Comparable<FieldOfView>
             QuerySolution soln = resultsrw.next();
             FieldOfView fov = find(soln.getResource("uri").getURI());
             fovs.add(fov);
-        }			
+        }
 
         java.util.Collections.sort((List<FieldOfView>) fovs);
 

@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -27,12 +21,15 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
-import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Indicator extends HADatAcThing implements Comparable<Indicator> {
+
+    private static final Logger log = LoggerFactory.getLogger(Indicator.class);
 
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -403,7 +400,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
             	"   ?inRelationToUri rdfs:label ?inRelationToLabel . " +
             	" }";
 
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
         while (resultsrw.hasNext()) {
@@ -559,7 +556,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 + "?dataAcq hasco:isDataAcquisitionOf ?studyUri . \n"
                 + "?dataAcq hasco:hasSchema ?schemaUri . \n"
                 + "?schemaAttribute hasco:partOfSchema ?schemaUri . \n"
-                + "?schemaAttribute ?x ?attributeUri . \n" 
+                + "{ ?schemaAttribute hasco:hasAttribute/rdf:rest*/rdf:first ?attributeUri} UNION { ?schemaAttribute ?x ?attributeUri } . \n"
                 + "?attributeUri rdfs:subClassOf* ?indicator . \n"
                 + "?attributeUri rdfs:label ?attributeLabel . \n"
                 + " { ?indicator rdfs:subClassOf hasco:SampleIndicator } UNION { ?indicator rdfs:subClassOf hasco:StudyIndicator } . \n"
@@ -569,7 +566,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
         
         Map<Facetable, List<Facetable>> mapIndicatorToCharList = new HashMap<Facetable, List<Facetable>>();
         try {
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {
@@ -577,7 +574,7 @@ public class Indicator extends HADatAcThing implements Comparable<Indicator> {
                 Indicator indicator = new Indicator();
                 indicator.setUri(soln.get("indicator").toString());
                 //System.out.println("Indicator.getTargetFacets(): identified indicator [" + indicator.getUri() + "]  label: [" + indicator.getLabel() + "]");
-                indicator.setLabel(WordUtils.capitalize(HADatAcThing.getShortestLabel(soln.get("indicator").toString())));
+                indicator.setLabel(WordUtils.capitalize(HADatAcThing.getFacetSearchShortestLabel(soln.get("indicator").toString())));
                 indicator.setField("indicator_uri_str");
                 indicator.setQuery(query);
 

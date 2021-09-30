@@ -3,20 +3,23 @@ package org.hadatac.console.controllers.schema;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.views.html.schema.*;
+//import controllers.AuthApplication;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.utils.ConfigProp;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
+import javax.inject.Inject;
 
 public class DeleteDASA extends Controller {
+	@Inject
+	Application application;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
 	public Result index(String dasa_uri) {
 
 		DataAcquisitionSchemaAttribute dasa = null;
@@ -33,19 +36,19 @@ public class DeleteDASA extends Controller {
 
 		if (!dasa_uri.equals("")) {
 			dasa = DataAcquisitionSchemaAttribute.find(dasa_uri);
-			System.out.println("delete data acquisition schema attribute");
-			return ok(deleteDASA.render(dasa));
+//			System.out.println("delete data acquisition schema attribute");
+			return ok(org.hadatac.console.views.html.schema.deleteDASA.render(dasa));
 		}
-		return ok(deleteDASA.render(dasa));
+		return ok(org.hadatac.console.views.html.schema.deleteDASA.render(dasa));
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
 	public Result postIndex(String dasa_uri) {
 		return index(dasa_uri);
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String dasa_uri) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result processForm(String dasa_uri, Http.Request request) {
 
 		DataAcquisitionSchemaAttribute dasa = null;
 
@@ -68,6 +71,6 @@ public class DeleteDASA extends Controller {
 			dasa.delete();
 		}
 
-		return ok(DASAConfirm.render("Deleted Data Acquisition Schema Attribute", "Deleted " + deletedRows + " tuples", dasa));
+		return ok(org.hadatac.console.views.html.schema.DASAConfirm.render("Deleted Data Acquisition Schema Attribute", "Deleted " + deletedRows + " tuples", dasa,application.getUserEmail(request)));
 	}
 }

@@ -1,10 +1,10 @@
-@()
+ @(userName: String)
 
-@import org.hadatac.console.views.html._
-@main(Messages("playauthenticate.verify.account.title")) {
+ @import org.hadatac.console.views.html._
+ @main("E-mail verification required","",userName) {
 
-	<h1>@Messages("playauthenticate.verify.account.title")</h1>
+	<h1>"E-mail verification required"</h1>
 	<p>
-	@Messages("playauthenticate.verify.account.before") <a href="@org.hadatac.console.controllers.routes.Account.verifyEmail">@Messages("playauthenticate.verify.account.first")</a>.<br/>
+	"Before setting a password, you need to" <a href="@org.hadatac.console.controllers.routes.Account.verifyEmail">"first verify your e-mail address"</a>.<br/>
 	</p>
 }

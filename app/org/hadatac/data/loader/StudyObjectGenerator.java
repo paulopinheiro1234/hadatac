@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.typesafe.config.ConfigFactory;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.entity.pojo.DataFile;
@@ -73,14 +74,17 @@ public class StudyObjectGenerator extends BaseGenerator {
 
     private String getUri(Record rec) {
         String originalID = rec.getValueByColumnName(mapCol.get("originalID"));
-        //System.out.println("StudyObjectGenerator: " + originalID);
+        // System.out.println("StudyObjectGenerator: " + originalID);
         if (URIUtils.isValidURI(originalID)) {
             //System.out.println("StudyObjectGenerator: VALID URI");
             return URIUtils.replaceNameSpaceEx(originalID);
         }
 
-        System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
-        return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
+        // System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
+        if ( uriMap.get(oc_type).contains("SBJ-") && "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+            return kbPrefix + uriMap.get(oc_type) + originalID;
+        } else return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
+
     }
 
     private String getType(Record rec) {
@@ -103,7 +107,10 @@ public class StudyObjectGenerator extends BaseGenerator {
         } else {
             auxstr = auxstr.replaceAll("-","");
         }
-        
+
+        if ( auxstr.contains("SBJ") && "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+            return auxstr + " " + originalID;
+        }
         return auxstr + " " + originalID + " - " + study_id;
     }
 
@@ -145,9 +152,12 @@ public class StudyObjectGenerator extends BaseGenerator {
         if (oc_scope != null && oc_scope.length() > 0){
         	if (mapContent.get(oc_scope) != null) {
         		String scopeOCtype = mapContent.get(oc_scope).get(1);
-        		return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
-        	} else {
-        		System.out.println("StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
+        		if ( scopeOCtype.toLowerCase().contains("SubjectGroup".toLowerCase()) &&
+                        "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
+                    return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "");
+                } else return kbPrefix + uriMap.get(scopeOCtype) + rec.getValueByColumnName(mapCol.get("scopeID")).replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
+            } else {
+        		System.out.println("[ERROR] StudyObjectGenerator: no mapping for [" + oc_scope + "] in getScopeUri()");
         		return "";
         	}
         } else {
@@ -169,7 +179,7 @@ public class StudyObjectGenerator extends BaseGenerator {
         			return kbPrefix + uriMap.get(timeScopeOCtype) + returnedValue.replaceAll("(?<=^\\d+)\\.0*$", "") + "-" + study_id;
         		}
         	} else {
-        		System.out.println("StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
+        		System.out.println("[ERROR] StudyObjectGenerator: no mapContent for [" + oc_timescope + "] in getTimeScopeUri(). Record is " + rec);
         		return "";
         	}
         } else {

@@ -2,7 +2,8 @@
    filename : String, 
    da_uri   : String, 
    results  : org.hadatac.console.models.SparqlQueryResults,
-   category : String)
+   category : String,
+   userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -11,7 +12,7 @@
 *@
 @import org.hadatac.console.views.html.metadata.empirical._
 
-@main("Hierarchies") {
+@main("Hierarchies","",userName) {
     @* 
     @if((category == "Units") || (category == "Characteristics") || (category == "Indicators")) { 
         @science_navigation(category)

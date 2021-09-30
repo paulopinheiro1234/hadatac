@@ -4,14 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hadatac.entity.pojo.DataFile;
-
+import org.hadatac.entity.pojo.ObjectCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GeneratorChain {
 
+    private static final Logger log = LoggerFactory.getLogger(GeneratorChain.class);
+
     private List<BaseGenerator> chain = new ArrayList<BaseGenerator>();
     private DataFile dataFile = null;
+    private DataFile codebookFile = null;
     private boolean bValid = true;
-    
+    private boolean pv = false;
+    private String sddName = "";
     private String studyUri = "";
     private String namedGraphUri = "";
 
@@ -39,6 +45,14 @@ public class GeneratorChain {
         this.dataFile = dataFile;
     }
 
+    public DataFile getCodebookFile() {
+        return codebookFile;
+    }
+
+    public void setCodebookFile(DataFile codebookFile) {
+        this.codebookFile = codebookFile;
+    }
+
     public boolean isValid() {
         return bValid;
     }
@@ -47,6 +61,22 @@ public class GeneratorChain {
         bValid = false;
     }
 
+    public boolean getPV() {
+        return pv;
+    }
+
+    public void setPV(boolean pv) {
+        this.pv = pv;
+    }
+
+    public String getSddName() {
+        return sddName;
+    }
+
+    public void setSddName(String sddName) {
+        this.sddName = sddName;
+    }
+    
     public void addGenerator(BaseGenerator generator) {
         chain.add(generator);
     }
@@ -60,14 +90,20 @@ public class GeneratorChain {
             return false;
         }
 
+        int i = 0;
         for (BaseGenerator generator : chain) {
+        	log.info("GeneratorChain: Position " + i++ + " has generator of type [" + generator.getClass(). getSimpleName() + "]");
+        }
+
+        for (BaseGenerator generator : chain) {
+        	//System.out.println("GeneratorChain: Executing generator of type [" + generator.getClass(). getSimpleName() + "]");
             try {
                 generator.preprocess();
                 generator.createRows();
                 generator.createObjects();
                 generator.postprocess();
             } catch (Exception e) {
-                System.out.println(generator.getErrorMsg(e));
+                System.out.println("[ERROR] GenerationChain: " + generator.getErrorMsg(e));
                 e.printStackTrace();
                 
                 generator.getLogger().printException(generator.getErrorMsg(e));
@@ -121,16 +157,26 @@ public class GeneratorChain {
 
     public void delete() {
         for (BaseGenerator generator : chain) {
+
+            if (!getNamedGraphUri().isEmpty()) {
+                generator.setNamedGraphUri(getNamedGraphUri());
+                log.info("deleting ... and setting the graph names...");
+            } else if (!generator.getStudyUri().isEmpty()) {
+                generator.setNamedGraphUri(generator.getStudyUri());
+                log.info("deleting ... and setting the graph names...");
+            }
+
             try {
+
                 generator.preprocess();
                 generator.createRows();
                 generator.createObjects();
                 generator.postprocess();
 
                 generator.deleteRowsFromTripleStore(generator.getRows());
-
                 generator.deleteObjectsFromTripleStore(generator.getObjects());
                 generator.deleteObjectsFromSolr(generator.getObjects());
+
             } catch (Exception e) {
                 System.out.println(generator.getErrorMsg(e));
                 e.printStackTrace();

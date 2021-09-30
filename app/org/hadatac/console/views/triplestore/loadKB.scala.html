@@ -1,4 +1,4 @@
-@(oper: String, message : String)
+@(oper: String, message : String,userName:String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -6,7 +6,7 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Load Facts into Metadata Store") {
+@main("Load Facts into Metadata Store","",userName) {
  
      <script type="text/javascript">
         function checkform3() {
@@ -23,15 +23,15 @@
         <div class="col-md-8 col-md-offset-1">
 
          @if(oper=="init") {
-
-             <h4>Load facts into metadata store from turtle...</h4>
+         </br></br></br>
+             <h4>Load facts into org.hadatac.metadata store from turtle...</h4>
              <div id="rcorners">
-                 The metadata store has @MetadataContext.playTotalTriples() triples. <br>
+                 The org.hadatac.metadata store has <br>  @MetadataContext.playTotalTriples() triples. <br>
 
                  <form name="fileUploadForm" id='upload3' method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.triplestore.routes.LoadKB.uploadTurtleFile("load")" onchange="checkform3()">
-                     <input type="file" class="btn btn-info" name="pic"> 
+                     <input type="file" class="btn btn-info" name="pic">
                      <div id='submitMessage3'  style="display:none;" >
-                        <br>Press <input type="submit" class="btn-sm btn-success" value="Parse and Load"> to add knowledge into the knowledge base. 
+                        <br>Press <input type="submit" class="btn-sm btn-success" value="Parse and Load"> to add knowledge into the knowledge base.
 	                 </div>
                  </form>
              </div>
@@ -57,7 +57,7 @@
 
          @if(oper=="init") {
 	        <br>
-            <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-warning" role="button">Back to Main Page</a>
+            <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class="btn btn-warning" role="button">Back to Main Page</a>
          }
 
 	   </div>

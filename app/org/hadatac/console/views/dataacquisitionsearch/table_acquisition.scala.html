@@ -1,13 +1,13 @@
 @( page : Int,
-   rows : Int,
-   facets : String,
-   documents : List[org.hadatac.entity.pojo.Measurement],
-   resultsSize : Long,
-   objDetails : String
- )
- 
-@import org.hadatac.metadata.loader._
-    
+        rows : Int,
+        facets : String,
+        documents : List[org.hadatac.entity.pojo.Measurement],
+        resultsSize : Long,
+        objDetails : String
+)
+
+    @import org.hadatac.metadata.loader._
+
     <style>
     .tooltip-inner {
         min-width: 450px;
@@ -17,51 +17,51 @@
     }
     </style>
     <div class="table-responsive">
-    	<button type="button" id="prevpage"class="btn btn-primary" onClick="prevPage();">Previous Page</button>
-    	<button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
-    	<button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
-    	<button type="button" id="lastpage"class="btn btn-primary" onClick="lastPage();">Last Page</button>
-    	<p id="pagecontrl"></p>
-    	<input type="checkbox" id="toggleOriginalValue" name="original_value"/> Show Original Values
-    	<table class="table table-hover tablesorter" id="measurementsTable">
+        <button type="button" id="prevpage"class="btn btn-primary" onClick="prevPage();">Previous Page</button>
+        <button type="button" id="nextpage" class="btn btn-primary" onClick="nextPage();">Next Page</button>
+        <button type="button" id="firstpage" class="btn btn-primary" onClick="firstPage();">First Page</button>
+        <button type="button" id="lastpage"class="btn btn-primary" onClick="lastPage();">Last Page</button>
+        <p id="pagecontrl"></p>
+        <input type="checkbox" id="toggleOriginalValue" name="original_value"/> Show Original Values
+        <table class="table table-hover tablesorter" id="measurementsTable">
             <thead>
-              <tr>
-              	<th>Object</th>
-                <th>Attribute</th>
-                <th>Value</th>
-                <th class="original_value" style="display:none;">Original Value</th>
-                <th>PID</th>
-                <th>SID</th>
-                <th>Object URI</th>
-                <th>Time</th>
-                <th>Location</th>
-              </tr>
+                <tr>
+                    <th>Object</th>
+                    <th>Attribute</th>
+                    <th>Value</th>
+                    <th class="original_value" style="display:none;">Original Value</th>
+                    <th>PID</th>
+                    <th>SID</th>
+                    <th>Object URI</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                </tr>
             </thead>
 
             <tbody>
-            	@for((document, index) <- documents.zipWithIndex) {
+            @for((document, index) <- documents.zipWithIndex) {
                 <tr id="@index" href="#" data-toggle="tooltip" data-html="true" data-placement="top">
                     <td>@document.getEntity()</td>
-                	<td>@document.getCharacteristic()</td>
-                	<td>@document.getValue()</td>
-                	<td class="original_value" style="display:none;">@document.getOriginalValue()</td>
-                	<td>@document.getObjectPID()</td>
-                	<td>@document.getObjectSID()</td>
-                	<td href="#" data-toggle="popover" data-html="true" data-placement="bottom" data-container="body" class="object_uri">@URIUtils.replaceNameSpaceEx(document.getObjectUri())</td>
-                	<td>@if(!document.getAbstractTime().equals("")) {
-                	    @URIUtils.replaceNameSpaceEx(document.getAbstractTime())
+                    <td>@document.getCharacteristicUris().get(0)</td>
+                    <td>@document.getValue()</td>
+                    <td class="original_value" style="display:none;">@document.getOriginalValue()</td>
+                    <td>@document.getObjectPID()</td>
+                    <td>@document.getObjectSID()</td>
+                    <td href="#" data-toggle="popover" data-html="true" data-placement="bottom" data-container="body" class="object_uri">@URIUtils.replaceNameSpaceEx(document.getObjectUri())</td>
+                    <td>@if(!document.getAbstractTime().equals("")) {
+                        @URIUtils.replaceNameSpaceEx(document.getAbstractTime())
                     } else {
                         @if(document.getTimestamp() != null) {
                             @document.getTimestamp()
                         }
                     }</td>
-                	<td>@document.getLocation()</td>
+                    <td>@document.getLocation()</td>
                 </tr>
-                }
+            }
             </tbody>
         </table>
     </div>
-    
+
     <script type="text/javascript" src="/hadatac/assets/javascripts/jquery.tablesorter.js"></script>
     <link href="@controllers.routes.Assets.versioned("css/blue/style.css")" rel="stylesheet">
     <script type="text/javascript">
@@ -72,7 +72,7 @@
         }
 
         var jsonDetails = JSON.parse(decodeString("@objDetails"));
-        
+
         var page_size = 15;
         var num_results = @resultsSize;
         var total_page = Math.ceil(num_results / page_size);
@@ -115,10 +115,10 @@
 
             var pages;
             pages = "Current Page: " + cur_page.toString() + " \/ " + total_page.toString() +
-                ", Number of Result: " + num_results.toString();
+                    ", Number of Result: " + num_results.toString();
             document.getElementById('pagecontrl').innerHTML = pages;
         }
-        
+
         onload = function () {
             updatePage();
         }
@@ -129,31 +129,31 @@
     }
 
     $("#toggleOriginalValue").change(function () {
-    	var column = "table ." + $(this).attr("name");
+        var column = "table ." + $(this).attr("name");
         if (this.checked) {
             $(column).show();
         } else {
-        	$(column).hide();
+            $(column).hide();
         }
     });
-    
+
     $(document).ready(function() {
-    	$("#measurementsTable").tablesorter();
-        
+        $("#measurementsTable").tablesorter();
+
         $("#measurementsTable tr").not(':first').each(function(i, el) {
             var title = "<table>"
-                + "<tr><td><b>URI:</b></td><td>" + json.documents[i]['uri'] + "</td></tr>"
-                + "<tr><td><b>Timestamp:</b></td><td>" + (json.documents[i]['timestamp'] == null ? json.documents[i]['abstractTime'] : json.documents[i]['timestamp']) + "</td></tr>"
-                + "<tr><td><b>Value:</b></td><td>" + json.documents[i]['value'] + "</td></tr>" 
-                + "<tr><td><b>Entity:</b></td><td>" + json.documents[i]['entity'] + "</td></tr>" 
-                + "<tr><td><b>Attribute:</b></td><td>" + json.documents[i]['characteristic'] + "</td></tr>" 
-                + "<tr><td><b>Unit:</b></td><td>" + json.documents[i]['unit'] + "</td></tr>" 
-                + "<tr><td><b>Instrument model:</b></td><td>" + json.documents[i]['instrumentModel'] + "</td></tr>" 
-                + "<tr><td><b>Platform name:</b></td><td>" + json.documents[i]['platformName'] + "</td></tr>"
-                + "</table>"
-                + "<a><strong>Click Object URI to check Object Details</strong></a>";
-            
-        	$(el).attr("title", title);
+                    + "<tr><td><b>URI:</b></td><td>" + json.documents[i]['uri'] + "</td></tr>"
+                    + "<tr><td><b>Timestamp:</b></td><td>" + (json.documents[i]['timestamp'] == null ? json.documents[i]['abstractTime'] : json.documents[i]['timestamp']) + "</td></tr>"
+                    + "<tr><td><b>Value:</b></td><td>" + json.documents[i]['value'] + "</td></tr>"
+                    + "<tr><td><b>Entity:</b></td><td>" + json.documents[i]['entity'] + "</td></tr>"
+                    + "<tr><td><b>Attribute:</b></td><td>" + json.documents[i]['characteristic'] + "</td></tr>"
+                    + "<tr><td><b>Unit:</b></td><td>" + json.documents[i]['unit'] + "</td></tr>"
+                    + "<tr><td><b>Instrument model:</b></td><td>" + json.documents[i]['instrumentModel'] + "</td></tr>"
+                    + "<tr><td><b>Platform name:</b></td><td>" + json.documents[i]['platformName'] + "</td></tr>"
+                    + "</table>"
+                    + "<a><strong>Click Object URI to check Object Details</strong></a>";
+
+            $(el).attr("title", title);
         });
 
         $("#measurementsTable tr").not(':first').find(".object_uri").each(function(i, el) {

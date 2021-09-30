@@ -17,14 +17,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-//import org.hadatac.entity.pojo.DataAcquisitionSchemaEvent;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.metadata.loader.URIUtils;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.http.SPARQLUtils;
 
 public class DataAcquisitionSchemaAttribute extends HADatAcThing {
@@ -559,9 +552,22 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
-	if (DataAcquisitionSchemaAttribute.getCache().get(dasa_uri) != null) {
-	    return DataAcquisitionSchemaAttribute.getCache().get(dasa_uri);
-	}
+
+        // debug
+        if ( dasa_uri.contains("zvalue-bwt-gage-sex-d")) {
+            int x = 1;
+        }
+        if ( dasa_uri.contains("ZBFA")) {
+            int x = 1;
+        }
+        if ( dasa_uri.contains("ZHFA")) {
+            int x = 1;
+        }
+        // end of debug
+
+        if (DataAcquisitionSchemaAttribute.getCache().get(dasa_uri) != null) {
+            return DataAcquisitionSchemaAttribute.getCache().get(dasa_uri);
+        }
         DataAcquisitionSchemaAttribute dasa = null;
         //System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
 
@@ -571,7 +577,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "    <" + dasa_uri + "> a hasco:DASchemaAttribute . \n" + 
                 "    <" + dasa_uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasEntity ?hasEntity } . \n" + 
-                "    OPTIONAL { <" + dasa_uri + "> hasco:hasAttribute ?hasAttribute } . \n" + 
+                "    OPTIONAL { <" + dasa_uri + "> hasco:hasAttribute/rdf:rest*/rdf:first ?hasAttribute } . \n" +
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasUnit ?hasUnit } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasEvent ?hasDASE } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:isAttributeOf ?hasDASO } . \n" + 
@@ -604,6 +610,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String inRelationToUri = "";
         String relationUri = "";
 
+        Map<String,String> relationMap = new HashMap<>();
         while (resultsrw.hasNext()) {        	
             QuerySolution soln = resultsrw.next();
 
@@ -639,7 +646,25 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 relationUri = soln.get("relation").toString();
             }
 
+            if ( relationUri != null && relationUri.length() > 0 && inRelationToUri != null && inRelationToUri.length() > 0 ) {
+                relationMap.put(relationUri, inRelationToUri);
+                relationUri = "";
+                inRelationToUri = "";
+            }
+
         }
+
+        // debug
+        if ( dasa_uri.contains("zvalue-bwt-gage-sex-d")) {
+            int x = 1;
+        }
+        if ( dasa_uri.contains("ZBFA")) {
+            int x = 1;
+        }
+        if ( dasa_uri.contains("ZHFA")) {
+            int x = 1;
+        }
+        // end of debug
 
         dasa = new DataAcquisitionSchemaAttribute(
                 dasa_uri,
@@ -653,55 +678,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 daseUriStr,
                 dasoUriStr);
 
-        dasa.addRelation(relationUri, inRelationToUri);
+        for ( Map.Entry<String, String> entry : relationMap.entrySet() ) {
+            dasa.addRelation(entry.getKey(), entry.getValue());
+        }
 
-	DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
+	    DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
         return dasa;
-    }
-
-    public static List<DataAcquisitionSchemaAttribute> findByAttribute(String attributeUri) {
-        //System.out.println("Looking for data acquisition schema attributes with hasco:hasAttribute " + attributeUri);
-        if (attributeUri.startsWith("http")) {
-            attributeUri = "<" + attributeUri + ">";
-        }
-        List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
-        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?uri ?hasEntity ?schemaUri " + 
-                " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed WHERE { " + 
-                "    ?uri a hasco:DASchemaAttribute . " + 
-                "    ?uri hasco:hasAttribute " + attributeUri + ". " +
-                "    ?uri hasco:partOfSchema ?schemaUri .  " + 
-                "} ";
-        //System.out.println("[DASA] query string = \n" + queryString);
-
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
-        if (!resultsrw.hasNext()) {
-            System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find DASA's with attribute: " + attributeUri);
-            return attributes;
-        }
-
-        String uriStr = "";
-
-        while (resultsrw.hasNext()) {
-            QuerySolution soln = resultsrw.next();
-            if (soln != null) {
-
-                try {
-                    if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
-                        uriStr = soln.getResource("uri").getURI();
-                        DataAcquisitionSchemaAttribute attr = find(uriStr);
-                        attributes.add(attr);
-                    }
-                } catch (Exception e1) {
-                    System.out.println("[ERROR] DataAcquisitionSchemaAttribute. URI: " + uriStr);
-                }
-            }
-        }
-        attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
-
-        return attributes;
     }
 
     // Given a study URI, 
@@ -926,3 +908,5 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return 0;
     }
 }
+
+

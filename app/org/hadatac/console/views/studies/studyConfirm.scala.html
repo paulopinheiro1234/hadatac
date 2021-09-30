@@ -1,27 +1,27 @@
-@(message: String, std : org.hadatac.entity.pojo.Study)
+@(message: String, std : org.hadatac.entity.pojo.Study, userName: String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main(message) {
+@main(message,"",userName) {
     <h4>@message</h4>
 
     <ul>
-    	<li><b>URI:</b> @URIUtils.replaceNameSpaceEx(std.getUri())</li>
-      	<li><b>Type:</b> @URIUtils.replaceNameSpaceEx(std.getTypeUri())</li>
-      	<li><b>Short Name:</b> @std.getLabel()</li>
-     	<li><b>Project:</b> @std.getProject()</li>
-     	<li><b>Description:</b> @std.getComment()</li>
-      	<li><b>External Source:</b> @std.getExternalSource()</li>
-      	<li><b>Agent:</b> @if(std.getAgent() != null) { @std.getAgent().getName() }</li>
-      	<li><b>Institution:</b> @if(std.getInstitution() != null) { @std.getInstitution().getName() }</li>
-	 	<li><b>Start Date/Time</b>: @if(std.getStartedAt() != null) { @std.getStartedAt() }</li>
-	 	<li><b>End Date/Time</b>: @if(std.getEndedAt() != null) { @std.getEndedAt() }</li>
+        <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(std.getUri())</li>
+        <li><b>Type:</b> @URIUtils.replaceNameSpaceEx(std.getTypeUri())</li>
+        <li><b>Short Name:</b> @std.getLabel()</li>
+        <li><b>Project:</b> @std.getProject()</li>
+        <li><b>Description:</b> @std.getComment()</li>
+        <li><b>External Source:</b> @std.getExternalSource()</li>
+        <li><b>Agent:</b> @if(std.getAgent() != null) { @std.getAgent().getName() }</li>
+        <li><b>Institution:</b> @if(std.getInstitution() != null) { @std.getInstitution().getName() }</li>
+        <li><b>Start Date/Time</b>: @if(std.getStartedAt() != null) { @std.getStartedAt() }</li>
+        <li><b>End Date/Time</b>: @if(std.getEndedAt() != null) { @std.getEndedAt() }</li>
     </ul>
-    
+
     @studyButton(false)
 }
 
-    
+

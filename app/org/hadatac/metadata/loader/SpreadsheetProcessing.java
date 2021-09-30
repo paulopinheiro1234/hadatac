@@ -16,16 +16,15 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hadatac.metadata.loader.SheetProcessing;
 import org.hadatac.metadata.model.SpreadsheetParsingResult;
 import org.hadatac.utils.Feedback;
 import org.hadatac.utils.NameSpaces;
-
+import org.hadatac.utils.ConfigProp;
 public class SpreadsheetProcessing {
 
     public static final String KB_FORMAT = "text/turtle";
 
-    public static final String TTL_DIR = "tmp/ttl/";
+    public static final String TTL_DIR = ConfigProp.getTmp() + "ttl/";
 
     public static String printFileWithLineNumber(int mode, String filename) {
         String str = "";
@@ -71,7 +70,7 @@ public class SpreadsheetProcessing {
 
                 //Iterate through workbook's sheets
                 for (int currentSheet=0; currentSheet < workbook.getNumberOfSheets(); currentSheet++) {
-                    XSSFSheet sheet = workbook.getSheetAt(currentSheet);	            
+                    XSSFSheet sheet = workbook.getSheetAt(currentSheet);
                     message += Feedback.print(mode, "   Processing sheet " + sheet.getSheetName() + "     ");
                     for (int i = sheet.getSheetName().length(); i < 20; i++) {
                         message += Feedback.print(mode, ".");

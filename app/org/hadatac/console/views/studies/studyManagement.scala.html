@@ -1,52 +1,52 @@
-@(studyList : List[org.hadatac.entity.pojo.Study])
+@(studyList : List[org.hadatac.entity.pojo.Study], userName: String)
 
 @import helper._
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 
-@main("Study Management") {
+@main("Study Management","",userName) {
 
     <h3>Study Management</h3>
-    
+
     <h4>Management options</h4>
 
     <div class="container-fluid">
-      <div class="row">
-         <div class="navbar-collapse collapse navbar-secondary">
-           <a href="@org.hadatac.console.controllers.studies.routes.NewStudy.index()" class="btn btn-primary" role="button">Create Study</a>
-           <a href="" class="btn btn-primary disabled" role="button">Manage Agents (PI's, CO-Pi's)</a>
-           <a href="" class="btn btn-primary disabled" role="button">Manage Organizations</a>
-         </div>
-      </div>
-   </div>
+        <div class="row">
+            <div class="navbar-collapse collapse navbar-secondary">
+                <a href="@org.hadatac.console.controllers.studies.routes.NewStudy.index()" class="btn btn-primary" role="button">Create Study</a>
+                <a href="" class="btn btn-primary disabled" role="button">Manage Agents (PI's, CO-Pi's)</a>
+                <a href="" class="btn btn-primary disabled" role="button">Manage Organizations</a>
+            </div>
+        </div>
+    </div>
 
-   <hr>
+    <hr>
 
-   <h4>Studies</h4>
-   
+    <h4>Studies</h4>
+
     <div class="container-fluid">
         <table class="table">
             <thead>
-              <tr>
-                <!--  <th>Study URI</th>  -->
-                <th>Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Start Date/Time</th>
-                <th>End Date/Time</th>
-                <th># DAs</th>
-                <th># SOCs</th>
-                <th>Operations</th>
-              </tr>
+                <tr>
+                        <!--  <th>Study URI</th>  -->
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Start Date/Time</th>
+                    <th>End Date/Time</th>
+                    <th># DAs</th>
+                    <th># SOCs</th>
+                    <th>Operations</th>
+                </tr>
             </thead>
             <tbody>
-              @for(study <- studyList){
-                  @study_entry(study)
-              }
+            @for(study <- studyList){
+                @study_entry(study)
+            }
             </tbody>
         </table>
-	
+
         @mainButton(false)
-	
+
     </div>
 }

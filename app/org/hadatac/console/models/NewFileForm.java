@@ -6,40 +6,40 @@ public class NewFileForm {
     public String newTemplate;
     public String newName;
     public String newDest;
-    
+
     public NewFileForm () {
     }
-    
+
     public String getNewType() {
-    	return newType;
+        return newType;
     }
-    
+
     public void setNewType(String newType) {
-    	this.newType = newType;
+        this.newType = newType;
     }
-    
+
     public String getNewTemplate() {
-    	return newTemplate;
+        return newTemplate;
     }
-    
+
     public void setNewTemplate(String newTemplate) {
-    	this.newTemplate = newTemplate;
+        this.newTemplate = newTemplate;
     }
-    
+
     public String getNewName() {
-    	return newName;
+        return newName;
     }
-    
+
     public void setNewName(String newName) {
-    	this.newName = newName;
+        this.newName = newName;
     }
-    
+
     public String getNewDest() {
-    	return newDest;
+        return newDest;
     }
-    
+
     public void setNewDest(String newDest) {
-    	this.newDest = newDest;
+        this.newDest = newDest;
     }
-    
+
 }

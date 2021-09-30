@@ -20,192 +20,190 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.noggit.JSONUtil;
 
-import com.typesafe.config.ConfigFactory;
-
 public class TokenAction {
 
-	public enum Type {
-		EMAIL_VERIFICATION,
-		PASSWORD_RESET
-	}
+    public enum Type {
+        EMAIL_VERIFICATION,
+        PASSWORD_RESET
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Verification time frame (until the user clicks on the link in the email)
-	 * in seconds
-	 * Defaults to one week
-	 */
-	private final static long VERIFICATION_TIME = 7 * 24 * 3600;
+    /**
+     * Verification time frame (until the user clicks on the link in the email)
+     * in seconds
+     * Defaults to one week
+     */
+    private final static long VERIFICATION_TIME = 7 * 24 * 3600;
 
-	public Long id;
-	
-	@Field("id")
-	public String id_s;
+    public Long id;
 
-	@Field("token_str")
-	public String token;
+    @Field("id")
+    public String id_s;
 
-	public SysUser targetUser;
+    @Field("token_str")
+    public String token;
 
-	public Type type;
+    public SysUser targetUser;
 
-	@Field("created_str")
-	public String created;
-	
-	public DateTime created_j;
+    public Type type;
 
-	@Field("expires_str")
-	public String expires;
-	
-	public DateTime expires_j;
-	
-	public String getTargetUserId() {
-		return targetUser.getId();
-	}
-	
-	@Field("target_user_id_str")
-	public void setTargetUserId(String id_s) {
-		targetUser.setId(id_s);
-	}
-	
-	public String getType() {
-		return type.name();
-	}
-	
-	@Field("type_str")
-	public void setType(String name) {
-		if (name.equals("EMAIL_VERIFICATION")) {
-			type = Type.EMAIL_VERIFICATION;
-		} else {
-			type = Type.PASSWORD_RESET;
-		}
-	}
-	
-	public String getCreated() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		return formatter.withZone(DateTimeZone.UTC).print(this.created_j);
-	}
-	
-	@Field("created_str")
-	public void setCreated(String created) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		created_j = formatter.parseDateTime(created);
-	}
-	
-	public String getExpires() {
-		DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-		return formatter.withZone(DateTimeZone.UTC).print(this.expires_j);
-	}
-	
-	@Field("expires_str")
-	public void setExpires(String expires) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-		expires_j = formatter.parseDateTime(expires);
-	}
+    @Field("created_str")
+    public String created;
 
-	public static TokenAction findByToken(final String token, final Type type) {
-		return findByTokenSolr(token, type);
-	}
-	
-	public static TokenAction findByTokenSolr(final String token, final Type type) {
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
-    	SolrQuery solrQuery = new SolrQuery("token_str:" + token + " AND type_str:" + type.name());
-    	TokenAction tokenAction = null;
-		
-    	try {
-			QueryResponse queryResponse = solrClient.query(solrQuery);
-			solrClient.close();
-			SolrDocumentList list = queryResponse.getResults();
-			if (list.size() == 1) {
-				DateTime date;
-				SolrDocument doc = list.get(0);
-				tokenAction = new TokenAction();
-				tokenAction.id_s = doc.getFieldValue("id").toString();
-				tokenAction.token = doc.getFieldValue("token_str").toString();
-				tokenAction.setType(doc.getFieldValue("type_str").toString());
-				date = new DateTime(doc.getFieldValue("created_str"));
-				tokenAction.setCreated(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-				date = new DateTime(doc.getFieldValue("expires_str"));
-				tokenAction.setExpires(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
-				tokenAction.targetUser = SysUser.findByIdSolr(doc.getFieldValue("target_user_id_str").toString());
-			}
-		} catch (Exception e) {
-			System.out.println("[ERROR] TokenAction.findByTokenSolr - Exception message: " + e.getMessage());
-		}
-    	
-    	return tokenAction;
-	}
+    public DateTime created_j;
 
-	public static void deleteByUser(final SysUser u, final Type type) {
-		deleteByUserSolr(u, type);
-	}
-	
-	public static void deleteByUserSolr(final SysUser u, final Type type) {
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
-		try {
-			solrClient.deleteByQuery("target_user_id_str:" + u.getId() + " AND type_str:" + type.name());
-			solrClient.commit();
-			solrClient.close();
-		} catch (SolrServerException | IOException e) {
-			System.out.println("[ERROR] TokenAction.deleteByUserSolr - Exception message: " + e.getMessage());
-		}
-	}
+    @Field("expires_str")
+    public String expires;
 
-	public boolean isValid() {
-		return this.expires_j.isAfterNow();
-	}
+    public DateTime expires_j;
 
-	public static TokenAction create(final Type type, final String token,
-			final SysUser targetUser) {
-		final TokenAction ua = new TokenAction();
-		ua.id_s = UUID.randomUUID().toString();
-		ua.targetUser = targetUser;
-		ua.token = token;
-		ua.type = type;
-		final Date created = new Date();
-		final DateTime created_j = new DateTime();
-		ua.created = created.toString();
-		ua.created_j = created_j;
-		ua.expires = new Date(created.getTime() + VERIFICATION_TIME * 1000).toString();
-		ua.expires_j = new DateTime(created_j.getMillis() + VERIFICATION_TIME * 1000);
-		ua.save();
-		return ua;
-	}
-	
-	public void save() {
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
-        
+    public String getTargetUserId() {
+        return targetUser.getId();
+    }
+
+    @Field("target_user_id_str")
+    public void setTargetUserId(String id_s) {
+        targetUser.setId(id_s);
+    }
+
+    public String getType() {
+        return type.name();
+    }
+
+    @Field("type_str")
+    public void setType(String name) {
+        if (name.equals("EMAIL_VERIFICATION")) {
+            type = Type.EMAIL_VERIFICATION;
+        } else {
+            type = Type.PASSWORD_RESET;
+        }
+    }
+
+    public String getCreated() {
+        DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+        return formatter.withZone(DateTimeZone.UTC).print(this.created_j);
+    }
+
+    @Field("created_str")
+    public void setCreated(String created) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
+        created_j = formatter.parseDateTime(created);
+    }
+
+    public String getExpires() {
+        DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+        return formatter.withZone(DateTimeZone.UTC).print(this.expires_j);
+    }
+
+    @Field("expires_str")
+    public void setExpires(String expires) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy");
+        expires_j = formatter.parseDateTime(expires);
+    }
+
+    public static TokenAction findByToken(final String token, final Type type) {
+        return findByTokenSolr(token, type);
+    }
+
+    public static TokenAction findByTokenSolr(final String token, final Type type) {
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
+        SolrQuery solrQuery = new SolrQuery("token_str:" + token + " AND type_str:" + type.name());
+        TokenAction tokenAction = null;
+
         try {
-        	solrClient.addBean(this);
-			solrClient.commit();
-			solrClient.close();
-		} catch (Exception e) {
-			System.out.println("[ERROR] TokenAction.save - Exception message: " + e.getMessage());
-		}
-	}
-	
-	public static String outputAsJson() {
-		SolrClient solrClient = new HttpSolrClient.Builder(
-		        CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
-		String query = "*:*";
-    	SolrQuery solrQuery = new SolrQuery(query);
-    	
-    	try {
-			QueryResponse queryResponse = solrClient.query(solrQuery);
-			solrClient.close();
-			SolrDocumentList docs = queryResponse.getResults();
-			return JSONUtil.toJSON(docs);
-		} catch (Exception e) {
-			System.out.println("[ERROR] TokenAction.outputAsJson - Exception message: " + e.getMessage());
-		}
-    	
-    	return "";
-	}
+            QueryResponse queryResponse = solrClient.query(solrQuery);
+            solrClient.close();
+            SolrDocumentList list = queryResponse.getResults();
+            if (list.size() == 1) {
+                DateTime date;
+                SolrDocument doc = list.get(0);
+                tokenAction = new TokenAction();
+                tokenAction.id_s = doc.getFieldValue("id").toString();
+                tokenAction.token = doc.getFieldValue("token_str").toString();
+                tokenAction.setType(doc.getFieldValue("type_str").toString());
+                date = new DateTime(doc.getFieldValue("created_str"));
+                tokenAction.setCreated(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+                date = new DateTime(doc.getFieldValue("expires_str"));
+                tokenAction.setExpires(date.withZone(DateTimeZone.UTC).toString("EEE MMM dd HH:mm:ss zzz yyyy"));
+                tokenAction.targetUser = SysUser.findByIdSolr(doc.getFieldValue("target_user_id_str").toString());
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] TokenAction.findByTokenSolr - Exception message: " + e.getMessage());
+        }
+
+        return tokenAction;
+    }
+
+    public static void deleteByUser(final SysUser u, final Type type) {
+        deleteByUserSolr(u, type);
+    }
+
+    public static void deleteByUserSolr(final SysUser u, final Type type) {
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
+        try {
+            solrClient.deleteByQuery("target_user_id_str:" + u.getId() + " AND type_str:" + type.name());
+            solrClient.commit();
+            solrClient.close();
+        } catch (SolrServerException | IOException e) {
+            System.out.println("[ERROR] TokenAction.deleteByUserSolr - Exception message: " + e.getMessage());
+        }
+    }
+
+    public boolean isValid() {
+        return this.expires_j.isAfterNow();
+    }
+
+    public static TokenAction create(final Type type, final String token,
+                                     final SysUser targetUser) {
+        final TokenAction ua = new TokenAction();
+        ua.id_s = UUID.randomUUID().toString();
+        ua.targetUser = targetUser;
+        ua.token = token;
+        ua.type = type;
+        final Date created = new Date();
+        final DateTime created_j = new DateTime();
+        ua.created = created.toString();
+        ua.created_j = created_j;
+        ua.expires = new Date(created.getTime() + VERIFICATION_TIME * 1000).toString();
+        ua.expires_j = new DateTime(created_j.getMillis() + VERIFICATION_TIME * 1000);
+        ua.save();
+        return ua;
+    }
+
+    public void save() {
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
+
+        try {
+            solrClient.addBean(this);
+            solrClient.commit();
+            solrClient.close();
+        } catch (Exception e) {
+            System.out.println("[ERROR] TokenAction.save - Exception message: " + e.getMessage());
+        }
+    }
+
+    public static String outputAsJson() {
+        SolrClient solrClient = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.AUTHENTICATE_TOKENS)).build();
+        String query = "*:*";
+        SolrQuery solrQuery = new SolrQuery(query);
+
+        try {
+            QueryResponse queryResponse = solrClient.query(solrQuery);
+            solrClient.close();
+            SolrDocumentList docs = queryResponse.getResults();
+            return JSONUtil.toJSON(docs);
+        } catch (Exception e) {
+            System.out.println("[ERROR] TokenAction.outputAsJson - Exception message: " + e.getMessage());
+        }
+
+        return "";
+    }
 }

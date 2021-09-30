@@ -124,9 +124,9 @@ public class MetadataContext implements RDFContext {
                 RepositoryConnection con = repo.getConnection();
                 ValueFactory factory = repo.getValueFactory();
                 if (graphUri.isEmpty()) {
-                	con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createBNode());
+                    con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createBNode());
                 } else {
-                	con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
+                    con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
                 }
             }
         } catch (NotFoundException e) {

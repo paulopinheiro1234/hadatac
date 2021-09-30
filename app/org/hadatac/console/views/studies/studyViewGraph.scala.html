@@ -1,8 +1,8 @@
 @(study_uri      : String,
-  results        : org.hadatac.console.controllers.studies.StudyForceFieldGraph,
-  autorefresh    : Boolean,
-  maxObjsPerSOC    : Integer)
-  
+        results        : org.hadatac.console.controllers.studies.StudyForceFieldGraph,
+        autorefresh    : Boolean,
+        maxObjsPerSOC    : Integer)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers._
@@ -12,85 +12,85 @@
 @import java.net.URLEncoder
 
 @maingraph("Study Graph") {
-	<head>
+    <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
-	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
     </head>
     <body>
 
-    <div class="container-fluid">
-    	<h4>Study's Graph View</h4>
-		<div class="container">
-  			<form>
-    			<label class="checkbox-inline">
-      				<input id="autorefresh" type="checkbox" value="" onclick="openWindowsFunction()">Auto-Refresh
-    			</label>
-    			<label class="checkbox-inline">
-      				<input type="checkbox" value="">Max Objects Per SOC
-			    </label>
-  			</form>
-		</div>
-
-	    <div class="row">
-        	<div class="col-lg-12">
-
-        	    <div id="query" data-results="@results.toJson()"></div>
- 	            <div id="graph-container" style="height: 800px;visibility: visible;">
-    	            <div id="graph" style="display: block; height: 700px;">
-    	            </div>
-        	    </div>
-            	<div id="docs-container">
-                	<a id="docs-close" href="#">&times;</a>
-                	<div id="docs" class="docs"></div>
-            	</div>
+        <div class="container-fluid">
+            <h4>Study's Graph View</h4>
+            <div class="container">
+                <form>
+                    <label class="checkbox-inline">
+                        <input id="autorefresh" type="checkbox" value="" onclick="openWindowsFunction()">Auto-Refresh
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="">Max Objects Per SOC
+                    </label>
+                </form>
             </div>
-		</div>
 
-		<a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary" 
-	       role="button">Back to Search Studies</a>  		
-	
-	</div>
+            <div class="row">
+                <div class="col-lg-12">
 
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/colorbrewer.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/geometry.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/graphview.js")"></script>
-    <!--   <script src="jquery/jquery-1.10.2.min.js"></script>  -->
-    <script>
-var refreshVar
+                    <div id="query" data-results="@results.toJson()"></div>
+                    <div id="graph-container" style="height: 800px;visibility: visible;">
+                        <div id="graph" style="display: block; height: 700px;">
+                        </div>
+                    </div>
+                    <div id="docs-container">
+                        <a id="docs-close" href="#">&times;</a>
+                        <div id="docs" class="docs"></div>
+                    </div>
+                </div>
+            </div>
 
-$( '#autorefresh' ).prop( "checked", @autorefresh );
-if ($('#autorefresh').is(':checked')) {
-	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,autorefresh,maxObjsPerSOC)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-	}, 30000)};
+            <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" class="btn btn-primary"
+            role="button">Back to Search Studies</a>
+
+        </div>
+
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/colorbrewer.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/geometry.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/graphview.js")"></script>
+            <!--   <script src="jquery/jquery-1.10.2.min.js"></script>  -->
+        <script>
+                var refreshVar
+
+                $( '#autorefresh' ).prop( "checked", @autorefresh );
+                if ($('#autorefresh').is(':checked')) {
+                    refreshVar = setTimeout(function() {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,autorefresh,maxObjsPerSOC)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }, 30000)};
 
 
-$('#autorefresh').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,true,maxObjsPerSOC)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,false,maxObjsPerSOC)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+                $('#autorefresh').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,true,maxObjsPerSOC)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index(study_uri,false,maxObjsPerSOC)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
 
-function msg(obj_uri){
-    var urlStr = "@org.hadatac.console.controllers.objects.routes.ObjectView.index("zzzzzz", false)";
-    obj_uri = encodeURIComponent(obj_uri);
-    urlStr = urlStr.replace(/&amp;/g, '&').replace("zzzzzz",obj_uri);
-    window.open(urlStr);
+                function msg(obj_uri){
+                    var urlStr = "@org.hadatac.console.controllers.objects.routes.ObjectView.index("zzzzzz", false)";
+                    obj_uri = encodeURIComponent(obj_uri);
+                    urlStr = urlStr.replace(/&amp;/g, '&').replace("zzzzzz",obj_uri);
+                    window.open(urlStr);
+                }
+        </script>
+    </body>
 }
-    </script> 
-   	</body>
-} 

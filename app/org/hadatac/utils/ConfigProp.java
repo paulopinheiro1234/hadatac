@@ -17,9 +17,9 @@ import com.typesafe.config.ConfigFactory;
 
 public class ConfigProp {
 
-	public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
+	//public static final String AUTOANNOTATOR_CONFIG_FILE = "autoccsv.config";
 
-	public static final String GUI_CONFIG_FILE = "gui.config";
+	//public static final String GUI_CONFIG_FILE = "gui.config";
 
 	public static final String MEDIA_FOLDER = "media";
 
@@ -70,67 +70,83 @@ public class ConfigProp {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix") + "-kb:";
 	}
 
+	public static String getTmp() {
+		return ConfigFactory.load().getString("hadatac.autoccsv.path_tmp");
+	}
+
+	public static String getLogs() {
+		return ConfigFactory.load().getString("hadatac.autoccsv.path_logs");
+	}
+
 	public static String getTemplateFileName() {
-		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "template_file_name");
+		return ConfigFactory.load().getString("hadatac.autoccsv.template_file_name");
+		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "template_file_name");
 	}
 
 	public static String getPathUnproc() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + Sandbox.SUFFIX;
+	    	return ConfigFactory.load().getString("hadatac.autoccsv.path_unproc") + Sandbox.SUFFIX;
+	        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc") + Sandbox.SUFFIX;
 	    }
-		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
+	    return ConfigFactory.load().getString("hadatac.autoccsv.path_unproc");
+		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_unproc");
 	}
 
 	public static String getPathProc() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + Sandbox.SUFFIX;
+	    	return ConfigFactory.load().getString("hadatac.autoccsv.path_proc") + Sandbox.SUFFIX;
+	        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc") + Sandbox.SUFFIX;
 	    }
-	    return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
+	    return ConfigFactory.load().getString("hadatac.autoccsv.path_proc");
+	    //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_proc");
 	}
 
 	public static String getPathMedia() {
 	    return Paths.get(getPathProc(), "/" + MEDIA_FOLDER + "/").toString();
 	}
 
-	public static String getPathDownload() {
-	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download") + Sandbox.SUFFIX;
-	    }
-		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_download");
-	}
-
 	public static String getPathDataDictionary() {
-        if (CollectionUtil.isSandboxMode()) {
-            return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict") + Sandbox.SUFFIX;
-        }
-        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_data_dict");
+        return getPathWorking();
     }
 
 	public static String getPathWorking() {
 	    if (CollectionUtil.isSandboxMode()) {
-	        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working") + Sandbox.SUFFIX;
+	    	return ConfigFactory.load().getString("hadatac.autoccsv.path_working") + Sandbox.SUFFIX;
+	        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working") + Sandbox.SUFFIX;
 	    }
-		return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working");
+	    return ConfigFactory.load().getString("hadatac.autoccsv.path_working");
+		//return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "path_working");
+	}
+	public static String getAuto() {
+		if(System.getProperty("hadatac.autoccsv.auto") != null && !System.getProperty("hadatac.autoccsv.auto").equals(ConfigFactory.load().getString("hadatac.autoccsv.auto"))){
+			return System.getProperty("hadatac.autoccsv.auto");
+		}
+		return ConfigFactory.load().getString("hadatac.autoccsv.auto");
 	}
 
 	public static String getDefaultOwnerEmail() {
-        return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
+		return ConfigFactory.load().getString("hadatac.autoccsv.default_owner_email");
+        //return getPropertyValue(AUTOANNOTATOR_CONFIG_FILE, "default_owner_email");
     }
 
 	public static String getFacetedDataUnit() {
-        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_unit");
+		return ConfigFactory.load().getString("hadatac.gui.faceted_data_unit");
+        //return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_unit");
     }
 
 	public static String getFacetedDataTime() {
-        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_time");
+		return ConfigFactory.load().getString("hadatac.gui.faceted_data_time");
+        //return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_time");
     }
 
 	public static String getFacetedDataSpace() {
-        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_space");
+		return ConfigFactory.load().getString("hadatac.gui.faceted_data_space");
+        //return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_space");
     }
 
 	public static String getFacetedDataPlatform() {
-        return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_platform");
+		return ConfigFactory.load().getString("hadatac.gui.faceted_data_platform");
+        //return getPropertyValue(GUI_CONFIG_FILE, "faceted_data_platform");
     }
 
     public static String getBioportalApiKey() {
@@ -153,6 +169,27 @@ public class ConfigProp {
 
     public static String getSDDGenAddress() {
         return ConfigFactory.load().getString("hadatac.search.sdd_gen_address");
+    }
+
+    public static String getTestUsername() {
+        return ConfigFactory.load().getString("hadatac.test.user_name");
+    }
+
+    public static boolean getSignUpBool() {
+        if(ConfigFactory.load().getString("hadatac.test.sign_up").toLowerCase().equals("true")){
+           return true;
+        }
+        else{
+           return false;
+        }
+    }
+
+    public static String getTestUserPass() {
+        return ConfigFactory.load().getString("hadatac.test.user_password");
+    }
+
+    public static String getWebDriverPath() {
+        return ConfigFactory.load().getString("hadatac.test.web_driver_path");
     }
 
     public static boolean hasSDDGenAddress() {

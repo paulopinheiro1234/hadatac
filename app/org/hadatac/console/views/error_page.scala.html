@@ -1,18 +1,18 @@
 @( stackTrace : String,
-   category : String)
+        category : String)
 
 @import helper._
-@import org.hadatac.console.views.html._
+@import views.html._
 
-@main("Oops!"){
+@main("Oops!","",""){
     <div class="container-fluid">
-      
-      <div class="row">
-        <div class="col-sm-9 col-md-10 main">
-            <h4>Error :(</h4>
-            <div class="row placeholders"></div>
-            <p>@stackTrace</p>
+
+        <div class="row">
+            <div class="col-sm-9 col-md-10 main">
+                <h4>Error :(</h4>
+                <div class="row placeholders"></div>
+                <p>@stackTrace</p>
+            </div>
         </div>
-      </div>
     </div>
 }

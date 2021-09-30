@@ -11,15 +11,28 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PossibleValue extends HADatAcClass implements Comparable<PossibleValue> {
 
+    private static final Logger log = LoggerFactory.getLogger(PossibleValue.class);
     static String className = "hasco:PossibleValue";
+
+    public static String INSERT_LINE1 = "INSERT DATA {  ";
+    public static String DELETE_LINE1 = "DELETE WHERE {  ";
+    public static String LINE3 = " a    sio:SIO_000614;  ";
+    public static String DELETE_LINE3 = " ?p ?o . ";
+    public static String LINE_LAST = "}  ";
 
     public PossibleValue () {
         super(className);
@@ -43,59 +56,95 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
     @PropertyField(uri="hasco:hasResource")
     private String hasResource;
    
+    @PropertyField(uri="hasco:otherFor")
+    private String hasOtherFor;
+   
     public String getHasDASAUri() {
-    	return hasDASAUri;
+        return hasDASAUri;
     }
-    
+
     public void setHasDASAUri(String hasDASAUri) {
-    	this.hasDASAUri = hasDASAUri;
+        this.hasDASAUri = hasDASAUri;
     }
-    
+
     public String getHasVariable() {
-    	return hasVariable;
+        return hasVariable;
     }
-    
+
     public void setHasVariable(String hasVariable) {
-    	this.hasVariable = hasVariable;
+        this.hasVariable = hasVariable;
     }
-    
+
     public String getHasCode() {
-    	return hasCode;
+        return hasCode;
     }
-    
+
     public void setHasCode(String hasCode) {
-    	this.hasCode = hasCode;
+        this.hasCode = hasCode;
     }
-    
+
     public String getHasCodeLabel() {
-    	return hasCodeLabel;
+    	if (hasClass == null || hasClass.isEmpty()) {
+    			return hasCodeLabel;
+    	}
+    	if (hasCodeLabel != null && !hasCodeLabel.isEmpty()) {
+    		return hasCodeLabel;
+    	}
+    	Attribute attr = Attribute.find(this.hasClass);
+    	if (attr != null && attr.getLabel() != null) {
+    		return "[" + attr.getLabel() + "]";
+    	}
+    	return "";
     }
-    
+
     public void setHasCodeLabel(String hasCodeLabel) {
-    	this.hasCodeLabel = hasCodeLabel;
+        this.hasCodeLabel = hasCodeLabel;
+    }
+
+    public String getHasClass() {
+        return hasClass;
     }
     
-    public String getHasClass() {
-    	return hasClass;
+    public String getPrettyHasClass() {
+    	return URIUtils.replaceNameSpaceEx(hasClass);
     }
     
     public void setHasClass(String hasClass) {
-    	this.hasClass = hasClass;
+        this.hasClass = hasClass;
     }
-    
+
     public String getHasResource() {
-    	return hasResource;
+        return hasResource;
+    }
+
+    public void setHasResource(String hasResource) {
+        this.hasResource = hasResource;
     }
     
-    public void setHasResource(String hasResource) {
-    	this.hasResource = hasResource;
+    public String getHasOtherFor() {
+    	return hasOtherFor;
+    }
+    
+    public String getPrettyHasOtherFor() {
+    	return URIUtils.replaceNameSpaceEx(hasOtherFor);
+    }
+    
+    public void setHasOtherFor(String hasOtherFor) {
+    	this.hasOtherFor = hasOtherFor;
+    }
+    
+    public String getHarmonizedCode() {
+    	if (this.hasClass == null || this.hasClass.isEmpty()) {
+    		return "";
+    	}
+    	return Attribute.findHarmonizedCode(this.hasClass);
     }
     
     public static List<PossibleValue> find() {
         List<PossibleValue> codebook = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* " + className + " . " + 
+                " ?uri rdfs:subClassOf* " + className + " . " +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -105,26 +154,66 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
             QuerySolution soln = resultsrw.next();
             PossibleValue code = find(soln.getResource("uri").getURI());
             codebook.add(code);
-        }			
+        }
 
         java.util.Collections.sort((List<PossibleValue>) codebook);
         return codebook;
     }
 
-    public static List<PossibleValue> findBySchema(String schemaUri) {    	
+    public static List<PossibleValue> findBySchema(String schemaUri) {
 
-    	System.out.println("SchemaUri: " + schemaUri);
+        System.out.println("SchemaUri: " + schemaUri);
+
+    	log.debug("PossibleValue.findBySchema: SchemaUri=" + schemaUri);
     	
     	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
                 + " SELECT ?uri WHERE { \n"
                 + " ?uri a hasco:PossibleValue . \n"
                 + " ?uri hasco:isPossibleValueOf ?daso_or_dasa . \n"
-                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
+                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n"
                 + " OPTIONAL { ?uri hasco:hasVariable ?variable . } \n"
                 + " OPTIONAL { ?uri hasco:hasCode ?code . } \n"
                 + " } \n"
                 + " ORDER BY ?variable ?code ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        try {
+            while (resultsrw.hasNext()) {
+                String pvUri = "";
+                QuerySolution soln = resultsrw.next();
+                if (soln.get("uri") != null && !soln.get("uri").toString().isEmpty()) {
+                    pvUri = soln.get("uri").toString();
+                    if (pvUri != null) {
+                        PossibleValue pv = find(pvUri);
+                        if (pv != null) {
+                            possibleValues.add(pv);
+                        }
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            log.error("[ERROR] PossibleValue.findBySchema(): " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return possibleValues;
+    }
+
+    public static List<PossibleValue> findByVariable(String variableUri) {    	
+
+    	log.debug("      VariableUri: " + variableUri);
+    	
+    	List<PossibleValue> possibleValues = new ArrayList<PossibleValue>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
+                + " SELECT ?uri WHERE { \n"
+                + " ?uri a hasco:PossibleValue . \n"
+                + " ?uri hasco:isPossibleValueOf <" + variableUri + "> .  \n"
+                + " } \n "
+                + " ORDER BY ?uri ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -145,7 +234,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
 
             }
         } catch (Exception e) {
-            System.out.println("PossibleValue.findBySchema() Error: " + e.getMessage());
+            log.error("[ERROR] PossibleValue.findByVariable(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -182,20 +271,20 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
         return null;
     }
 
-    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {    	
-    	Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
+    public static Map<String, Map<String, String>> findPossibleValues(String schemaUri) {
+        Map<String, Map<String, String>> mapPossibleValues = new HashMap<String, Map<String, String>>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList()
-                + " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource WHERE { \n"
+                + " SELECT ?daso_or_dasa ?codeClass ?code ?codeLabel ?resource ?other WHERE { \n"
                 + " ?possibleValue a hasco:PossibleValue . \n"
                 + " ?possibleValue hasco:isPossibleValueOf ?daso_or_dasa . \n"
                 + " ?possibleValue hasco:hasCode ?code . \n"
-                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n" 
+                + " ?daso_or_dasa hasco:partOfSchema <" + schemaUri + "> . \n"
                 + " OPTIONAL { ?possibleValue hasco:hasClass ?codeClass } . \n"
                 + " OPTIONAL { ?possibleValue hasco:hasResource ?resource } . \n"
                 + " OPTIONAL { ?possibleValue hasco:hasCodeLabel ?codeLabel } . \n"
                 + " }";
 
-        //System.out.println("findPossibleValues query: \n" + queryString);
+        log.debug("----> findPossibleValues query: \n" + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -224,7 +313,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                 }
             }
         } catch (Exception e) {
-            System.out.println("PossibleValue.findPossibleValues() Error: " + e.getMessage());
+            log.error("[ERROR] PossibleValue.findPossibleValues(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -251,21 +340,25 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/isPossibleValueOf")) {
                 code.setHasDASAUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCode")) {
-            	code.setHasCode(object.asLiteral().getString());
+                code.setHasCode(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasVariable")) {
-            	code.setHasVariable(object.asLiteral().getString());
+                code.setHasVariable(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCodeLabel")) {
-            	code.setHasCodeLabel(object.asLiteral().getString());
+                code.setHasCodeLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
                 code.setSuperUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasClass")) {
             	try {
             		code.setHasClass(object.asResource().getURI());
             	} catch (Exception e) {
-            		code.setHasClass("");
+            	}
+            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/otherFor")) {
+            	try {
+            	   code.setHasOtherFor(object.asResource().getURI());
+            	} catch (Exception e) {
             	}
             } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasResource")) {
-            	code.setHasResource(object.asResource().getURI());
+                code.setHasResource(object.asResource().getURI());
             }
         }
 
@@ -278,6 +371,86 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
         return code;
     }
 
+    public boolean deleteHasClass() {
+        String query = "";
+        String uri = "";
+        if (getUri() == null || getUri().equals("")) {
+            return false;
+        }
+
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += " DELETE WHERE { \n";
+
+        if (getUri().startsWith("http")) {
+            uri += "<" + this.getUri() + ">";
+        } else {
+            uri += this.getUri();
+        }
+
+        query += uri + " <http://hadatac.org/ont/hasco/hasClass> ?o . \n";
+        query += " } ";
+
+        try {
+	        UpdateRequest request = UpdateFactory.create(query);
+	        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+	                request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+	        processor.execute();
+        } catch (Exception e) {
+            log.error("[ERROR] Possiblevalue.java: QueryParseException due to update query: " + query);
+        	return false;
+        }
+
+        log.debug("Deleted hasco:hasClass property of <" + getUri() + "> from triple store");
+        return true;
+        
+    }
+    
+    public boolean saveHasClass() {
+    	if (!deleteHasClass()) {
+    		return false;
+    	};
+    	
+    	String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert += INSERT_LINE1;
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + getNamedGraph() + "> { ";
+        }
+        
+        insert += "<" + this.getUri() + ">  ";
+        insert += LINE3;
+
+        if (this.getHasClass() != null && !this.getHasClass().isEmpty()) {
+        	insert += " <http://hadatac.org/ont/hasco/hasClass> <" + this.getHasClass() + "> ;   ";
+        }
+        
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+        
+        insert += LINE_LAST;
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
+        } catch (Exception e) {
+            log.error("[ERROR] PossibleValue.java: QueryParseException due to update query: " + insert);
+            return false;
+        }
+
+        log.debug("Added hasco:hasClass property of <" + getUri() + "> from triple store");
+        return true;
+    	
+    }
+    
+    @Override
+    public void save() {
+        saveToTripleStore();
+    }
+    
     @Override
     public int compareTo(PossibleValue another) {
         if (this.getLabel() != null && another.getLabel() != null) {

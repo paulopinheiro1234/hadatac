@@ -3,14 +3,15 @@
   filename  : String,
   da_uri    : String,
   study_uri : String, 
-  oc        : org.hadatac.entity.pojo.ObjectCollection)
+  oc        : org.hadatac.entity.pojo.ObjectCollection,
+  userName  : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main(message) {
+@main(message,"",userName) {
     <div class="container">
        <h4>@message</h4>
 

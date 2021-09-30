@@ -1,7 +1,7 @@
 @(dir          : String,
-  fileId       : String,
-  da_uri       : String,
-  studyOptions : List[org.hadatac.entity.pojo.Study])
+        fileId       : String,
+        da_uri       : String,
+        studyOptions : List[org.hadatac.entity.pojo.Study], userName :String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -10,49 +10,49 @@
 @import org.hadatac.console.controllers.triplestore._
 @import org.hadatac.console.controllers._
 
-@main("Select Study for " + da_uri) {
+@main("Select Study for " + da_uri,"",userName) {
 
-<script type="text/javascript">
-   function checkform() {
-      var cansubmit = true;
+    <script type="text/javascript">
+            function checkform() {
+                var cansubmit = true;
 
-      if (document.getElementById('option').value.length == 0) {
-          cansubmit = false;
-      }
-         
-      if (cansubmit) {
-          document.getElementById('submitbutton').disabled = false;
-      } else {
-          document.getElementById('submitbutton').disabled = 'disabled';
-      }
-   }
-</script>
+                if (document.getElementById('option').value.length == 0) {
+                    cansubmit = false;
+                }
 
-  <div class="container">
-    <h2>Select Study for @da_uri</h2>
+                if (cansubmit) {
+                    document.getElementById('submitbutton').disabled = false;
+                } else {
+                    document.getElementById('submitbutton').disabled = 'disabled';
+                }
+            }
+    </script>
 
-    <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectStudy(dir, fileId, da_uri)">
+    <div class="container">
+        <h2>Select Study for @da_uri</h2>
 
-    <div class="form-group">
-      <label>Selected Data Acquisition</label> <br>
-      @da_uri<br>
-      <br>
-      <label>New Study</label> 
-      <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >
-        @for(std <- studyOptions) {
-            <option value="@std.getUri()">@std.getLabel()</option>
-        }
-      </select>
+        <form class="form-horizontal" name="assignOption" method="post" action="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.processSelectStudy(dir, fileId, da_uri)">
+
+            <div class="form-group">
+                <label>Selected Data Acquisition</label> <br>
+                @da_uri<br>
+                <br>
+                <label>New Study</label>
+                <select class="form-control col-sm-6" id="option" size="20" name="option" onchange="checkform()" >
+                @for(std <- studyOptions) {
+                    <option value="@std.getUri()">@std.getLabel()</option>
+                }
+                </select>
+            </div>
+
+            <div class="form-group" class="col-sm-6 col-offset-3">
+                <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Study" disabled="disabled" />
+            </div>
+            <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)"
+            class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
+
+        </form>
     </div>
-    
-    <div class="form-group" class="col-sm-6 col-offset-3">
-      <input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Select Study" disabled="disabled" />
-    </div>
-    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, fileId, da_uri)" 
-       class="btn btn-primary" role="button">Back to Prepare Ingestion</a>
-    
-    </form>    
-  </div>
-  
-  }
-  
+
+}
+

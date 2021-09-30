@@ -1,11 +1,11 @@
 @(results        : org.hadatac.console.controllers.kg.KGForceFieldGraph,
-  autorefresh    : Boolean,
-  hasOntologies  : Boolean,
-  hasIndicators  : Boolean,
-  hasDeployments : Boolean,
-  hasSDDs        : Boolean,
-  hasDASpecs     : Boolean)
-  
+        autorefresh    : Boolean,
+        hasOntologies  : Boolean,
+        hasIndicators  : Boolean,
+        hasDeployments : Boolean,
+        hasSDDs        : Boolean,
+        hasDASpecs     : Boolean)
+
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers._
@@ -15,161 +15,161 @@
 @import java.net.URLEncoder
 
 @maingraph("Knowledge Graph View") {
-	<head>
+    <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta charset="utf-8">
-	    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
-		<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
-     	<link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/vendor/bootstrap/css/bootstrap.min.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+        <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/svg.css")"/>
     </head>
     <body>
 
-    <div class="container-fluid">
-    	<h4>Knowledge Graph View</h4>
-		<div class="container">
-  			<form>
-    			<label class="checkbox-inline">
-      				<input id="autorefresh" type="checkbox">Auto-Refresh
-    			</label>
-    			<label class="checkbox-inline">
-      				<input id="ontologies" type="checkbox">Show Ontologies
-			    </label>
-    			<label class="checkbox-inline">
-      				<input id="indicators" type="checkbox">Show Indicators
-    			</label>
-    			<label class="checkbox-inline">
-      				<input id="deployments" type="checkbox">Show Deployments
-    			</label>
-    			<label class="checkbox-inline">
-      				<input id="sdds" type="checkbox">Show Semantic Data Dictionaries
-    			</label>
-    			<label class="checkbox-inline">
-      				<input id="daspecs" type="checkbox">Show Data Acquisition Specs
-    			</label>
-  			</form>
-		</div>
-
-	    <div class="row">
-        	<div class="col-lg-12">
-
-        	    <div id="query" data-results="@results.toJson()"></div>
- 	            <div id="graph-container" style="height: 800px;visibility: visible;">
-    	            <div id="graph" style="display: block; height: 700px;">
-    	            </div>
-        	    </div>
-            	<div id="docs-container">
-                	<a id="docs-close" href="#">&times;</a>
-                	<div id="docs" class="docs"></div>
-            	</div>
+        <div class="container-fluid">
+            <h4>Knowledge Graph View</h4>
+            <div class="container">
+                <form>
+                    <label class="checkbox-inline">
+                        <input id="autorefresh" type="checkbox">Auto-Refresh
+                    </label>
+                    <label class="checkbox-inline">
+                        <input id="ontologies" type="checkbox">Show Ontologies
+                    </label>
+                    <label class="checkbox-inline">
+                        <input id="indicators" type="checkbox">Show Indicators
+                    </label>
+                    <label class="checkbox-inline">
+                        <input id="deployments" type="checkbox">Show Deployments
+                    </label>
+                    <label class="checkbox-inline">
+                        <input id="sdds" type="checkbox">Show Semantic Data Dictionaries
+                    </label>
+                    <label class="checkbox-inline">
+                        <input id="daspecs" type="checkbox">Show Data Acquisition Specs
+                    </label>
+                </form>
             </div>
-		</div>
 
-		<a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" 
-	       role="button">Back to Home</a>  		
-	
-	</div>
+            <div class="row">
+                <div class="col-lg-12">
 
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/colorbrewer.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/geometry.js")"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/graphview.js")"></script>
-    <!--   <script src="jquery/jquery-1.10.2.min.js"></script>  -->
-    <script>
-var refreshVar
+                    <div id="query" data-results="@results.toJson()"></div>
+                    <div id="graph-container" style="height: 800px;visibility: visible;">
+                        <div id="graph" style="display: block; height: 700px;">
+                        </div>
+                    </div>
+                    <div id="docs-container">
+                        <a id="docs-close" href="#">&times;</a>
+                        <div id="docs" class="docs"></div>
+                    </div>
+                </div>
+            </div>
 
-$( '#autorefresh' ).prop( "checked", @autorefresh );
-if ($('#autorefresh').is(':checked')) {
-	refreshVar = setTimeout(function() { 
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-	}, 30000)};
-$( '#ontologies' ).prop( "checked", @hasOntologies );
-$( '#indicators' ).prop( "checked", @hasIndicators );
-$( '#deployments' ).prop( "checked", @hasDeployments );
-$( '#sdds' ).prop( "checked", @hasSDDs );
-$( '#daspecs' ).prop( "checked", @hasDASpecs );
+            <a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary"
+            role="button">Back to Home</a>
 
-$('#autorefresh').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(true,hasOntologies,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(false,hasOntologies,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+        </div>
 
-$('#ontologies').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,true,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,false,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery-2.1.4.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/jquery.browser.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/d3.v3.min.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/colorbrewer.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/geometry.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/graphview.js")"></script>
+            <!--   <script src="jquery/jquery-1.10.2.min.js"></script>  -->
+        <script>
+                var refreshVar
 
-$('#indicators').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,true,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,false,hasDeployments,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+                $( '#autorefresh' ).prop( "checked", @autorefresh );
+                if ($('#autorefresh').is(':checked')) {
+                    refreshVar = setTimeout(function() {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }, 30000)};
+                $( '#ontologies' ).prop( "checked", @hasOntologies );
+                $( '#indicators' ).prop( "checked", @hasIndicators );
+                $( '#deployments' ).prop( "checked", @hasDeployments );
+                $( '#sdds' ).prop( "checked", @hasSDDs );
+                $( '#daspecs' ).prop( "checked", @hasDASpecs );
 
-$('#deployments').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,true,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,false,hasSDDs,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+                $('#autorefresh').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(true,hasOntologies,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(false,hasOntologies,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
 
-$('#sdds').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,true,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,false,hasDASpecs)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+                $('#ontologies').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,true,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,false,hasIndicators,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
 
-$('#daspecs').change(function() {
-  if ($(this).is(':checked')) {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,hasSDDs,true)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  } else {
-		hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,hasSDDs,false)";
-		hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
-		window.location.href = hrefValue; 
-  }
-});
+                $('#indicators').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,true,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,false,hasDeployments,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
 
-function msg(study_uri){
-    var urlStr = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index("zzzzzz", false, 10)";
-    study_uri = encodeURIComponent(study_uri);
-    urlStr = urlStr.replace(/&amp;/g, '&').replace("zzzzzz",study_uri);
-    window.open(urlStr);
+                $('#deployments').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,true,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,false,hasSDDs,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
+
+                $('#sdds').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,true,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,false,hasDASpecs)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
+
+                $('#daspecs').change(function() {
+                    if ($(this).is(':checked')) {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,hasSDDs,true)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    } else {
+                        hrefValueEncoded = "@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(autorefresh,hasOntologies,hasIndicators,hasDeployments,hasSDDs,false)";
+                        hrefValue = hrefValueEncoded.replace(/&amp;/g, '&');
+                        window.location.href = hrefValue;
+                    }
+                });
+
+                function msg(study_uri){
+                    var urlStr = "@org.hadatac.console.controllers.studies.routes.StudyViewGraph.index("zzzzzz", false, 10)";
+                    study_uri = encodeURIComponent(study_uri);
+                    urlStr = urlStr.replace(/&amp;/g, '&').replace("zzzzzz",study_uri);
+                    window.open(urlStr);
+                }
+        </script>
+    </body>
 }
-    </script> 
-   	</body>
-} 

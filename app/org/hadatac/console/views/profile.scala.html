@@ -1,55 +1,53 @@
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, localUser: org.hadatac.console.models.SysUser = null)
+@(localUser: org.hadatac.console.models.SysUser = null)
 
-@import com.feth.play.module.pa.views.html._
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.controllers._
 
-@main(Messages("playauthenticate.profile.title"),"profile") {
-
-    <h1>@Messages("playauthenticate.profile.title")</h1>
+@main("User profile","profile",localUser.getEmail) {
+    <h1>User profile</h1>
     <p>
-    Your name is @localUser.getName() and your email address is @if(!localUser.getEmail()) {<em>&lt;unknown&gt;</em>.} else {
-    	@localUser.getEmail().
-	    <i>
-	    @if(!localUser.getEmailValidated() && localUser.getEmail()) {
-	      (<a href="@org.hadatac.console.controllers.routes.Account.verifyEmail">unverified - click to verify</a>)
-	    } else {
-	      (verified)
-	    }</i>
+        Your name is @localUser.getName() and your email address is @if(!localUser.getEmail()) {<em>&lt;unknown&gt;</em>.} else {
+        @localUser.getEmail().
+        <i>
+        @if(!localUser.getEmailValidated() && localUser.getEmail()) {
+            (<a href="@org.hadatac.console.controllers.routes.Account.verifyEmail">unverified - click to verify</a>)
+        } else {
+            (verified)
+        }</i>
     }
-    <br />
+        <br />
         Your user URI is: @localUser.getUri()
         <br/>
         @if(localUser.getFirstName() && localUser.getLastName()) {
             Your first name is @localUser.getFirstName() and your last name is @localUser.getLastName()
             <br/>
         }
-    @defining(localUser.getProviders()) { providers =>
-        @if(providers.size() > 0) {
-        @if(providers.size() ==1) {
-            @Messages("playauthenticate.profile.providers_one")
-        } else {
-            @Messages("playauthenticate.profile.providers_many",providers.size().toString())
+        @defining(localUser.getProviders()) { providers =>
+            @if(providers.size() > 0) {
+                @if(providers.size() ==1) {
+                    There is one provider linked with your account:
+                } else {
+                    There are providers.size().toString() providers linked with your account:
+                }
+                @for(p <- providers) {
+                    @_providerIcon(p)
+                }
+                <br/>
+            }
         }
-        @for(p <- providers) {
-            @_providerIcon(p)
-        }
-        <br/>
-        }
-    }
 
-    <br/>
-    @currentAuth(playAuth) { auth =>
-        @Messages("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
-        @if(auth.expires() != -1){
-            @Messages("playauthenticate.profile.session", auth.getId(), AuthApplication.formatTimestamp(auth.expires()))
-        } else {
-            @Messages("playauthenticate.profile.session_endless", auth.getId())
-        }
-    }
-    <br/>
-    <ul>
-    	<li><a href="@org.hadatac.console.controllers.routes.Account.changePassword">@Messages("playauthenticate.profile.password_change")</a></li>
-    </ul>
+        <br/>
+@*        @currentAuth(playAuth) { auth =>*@
+@*            You are currently logged in with: @_providerIcon(auth.getProvider())<br/>*@
+@*            @if(auth.expires() != -1){*@
+@*                "Your user ID is " auth.getId() "and your session will expire on" AuthApplication.formatTimestamp(auth.expires())*@
+@*            } else {*@
+@*                "Your user ID is" auth.getId() "and your session will not expire, as it is endless"*@
+@*            }*@
+@*        }*@
+        <br/>
+<ul>
+    <li><a href="@org.hadatac.console.controllers.routes.Account.changePassword">Change/set a password for your account</a></li>
+</ul>
     </p>
 }

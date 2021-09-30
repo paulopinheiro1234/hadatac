@@ -27,9 +27,9 @@ public class SolrUtils {
 		    entity.setContentType("application/json");
 		    post.setEntity(entity);
 		    HttpResponse response = httpClient.execute(post);
-		    System.out.println(post.toString());
+		    /*System.out.println(post.toString());
 		    System.out.println("Content: " + content);
-		    System.out.println("Status: " + response.getStatusLine().getStatusCode());
+		    System.out.println("Status: " + response.getStatusLine().getStatusCode());*/
 		    if (200 == response.getStatusLine().getStatusCode()) {
 		    	return true;
 		    }

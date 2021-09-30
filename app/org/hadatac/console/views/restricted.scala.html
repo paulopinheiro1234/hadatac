@@ -1,11 +1,12 @@
-@(localUser: org.hadatac.console.models.SysUser = null)
+@import play.api.i18n.Messages.implicitMessagesProviderToMessages
+@(localUser: org.hadatac.console.models.SysUser = null, userName: String) (implicit messages: play.i18n.Messages)
 
 @import org.hadatac.console.views.html._
 
-@main(Messages("playauthenticate.navigation.restricted"), "restricted") {
-    
-    <h1>@Messages("playauthenticate.navigation.restricted")</h1>
+@main("Restricted page", "restricted",userName) {
+
+    <h1>"Restricted page"</h1>
     <p>
-        @Messages("playauthenticate.restricted.secrets")
+    "Secrets, everywhere!"
     </p>
 }

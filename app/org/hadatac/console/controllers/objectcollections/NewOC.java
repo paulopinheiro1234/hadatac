@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 import play.data.FormFactory;
@@ -25,9 +29,11 @@ public class NewOC extends Controller {
 	
 	@Inject
 	private FormFactory formFactory;
+	@Inject
+	Application application;
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result index(String dir, String filename, String da_uri, String std_uri) {
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result index(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
 		Study study = Study.find(std_uri);
 		List<ObjectCollectionType> typeList = ObjectCollectionType.find();
 
@@ -45,17 +51,17 @@ public class NewOC extends Controller {
 			}
 		}
 
-		return ok(newObjectCollection.render(dir, filename, da_uri, study, domainList, locationList, timeList, typeList));
+		return ok(newObjectCollection.render(dir, filename, da_uri, study, domainList, locationList, timeList, typeList, application.getUserEmail(request)));
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result postIndex(String dir, String filename, String da_uri, String std_uri) {
-		return index(dir, filename, da_uri, std_uri);
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result postIndex(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
+		return index(dir, filename, da_uri, std_uri, request);
 	}
 
-	@Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-	public Result processForm(String dir, String filename, String da_uri, String std_uri) {
-		Form<ObjectCollectionForm> form = formFactory.form(ObjectCollectionForm.class).bindFromRequest();
+	@Secure(authorizers = Constants.DATA_OWNER_ROLE)
+	public Result processForm(String dir, String filename, String da_uri, String std_uri, Http.Request request) {
+		Form<ObjectCollectionForm> form = formFactory.form(ObjectCollectionForm.class).bindFromRequest(request);
 		ObjectCollectionForm data = form.get();
 
 		if (form.hasErrors()) {
@@ -106,7 +112,7 @@ public class NewOC extends Controller {
 		// insert the new OC content inside of the triplestore regardless of any change -- the previous content has already been deleted
 		oc.save();
 
-		return ok(objectCollectionConfirm.render("New Object Collection has been Generated", dir, filename, da_uri, std_uri, oc));
+		return ok(objectCollectionConfirm.render("New Object Collection has been Generated", dir, filename, da_uri, std_uri, oc, application.getUserEmail(request)));
 	}
 
 }

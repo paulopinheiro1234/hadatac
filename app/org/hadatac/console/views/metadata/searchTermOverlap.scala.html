@@ -1,11 +1,11 @@
-@(map		: java.util.Map[java.lang.String,java.util.List[org.hadatac.utils.OntologyTerm]])
+@(map		: java.util.Map[java.lang.String,java.util.List[org.hadatac.utils.OntologyTerm]], userName: String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.entity.pojo.DataAcquisitionSchema
 @import org.hadatac.utils._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main("Browse Overlapping Terms") {
+@main("Browse Overlapping Terms","",userName) {
 
 <style>
 

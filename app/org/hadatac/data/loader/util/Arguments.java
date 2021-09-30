@@ -9,20 +9,20 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionHandlerFilter;
 import org.kohsuke.args4j.ParserProperties;
-
+import org.hadatac.utils.ConfigProp;
 public class Arguments {
 
     @Option(name="-i",required=true,usage="input file",metaVar="input_file")
     private String inputPath;
 
     @Option(name="-o",required=false,usage="output path for normalized csv",metaVar="output_path")
-    private String outputPath = "tmp/";
+    private String outputPath = ConfigProp.getTmp();
 
     @Option(name="-t",required=false,usage="temporary path",metaVar="temp_path")
-    private String tempPath = "tmp/";
+    private String tempPath = ConfigProp.getTmp();
 
     @Option(name="-l",required=false,usage="log path",metaVar="log_path")
-    private String logPath = "logs/";
+    private String logPath = ConfigProp.getLogs();
 
     @Option(name="-m",required=true,usage="input type",metaVar="input_type")
     private String inputType;

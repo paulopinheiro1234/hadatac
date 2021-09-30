@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.deployments;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.http.GetSparqlQuery;
 
 import java.text.DateFormat;
@@ -8,7 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.inject.Inject;
 
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.data.*;
 
@@ -39,6 +43,8 @@ public class NewDeployment extends Controller {
 
     @Inject
     FormFactory formFactory;
+    @Inject
+    Application application;
 
     public static SparqlQueryResults getQueryResults(String tabName) {
         SparqlQuery query = new SparqlQuery();
@@ -54,8 +60,8 @@ public class NewDeployment extends Controller {
         return thePlatforms;
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String type, String dir, String filename, String da_uri, Integer page) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String type, String dir, String filename, String da_uri, Integer page, Http.Request request) {
 
         if (type.equalsIgnoreCase("regular")) {
             return ok(newDeployment.render(
@@ -63,10 +69,10 @@ public class NewDeployment extends Controller {
                     Instrument.findAvailable(),
                     Detector.findAvailable(),
                     type,
-                    dir, 
-                    filename, 
+                    dir,
+                    filename,
                     da_uri,
-                    page));
+                    page,application.getUserEmail(request)));
         }
         else if (type.equalsIgnoreCase("legacy")) {
             return ok(newDeployment.render(
@@ -77,22 +83,23 @@ public class NewDeployment extends Controller {
                     dir,
                     filename,
                     da_uri,
-                    page));
+                    page, application.getUserEmail(request)));
         }
 
         return badRequest("Invalid deployment type!");
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String type, String dir, String filename, String da_uri, Integer page) {
-        return index(type, dir, filename, da_uri, page);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String type, String dir, String filename, String da_uri, Integer page,Http.Request request) {
+        return index(type, dir, filename, da_uri, page, request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir, String filename, String da_uri, Integer page) {
-        final SysUser user = AuthApplication.getLocalUser(session());
-        
-        Form<DeploymentForm> form = formFactory.form(DeploymentForm.class).bindFromRequest();
+
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processForm(String dir, String filename, String da_uri, Integer page, Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+
+        Form<DeploymentForm> form = formFactory.form(DeploymentForm.class).bindFromRequest(request);
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
         }
@@ -113,16 +120,16 @@ public class NewDeployment extends Controller {
 
         String deploymentUri = data.getUri();
         deploymentUri = URIUtils.replacePrefixEx(deploymentUri);
-        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(), 
+        Deployment deployment = DataFactory.createDeployment(deploymentUri, data.getPlatform(),
                 data.getInstrument(), data.getDetectors(), dateString, data.getType());
 
         int nRowsOfDeployment = 0;
         int nRowsOfDA = 0;
 
         if (da_uri != null && !da_uri.equals("")) {
-            /* 
+            /*
              *
-             *   DEPLOYMENT INFO IS ADDED TO EXISTING AND INCOMPLETE DATA ACQUISITION 
+             *   DEPLOYMENT INFO IS ADDED TO EXISTING AND INCOMPLETE DATA ACQUISITION
              *
              */
 
@@ -135,9 +142,9 @@ public class NewDeployment extends Controller {
             deployment.saveToTripleStore();
             da.save();
         } else {
-            /* 
+            /*
              *
-             *   NEW DATA ACQUISITION IS CREATED 
+             *   NEW DATA ACQUISITION IS CREATED
              *
              */
 
@@ -156,14 +163,14 @@ public class NewDeployment extends Controller {
             String param = data.getInitialParameter();
             System.out.println("NewDeployment: Creating new DA : [" + dataAcquisitionUri + "]");
             STR dataAcquisition = DataFactory.createDataAcquisition(
-                    triggeringEvent, dataAcquisitionUri, deploymentUri, 
+                    triggeringEvent, dataAcquisitionUri, deploymentUri,
                     param, UserManagement.getUriByEmail(user.getEmail()));
 
             System.out.println("NewDeployment: Showing DA: " + dataAcquisition);
             deployment.saveToTripleStore();
             dataAcquisition.save();
         }
-        
-        return ok(deploymentConfirm.render("New Deployment created.", data, dir, filename, da_uri, page));
+
+        return ok(deploymentConfirm.render("New Deployment created.", data, dir, filename, da_uri, page, user.getEmail()));
     }
 }

@@ -1,10 +1,11 @@
 @(dir              : String,
-  folders          : List[String], 
-  unprocessedFiles : List[org.hadatac.entity.pojo.DataFile], 
-  processedFiles   : List[org.hadatac.entity.pojo.DataFile],
-  studyURIs        : List[String],
-  bStarted         : Boolean,
-  bAdmin           : Boolean)
+        folders          : List[String],
+        unprocessedFiles : List[org.hadatac.entity.pojo.DataFile],
+        processedFiles   : List[org.hadatac.entity.pojo.DataFile],
+        studyURIs        : List[String],
+        bStarted         : Boolean,
+        bAdmin           : Boolean,
+        userName         : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -15,83 +16,83 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("Automatic Annotator") {
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
-    
-    <div class="container-fluid">
-	
-	@if(bAdmin) {
-		@if(bStarted){
-			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
-			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
-		}else{
-			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Start Auto-Annotator</a>
-			<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>		
-		}
-	}
-	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteFolder(dir)" class="btn btn-primary" role="button">Delete Current Folder</a>
-	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
-	<a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>
-    
-	<div id="frame">
-    <div class="resumable-error">
-      Your browser, unfortunately, is not supported by Resumable.js.
-    </div>
-    
-    <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
-      <h4>Data File Uploader</h4>
-      Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
-    </div>
-    
-    <br>
-    <div class="resumable-progress">
-      <table>
-        <tr>
-          <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
-          <td class="progress-text" nowrap="nowrap"></td>
-          <td class="progress-pause" nowrap="nowrap">
-            <a href="#" onclick="r.upload(); return(false);" class="progress-resume-link"><img src="@controllers.routes.Assets.versioned("images/resume.png")" title="Resume upload" /></a>
-            <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="@controllers.routes.Assets.versioned("images/pause.png")" title="Pause upload" /></a>
-          </td>
-        </tr>
-      </table>
-    </div>
-    
-    <ul class="resumable-list"></ul>
-    </div>
+@main("Automatic Annotator","",userName) {
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/resumable.js")"></script>
 
-    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadAnnotator.js")"></script>
-    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
-    
-    <!-- 
-    <div class="container-fluid"> 
+    <div class="container-fluid">
+
+        @if(bAdmin) {
+            @if(bStarted){
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Start Auto-Annotator</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Stop Auto-Annotator</a>
+            }else{
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary" role="button">Start Auto-Annotator</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.toggleAutoAnnotator(dir)" class="btn btn-primary disabled" role="button">Stop Auto-Annotator</a>
+            }
+        }
+        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteFolder(dir)" class="btn btn-primary" role="button">Delete Current Folder</a>
+        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadTemplates(dir)" class="btn btn-primary" role="button">Download Templates</a>
+        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkErrorDictionary()" class="btn btn-primary" role="button">Error Dictionary</a>
+
+        <div id="frame">
+            <div class="resumable-error">
+                Your browser, unfortunately, is not supported by Resumable.js.
+            </div>
+
+            <div class="resumable-drop" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
+                <h4>Data File Uploader</h4>
+                Drop data files here to preview or <a class="resumable-browse"><u>select from your computer</u></a>
+            </div>
+
+            <br>
+            <div class="resumable-progress">
+                <table>
+                    <tr>
+                        <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
+                        <td class="progress-text" nowrap="nowrap"></td>
+                        <td class="progress-pause" nowrap="nowrap">
+                            <a href="#" onclick="r.upload(); return(false);" class="progress-resume-link"><img src="@controllers.routes.Assets.versioned("images/resume.png")" title="Resume upload" /></a>
+                            <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="@controllers.routes.Assets.versioned("images/pause.png")" title="Pause upload" /></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <ul class="resumable-list"></ul>
+        </div>
+
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/uploadAnnotator.js")"></script>
+        <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/upload.js")"></script>
+
+            <!--
+    <div class="container-fluid">
     	<div class="col-lg-6 right">
         	<div class="button-group">
             	<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span>Filter by Study<span class="caret"></span></button>
             	<ul class="dropdown-menu" id="study-filter">
                 	@for(study <- studyURIs){
-                    	<li><a href="#" class="small" data-value="@study" tabIndex="-1"><input type="checkbox"/>&nbsp;@study</a></li>
-                	}
-            	</ul>
-        	</div>
-    	</div>
+        <li><a href="#" class="small" data-value="@study" tabIndex="-1"><input type="checkbox"/>&nbsp;@study</a></li>
+    }
+    </ul>
+    </div>
+    </div>
     </div>
     -->
- 	
- 	<table class="table">
-    <thead>
-         <tr>
-            <th><font color="Green">Unprocessed Data Files</font></th>
-            @if(bAdmin) {
-                <th>Owner Email</th>
-            }
-            <th>Assigned Data Acquisition</th>
-            <th>Time Uploaded</th>
-            <th>Operations</th>
-         </tr>
-    </thead>
-    <tbody>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th><font color="Green">Unprocessed Data Files</font></th>
+                @if(bAdmin) {
+                    <th>Owner Email</th>
+                }
+                <th>Assigned Data Acquisition</th>
+                <th>Time Uploaded</th>
+                <th>Operations</th>
+            </tr>
+        </thead>
+        <tbody>
         @for(file <- unprocessedFiles) {
             <tr name="unprocessed">
                 @if(file.getLog().contains("[ERROR]")) {
@@ -104,156 +105,156 @@
                 @if(bAdmin) {
                     <td>@file.getOwnerEmail()</td>
                 }
-                <td>@file.getDataAcquisitionUri()</td>
-                <td>@file.getSubmissionTime()</td>
-                <td>
+            <td>@file.getDataAcquisitionUri()</td>
+            <td>@file.getSubmissionTime()</td>
+            <td>
                 @if(file.getStatus().equals("FREEZED")) {
-                   <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(dir, file.getId())" 
-                   class="btn-xs btn-success" role="button">Activate</a>
+                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.activateDataFile(dir, file.getId())"
+                    class="btn-xs btn-success" role="button">Activate</a>
                 }
                 @if(file.getFileName().startsWith("DA")) {
-                   <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getId(), file.getDataAcquisitionUri())" 
-                   class="btn-xs btn-success" role="button">Prepare Ingestion</a>
+                    <a href="@org.hadatac.console.controllers.annotator.routes.PrepareIngestion.create(dir, file.getId(), file.getDataAcquisitionUri())"
+                    class="btn-xs btn-success" role="button">Prepare Ingestion</a>
                 }
-                
+
                 @if(file.getFileName().endsWith(".csv")) {
-                    @defining("") { da_uri => @defining("") { oc_uri => 
-                             <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.UNPROC, dir, file.getId(), da_uri, oc_uri, 10, 1)" 
-                class="btn-xs btn-primary" role="button">Preview File</a>
-                        }}}
+                    @defining("") { da_uri => @defining("") { oc_uri =>
+                        <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.UNPROC, dir, file.getId(), da_uri, oc_uri, 10, 1)"
+                        class="btn-xs btn-primary" role="button">Preview File</a>
+                    }}}
                 @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFileOnly(dir, file.getId())" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFileToWorking(file.getId())" class="btn-xs btn-primary" role="button" id="move-to-working" onclick="return confirm('Are you sure to move it to working list?')">Move to Working</a>
+            <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFileOnly(dir, file.getId())" class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
+            <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFileToWorking(file.getId())" class="btn-xs btn-primary" role="button" id="move-to-working" onclick="return confirm('Are you sure to move it to working list?')">Move to Working</a>
                 @if(bAdmin) {
                     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn-xs btn-primary" role="button">Assign Owner</a>
                 }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getId())" class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getId())" class="btn-xs btn-primary" role="button">Download</a>
-                </td>   
+            <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getId())" class="btn-xs btn-primary" role="button">Logs</a>
+            <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getId())" class="btn-xs btn-primary" role="button">Download</a>
+            </td>
             </tr>
         }
-    </tbody>
+        </tbody>
     </table>
     @if(unprocessedFiles.isEmpty()) {
         <p>No unprocessed files</p>
     }
-    
- 	<br>
+
+    <br>
 
     <h4>Current Processed Data Files Folder: <font color="Green">@dir</font></h4>
-    
+
     <table class="table">
-    <thead>
-         <tr>
-            <th><font color="Green">Processed Data Files</font></th>
-            @if(bAdmin) {
-                <th>Owner Email</th>
-            }
-            <th>Assigned Data Acquisition</th>
-            <th>Time Uploaded</th>
-            <th>Time Processed</th>
-            <th>Operations</th>
-         </tr>
-    </thead>
-    <tbody>
-        @for(folder <- folders) {
-            <tr name="processed">
-              <td><a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, folder)">@folder</a></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-        }
-        @for(file <- processedFiles){
-            <tr name="processed" data-value="@file.getStudyUri()">
-                @if(file.getLog().contains("[ERROR]")) {
-                    <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
-                } else { @if(file.getLog().contains("[WARNING]")) {
-                    <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
-                } else {
-                    <td name="file_name">@file.getFileName()</td>
-                }}
+        <thead>
+            <tr>
+                <th><font color="Green">Processed Data Files</font></th>
                 @if(bAdmin) {
-                    <td>@file.getOwnerEmail()</td>
+                    <th>Owner Email</th>
                 }
+                <th>Assigned Data Acquisition</th>
+                <th>Time Uploaded</th>
+                <th>Time Processed</th>
+                <th>Operations</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(folder <- folders) {
+                <tr name="processed">
+                    <td><a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index(dir, folder)">@folder</a></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
+            @for(file <- processedFiles){
+                <tr name="processed" data-value="@file.getStudyUri()">
+                    @if(file.getLog().contains("[ERROR]")) {
+                        <td bgcolor="#FF9999" name="file_name">@file.getFileName()</td>
+                    } else { @if(file.getLog().contains("[WARNING]")) {
+                        <td bgcolor="#FFFF99" name="file_name">@file.getFileName()</td>
+                    } else {
+                        <td name="file_name">@file.getFileName()</td>
+                    }}
+                    @if(bAdmin) {
+                        <td>@file.getOwnerEmail()</td>
+                    }
                 <td>@file.getDataAcquisitionUri()</td>
                 <td>@file.getSubmissionTime()</td>
                 <td>@file.getCompletionTime()</td>
                 <td>@if(file.getFileName().endsWith(".csv")) {
-                        @defining("") { da_uri =>  @defining("") { oc_uri => 
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.PROC, dir, file.getId(), da_uri, oc_uri, 10, 1)" 
-                   class="btn-xs btn-primary" role="button">Preview File</a>
-                        }}}
-                @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
-                    <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
-                }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(dir, file.getId())" 
-               class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getId())" 
-               class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
-                @if(file.getFileName().startsWith("DA-")) {
-                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(dir, file.getDataAcquisitionUri(), file.getId())" 
-               class="btn-xs btn-primary" role="button">Assign Acquisition</a>
-                }
-                @if(bAdmin) {
-                    <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" 
-                   class="btn-xs btn-primary" role="button">Assign Owner</a>
-                }
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getId())" 
-               class="btn-xs btn-primary" role="button">Logs</a>
-                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getId())" 
-               class="btn-xs btn-primary" role="button">Download</a>
+                    @defining("") { da_uri =>  @defining("") { oc_uri =>
+                        <a href="@org.hadatac.console.controllers.fileviewer.routes.CSVPreview.getCSVPreview(FileManager.PROC, dir, file.getId(), da_uri, oc_uri, 10, 1)"
+                        class="btn-xs btn-primary" role="button">Preview File</a>
+                    }}}
+                    @if(file.getFileName().endsWith(".xlsx") || file.getFileName().endsWith(".xls")) {
+                        <a href="@org.hadatac.console.controllers.fileviewer.routes.ExcelPreview.index(file.getId(), false)" class="btn-xs btn-primary" role="button">Preview File</a>
+                    }
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.moveDataFile(dir, file.getId())"
+                class="btn-xs btn-primary" role="button" onclick="return confirm('Are you sure to move? If so, the ingested data from this file will be deleted as well!')" >Move to Unprocessed Folder</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.deleteDataFile(dir, file.getId())"
+                class="btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete? If so, the ingested data from this file will be deleted as well!')">Delete</a>
+                    @if(file.getFileName().startsWith("DA-")) {
+                        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignDataAcquisition(dir, file.getDataAcquisitionUri(), file.getId())"
+                        class="btn-xs btn-primary" role="button">Assign Acquisition</a>
+                    }
+                    @if(bAdmin) {
+                        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.assignFileOwner(dir, file.getOwnerEmail(), file.getId())"
+                        class="btn-xs btn-primary" role="button">Assign Owner</a>
+                    }
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.checkAnnotationLog(dir, file.getId())"
+                class="btn-xs btn-primary" role="button">Logs</a>
+                <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(file.getId())"
+                class="btn-xs btn-primary" role="button">Download</a>
                 </td>
-            </tr>
-        }
-    </tbody>
+                </tr>
+            }
+        </tbody>
     </table>
     @if(processedFiles.isEmpty() && folders.isEmpty()) {
         <p>No records for processed files</p>
     }
     <br><br>
-    <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Back to Main Page</a>
-	</div>
-	
-	<script type="text/javascript">
-    var options = [];
+    <a href="@org.hadatac.console.controllers.routes.Application.protectedIndex()" class="btn btn-primary" role="button">Back to Main Page</a>
+    </div>
 
-    $('#study-filter a').on('click', function(event) {
+    <script type="text/javascript">
+            var options = [];
 
-       var $target = $( event.currentTarget ),
-           val = $target.attr( 'data-value' ),
-           $inp = $target.find( 'input' ),
-           idx;
+            $('#study-filter a').on('click', function(event) {
 
-       if ( ( idx = options.indexOf( val ) ) > -1 ) {
-          options.splice( idx, 1 );
-          setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
-       } else {
-          options.push( val );
-          setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
-       }
+                var $target = $( event.currentTarget ),
+                        val = $target.attr( 'data-value' ),
+                        $inp = $target.find( 'input' ),
+                        idx;
 
-       $( event.target ).blur();
+                if ( ( idx = options.indexOf( val ) ) > -1 ) {
+                    options.splice( idx, 1 );
+                    setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+                } else {
+                    options.push( val );
+                    setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+                }
 
-       if (options.length > 0) {
-    	   $("tbody tr[name='processed']").each(function(index) {
-               if (options.indexOf($(this).attr("data-value")) > -1 
-                       || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
-                   $(this).show();
-               } else {
-                   $(this).hide();
-               }
-           });
-       } else {
-    	   $("tbody tr[name='processed']").each(function(index) {
-        	   $(this).show();
-           });
-       }
-       
-       return false;
-    });
+                $( event.target ).blur();
+
+                if (options.length > 0) {
+                    $("tbody tr[name='processed']").each(function(index) {
+                        if (options.indexOf($(this).attr("data-value")) > -1
+                                || $(this).find("[name='file_name']").text().startsWith("SDD-")) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                } else {
+                    $("tbody tr[name='processed']").each(function(index) {
+                        $(this).show();
+                    });
+                }
+
+                return false;
+            });
     </script>
 }

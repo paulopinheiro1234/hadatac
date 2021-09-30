@@ -156,7 +156,7 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 	    	}
 	    }
 	    
-	    System.out.println("[DASOGenerator] Added " + rowNumber + " rows!");
+	    //System.out.println("[DASOGenerator] Added " + rowNumber + " rows!");
 	}
     
 	public List<String> createUris() throws Exception {

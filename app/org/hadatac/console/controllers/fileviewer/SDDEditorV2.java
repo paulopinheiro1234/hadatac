@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.fileviewer.*;
@@ -15,7 +17,10 @@ import org.hadatac.utils.ConfigProp;
 
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import org.pac4j.play.java.Secure;
+import org.w3c.dom.html.HTMLTableCaptionElement;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.NameSpace;
@@ -28,6 +33,8 @@ import org.hadatac.utils.FirstLabel;
 import org.hadatac.entity.pojo.Ontology;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QueryParseException;
+
+import javax.inject.Inject;
 
 public class SDDEditorV2 extends Controller {
     URIUtils aURI;
@@ -47,16 +54,15 @@ public class SDDEditorV2 extends Controller {
     String dd_file_id="";
     int indicatorVal;
 
-
-
-
+    @Inject
+    Application application;
 
 
     // ArrayList<ArrayList<String>> storeRows=new ArrayList<ArrayList<String>>();
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String fileId, boolean bSavable, int indicator) {
-        final SysUser user = AuthApplication.getLocalUser(session());
-
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String fileId, boolean bSavable, int indicator, Http.Request request) {
+        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+        //System.out.println(user);
         // System.out.println("ConfigProp.hasBioportalApiKey() = " + ConfigProp.hasBioportalApiKey());
         // System.out.println("ConfigProp.getBioportalApiKey() = " + ConfigProp.getBioportalApiKey());
 
@@ -81,7 +87,7 @@ public class SDDEditorV2 extends Controller {
 
         } else if (indicator == 0) {
             List<DataFile> files = null;
-            String path = ConfigProp.getPathDownload();
+            String path = ConfigProp.getPathWorking();
             files = DataFile.find(user.getEmail());
             String dd_filename=dataFile.getFileName();
             dd_filename = dd_filename.substring(1); // Only files with the prefix SDD are allowed so were always going to have a second character
@@ -96,47 +102,47 @@ public class SDDEditorV2 extends Controller {
 
         dataFile.updatePermissionByUserEmail(user.getEmail());
         if (!dataFile.getAllowEditing()) {
-            return ok(sdd_editor_v2.render(dataFile, finalDF, false, loadedList, this));
+            return ok(sdd_editor_v2.render(dataFile, finalDF, false, loadedList, this,application.getUserEmail(request)));
         }
 
-        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable, loadedList, this));
+        return ok(sdd_editor_v2.render(dataFile, finalDF, bSavable, loadedList, this,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String fileId, boolean bSavable,int indicator) {
-        return index(fileId, bSavable,indicator);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String fileId, boolean bSavable,int indicator,Http.Request request) {
+        return index(fileId, bSavable,indicator,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result fromViewableLink(String viewableId) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result fromViewableLink(String viewableId,Http.Request request) {
         Collections.sort(loadedList);
         DataFile dataFile = DataFile.findByViewableId(viewableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(sdd_editor_v2.render(dataFile,null, false, loadedList, this));
+        return ok(sdd_editor_v2.render(dataFile,null, false, loadedList, this,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postFromViewableLink(String viewableId) {
-        return fromViewableLink(viewableId);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postFromViewableLink(String viewableId,Http.Request request) {
+        return fromViewableLink(viewableId,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result fromEditableLink(String editableId) {
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result fromEditableLink(String editableId,Http.Request request) {
         Collections.sort(loadedList);
         DataFile dataFile = DataFile.findByEditableId(editableId);
         if (null == dataFile) {
             return badRequest("Invalid link!");
         }
 
-        return ok(sdd_editor_v2.render(dataFile,null, false, loadedList, this));
+        return ok(sdd_editor_v2.render(dataFile,null, false, loadedList, this,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postFromEditableLink(String editableId) {
-        return fromEditableLink(editableId);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postFromEditableLink(String editableId,Http.Request request) {
+        return fromEditableLink(editableId,request);
     }
     public Result getIndicator(){
         return ok(Json.toJson(indicatorVal));
@@ -293,6 +299,9 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(isValid));
 
     }
-
+    
+    public Result getUserName(Http.Request request) {
+    	return ok(Json.toJson(AuthApplication.getLocalUser(application.getUserEmail(request)).getName()));
+    }
 
 }

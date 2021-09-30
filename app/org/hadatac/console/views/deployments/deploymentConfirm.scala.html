@@ -1,24 +1,26 @@
-@(message  : String, 
-  data     : org.hadatac.console.models.DeploymentForm,
-  dir      : String,
-  filename : String,
-  da_uri   : String,
-  page     : Integer)
+@import org.hadatac.console.views.html.deployments.deploymentButton
+@(message  : String,
+        data     : org.hadatac.console.models.DeploymentForm,
+        dir      : String,
+        filename : String,
+        da_uri   : String,
+        page     : Integer,
+        userName : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.deployments._
 
-@main(message) {
+@main(message,"",userName) {
     <h4>@message</h4>
-    
-	<ul>
-		<li><b>Platform</b>: @data.getPlatform()</li>
-		<li><b>Instrument</b>: @data.getInstrument()</li>
-		<li><b>Detector</b>: @data.getDetectors()</li>
-		<li><b>Start Date/Time</b>: @data.getStartDateTime()</li>
-		<li><b>End Date/Time</b>: @data.getEndDateTime()</li>
-	</ul>
 
-   @deploymentButton(false, dir, filename, da_uri, page)
+    <ul>
+        <li><b>Platform</b>: @data.getPlatform()</li>
+        <li><b>Instrument</b>: @data.getInstrument()</li>
+        <li><b>Detector</b>: @data.getDetectors()</li>
+        <li><b>Start Date/Time</b>: @data.getStartDateTime()</li>
+        <li><b>End Date/Time</b>: @data.getEndDateTime()</li>
+    </ul>
+
+    @deploymentButton(false, dir, filename, da_uri, page)
 }

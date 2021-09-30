@@ -1,0 +1,153 @@
+@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], userName: String)
+@import scala.collection.JavaConverters._
+    @import java.lang.System.console
+    @()
+
+    @import helper._
+@import org.hadatac.utils._
+    @import views.html._
+    @import org.hadatac.console.controllers._
+    @import be.objectify.deadbolt.java.views.html._
+    @import be.objectify.deadbolt.java.utils.TemplateUtils._
+    @import play.api.Play
+    @import com.typesafe.config.ConfigFactory
+@profiles() = { @profileList.toList }
+    @main("HADatAc: Human-Aware Data Acquisition Framework","LoggedIn",userName) {
+
+        <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                <div id="textTitle" class="col-md-8 col-xs-0">
+                    <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+                    <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+                    <hr>
+                </div>
+                <div class="col-md-1 col-xs-0"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                <div class="col-md-3 col-xs-2">
+                    <h4>Data/Metadata Search</h4>
+                    @*<a href="@org.hadatac.console.controllers.kg.routes.KnowledgeGraphBrowser.index(false, false, false, false, false, false)"
+                    id="kg" class="btn btn-primary btn-block" role="button">Knowledge Graph Browsing</a>    *@
+                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()"
+                    id="metadatafacet" class="btn btn-primary btn-block" role="button">Study Search</a>
+                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()"
+                    id="dataacquisitionfacet" class="btn btn-primary btn-block" role="button">Acquisition Search</a>
+                    <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()"
+                    id="data" class="btn btn-primary btn-block" role="button">Data Faceted Search</a>
+                    <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentBrowser.index("/", "", "", "", "")"
+                    id="spatial" class="btn btn-primary btn-block" role="button">Data Spatial Search</a>
+                    <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()"
+                    id="variables" class="btn btn-primary btn-block" role="button">Variable Search</a>
+                    @*<a href="@org.hadatac.console.controllers.metadataacquisition.routes.Analytes.index()"
+                    id="analytes" class="btn btn-primary btn-block disabled" role="button">Analyte Search</a>  *@
+                    @*<a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()"
+                    class="btn btn-primary btn-block disabled" role="button">Browse Ontologies and Metadata</a>  *@
+                    <a href="@org.hadatac.console.controllers.routes.URILookup.index("", "")"
+                    id="urilookup" class="btn btn-primary btn-block" role="button">URI Lookup</a>
+
+                    <h4>Data/Metadata Retrieve and Download</h4>
+                    <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")"
+                    id="downloader" class="btn btn-primary btn-block" role="button">Data Download</a>
+                    <a href="@org.hadatac.console.controllers.restapi.routes.ExampleCalls.index()"
+                    id="apicall" class="btn btn-primary btn-block" role="button">RESTFul API Calls</a>
+                </div>
+                <div class="col-md-3 col-xs-2">
+                    <h4>Metadata Recording and Data Upload</h4>
+                    @defining("") { filename => @defining("") { da_uri =>
+                        <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.index("/", ".")"
+                        id="autoannotate" class="btn btn-primary btn-block" role="button">Ingest Files</a>
+                    @defining(0) { page =>
+                        <a href="@org.hadatac.console.controllers.messages.routes.MessageManagement.index("/", filename, da_uri, page, false)"
+                        id="messages" class="btn btn-primary btn-block" role="button">Ingest Messages</a>
+                    }
+                        <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/", true)"
+                        id="workingfiles" class="btn btn-primary btn-block" role="button">Manage Working Files</a>
+                        <a href="@org.hadatac.console.controllers.studies.routes.StudyManagement.index()"
+                        id="studies" class="btn btn-primary btn-block" role="button">Manage Studies [STD/SSD]</a>
+                        <a href="@org.hadatac.console.controllers.metadata.empirical.routes.Infra.index("/", filename, da_uri)"
+                        id="infra" class="btn btn-primary btn-block" role="button">Manage Instrument Infrastructure [DPL]</a>
+                    @defining(0) { page =>
+                        <a href="@org.hadatac.console.controllers.deployments.routes.DeploymentManagement.index(State.ACTIVE, "/", filename, da_uri, page, 0)"
+                        id="deployments" class="btn btn-primary btn-block" role="button">Manage Deployments [DPL]</a>
+                    }
+                        <a href="@org.hadatac.console.controllers.dataacquisitionmanagement.routes.DataAcquisitionManagement.index(State.ACTIVE)"
+                        id="dataacquisitions" class="btn btn-primary btn-block" role="button">Manage Data Stream Specs [STR]</a>
+                        <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()"
+                        id="DAS" class="btn btn-primary btn-block" role="button">Manage Semantic Data Dictionaries [SDD]</a>
+                        <a href="@org.hadatac.console.controllers.indicators.routes.IndicatorManagement.index()"
+                        id="indicators" class="btn btn-primary btn-block" role="button">Manage Indicators</a>
+                }}
+            </div>
+                @defining(AuthApplication.getAuthApplication().getUserProvider().getUser(userName)) { user =>
+                    @if(user.isDataManager){
+                            <div class="col-md-3 col-xs-2">
+                                <h4>Knowledge Management</h4>
+                                <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("init")"
+                                class="btn btn-primary btn-block" role="button">Manage Repository</a>
+                                <a href="@org.hadatac.console.controllers.triplestore.routes.LoadOnt.loadOnt("init")"
+                                class="btn btn-primary btn-block" role="button">Manage Ontologies</a>
+                                <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.loadKB("init")"
+                                class="btn btn-primary btn-block" role="button">Upload Additional Knowledge</a>
+                                <a href="@org.hadatac.console.controllers.triplestore.routes.LoadKB.createInMemoryDataset("init")"
+                                class="btn btn-primary btn-block" role="button">Create In-memory KG Dataset</a>
+                                <a href="@org.hadatac.console.controllers.triplestore.routes.UserManagement.index("init")"
+                                class="btn btn-primary btn-block" role="button">Manage Users</a>
+                            </div>
+                        }
+                }
+            <div class="col-md-1 col-xs-0"></div>
+        </div>
+
+
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                <div class="col-md-8 col-xs-0">
+                    <hr>
+                    <h4>Documentation</h4>
+                </div>
+                <div class="col-md-1 col-xs-0"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-xs-0"></div>
+                @* <div class="col-md-3 col-xs-0">
+                <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-Tutorial" class="btn btn-warning btn-block" role="button">Get Started</a>
+                </div> *@
+                <div class="col-md-3 col-xs-0">
+                    <a href="https://github.com/paulopinheiro1234/hadatac/wiki/HADatAc-User-Guide" class="btn btn-warning btn-block" role="button">User Guide</a>
+                </div>
+                <div class="col-md-2 col-xs-0"></div>
+            </div>
+        </div>
+        <script type="text/javascript">
+                $( document ).ready(function() {
+                    @if((AuthApplication.getAuthApplication().getUserProvider().getUser(userName))!= null) {
+                    $('#kg').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#metadatafacet').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#subjectviewdemo').attr( 'class', 'btn btn-primary btn-block');
+                    $('#data').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#spatial').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#variables').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#analytes').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#downloader').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#apicall').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#dataacquisitionfacet').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#autoannotate').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#messages').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#workingfiles').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#studies').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#indicators').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#infra').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#deployments').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#dataacquisitions').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#annotator').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#csvloader').attr( 'class', 'btn btn-primary btn-block' );
+                    $('#DAS').attr( 'class', 'btn btn-primary btn-block' );
+                    }
+                });
+        </script>
+
+    }

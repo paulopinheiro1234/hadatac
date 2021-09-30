@@ -1,4 +1,4 @@
-@(handler: org.hadatac.console.models.CSVAnnotationHandler, oper: String, message : String)
+@(handler: org.hadatac.console.models.CSVAnnotationHandler, oper: String, message : String, userName:String)
 
 @import helper._
 @import org.hadatac.console.views.html._
@@ -6,43 +6,43 @@
 @import org.hadatac.metadata.loader._
 @import java.net._
 
-@main("CSV Annotator") {
- 
+@main("CSV Annotator","",userName) {
+
     <h2>CSV Annotator</h2>
-    
+
     <h3>Selected Deployment</h3>
-        <ul>
-          <li><b>Deployment URI</b>: @handler.getDeploymentUri()</li>
-          <li><b>Platform</b>: @handler.getDeploymentPlatform()</li>
-          <li><b>Instrument</b>:@handler.getDeploymentInstrument()</li>
-        </ul>
+    <ul>
+        <li><b>Deployment URI</b>: @handler.getDeploymentUri()</li>
+        <li><b>Platform</b>: @handler.getDeploymentPlatform()</li>
+        <li><b>Instrument</b>:@handler.getDeploymentInstrument()</li>
+    </ul>
 
     <h3>Step 2 of 3: Upload CSV File</h3>
-   
-    <div class="container-fluid">
-      
-      <div class="row">
- 
-             @if(oper=="init") {
 
-              <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.FileProcessing.uploadFile(URLEncoder.encode(handler.toJSON(),"UTF-8"))">
-                     <input type="file" class="btn btn-info" name="pic">
-                     <br> Ready to upload the CSV file?
-                     <input type="submit" class="btn btn-success" value="Confirm">
-                     <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.("cancelled")" class="btn btn-danger" role="button">Cancel</a>
-              </form>
+    <div class="container-fluid">
+
+        <div class="row">
+
+            @if(oper=="init") {
+
+                <form name="fileUploadForm" method="POST" enctype="multipart/form-data" action="@org.hadatac.console.controllers.annotator.routes.FileProcessing.uploadFile(URLEncoder.encode(handler.toJSON(),"UTF-8"))">
+                    <input type="file" class="btn btn-info" name="pic">
+                    <br> Ready to upload the CSV file?
+                    <input type="submit" class="btn btn-success" value="Confirm">
+                    <a href="@org.hadatac.console.controllers.annotator.routes.Annotator.("cancelled")" class="btn btn-danger" role="button">Cancel</a>
+                </form>
             }
 
-             <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
-         
-             @if(oper=="cancelled") {
+            <p  style='font-family: "Lucida Console", Monaco, monospace;' id='msgarea'></p>
+
+            @if(oper=="cancelled") {
                 <div id="cancel-box">
-                   <h4>Operation [Load CSV] has been cancelled.</h4>
-                   Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Ok</a>
-     	        </div>
-             }
-             
-      </div>
+                    <h4>Operation [Load CSV] has been cancelled.</h4>
+                    Press OK button to return to HADataC's main page <a href="@org.hadatac.console.controllers.routes.Portal.index()" class="btn btn-primary" role="button">Ok</a>
+                </div>
+            }
+
+        </div>
 
     </div>
 

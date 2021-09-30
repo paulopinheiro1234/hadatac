@@ -151,7 +151,7 @@ public class FacetHandler {
         if (query.isEmpty()) {
             query = "*:*";
         } else {
-            query = "(" + query + ")"; 
+            query = "(" + query + ")";
         }
 
         return query;
@@ -179,7 +179,7 @@ public class FacetHandler {
         if (query.isEmpty()) {
             query = "*:*";
         } else {
-            query = "(" + query + ")"; 
+            query = "(" + query + ")";
         }
 
         return query;

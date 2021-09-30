@@ -1,4 +1,4 @@
-@(study: org.hadatac.entity.pojo.Study, results : String)
+@(study: org.hadatac.entity.pojo.Study, results : String, userName : String)
 
 @import helper._
 @import org.hadatac.utils._
@@ -8,33 +8,33 @@
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.console.controllers.triplestore._
 
-@main("Delete Study") {
-<div class="container">
-<h4>Delete Study</h4>
- 
-   <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study.getUri())">
+@main("Delete Study","",userName) {
+    <div class="container">
+        <h4>Delete Study</h4>
 
-    <ul>
-    	<li><b>URI:</b> @URIUtils.replaceNameSpaceEx(study.getUri())</li>
-      	<li><b>Type:</b> @URIUtils.replaceNameSpaceEx(study.getTypeUri())</li>
-      	<li><b>Short Name:</b> @study.getLabel()</li>
-     	<li><b>Project:</b> @study.getProject()</li>
-     	<li><b>Description:</b> @study.getComment()</li>
-      	<li><b>External Source:</b> @study.getExternalSource()</li>
-      	<li><b>Agent:</b> @if(study.getAgent() != null) { @study.getAgent().getName() }</li>
-      	<li><b>Institution:</b> @if(study.getInstitution() != null) { @study.getInstitution().getName() }</li>
-	 	<li><b>Start Date/Time</b>: @if(study.getStartedAt() != null) { @study.getStartedAt() }</li>
-	 	<li><b>End Date/Time</b>: @if(study.getEndedAt() != null) { @study.getEndedAt() }</li>
-    </ul>
-    
- 	<p style="color:red;"><b>THIS OPERATION MAY TAKE SEVERAL MINUTES TO COMPLETE</b></p>
-	
-	<div class="form-group" class="col-sm-6 col-offset-3">
-		<input class="btn btn-success" role="button" type="submit" value="Delete" />
+        <form class="form-horizontal" method="post" action="@org.hadatac.console.controllers.studies.routes.DeleteStudy.processForm(study.getUri())">
+
+            <ul>
+                <li><b>URI:</b> @URIUtils.replaceNameSpaceEx(study.getUri())</li>
+                <li><b>Type:</b> @URIUtils.replaceNameSpaceEx(study.getTypeUri())</li>
+                <li><b>Short Name:</b> @study.getLabel()</li>
+                <li><b>Project:</b> @study.getProject()</li>
+                <li><b>Description:</b> @study.getComment()</li>
+                <li><b>External Source:</b> @study.getExternalSource()</li>
+                <li><b>Agent:</b> @if(study.getAgent() != null) { @study.getAgent().getName() }</li>
+                <li><b>Institution:</b> @if(study.getInstitution() != null) { @study.getInstitution().getName() }</li>
+                <li><b>Start Date/Time</b>: @if(study.getStartedAt() != null) { @study.getStartedAt() }</li>
+                <li><b>End Date/Time</b>: @if(study.getEndedAt() != null) { @study.getEndedAt() }</li>
+            </ul>
+
+            <p style="color:red;"><b>THIS OPERATION MAY TAKE SEVERAL MINUTES TO COMPLETE</b></p>
+
+            <div class="form-group" class="col-sm-6 col-offset-3">
+                <input class="btn btn-success" role="button" type="submit" value="Delete" />
+            </div>
+
+            @studyButton(false)
+
     </div>
-
-    @studyButton(false)
-
-</div>
 
 }

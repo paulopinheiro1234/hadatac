@@ -1,7 +1,8 @@
 @* mode="PLAIN" means no use of main() template  *@
 
 @(mode    : String,   
-  message : String)
+  message : String,
+  userName : String)
 
 @import helper._
 @import org.hadatac.utils.NameSpaces
@@ -18,7 +19,7 @@
 @import play.api.Play
 @import com.typesafe.config.ConfigFactory
 
-@main("URI Lookup") {
+@main("URI Lookup","",userName) {
 
    <div class="container-fluid">
  

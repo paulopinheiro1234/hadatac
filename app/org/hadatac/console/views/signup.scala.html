@@ -1,51 +1,32 @@
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, 
-    signupForm: Form[_])
-
+@(url:String)
+signupForm: Form[_])
 @import helper._
-@import org.hadatac.console.views.html._
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+@import views.html._
+@* @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }*@
 
-@main(Messages("playauthenticate.signup.title"),"signup") {
 
-  <div class="row">
-    <div class="col-xs-6 col-xs-offset-1 col-md-4">
-      <h1>@Messages("playauthenticate.signup.title")</h1>
-    </div>
-  </div>
-
-  <div id="signup" class="row">
-
-    <div class="col-xs-6 col-xs-offset-1 col-md-4">
-        @* Display proprietary login form *@
-    	@helper.form(org.hadatac.console.controllers.routes.AuthApplication.doSignup, 'class -> "form-horizontal", 'role -> "form") {
-
-            @if(signupForm.hasGlobalErrors) {
-		        <p class="alert alert-danger">
-		          @signupForm.getGlobalError.get.message
-		     	</p>
-            }
-
-             @inputText(
-                signupForm("name"),
-                '_label -> Messages("playauthenticate.signup.name")
-             )
-
-             @_emailPartial(signupForm)
-
-             @_passwordPartial(signupForm)
-
-            <button type="submit" class="btn btn-default">@Messages("playauthenticate.signup.now")</button>
-    	}
+ @main("Signup", "signUp","") {
+    <div class="row">
+        <div class="col-xs-6 col-xs-offset-1 col-sm-4">
+            <h1>Sign Up</h1>
+            <h1></h1>
+        </div>
     </div>
 
-    <!--
-    <div class="col-xs-6 col-xs-offset-2 col-md-4">
-        @Messages("playauthenticate.signup.oauth")
-        @* Display list of available providers *@
-        @_providerPartial(playAuth, skipCurrent=false)
+    <div id="login" class="row">
+
+        <div class="col-xs-6 col-xs-offset-1 col-sm-4">
+@*            <li><a href="controllers.routes.Signup.hello()"><i class="icon-off"></i> "Sign out"</a></li>*@
+            <form action="@url?client_name=FormClient" method="POST">
+                <b>User Name</b></br>
+                <input type="text" name="username" value="" />
+                <p /><p />
+                <b>Password</b></br>
+                <input type="password" name="password" value="" />
+                <p />
+                <input type="submit" name="submit" value="Submit" />
+            </form>
+        </div>
     </div>
-    -->
-
-  </div>
-
 }
+

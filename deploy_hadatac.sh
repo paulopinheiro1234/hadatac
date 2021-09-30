@@ -71,9 +71,9 @@ echo ""
 echo "Stopping Hadatac Service"
 echo ""
 service hadatac stop
-echo "Stopping Solr6 Service"
+echo "Stopping Solr8 Service"
 echo ""
-sh ${SOLR_HOME}/run_solr6.sh stop
+sh ${SOLR_HOME}/run_solr8.sh stop
 echo ""
 echo "Stopping Blazegraph Service"
 echo ""
@@ -114,7 +114,7 @@ cp -p /data/conf/play-authenticate/mine.conf conf/play-authenticate/
 echo ""
 echo "Starting Services"
 echo ""
-sh ${SOLR_HOME}/run_solr6.sh start
+sh ${SOLR_HOME}/run_solr8.sh start
 service jetty8 start 
 wait $!
 service hadatac start

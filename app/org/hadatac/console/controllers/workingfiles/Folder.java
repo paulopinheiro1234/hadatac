@@ -16,7 +16,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import javax.inject.Inject;
 
+import org.hadatac.Constants;
+import org.hadatac.console.controllers.Application;
+import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.Environment;
 import play.data.*;
@@ -40,20 +44,22 @@ public class Folder extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    @Inject
+    Application application;
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postIndex(String dir) {
-        return index(dir);
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postIndex(String dir, Http.Request request) {
+        return index(dir,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result index(String dir) {
-    	return ok(newFolder.render(dir));
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result index(String dir, Http.Request request) {
+        return ok(newFolder.render(dir,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result processForm(String dir) {
-        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest();
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result processForm(String dir,Http.Request request) {
+        Form<NewFileForm> form = formFactory.form(NewFileForm.class).bindFromRequest(request);
         NewFileForm data = form.get();
         if (form.hasErrors()) {
             return badRequest("The submitted form has errors!");
@@ -66,45 +72,45 @@ public class Folder extends Controller {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        
-        return redirect(routes.WorkingFiles.index(dir, "."));
+
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result delete(String dir, String path) {
-    	if (dir == null || path == null || path.equals("/")) {
-    		return redirect(routes.WorkingFiles.index(dir, "."));
-    	}
-    	
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result delete(String dir, String path,Http.Request request) {
+        if (dir == null || path == null || path.equals("/")) {
+            return redirect(routes.WorkingFiles.index(dir, ".", false));
+        }
+
         String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
-    	File folder = new File(fullPath);
+        File folder = new File(fullPath);
 
         File[] listOfFiles = folder.listFiles();
         Boolean folderEmpty = listOfFiles == null || listOfFiles.length == 0;
 
-        return ok(deleteFolder.render(dir, path, folderEmpty));
+        return ok(deleteFolder.render(dir, path, folderEmpty,application.getUserEmail(request)));
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
-    public Result postDelete(String dir, String path) {
-        return delete(dir, path);
+    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postDelete(String dir, String path,Http.Request request) {
+        return delete(dir, path,request);
     }
 
-    @Restrict(@Group(AuthApplication.DATA_OWNER_ROLE))
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result deleteForm(String dir, String path) {
-    	if (dir == null || path == null || path.equals("/")) {
-    		return redirect(routes.WorkingFiles.index(dir, "."));
-    	}
-
-    	String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
-        File deleteFolder = new File(fullPath);
-        
-        try {
-        	FileUtils.deleteDirectory(deleteFolder);
-        } catch (Exception e) {
-        	e.printStackTrace();
+        if (dir == null || path == null || path.equals("/")) {
+            return redirect(routes.WorkingFiles.index(dir, ".", false));
         }
 
-        return redirect(routes.WorkingFiles.index(dir, "."));
+        String fullPath = Paths.get(ConfigProp.getPathWorking(), dir, path).toString();
+        File deleteFolder = new File(fullPath);
+
+        try {
+            FileUtils.deleteDirectory(deleteFolder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 }

@@ -3,15 +3,22 @@ package org.hadatac.console.controllers.annotator;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URLEncoder;
+
+import org.hadatac.console.controllers.Application;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.views.html.schema.*;
 
 import play.mvc.*;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+
 public class SchemaFromFile extends Controller {
 
-	public Result create(String dir, String file_name) {
+	@Inject
+	Application application;
+
+	public Result create(String dir, String file_name, Http.Request request) {
 
 		String path = "";
 		String labels = "";
@@ -51,7 +58,7 @@ public class SchemaFromFile extends Controller {
 
 		System.out.println("SchemaFromFile: labels = <" + labels + ">");
 
-		return ok(newDASFromFile.render(dir, file_name, labels));
+		return ok(newDASFromFile.render(dir, file_name, labels,application.getUserEmail(request)));
 	}
 	
 }

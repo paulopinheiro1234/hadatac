@@ -6,10 +6,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -24,9 +20,13 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ObjectCollectionType extends HADatAcClass implements Comparable<ObjectCollectionType> {
+
+	private static final Logger log = LoggerFactory.getLogger(ObjectCollection.class);
 
 	static String className = "hasco:ObjectCollection";
 	String studyObjectTypeUri = "";
@@ -166,7 +166,7 @@ public class ObjectCollectionType extends HADatAcClass implements Comparable<Obj
 
         Map<Facetable, List<Facetable>> results = new HashMap<Facetable, List<Facetable>>();
         try {            
-            ResultSetRewindable resultsrw = SPARQLUtils.select(
+            ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
 
             while (resultsrw.hasNext()) {

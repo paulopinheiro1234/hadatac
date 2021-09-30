@@ -1,62 +1,66 @@
-@(handler: org.hadatac.console.models.CSVAnnotationHandler,
-  theEntities : org.hadatac.console.models.SparqlQueryResults,
-  theUnits : org.hadatac.console.models.SparqlQueryResults)
+@import org.hadatac.console.views.html.annotator.field_option
+@import org.hadatac.console.models.SparqlQueryResults
+@import org.hadatac.console.models.CSVAnnotationHandler
+@(handler: CSVAnnotationHandler,
+        theEntities : SparqlQueryResults,
+        theUnits : SparqlQueryResults, userName : String)
 
 @import helper._
 @import org.hadatac.console.views.html._
-@import org.hadatac.console.controllers.annotator.Downloads
 @import java.net._
 
-@main("CSV Annotator") {
+@import org.hadatac.console.controllers.annotator.Downloads
+
+@main("CSV Annotator","",userName) {
 
     <h2>CSV Annotator</h2>
-    
+
     <h3>Selected Deployment</h3>
-        <ul>
-          <li><b>Deployment URI</b>: @handler.getDeploymentUri()</li>
-          <li><b>Platform</b>: @handler.getDeploymentPlatform()</li>
-          <li><b>Instrument</b>:@handler.getDeploymentInstrument()</li>
-        </ul>
-    
+    <ul>
+        <li><b>Deployment URI</b>: @handler.getDeploymentUri()</li>
+        <li><b>Platform</b>: @handler.getDeploymentPlatform()</li>
+        <li><b>Instrument</b>:@handler.getDeploymentInstrument()</li>
+    </ul>
+
     <h3>Uploaded CSV</h3>
-        <ul>
-          <li><b>Name</b>: @handler.getDatasetName()</li>
-          <li><b>Upload date/time</b>: @handler.getDatasetUploadDatetime()</li>
-        </ul>
-    
+    <ul>
+        <li><b>Name</b>: @handler.getDatasetName()</li>
+        <li><b>Upload date/time</b>: @handler.getDatasetUploadDatetime()</li>
+    </ul>
+
     <h3>Step 3 of 3: Select Measurements' Characteristics and Units:</h3>
-   
+
     <form name="FullAnnotatorForm" method="POST" enctype="text/plain" action="@org.hadatac.console.controllers.annotator.routes.Downloads.postGenerate(URLEncoder.encode(handler.toJSON(),"UTF-8"))">
 
         <div class="container-fluid">
             <table class="table">
-                 <thead>
+                <thead>
                     <tr>
-                       <th>Measurement</th>
-                       <th>Entity</th>
-                       <th>Characteristic</th>
-                       <th>Unit</th>
+                        <th>Measurement</th>
+                        <th>Entity</th>
+                        <th>Characteristic</th>
+                        <th>Unit</th>
                     </tr>
-                 </thead>
-                 <tbody>
-                    @for((field, index) <- handler.getFields.zipWithIndex){
-                        @field_option(index, field, handler.getDeploymentCharacteristics(), theEntities, theUnits)
-                    } 
-                 </tbody>
+                </thead>
+                <tbody>
+                @for((field, index) <- handler.getFields.zipWithIndex){
+                    @field_option(index, field, handler.getDeploymentCharacteristics(), theEntities, theUnits)
+                }
+                </tbody>
             </table>
         </div>
- 
+
         <h3>CCSV Options</h3>
 
         <div class="container-fluid">
-           <div class="row">
-              <div class="navbar-collapse collapse navbar-secondary">
-                 <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_UPLOAD">
-                 <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_CCSV">
-                 <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_PREAMBLE">
-                 <input type="submit" name="submitButton"  class="btn btn-danger"  value="@Downloads.OPER_FINISH">
-              </div>
-          </div>
+            <div class="row">
+                <div class="navbar-collapse collapse navbar-secondary">
+                    <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_UPLOAD">
+                    <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_CCSV">
+                    <input type="submit" name="submitButton"  class="btn btn-primary" value="@Downloads.OPER_PREAMBLE">
+                    <input type="submit" name="submitButton"  class="btn btn-danger"  value="@Downloads.OPER_FINISH">
+                </div>
+            </div>
         </div>
 
     </form>

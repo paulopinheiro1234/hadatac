@@ -3,155 +3,158 @@
 @import org.hadatac.console.models.FacetHandler
 @import org.hadatac.utils._
 
+@import org.hadatac.console.views.html.dataacquisitionsearch.downloadDialog
+@import org.hadatac.console.views.html.dataacquisitionsearch.facetTree
 @(	page : Int,
-	rows : Int,
-	ownerUri : String,
-	facets : String,
-	resultsSize : Long,
-	results : org.hadatac.data.model.AcquisitionQueryResult,
-	documentJson : String,
-	handler : FacetHandler,
-	objDetails : String,
-	objFields : List[String],
-	objOCs : List[org.hadatac.entity.pojo.ObjectCollection]
+        rows : Int,
+        ownerUri : String,
+        facets : String,
+        resultsSize : Long,
+        results : org.hadatac.data.model.AcquisitionQueryResult,
+        documentJson : String,
+        handler : FacetHandler,
+        objDetails : String,
+        objFields : List[String],
+        objOCs : List[org.hadatac.entity.pojo.ObjectCollection],
+        userName : String
 )
 
-@main("Simple Faceted Search") {
+@main("Simple Faceted Search","",userName) {
     <script type="text/javascript" src="/hadatac/assets/javascripts/jquery.redirect.js"></script>
-	<script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
-	<div id="query" data-documents="@documentJson"/>
-	<div id="facetDiv" data-documents="@handler.toJSON()"/>
+    <script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
+    <div id="query" data-documents="@documentJson"/>
+    <div id="facetDiv" data-documents="@handler.toJSON()"/>
     <div id="preferences" data-results="@ConfigProp.toGuiJson()"/>
-	
-	<div class="container-fluid">
-		<div class="row">
-		        <div id="legend">
-			        <legend>Facet search</legend>
-		        </div>
 
-			<div class="col-md-2 sidebar">
-			   <center><font size="4"> Selected data values: <b>@resultsSize</b></font> </center> <br></br>
-			</div>
-			<div class="col-md-7 sidebar">
-		        <button type="button" class="btn btn-primary" onClick="search();">Search</button>
-		        <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
-		        @if(ownerUri != "Public") {
-		            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
-		        }
-			    <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
-			    <button type="button" class="btn btn-primary" id="toggleCharts">Hide Charts</button>
-			    
-			    <div id="panel_options"></div>
-		    
-		        @if(ownerUri != "Public") {
-		            @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields, objOCs)
-		        } 
-			</div>
-	    </div>
-	    
-		<div class="row" id="panels">
-			<div class="col-md-2 sidebar" id="Studies_and_Data_Acquisitions">
-			    <div id="chartStudy" name="charts"></div>
-				<div width="100%" style="background-color:#dddddd">
-					<label class="col-md-offset-1 control-label">Studies and Data Acquisitions</label>
-				</div>
-				<div id="treeStudyBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
-			</div>
-			
-			<div class="col-md-2 sidebar" id="Object_Collections_and_Roles">
-			    <div id="chartObjectCollection" name="charts"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div id="legend">
+                <legend>Facet search</legend>
+            </div>
+
+            <div class="col-md-2 sidebar">
+                <center><font size="4"> Selected data values: <b>@resultsSize</b></font> </center> <br></br>
+            </div>
+            <div class="col-md-7 sidebar">
+                <button type="button" class="btn btn-primary" onClick="search();">Search</button>
+                <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
+                @if(ownerUri != "Public") {
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Download</button>
+                }
+                <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
+                <button type="button" class="btn btn-primary" id="toggleCharts">Hide Charts</button>
+
+                <div id="panel_options"></div>
+
+                @if(ownerUri != "Public") {
+                    @downloadDialog(page, rows, facets, resultsSize, results, documentJson, objDetails, objFields, objOCs)
+                }
+            </div>
+        </div>
+
+        <div class="row" id="panels">
+            <div class="col-md-2 sidebar" id="Studies_and_Data_Acquisitions">
+                <div id="chartStudy" name="charts"></div>
+                <div width="100%" style="background-color:#dddddd">
+                    <label class="col-md-offset-1 control-label">Studies and Data Acquisitions</label>
+                </div>
+                <div id="treeStudyBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+            </div>
+
+            <div class="col-md-2 sidebar" id="Object_Collections_and_Roles">
+                <div id="chartObjectCollection" name="charts"></div>
                 <div width="100%" style="background-color:#dddddd">
                     <label class="col-md-offset-1 control-label">Object Collections and Roles</label>
                 </div>
                 <div id="treeObjectCollectionBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
             </div>
-            
-			<div class="col-md-2 sidebar" id="Entities_and_Attributes">
-			    <div id="chartEntityCharacteristic" name="charts"></div>
-				<div width="100%" style="background-color:#dddddd">
-					<a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.index("ent")">Entities and Attributes</a>
-				</div>
-				<div id="treeEntityCharacteristicBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
-			</div>
-			
-			<div class="col-md-2 sidebar" id="Units">
-			    <div id="chartUnit" name="charts"></div>
-				<div width="100%" style="background-color:#dddddd">
-					<a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.index("unit")">Units</a>
-				</div>
-				<div id="treeUnitBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
-			</div>
-			
-			<div class="col-md-2 sidebar" id="Times">
-			    <div id="chartTime" name="charts"></div>
-				<div width="100%" style="background-color:#dddddd">
-					<label class="col-md-offset-1 control-label">Times</label>
-				</div>
-				<div id="treeTimeBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
-			</div>
-			
-			<div class="col-md-2 sidebar" id="Platforms_and_Instruments">
-			    <div id="chartPlatformInstrument" name="charts"></div>
-				<div width="100%" style="background-color:#dddddd">
-					<label class="col-md-offset-1 control-label">Platforms and Instruments</label>
-				</div>
-				<div id="treePlatformInstrumentBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
-			</div>
-		</div>
-	</div>
-	
-	@facetTree(page, rows, facets, resultsSize, results, documentJson, handler, objDetails)
-	
-	<script>
-	var query_res = document.getElementById('preferences'); 
-	var pref = JSON.parse('{"value":' + query_res.dataset.results + '}');
-	var i = 0;
 
-	$(document).ready(function() {
-		$("#panels").children().each(function () {  
-			$("#panel_options").append($('<label/>').html(this.id.replace(/_/g, ' ') + '&nbsp;&nbsp;').prepend($('<input/>').attr(
-					{ type: 'checkbox', name: this.id, 'checked': pref.value[i++]}).change(function () {
-		        if (this.checked) { 
-		            $("#" + this.name).show();
-		        } else {
-		        	$("#" + this.name).hide();
-		        }
-		        updatePanelWidths();
-		    })));
-		});
-		i = 0;
-		$("#panels").children().each(function () {
-			if (!pref.value[i++]) {
-				$(this).hide();	
-				updatePanelWidths();				
-			}
-		});
-	});
-	
-	function updatePanelWidths() {
-		var num_visible = $('#panels .sidebar:visible').length;
-		$("#panels").children().each(function () {
-			if ($(this).is(':visible')) {
-				if (num_visible == 1) {
-					$(this).removeClass().addClass('col-md-12').addClass('sidebar');	
-				}
-				if (num_visible == 2) {
-                    $(this).removeClass().addClass('col-md-6').addClass('sidebar'); 
-                }
-				if (num_visible == 3) {
-                    $(this).removeClass().addClass('col-md-4').addClass('sidebar'); 
-                }
-				if (num_visible == 4) {
-                    $(this).removeClass().addClass('col-md-3').addClass('sidebar'); 
-                }
-				if (num_visible == 5) {
-                    $(this).removeClass().addClass('col-md-2').addClass('sidebar'); 
-                }
-				if (num_visible == 6) {
-                    $(this).removeClass().addClass('col-md-2').addClass('sidebar'); 
-                }
-			}
-		});
-	}
-	</script>
+            <div class="col-md-2 sidebar" id="Entities_and_Attributes">
+                <div id="chartEntityCharacteristic" name="charts"></div>
+                <div width="100%" style="background-color:#dddddd">
+                    <label class="col-md-offset-1 control-label">Entities and Attributes</label>
+                </div>
+                <div id="treeEntityCharacteristicBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+            </div>
+
+            <div class="col-md-2 sidebar" id="Units">
+                <div id="chartUnit" name="charts"></div>
+                <div width="100%" style="background-color:#dddddd">
+                    <a href="@org.hadatac.console.controllers.metadata.routes.BrowseOntology.index("unit")">Units</a>
+                </div>
+                <div id="treeUnitBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+            </div>
+
+            <div class="col-md-2 sidebar" id="Times">
+                <div id="chartTime" name="charts"></div>
+                <div width="100%" style="background-color:#dddddd">
+                    <label class="col-md-offset-1 control-label">Times</label>
+                </div>
+                <div id="treeTimeBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+            </div>
+
+            <div class="col-md-2 sidebar" id="Platforms_and_Instruments">
+                <div id="chartPlatformInstrument" name="charts"></div>
+                <div width="100%" style="background-color:#dddddd">
+                    <label class="col-md-offset-1 control-label">Platforms and Instruments</label>
+                </div>
+                <div id="treePlatformInstrumentBox" style="width:100%; height:400px; background-color:#f5f5f5; border :1px solid Silver; overflow:auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    @facetTree(page, rows, facets, resultsSize, results, documentJson, handler, objDetails)
+
+    <script>
+            var query_res = document.getElementById('preferences');
+            var pref = JSON.parse('{"value":' + query_res.dataset.results + '}');
+            var i = 0;
+
+            $(document).ready(function() {
+                $("#panels").children().each(function () {
+                    $("#panel_options").append($('<label/>').html(this.id.replace(/_/g, ' ') + '&nbsp;&nbsp;').prepend($('<input/>').attr(
+                            { type: 'checkbox', name: this.id, 'checked': pref.value[i++]}).change(function () {
+                        if (this.checked) {
+                            $("#" + this.name).show();
+                        } else {
+                            $("#" + this.name).hide();
+                        }
+                        updatePanelWidths();
+                    })));
+                });
+                i = 0;
+                $("#panels").children().each(function () {
+                    if (!pref.value[i++]) {
+                        $(this).hide();
+                        updatePanelWidths();
+                    }
+                });
+            });
+
+            function updatePanelWidths() {
+                var num_visible = $('#panels .sidebar:visible').length;
+                $("#panels").children().each(function () {
+                    if ($(this).is(':visible')) {
+                        if (num_visible == 1) {
+                            $(this).removeClass().addClass('col-md-12').addClass('sidebar');
+                        }
+                        if (num_visible == 2) {
+                            $(this).removeClass().addClass('col-md-6').addClass('sidebar');
+                        }
+                        if (num_visible == 3) {
+                            $(this).removeClass().addClass('col-md-4').addClass('sidebar');
+                        }
+                        if (num_visible == 4) {
+                            $(this).removeClass().addClass('col-md-3').addClass('sidebar');
+                        }
+                        if (num_visible == 5) {
+                            $(this).removeClass().addClass('col-md-2').addClass('sidebar');
+                        }
+                        if (num_visible == 6) {
+                            $(this).removeClass().addClass('col-md-2').addClass('sidebar');
+                        }
+                    }
+                });
+            }
+    </script>
 }

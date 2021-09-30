@@ -68,7 +68,7 @@ else
 fi
 HADATAC_DOWNLOAD=$HADATAC_HOME/download
 HADATAC_SOLR=$HADATAC_HOME/solr
-SOLR6_HOME=$HADATAC_SOLR/solr-6.5.0
+SOLR8_HOME=$HADATAC_SOLR/solr-8.6.1
 JETTY_NAME=jetty-distribution-9.4.12.v20180830
 
 mkdir $HADATAC_HOME
@@ -78,41 +78,33 @@ mkdir $BLAZEGRAPH_HOME
 
 cp -R solr/ $HADATAC_SOLR
 
-echo "=== Downloading Apache Solr 6.5.0..."
-wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz
+echo "=== Downloading Apache Solr 8.6.1..."
+wget -O $HADATAC_DOWNLOAD/solr-8.6.1.tgz http://archive.apache.org/dist/lucene/solr/8.6.1/solr-8.6.1.tgz
 wait $!
-wget -O $HADATAC_DOWNLOAD/solr-6.5.0.tgz.md5 http://archive.apache.org/dist/lucene/solr/6.5.0/solr-6.5.0.tgz.md5
+wget -O $HADATAC_DOWNLOAD/solr-8.6.1.tgz.md5 http://archive.apache.org/dist/lucene/solr/8.6.1/solr-8.6.1.tgz.md5 #TODO - correct
 wait $!
-echo "=== Downloading JTS Topology Suite 1.14..."
-wget -O $HADATAC_DOWNLOAD/jts-1.14.zip https://sourceforge.net/projects/jts-topo-suite/files/jts/1.14/jts-1.14.zip
+echo "=== Downloading JTS Topology Suite 1.15..."
+wget -O $HADATAC_DOWNLOAD/jts-1.15.jar https://repo1.maven.org/maven2/org/locationtech/jts/jts-core/1.15.0/jts-core-1.15.0.jar
 
-echo "=== Uncompressing Apache Solr 6.5.0..."
-tar -xzf $HADATAC_DOWNLOAD/solr-6.5.0.tgz -C $HADATAC_SOLR
+echo "=== Uncompressing Apache Solr 8.6.1..."
+tar -xzf $HADATAC_DOWNLOAD/solr-8.6.1.tgz -C $HADATAC_SOLR
 wait $!
-echo "=== Uncompressing JTS Topology Suite 1.14..."
-unzip -o -qq $HADATAC_DOWNLOAD/jts-1.14.zip -d $HADATAC_DOWNLOAD/jts-1.14
-wait $!
-
-mv $HADATAC_SOLR/solr/* $HADATAC_SOLR
-rm -rf $HADATAC_SOLR/solr
 
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
-cat $HADATAC_SOLR/solr6.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
-mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/solr6.in.sh
+cat $HADATAC_SOLR/solr8.in.sh >> $HADATAC_SOLR/hadatac_solr.sh
+mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/solr8.in.sh
 
 echo "HADATAC_SOLR=$HADATAC_SOLR" >> $HADATAC_SOLR/hadatac_solr.sh
-cat $HADATAC_SOLR/run_solr6.sh >> $HADATAC_SOLR/hadatac_solr.sh
-mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/run_solr6.sh
+cat $HADATAC_SOLR/run_solr8.sh >> $HADATAC_SOLR/hadatac_solr.sh
+mv $HADATAC_SOLR/hadatac_solr.sh $HADATAC_SOLR/run_solr8.sh
 
-sh $HADATAC_SOLR/run_solr6.sh stop
+sh $HADATAC_SOLR/run_solr8.sh stop
 wait $!
-sh $HADATAC_SOLR/run_solr6.sh start
-wait $!
+cp $HADATAC_DOWNLOAD/jts-1.15.jar $HADATAC_SOLR/solr-8.6.1/server/solr-webapp/webapp/WEB-INF/lib/
 
-cp $HADATAC_DOWNLOAD/jts-1.14/lib/* $HADATAC_SOLR/solr-6.5.0/server/solr-webapp/webapp/WEB-INF/lib/
-
-echo "=== Starting Apache Solr 6.5.0..."
-sh $HADATAC_SOLR/run_solr6.sh restart
+echo "=== Starting Apache Solr 8.6.1..."
+sh $HADATAC_SOLR/run_solr8.sh start -v
+wait $1
 
 echo "=== Downloading Jetty ..."
 wget -O $BLAZEGRAPH_HOME/$JETTY_NAME.zip https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.12.v20180830/jetty-distribution-9.4.12.v20180830.zip

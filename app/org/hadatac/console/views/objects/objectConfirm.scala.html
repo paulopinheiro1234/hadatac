@@ -4,14 +4,15 @@
   da_uri    : String,
   study_uri : String, 
   oc_uri    : String,
-  page      : Integer)
+  page      : Integer,
+  userName  : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.studies._
 @import org.hadatac.metadata.loader.URIUtils
 
-@main(message) {
+@main(message,"",userName) {
     <div class="container">
        <h4>@message</h4>
 

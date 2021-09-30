@@ -1,59 +1,62 @@
 @(das      : org.hadatac.entity.pojo.DataAcquisitionSchema,
-  codebook : List[org.hadatac.entity.pojo.PossibleValue])
+  codebook : List[org.hadatac.entity.pojo.PossibleValue],
+  userName : String)
 
 @import org.hadatac.console.views.html._
 @import org.hadatac.utils._
 @import org.hadatac.console.controllers.schema._
 
-@main("View Semantic Data Dictionary") {
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
-    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
-    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
+@main("View Semantic Data Dictionary","",userName) {
+	<link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
+	<script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+	<script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
 
-    <div class="row">
-        <div class="col-md-1">
-	    </div>
-        <div class="col-md-12">
-            
-            <h3>View Code Book</h3>
+	<div class="row">
+		<div class="col-md-1">
+		</div>
+		<div class="col-md-12">
 
-            <h4>Basic Schema Info</h4>
+			<h3>View Code Book</h3>
 
-                <ul>
-                    <li><b>URI</b>: @das.getUriNamespace()</li>
-                    <li><b>Name</b>: @das.getLabel()</li>
-                </ul>
+			<h4>Basic Schema Info</h4>
 
-            <a href="@org.hadatac.console.controllers.schema.routes.ViewDAS.index(das.getUri())" class="btn btn-primary" role="button">View Semantic Data Dictionary</a>
+			<ul>
+				<li><b>URI</b>: @das.getUriNamespace()</li>
+				<li><b>Name</b>: @das.getLabel()</li>
+			</ul>
 
-            <h4>Code Table</h4>
+			<a href="@org.hadatac.console.controllers.schema.routes.ViewDAS.index(das.getUri())" class="btn btn-primary" role="button">View Semantic Data Dictionary</a>
 
-			    <div id="rcorners">
-		            <table class="table">
-		                 <thead>
-		                 <tr>
-		                    <th>Variable</th>
-				            <th>Code</th>
-		                    <th>Code Label</th>
-				            <th>Class</th>
-		                    <th>Resource</th>
-		                 </tr>
-		                 </thead>
-		                 <tbody>
-		                   @for(pv <- codebook){
-		                       @PV_entry(pv)
-		                   }
-		                 </tbody>
-		            </table>
-			    </div>
+			<h4>Code Table</h4>
 
-      <br>
-      <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to SSD Management</a>
-        </div>
+			<div id="rcorners">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Variable</th>
+							<th>Code</th>
+							<th>Code Label</th>
+							<th>Class</th>
+							<th>Harmonized Code</th>
+							<th>Resource</th>
+							<th>Other For</th>
+						</tr>
+					</thead>
+					<tbody>
+					@for(pv <- codebook){
+						@PV_entry(pv)
+					}
+					</tbody>
+				</table>
+			</div>
 
-    </div>
+			<br>
+			<a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to SSD Management</a>
+		</div>
 
-    </div>
+	</div>
+
+	</div>
 
 
 }
