@@ -2,6 +2,7 @@
 <schema version="1.5">
   <fields>
     <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="json_query_str" type="text_general" indexed="false" stored="true" />
     <dynamicField name="*_str" type="string" indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_str_multi" type="string" indexed="true" stored="true" docValues="true" multiValued="true" />
     <dynamicField name="*_date" type="date" indexed="true" stored="true" docValues="true"/>

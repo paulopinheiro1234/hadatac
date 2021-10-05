@@ -603,16 +603,14 @@ public class AnnotationWorker {
                 chain.setStudyUri(studyUri);
                 study = Study.find(studyUri);
                 if (study != null) {
-                    String updatedSSDUri =studyUri.replaceAll("STD","SSD");
-                    dataFile.getLogger().println("SSD ingestion: The study uri :" + studyUri.replaceAll("STD","SSD") + " is in the TS.");
-//                    dataFile.getLogger().println("SSD ingestion: The study uri :" + studyUri + " is in the TS.");
-                    socgen.setStudyUri(updatedSSDUri);
+                    dataFile.getLogger().println("SSD ingestion: The study uri :" + studyUri + " is in the TS.");
+                    socgen.setStudyUri(studyUri);
                 } else {
                     dataFile.getLogger().printExceptionByIdWithArgs("SSD_00005", studyUri);
                     return null;
                 }
             }
-
+            chain.setNamedGraphUri(studyUri.replaceAll("STD","SSD"));
             chain.setDataFile(dataFile);
 
         } else {
@@ -632,7 +630,6 @@ public class AnnotationWorker {
                     if (mapContent == null || mapContent.get(i) == null) {
                         dataFile.getLogger().printException("No value for MapContent with index [" + i + "]");
                     } else {
-                        study_uri= (study_uri.contains("STD")) ? study_uri.replaceAll("STD","SSD"):study_uri;
                     	chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri, study.getId()));
                     }
                 } catch (CloneNotSupportedException e) {

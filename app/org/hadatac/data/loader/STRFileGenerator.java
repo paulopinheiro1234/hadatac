@@ -276,10 +276,7 @@ public class STRFileGenerator extends BaseGenerator {
         //String studyUri = URIUtils.replacePrefixEx(ConfigProp.getKbPrefix() + "STD-" + studyName);
 
         //dataFile.getLogger().println("Study ID found: " + studyName);
-        String studyUriForVC =(str.getStudy().getUri()).replace("STD", "SSD");
-        dataFile.getLogger().println("Study URI found: " + studyUriForVC);
-
-        List<VirtualColumn> vcList = VirtualColumn.findByStudyUri(studyUriForVC);
+        List<VirtualColumn> vcList = VirtualColumn.findByStudyUri(str.getStudy().getUri());
         // map of SOCReference and grounding label
         Map<String, String> refList = new HashMap<String, String>();
         // map of daso uri and SOCReference

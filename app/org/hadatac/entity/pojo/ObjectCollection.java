@@ -1339,22 +1339,25 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         if (uri == null || uri.equals("")) {
             return;
         }
-        String studyUri= uri.contains("SOC") && this.getStudyUri()!=null ? this.getStudyUri().replace("STD","SSD"):this.getStudyUri();
 
         this.hasRoleLabel = label;
         String insert = "";
 
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += INSERT_LINE1;
+        if(!getNamedGraph().isEmpty()){
+            insert += "graph  <"+getNamedGraph()+"> { " ;
+        }
         if (uri.startsWith("http")) {
-            insert += "graph  <"+studyUri+"> { " ;
             insert += "  <" + uri + "> hasco:hasRoleLabel \"" + label + "\" . ";
 
         } else {
-            insert += "graph  <"+studyUri+"> { " ;
             insert += "  " + uri + " hasco:hasRoleLabel \"" + label + "\" . ";
         }
-        insert += LINE_LAST+LINE_LAST;
+        insert += LINE_LAST;
+        if(!getNamedGraph().isEmpty()){
+            insert += LINE_LAST;
+        }
         UpdateRequest request = UpdateFactory.create(insert);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
