@@ -44,11 +44,18 @@
 				<label>File Name</label>
 				<input type="text" class="form-control col-sm-6" name="newName" id="newName" value="@dataFile.getFileName()" onchange="checkform()">
 			</div>
-	
-			<div class="form-group" class="col-sm-6 col-offset-3">
-				<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" /> 
-				<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
-			</div>
+
+			@if(dir.indexOf("/download")>=0) {
+				<div class="form-group" class="col-sm-6 col-offset-3">
+					<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" />
+				<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index_datasetGeneration(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
+				</div>
+			} else {
+				<div class="form-group" class="col-sm-6 col-offset-3">
+					<input class="btn btn-primary" role="button" id="submitbutton" type="submit" value="OK" disabled="disabled" />
+					<a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index(dir, ".")" class="btn btn-primary" role="button">Cancel</a>
+				</div>
+			}
 		</form>
 	</div>
 }

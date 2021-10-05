@@ -343,7 +343,7 @@ public class DataAcquisitionSearch extends Controller {
             e.printStackTrace();
         }
 
-        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/", false));
+        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index_datasetGeneration("/", "/", false));
     }
 
     private String getUserEmail(Http.Request request) {
