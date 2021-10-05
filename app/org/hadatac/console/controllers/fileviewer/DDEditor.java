@@ -3,9 +3,6 @@ package org.hadatac.console.controllers.fileviewer;
 import java.util.List;
 import java.util.ArrayList;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 //import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
@@ -45,8 +42,8 @@ public class DDEditor extends Controller {
 
             return ok(dd_editor.render(dataFile,false,dir,dirFile,user.getEmail()));
         }
-
-
+        
+        
         getdd_df(dataFile);
         List<DataFile> files = null;
         String path = ConfigProp.getPathWorking();
@@ -63,9 +60,9 @@ public class DDEditor extends Controller {
     //       }
     //    }
 
+        
 
-
-
+        
         return ok(dd_editor.render(dataFile, bSavable,dir,dirFile,user.getEmail()));
     }
 
@@ -93,7 +90,7 @@ public class DDEditor extends Controller {
         return new Result(200);
     }
    public Result getHeaderLoc(String header_loc){
-
+        
         headerSheetColumn=header_loc;
         System.out.println(headerSheetColumn);
         return new Result(200);
@@ -103,24 +100,27 @@ public class DDEditor extends Controller {
         System.out.println(commentSheetColumn);
         return new Result(200);
     }
-
-
-    public Result getCheckedSDD(String sddFileName, Http.Request request){
+   
+    
+    public Result getCheckedSDD(String sddFileName,Http.Request request){
+        System.out.println("sdd filename: "+sddFileName);
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
-        List<DataFile> files = DataFile.find(user.getEmail());
+        List<DataFile> files = null;
+        String path = ConfigProp.getPathWorking();
 
-        DataFile sdd_dataFile = null;
+        files = DataFile.find(user.getEmail());
+        String sdd_filename=sddFileName;
+        DataFile sdd_dataFile = new DataFile("");
         for(DataFile df : files){
-           String localPath = Paths.get(df.getDir(), df.getFileName()).toString();
-           if(localPath.equals(sddFileName)){
+           if(df.getFileName().equals(sdd_filename)){
              sdd_dataFile = df;
-             break;
           }
        }
 
-       return ok(Json.toJson(sdd_dataFile.getId()));
+       String sdd_id=sdd_dataFile.getId();
+       System.out.println("sdd fileid: "+sdd_id);
+       return ok(Json.toJson(sdd_id));
     }
-
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result fromEditableLink(String editableId, String dir,Http.Request request) {
         DataFile dataFile = DataFile.findByEditableId(editableId);

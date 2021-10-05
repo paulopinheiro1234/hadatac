@@ -24,32 +24,32 @@ userName: String
 
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs_dd.css")">
     <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
-
+    
     <div id="rcorners">
     <h4>@dataFile.getFileName()</h4>
     <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
     @if(bSavable) {
         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
     }
-
-
+    
+    
     <a href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
        <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
     <a href="@org.hadatac.console.controllers.workingfiles.routes.NewFile.index(dir)" target="_blank" class="btn btn-primary" role="button">Blank Metadata File</a>
-
+    
       <button type="button" class="isHeader" role="button">
-          <img src="@controllers.routes.Assets.versioned("icons/header.png")"  width="25" height="25" alt=""/> Column Header
+          <img src="@controllers.routes.Assets.versioned("icons/header.png")"  width="25" height="25" alt=""/> Column Header 
       </button>
       <input type="text" id="headerdetails" value=" "/>
-
-
+    
+   
       <button type="button" class="isDesc" role="button">
           <img src="@controllers.routes.Assets.versioned("icons/notepad.png")"  width="24" height="27" alt=""/> Description
       </button>
       <input type="text" id="descdetails" value=" "/>
-
-
-
+  
+   
+ 
       <button class="main-navi" id="showcarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
         width="32" height="30" alt=""/> Add to SDD</button>
         <button class="Close" id="hidecarry"> <img src="@controllers.routes.Assets.versioned("icons/add.png")"
@@ -60,17 +60,17 @@ userName: String
             <script type="text/javascript">
             function checkform() {
                var cansubmit = true;
-
+     
                if (document.getElementById('targetFile').value.length == 0) {
                    cansubmit = false;
                }
-
+     
                if (cansubmit) {
                    document.getElementById('togoback').disabled = false;
-
+                   
                } else {
                    document.getElementById('togoback').disabled = 'disabled';
-
+                   
                }
             }
          </script>
@@ -79,21 +79,21 @@ userName: String
              list-style-type: none;
              position: relative;
            }
-
+     
            ul.tree li ul {
              display: none;
            }
-
+     
            ul.tree li.open > ul {
              display: block;
            }
-
+     
            ul.tree li a {
              color: black;
              text-decoration: none;
-	     cursor: default;
+	     cursor: default;            
            }
-
+     
            ul.tree li a:before {
              height: 1em;
              padding:0 .1em;
@@ -102,11 +102,11 @@ userName: String
              position: absolute;
              left: -1.3em;
              top: .2em;
-
+             
            }
-
+     
            ul.tree li > a:not(:last-child):before {
-             content: '+';
+             content: 'Click To Add SDD';
 	     background-color: #EEEEEE;
     	     padding-top: 6px;
 	     padding-bottom: 20px;
@@ -120,11 +120,11 @@ userName: String
 	     border-radius:5px;
     	     cursor:pointer;
            }
-
+     
            ul.tree li.open > a:not(:last-child):before {
-             content: '-';
+             content: 'Close';
            }
-
+           
         .container{
             width:320px;
             word-wrap: break-word;
@@ -145,99 +145,96 @@ userName: String
           padding-left: 20px;
           padding-right: 20px;
         }
-
+        
         </style>
         <div class= "cont">
-            <img src="@controllers.routes.Assets.versioned("icons/rect.jpg")" alt="" width="100%" height="50" style="margin-left: 5px;
+            <img src="@controllers.routes.Assets.versioned("icons/rect.jpg")" alt="" width="100%" height="50" style="margin-left: 5px; 
             margin-right: 5px;">
             <div class="text-block">
                <h4>Add File Headers into SDD</h4>
-
-
+               
+               
             </div>
         </div>
        <div class="container">
-
+     
          <form class="form-horizontal" name="newDAS" method="post">
-
+           
 
            <div class="form-group">
-              <p style="font-size:10pt; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana,
+              <p style="font-size:10pt; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, 
               sans-serif">Extract column headers from data dictionary (DD) files and add them into a give Semantic Data Dictionary (SDD).</p>
            </div>
-
+     
            <div class="form-group">
              <p style="font-size:9pt; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif"
              ><strong>SDD: </strong>The Data Dictionary file providing the column headers and comments to be added into an SDD.</p>
           <input type="text" style="width:100%;" class="form-control col-sm-6" name="label" id="label" readonly  value=@dataFile.getFileName() >
-
+          
            </div>
-
+     
            <div class="form-group" style="margin-top: 0px;margin-bottom: 0px;">
              <p style="font-size:9pt; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif"
              ><strong>Selected File: </strong> The SDD file receiving the DD information needs to be selected. If the SDD is already on working files, use the option
              below to expand the directories and select the target SDD.</p>
                <ul class="tree">
                  @if(dirFile != null) {
-                        @tree_node_generic(DataFile.getHierarchy("/","",false),"targetFile", "", false)
+                        @tree_node_generic(DataFile.getHierarchy("/","",false),"targetFile", "", false)    
                  }
                </ul>
-
-           </div>
+     
+           </div>           
          </form>
          <button class="btn btn-primary" style="margin-top: 0px;" role="button" id="togoback" onclick="goToSDD()" disabled="disabled"> <span class="glyphicon glyphicon-circle-arrow-left"></span>  Back to SDD</button>
        </div>
        <div id="lg"></div>
           <script>
-
+       
        var headerSheetColumn=document.getElementById("headerdetails").value;
        var commentSheetColumn=document.getElementById("descdetails").value;
        var sddId;
             function typechange() {
                var newType = $("input[name=newStudyType]:checked").val();
                var checkedSDDName=$("input:checked").val();
-
+               
                checkedSDDName=checkedSDDName.replace('/',"")
-
-
-
+              
+               
+              
                $.ajax({
                type : 'GET',
                url : 'http://localhost:9000/hadatac/dd_editor/getCheckedSDD',
                data : {
                  sddFileName: checkedSDDName
-
+                 
                },
                success : function(data) {
-
+                 
                  sddId=data;
-
-
+                 
+                 
                },
-
+             
              });
           $('#currentType').val(newType);
                checkform();
             };
-
+            
             function goToSDD(){
-
-
+                
+                
               window.location.href="/hadatac/sddeditor_v2?file_id="+sddId+"&bSavable=true&indicator=1";
-
-
+           
+             
             }
-            console.log("tree");
             var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
-            console.log(tree);
-
             for(var i = 0; i < tree.length; i++){
                tree[i].addEventListener('click', function(e) {
-
+                
                var parent = e.target.parentElement;
-
+             
                var classList = parent.classList;
-
+               
                if(classList.contains("open")) {
                  classList.remove('open');
                  var opensubs = parent.querySelectorAll(':scope .open');
@@ -251,11 +248,11 @@ userName: String
             }
             </script>
         </div>
-
+    
     <div><a id="alarmmsg"></a></div>
     <div><a id="error_msg"></a></div>
     <div id="grid"></div>
-
+    
     <div id="gridcopy"></div>
     <div id="footnote"></div>
     <div id="buttons"></div>
@@ -267,25 +264,25 @@ userName: String
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server_dd.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/js/ddhideshow.js")"></script>
     <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
-
+    
     <script type="text/javascript">
     /* set up async GET request */
     var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
-    var _upload = document.getElementById('upload');
+    var _upload = document.getElementById('upload');    
     var _onreponse = function() {
     	$("#error_msg").html(decodeURIComponent(this.responseText));
     	setTimeout(function() {
     		$("#error_msg").html("");
     	}, 3000);
     };
-
+    
     var req = new XMLHttpRequest();
     req.open("GET", url, true);
     req.responseType = "arraybuffer";
 
     req.onload = function(e) {
       var data = new Uint8Array(req.response);
-
+      
       // var workbook = XLSX.read(data, {type:"array"});
       // console.log("SheetNames: " + workbook.SheetNames);
 

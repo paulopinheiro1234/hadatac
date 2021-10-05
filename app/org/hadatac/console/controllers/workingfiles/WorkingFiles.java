@@ -77,56 +77,6 @@ public class WorkingFiles extends Controller {
     public Result index(String dir, String dest, Boolean stayAtRoot, Http.Request request) {
 
         final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
-        final Path pathWorking = Paths.get(ConfigProp.getPathWorking());
-
-        // Determine working path
-        Path targetDir = null;
-        if ( stayAtRoot ) {
-            targetDir = pathWorking;
-        } else {
-            if (dest.equals(File.separator)) {
-                targetDir = Paths.get(pathWorking.toString(), DataFile.DS_GENERATION, user.getEmail());
-            } else {
-                targetDir = Paths.get(dir, dest).normalize();
-            }
-        }
-
-        // This code switches to the target directory on the current path if the target is not an absolute path
-        // This also ensures that users cant access the entire file system
-        if(!targetDir.startsWith(pathWorking)){
-           targetDir = Paths.get(pathWorking.toString(), targetDir.toString()).normalize();
-        }
-
-        // Get Folders from OS
-        List<String> folders = DataFile.findFolders(targetDir.toString(), false);
-
-        // Solr stores the relative path so show only search relative path files
-        // This does mean that the context of the search matters becasue base directory
-        // will show for all working files even if they don't actually exist
-        // String relativePath = targetDir.replace(pathWorking, "");
-        String relativePath = pathWorking.relativize(targetDir).toString();
-        if(relativePath.equals("")){ // we are at base directory aka pathWorking
-           relativePath = File.separator; // this is needed for upload files to work
-        }
-        else{
-           folders.add(0, ".."); // if were not at base add the ability to go up a directory
-        }
-        Collections.sort(folders);
-
-        // Get files in working directory
-        List<DataFile> wkFiles = new ArrayList<DataFile>();
-        wkFiles.addAll(DataFile.findDownloadedFilesInDir(relativePath, DataFile.CREATING));
-        wkFiles.addAll(DataFile.findDownloadedFilesInDir(relativePath, DataFile.WORKING));
-        DataFile.updatePermission(wkFiles, user.getEmail());
-
-        // The rest of the functions expect a relative path from the base
-        return ok(workingFiles.render(relativePath, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
-    }
-
-    @Secure(authorizers = Constants.DATA_OWNER_ROLE)
-    public Result index_datasetGeneration(String dir, String dest, Boolean stayAtRoot, Http.Request request) {
-
-        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
 
         String targetDir = null;
         List<DataFile> wkFiles = null;
@@ -136,7 +86,7 @@ public class WorkingFiles extends Controller {
             targetDir = pathWorking;
         } else {
             if ("/".equals(dest)) {
-                targetDir = pathWorking + "/"+ DataFile.DS_GENERATION + "/" + user.getEmail();
+                targetDir = pathWorking + "download/" + user.getEmail();
             } else {
                 targetDir = Paths.get(dir, dest).normalize().toString();
             }
@@ -172,11 +122,11 @@ public class WorkingFiles extends Controller {
         DataFile.updatePermission(wkFiles, user.getEmail());
 
         // once we reach the level that contains download, we don't want to allow the use to nevigate back to upper level
-        if ( folders.contains(DataFile.DS_GENERATION + "/") || targetDir.endsWith(DataFile.DS_GENERATION)) {
+        if ( folders.contains("download/") ) {
             folders.remove("..");
         }
+        return ok(workingFiles.render(targetDir, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
 
-        return ok(datasetGeneration.render(targetDir, folders, wkFiles, user.isDataManager(),application.getUserEmail(request)));
     }
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
@@ -252,10 +202,6 @@ public class WorkingFiles extends Controller {
                 }
             }
 
-            // if this is dataset generation, then use its own entry point
-            if ( dir.indexOf(DataFile.DS_GENERATION) >= 0 ) {
-                return redirect(routes.WorkingFiles.index_datasetGeneration(dir, ".", false));
-            }
             return redirect(routes.WorkingFiles.index(dir, ".", false));
         }
     }
@@ -277,6 +223,7 @@ public class WorkingFiles extends Controller {
 
         DataFile dirFile = new DataFile(dir);
         dirFile.setStatus(DataFile.WORKING);
+
         return ok(moveFile.render(dir, dataFile, dirFile, user.getEmail()));
     }
 
@@ -558,16 +505,16 @@ public class WorkingFiles extends Controller {
 
         return redirect(routes.WorkingFiles.shareDataFile(dir, fileId));
     }
-
+    
     /*
     @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
-    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {
+    public Result assignFileOwner(String dir, String ownerEmail, String selectedFile) {	
         return ok(workingFiles.render(User.getUserEmails(), routes.WorkingFiles.processOwnerForm(dir, ownerEmail, selectedFile), "Owner", "Selected File", selectedFile));
     }
     @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postAssignFileOwner(String dir, String ownerEmail, String selectedFile) {
         return assignFileOwner(dir, ownerEmail, selectedFile);
-    }
+    } 
     @Secure (authorizers = Constants.DATA_MANAGER_ROLE)
     public Result processOwnerForm(String dir, String ownerEmail, String selectedFile) {
         Form<AssignOptionForm> form = formFactory.form(AssignOptionForm.class).bindFromRequest();
@@ -591,7 +538,7 @@ public class WorkingFiles extends Controller {
             file.save();
             return redirect(routes.WorkingFiles.index(dir, "."));
         }
-    }
+    } 
     */
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
@@ -607,12 +554,6 @@ public class WorkingFiles extends Controller {
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkAnnotationLog(String dir, String fileId, Http.Request request) {
         DataFile dataFile = DataFile.findById(fileId);
-        // for dataset generation, dir should contain the word "download" and it should go to its own entry point
-        if ( dir != null && dir.contains(DataFile.DS_GENERATION) ) {
-            return ok(annotation_log.render(Feedback.print(Feedback.WEB,
-                    DataFile.findById(fileId).getLog()),
-                    routes.WorkingFiles.index_datasetGeneration(dir, "/", false).url(), application.getUserEmail(request)));
-        }
         return ok(annotation_log.render(Feedback.print(Feedback.WEB,
                 DataFile.findById(fileId).getLog()),
                 routes.WorkingFiles.index(dir, "/", false).url(), application.getUserEmail(request)));
@@ -657,10 +598,6 @@ public class WorkingFiles extends Controller {
         file.delete();
         dataFile.delete();
 
-        // if this is dataset generation, we will need to use its own entry point
-        if ( dir.indexOf(DataFile.DS_GENERATION) >= 0) {
-            return redirect(routes.WorkingFiles.index_datasetGeneration(dir, ".", false));
-        }
         return redirect(routes.WorkingFiles.index(dir, ".", false));
     }
 
