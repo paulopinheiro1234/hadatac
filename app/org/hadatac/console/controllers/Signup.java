@@ -9,6 +9,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TokenAction;
 import org.hadatac.console.providers.MyService;
 import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
+import org.hadatac.console.providers.MyUsernamePasswordAuthUser;
 import org.hadatac.console.providers.UserProvider;
 import org.hadatac.console.views.html.account.signup.no_token_or_invalid;
 import org.hadatac.console.views.html.account.signup.password_forgot;
@@ -112,13 +113,12 @@ public class Signup {
     }
 
     //TODO : fix this
-    public Result doResetPassword(Http.Request request) {
+    public Result doResetPassword(String token, Http.Request request) {
         final Form<PasswordReset> filledForm = PASSWORD_RESET_FORM
                 .bindFromRequest(request);
         if (filledForm.hasErrors()) {
-            return badRequest(password_reset.render(filledForm,msg.preferred(request))).withHeader("Cache-Control", "no-cache");
+            return badRequest(password_reset.render(filledForm,"",msg.preferred(request))).withHeader("Cache-Control", "no-cache");
         } else {
-            final String token = filledForm.get().token;
             final String newPassword = filledForm.get().password;
 
             final TokenAction ta = tokenIsValid(token, Type.PASSWORD_RESET);
@@ -126,28 +126,28 @@ public class Signup {
                 return badRequest(no_token_or_invalid.render());
             }
             final SysUser u = ta.targetUser;
-//            try {
-//                // Pass true for the second parameter if you want to
-//                // automatically create a password and the exception never to
-//                // happen
-//                u.resetPassword(new MyUsernamePasswordAuthUser(newPassword),
-//                        false);
-//            } catch (final RuntimeException re) {
-//                flash(AuthApplication.FLASH_MESSAGE_KEY,
-//                        this.msg.preferred(request()).at("playauthenticate.reset_password.message.no_password_account"));
-//            }
+            try {
+                // Pass true for the second parameter if you want to
+                // automatically create a password and the exception never to
+                // happen
+                u.resetPassword(new MyUsernamePasswordAuthUser(newPassword,u.getEmail(),u.getName()), false);
+            } catch (final RuntimeException re) {
+                System.out.println(re+ "\n"+ re.getStackTrace());
+                return redirect(routes.Application.loginForm()).flashing(AuthApplication.FLASH_MESSAGE_KEY,
+                        this.msg.preferred(request).at("authenticate.reset_password.message.no_password_account"));
+            }
 //            final boolean login = this.userPaswAuthProvider.isLoginAfterPasswordReset();
 //            if (login) {
 //                // automatically log in
 //                flash(AuthApplication.FLASH_MESSAGE_KEY,
-//                        this.msg.preferred(request()).at("playauthenticate.reset_password.message.success.auto_login"));
+//                        this.msg.preferred(request).at("playauthenticate.reset_password.message.success.auto_login"));
 //
 //                return this.auth.loginAndRedirect(ctx(),
 //                        new MyLoginUsernamePasswordAuthUser(u.getEmail()));
 //            } else {
 //                // send the user to the login page
-//                flash(AuthApplication.FLASH_MESSAGE_KEY,
-//                        this.msg.preferred(request()).at("playauthenticate.reset_password.message.success.manual_login"));
+//                return redirect(routes.Application.loginForm()).flashing(AuthApplication.FLASH_MESSAGE_KEY,
+//                        this.msg.preferred(request).at("playauthenticate.reset_password.message.success.manual_login"));
 //            }
             return redirect(routes.Application.loginForm());
         }
@@ -225,7 +225,6 @@ public class Signup {
         }
     }
 
-    //TODO :test this
     public Result resetPassword(final String token, Http.Request request) {
         final TokenAction ta = tokenIsValid(token, Type.PASSWORD_RESET);
         final Form<PasswordReset> filledForm = PASSWORD_RESET_FORM.fill(new PasswordReset(token, this.msg)).bindFromRequest(request);
@@ -233,7 +232,7 @@ public class Signup {
             return badRequest(no_token_or_invalid.render());
         }
 
-        return ok(password_reset.render(filledForm,msg.preferred(request))).withHeader("Cache-Control", "no-cache");
+        return ok(password_reset.render(filledForm,token,msg.preferred(request))).withHeader("Cache-Control", "no-cache");
     }
 
     public Result verify(final String token, Http.Request request) {

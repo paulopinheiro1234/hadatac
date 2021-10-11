@@ -22,13 +22,17 @@ public class MyUsernamePasswordAuthUser extends MyUsernamePasswordAuthProvider {
      * Used for password reset only - do not use this to signup a user!
      * @param password
      */
-    public MyUsernamePasswordAuthUser(final String password) {
+    public MyUsernamePasswordAuthUser(final String password, String email, String name) {
         this.password = password;
-        this.email = null;
-        name = null;
+        this.email = email;
+        this.name = name;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
