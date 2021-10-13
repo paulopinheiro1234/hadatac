@@ -1,0 +1,119 @@
+@(userName:String)
+
+@import helper._
+@import org.hadatac.utils.NameSpaces
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute
+@import org.hadatac.entity.pojo.HADatAcClass
+@import org.hadatac.entity.pojo.HADatAcThing
+@import org.hadatac.entity.pojo.Study
+@import org.hadatac.entity.pojo.StudyObject
+@import org.hadatac.data.loader.DataContext
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play
+@import com.typesafe.config.ConfigFactory
+
+@main("HADataC: Human-Aware Data Acquisition Framework","",userName) {
+
+    <style>
+            .dashNumber
+            {
+                font-family:    Arial, Helvetica, sans-serif;
+                font-size:      48px;
+                font-weight:    bold;
+                color:          Black;
+            }
+            .dashText
+            {
+                font-family:    Arial, Helvetica, sans-serif;
+                font-size:      28px;
+                font-weight:    bold;
+                padding:        1px 15px 35px 15px;
+            }
+    </style>
+
+    <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div id="textTitle" class="col-md-8">
+                <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+                <script>showText("@ConfigFactory.load().getString("hadatac.AnonymousUser.landingPage.description")", "textTitle")</script><p>If you are a validated user on the <a href="https://hheardatacenter.mssm.edu/">HHEAR Data Center portal</a>, you may set up an account on this repository. Please <a href="@org.hadatac.console.controllers.routes.WidgetController.listWidgets()"> Sign-up</a> and follow the instructions. Returning users may log in <a href="@org.hadatac.console.controllers.routes.Application.formIndex()"> here.</p>
+                <hr>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <h3>Statistics and Main Functionalities</h3>
+                <div class="row dash-text">
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@Study.getNumberStudies()</div>
+                        <a href="@org.hadatac.console.controllers.metadataacquisition.routes.MetadataAcquisition.index()" id="metadatafacet" class="btn btn-primary btn-block disabled" role="button">Studies</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@DataContext.playTotalDataAcquisitions()</div>
+                        <a href="@org.hadatac.console.controllers.metadataacquisition.routes.DataAcquisitionBrowser.index()" id="dataacquisitionfacet" class="btn btn-primary btn-block disabled" role="button">Data Acquisitions</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@DataAcquisitionSchemaAttribute.getNumberDASAs()</div>
+                        <a href="@org.hadatac.console.controllers.metadataacquisition.routes.SchemaAttribute.index()" id="variables" class="btn btn-primary btn-block disabled" role="button">Variables</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2  text-center">
+                        <div class="dashNumber">@StudyObject.getNumberStudyObjects()</div>
+                        <a href="" id="data" class="btn btn-primary btn-block disabled" role="button">Objects</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@DataContext.playTotalMeasurements()</div>
+                        <a href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Data Values</a>
+                        <br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@NameSpaces.getInstance().getLoadedOntologies.size()</div>
+                        <a href="@org.hadatac.console.controllers.stats.routes.Ontologies.index()" id="data" class="btn btn-primary btn-block disabled" role="button">Loaded Onts</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@NameSpaces.getInstance().getNumOfNameSpaces</div>
+                        <a href="" id="data" class="btn btn-primary btn-block disabled" role="button">Namespaces</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@HADatAcClass.getNumberClasses()</div>
+                        <a href="" id="data" class="btn btn-primary btn-block disabled" role="button">Classes</a>
+                        <br>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="dashNumber">@HADatAcThing.getNumberInstances()</div>
+                        <a href="" id="data" class="btn btn-primary btn-block disabled" role="button">Instances</a>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-9">
+                <h3>Additional Functionalities</h3>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/")" id="downloader" class="btn btn-primary btn-block disabled" role="button">Data Download Reports</a>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <a href="@org.hadatac.console.controllers.metadata.routes.Metadata.index()" class="btn btn-primary btn-block disabled" role="button">Browse Metadata</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+}
