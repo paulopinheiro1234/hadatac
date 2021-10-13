@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers;
 
+import org.hadatac.console.views.html.landingPage;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -38,7 +39,7 @@ public class Portal extends Controller {
         SysUser user = AuthApplication.getAuthApplication().getUserProvider().getUser(application.getUserEmail(request));
 
         if (user == null) {
-            return ok(dashboard.render(application.getUserEmail(request)));
+            return ok(landingPage.render(application.getUserEmail(request)));
         } else {
             return ok(portal.render(application.getUserEmail(request)));
         }
