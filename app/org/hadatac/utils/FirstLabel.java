@@ -49,8 +49,25 @@ public class FirstLabel {
         }
 
         if ( resultsrw == null || resultsrw.size() == 0) {
-            log.warn("URI " + uri + " does not have any label in the graph.");
-            return "";
+            if (uri.startsWith("http")) uri = "<" + uri.trim() + ">";
+            String queryString2 = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?graph ?label WHERE { \n" +
+                "GRAPH ?graph { \n" +
+                "  " + uri + " skos:prefLabel ?label . } \n" +
+                "}";
+            ResultSetRewindable resultsrw2 = null;
+            if ( !useInMemoryModel ) {
+                resultsrw2 = SPARQLUtils.select(
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString2);
+            } else {
+                resultsrw2 = SPARQLUtilsFacetSearch.select(
+                        CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString2);
+            }
+            if ( resultsrw2 == null || resultsrw2.size() == 0) {
+                log.warn("URI " + uri + " does not have any label in the graph.");
+                return "";
+            }
+            resultsrw = resultsrw2;
         }
 
         String labelStr = "";
