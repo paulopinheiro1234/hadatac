@@ -63,10 +63,12 @@ public class PVGenerator extends BaseGenerator {
 
 	private String getCode(Record rec) {
 		String ss = Normalizer.normalize(rec.getValueByColumnName(mapCol.get("Code")), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim();
+		/*
 		int iend = ss.indexOf(".");
 		if (iend != -1){
 			ss = ss.substring(0 , iend);
 		}
+		*/
 		return ss.trim();
 	}
 
