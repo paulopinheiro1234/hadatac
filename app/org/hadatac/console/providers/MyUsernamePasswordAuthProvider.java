@@ -147,6 +147,10 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
         return createPassword(this.password);
     }
 
+    public String getHashedPassword(String password) {
+        return createPassword(password);
+    }
+
     protected String createPassword(final String clearString) {
         return BCrypt.hashpw(clearString, BCrypt.gensalt());
     }
