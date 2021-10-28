@@ -258,9 +258,6 @@ public class DataFile implements Cloneable {
     }
 
     public String getAbsolutePath() {
-      System.out.println("getStatus() = ");
-      System.out.println(getStatus());
-
         if (Arrays.asList(UNPROCESSED, FREEZED).contains(getStatus())) {
             return Paths.get(ConfigProp.getPathUnproc(), getDir(), getStorageFileName()).toString();
         } else if (getStatus().equals(PROCESSED)) {
