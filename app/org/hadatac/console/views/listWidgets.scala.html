@@ -26,11 +26,11 @@
         }
     }
     <div id="signup" class="row">
-    <div class="col-xs-6 col-xs-offset-1 col-sm-4">
+    <div class="col-xs-6 col-xs-offset-1 col-sm-2">
     @helper.form(org.hadatac.console.controllers.routes.Signup.createUser) {
         @helper.inputText(form("name"), '_label->"Your name")
 
-        @helper.inputText(form("email"), '_label->"Your e-mail address")
+        @helper.inputText(form("email"), '_id -> "test", '_label->"Your e-mail address",'_help -> "Note: You must use the same email address that you used to sign up for the HHEAR Data Center Portal. You may use a different password.")
 
         @helper.inputPassword(form("password"), '_label->"Password")
         @helper.inputPassword(form("repeatPassword"), '_label->"Repeat Password")

@@ -1,6 +1,9 @@
 package org.hadatac.console.providers;
 
 import javax.inject.Inject;
+import javax.validation.Constraint;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import akka.actor.Cancellable;
 import com.feth.play.module.mail.IMailer;
@@ -46,8 +49,7 @@ public class MyUsernamePasswordAuthProvider implements MyAuthUserIdentity{
 
     @Constraints.Required
     private String name;
-    @Constraints.Required
-    @Constraints.Email
+    @NotNull @NotEmpty
     private String email;
     @Constraints.Required
     @Constraints.MinLength(5)
