@@ -150,7 +150,7 @@ public class Account extends Controller {
             user.setUri(UserManagement.getUriByEmail(user.getEmail()));
             user.save();
             /* ---- */
-            user.changePassword(new MyUsernamePasswordAuthUser(newPassword), true);
+            user.changePassword(new MyUsernamePasswordAuthUser(newPassword,user.getEmail(),user.getName()), true); //TODO: why is this true?
             return redirect(routes.AuthApplication.profile(user.getEmail()))
                     .withHeader("Cache-Control", "no-cache")
                     .flashing(Constants.FLASH_MESSAGE_KEY,"Password has been changed successfully.");

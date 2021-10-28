@@ -591,23 +591,22 @@ public class SysUser implements Subject {
 						"Account not enabled for password usage");
 			}
 		}
-		account.providerUserId = authUser.getHashedPassword();
+		account.providerUserId = authUser.getHashedPassword(authUser.getPassword());
 		account.save();
 	}
-//
-//	//todo :fix this
-//	public void resetPassword(final MyUsernamePasswordAuthProvider authUser //UsernamePasswordAuthUser authUser,
-//			final boolean create) {
-//		// You might want to wrap this into a transaction
-//		resetPasswordSolr(authUser, create);
-//	}
-//	//todo :fix this
-//	public void resetPasswordSolr(final MyUsernamePasswordAuthProvider authUser //UsernamePasswordAuthUser authUser,
-//			final boolean create) {
-//		// You might want to wrap this into a transaction
-//		this.changePassword(authUser, create);
-//		TokenAction.deleteByUserSolr(this, Type.PASSWORD_RESET);
-//	}
+
+	public void resetPassword(final MyUsernamePasswordAuthUser authUser,
+							  final boolean create) {
+		// You might want to wrap this into a transaction
+		resetPasswordSolr(authUser, create);
+	}
+
+	public void resetPasswordSolr(final MyUsernamePasswordAuthUser authUser,
+								  final boolean create) {
+		// You might want to wrap this into a transaction
+		this.changePassword(authUser, create);
+		TokenAction.deleteByUserSolr(this, Type.PASSWORD_RESET);
+	}
 
 	public static SysUser convertSolrDocumentToUser(SolrDocument doc) {
 		SysUser user = new SysUser();
