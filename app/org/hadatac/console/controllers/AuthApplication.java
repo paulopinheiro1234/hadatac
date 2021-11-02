@@ -32,6 +32,8 @@ public class AuthApplication extends Controller {
     @Inject
     private Application application;
 
+    public static final String FLASH_MESSAGE_KEY = "message";
+    public static final String FLASH_ERROR_KEY = "error";
     private static AuthApplication authApplication = null;
     private final MyUsernamePasswordAuthProvider provider;
     private final UserProvider userProvider;

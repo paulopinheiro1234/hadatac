@@ -125,7 +125,7 @@ POST	/hadatac/stats/ont		                       org.hadatac.console.controllers.
 GET     /hadatac/restricted                            org.hadatac.console.controllers.AuthApplication.restricted(username : String)
 GET     /hadatac/signUp                                    org.hadatac.console.controllers.WidgetController.listWidgets(request: Request)
 POST    /hadatac/signUp                                    org.hadatac.console.controllers.Signup.createUser(request: Request)
-POST    /hadatac/accounts/password/reset                   org.hadatac.console.controllers.Signup.doResetPassword(request: Request)
+POST    /hadatac/accounts/password/reset                   org.hadatac.console.controllers.Signup.doResetPassword(token: String, request: Request)
 GET     /hadatac/login/password/forgot                     org.hadatac.console.controllers.Signup.forgotPassword(request: Request)
 POST    /hadatac/login/password/forgot		               org.hadatac.console.controllers.Signup.doForgotPassword(request: Request)
 GET     /hadatac/accounts/password/reset/:token            org.hadatac.console.controllers.Signup.resetPassword(token: String, request: Request)
