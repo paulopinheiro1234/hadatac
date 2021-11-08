@@ -289,6 +289,10 @@ public class Signup {
             linkedAccount.providerUserId=data.getHashedPassword();
             String userUri = UserManagement.getUriByEmail(data.getEmail());
             final SysUser newUser = SysUser.create(data, userUri, linkedAccount);
+            if (redirectedUser){
+                newUser.setEmailValidated(true);
+                newUser.save();
+            }
             System.out.println("commit done");
         } catch (Exception e) {
             System.out.println("[ERROR] User.getAuthUserFindSolr - Exception message: " + e.getMessage());
@@ -303,21 +307,19 @@ public class Signup {
     public Result checkUserExists(Http.Request request) throws TechnicalException {
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
-            if (SysUser.findByEmail(formData.get().getEmail()) != null && !formData.get().getEmail().isEmpty()) {
-                //Login user
-                System.out.println("Redirected from HHEAR Portal, user exists - logging in");
-                SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
-                final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-                test.validate(new UsernamePasswordCredentials(formData.get().getEmail(), formData.get().getPassword()), context);
-                SysUser user = SysUser.findByEmail(formData.get().getEmail());
-                application.formIndex(request,user);
-                return ok ("/protected/index.html/"+user.getEmail());
-            } else {
-                System.out.println("Redirected from HHEAR Portal, user Does not exist, Signing up");
+            System.out.println("Redirected from HHEAR Portal");
+            if (SysUser.findByEmail(formData.get().getEmail()) == null && !formData.get().getEmail().isEmpty()) {
+                System.out.println("User Does not exist, Signing up");
                 MyUsernamePasswordAuthProvider data = formData.get();
                 settingUpAccount(data,true);
-                return ok("user does not exist"); //TODO: This needs to change to login
             }
+            //Login user
+            SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
+            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
+            test.validate(new UsernamePasswordCredentials(formData.get().getEmail(), formData.get().getPassword()), context);
+            SysUser user = SysUser.findByEmail(formData.get().getEmail());
+            application.formIndex(request,user);
+            return ok ("/protected/index.html/"+user.getEmail());
         }
         return badRequest("what happened?");
     }

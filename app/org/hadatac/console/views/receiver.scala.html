@@ -25,7 +25,7 @@
     <script type="text/javascript">
             var data1;
             window.addEventListener('click', function (e) {
-                var txt = '{"username":"jane", "age":30, "city":"New York", "email": "sheersha.kandwal@@mssm.edu", "password": "Krishna108*"}'
+                var txt = '{"username":"jane", "age":30, "city":"New York", "email": "sheersha.kandwal@@gmail.com", "password": "12345"}'
                 var obj = JSON.parse(txt);
                 console.log("inside script");
                 e.data = "sheersha.kandwal" + "@@" + "mssm.edu"
@@ -35,52 +35,12 @@
                 console.log("email :" + data1);
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
-                @*$.ajax({*@
-                @*    type: 'POST',*@
-                @*    url: '/hadatac/checkUser/',*@
-                @*    data: obj,*@
-                @*    success: function (response) {*@
-                @*        var userName = obj.email;*@
-                @*        $.post("/hadatac/login/"+obj.email,{userName: obj.email,password: obj.password},function (data){*@
-                @*            window.document.body.parentNode.innerHTML = data;*@
-                @*        })*@
-                @*        // console.log(response);*@
-                @*        // window.document.body.parentNode.innerHTML = response;*@
-
-                @*        *@@*window.location("@org.hadatac.console.controllers.routes.Application.protectedIndex()")*@
-                @*        // $("#result").html(response).show();*@
-                @*        *@@*window.location = "/hadatac/login?username=sheersha.kandwal@@mssm.edu&password=Krishna108*"*@
-                @*                // "?client_name=FormClient";*@
-                @*    },*@
-                @*});*@
                 $.ajax({
                     type: 'POST',
-                    url: '/hadatac/checkUser/',//+ data1,
+                    url: '/hadatac/checkUser/',
                     data: obj,
                     success: function (response) {
-                        console.log(response);
-                        // window.location="/hadatac/login"
-                        // $(document).on("ready", function () {
-                        //     console.log("inside document");
-                        //     document.getElementById("username").value=obj.email;
-                        //     document.getElementById("password").value=obj.password;
-                        //     document.getElementById("submit").click();
-                        // });
-
-                 // window.document.body.parentNode.innerHTML = response;
-//
-                @*        *@@*window.location("@org.hadatac.console.controllers.routes.Application.protectedIndex()")*@
-@*                        @if(!userName.isEmpty()){*@
-@*                        @protectedIndex(userName);*@
-@*                        }*@
-
-
-                        // location.replace("/hadatac/form/index.html");
-
-                       // $("#result").html(response)
                         location.replace(response);
-                        // window.location="/hadatac/form/index.html"
-
                     },
                 });
             }, false);

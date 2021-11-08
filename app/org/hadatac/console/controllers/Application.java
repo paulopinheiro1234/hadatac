@@ -306,8 +306,13 @@ public class Application extends Controller {
         }
         return roles;
     }
+
     public Result protectedInd(String email) {
-        return ok(protectedIndex.render(email));
+        SysUser user = SysUser.findByEmail(email);
+        if(null != user && user.isDataManager()){
+            return ok(protectedIndex.render(user.getEmail()));
+        }
+        return ok(portal.render(email));
     }
 
     public void formIndex(Http.Request request, SysUser sysUserValue){
