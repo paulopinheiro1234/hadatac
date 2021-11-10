@@ -5,10 +5,7 @@ import com.typesafe.config.ConfigFactory;
 import module.SecurityModule;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.models.LinkedAccount;
-import org.hadatac.console.models.SignUp;
-import org.hadatac.console.models.SysUser;
-import org.hadatac.console.models.TokenAction;
+import org.hadatac.console.models.*;
 import org.hadatac.console.providers.*;
 import org.hadatac.console.views.html.account.errorLogin;
 import org.hadatac.console.views.html.account.signup.no_token_or_invalid;
@@ -18,6 +15,10 @@ import org.hadatac.console.views.html.loginForm;
 import org.hadatac.console.views.html.portal;
 import org.hadatac.console.views.html.protectedIndex;
 import org.hadatac.console.views.html.triplestore.notRegistered;
+import org.hadatac.entity.pojo.User;
+import org.hadatac.metadata.loader.PermissionsContext;
+import org.hadatac.metadata.loader.SpreadsheetProcessing;
+import org.hadatac.utils.Feedback;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
@@ -44,6 +45,7 @@ import javax.inject.Inject;
 
 import java.util.*;
 
+import static org.hadatac.console.controllers.triplestore.UserManagement.generateTTL;
 import static play.libs.Scala.asScala;
 import static play.mvc.Results.*;
 import static play.shaded.ahc.io.netty.util.internal.SystemPropertyUtil.get;
@@ -90,6 +92,7 @@ public class Signup {
     private final MessagesApi msg;
     private final UserProvider userProvider;
     private final Form<MyUsernamePasswordAuthProvider> form;
+    private final Form<UserPreRegistrationForm> formUser;
     MyService myService;
     private MessagesApi messagesApi;
     private final List<SignUp> signUps;
@@ -110,6 +113,7 @@ public class Signup {
         this.msg = msg;
         this.myService = myService;
         this.form = formFactory.form(MyUsernamePasswordAuthProvider.class);
+        this.formUser = formFactory.form(UserPreRegistrationForm.class);
         this.signUps = com.google.common.collect.Lists.newArrayList(
                 new SignUp("Data 1", "a", "a", "a"),
                 new SignUp("Data 2", "b", "b", "b"),
@@ -290,6 +294,7 @@ public class Signup {
             String userUri = UserManagement.getUriByEmail(data.getEmail());
             final SysUser newUser = SysUser.create(data, userUri, linkedAccount);
             if (redirectedUser){
+                newUser.setUri("http://hadatac.org/kb/hhear#PER-"+data.getName());
                 newUser.setEmailValidated(true);
                 newUser.save();
             }
@@ -312,7 +317,10 @@ public class Signup {
                 System.out.println("User Does not exist, Signing up");
                 MyUsernamePasswordAuthProvider data = formData.get();
                 settingUpAccount(data,true);
+                //Adding new user to manage Users
+                addUsertoManageUsers(request,data);
             }
+
             //Login user
             SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
             final PlayWebContext context = new PlayWebContext(request, playSessionStore);
@@ -322,5 +330,40 @@ public class Signup {
             return ok ("/protected/index.html/"+user.getEmail());
         }
         return badRequest("what happened?");
+    }
+
+    private void addUsertoManageUsers (Http.Request request, MyUsernamePasswordAuthProvider data ) {
+        System.out.println("Adding HHEAR user to blazegraph...");
+        int mode = Feedback.WEB;
+        String oper = "load";
+        PermissionsContext rdf = new PermissionsContext(
+                "user",
+                "password",
+                ConfigFactory.load().getString("hadatac.solr.permissions"),
+                false);
+
+        Form<UserPreRegistrationForm> userForm = formUser.bindFromRequest(request);
+        UserPreRegistrationForm dataUser = userForm.get();
+        dataUser.given_name = data.getName();
+        dataUser.email = data.getEmail();
+        String given_name = dataUser.getGivenName();
+        String usr_uri = "http://hadatac.org/kb/hhear#PER-"+given_name;
+        String family_name = dataUser.getFamilyName();
+        String comment = dataUser.getComment();
+        String email = dataUser.getEmail();
+        String homepage = dataUser.getHomepage();
+        String group_uri = "http://hadatac-web.mssm.edu/accesslevel#HHEAR_COMMUNITY"; //All users are added to HHEAR community by default
+
+        Map<String, String> pred_value_map = new HashMap<String, String>();
+        pred_value_map.put("a", "foaf:Person, prov:Person");
+        pred_value_map.put("foaf:name", given_name + " " + family_name);
+        pred_value_map.put("foaf:familyName", family_name);
+        pred_value_map.put("foaf:givenName", given_name);
+        pred_value_map.put("rdfs:comment", comment);
+        pred_value_map.put("foaf:mbox", email);
+        pred_value_map.put("foaf:homepage", "<" + homepage + ">");
+        pred_value_map.put("sio:SIO_000095", group_uri);
+        generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
+
     }
 }
