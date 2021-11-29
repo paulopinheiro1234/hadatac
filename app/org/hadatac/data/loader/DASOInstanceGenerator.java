@@ -659,8 +659,14 @@ public class DASOInstanceGenerator extends BaseGenerator {
                 	if (tmpUri == null || tmpUri.isEmpty()) {
                 		logger.println("DASOInstanceGenerator:       [WARNING] SOC association ignored for " + daso.getUri());
                 		return false;
-                	} 
-                	scopeUri = tmpUri.replace("DASO", "SOC");
+                	}
+                    DataAcquisitionSchemaObject newDaso = DataAcquisitionSchemaObject.find(tmpUri);
+                    if (newDaso == null) {
+                        logger.println("DASOInstanceGenerator: [ERROR] Could not find DASO with following URI : " + tmpUri);
+                        return false;
+                    }
+                    scopeUri = studyUri.contains("STD") ? studyUri.replace("STD","SOC") + "-" + newDaso.getLabel().replace("??","") : studyUri.replace("SSD","SOC") + "-" + newDaso.getLabel().replace("??","");;
+                	//scopeUri = tmpUri.replace("DASO", "SOC");
                 }
             }
             String newLabel = daso.getLabel().replace("??","");
