@@ -2,6 +2,7 @@ package src.studyTest;
 
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.controllers.dataacquisitionsearch.Downloader;
+import org.hadatac.data.loader.CSVFileRecord;
 import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
@@ -47,11 +48,23 @@ public class StudyTest {
     @After
     public void tearDown() {
         System.out.println("\n\n------ FINAL REPORT ------\n");
-        System.out.println("=> total number of downloaded DA files that have been tested: " + totalDownloads + "\n\n");
+        System.out.println("=> total number of downloaded DA/Lab files that have been tested: " + totalDownloads + "\n\n");
     }
 
     @Test
     public void testAll() {
+
+        /*
+        here is how to run:
+        sbt "testOnly *StudyTest -- -DdataFileURL=http://hadatac.org/kb/hhear#DA-2016-34-PD-DemoHealth"
+        sbt "testOnly *StudyTest"
+        reference: https://stackoverflow.com/questions/37978961/passing-command-line-argument-to-sbt-test
+        */
+
+        String selectedURL = System.getProperty("dataFileURL");
+        System.out.println("\n\n\n");
+        if  ( selectedURL == null || selectedURL.length() == 0 ) System.out.println("NO datafile is provided, will run all available tests.");
+        else System.out.println("provided data file = " + selectedURL);
 
         for ( Map.Entry<String, Object> testEntry : testDescriptions.entrySet() ) {
 
@@ -59,6 +72,12 @@ public class StudyTest {
             Map<String, Object> testDetails = (Map<String, Object>)testEntry.getValue();
             String facets = (String)testDetails.get("facets");
 
+            // this is temprary
+            // if ( testDetails.containsKey("columnMapping") ) continue;
+
+            if ( selectedURL != null && selectedURL.length() > 0 ) {
+                if ( test.equalsIgnoreCase(selectedURL) == false ) continue;
+            }
             // execute the main codebase to download the data file
             Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, categoricalOption, true);
 
@@ -68,9 +87,97 @@ public class StudyTest {
             System.out.println("downloaded file: " + file.getAbsolutePath());
 
             // compare the downloaded file to the original DA file
-            check(file.getAbsolutePath(), test, testDetails);
+            if ( test.toUpperCase().contains("PD") ) check(file.getAbsolutePath(), test, testDetails);
+
+            // for the Lab files
+            if ( test.toUpperCase().contains("LAB") ) checkLabFile(file.getAbsolutePath(), test, testDetails);
 
             totalDownloads ++;
+        }
+
+    }
+
+    private void checkLabFile(String downloadFilePath, String testURL, Map<String, Object> testDetails) {
+
+        List<Record> recordsDownloaded = null;
+        List<Record> recordsOriginal = null;
+        RecordFile recordFile = null;
+
+        // retrieve all the original records in the DA file
+        recordFile = new CSVRecordFile(new File((String)testDetails.get("originalDApath")));
+        recordsOriginal = recordFile.getRecords();
+
+        // retrieve all the downloaded records
+        recordFile = new CSVRecordFile(new File(downloadFilePath));
+        recordsDownloaded = recordFile.getRecords();
+
+        /*
+            check if the numbers of records are the same?
+            and other few things... add those later
+         */
+
+        List<Double> original = new ArrayList<>();
+        for ( Record record : recordsOriginal ) {
+            String value = record.getValueByColumnName("Concentration"); // is this safe to do?
+            if (value == null) continue;
+            value = value.trim();
+            if (value.length() != 0 && !value.equalsIgnoreCase("NA")) {
+                try {
+                    if ( value.contains(",") ) value = value.replaceAll(",", "");
+                    original.add(Double.valueOf(value));
+                } catch (Exception e) {
+                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in Concentration column.");
+                }
+            }
+        }
+
+        List<Double> downloaded = new ArrayList<>();
+        for ( Record record : recordsDownloaded ) {
+            List<String> columnHeaders = recordFile.getHeaders();
+            for (String header : columnHeaders) {
+                if (!header.toUpperCase().contains("CONCENTRATION")) continue;
+                String value = record.getValueByColumnName(header);
+                if (value == null) continue;
+                value = value.trim();
+                if (value.length() != 0 && !value.equalsIgnoreCase("NA")) {
+                    try {
+                        downloaded.add(Double.valueOf(value));
+                    } catch (Exception e) {
+                        System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in downloaded file.");
+                    }
+                }
+            }
+        }
+
+        try {
+            assertEquals("[" + testURL + ": original Lab file has " + original.size() +
+                            " concentration values, downloaded lab file has " + downloaded.size() + " concentration observations.",
+                    original.size(), downloaded.size(), 0);
+        } catch (AssertionError e) {
+            System.out.println(e.getMessage());
+            collector.addError(e);
+        }
+
+        double meanOriginal = getMean(original), meanDownloaded = getMean(downloaded);
+        double stddevOriginal = getStandardDev(original), stddevDownloaded = getStandardDev(downloaded);
+
+        System.out.println("[" + testURL + "]: mean/stddev for downloaded concentration values: mean = " + meanDownloaded + ", stddev = " + stddevDownloaded);
+        System.out.println("[" + testURL + "]: mean/stddev for original concentration values: mean = " + meanOriginal + ", stddev = " + stddevOriginal);
+
+        try {
+            assertEquals("[" + testURL + "]: unmatched mean for the concentration observations. ",
+                    meanOriginal, meanDownloaded, epsilon);
+        } catch (AssertionError e) {
+            System.out.println(e.getMessage());
+            collector.addError(e);
+        }
+
+        try {
+            assertEquals("[" + testURL + "]: unmatched stddev for the concentration observations. ",
+                    stddevOriginal, stddevDownloaded, epsilon);
+        } catch (AssertionError e) {
+            System.out.println(e.getMessage());
+            collector.addError(e);
         }
 
     }
@@ -117,7 +224,7 @@ public class StudyTest {
                 try {
                     original.add(Double.valueOf(value));
                 } catch (Exception e) {
-                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", culumn: " + originalColumnName);
+                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", column: " + originalColumnName);
                 }
             }
             // else original.add(0.0);
@@ -349,14 +456,16 @@ public class StudyTest {
                 testDescription.put("facets", facetsObj.toJSONString());
                 Map<String, Object> columnMapping = new HashMap<>();
                 JSONArray columns = (JSONArray)test.get("columnMapping");
-                Iterator<JSONObject> columnIter = columns.iterator();
-                while (columnIter.hasNext()) {
-                    JSONObject columnDesc = columnIter.next();
-                    String key = (String)columnDesc.get("generated");
-                    columnMapping.put(key, new Column((String)columnDesc.get("original"),
-                            ((String)columnDesc.get("categorical")).equalsIgnoreCase("true")? true : false));
+                if ( columns != null ) {
+                    Iterator<JSONObject> columnIter = columns.iterator();
+                    while (columnIter.hasNext()) {
+                        JSONObject columnDesc = columnIter.next();
+                        String key = (String) columnDesc.get("generated");
+                        columnMapping.put(key, new Column((String) columnDesc.get("original"),
+                                ((String) columnDesc.get("categorical")).equalsIgnoreCase("true") ? true : false));
+                    }
+                    testDescription.put("columnMapping", columnMapping);
                 }
-                testDescription.put("columnMapping", columnMapping);
                 testDescriptions.put((String)test.get("acquisition_uri_str"), testDescription);
             }
 
