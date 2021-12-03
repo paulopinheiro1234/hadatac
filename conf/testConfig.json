@@ -1,0 +1,1610 @@
+{
+  "testCases": [
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-34-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-34",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-34",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-34-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-34-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-34/DA-2016-34-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-Height-Centimeter-Birth",
+          "original": "birthlength",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Weight-Kilogram-Birth",
+          "original": "birthweight",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildAnatomy-Head-Circumference-Centimeter-Birth",
+          "original": "headcircumference",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Cord-Blood-Concentration-Arsenic-V-Acid-Micrograms-Per-Deciliter-Birth",
+          "original": "cordblood_as",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Education-Pregnancy",
+          "original": "education",
+          "categorical": "true"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1762-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1762/DA-2017-1762-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Caregiver-Human-Age-Year-Childhood-Baseline",
+          "original": "age",
+          "categorical": "false"
+        },
+        {
+          "generated": "Caregiver-Human-Biological-Sex",
+          "original": "sex",
+          "categorical": "true"
+        },
+        {
+          "generated": "Caregiver-Human-Birth-Year",
+          "original": "birth_year",
+          "categorical": "false"
+        },
+        {
+          "generated": "Caregiver-Human-Cigarettes-Per-Day-Childhood-Baseline",
+          "original": "smkday",
+          "categorical": "false"
+        },
+        {
+          "generated": "Caregiver-Human-Cigarettes-Per-Day-Childhood-Followup",
+          "original": "smkmomchldin",
+          "categorical": "false"
+        },
+        {
+          "generated": "Caregiver-Human-Ethnicity",
+          "original": "ethnic",
+          "categorical": "true"
+        },
+        {
+          "generated": "Caregiver-Human-Race",
+          "original": "race",
+          "categorical": "true"
+        },
+        {
+          "generated": "Child-Human-Biological-Sex",
+          "original": "chldsex",
+          "categorical": "true"
+        },
+        {
+          "generated": "Child-Human-Birth-Year",
+          "original": "chldbrth_year",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Height-Centimeter-Childhood-Baseline",
+          "original": "hgt",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Phenotype-Childhood-Baseline",
+          "original": "medhx___1 medhx___2 medhx___3 medhx___4 medhx___5",
+          "categorical": "true"
+        },
+        {
+          "generated": "Child-Human-Weight-Kilogram-Childhood-Baseline",
+          "original": "wgt",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Saliva-Mean-Concentration-Cotinine-Nanogram-Per-Milliliter-Childhood-Baseline",
+          "original": "blelisavg",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Saliva-Mean-Concentration-Cotinine-Nanogram-Per-Milliliter-Childhood-Followup",
+          "original": "fuelisavg",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-Blood-Eosinophil-Count-10^3-Cells-Per-Microliter-Childhood-Baseline",
+          "original": "cbc_abs_eos_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Blood-Segmented-Neurophil-Count-10^3-Cells-Per-Microliter-Childhood-Baseline",
+          "original": "cbc_abs_neut_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Body-Mass-Index-Kilogram-Per-Square-Meter-Childhood-Baseline",
+          "original": "vital_bmi_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Eosinophil-Percentage-Percent-Childhood-Baseline",
+          "original": "cbc_percent_eos_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-FEV1/FVC-Ratio-Childhood-Baseline",
+          "original": "spiro_fev_fvc_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Height-Centimeter-Childhood-Baseline",
+          "original": "vital_height_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildHouseholdSample-Indoor-Air-Concentration-Nitrogen-Dioxide-Parts-Per-Billion-Childhood-Baseline",
+          "original": "stat_no2_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildHouseholdSample-Indoor-Air-Concentration-PM-10-Microgram-Per-Cubic-Meter",
+          "original": "msp_pm10_visit3",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildHouseholdSample-Indoor-Air-Concentration-PM-10-Microgram-Per-Cubic-Meter-Childhood-Baseline",
+          "original": "msp_pm10_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Breath-Concentration-Nitric-Oxide-Parts-Per-Billion-Childhood-Baseline",
+          "original": "eno_feno_avg_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildVestSample-Indoor-Air-Concentration-Endotoxin-Allergen-Endotoxin-Unit-Per-Cubic-Meter-Childhood-Baseline",
+          "original": "cbc_abs_neut_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildVestSample-Indoor-Air-Concentration-Glucan-Picogram-Per-Cubic-Meter-Childhood-Baseline",
+          "original": "v_upem_glucan_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildVestSample-Indoor-Air-Concentration-Nitrogen-Dioxide-Parts-Per-Billion-Childhood-Baseline",
+          "original": "vest_no2_visit1",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Household-Income-Childhood-Baseline",
+          "original": "demo_income_code",
+          "categorical": "true"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1461-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1461/DA-2016-1461-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-Mullen-Scales-Of-Early-Learning-Development-Quotient-Mullens-Testing",
+          "original": "MSLelcDQ",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Mullen-Scales-Of-Early-Learning-expressive-Language-Development-Quotient-Mullens-Testing",
+          "original": "MSLrlDQ",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Mullen-Scales-Of-Early-Learning-fine-Motor-Development-Quotient-Mullens-Testing",
+          "original": "MSLfmDQ",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Mullen-Scales-Of-Early-Learning-receptive-Language-Development-Quotient-Mullens-Testing",
+          "original": "MSLelDQ",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Mullens-Non-Verbal-Domain-Development-Quotient-Mullens-Testing",
+          "original": "MSLnoverbDQ",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Vineland-Adaptive-Behavior-Scales-Development-Quotient-Vineland-Testing",
+          "original": "VINcompDQ",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Average-B6-Supplement-Intake-Microgram-Month-Prior-And-First-Month-Of-Pregnancy",
+          "original": "vB1P1B62_NM",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Average-Folic-Acid-Supplement-Intake-Microgram-Month-Prior-And-First-Month-Of-Pregnancy",
+          "original": "vB1P1FA2_NM",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Average-Iron-Supplement-Intake-Milligram-Pregnancy-Month-6",
+          "original": "vP6FE2",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Education-Birth",
+          "original": "MomEdu_4cat",
+          "categorical": "true"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-PD-Demo",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1449-PD-Demo",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-PD-Demo"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1449/DA-2016-1449-PD-Demo.csv",
+      "columnMapping": [
+        {
+          "generated": "Father-Human-Age-Birth",
+          "original": "AgeDadYrs",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Age-Birth",
+          "original": "AgeMomYrs",
+          "categorical": "false"
+        },
+        {
+          "generated": "Father-Human-Education-Birth",
+          "original": "DadEdu",
+          "categorical": "true"
+        },
+        {
+          "generated": "Mother-Human-Education-Birth",
+          "original": "MomEdu",
+          "categorical": "true"
+        },
+        {
+          "generated": "Mother-Human-Home-Ownership-Birth",
+          "original": "OwnHome",
+          "categorical": "true"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1438-PD-Demo",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1438",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1438",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1438-PD-Demo",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1438-PD-Demo"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1438/DA-2016-1438-PD-Demo.csv",
+      "columnMapping": [
+        {
+          "generated": "Mother-Human-Birthplace",
+          "original": "BirthPlaceMom",
+          "categorical": "true"
+        },
+        {
+          "generated": "Father-Human-Education-Birth",
+          "original": "DadEdu",
+          "categorical": "true"
+        },
+        {
+          "generated": "Mother-Human-Education-Birth",
+          "original": "MomEdu",
+          "categorical": "true"
+        },
+        {
+          "generated": "Mother-Human-Home-Ownership-Birth",
+          "original": "OwnHome",
+          "categorical": "true"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1945-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1945",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1945",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1945-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1945-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1945/DA-2017-1945-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-Gestational-Age-Week-Birth",
+          "original": "GA",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Weight-Gram-Birth",
+          "original": "birthweight",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Age-Year-Birth",
+          "original": "birth_mat_age",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Age-Year-First-Trimester",
+          "original": "t1_mat_age",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Age-Year-Third-Trimester",
+          "original": "t3_mat_age",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Body-Mass-Index-Kilogram-Per-Square-Meter-Pre-Pregnancy",
+          "original": "t1_pre_BMI",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Weight-Kilogram-Pre-Pregnancy",
+          "original": "t1_pre_weight",
+          "categorical": "false"
+        },
+        {
+          "generated": "PregnancySample-Urine-Specific-Gravity-First-Trimester",
+          "original": "Specific_Gravity_Tri1",
+          "categorical": "false"
+        },
+        {
+          "generated": "PregnancySample-Urine-Specific-Gravity-Third-Trimester",
+          "original": "Specific_Gravity_Tri3",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1448-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1448",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1448",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1448-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1448-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1448/DA-2016-1448-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Adult-Human-Body-Mass-Index-Kilogram-Per-Square-Meter-Adulthood-Period",
+          "original": "BMI",
+          "categorical": "false"
+        },
+        {
+          "generated": "Adult-Human-Height-Centimeter-Adulthood-Period",
+          "original": "Height",
+          "categorical": "false"
+        },
+        {
+          "generated": "Adult-Human-Weight-Kilogram-Adulthood-Period",
+          "original": "Weight",
+          "categorical": "false"
+        },
+        {
+          "generated": "AdultHouseholdSample-Outdoor-Air-Annual-Mean-Concentration-Fine-Respirable-Suspended-Particulate-Matter-Microgram-Per-Cubic-Meter-Adulthood-Period",
+          "original": "PM25",
+          "categorical": "false"
+        },
+        {
+          "generated": "AdultHouseholdSample-Outdoor-Air-Annual-Mean-Concentration-Nitrogen-Oxides-Parts-Per-Billion-Adulthood-Period",
+          "original": "Total_NOx",
+          "categorical": "false"
+        },
+        {
+          "generated": "AdultSample-Blood-Component-Concentration-Glucose-Milligram-Per-Deciliter-Adulthood-Period",
+          "original": "FastingGlucose",
+          "categorical": "false"
+        },
+        {
+          "generated": "AdultSample-Blood-Component-Concentration-Insulin-Microunits-Per-Milliliter-Adulthood-Period",
+          "original": "FastingInsulin",
+          "categorical": "false"
+        },
+        {
+          "generated": "AdultSample-Blood-Component-Concentration-Leptin-Picogram-Per-Milliliter-Adulthood-Period",
+          "original": "Leptin",
+          "categorical": "false"
+        },
+        {
+          "generated": "AdultSample-Blood-Component-Homeostatic-Model-Assessment-Of-Insulin-Resistance-Milligrams-microunits-Per-Deciliter-milliliter-Adulthood-Period",
+          "original": "HOMA_IR",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1432-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1432",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1432",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1432-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1432-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1432/DA-2016-1432-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-Coma-Hour-Childhood-Followup",
+          "original": "comatot",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Early-Childhood-Vigilance-Test-Raw-Score-Childhood-Followup-2",
+          "original": "ecvt12",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Height-Centimeter-Childhood-Baseline",
+          "original": "height",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Test-Of-Variables-Of-Attention-Raw-Score-Childhood-Followup-2",
+          "original": "vdpt_12",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Weight-Kilogram-Childhood-Baseline",
+          "original": "weight",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Z-Score-Height-Childhood-Baseline",
+          "original": "haz",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Z-Score-Weight-Childhood-Baseline",
+          "original": "waz",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-Blood-Lymphocyte-Count-10^3-Cells-Per-Microliter-Childhood-Baseline",
+          "original": "ly",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-Blood-Monocyte-Count-10^3-Cells-Per-Microliter-Childhood-Baseline",
+          "original": "mo",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-Concentration-Histidine-rich-Protein-PFHRP-II-Nanogram-Per-Milliliter-Childhood-Baseline",
+          "original": "hrp2_pl1",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-Hematocrit-Percent-Childhood-Baseline",
+          "original": "hct",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-Hemoglobin-Measurement-Gram-Per-Deciliter",
+          "original": "hgbbase",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-White-Blood-Cell-Count-10^9-Cells-Per-Microliter-Childhood-Baseline",
+          "original": "wbc",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Blood-Component-Red-Blood-Cell-Count-10^6-Cells-Per-Microliter-Childhood-Baseline",
+          "original": "rbc",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1740-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1740",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1740",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1740-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1740-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1740/DA-2017-1740-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-Difference-Of-Weight-to-Length-Z-Scores-From-0-To-6-Months-Childhood-Period",
+          "original": "zvalue_bwt_gage_sex_d",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Gestational-Age-Week-Birth",
+          "original": "gestage_wks_deliv_d",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Height-Centimeter-Birth",
+          "original": "height_nb_RA_meas",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Weight-Kilogram-Birth",
+          "original": "birthweight_d",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Z-Score-Weight-Birth",
+          "original": "zvalue_bwt_gage_sex_d",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Z-Score-Weight-Childhood-Period",
+          "original": "WHZ_6m",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Body-Mass-Index-Kilogram-Per-Square-Meter-Pre-Pregnancy",
+          "original": "bmi_mom_prepreg_d",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Height-Meter-Pre-Pregnancy",
+          "original": "heightm_mom_epi_epia_d",
+          "categorical": "false"
+        },
+        {
+          "generated": "Mother-Human-Weight-Kilogram-Pre-Pregnancy",
+          "original": "weightmkgs_mom_eps_epsa_d",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-PD-DemoHealth",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-PD-DemoHealth",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-PD-DemoHealth"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-PD-DemoHealth.csv",
+      "columnMapping": [
+        {
+          "generated": "Child-Human-FEV1-Best-Value-Liter-Childhood-Period",
+          "original": "fev1_best",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-FVC-Best-Value-Liter-Childhood-Period",
+          "original": "fvc_best",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Mean-Body-Weight-Kilogram-Childhood-Period",
+          "original": "weight_average",
+          "categorical": "false"
+        },
+        {
+          "generated": "Child-Human-Mean-Height-Centimeter-Childhood-Period",
+          "original": "height_average",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1431-PD-Demo",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1431",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1431",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1431-PD-Demo",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1431-PD-Demo"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1431/DA-2016-1431-PD-Demo.csv",
+      "columnMapping": [
+        {
+          "generated": "MotherAnatomy-Tibia-Concentration-Lead-Microgram-Per-Gram-Post-Pregnancy",
+          "original": "tibia_qualitycheck",
+          "categorical": "false"
+        },
+        {
+          "generated": "MotherAnatomy-Patella-Concentration-Lead-Microgram-Per-Gram-Post-Pregnancy",
+          "original": "rotula_qualitycheck",
+          "categorical": "false"
+        },
+        {
+          "generated": "ChildSample-Cord-Blood-Concentration-Lead-Micrograms-Per-Deciliter-Birth",
+          "original": "DELIVERY_PBCORD",
+          "categorical": "false"
+        }
+      ]
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-Pesticides-T1",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-Pesticides-T1",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-Pesticides-T1"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1449/DA-2016-1449-Lab-Pesticides-T1.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-Phthalates-T1",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-Phthalates-T1",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-Phthalates-T1"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1449/DA-2016-1449-Lab-Phthalates-T1.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-SpecGrav-T1",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-SpecGrav-T1",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-SpecGrav-T1"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1449/DA-2016-1449-Lab-SpecGrav-T1.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-UEP-T1",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-UEP-T1",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-UEP-T1"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1449/DA-2016-1449-Lab-UEP-T1.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-UEP-T2T3",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1449",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-UEP-T2T3",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1449-Lab-UEP-T2T3"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1449/DA-2016-1449-Lab-UEP-T2T3.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-34-Lab-Creatinine",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-34",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-34",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-34-Lab-Creatinine",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-34-Lab-Creatinine"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-34/DA-2016-34-Lab-Creatinine.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-34-Lab-Metals",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-34",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-34",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-34-Lab-Metals",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-34-Lab-Metals"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-34/DA-2016-34-Lab-Metals.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Cot",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Cot",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Cot"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-Lab-Cot.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Creatinine",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Creatinine",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Creatinine"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-Lab-Creatinine.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-PAH",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-PAH",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-PAH"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-Lab-PAH.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Phthalates",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Phthalates",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-Phthalates"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-Lab-Phthalates.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-SpecGrav",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-SpecGrav",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-SpecGrav"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-Lab-SpecGrav.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-UEP",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1407",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-UEP",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1407-Lab-UEP"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1407/DA-2016-1407-Lab-UEP.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1431-Lab-PAH-PSAMPLES",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1431",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1431",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1431-Lab-PAH-PSAMPLES",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1431-Lab-PAH-PSAMPLES"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1431/DA-2016-1431-Lab-PAH-PSAMPLES.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1431-Lab-PAH-SSAMPLES",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1431",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1431",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1431-Lab-PAH-SSAMPLES",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1431-Lab-PAH-SSAMPLES"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1431/DA-2016-1431-Lab-PAH-SSAMPLES.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1432-Lab-Inflam",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1432",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1432",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1432-Lab-Inflam",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1432-Lab-Inflam"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1432/DA-2016-1432-Lab-Inflam.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1432-Lab-Metals",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1432",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1432",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1432-Lab-Metals",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1432-Lab-Metals"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1432/DA-2016-1432-Lab-Metals.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Creatinine",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Creatinine",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Creatinine"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-Creatinine.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Inflam",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Inflam",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Inflam"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-Inflam.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Oxid",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Oxid",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Oxid"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-Oxid.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-PAH",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-PAH",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-PAH"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-PAH.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Phthalates",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Phthalates",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Phthalates"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-Phthalates.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Smoke",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Smoke",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-Smoke"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-Smoke.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-VOC",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1450",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-VOC",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1450-Lab-VOC"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1450/DA-2016-1450-Lab-VOC.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Metals",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Metals",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Metals"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1461/DA-2016-1461-Lab-Metals.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Pesticides",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Pesticides",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Pesticides"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1461/DA-2016-1461-Lab-Pesticides.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-PFC",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-PFC",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-PFC"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1461/DA-2016-1461-Lab-PFC.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Phthalates",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Phthalates",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-Phthalates"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1461/DA-2016-1461-Lab-Phthalates.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-UEP",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2016-1461",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-UEP",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2016-1461-Lab-UEP"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2016-1461/DA-2016-1461-Lab-UEP.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1740-Lab-Mercury",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1740",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1740",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1740-Lab-Mercury",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1740-Lab-Mercury"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1740/DA-2017-1740-Lab-Mercury.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1740-Lab-Metals",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1740",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1740",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1740-Lab-Metals",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1740-Lab-Metals"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1740/DA-2017-1740-Lab-Metals.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-CotA",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-CotA",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-CotA"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1762/DA-2017-1762-Lab-CotA.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-CotB",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-CotB",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-CotB"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1762/DA-2017-1762-Lab-CotB.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-Inflam",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1762",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-Inflam",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1762-Lab-Inflam"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1762/DA-2017-1762-Lab-Inflam.csv"
+    },
+    {
+      "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1945-Lab-Metals",
+      "facets": {
+        "facetsEC": [],
+        "facetsS": [
+          {
+            "id": "http://hadatac.org/kb/hhear#STD-2017-1945",
+            "study_uri_str": "http://hadatac.org/kb/hhear#STD-2017-1945",
+            "children": [
+              {
+                "id": "http://hadatac.org/kb/hhear#DA-2017-1945-Lab-Metals",
+                "acquisition_uri_str": "http://hadatac.org/kb/hhear#DA-2017-1945-Lab-Metals"
+              }
+            ]
+          }
+        ],
+        "facetsOC": [],
+        "facetsU": [],
+        "facetsT": [],
+        "facetsPI": []
+      },
+      "originalDApath": "/Users/yul09/hhear-studies/DAFiles/2017-1945/DA-2017-1945-Lab-Metals.csv"
+    }
+  ],
+  "ownerEmail": "liyang.yu@mssm.edu",
+  "ownerUri": "http://hadatac.org/kb/hhear#PER-YU",
+  "categoricalOption": "withCodeBook"
+}
