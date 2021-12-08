@@ -76,6 +76,24 @@ services:
         depends_on:
             - blazegraph
             - solr
+  
+    shinyproxy:
+        image: tetherlessworld/hadatac-shinyproxy:latest
+        container_name: hadatac_shinyproxy
+        ports:
+            - 8081:8080
+        environment: 
+            - "WORK_DIR=${PWD}"
+        networks:
+            hadatac:
+                aliases:
+                    - shinyproxy
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+            - "/var/log/hadatac_shinyproxy/server:/log"
+            - "/var/log/hadatac_shinyproxy/container:/container-logs"
+            - "./shinyproxy/application.yml:/opt/shinyproxy/application.yml"
+            - "./shinyproxy/fragments:/opt/shinyproxy/fragments"
 
 volumes:
     hadatac-solr:
