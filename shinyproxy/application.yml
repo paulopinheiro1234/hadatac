@@ -1,0 +1,21 @@
+proxy:
+  title: HADatAc ShinyProxy
+  port: 8080
+  hide-navbar: false
+  template-path: ./template
+  container-log-path: /container-logs
+  docker:
+    internal-networking: true
+    container-network: "hadatac_hadatac"
+  specs:
+  - id: clinical-trial-equity
+    container-cmd: ["R", "-e", "shiny::runApp('/home/app', host = '0.0.0.0', port = 3838)"]
+    container-image: therensselaeridea/clinicaltrialequity
+    container-network: "${proxy.docker.container-network}"
+logging:
+  file:
+    /log/shinyproxy.log
+
+server:
+  servlet:
+    context-path:  /
