@@ -1,7 +1,7 @@
 # The first part of this Dockerfile is inspired by an existing Dockerfile hosted at https://github.com/mozilla/docker-sbt/blob/main/Dockerfile
 # The important parts have been copied over to remove a dependency on two public Docker containers
 #FROM openjdk:11
-FROM hseeberger/scala-sbt:11.0.12_1.5.5_2.12.14
+FROM hseeberger/scala-sbt:11.0.13_1.5.6_2.12.15
 
 ENV JAVA_OPTS="-Xms6048m -Xmx10000m"
 WORKDIR /tmp/build
