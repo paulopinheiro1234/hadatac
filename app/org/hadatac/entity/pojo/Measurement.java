@@ -2004,21 +2004,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	            	try {
 	            		v1Str = cbe1.getCode().trim();
 	            		v2Str = cbe2.getCode().trim();
-	            		if (v1Str.length() <= 7 && v2Str.length() <= 7) {
-	            			int v1 = Integer.parseInt(v1Str);
-	            			int v2 = Integer.parseInt(v2Str);
-	            			if(v1 > v2) {
-	            				return 1;
-	            			}else if(v1 < v2) {
-	            				return -1;
-	            			}
-		            		if (v1Str.length() <= 7) { 
-		            			return 1;
-		            		} else {
-		            			return -1;
-		            		}
-	            		} 
-	                    return 0;            
+                        return v1Str.compareTo(v2Str);
 	            	} catch (Exception e) {
 	            		dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "[ERROR] Measurement: not possible to convert one or both of following codes into integers: [" + v1Str + "] and [" + v2Str + "]"));
 	            	}
