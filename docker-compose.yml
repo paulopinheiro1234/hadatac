@@ -60,14 +60,15 @@ services:
             # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
 
             # Comment out this option to use external binding
-            - hadatac-csvs:/root/app/csvs
+            - hadatac-csvs:/hadatac/csvs
 #            - /Users/kandws01/Documents/merge3/local:/root/app/csvs  # Uncomment this option to use external binding
             # Creates a volume for the config files. This way configuration file changes
             #   are persisted when the container is removed or rebuilt.
 
             # Comment out this option to use external binding
-            - hadatac-conf:/root/app/conf
+            - hadatac-conf:/hadatac/conf
 #            - /path in host server/conf:/root/app/conf # Uncomment this option to use external binding
+            - /var/log/hadatac:/hadatac/logs
         links:
             - blazegraph
             - solr

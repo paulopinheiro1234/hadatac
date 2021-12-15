@@ -30,8 +30,6 @@ COPY --from=build-java /hadatac/target/universal/hadatac-10.0.1-SNAPSHOT /hadata
 COPY ./conf/hadatac-docker.conf /hadatac/conf/hadatac.conf
 COPY ./conf/autoccsv-docker.config /hadatac/conf/autoccsv.config
 
-VOLUME ["/hadatac/conf", "/hadatac/csvs"]
-
 EXPOSE 9000
 
 ENTRYPOINT [ "bin/hadatac" ]
