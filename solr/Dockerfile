@@ -1,4 +1,4 @@
-FROM solr:8.6.1
+FROM solr:8.6-slim
 
 #### Installs JTS Topology Suite 1.14
 
