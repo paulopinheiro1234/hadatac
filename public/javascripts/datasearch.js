@@ -81,6 +81,7 @@ function clearSearch() {
 	window.location.href = encodeURI(url);
 }
 
-
-
-
+function openShiny() {
+	var url = location.protocol + '//' + location.hostname + ':8081';
+	window.open(encodeURI(url), '_blank');
+}
