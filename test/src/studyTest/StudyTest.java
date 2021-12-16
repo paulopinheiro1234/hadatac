@@ -1,16 +1,17 @@
 package src.studyTest;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.hadatac.console.controllers.dataacquisitionsearch.Downloader;
-import org.hadatac.data.loader.CSVFileRecord;
 import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
+import org.hadatac.entity.pojo.ColumnMapping;
+import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -18,7 +19,6 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 
 import java.io.File;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -29,12 +29,15 @@ import static org.junit.Assert.assertTrue;
 public class StudyTest {
 
     final double epsilon = 0.000001d;
+    final Integer MAX_DA_FILES = 1000;
 
     Map<String, Object> testDescriptions = new HashMap<>();
-    String ownerUri = null;
-    String ownerEmail = null;
-    String categoricalOption = null;
     int totalDownloads = 0;
+
+    // these should be replaced by a config file
+    String ownerUri = "http://hadatac.org/kb/hhear#PER-YU";
+    String ownerEmail = "liyang.yu@mssm.edu";
+    String categoricalOption = "withCodeBook";
 
     @Rule
     public ErrorCollector collector = new ErrorCollector();
@@ -42,7 +45,8 @@ public class StudyTest {
     @Before
     public void initialize()  {
         SPARQLUtilsFacetSearch.createInMemoryModel();
-        retrieveTestConfig();
+        // retrieveTestConfig();
+        createTestCases();
     }
 
     @After
@@ -56,15 +60,19 @@ public class StudyTest {
 
         /*
         here is how to run:
-        sbt "testOnly *StudyTest -- -DdataFileURL=http://hadatac.org/kb/hhear#DA-2016-34-PD-DemoHealth"
+        sbt "testOnly *StudyTest -- -DdataFileName=DA-2016-34-PD-DemoHealth"
+        sbt "testOnly *StudyTest -- -DstudyID=2016-34"
         sbt "testOnly *StudyTest"
         reference: https://stackoverflow.com/questions/37978961/passing-command-line-argument-to-sbt-test
         */
 
-        String selectedURL = System.getProperty("dataFileURL");
-        System.out.println("\n\n\n");
-        if  ( selectedURL == null || selectedURL.length() == 0 ) System.out.println("NO datafile is provided, will run all available tests.");
-        else System.out.println("provided data file = " + selectedURL);
+        String dataFileName = System.getProperty("dataFileName");
+        if  ( dataFileName == null || dataFileName.length() == 0 ) System.out.println("NO datafile is provided.");
+        else System.out.println("provided data file = " + dataFileName);
+
+        String studyID = System.getProperty("studyID");
+        if  ( studyID == null || studyID.length() == 0 ) System.out.println("NO studyID is provided.");
+        else System.out.println("provided studyID = " + studyID);
 
         for ( Map.Entry<String, Object> testEntry : testDescriptions.entrySet() ) {
 
@@ -72,14 +80,21 @@ public class StudyTest {
             Map<String, Object> testDetails = (Map<String, Object>)testEntry.getValue();
             String facets = (String)testDetails.get("facets");
 
-            // this is temprary
-            // if ( testDetails.containsKey("columnMapping") ) continue;
-
-            if ( selectedURL != null && selectedURL.length() > 0 ) {
-                if ( test.equalsIgnoreCase(selectedURL) == false ) continue;
+            if ( dataFileName != null && dataFileName.length() > 0 ) {
+                if ( test.contains(dataFileName) == false ) continue;
             }
+
+            if ( studyID != null && studyID.length() > 0 ) {
+                if ( test.contains(studyID) == false ) continue;
+            }
+
             // execute the main codebase to download the data file
-            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, categoricalOption, true);
+            System.out.println("\n\n\n====> working on " + test);
+            ColumnMapping columnMapping = new ColumnMapping();
+            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, categoricalOption, true, columnMapping);
+            testDetails.put("columnMapping", columnMapping);
+            System.out.println("-------------------------------------------");
+            System.out.println(columnMapping.toString());
 
             // get the downloaded data file from hard drive and make some initial check
             File file = getDownloadedFile(ownerEmail, "object_alignment");
@@ -99,6 +114,7 @@ public class StudyTest {
 
     private void checkLabFile(String downloadFilePath, String testURL, Map<String, Object> testDetails) {
 
+        ColumnMapping columnMapping = (ColumnMapping) testDetails.get("columnMapping");
         List<Record> recordsDownloaded = null;
         List<Record> recordsOriginal = null;
         RecordFile recordFile = null;
@@ -106,85 +122,112 @@ public class StudyTest {
         // retrieve all the original records in the DA file
         recordFile = new CSVRecordFile(new File((String)testDetails.get("originalDApath")));
         recordsOriginal = recordFile.getRecords();
+        List<String> originalHeaders = recordFile.getHeaders();
 
         // retrieve all the downloaded records
         recordFile = new CSVRecordFile(new File(downloadFilePath));
         recordsDownloaded = recordFile.getRecords();
 
-        /*
-            check if the numbers of records are the same?
-            and other few things... add those later
-         */
-
         List<Double> original = new ArrayList<>();
-        for ( Record record : recordsOriginal ) {
-            String value = record.getValueByColumnName("Concentration"); // is this safe to do?
-            if (value == null) continue;
-            value = value.trim();
-            if (value.length() != 0 && !value.equalsIgnoreCase("NA")) {
-                try {
-                    if ( value.contains(",") ) value = value.replaceAll(",", "");
-                    original.add(Double.valueOf(value));
-                } catch (Exception e) {
-                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in Concentration column.");
-                }
-            }
-        }
-
         List<Double> downloaded = new ArrayList<>();
-        for ( Record record : recordsDownloaded ) {
-            List<String> columnHeaders = recordFile.getHeaders();
-            for (String header : columnHeaders) {
-                if (!header.toUpperCase().contains("CONCENTRATION")) continue;
-                String value = record.getValueByColumnName(header);
+        Set<String> visited = new HashSet<>();
+
+        for ( String header : recordFile.getHeaders() ) {
+
+            boolean isCategorical = false;
+            List<String> originalColumnNames = columnMapping.getMappings().get(header + "|false");
+            if (originalColumnNames == null) {
+                originalColumnNames = columnMapping.getMappings().get(header + "|true");
+                isCategorical = true;
+            }
+            if (originalColumnNames == null || originalColumnNames.size() == 0) continue;
+
+            standardizedColumnNames(originalHeaders, originalColumnNames);
+            String originalColumnName = originalColumnNames.get(0);  // assume this is a single mapping at this point
+            if (visited.contains(originalColumnName)) continue;
+            visited.add(originalColumnName);
+
+            isCategorical = false;
+            List<String> downloadedColumnNames = columnMapping.getMappings().get(originalColumnName + "|false");
+            if (downloadedColumnNames == null) {
+                downloadedColumnNames = columnMapping.getMappings().get(originalColumnName + "|true");
+                isCategorical = true;
+            }
+            if (downloadedColumnNames == null || downloadedColumnNames.size() == 0) continue;
+
+            columnMapping.getMappings().remove(isCategorical == true ? originalColumnName + "|true" : originalColumnName + "false");
+
+            // collect all observations for this column from original DA
+            original.clear();
+            for (Record record : recordsOriginal) {
+                String value = record.getValueByColumnName(originalColumnName);
                 if (value == null) continue;
                 value = value.trim();
                 if (value.length() != 0 && !value.equalsIgnoreCase("NA")) {
                     try {
-                        downloaded.add(Double.valueOf(value));
+                        if (value.contains(",")) value = value.replaceAll(",", "");
+                        original.add(Double.valueOf(value));
                     } catch (Exception e) {
-                        System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in downloaded file.");
+                        System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in Concentration column.");
                     }
                 }
             }
-        }
 
-        try {
-            assertEquals("[" + testURL + ": original Lab file has " + original.size() +
-                            " concentration values, downloaded lab file has " + downloaded.size() + " concentration observations.",
-                    original.size(), downloaded.size(), 0);
-        } catch (AssertionError e) {
-            System.out.println(e.getMessage());
-            collector.addError(e);
-        }
+            // collect all observations in the harmonized dataset for this originalColumnName
+            downloaded.clear();
+            for (Record record : recordsDownloaded) {
+                for (String downloadedColumnName : downloadedColumnNames) {
+                    String value = record.getValueByColumnName(downloadedColumnName);
+                    if (value == null) continue;
+                    value = value.trim();
+                    if (value.length() != 0 && !value.equalsIgnoreCase("NA")) {
+                        try {
+                            downloaded.add(Double.valueOf(value));
+                        } catch (Exception e) {
+                            System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in downloaded file.");
+                        }
+                    }
+                }
+            }
 
-        double meanOriginal = getMean(original), meanDownloaded = getMean(downloaded);
-        double stddevOriginal = getStandardDev(original), stddevDownloaded = getStandardDev(downloaded);
+            try {
+                assertEquals("[" + testURL + ": original Lab file has " + original.size() + originalColumnName +
+                                " values, downloaded lab file has " + downloaded.size() + " corresponding observations.",
+                        original.size(), downloaded.size(), 0);
+            } catch (AssertionError e) {
+                System.out.println(e.getMessage());
+                collector.addError(e);
+            }
 
-        System.out.println("[" + testURL + "]: mean/stddev for downloaded concentration values: mean = " + meanDownloaded + ", stddev = " + stddevDownloaded);
-        System.out.println("[" + testURL + "]: mean/stddev for original concentration values: mean = " + meanOriginal + ", stddev = " + stddevOriginal);
+            double meanOriginal = getMean(original), meanDownloaded = getMean(downloaded);
+            double stddevOriginal = getStandardDev(original), stddevDownloaded = getStandardDev(downloaded);
 
-        try {
-            assertEquals("[" + testURL + "]: unmatched mean for the concentration observations. ",
-                    meanOriginal, meanDownloaded, epsilon);
-        } catch (AssertionError e) {
-            System.out.println(e.getMessage());
-            collector.addError(e);
-        }
+            System.out.println("[" + testURL + "]: mean/stddev for downloaded " + originalColumnName + " values: mean = " + meanDownloaded + ", stddev = " + stddevDownloaded);
+            System.out.println("[" + testURL + "]: mean/stddev for original " + originalColumnName + " values: mean = " + meanOriginal + ", stddev = " + stddevOriginal);
 
-        try {
-            assertEquals("[" + testURL + "]: unmatched stddev for the concentration observations. ",
-                    stddevOriginal, stddevDownloaded, epsilon);
-        } catch (AssertionError e) {
-            System.out.println(e.getMessage());
-            collector.addError(e);
+            try {
+                assertEquals("[" + testURL + "]: unmatched mean for the concentration observations. ",
+                        meanOriginal, meanDownloaded, epsilon);
+            } catch (AssertionError e) {
+                System.out.println(e.getMessage());
+                collector.addError(e);
+            }
+
+            try {
+                assertEquals("[" + testURL + "]: unmatched stddev for the concentration observations. ",
+                        stddevOriginal, stddevDownloaded, epsilon);
+            } catch (AssertionError e) {
+                System.out.println(e.getMessage());
+                collector.addError(e);
+            }
+
         }
 
     }
 
     private void check(String downloadFilePath, String testURL, Map<String, Object> testDetails) {
 
-        Map<String, Object> columnMappings = (Map<String, Object>)testDetails.get("columnMapping");
+        ColumnMapping columnMapping = (ColumnMapping) testDetails.get("columnMapping");
         List<Record> recordsDownloaded = null;
         List<Record> recordsOriginal = null;
         RecordFile recordFile = null;
@@ -192,42 +235,50 @@ public class StudyTest {
         // retrieve all the original records in the DA file
         recordFile = new CSVRecordFile(new File((String)testDetails.get("originalDApath")));
         recordsOriginal = recordFile.getRecords();
+        List<String> originalHeaders = recordFile.getHeaders();
 
         // retrieve all the downloaded records
         recordFile = new CSVRecordFile(new File(downloadFilePath));
         recordsDownloaded = recordFile.getRecords();
 
-        /*
-            check if the numbers of records are the same?
-            and other few things... add those later
-         */
+        for ( String header : recordFile.getHeaders() ) {
 
-        for (Map.Entry<String, Object> columnMapping : columnMappings.entrySet() ) {
+            boolean isCategorical = false;
+            List<String> originalColumnNames = columnMapping.getMappings().get(header + "|false");
+            if ( originalColumnNames == null ) {
+                originalColumnNames = columnMapping.getMappings().get(header + "|true");
+                isCategorical = true;
+            }
+            if ( originalColumnNames == null || originalColumnNames.size() == 0 ) continue;
 
-            Column column = (Column)columnMapping.getValue();
-            String downloadedColumnName = columnMapping.getKey();
-            String originalColumnName = column.columnName;
+            standardizedColumnNames(originalHeaders, originalColumnNames);
+            if ( isCategorical == false )
+                checkNonCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnNames, header);
+            else checkCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnNames, header);
 
-            if ( column.categorical == false ) checkNonCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnName, downloadedColumnName);
-            else checkCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnName, downloadedColumnName);
         }
 
     }
 
     private void checkNonCategoricalColumn(String testURL, List<Record> recordsOriginal, List<Record> recordsDownloaded,
-                                           String originalColumnName, String downloadedColumnName) {
+                                           List<String> originalColumnNames, String downloadedColumnName) {
+
         List<Double> original = new ArrayList<>();
-        for ( Record record : recordsOriginal ) {
-            String value = record.getValueByColumnName(originalColumnName);
-            if ( value != null ) value = value.trim();
-            if ( value != null && value.length() != 0 && !value.equalsIgnoreCase("NA")) {
-                try {
-                    original.add(Double.valueOf(value));
-                } catch (Exception e) {
-                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", column: " + originalColumnName);
+        String originalColumnHeader = "";
+        for ( String originalColumnName : originalColumnNames ) {
+            originalColumnHeader += originalColumnName + " ";
+            for (Record record : recordsOriginal) {
+                String value = record.getValueByColumnName(originalColumnName);
+                if (value != null) value = value.trim();
+                if (value != null && value.length() != 0 && !value.equalsIgnoreCase("NA")) {
+                    try {
+                        original.add(Double.valueOf(value));
+                    } catch (Exception e) {
+                        System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", column: " + originalColumnName);
+                    }
                 }
+                // else original.add(0.0);
             }
-            // else original.add(0.0);
         }
 
         List<Double> downloaded = new ArrayList<>();
@@ -235,10 +286,13 @@ public class StudyTest {
             String value = record.getValueByColumnName(downloadedColumnName);
             if ( value != null ) value = value.trim();
             if ( value != null && value.length() != 0 && !value.equalsIgnoreCase("NA")) {
-                try {
-                    downloaded.add(Double.valueOf(value));
-                } catch (Exception e) {
-                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", culumn: " + downloadedColumnName);
+                String[] items = value.split("\\s+");
+                for ( String item : items ) {
+                    try {
+                        downloaded.add(Double.valueOf(item));
+                    } catch (Exception e) {
+                        System.out.println("-----------!!!! encounter abnormal value: [" + item + "], for " + testURL + ", culumn: " + downloadedColumnName);
+                    }
                 }
             }
             // else downloaded.add(0.0);
@@ -247,11 +301,11 @@ public class StudyTest {
         double meanOriginal = getMean(original), meanDownloaded = getMean(downloaded);
         double stddevOriginal = getStandardDev(original), stddevDownloaded = getStandardDev(downloaded);
 
-        System.out.println(downloadedColumnName + ": mean = " + meanDownloaded + ", stddev = " + stddevDownloaded);
-        System.out.println(originalColumnName + ": mean = " + meanOriginal + ", stddev = " + stddevOriginal);
+        System.out.println("[" + downloadedColumnName + ", " + originalColumnHeader + "] m/s = "
+                + meanDownloaded + "/" + stddevDownloaded + ", m/s = " + meanOriginal + "/" + stddevOriginal);
 
         try {
-            assertEquals("[" + testURL + ": " + downloadedColumnName + " => " + originalColumnName + "], unmatched mean: ",
+            assertEquals("[" + testURL + ": " + downloadedColumnName + " => " + originalColumnHeader + "], unmatched mean: ",
                     meanOriginal, meanDownloaded, epsilon);
         } catch (AssertionError e) {
             System.out.println(e.getMessage());
@@ -259,7 +313,7 @@ public class StudyTest {
         }
 
         try {
-            assertEquals("[" + testURL + ": " + downloadedColumnName + " => " + originalColumnName + "], unmatched stddev:  ",
+            assertEquals("[" + testURL + ": " + downloadedColumnName + " => " + originalColumnHeader + "], unmatched stddev:  ",
                     stddevOriginal, stddevDownloaded, epsilon);
         } catch (AssertionError e) {
             System.out.println(e.getMessage());
@@ -269,24 +323,29 @@ public class StudyTest {
     }
 
     private void checkCategoricalColumn(String testURL, List<Record> recordsOriginal, List<Record> recordsDownloaded,
-                                        String originalColumnName, String downloadedColumnName) {
+                                        List<String> originalColumnNames, String downloadedColumnName) {
 
-        if ( originalColumnName.contains(" ") ) {
-            checkCompositeCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnName, downloadedColumnName);
-        } else checkSingleCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnName, downloadedColumnName);
+        if ( originalColumnNames.size() > 1 ) {
+            checkCompositeCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnNames, downloadedColumnName);
+        } else checkSingleCategoricalColumn(testURL, recordsOriginal, recordsDownloaded, originalColumnNames, downloadedColumnName);
 
     }
 
     private void checkCompositeCategoricalColumn(String testURL, List<Record> recordsOriginal, List<Record> recordsDownloaded,
-                                              String originalColumnName, String downloadedColumnName) {
+                                              List<String> originalColumnNames, String downloadedColumnName) {
 
-        String[] columns = originalColumnName.split(" ");
+        StringBuilder originalColumnHeader = new StringBuilder();
+        for ( String originalColumnName : originalColumnNames ) originalColumnHeader.append(originalColumnName).append(",");
+        originalColumnHeader.setLength(originalColumnHeader.length()-1);
+
         Map<String, Integer> originalFreq = new HashMap<>();
         for ( Record record : recordsOriginal ) {
-            for ( String column : columns ) {
+            for ( String column : originalColumnNames ) {
                 String value = record.getValueByColumnName(column);
-                if (value == null || value.length() == 0 || value.equalsIgnoreCase("NA")) continue;
-                String tmp = column + "-" + value.trim();
+                if (value == null || value.length() == 0 ) continue;
+                value = value.trim();
+                if ( value.equalsIgnoreCase("NA")) continue;
+                String tmp = column + "-" + value;
                 originalFreq.put(tmp, originalFreq.getOrDefault(tmp, 0) + 1);
             }
         };
@@ -294,9 +353,14 @@ public class StudyTest {
         Map<String, Integer> downloadedFreq = new HashMap<>();
         for ( Record record : recordsDownloaded ) {
             String value = record.getValueByColumnName(downloadedColumnName);
-            if (value == null || value.length() == 0 || value.equalsIgnoreCase("NA")) continue;
-            String[] items = value.split(" ");
-            for (String item : items) downloadedFreq.put(item, downloadedFreq.getOrDefault(item, 0) + 1);
+            if (value == null || value.length() == 0 ) continue;
+            value = value.trim();
+            String[] items = value.split("\\s+");
+            for (int i = 0; i < items.length; i++ ) {
+                if ( items[i].equalsIgnoreCase("NA") ) continue;
+                String tmp = "" + i + "-" + items[i];
+                downloadedFreq.put(tmp, downloadedFreq.getOrDefault(tmp, 0) + 1);
+            }
         }
 
         Map<Integer, Integer> freqCount = new HashMap<>();
@@ -305,9 +369,10 @@ public class StudyTest {
         boolean matched = true;
         for ( Map.Entry<String, Integer> entry : downloadedFreq.entrySet() ) {
             if ( freqCount.containsKey(entry.getValue()) == false ) {
-                // System.out.println("ERROR: unmatched categorical variable frequency found for [" + entry.getKey() + "], freq = " + entry.getValue());
+                // System.out.println("[" + testURL + "] unmatched categorical variable: [" + originalColumnHeader.toString() + "] => [" + downloadedColumnName + "]");
                 try {
-                    throw new AssertionError("unmatched categorical variable frequency found for [" + entry.getKey() + "], freq = " + entry.getValue());
+                    throw new AssertionError("[" + testURL + "] unmatched categorical variable frequency: [" +
+                            originalColumnHeader.toString() + "] => [" + downloadedColumnName + "]");
                 } catch (AssertionError e) {
                     System.out.println(e.getMessage());
                     collector.addError(e);
@@ -319,42 +384,31 @@ public class StudyTest {
                 else freqCount.put(entry.getValue(), xf-1);
             }
         }
-        if ( matched) System.out.println("[" + downloadedColumnName + ", " + originalColumnName + "] categorical value frequency matched.");
+        if ( matched) System.out.println("[" + testURL + "] " + downloadedColumnName + ", " +
+                originalColumnHeader + "] categorical value frequency matched.");
     }
 
     private void checkSingleCategoricalColumn(String testURL, List<Record> recordsOriginal, List<Record> recordsDownloaded,
-                                           String originalColumnName, String downloadedColumnName) {
+                                           List<String> originalColumnNames, String downloadedColumnName) {
 
-        List<Integer> original = new ArrayList<>();
+        String originalColumnName = originalColumnNames.get(0);
+        List<String> original = new ArrayList<>();
         for ( Record record : recordsOriginal ) {
             String value = record.getValueByColumnName(originalColumnName);
             if ( value != null ) value = value.trim();
-            if ( value != null && value.length() != 0 && !value.equalsIgnoreCase("NA")) {
-                try {
-                    original.add(Integer.valueOf(value));
-                } catch (Exception e) {
-                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL+ ", culumn: " + originalColumnName);
-                }
-            }
-            // else original.add(0);
+            if ( value != null && value.length() != 0 && !value.equalsIgnoreCase("NA")) original.add(value);
         }
 
-        List<Integer> downloaded = new ArrayList<>();
+        List<String> downloaded = new ArrayList<>();
         for ( Record record : recordsDownloaded ) {
             String value = record.getValueByColumnName(downloadedColumnName);
-            if ( value != null ) value = value.trim();
-            if ( value != null && value.length() != 0 && !value.equalsIgnoreCase("NA") ) {
-                try {
-                    downloaded.add(Integer.valueOf(value));
-                } catch (Exception e) {
-                    System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL+ ", culumn: " + downloadedColumnName);
-                }
-            }
+            if (value == null || value.length() == 0 ) continue;
+            value = value.trim();
+            if ( value.equalsIgnoreCase("NA") ) continue;
+            downloaded.add(value);
             // else downloaded.add(0);
         }
 
-        //System.out.println("for categorical value [" + originalColumnName + "], its mapping column is [" + downloadedColumnName + "]:");
-        //System.out.println(originalColumnName + " has " + original.size() + " observations, " + downloadedColumnName + " has " + downloaded.size() + " observations. ");
         try {
             assertEquals("[" + testURL + ": " + originalColumnName + " and " + downloadedColumnName + "] should have the same number of observations: ",
                     original.size(), downloaded.size());
@@ -363,20 +417,21 @@ public class StudyTest {
             collector.addError(e);
         }
 
-        Map<Integer, Integer> originalFreq = new HashMap<>();
-        for ( int f : original ) originalFreq.put(f, originalFreq.getOrDefault(f, 0)+1);
+        Map<String, Integer> originalFreq = new HashMap<>();
+        for ( String value : original ) originalFreq.put(value, originalFreq.getOrDefault(value, 0)+1);
         Map<Integer, Integer> freqCount = new HashMap<>();
         for ( int f : originalFreq.values() ) freqCount.put(f, freqCount.getOrDefault(f, 0)+1);
 
-        Map<Integer, Integer> downloadedFreq = new HashMap<>();
-        for ( int f : downloaded ) downloadedFreq.put(f, downloadedFreq.getOrDefault(f, 0)+1);
+        Map<String, Integer> downloadedFreq = new HashMap<>();
+        for ( String f : downloaded ) downloadedFreq.put(f, downloadedFreq.getOrDefault(f, 0)+1);
 
         boolean matched = true;
-        for ( Map.Entry<Integer, Integer> entry : downloadedFreq.entrySet() ) {
+        for ( Map.Entry<String, Integer> entry : downloadedFreq.entrySet() ) {
             if ( freqCount.containsKey(entry.getValue()) == false ) {
-                // System.out.println("ERROR: unmatched categorical variable frequency found for [" + entry.getKey() + "], freq = " + entry.getValue());
+                //System.out.println("ERROR: unmatched categorical variable frequency found for [" + originalColumnName + "] => [" + downloadedColumnName + "]");
                 try {
-                    throw new AssertionError("unmatched categorical variable frequency found for [" + entry.getKey() + "], freq = " + entry.getValue());
+                    throw new AssertionError("[" + testURL + "] unmatched categorical variable frequency [" +
+                            originalColumnName + "] => [" + downloadedColumnName + "]");
                 } catch (AssertionError e) {
                     System.out.println(e.getMessage());
                     collector.addError(e);
@@ -388,7 +443,8 @@ public class StudyTest {
                 else freqCount.put(entry.getValue(), xf-1);
             }
         }
-        if ( matched) System.out.println("[" + downloadedColumnName + ", " + originalColumnName + "] categorical value frequency matched.");
+        if ( matched) System.out.println("[" + testURL + "] " + downloadedColumnName + ", " +
+                originalColumnName + "] categorical value frequency matched.");
     }
 
     private double getStandardDev(List<Double> nums) {
@@ -405,7 +461,7 @@ public class StudyTest {
     }
 
     private double getMean(List<Double> nums) {
-        float sum = 0;
+        double sum = 0;
         for ( double x : nums ) sum += x;
         return round(sum/(double)nums.size(), 4);
     }
@@ -429,50 +485,116 @@ public class StudyTest {
         return chosenFile;
     }
 
-    private void retrieveTestConfig() {
+    public void createTestCases()  {
 
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("testConfig.json");
-        String jsonText = "";
-        JSONParser jsonParser = new JSONParser();
+        // query csv dataset to get all the DA files
+        SolrQuery query = new SolrQuery();
+        query.setQuery("*:*");
+        query.setQuery("status_str:\"" + DataFile.PROCESSED + "\"");
+        query.setRows(MAX_DA_FILES);
+        List<DataFile> files = DataFile.findByQuery(query);
 
-        try {
+        // create map for test cases
+        testDescriptions.clear();
+        for ( DataFile dataFile : files ) {
 
-            jsonText = IOUtils.toString(inputStream, "UTF-8");
-            Object object = jsonParser.parse(jsonText);
-            JSONObject jsonObject = (JSONObject)object;
-
-            ownerUri = (String)jsonObject.get("ownerUri");
-            ownerEmail = (String)jsonObject.get("ownerEmail");
-            categoricalOption = (String)jsonObject.get("categoricalOption");
-
-            JSONArray tests = (JSONArray) jsonObject.get("testCases");
-            Iterator<JSONObject> iterator = tests.iterator();
-            while (iterator.hasNext()) {
-                JSONObject test = iterator.next();
-                Map<String, Object> testDescription = new HashMap<>();
-                testDescription.put("acquisition_uri_str", (String)test.get("acquisition_uri_str"));
-                testDescription.put("originalDApath", (String)test.get("originalDApath"));
-                JSONObject facetsObj = (JSONObject)test.get("facets");
-                testDescription.put("facets", facetsObj.toJSONString());
-                Map<String, Object> columnMapping = new HashMap<>();
-                JSONArray columns = (JSONArray)test.get("columnMapping");
-                if ( columns != null ) {
-                    Iterator<JSONObject> columnIter = columns.iterator();
-                    while (columnIter.hasNext()) {
-                        JSONObject columnDesc = columnIter.next();
-                        String key = (String) columnDesc.get("generated");
-                        columnMapping.put(key, new Column((String) columnDesc.get("original"),
-                                ((String) columnDesc.get("categorical")).equalsIgnoreCase("true") ? true : false));
-                    }
-                    testDescription.put("columnMapping", columnMapping);
-                }
-                testDescriptions.put((String)test.get("acquisition_uri_str"), testDescription);
+            String originalFilePath = dataFile.getAbsolutePath();
+            if ( originalFilePath == null ) continue;
+            if ( originalFilePath.toUpperCase().contains("SDD") ) continue;
+            if ( !originalFilePath.toUpperCase().contains("DA") && !originalFilePath.toUpperCase().contains("LAB") ) continue;
+            if ( checkFileExists(originalFilePath) == false ) {
+                System.out.println("===> ingested DA File [" + originalFilePath +"] does not exists, skip.");
+                continue;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            Map<String, Object> testDescription = new HashMap<>();
+            String dataAcquisitionName = getDAFileName(dataFile.getDataAcquisitionUri());
+            if ( dataAcquisitionName == null ) continue;
+
+            testDescription.put("acquisition_uri_str", dataAcquisitionName);
+            testDescription.put("facets",getSearchFacet(dataFile.getStudyUri(), dataAcquisitionName));
+            testDescription.put("originalDApath", dataFile.getAbsolutePath());
+
+            testDescriptions.put(dataAcquisitionName, testDescription);
         }
 
+        return;
+    }
+
+    private void standardizedColumnNames(List<String> headers, List<String> columns) {
+
+        if ( columns == null || columns.size() == 0 ) return;
+        if ( headers == null || headers.size() == 0 ) return;
+
+        Map<String, String> map = new HashMap<>();
+        for ( String header : headers ) map.put(header.toLowerCase(), header);
+        for ( int i = 0; i < columns.size(); i++ ) {
+            if ( map.containsKey(columns.get(i).toLowerCase()) ) {
+                columns.set(i, map.get(columns.get(i).toLowerCase()));
+            }
+        }
+    }
+
+    private boolean checkFileExists(String path) {
+        File f = new File(path);
+        if (f.exists() && !f.isDirectory()) return true;
+        return false;
+    }
+
+    private String getSearchFacet(String studyUriStr, String acquisitionUriStr) {
+
+        JSONArray facetsEC = new JSONArray();
+        JSONArray facetsS = new JSONArray();
+        JSONArray facetsOC = new JSONArray();
+        JSONArray facetsU = new JSONArray();
+        JSONArray facetsT = new JSONArray();
+        JSONArray facestPI = new JSONArray();
+
+        JSONArray facetsSChildArray = new JSONArray();
+        JSONObject facetsSChild = new JSONObject();
+        facetsSChild.put("id", acquisitionUriStr);
+        facetsSChild.put("acquisition_uri_str", acquisitionUriStr);
+        facetsSChildArray.add(facetsSChild);
+
+        JSONObject facetsSObj = new JSONObject();
+        facetsSObj.put("id", studyUriStr);
+        facetsSObj.put("study_uri_str", studyUriStr);
+        facetsSObj.put("children", facetsSChildArray);
+        facetsS.add(facetsSObj);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("facetsEC",facetsEC);
+        jsonObject.put("facetsS", facetsS);
+        jsonObject.put("facetsOC", facetsOC);
+        jsonObject.put("facetsU", facetsU);
+        jsonObject.put("facetsT", facetsT);
+        jsonObject.put("facetsPI", facestPI);
+
+        //JSONObject top = new JSONObject();
+        //top.put("facets", jsonObject);
+
+        return jsonObject.toJSONString();
+    }
+
+    private String getDAFileName(String acquisitionURL) {
+        if ( acquisitionURL == null || acquisitionURL.length() == 0 ) return null;
+        if ( acquisitionURL.indexOf(":") < 0 ) return acquisitionURL;
+        String[] names = acquisitionURL.split(":");
+        return NameSpaces.getInstance().getNameByAbbreviation(names[0])+names[1];
+    }
+
+    private String writeToTestConfig(Map<String, Object> testDescriptions) {
+        JSONArray tests = new JSONArray();
+        for ( Map.Entry<String, Object> entry : testDescriptions.entrySet() ) {
+            JSONObject test = new JSONObject();
+            Object value = entry.getValue();
+            if ( value instanceof String )
+                test.put(entry.getKey(), (String)value);
+            else
+                test.put(entry.getKey(), writeToTestConfig((Map<String,Object>)entry.getValue()));
+            tests.add(test);
+        }
+        return tests.toJSONString();
     }
 
     private static double round(double value, int places) {
@@ -480,14 +602,5 @@ public class StudyTest {
         BigDecimal bd = new BigDecimal(Double.toString(value));
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
-    }
-}
-
-class Column {
-    protected String columnName;
-    protected boolean categorical;
-    public Column(String columnName, boolean categorical) {
-        this.columnName = columnName;
-        this.categorical = categorical;
     }
 }
