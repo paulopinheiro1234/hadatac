@@ -20,10 +20,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.console.views.html.annotator.annotation_log;
 import org.hadatac.console.views.html.annotator.assignOption;
-import org.hadatac.entity.pojo.Alignment;
-import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.User;
+import org.hadatac.entity.pojo.*;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
@@ -209,7 +206,9 @@ public class Downloader extends Controller {
         return 0;
     }
 
-    public static int generateCSVFileBySubjectAlignment(String ownerUri, String facets, String ownerEmail, String categoricalOption, boolean keepSameValue) {
+    public static int generateCSVFileBySubjectAlignment(String ownerUri, String facets, String ownerEmail,
+                                                        String categoricalOption, boolean keepSameValue,
+                                                        ColumnMapping columnMapping) {
 
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
@@ -227,7 +226,7 @@ public class Downloader extends Controller {
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
 
-        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), categoricalOption, keepSameValue);
+        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), categoricalOption, keepSameValue, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;
