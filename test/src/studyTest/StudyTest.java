@@ -60,7 +60,7 @@ public class StudyTest {
 
         /*
         here is how to run:
-        sbt "testOnly *StudyTest -- -DdataFileName=DA-2016-34-PD-DemoHealth"
+        sbt "testOnly *StudyTest -- -DdataFileName=DA-2016-1523-Lab-CRE"
         sbt "testOnly *StudyTest -- -DstudyID=2016-34"
         sbt "testOnly *StudyTest"
         reference: https://stackoverflow.com/questions/37978961/passing-command-line-argument-to-sbt-test
@@ -181,10 +181,13 @@ public class StudyTest {
                     if (value == null) continue;
                     value = value.trim();
                     if (value.length() != 0 && !value.equalsIgnoreCase("NA")) {
-                        try {
-                            downloaded.add(Double.valueOf(value));
-                        } catch (Exception e) {
-                            System.out.println("-----------!!!! encounter abnormal value: [" + value + "], for " + testURL + ", in downloaded file.");
+                        String[] items = value.split("\\s+");
+                        for ( String item : items ) {
+                            try {
+                                downloaded.add(Double.valueOf(item));
+                            } catch (Exception e) {
+                                System.out.println("-----------!!!! encounter abnormal value: [" + item + "], for " + testURL + ", column: " + downloadedColumnName);
+                            }
                         }
                     }
                 }
@@ -361,6 +364,19 @@ public class StudyTest {
                 String tmp = "" + i + "-" + items[i];
                 downloadedFreq.put(tmp, downloadedFreq.getOrDefault(tmp, 0) + 1);
             }
+        }
+
+        if ( originalFreq.size() != downloadedFreq.size() ) {
+            // merge the ones in downloadedFreq
+            Map<String, Integer> tmp = new HashMap<>();
+            for ( Map.Entry<String, Integer> entry : downloadedFreq.entrySet() ) {
+                String key = entry.getKey();
+                Integer freq = entry.getValue();
+                key = key.substring(key.indexOf("-")+1);
+                tmp.put(key, tmp.getOrDefault(key,0)+freq);
+            }
+            downloadedFreq.clear();
+            downloadedFreq.putAll(tmp);
         }
 
         Map<Integer, Integer> freqCount = new HashMap<>();
