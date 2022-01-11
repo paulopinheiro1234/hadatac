@@ -3,6 +3,7 @@ package org.hadatac.console.controllers;
 import be.objectify.deadbolt.java.actions.SubjectNotPresent;
 import com.typesafe.config.ConfigFactory;
 import module.SecurityModule;
+import org.apache.commons.lang.RandomStringUtils;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.*;
@@ -286,6 +287,12 @@ public class Signup {
             return redirect(org.hadatac.console.controllers.routes.WidgetController.listWidgets())
                     .flashing("error",data.validate());
         }
+        String password =RandomStringUtils.randomAlphanumeric(12); // Is this sufficient?
+        if(redirectedUser) {
+            System.out.println("Addding random password for redirected user from HHEAR:"+password);
+            data.setPassword(password);
+            data.setRepeatPassword(password);
+        }
         signUps.add(new SignUp(data.getName(), data.getEmail(), data.getPassword(), data.getRepeatPassword()));
         try {
             LinkedAccount linkedAccount = new LinkedAccount();
@@ -306,6 +313,7 @@ public class Signup {
             return redirect(org.hadatac.console.controllers.routes.Portal.index());
         return ok("Account set up is complete");
     }
+
     //For users redirected to Hadatac -
     // New users Signup and then login
     // Existing users Login
@@ -322,9 +330,10 @@ public class Signup {
             }
 
             //Login user
-            SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
-            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-            test.validate(new UsernamePasswordCredentials(formData.get().getEmail(), formData.get().getPassword()), context);
+//            SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
+//            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
+//            test.validate(new UsernamePasswordCredentials(formData.get().getEmail(), formData.get().getPassword()), context);
+            System.out.println("Logging in user redirected from HHEAR ");
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
             application.formIndex(request,user);
             return ok ("/protected/index.html/"+user.getEmail());

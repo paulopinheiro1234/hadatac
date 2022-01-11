@@ -9,8 +9,50 @@
 @import com.typesafe.config.ConfigFactory
 @main("", "",userName) {
 <!DOCTYPE html>
-    <div class="text-center"><h1 class="display-4">Welcome</h1><p id='test'></p></div>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <style>
+            .loader {
+                position: absolute;
+                left: 50%;
+                top: 25%;
+                z-index: 1;
+                width: 120px;
+                height: 120px;
+                margin: -76px 0 0 -76px;
+                border: 10px solid #f3f3f3;
+                border-radius: 50%;
+                border-top: 10px solid black;
+                border-bottom: 10px solid black;
+                width: 100px;
+                height: 100px;
+                -webkit-animation: spin 2s linear infinite;
+                animation: spin 2s linear infinite;
+            }
+
+            @@-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+            }
+
+            @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+            }
+            .redirect {
+                position: absolute;
+                top: 30%;
+                /*right: 40%;*/
+                /*bottom: 20%;*/
+                left: 46%;
+                /*background: gold;*/
+                /*border: 1px solid blue;*/
+            }
+    </style>
+    <div class="text-center"></br></br></br></br></br></br></br></br></br></br></br></br>
+    </br></br></br></br></br></br></br></br></br></br></br></br></div>
+    <div class="loader"></div>
+    <div class="redirect" >Redirecting...<p id='test'></p></div>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
     <div id="result" hidden>
         <form action="/callback?client_name=FormClient" method="POST">
             <b>User Name</b></br>
@@ -24,25 +66,39 @@
     </div>
     <script type="text/javascript">
             var data1;
-            window.addEventListener('click', function (e) {
-                var txt = '{"username":"jane", "age":30, "city":"New York", "email": "sheersha.kandwal@@gmail.com", "password": "12345"}'
+            document.onreadystatechange = function () {
+                var state = document.readyState
+                if (state == 'interactive') {
+                    document.getElementById('contents').style.visibility="hidden";
+                } else if (state == 'complete') {
+                    setTimeout(function(){
+                        document.getElementById('interactive');
+                        document.getElementById('load').style.visibility="hidden";
+                        document.getElementById('contents').style.visibility="visible";
+                    },1000);
+                }
+            }
+
+            window.addEventListener('message', function (e) {
+                var txt = '{"username":"Jane", "token":"FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA", "email": "c@@gmail.com", "password":"abcde"}'
                 var obj = JSON.parse(txt);
                 console.log("inside script");
                 e.data = "sheersha.kandwal" + "@@" + "mssm.edu"
                 console.log(e.data)
-                document.getElementById("test").innerHTML = obj.username + "," + obj.email;
+                // document.getElementById("test").innerHTML = obj.username + "," + obj.email;
                 data1 = obj;
-                console.log("email :" + data1);
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
-                $.ajax({
-                    type: 'POST',
-                    url: '/hadatac/checkUser/',
-                    data: obj,
-                    success: function (response) {
-                        location.replace(response);
-                    },
-                });
+                if(obj.token =="@ConfigFactory.load().getString("hadatac.oauth.tokenUrl")"){
+                    $.ajax({
+                        type: 'POST',
+                        url: '/hadatac/checkUser/',
+                        data: obj,
+                        success: function (response) {
+                            location.replace(response);
+                        },
+                    });
+                }
             }, false);
     </script>
 }
