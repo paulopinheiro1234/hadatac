@@ -20,6 +20,7 @@ public class SSDGeneratorChain extends GeneratorChain {
                 getDataFile().getLogger().println("Label for " + oc.getSOCReference() + ": ERROR could not find path to colletion with grounding label");
             } else {
                 getDataFile().getLogger().println("Label for " + oc.getSOCReference() + ": " + labelResult);
+                oc.setNamedGraph(getNamedGraphUri());
                 oc.saveRoleLabel(labelResult);
             }
         } 

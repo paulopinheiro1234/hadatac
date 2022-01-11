@@ -173,7 +173,7 @@ public class DataAcquisitionSearch extends Controller {
             facets = request.body().asFormUrlEncoded().get("facets")[0];
         }
 
-        log.debug("facets: " + facets);
+        // log.debug("facets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();
         facetHandler.loadFacetsFromString(facets);
@@ -232,10 +232,12 @@ public class DataAcquisitionSearch extends Controller {
         log.debug("---> ObjectCollection.findAllFacetSearch() + Measurement.findAsync() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
         startTime = System.currentTimeMillis();
+
+        // System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
         ObjectDetails objDetails = getObjectDetails(results);
         log.debug("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
-        //System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
+        // System.out.println("\n\n\n\nresults to JSON 1: " + results.toJSON());
 
         SPARQLUtilsFacetSearch.reportStats();
         // SolrUtilsFacetSearch.reportStats();
@@ -308,7 +310,8 @@ public class DataAcquisitionSearch extends Controller {
         }
 
         long startTime = System.currentTimeMillis();
-        AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
+        // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
+        AcquisitionQueryResult results = null;
         log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
 
         final String finalFacets = facets;
@@ -323,7 +326,7 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    results.getDocuments(), finalFacets, email, categoricalOption, keepSameValue),
+                    ownerUri, finalFacets, email, categoricalOption, keepSameValue, null),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
@@ -343,7 +346,7 @@ public class DataAcquisitionSearch extends Controller {
             e.printStackTrace();
         }
 
-        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index("/", "/", false));
+        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index_datasetGeneration("/", "/", false));
     }
 
     private String getUserEmail(Http.Request request) {

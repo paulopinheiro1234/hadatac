@@ -666,7 +666,7 @@ public class StudyObject extends HADatAcThing {
                     obj = new StudyObject(obj_uri,
                             typeStr,
                             originalIdStr,
-                            FirstLabel.getLabelFacetSearch(obj_uri),
+                            "", // only used for dataset generation and not needed
                             isMemberOfStr,
                             commentStr,
                             retrieveScopeUrisFacetSearch(obj_uri),

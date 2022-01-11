@@ -460,6 +460,11 @@ POST    /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.contr
 
 #GET		/hadatac/sddeditor_v2/getUserName			   org.hadatac.console.controllers.fileviewer.SDDEditorV2.getUserName()
 #POST	        /hadatac/sddeditor_v2/getUserName			   org.hadatac.console.controllers.fileviewer.SDDEditorV2.getUserName()
+
+# dataset generation
+GET	    /hadatac/datasetGeneration	        	       org.hadatac.console.controllers.workingfiles.WorkingFiles.index_datasetGeneration(dir : String, dest: String, stayAtRoot : Boolean ?= false, request: Request)
+POST	/hadatac/datasetGeneration	        	       org.hadatac.console.controllers.workingfiles.WorkingFiles.index_datasetGeneration(dir : String, dest: String, stayAtRoot : Boolean ?= false, request: Request)
+
 # working files
 GET	    /hadatac/working	        	               org.hadatac.console.controllers.workingfiles.WorkingFiles.index(dir : String, dest: String, stayAtRoot : Boolean ?= false, request: Request)
 POST	/hadatac/working     	                       org.hadatac.console.controllers.workingfiles.WorkingFiles.postIndex(dir: String, dest: String, request: Request)

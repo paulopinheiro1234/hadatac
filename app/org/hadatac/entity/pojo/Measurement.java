@@ -836,6 +836,107 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
+    public static AcquisitionQueryResult readSolrByPage(String user_uri, int page, int pageSize, String facets,
+                                                        AcquisitionQueryResult acquisitionQueryResult, String solrQuery)  {
+
+        /*AcquisitionQueryResult acquisitionQueryResult = new AcquisitionQueryResult();
+
+        long startTime = System.currentTimeMillis();
+        List<String> ownedDAs = STR.findAllAccessibleDataAcquisition(user_uri);
+        log.info("STR.findAllAccessibleDataAcquisition(user_uri) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        if (ownedDAs.isEmpty()) {
+            System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
+            return acquisitionQueryResult;
+        }
+
+        startTime = System.currentTimeMillis();
+        FacetHandler facetHandler = new FacetHandler();
+        facetHandler.loadFacetsFromString(facets);
+        log.info("facetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        startTime = System.currentTimeMillis();
+        FacetHandler retFacetHandler = new FacetHandler();
+        retFacetHandler.loadFacetsFromString(facets);
+        log.info("retFacetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
+        // System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
+
+        // Run one time
+        // getAllFacetStats(facetHandler, retFacetHandler, acquisitionQueryResult, false);
+
+        // Get facet statistics
+        // getAllFacetStats(retFacetHandler, retFacetHandler, acquisitionQueryResult, true);
+        startTime = System.currentTimeMillis();
+        getAllFacetStats(facetHandler, retFacetHandler, acquisitionQueryResult, true);
+        log.info("getAllFacetStats() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
+        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.toJSON());
+        */
+
+        // Get documents
+        long docSize = 0;
+        SolrQuery query = new SolrQuery();
+        query.setQuery(solrQuery);
+        query.setStart(page * pageSize);
+        query.setRows(pageSize);
+        //query.setFacet(true);     // not sure about these two line
+        //query.setFacetLimit(-1);  // not sure about these two line
+
+        // prepare query result
+        if ( acquisitionQueryResult == null ) return null;
+        acquisitionQueryResult.clearDocument();
+
+        long startTime = System.currentTimeMillis();
+        try {
+            SolrClient solr = new HttpSolrClient.Builder(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+            solr.close();
+
+            SolrDocumentList docs = queryResponse.getResults();
+
+            docSize = docs.getNumFound();
+            System.out.println("<" + user_uri + "> is reading Solr backend with page =  " + page + ", with pageSize = " + pageSize + ", # of results: " + docs.size() ) ;
+
+            Set<String> uri_set = new HashSet<String>();
+            Map<String, STR> cachedDA = new HashMap<String, STR>();
+            Map<String, String> mapClassLabel = generateCodeClassLabelFacetSearch();
+
+            Iterator<SolrDocument> iterDoc = docs.iterator();
+            while (iterDoc.hasNext()) {
+                Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
+                acquisitionQueryResult.addDocument(measurement);
+                uri_set.add(measurement.getEntityUri());
+                uri_set.addAll(measurement.getCharacteristicUris());
+                uri_set.add(measurement.getUnitUri());
+            }
+
+            // Assign labels of entity, characteristic, and units collectively
+            Map<String, String> cachedLabels = Measurement.generateCachedLabelFacetSearch(new ArrayList<String>(uri_set));
+            for (Measurement measurement : acquisitionQueryResult.getDocuments()) {
+                measurement.setLabels(cachedLabels);
+            }
+
+        } catch (SolrServerException e) {
+            System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        acquisitionQueryResult.setDocumentSize(docSize);
+
+        log.info("quering solr back for a single takes: " + (System.currentTimeMillis()-startTime));
+
+        return acquisitionQueryResult;
+
+    }
+
     public static AcquisitionQueryResult getAllFacetStatsWrapper(AcquisitionQueryResult result, String facets, DatabaseExecutionContext databaseExecutionContext) {
 
         long startTime = System.currentTimeMillis();
@@ -1555,27 +1656,29 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVBySubjectAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption, boolean keepSameValue) {
+    public static void outputAsCSVBySubjectAlignment(String ownerUri, String facets, File file, String fileId,
+                                                     String categoricalOption, boolean keepSameValue,
+                                                     ColumnMapping columnMapping) {
 
-        String roles = ConfigFactory.load().getString("hadatac.download.alignment");
-        List<String> selecteedRoles = new ArrayList<>();
-
-        if ( roles == null || roles.length() == 0 ) {
-            selecteedRoles.add("Child"); // default to Child is not configured
-        } else if ( !roles.contains(",") ) {
-            selecteedRoles.add(roles);
-        } else {
-            selecteedRoles.addAll(Arrays.asList(roles.split(",")));
-        }
-
-        DataFile dataFile = null;
-        boolean fileCreated = false;
-        
         // Initiate Alignment
         Alignment alignment = new Alignment();
         Map<String, List<String>> alignCache = new HashMap<String, List<String>>();
+        Map<String, List<String>> studyMap = new HashMap<>();
 
-        Map<String, List<String>> studyMap = getSourceStudies(measurements);
+        // read the page size from config
+        String sPageSize = ConfigFactory.load().getString("hadatac.download.pageSize");
+        int pageSize = 32000;
+        try {
+            pageSize = Integer.parseInt(sPageSize);
+        } catch(Exception e) {};
+
+        // read backend Solr page by page and merge the results
+        System.out.println("start the pagination process...pageSize = " + pageSize);
+        Map<String, Map<String, List<String>>> results = readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment,alignCache, categoricalOption, keepSameValue, columnMapping);
+
+        // write the results to hard drive
+        System.out.print("start to write the dataset to hard drive...");
+        DataFile dataFile = null;
 
         try {
             // Write empty string to create the file
@@ -1585,245 +1688,13 @@ public class Measurement extends HADatAcThing implements Runnable {
             //     HashMap<base object, Map<measurement's key, List<value>>, where
             //        - base object is the object to be aligned. For example, if the alignment is a subject and the current object of the measurement is a sample 
             //          from the subject, the base object is the subject of the sample  
-            Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
             List<String> values = null;
             boolean processOriginalID = false;
+            boolean fileCreated = false;
             
             // Prepare rows: Measurements are compared against alignment attributes from previous measurements (role/entity/attribute-list/inrelationto/unit/time)
             //               New alignment attributes are created for measurements with no corresponding alignment attributes.
-            int i = 1;
-            int prev_ratio = 0;
-            int total = measurements.size();
-            long startTime = 0;
 
-            //System.out.println("Align-Debug: Measurement size is " + total);
-        	//System.out.println("Phase I: before Measurement loop");
-            for (Measurement m : measurements) {
-
-            	//System.out.println("Phase I: start of Measurement loop");
-                StudyObject referenceObj = null;
-
-                if (m.getObjectUri() != null && !m.getObjectUri().equals("")) {
-
-                	//System.out.println("Phase I: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
-
-                    // Perform following actions required if the object of the measurement has not been processed yet
-                    //   - add a row in the result set for aligning object, if such row does not exist
-                    //   - add entity-role to the collection of entity-roles of the alignment
-                    //   - add object to the collection of objects of the alignment
-
-                	List<String> alignObjs = alignCache.get(m.getEntryObjectUri());
-                	long duration = 0, threshold = 20;
-
-                	if (alignObjs == null) {
-
-                	    startTime = System.currentTimeMillis();
-                		alignObjs = Alignment.alignmentObjects(m.getEntryObjectUri(), selecteedRoles, m.getOriginalId());
-                		duration = System.currentTimeMillis() - startTime;
-                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.alignmentObject: " + duration);
-
-                		if (alignObjs != null) {
-                			alignCache.put(m.getEntryObjectUri(),alignObjs);
-                			/*
-                			System.out.print("Main object: [" + m.getObjectUri() + "] Associated Objects: [ ");
-                			for (String aux : alignObjs) {
-                				System.out.print(aux + " ");
-                			}
-                			System.out.println("]");
-                			*/
-                		}
-                	}
-                    	
-                	for (String currentAlignmentObjectUri : alignObjs) {
-                		
-	                	/* START OF REFERENCE OBJECT SCOPE */
-	                	
-                		/*
-                		referenceObj = alignment.getObject(m.getStudyObjectUri());
-	                    if (referenceObj == null || !referenceObj.getUri().equals(m.getStudyObjectUri())) {
-	                    	System.out.println("Phase I: Reading object [" + m.getStudyObjectUri() + "]");
-	                        referenceObj = StudyObject.find(m.getStudyObjectUri());
-	                        if (referenceObj != null) {
-	                        	//System.out.println("Align-Debug: Caching object [" + referenceObj.getUri() + "]");
-	                            alignment.addObject(referenceObj);
-	                        }
-	                    }
-	                    */
-                        startTime = System.currentTimeMillis();
-                		referenceObj = alignment.getObject(currentAlignmentObjectUri);
-                        duration = System.currentTimeMillis() - startTime;
-                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.getObject: " + duration);
-
-                        if (referenceObj == null || !referenceObj.getUri().equals(currentAlignmentObjectUri)) {
-	                    	//System.out.println("Phase I: Reading object [" + currentAlignmentObjectUri + "]");
-
-                            startTime = System.currentTimeMillis();
-	                        referenceObj = StudyObject.findFacetSearch(currentAlignmentObjectUri, m.getStudyUri());
-                            duration = System.currentTimeMillis() - startTime;
-                            if ( duration > threshold ) log.debug("DOWNLOAD: studyObject.find: " + duration);
-
-                            if (referenceObj != null) {
-	                        	//System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
-	                            alignment.addObject(referenceObj);
-                                addToStudyMap(studyMap, alignment, referenceObj); // we need to add the studyId to the studyMap collection
-	                        }
-	                    }
-	                    
-	                	if (referenceObj == null) {
-	                		System.out.println("[ERROR] Measurement: could not find reference object with uri " + m.getObjectUri());
-	                	} else {
-	                    	//System.out.println("Phase I: ReferenceUri is [" + referenceObj.getUri() + "]");
-	                		if (!results.containsKey(referenceObj.getUri())) {
-	
-	                			//System.out.println("Align-Debug: adding entity-role");
-                                startTime = System.currentTimeMillis();
-	                	        Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
-                                duration = System.currentTimeMillis() - startTime;
-                                if ( duration > threshold ) log.debug("DOWNLOAD: alignment.getEntity: " + duration);
-
-                                if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
-
-                                    startTime = System.currentTimeMillis();
-	                	        	referenceObjEntity = Entity.facetSearchFind(referenceObj.getTypeUri());
-                                    duration = System.currentTimeMillis() - startTime;
-                                    if ( duration > threshold ) log.debug("DOWNLOAD: Entity.find: " + duration);
-
-                                    if (referenceObjEntity == null) {
-	                	                System.out.println("[ERROR] Measurement: retrieving entity " + referenceObj.getTypeUri());
-	                	            } else {
-	                	                alignment.addEntity(referenceObjEntity);
-	                	            }
-	                	        }
-	                	        if (referenceObjEntity != null) {
-	                	        	//AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
-	                	        	AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
-	                				if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
-	                					alignment.addRole(referenceEntRole);
-	                				}							
-				    
-	                				if (results.get(referenceObj.getUri()) == null) {
-	                					values = new ArrayList<String>();
-	                					results.put(referenceObj.getUri(), new HashMap<String, List<String>>());
-	                					if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
-	                						if (referenceObj.getOriginalId() != null) { 
-	                							//System.out.println("Phase I: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
-	                							values.add(referenceObj.getOriginalId());
-	                							results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), values);
-	                						}
-	                						/*
-	                						if (referenceObj.getOriginalId() != null) { 
-	                							//System.out.println("Phase I: adding GROUPID to result's map as a key: " + alignment.groupKey(referenceEntRole)); 
-	                							values.add(referenceObj.getGroupId());
-	                							results.get(referenceObj.getUri()).put(alignment.groupKey(referenceEntRole), values);
-	                						}
-	                						*/
-	                						processOriginalID = true;
-	                					} 
-	                				}
-	                	        } 
-	                		}
-	                	}
-			    
-	                	//System.out.println("Phase I: processing Object with PID " + m.getObjectPID());
-			    
-	                	// assign values to results
-                        startTime = System.currentTimeMillis();
-	                	String key = alignment.measurementKey(m);
-                        duration = System.currentTimeMillis() - startTime;
-                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.measurementKey " + duration);
-
-	                	//System.out.println("Phase I: computed measurement key [" + key + "]");
-	                	if (key != null) {
-	                		String finalValue = "";
-				
-	                		if (categoricalOption.equals(WITH_VALUES)){
-	                			finalValue = m.getValue();
-	                		} else {
-	                			//System.out.println("Phase I: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]"); 
-	                			if (m.getValueClass() != null && !m.getValueClass().equals("") && URIUtils.isValidURI(m.getValueClass())) {
-	                				if (!alignment.containsCode(m.getValueClass())) {
-
-	                				    startTime = System.currentTimeMillis();
-	                					String code = Attribute.findHarmonizedCode(m.getValueClass());
-                                        duration = System.currentTimeMillis() - startTime;
-                                        if ( duration > threshold ) log.debug("DOWNLOAD: Attribute.findHarmonizedcode: " + duration);
-
-                                        //System.out.println("Phase I: new harmonized Code [" + code + "] for URI-value [" + m.getValueClass() + "]");
-	                					if (code != null && !code.equals("")) {
-	                						List<String> newEntry = new ArrayList<String>();
-	                						newEntry.add(code);
-	                						newEntry.add(m.getValue());
-	                						alignment.addCode(m.getValueClass(), newEntry);
-	                					}	
-	                				}
-	                			}
-				    
-	                			if (alignment.containsCode(m.getValueClass())) {
-	                				// get code for qualitative variables
-	                				List<String> entry = alignment.getCode(m.getValueClass()); 
-	                				finalValue = entry.get(0);
-	                			} else {
-	                				// get actual value for quantitative variables
-	                				finalValue = m.getValueClass();
-	                			}
-	                		}
-	
-	                		if (referenceObj != null && finalValue != null) {
-	                		    if ( m.isAllNumerical(finalValue) && finalValue.contains(",") ) {
-	                		        finalValue = finalValue.replaceAll(",", "");
-                                }
-	                			values = results.get(referenceObj.getUri()).get(key);
-	                 			if (values == null) {
-	                 				values = new ArrayList<String>();
-	                 				values.add(finalValue);
-	                			} else {
-                                    /*if ( m.getObjectUri().contains("1459288") ) {
-                                        System.out.println("this is 1459288, and here is the values: " + values.get(0));
-                                    }*/
-                                    if ( values.contains(finalValue) == false || keepSameValue ) values.add(finalValue);
-	                			}
-	                			results.get(referenceObj.getUri()).put(key, values);
-	                			//System.out.println("Phase I: final value [" + finalValue + "]");
-	                		}
-	                			
-	                	} else {
-	                			
-	                		System.out.println("[ERROR] Measurement: the following measurement could not match any alignment attribute (and no alignment " + 
-	                				"attribute could be created for this measurement): " + 
-	                				//m.getEntityUri() + " " + m.getCharacteristicUri());
-	                				m.getEntityUri() + " " + m.getCharacteristicUris().get(0));
-	                	}
-	                	
-	                	/* END OF REFERENCE OBJECT SCOPE */
-                	}
-                	
-                }
-                
-
-                // compute and show progress 
-                double ratio = (double)i / total * 100;
-                int current_ratio = (int)ratio;
-                if (current_ratio > prev_ratio) {
-                    prev_ratio = current_ratio;
-                    System.out.println("Progress: " + current_ratio + "%");
-
-                    dataFile = DataFile.findById(fileId);
-                    if (dataFile != null) {
-                        if (dataFile.getStatus() == DataFile.DELETED) {
-                            dataFile.delete();
-                            return;
-                        }
-                        dataFile.setCompletionPercentage(current_ratio);
-                        dataFile.save();
-                    } else {
-                        return;
-                    }
-                }
-                i++;
-            	//System.out.println("Phase I: end of Measurement loop");
-            }
-        	//System.out.println("Phase I: Measurement loop COMPLETED");
-            
             //alignment.printAlignment();
             
             // Write headers: Labels are derived from collected alignment attributes
@@ -1909,6 +1780,301 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
+    private static Map<String, Map<String, List<String>>> readSolrPagesAndMerge(String ownerUri, String facets,
+                                                                         String fileId, int pageSize,
+                                                                         Map<String, List<String>> studyMap,
+                                                                         Alignment alignment, Map<String,List<String>> alignCache,
+                                                                         String categoricalOption, boolean keepSameValue, ColumnMapping columnMapping) {
+
+        Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
+        int page = 0;
+
+        AcquisitionQueryResult acquisitionQueryResult = new AcquisitionQueryResult();
+        String solQuery = prepareQueryAndResult(ownerUri, facets, acquisitionQueryResult);
+        if ( solQuery == null ) return results;
+
+        do {
+
+            long startTime = System.currentTimeMillis();
+            readSolrByPage(ownerUri, page, pageSize, facets, acquisitionQueryResult, solQuery);
+            long duration = System.currentTimeMillis() - startTime;
+            log.warn("this might take longer time: " + duration);
+
+            if (acquisitionQueryResult == null) break;
+            if (acquisitionQueryResult.getDocuments() == null || acquisitionQueryResult.getDocuments().size() == 0 ) break;
+
+            parseAndMerge(results, acquisitionQueryResult.getDocuments(), studyMap, alignment, alignCache, fileId, page,
+                    pageSize, acquisitionQueryResult.getDocumentSize(), categoricalOption, keepSameValue, columnMapping);
+            page++;
+
+            if ( acquisitionQueryResult.getDocuments().size() < pageSize ) break;
+
+        } while (true);
+
+        return results;
+    }
+
+    private static String prepareQueryAndResult(String user_uri, String facets, AcquisitionQueryResult acquisitionQueryResult) {
+
+        long startTime = System.currentTimeMillis();
+        List<String> ownedDAs = STR.findAllAccessibleDataAcquisition(user_uri);
+        log.info("STR.findAllAccessibleDataAcquisition(user_uri) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        if (ownedDAs.isEmpty()) {
+            /*
+             * an empty query happens when current user is not allowed to see any
+             * data acquisition
+             */
+            System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
+            return null;
+        }
+
+        startTime = System.currentTimeMillis();
+        FacetHandler facetHandler = new FacetHandler();
+        facetHandler.loadFacetsFromString(facets);
+        log.info("facetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        startTime = System.currentTimeMillis();
+        FacetHandler retFacetHandler = new FacetHandler();
+        retFacetHandler.loadFacetsFromString(facets);
+        log.info("retFacetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        startTime = System.currentTimeMillis();
+        getAllFacetStats(facetHandler, retFacetHandler, acquisitionQueryResult, true);
+        log.info("getAllFacetStats() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
+
+        return buildQuery(ownedDAs, facetHandler);
+
+    }
+
+    private static void parseAndMerge(Map<String, Map<String, List<String>>> results, List<Measurement> measurements,
+                               Map<String, List<String>> studyMap, Alignment alignment, Map<String, List<String>> alignCache,
+                               String fileId, int page, int pageSize, long totalSize, String categoricalOption, boolean keepSameValue,
+                                      ColumnMapping columnMapping) {
+
+        if ( measurements == null || measurements.size() == 0 ) return;
+
+        String roles = ConfigFactory.load().getString("hadatac.download.alignment");
+        List<String> selectedRoles = new ArrayList<>();
+        if ( roles == null || roles.length() == 0 ) {
+            selectedRoles.add("Child"); // default to Child is not configured
+        } else if ( !roles.contains(",") ) {
+            selectedRoles.add(roles);
+        } else {
+            selectedRoles.addAll(Arrays.asList(roles.split(",")));
+        }
+
+        updateSourceStudies(studyMap, measurements);
+        List<String> values = null;
+        int counter = 0, prev_ratio = 0;
+        DataFile dataFile = null;
+
+        for ( Measurement measurement : measurements ) {
+
+            if ( measurement.getObjectUri() == null || measurement.getObjectUri().equals("") ) continue;
+
+            counter++;
+            StudyObject referenceObj = null;
+            //System.out.println("Phase I: ReferenceUri is [" + m.getStudyObjectUri() + "]   ObjectURI is [" + m.getObjectUri() + "]");
+            // Perform following actions required if the object of the measurement has not been processed yet
+            //   - add a row in the result set for aligning object, if such row does not exist
+            //   - add entity-role to the collection of entity-roles of the alignment
+            //   - add object to the collection of objects of the alignment
+
+            List<String> alignObjs = alignCache.get(measurement.getEntryObjectUri());
+            long duration = 0, threshold = 20;
+            if (alignObjs == null) {
+
+                long startTime = System.currentTimeMillis();
+                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), selectedRoles, measurement.getOriginalId());
+                duration = System.currentTimeMillis() - startTime;
+                if ( duration > threshold ) log.debug("DOWNLOAD: alignment.alignmentObject: " + duration);
+
+                if (alignObjs != null) {
+                    alignCache.put(measurement.getEntryObjectUri(),alignObjs);
+                    /*
+                			System.out.print("Main object: [" + m.getObjectUri() + "] Associated Objects: [ ");
+                			for (String aux : alignObjs) {
+                				System.out.print(aux + " ");
+                			}
+                			System.out.println("]");
+                	*/
+                }
+            }
+
+            for (String currentAlignmentObjectUri : alignObjs) {
+
+                /* START OF REFERENCE OBJECT SCOPE */
+                long startTime = System.currentTimeMillis();
+                referenceObj = alignment.getObject(currentAlignmentObjectUri);
+                duration = System.currentTimeMillis() - startTime;
+                if ( duration > threshold ) log.debug("DOWNLOAD: alignment.getObject: " + duration);
+
+                if (referenceObj == null || !referenceObj.getUri().equals(currentAlignmentObjectUri)) {
+                    //System.out.println("Phase I: Reading object [" + currentAlignmentObjectUri + "]");
+                    startTime = System.currentTimeMillis();
+                    referenceObj = StudyObject.findFacetSearch(currentAlignmentObjectUri, measurement.getStudyUri());
+                    duration = System.currentTimeMillis() - startTime;
+                    if ( duration > threshold ) log.debug("DOWNLOAD: studyObject.find: " + duration);
+
+                    if (referenceObj != null) {
+                        //System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
+                        alignment.addObject(referenceObj);
+                        addToStudyMap(studyMap, alignment, referenceObj); // we need to add the studyId to the studyMap collection
+                    }
+                }
+
+                if (referenceObj == null) {
+                    System.out.println("[ERROR] Measurement: could not find reference object with uri " + measurement.getObjectUri());
+                } else {
+                    //System.out.println("Phase I: ReferenceUri is [" + referenceObj.getUri() + "]");
+                    if (!results.containsKey(referenceObj.getUri())) {
+
+                        //System.out.println("Align-Debug: adding entity-role");
+                        startTime = System.currentTimeMillis();
+                        Entity referenceObjEntity = alignment.getEntity(referenceObj.getTypeUri());
+                        duration = System.currentTimeMillis() - startTime;
+                        if ( duration > threshold ) log.debug("DOWNLOAD: alignment.getEntity: " + duration);
+
+                        if (referenceObjEntity == null || !referenceObjEntity.getUri().equals(referenceObj.getTypeUri())) {
+
+                            startTime = System.currentTimeMillis();
+                            referenceObjEntity = Entity.facetSearchFind(referenceObj.getTypeUri());
+                            duration = System.currentTimeMillis() - startTime;
+                            if ( duration > threshold ) log.debug("DOWNLOAD: Entity.find: " + duration);
+
+                            if (referenceObjEntity == null) {
+                                System.out.println("[ERROR] Measurement: retrieving entity " + referenceObj.getTypeUri());
+                            } else {
+                                alignment.addEntity(referenceObjEntity);
+                            }
+                        }
+
+                        if (referenceObjEntity != null) {
+                            //AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,m.getRole());
+                            AlignmentEntityRole referenceEntRole = new AlignmentEntityRole(referenceObjEntity,null);
+                            if (!alignment.containsRole(referenceEntRole.getKey())) {  // entRole's key is the string of the role plus the label of the entity
+                                alignment.addRole(referenceEntRole);
+                            }
+
+                            if (results.get(referenceObj.getUri()) == null) {
+                                values = new ArrayList<String>();
+                                results.put(referenceObj.getUri(), new HashMap<String, List<String>>());
+                                if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
+                                    if (referenceObj.getOriginalId() != null) {
+                                        //System.out.println("Phase I: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole));
+                                        values.add(referenceObj.getOriginalId());
+                                        results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), values);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
+                //System.out.println("Phase I: processing Object with PID " + m.getObjectPID());
+
+                // assign values to results
+                startTime = System.currentTimeMillis();
+                String key = alignment.measurementKey(measurement);
+                if ( columnMapping != null ) {
+                    // this is to remember the column mapping between the hormonized data file and the original DA file
+                    columnMapping.addToMappings(key, measurement.getDasaUri(), measurement.getValueClass());
+                }
+
+                duration = System.currentTimeMillis() - startTime;
+                if ( duration > threshold ) log.debug("DOWNLOAD: alignment.measurementKey " + duration);
+
+                //System.out.println("Phase I: computed measurement key [" + key + "]");
+                if (key != null) {
+
+                    String finalValue = "";
+                    if (categoricalOption.equals(WITH_VALUES)){
+                        finalValue = measurement.getValue();
+                    } else {
+                        //System.out.println("Phase I: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]");
+                        if (measurement.getValueClass() != null && !measurement.getValueClass().equals("") && URIUtils.isValidURI(measurement.getValueClass())) {
+                            if (!alignment.containsCode(measurement.getValueClass())) {
+
+                                startTime = System.currentTimeMillis();
+                                String code = Attribute.findHarmonizedCode(measurement.getValueClass());
+                                duration = System.currentTimeMillis() - startTime;
+                                if ( duration > threshold ) log.debug("DOWNLOAD: Attribute.findHarmonizedcode: " + duration);
+
+                                //System.out.println("Phase I: new harmonized Code [" + code + "] for URI-value [" + m.getValueClass() + "]");
+                                if (code != null && !code.equals("")) {
+                                    List<String> newEntry = new ArrayList<String>();
+                                    newEntry.add(code);
+                                    newEntry.add(measurement.getValue());
+                                    alignment.addCode(measurement.getValueClass(), newEntry);
+                                }
+                            }
+                        }
+
+                        if (alignment.containsCode(measurement.getValueClass())) {
+                            // get code for qualitative variables
+                            List<String> entry = alignment.getCode(measurement.getValueClass());
+                            finalValue = entry.get(0);
+                        } else {
+                            // get actual value for quantitative variables
+                            finalValue = measurement.getValueClass();
+                        }
+                    }
+
+                    if (referenceObj != null && finalValue != null) {
+                        if ( measurement.isAllNumerical(finalValue) && finalValue.contains(",") ) {
+                            finalValue = finalValue.replaceAll(",", "");
+                        }
+                        values = results.get(referenceObj.getUri()).get(key);
+                        if (values == null) {
+                            values = new ArrayList<String>();
+                            values.add(finalValue);
+                        } else {
+                            if ( values.contains(finalValue) == false || keepSameValue ) values.add(finalValue);
+                        }
+                        results.get(referenceObj.getUri()).put(key, values);
+                            //System.out.println("Phase I: final value [" + finalValue + "]");
+                    }
+
+                } else {
+                    System.out.println("[ERROR] Measurement: the following measurement could not match any alignment attribute (and no alignment " +
+                                "attribute could be created for this measurement): " +
+                                //m.getEntityUri() + " " + m.getCharacteristicUri());
+                                measurement.getEntityUri() + " " + measurement.getCharacteristicUris().get(0));
+                }
+
+                    /* END OF REFERENCE OBJECT SCOPE */
+            }
+
+            // compute and show progress
+            double ratio = (double)(page*pageSize + counter) / totalSize * 100;
+            int current_ratio = (int)ratio;
+            if (current_ratio > prev_ratio) {
+                prev_ratio = current_ratio;
+                if ( current_ratio % 20 == 0 ) System.out.println(Thread.currentThread() + " : Progress: " + current_ratio + "%");
+
+                dataFile = DataFile.findById(fileId);
+                if (dataFile != null) {
+                    if (dataFile.getStatus() == DataFile.DELETED) {
+                        dataFile.delete();
+                        return;
+                    }
+                    dataFile.setCompletionPercentage(current_ratio);
+                    dataFile.save();
+                } else {
+                    return;
+                }
+            }
+
+        }
+
+        System.out.println("parseAndMerge: finished one page");
+
+    }
+
+
     private static void addToStudyMap(Map<String, List<String>> studyMap, Alignment alignment, StudyObject referenceObj) {
 
         if ( studyMap == null || alignment == null || referenceObj == null ) return;
@@ -1920,10 +2086,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    private static Map<String, List<String>> getSourceStudies(List<Measurement> measurements) {
+    private static void updateSourceStudies(Map<String, List<String>> map, List<Measurement> measurements) {
 
-        Map<String, List<String>> map = new HashMap<>();
-        if ( measurements == null || measurements.size() == 0 ) return map;
+        if ( measurements == null || measurements.size() == 0 ) return;
 
         for ( Measurement measurement : measurements ) {
             String studyId = measurement.getStudyUri();
@@ -1933,7 +2098,6 @@ public class Measurement extends HADatAcThing implements Runnable {
             map.put(measurement.getObjectUri(), list);
         }
 
-        return map;
     }
 
     private static String getRelatedStudies(Map<String, List<String>> studyMap, String subject) {
