@@ -73,6 +73,9 @@ libraryDependencies ++= Seq(
   //  "com.typesafe.play" %% "play-mailer-guice" % "8.0.1",
   "org.springframework.security" % "spring-security-crypto" % "5.4.1",
   "be.objectify" %% "deadbolt-java-gs" % "2.6.0",
+  "org.apache.logging.log4j" % "log4j-api" % "2.17.0",
+  "org.apache.logging.log4j" % "log4j-core" % "2.17.0",
+//  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.0",
 
   //For Java > 8
   "javax.xml.bind" % "jaxb-api" % "2.3.1",
@@ -80,7 +83,8 @@ libraryDependencies ++= Seq(
   "javax.el" % "javax.el-api" % "3.0.0",
   "org.glassfish" % "javax.el" % "3.0.0"
 
-) ++ guiceDeps //For Play 2.6 & JDK9
+
+) .map(_.exclude("*", "slf4j-log4j12")) ++ guiceDeps //For Play 2.6 & JDK9
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/",
   "Spring Framework Security" at "https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto")
