@@ -106,7 +106,7 @@ hadatac
     		path_data_dict=/hadatac/data_dictionary/
     		path_download=/hadatac/working_csv/ #TODO - Remove this is not used in latest code
     		path_working=/hadatac/working_csv/
-    		path_tmp=/hadataf/tmp/
+    		path_tmp=/hadatac/tmp/
     		path_logs=/hadatac/logs/
     		auto=on
 
