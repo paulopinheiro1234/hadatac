@@ -317,9 +317,12 @@ public class Application extends Controller {
 
     public void formIndex(Http.Request request, SysUser sysUserValue){
         sysUser = sysUserValue;
-        formIndex(request);
-    }
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.HhearUser.userRedirection")));
+//ToDo  add redirected url
+        else
+            formIndex(request);
 
+    }
     private SysUser getSysUser(){return sysUser;}
     private void setSysUser(SysUser sysUserNew){ sysUser=sysUserNew;}
 
