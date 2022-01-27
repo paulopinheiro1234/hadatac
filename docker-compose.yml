@@ -35,8 +35,7 @@ services:
             - "8080:8080"
         restart: always
         environment:
-            JAVA_XMS: 512m
-            JAVA_XMX: 4g
+            JAVA_OPTS: -Xms128m -Xmx2g
         volumes:
             - hadatac-blazegraph:/var/lib/jetty
 #            - /path in host server/blazegraph/bigdata.jnl:/var/lib/jetty/bigdata.jnl # Uncomment this option to use external binding
@@ -54,22 +53,22 @@ services:
                 aliases:
                     - hadatac
         environment:
-            JAVA_XMS: 2g
-            JAVA_XMX: 12g
+            JAVA_OPTS: -Xms128m -Xmx12g
         volumes:
             # Creates a volume to store the various csv files. This allows the data
             #   to be persisted when the container is removed or when Hadatac is rebuilt.
             # Example command: docker cp <filename> hadatac:/root/app/csvs/unprocessed_csv
 
             # Comment out this option to use external binding
-            - hadatac-csvs:/root/app/csvs
+            - hadatac-csvs:/hadatac/csvs
 #            - /Users/kandws01/Documents/merge3/local:/root/app/csvs  # Uncomment this option to use external binding
             # Creates a volume for the config files. This way configuration file changes
             #   are persisted when the container is removed or rebuilt.
 
             # Comment out this option to use external binding
-            - hadatac-conf:/root/app/conf
+            - hadatac-conf:/hadatac/conf
 #            - /path in host server/conf:/root/app/conf # Uncomment this option to use external binding
+            - /var/log/hadatac:/hadatac/logs
         links:
             - blazegraph
             - solr
