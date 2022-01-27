@@ -20,10 +20,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.console.views.html.annotator.annotation_log;
 import org.hadatac.console.views.html.annotator.assignOption;
-import org.hadatac.entity.pojo.Alignment;
-import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.User;
+import org.hadatac.entity.pojo.*;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
@@ -209,15 +206,17 @@ public class Downloader extends Controller {
         return 0;
     }
 
-    public static int generateCSVFileBySubjectAlignment(List<Measurement> measurements,
-                                                        String facets, String ownerEmail, String categoricalOption, boolean keepSameValue) {
+    public static int generateCSVFileBySubjectAlignment(String ownerUri, String facets, String ownerEmail,
+                                                        String categoricalOption, boolean keepSameValue,
+                                                        ColumnMapping columnMapping) {
+
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
         String fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
 
         // will use the user email address as the directory
-        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "download/"+ ownerEmail, ownerEmail, DataFile.CREATING);
+        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "/" + DataFile.DS_GENERATION + "/"+ ownerEmail, ownerEmail, DataFile.CREATING);
         dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
         dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
         dataFile.save();
@@ -227,7 +226,7 @@ public class Downloader extends Controller {
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
 
-        Measurement.outputAsCSVBySubjectAlignment(measurements, file, dataFile.getId(), categoricalOption, keepSameValue);
+        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), categoricalOption, keepSameValue, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;

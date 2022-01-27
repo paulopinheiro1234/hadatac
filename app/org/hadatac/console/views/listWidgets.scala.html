@@ -1,6 +1,7 @@
 @import org.hadatac.console.models.SignUp
 @import org.hadatac.console.providers.MyUsernamePasswordAuthProvider
 @import play.mvc.Http.Request
+@import helper._
 @(widgets: Seq[SignUp], form: Form[MyUsernamePasswordAuthProvider])(implicit request: Request, messages: play.i18n.Messages)
 
 @main("Signup","signUp","") {
@@ -14,17 +15,15 @@
 
     @* Flash shows updates to a page *@
     @request.flash.asScala().data.map { case (name, value) =>
-    <div class="@name">@value</div>
+        @if(value.contains("match")){
+            <div class="@name"><font color="Red">@value</font></div>
+            <meta http-equiv="refresh" content="2;url=@org.hadatac.console.controllers.routes.WidgetController.listWidgets()" />
+        } else{
+            <div class="@name" color><font color="Red">Mandatory field empty or null -  @value.substring(value.indexOf("(")+1,value.indexOf(","))</font></div>
+            <meta http-equiv="refresh" content="2;url=@org.hadatac.console.controllers.routes.WidgetController.listWidgets()" />
+    }
     }
 
-    @* Global errors are not tied to any particular form field *@
-    @if(form.hasGlobalErrors) {
-        @form.globalErrors.asScala.map { error: play.data.validation.ValidationError =>
-            <div>
-                @error.key: @error.message
-            </div>
-        }
-    }
     <div id="signup" class="row">
     <div class="col-xs-6 col-xs-offset-1 col-sm-4">
     @helper.form(org.hadatac.console.controllers.routes.Signup.createUser) {
