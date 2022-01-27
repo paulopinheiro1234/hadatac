@@ -146,4 +146,21 @@ public class TreeNode {
                 ind + " </ul>");
     }
 
+    public String toString() {
+      return toString(0);
+    }
+
+    public String toString(int depth) {
+      String base = "";
+      for(int i = 0; i < depth; i++){
+         base += "\t";
+      }
+      base += this.name + "\n";
+
+      for(TreeNode c : children){
+         base += c.toString(depth + 1) + "\n";
+      }
+
+      return base;
+    }
 }

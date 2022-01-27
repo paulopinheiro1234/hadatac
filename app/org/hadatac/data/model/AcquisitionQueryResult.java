@@ -33,6 +33,10 @@ public class AcquisitionQueryResult {
         return documents;
     }
 
+    public void clearDocument() {
+        documents.clear();
+    }
+
     public void addDocument(Measurement doc) {
         documents.add(doc);
     }

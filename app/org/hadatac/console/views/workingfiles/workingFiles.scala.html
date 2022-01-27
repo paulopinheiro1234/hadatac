@@ -134,16 +134,15 @@
 
 
     <h4>Current Working Files Folder: <font color="Green">
-        @(if(dir.indexOf("/download")>=0) {
-            dir.substring(dir.indexOf("/download"));
-        } else { "/"; })</font></h4>
+        @dir
+     </font></h4>
 
     <form id="fileListForm" method="post">
     @if(!workingFiles.isEmpty()) {
         <label><input type="checkbox" id="select_all"> Select All</label>
         <button class="btn btn-primary btn-sm" id="move_selection" style="display:none;">Move Selection</button>
         <button class="btn btn-primary btn-sm" id="delete_selection" style="display:none;" onclick="return confirm('Are you sure to delete?')">Delete Selection</button>
-        <!-- <button class="btn btn-primary btn-sm" id="download_selection" role="button" style="display:none;">Download Selection</button> -->   
+        <!-- <button class="btn btn-primary btn-sm" id="download_selection" role="button" style="display:none;">Download Selection</button> -->
     }
  	<table class="table" id="download_files">
     <thead>
@@ -202,7 +201,7 @@
                     }
                 }
                 }
-                
+
                 @if(file.getAllowEditing()) {
                 @if(file.getFileName().startsWith("DD") || file.getFileName().startsWith("dd")){
                     <a href="@org.hadatac.console.controllers.fileviewer.routes.DDEditor.index(file.getId(), true, dir)" class="btn btn-xs btn-primary" role="button" id="edit">Edit DD</a>
@@ -221,15 +220,15 @@
                 @if(file.getAllowMoving()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.moveDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="move">Move</a>
                 } *@
-                
+
                 @if(file.getAllowDeleting()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="delete" onclick="return confirm('Are you sure to delete?')">Delete</a>
                 }
-                
+
                 @if(file.getAllowSharing()) {
                 <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.shareDataFile(dir, file.getId())" class="btn btn-xs btn-primary" role="button" id="share">Share</a>
                 }
-                
+
 				@*
                 @if(bAdmin) {
                     <a href="@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.assignFileOwner(dir, file.getOwnerEmail(), file.getId())" class="btn btn-xs btn-primary" role="button">Assign Owner</a>
@@ -258,7 +257,7 @@
 					}
 				}
 				*@
-				
+
 				@if(file.getAllowVerifying()) {
                 @if(file.getFileName().startsWith("DPL-") || file.getFileName().startsWith("STD-") ||
                     file.getFileName().startsWith("SSD-") || file.getFileName().startsWith("SDD-") ||
@@ -287,15 +286,15 @@
 	$("#select_all").change(function() {
         $("tr input:checkbox").not(this).prop("checked", this.checked);
     });
-    
+
     $("#move_selection").click(function() {
         $("#fileListForm").attr("action", "@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.moveDataFiles(dir)");
     });
-    
+
     $("#delete_selection").click(function() {
         $("#fileListForm").attr("action", "@org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.deleteDataFiles(dir)");
     });
-	
+
 	$("#fileListForm").submit(function(eventObj) {
 	   var fileIds = [];
 	   $("td input:checkbox").each(function () {
@@ -303,14 +302,14 @@
 	           fileIds.push($(this).attr("id"));
 	       }
        });
-	   
+
 	   $('<input />').attr('type', 'hidden')
                .attr("name", "fileIds")
                .attr("value", fileIds)
                .appendTo(this);
        return true;
     });
-    
+
     $("input:checkbox").change(function() {
         var numSelected = 0;
         $("td input:checkbox").each(function () {
@@ -318,7 +317,7 @@
                 numSelected++;
             }
         });
-       
+
         if (numSelected > 0) {
             $('#move_selection').show();
             $('#delete_selection').show();
@@ -328,7 +327,7 @@
         }
         return true;
     });
-	
+
     var options = [];
 
     $('#study-filter a').on('click', function(event) {
