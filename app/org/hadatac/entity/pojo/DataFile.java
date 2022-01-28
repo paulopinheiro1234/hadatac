@@ -46,11 +46,14 @@ public class DataFile implements Cloneable {
     public static final String CREATING = "CREATING";
     public static final String CREATED 	= "CREATED";
     public static final String DELETED  = "DELETED";
-    
+
     // Process status for SDD generator
     public static final String DD_UNPROCESSED = "DD_UNPROCESSED";
     public static final String DD_PROCESSED = "DD_PROCESSED";
     public static final String DD_FREEZED = "DD_FREEZED";
+
+    // constant used for dataset generation
+    public static final String DS_GENERATION = "download";
 
     @Field("id")
     private String id;
@@ -88,11 +91,11 @@ public class DataFile implements Cloneable {
     private List<String> wasDerivedFrom;
     @Field("log_str")
     private String log = "";
-    
+
     private AnnotationLogger logger = null;
     private RecordFile recordFile = null;
     private File file = null;
-    
+
     // Permissible actions depending on user
     private boolean allowViewing = false;
     private boolean allowEditing = false;
@@ -109,7 +112,7 @@ public class DataFile implements Cloneable {
         this.fileName = fileName;
         logger = new AnnotationLogger(this);
     }
-    
+
     public boolean attachFile(File file) {
         RecordFile recordFile = null;
         if (file.getName().endsWith(".csv")) {
@@ -121,13 +124,13 @@ public class DataFile implements Cloneable {
                     "[ERROR] Unknown file format: %s", file.getName())));
             return false;
         }
-        
+
         setRecordFile(recordFile);
         return true;
     }
-    
+
     public Object clone()throws CloneNotSupportedException {
-        return (DataFile)super.clone();  
+        return (DataFile)super.clone();
     }
 
     @Override
@@ -142,76 +145,76 @@ public class DataFile implements Cloneable {
         }
         return false;
     }
-    
+
     public boolean getAllowViewing() {
         return allowViewing;
     }
     public void setAllowViewing(boolean allowViewing) {
         this.allowViewing = allowViewing;
     }
-    
+
     public boolean getAllowEditing() {
         return allowEditing;
     }
     public void setAllowEditing(boolean allowEditing) {
         this.allowEditing = allowEditing;
     }
-    
+
     public boolean getAllowRenaming() {
         return allowRenaming;
     }
     public void setAllowRenaming(boolean allowRenaming) {
         this.allowRenaming = allowRenaming;
     }
-    
+
     public boolean getAllowMoving() {
         return allowMoving;
     }
     public void setAllowMoving(boolean allowMoving) {
         this.allowMoving = allowMoving;
     }
-    
+
     public boolean getAllowDeleting() {
         return allowDeleting;
     }
     public void setAllowDeleting(boolean allowDeleting) {
         this.allowDeleting = allowDeleting;
     }
-    
+
     public boolean getAllowSharing() {
         return allowSharing;
     }
     public void setAllowSharing(boolean allowSharing) {
         this.allowSharing = allowSharing;
     }
-    
+
     public boolean getAllowDownloading() {
         return allowDownloading;
     }
     public void setAllowDownloading(boolean allowDownloading) {
         this.allowDownloading = allowDownloading;
     }
-    
+
     public boolean getAllowIngesting() {
         return allowIngesting;
     }
     public void setAllowIngesting(boolean allowIngesting) {
         this.allowIngesting = allowIngesting;
     }
-    
+
     public boolean getAllowVerifying() {
         return allowVerifying;
     }
     public void setAllowVerifying(boolean allowVerifying) {
         this.allowVerifying = allowVerifying;
     }
-    
+
     public static void updatePermission(List<DataFile> dataFiles, String userEmail) {
         for (DataFile dataFile : dataFiles) {
             dataFile.updatePermissionByUserEmail(userEmail);
         }
     }
-    
+
     public void updatePermissionByUserEmail(String userEmail) {
         if (getOwnerEmail().equals(userEmail)) {
             setAllowViewing(true);
@@ -232,28 +235,28 @@ public class DataFile implements Cloneable {
             setAllowDownloading(true);
         }
     }
-    
+
     public String getId() {
         return id;
     }
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getViewableId() {
         return viewableId;
     }
     public void setViewableId(String viewableId) {
         this.viewableId = viewableId;
     }
-    
+
     public String getEditableId() {
         return editableId;
     }
     public void setEditableId(String editableId) {
         this.editableId = editableId;
     }
-    
+
     public String getAbsolutePath() {
         if (Arrays.asList(UNPROCESSED, FREEZED).contains(getStatus())) {
             return Paths.get(ConfigProp.getPathUnproc(), getDir(), getStorageFileName()).toString();
@@ -266,26 +269,26 @@ public class DataFile implements Cloneable {
         } else if (Arrays.asList(DD_UNPROCESSED, DD_PROCESSED, DD_FREEZED).contains(getStatus())) {
             return Paths.get(ConfigProp.getPathDataDictionary(), getDir(), getStorageFileName()).toString();
         }
-        
+
         return "";
     }
-    
+
     public static String getMediaUrl(String filename) {
     	if (filename == null || !filename.startsWith("file:///media/")) {
     		return "";
     	}
-    	return ConfigFactory.load().getString("hadatac.console.host") + 
-    			org.hadatac.console.controllers.routes.Portal.index().url() + 
+    	return ConfigFactory.load().getString("hadatac.console.host") +
+    			org.hadatac.console.controllers.routes.Portal.index().url() +
     			filename.replace("file:///", "");
     }
-    
+
     public AnnotationLogger getLogger() {
         return logger;
     }
     public void setLogger(AnnotationLogger logger) {
         this.logger = logger;
     }
-    
+
     public RecordFile getRecordFile() {
         return recordFile;
     }
@@ -293,15 +296,15 @@ public class DataFile implements Cloneable {
         this.recordFile = recordFile;
         this.file = recordFile.getFile();
     }
-    
+
     public File getFile() {
         return file;
     }
-    
+
     public String getBaseName() {
         return FilenameUtils.getBaseName(fileName);
     }
-    
+
     public String getFileExtention() {
         return FilenameUtils.getExtension(fileName);
     }
@@ -312,7 +315,7 @@ public class DataFile implements Cloneable {
     public void setOwnerEmail(String ownerEmail) {
         this.ownerEmail = ownerEmail;
     }
-    
+
     public List<String> getViewerEmails() {
         return viewerEmails;
     }
@@ -329,7 +332,7 @@ public class DataFile implements Cloneable {
             viewerEmails.remove(viewerEmail);
         }
     }
-    
+
     public List<String> getEditorEmails() {
         return editorEmails;
     }
@@ -374,7 +377,7 @@ public class DataFile implements Cloneable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    
+
     public String getDir() {
         return dir;
     }
@@ -385,24 +388,24 @@ public class DataFile implements Cloneable {
         }
         this.dir = dir;
     }
-    
+
     public String getPureFileName() {
         return Paths.get(fileName).getFileName().toString();
     }
-    
+
     public String getStorageFileName() {
         if (FilenameUtils.getExtension(fileName).isEmpty()) {
             return fileName;
         }
-        
-        return FilenameUtils.getBaseName(fileName) + "_" + id 
+
+        return FilenameUtils.getBaseName(fileName) + "_" + id
                 + "." + FilenameUtils.getExtension(fileName);
     }
 
     public String getStatus() {
         return status;
     }
-    
+
     public boolean isMediaFile() {
     	System.out.println("isMediaFile: [" + fileName + "]   status: [" + status +"]");
     	if (fileName == null || fileName.isEmpty()) {
@@ -413,7 +416,7 @@ public class DataFile implements Cloneable {
         		 fileName.endsWith(".jpeg") || fileName.endsWith(".JPEG") ||
         		 fileName.endsWith(".pdf") || fileName.endsWith(".PDF"));
     }
-    
+
     public void setStatus(String status) {
         this.status = status;
     }
@@ -445,7 +448,7 @@ public class DataFile implements Cloneable {
     public void setLastProcessTime(String lastProcessTime) {
         this.lastProcessTime = lastProcessTime;
     }
-    
+
     public List<String> getWasDerivedFrom() {
         return wasDerivedFrom;
     }
@@ -462,7 +465,7 @@ public class DataFile implements Cloneable {
             wasDerivedFrom.remove(wasDerivedFromInd);
         }
     }
-    
+
     public String getLog() {
         return getLogger().getLog();
     }
@@ -473,7 +476,7 @@ public class DataFile implements Cloneable {
 
     public int save() {
         log = getLogger().getLog();
-        
+
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
@@ -492,7 +495,7 @@ public class DataFile implements Cloneable {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
-            
+
             UpdateResponse response = solr.deleteById(getId());
             solr.commit();
             solr.close();
@@ -507,12 +510,12 @@ public class DataFile implements Cloneable {
 
         return -1;
     }
-    
+
     public void freeze() {
         setStatus(FREEZED);
         save();
     }
-    
+
     public void resetForUnprocessed() {
         setStatus(DataFile.UNPROCESSED);
         getLogger().resetLog();
@@ -551,7 +554,7 @@ public class DataFile implements Cloneable {
         }
 
         dataFile.save();
-        
+
         return dataFile;
     }
 
@@ -650,21 +653,21 @@ public class DataFile implements Cloneable {
     	String[] tokens = path.split("/");
     	return tokens[tokens.length - 1];
     }
-    
+
     public static List<DataFile> findByStatus(String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"");
         query.set("rows", "10000000");
         return findByQuery(query);
     }
-    
+
     public static int totalByStatus(String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"");
         query.set("rows", "10000000");
         return totalByQuery(query);
     }
-    
+
     public static List<DataFile> findByMultiStatus(List<String> status) {
         SolrQuery query = new SolrQuery();
         query.set("q", String.join(" OR ", status.stream()
@@ -673,7 +676,7 @@ public class DataFile implements Cloneable {
         query.set("rows", "10000000");
         return findByQuery(query);
     }
-    
+
     public static List<DataFile> findByDataAcquisition(String dataAcquisitionUri) {
     	/*
     	 * this is a hack. acquisition_uri_str is supposed to be the full uri
@@ -684,7 +687,7 @@ public class DataFile implements Cloneable {
         query.set("rows", "10000000");
         return findByQuery(query);
     }
-    
+
     public static int totalByMultiStatus(List<String> status) {
         SolrQuery query = new SolrQuery();
         query.set("q", String.join(" OR ", status.stream()
@@ -693,8 +696,8 @@ public class DataFile implements Cloneable {
         query.set("rows", "10000000");
         return totalByQuery(query);
     }
-    
-    public static DataFile findByIdAndEmail(String id, String ownerEmail) {        
+
+    public static DataFile findByIdAndEmail(String id, String ownerEmail) {
         SolrQuery query = new SolrQuery();
         if (null == ownerEmail) {
             query.set("q", "id:\"" + id + "\"");
@@ -710,7 +713,7 @@ public class DataFile implements Cloneable {
 
         return null;
     }
-    
+
     public static DataFile findByIdAndStatus(String id, String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"" + " AND " + "id:\"" + id + "\"");
@@ -723,7 +726,7 @@ public class DataFile implements Cloneable {
 
         return null;
     }
-    
+
     public static DataFile findByNameAndStatus(String fileName, String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "status_str:\"" + status + "\"" + " AND " + "file_name_str:\"" + fileName + "\"");
@@ -736,8 +739,8 @@ public class DataFile implements Cloneable {
 
         return null;
     }
-    
-    public static DataFile findByIdAndOwnerEmailAndStatus(String id, String ownerEmail, String status) {        
+
+    public static DataFile findByIdAndOwnerEmailAndStatus(String id, String ownerEmail, String status) {
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "status_str:\"" + status + "\"" + " AND " + "id:\"" + id + "\"");
         query.set("rows", "10000000");
@@ -749,7 +752,7 @@ public class DataFile implements Cloneable {
 
         return null;
     }
-    
+
     public static DataFile findByViewableId(String id) {
         SolrQuery query = new SolrQuery();
         query.set("q", "viewable_id_str:\"" + id + "\"");
@@ -762,7 +765,7 @@ public class DataFile implements Cloneable {
 
         return null;
     }
-    
+
     public static DataFile findByEditableId(String id) {
         SolrQuery query = new SolrQuery();
         query.set("q", "editable_id_str:\"" + id + "\"");
@@ -798,44 +801,44 @@ public class DataFile implements Cloneable {
         }
         return false;
     }
-    
+
     public static DataFile find(String fileName, String dir, List<DataFile> pool) {
         for (DataFile dataFile : pool) {
-            if (dataFile.getPureFileName().equals(fileName) 
+            if (dataFile.getPureFileName().equals(fileName)
                     && dataFile.getDir().equals(dir)) {
                 return dataFile;
             }
         }
-        
+
         return null;
     }
 
-    public static void includeUnrecognizedFiles(String curPath, String basePath, 
+    public static void includeUnrecognizedFiles(String curPath, String basePath,
             List<DataFile> dataFiles, String ownerEmail, String defaultStatus) {
         File folder = new File(curPath);
         if (!folder.exists()) {
             return;
         }
-        
+
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() 
+            if (listOfFiles[i].isFile()
                     && hasValidExtension(listOfFiles[i].getName())
-                    && !listOfFiles[i].getName().startsWith(".") 
+                    && !listOfFiles[i].getName().startsWith(".")
                     && !search(listOfFiles[i].getName(), basePath, dataFiles)) {
                 DataFile dataFile = find(listOfFiles[i].getName(), basePath, dataFiles);
                 if (null == dataFile) {
                     dataFile = DataFile.create(listOfFiles[i].getName(), basePath, ownerEmail, defaultStatus);
                 }
-                
+
                 String originalPath = Paths.get(curPath, dataFile.getPureFileName()).toString();
                 File file = new File(originalPath);
                 String newPath = originalPath.replace(
-                        "/" + dataFile.getPureFileName(), 
+                        "/" + dataFile.getPureFileName(),
                         "/" + dataFile.getStorageFileName());
                 file.renameTo(new File(newPath));
                 file.delete();
-                
+
                 dataFiles.add(dataFile);
             }
         }
@@ -869,12 +872,12 @@ public class DataFile implements Cloneable {
 
         File[] listOfFiles = folder.listFiles();
         for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() 
+            if (listOfFiles[i].isFile()
                     && FilenameUtils.getExtension(listOfFiles[i].getName()).equals(ext)) {
                 results.add(listOfFiles[i]);
             }
         }
-        
+
         return results;
     }
 
@@ -915,7 +918,7 @@ public class DataFile implements Cloneable {
                 + "AND ( owner_email_str:\"%s\" OR viewer_email_str_multi:\"%s\" OR editor_email_str_multi:\"%s\" ) "
                 + "AND (status_str:\"%s\" OR status_str:\"%s\")", dir, userEmail, userEmail, userEmail, status, "CREATED"));
         query.set("rows", "10000000");
-        
+
         return findByQuery(query);
     }
 
@@ -924,11 +927,11 @@ public class DataFile implements Cloneable {
         if ( dir.startsWith("/") && !dir.contains(ConfigProp.getPathWorking()) ) {
             dir = dir.substring(1, dir.length());
         }
-        
+
         SolrQuery query = new SolrQuery();
         query.set("q", "dir_str:\"" + dir + "\"" + " AND " + "(status_str:\"" + status + "\" OR status_str:\"CREATED\")");
         query.set("rows", "10000000");
-        
+
         return findByQuery(query);
     }
 
@@ -936,10 +939,10 @@ public class DataFile implements Cloneable {
         if (!dir.exists()) {
             return true;
         }
-        
+
         return dir.listFiles().length == 0;
     }
-    
+
     public static List<String> findFolders(String dir, boolean ignoreEmptyFolders) {
 
         List<String> results = new ArrayList<String>();
@@ -962,55 +965,48 @@ public class DataFile implements Cloneable {
                 }
             }
         }
-        
+
         return results;
     }
 
     @JsonIgnore
     public static TreeNode getHierarchy(String current, String path, boolean justDir) {
-    	if (current == null) {
-    		return null;
-    	}
-    	DataFile dirFile = null;
-    	if (path.equals("")) {
-    		path = current;
-    	} else if (path.equals("/")) {
-    		path = path + current;
-    	} else {
-    		path = path + "/" + current;
-    	}
-    	
-    	System.out.println("path: " + path);
-    	
-		dirFile = new DataFile(path);
-		dirFile.setStatus(DataFile.WORKING);
-		
-		System.out.println("dirFile.getAbsolutePath(): " + dirFile.getAbsolutePath());
-        File fileAux = new File(dirFile.getAbsolutePath());
-        
-        TreeNode node = null;
-        if (fileAux.isDirectory() && !justDir) {
-        	node = new TreeNode("+" + path);
-        } else {
-        	node = new TreeNode(path);
-        }
-        if (fileAux.isDirectory() && fileAux.listFiles() != null) {
-        	File[] children = fileAux.listFiles();
-        	for (File child : children) {
-        		DataFile childDataFile = new DataFile(child.getName());
-        		childDataFile.setStatus(DataFile.WORKING);
-        		if (justDir) {
-        			if (child.isDirectory()) {
-        				node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path, justDir));
-        			}
-        		} else {
-        			node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path, justDir));
-        		}
-        	}
-        }
-        return node;
+      if (current == null) {
+         return null;
+      }
+
+      if (path.equals("")) {
+         path = current;
+      } else if (path.equals("/")) {
+         path = path + current;
+      } else {
+         path = path + "/" + current;
+      }
+
+      String absPath = Paths.get(ConfigProp.getPathWorking(), path).toString();
+      File fileAux = new File(absPath);
+
+      // Generate the new node
+      TreeNode node = null;
+      if (fileAux.isDirectory() && !justDir) { // Directory with modified string
+         node = new TreeNode("+" + path);
+      }
+      else { // Directory or File node created
+         node = new TreeNode(path);
+      }
+
+      // Add directory children
+      if (fileAux.isDirectory() && fileAux.listFiles() != null) {
+         File[] children = fileAux.listFiles();
+         for (File child : children) {
+            DataFile childDataFile = new DataFile(child.getName());
+            childDataFile.setStatus(DataFile.WORKING);
+            node.addChild(DataFile.getHierarchy(childDataFile.getFileName(), path, justDir));
+         }
+      }
+      return node;
     }
-    
+
     public static String getFolderLabel(String folderPath) {
     	if (folderPath == null) {
     		return "";
