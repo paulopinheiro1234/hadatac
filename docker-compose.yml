@@ -61,6 +61,7 @@ services:
 
             # Comment out this option to use external binding
             - hadatac-csvs:/hadatac/csvs
+            - hadatac-working_csv:/hadatac/working_csv
 #            - /Users/kandws01/Documents/merge3/local:/root/app/csvs  # Uncomment this option to use external binding
             # Creates a volume for the config files. This way configuration file changes
             #   are persisted when the container is removed or rebuilt.
@@ -98,6 +99,7 @@ volumes:
     hadatac-solr:
     hadatac-blazegraph:
     hadatac-csvs:
+    hadatac-working_csv:
     hadatac-conf:
 
 networks:
