@@ -1309,8 +1309,8 @@ search box - the end user will not know they are happening.
             for (var item in options.facets) {
                 urlfilters += "facet.field=" + options.facets[item]['field'] + "&";
                 //prompt('options.facets[item][\'size\'] = ' + options.facets[item]['size'] );
-                //var size = options.facets[item]['size'] ? options.facets[item]['size'] : 5;
-                // urlfilters += "f." + options.facets[item]['field'] + ".facet.limit=" + size + "&";
+                var size = options.facets[item]['size'] ? options.facets[item]['size'] : 10000;
+                urlfilters += "f." + options.facets[item]['field'] + ".facet.limit=" + size + "&";
 		var sort = 'count';
 		if (options.facets[item]['order']) {
 		    sort = options.facets[item]['order'];
