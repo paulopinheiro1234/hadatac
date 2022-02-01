@@ -289,7 +289,7 @@ public class Signup {
         }
         String password =RandomStringUtils.randomAlphanumeric(12); // Is this sufficient?
         if(redirectedUser) {
-            System.out.println("Addding random password for redirected user from HHEAR:"+password);
+            System.out.println("Addding random password for redirected user from HHEAR");//+password);
             data.setPassword(password);
             data.setRepeatPassword(password);
         }
@@ -301,7 +301,7 @@ public class Signup {
             String userUri = UserManagement.getUriByEmail(data.getEmail());
             final SysUser newUser = SysUser.create(data, userUri, linkedAccount);
             if (redirectedUser){
-                newUser.setUri("http://hadatac.org/kb/hhear#PER-"+data.getName());
+                newUser.setUri("http://hadatac.org/kb/hhear#PER-"+data.getName().replaceAll("[^a-zA-Z0-9]", "").replaceAll(" ",""));
                 newUser.setEmailValidated(true);
                 newUser.save();
             }
@@ -353,7 +353,7 @@ public class Signup {
 
         Form<UserPreRegistrationForm> userForm = formUser.bindFromRequest(request);
         UserPreRegistrationForm dataUser = userForm.get();
-        dataUser.given_name = data.getName();
+        dataUser.given_name = data.getName().replaceAll("[^a-zA-Z0-9]", "").replaceAll(" ","");
         dataUser.email = data.getEmail();
         String given_name = dataUser.getGivenName();
         String usr_uri = "http://hadatac.org/kb/hhear#PER-"+given_name;

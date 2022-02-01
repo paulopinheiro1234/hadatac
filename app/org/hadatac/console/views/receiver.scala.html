@@ -80,13 +80,14 @@
             }
 
             window.addEventListener('message', function (e) {
-                var obj = JSON.parse(e);
-                // console.log("inside script");
-                // console.log(e.data)
+                var obj = JSON.parse(e.data);
+                // console.log("inside script:"+e.origin);
+                // console.log(e.data);
+                // console.log(obj);
                 // data1 = obj;
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
-                if(e.origin =="@ConfigFactory.load().getString("hadatac.HhearUser.oauth.origin")" && obj.token =="@ConfigFactory.load().getString("hadatac.HhearUser.oauth.tokenUrl")"){
+                if(e.origin =="@ConfigFactory.load().getString("hadatac.HhearUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.HhearUser.oauth.tokenUrl")"){
                     $.ajax({
                         type: 'POST',
                         url: '/hadatac/checkUser/',
