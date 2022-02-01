@@ -372,7 +372,8 @@ public class Signup {
         pred_value_map.put("foaf:mbox", email);
         pred_value_map.put("foaf:homepage", "<" + homepage + ">");
         pred_value_map.put("sio:SIO_000095", group_uri);
-        generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
+        String message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
+        System.out.println("Add to manage users ttl:"+message);
 
     }
 }

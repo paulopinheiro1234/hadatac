@@ -179,6 +179,10 @@ public class Application extends Controller {
     }
 
     public Result loginForm(Http.Request request) throws TechnicalException {
+        //If The user has been redirected from portal to Hadatac. To login we go back to the redirected portal
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.HhearUser.userRedirection")))
+            return redirect(ConfigFactory.load().getString("hadatac.HhearUser.oauth.redirectionUrl"));
+
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         Optional<String> username = request.queryString("username");
         Optional<String> error = request.queryString("error");
@@ -317,10 +321,7 @@ public class Application extends Controller {
 
     public void formIndex(Http.Request request, SysUser sysUserValue){
         sysUser = sysUserValue;
-        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.HhearUser.userRedirection")));
-//ToDo  add redirected url
-        else
-            formIndex(request);
+        formIndex(request);
 
     }
     private SysUser getSysUser(){return sysUser;}
@@ -330,6 +331,5 @@ public class Application extends Controller {
         setSysUser(null);
         return centralLogoutController.logout(request);
     }
-
 
 }
