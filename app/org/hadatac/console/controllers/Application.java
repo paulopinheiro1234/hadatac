@@ -180,8 +180,8 @@ public class Application extends Controller {
 
     public Result loginForm(Http.Request request) throws TechnicalException {
         //If The user has been redirected from portal to Hadatac. To login we go back to the redirected portal
-        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.HhearUser.userRedirection")))
-            return redirect(ConfigFactory.load().getString("hadatac.HhearUser.oauth.redirectionUrl"));
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")))
+            return redirect(ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionUrl"));
 
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         Optional<String> username = request.queryString("username");

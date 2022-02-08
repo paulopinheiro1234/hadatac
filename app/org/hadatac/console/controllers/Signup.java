@@ -289,7 +289,7 @@ public class Signup {
         }
         String password =RandomStringUtils.randomAlphanumeric(12); // Is this sufficient?
         if(redirectedUser) {
-            System.out.println("Addding random password for redirected user from HHEAR");//+password);
+            System.out.println("Addding random password for redirected user from Third party");//+password);
             data.setPassword(password);
             data.setRepeatPassword(password);
         }
@@ -320,7 +320,7 @@ public class Signup {
     public Result checkUserExists(Http.Request request) throws TechnicalException {
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
-            System.out.println("Redirected from HHEAR Portal");
+            System.out.println("Redirected from Third party Portal:"+request.host());
             if (SysUser.findByEmail(formData.get().getEmail()) == null && !formData.get().getEmail().isEmpty()) {
                 System.out.println("User Does not exist, Signing up");
                 MyUsernamePasswordAuthProvider data = formData.get();
@@ -333,7 +333,7 @@ public class Signup {
 //            SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
 //            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
 //            test.validate(new UsernamePasswordCredentials(formData.get().getEmail(), formData.get().getPassword()), context);
-            System.out.println("Logging in user redirected from HHEAR ");
+            System.out.println("Logging in user redirected from Third party ");
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
             application.formIndex(request,user);
             return ok ("/protected/index.html/"+user.getEmail());
@@ -342,7 +342,7 @@ public class Signup {
     }
 
     private void addUsertoManageUsers (Http.Request request, MyUsernamePasswordAuthProvider data ) {
-        System.out.println("Adding HHEAR user to blazegraph...");
+        System.out.println("Adding Third party user to blazegraph...");
         int mode = Feedback.WEB;
         String oper = "load";
         PermissionsContext rdf = new PermissionsContext(

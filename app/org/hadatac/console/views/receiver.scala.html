@@ -87,7 +87,7 @@
                 // data1 = obj;
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
-                if(e.origin =="@ConfigFactory.load().getString("hadatac.HhearUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.HhearUser.oauth.tokenUrl")"){
+                if(e.origin =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.tokenUrl")"){
                     $.ajax({
                         type: 'POST',
                         url: '/hadatac/checkUser/',
