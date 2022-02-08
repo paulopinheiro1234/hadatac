@@ -336,9 +336,57 @@ public class DataAcquisitionSearch extends Controller {
         }
 
         promiseOfResult.whenComplete(
-                (result, exeception) -> {
+                (result, exception) -> {
                     log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
                 });
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index_datasetGeneration("/", "/", false));
+    }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result downloadSummarization(Http.Request request) {
+        String ownerUri = getOwnerUri(request);
+        String email = getUserEmail(request);
+
+        String facets = "";
+        String nonCategoricalVariables = "";
+
+        List<String> selectedFields = new LinkedList<String>();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
+        if (name_map != null) {
+            if (name_map.get("facets") != null) {
+                facets = name_map.get("facets")[0];
+            }
+            if (name_map.get("selNonCatVariable") != null) {
+                nonCategoricalVariables = name_map.get("selNonCatVariable")[0].toString();
+            }
+        }
+
+        long startTime = System.currentTimeMillis();
+        // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
+        AcquisitionQueryResult results = null;
+        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis() - startTime) + "ms to finish");
+
+        final String finalFacets = facets;
+        final String categoricalOption = nonCategoricalVariables;
+
+        CompletionStage<Integer> promiseOfResult = null;
+        long currentTime = System.currentTimeMillis();
+
+        promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySummarization(
+            ownerUri, finalFacets, email, categoricalOption, null),
+            databaseExecutionContext);
+
+        promiseOfResult.whenComplete(
+            (result, exception) -> {
+                log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
+            });
 
         try {
             Thread.sleep(100);
@@ -381,6 +429,11 @@ public class DataAcquisitionSearch extends Controller {
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadAlignment(Http.Request request) {
         return downloadAlignment(request);
+    }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postDownloadSummarization(Http.Request request) {
+        return downloadSummarization(request);
     }
 
     private static void printMemoryStats() {

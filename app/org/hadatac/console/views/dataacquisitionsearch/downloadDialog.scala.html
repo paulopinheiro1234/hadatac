@@ -2,6 +2,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.models.FacetHandler
 @import org.hadatac.console.controllers.dataacquisitionsearch.Downloader
+@import org.hadatac.entity.pojo.Measurement
 
 @(	page         : Int,
         rows         : Int,
@@ -142,6 +143,41 @@
     </div>
 </div>
 
+<div id="myModalSummarization" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Summarization</h4>
+            </div>
+            <div class="modal-body">
+                <form id="summmarizationDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadSummarization()">
+                    <label for="selNonCatVariable">Handling of Non Categorical Variables:</label>
+                    <select class="form-control" name="selNonCatVariable" id="selNonCatVariable">
+                        <option value="@Measurement.NON_CATG_IGNORE">Ignore non-categorical variables</option>
+                        <option value="@Measurement.NON_CATG_INCLUDE">Summarize values of non-categorical variables</option>
+                        <option value="@Measurement.NON_CATG_CATG">Categorize non-categorical variables</option>
+                    </select>
+                    <br>
+                    <input class="btn btn-info" type="submit" id="submitSummarization" value="Confirm" />
+                </form>
+                <script type="text/javascript">
+                        $("#summarizationDialogForm").submit(function(eventObj) {
+                            $('<input />').attr('type', 'hidden')
+                                    .attr('name', "facets")
+                                    .attr('value', getSelectedFacets())
+                                    .appendTo(this);
+                            return true;
+                        });
+                </script>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -150,8 +186,9 @@
                 <h4 class="modal-title">Dataset Generation</h4>
             </div>
             <div class="modal-body">
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Alignment of Multiple Values per Row</button>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalSummarization" data-dismiss="modal">Summarization of Multiple Values per Row</button>
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalDownload" data-dismiss="modal">One Value per Row</button>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModalAlignment" data-dismiss="modal">Multiple Values per Row</button>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -160,14 +160,29 @@ public class Downloader extends Controller {
     @Secure(authorizers = Constants.DATA_OWNER_ROLE)
     public Result checkCompletion(String fileId) {
 
+        String ALIGNMENT = "object_alignment";
+        String SUMMARIZATION = "summary";
+
+        //System.out.println("checkCompletion: [" + fileId + "]");
+
         Map<String, Object> result = new HashMap<String, Object>();
 
-        if ( fileId == null || fileId.indexOf("object_alignment") < 0 ) {
+        if ( fileId == null ) {
             return ok(Json.toJson(result));
         }
-        if ( fileId.startsWith("object_alignment") == false ) {
-            fileId = fileId.substring(fileId.indexOf("object_alignment"));
+        if (fileId.indexOf(ALIGNMENT) < 0 && fileId.indexOf(SUMMARIZATION) < 0) {
+            return ok(Json.toJson(result));
         }
+
+        if (fileId.indexOf(ALIGNMENT) >= 0 && fileId.startsWith(ALIGNMENT) == false) {
+            fileId = fileId.substring(fileId.indexOf(ALIGNMENT));
+        }
+
+        if (fileId.indexOf(SUMMARIZATION) >= 0 && fileId.startsWith(SUMMARIZATION) == false) {
+            fileId = fileId.substring(fileId.indexOf(SUMMARIZATION));
+        }
+
+        //System.out.println("checkCompletion after adjustment: [" + fileId + "]");
 
         DataFile dataFile = DataFile.findByNameAndStatus(fileId, DataFile.CREATING);
         if ( dataFile == null ) {
@@ -253,4 +268,32 @@ public class Downloader extends Controller {
 
         return 0;
     }
+
+    public static int generateCSVFileBySummarization(String ownerUri, String facets, String ownerEmail,
+                                                        String categoricalOption,
+                                                        ColumnMapping columnMapping) {
+
+        System.out.println("Invoked CSV generation with study summarization ...");
+        System.out.println("Categorical option: [" + categoricalOption + "]");
+        Date date = new Date();
+        String fileName = "summary_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+
+        // will use the user email address as the directory
+        DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "/" + DataFile.DS_GENERATION + "/"+ ownerEmail, ownerEmail, DataFile.CREATING);
+        dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));
+        dataFile.getLogger().addLine(Feedback.println(Feedback.WEB, "Facets: " + facets));
+        dataFile.save();
+        System.out.println("Created summary " + fileName);
+
+        String absolutePath = dataFile.getAbsolutePath();
+        System.out.println("Generated summary file... absolute path = " + absolutePath);
+        File file = new File(absolutePath);
+
+        System.out.println("Calling summarization...");
+        Measurement.outputAsCSVBySummarization(ownerUri, facets, file, dataFile.getId(), categoricalOption, columnMapping);
+        System.out.println("download finished, CSV files are generated...");
+
+        return 0;
+    }
+
 }
