@@ -28,6 +28,7 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.util.Pac4jConstants;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.store.PlaySessionStore;
@@ -50,6 +51,7 @@ import static org.hadatac.console.controllers.triplestore.UserManagement.generat
 import static play.libs.Scala.asScala;
 import static play.mvc.Results.*;
 import static play.shaded.ahc.io.netty.util.internal.SystemPropertyUtil.get;
+import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
 
 
 public class Signup {
@@ -318,6 +320,7 @@ public class Signup {
     // New users Signup and then login
     // Existing users Login
     public Result checkUserExists(Http.Request request) throws TechnicalException {
+        if("false".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) return badRequest("Operation not allowed");
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
             System.out.println("Redirected from Third party Portal:"+request.host());
@@ -328,15 +331,14 @@ public class Signup {
                 //Adding new user to manage Users
                 addUsertoManageUsers(request,data);
             }
+            //Create profile for user trying to login
+            createUserProfile(request,formData.get().getEmail());
 
             //Login user
-//            SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
-//            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-//            test.validate(new UsernamePasswordCredentials(formData.get().getEmail(), formData.get().getPassword()), context);
             System.out.println("Logging in user redirected from Third party ");
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
             application.formIndex(request,user);
-            return ok ("/protected/index.html/"+user.getEmail());
+            return ok ("/protected/index.html/"+user.getEmail()).addingToSession(request ,"userValidated", "yes");
         }
         return badRequest("what happened?");
     }
@@ -374,6 +376,21 @@ public class Signup {
         pred_value_map.put("sio:SIO_000095", group_uri);
         String message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
         System.out.println("Add to manage users ttl:"+message);
+
+    }
+
+    private CommonProfile createUserProfile(Http.Request request,String userName){
+        SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
+        final CommonProfile profile = new CommonProfile();
+        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
+        final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
+        final SysUser sysUser = SysUser.findByEmailSolr(userName);
+        profile.setId(sysUser.getEmail());
+        profile.addAttribute(Pac4jConstants.USERNAME, sysUser.getEmail());
+        profile.setRoles(test.getUserRoles(sysUser));
+        profile.setRemembered(true);
+        profileManager.save(true, profile, true);
+        return profile;
 
     }
 }

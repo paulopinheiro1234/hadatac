@@ -84,6 +84,12 @@ public class Application extends Controller {
     }
 
     public String getUserEmail(Http.Request request) {
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
+            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
+            final ProfileManager<CommonProfile> profileManager = new ProfileManager(context,playSessionStore);
+            final String userEmail =  profileManager.get(true).isEmpty() ? "": profileManager.get(true).get().getUsername();
+            return userEmail;
+        }
         final String userEmail = (getProfile(request) == null) ? "" : getProfile(request).getUsername();
         return userEmail;
     }
