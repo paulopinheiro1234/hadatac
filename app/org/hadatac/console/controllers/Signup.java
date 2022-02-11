@@ -355,10 +355,10 @@ public class Signup {
 
         Form<UserPreRegistrationForm> userForm = formUser.bindFromRequest(request);
         UserPreRegistrationForm dataUser = userForm.get();
-        dataUser.given_name = data.getName().replaceAll("[^a-zA-Z0-9]", "").replaceAll(" ","");
+        dataUser.given_name = data.getName();
         dataUser.email = data.getEmail();
         String given_name = dataUser.getGivenName();
-        String usr_uri = "http://hadatac.org/kb/hhear#PER-"+given_name;
+        String usr_uri = "http://hadatac.org/kb/hhear#PER-"+data.getName().replaceAll("[^a-zA-Z0-9]", "").replaceAll(" ","");
         String family_name = dataUser.getFamilyName();
         String comment = dataUser.getComment();
         String email = dataUser.getEmail();
