@@ -27,6 +27,7 @@ import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.java.Secure;
+import org.pac4j.play.store.PlayCacheSessionStore;
 import org.pac4j.play.store.PlaySessionStore;
 import play.Logger;
 import play.api.libs.mailer.MailerClient;
@@ -55,6 +56,7 @@ public class Application extends Controller {
     @Inject CentralLogoutController centralLogoutController;
     @Inject private MailerClient mailerClient;
     private static SysUser sysUser;
+    private PlayWebContext playWebContext;
 
     private List<CommonProfile> getProfiles(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
@@ -79,15 +81,16 @@ public class Application extends Controller {
     public String getSessionId (Http.Request request){
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
-        System.out.println("sessionId :"+ sessionId);
+//        System.out.println("sessionId :"+ sessionId);
         return sessionId;
     }
 
     public String getUserEmail(Http.Request request) {
         if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
-            final PlayWebContext context = new PlayWebContext(request, playSessionStore);
+            final PlayWebContext context = getPlayWebContext()!=null? getPlayWebContext():new PlayWebContext(request, playSessionStore);
             final ProfileManager<CommonProfile> profileManager = new ProfileManager(context,playSessionStore);
             final String userEmail =  profileManager.get(true).isEmpty() ? "": profileManager.get(true).get().getUsername();
+            System.out.println("getUserEmail:"+userEmail+"\n sessionId:"+playSessionStore.getOrCreateSessionId(context));
             return userEmail;
         }
         final String userEmail = (getProfile(request) == null) ? "" : getProfile(request).getUsername();
@@ -98,7 +101,7 @@ public class Application extends Controller {
 //        getUserEmail(request);
 //        getProfiles(request);
         String userEmail =getUserEmail(request);
-          return ok(protectedIndex.render(userEmail));
+        return ok(protectedIndex.render(userEmail));
     }
 
     private Result notProtectedIndexView(Http.Request request) {
@@ -325,8 +328,11 @@ public class Application extends Controller {
         return ok(portal.render(email));
     }
 
-    public void formIndex(Http.Request request, SysUser sysUserValue){
+    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext){
         sysUser = sysUserValue;
+        playSessionStore = sessionStore;
+        setSessionStore(sessionStore);
+        setPlayWebContext(webContext);
         formIndex(request);
 
     }
@@ -336,6 +342,18 @@ public class Application extends Controller {
     public CompletionStage<Result> logOutUser (Http.Request request){
         setSysUser(null);
         return centralLogoutController.logout(request);
+    }
+    public void setSessionStore ( PlaySessionStore sessionStore){
+        playSessionStore =sessionStore;
+    }
+    public PlaySessionStore getSessionStore (){
+        return  playSessionStore ;
+    }
+    public void setPlayWebContext ( PlayWebContext webContext){
+        playWebContext =webContext;
+    }
+    public PlayWebContext getPlayWebContext (){
+        return  playWebContext ;
     }
 
 }

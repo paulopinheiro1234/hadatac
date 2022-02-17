@@ -79,6 +79,7 @@
                 }
             }
 
+            let count =0;
             window.addEventListener('message', function (e) {
                 var obj = JSON.parse(e.data);
                 // console.log("inside script:"+e.origin);
@@ -87,7 +88,8 @@
                 // data1 = obj;
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
-                if(e.origin =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.tokenUrl")"){
+                count=count+1;
+                if(count.valueOf()<3 && e.origin =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.tokenUrl")"){
                     $.ajax({
                         type: 'POST',
                         url: '/hadatac/checkUser/',

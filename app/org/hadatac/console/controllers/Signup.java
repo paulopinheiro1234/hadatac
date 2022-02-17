@@ -323,7 +323,7 @@ public class Signup {
         if("false".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) return badRequest("Operation not allowed");
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
-            System.out.println("Redirected from Third party Portal:"+request.host());
+            System.out.println("\n Redirected from Third party Portal:"+request.host());
             if (SysUser.findByEmail(formData.get().getEmail()) == null && !formData.get().getEmail().isEmpty()) {
                 System.out.println("User Does not exist, Signing up");
                 MyUsernamePasswordAuthProvider data = formData.get();
@@ -332,12 +332,13 @@ public class Signup {
                 addUsertoManageUsers(request,data);
             }
             //Create profile for user trying to login
-            createUserProfile(request,formData.get().getEmail());
+            final PlayWebContext playWebContext = createUserProfile(request,formData.get().getEmail());
+//            System.out.println("checkUserExists create user profile:"+userEmail+"\n application.getSessionStore()):"+application.getSessionStore().getOrCreateSessionId(playWebContext));
 
             //Login user
-            System.out.println("Logging in user redirected from Third party ");
+            System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
-            application.formIndex(request,user);
+            application.formIndex(request,user,playSessionStore,playWebContext);
             return ok ("/protected/index.html/"+user.getEmail()).addingToSession(request ,"userValidated", "yes");
         }
         return badRequest("what happened?");
@@ -379,18 +380,20 @@ public class Signup {
 
     }
 
-    private CommonProfile createUserProfile(Http.Request request,String userName){
+    private  PlayWebContext createUserProfile(Http.Request request, String userName){
         SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
         final CommonProfile profile = new CommonProfile();
-        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-        final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
+        final PlayWebContext playWebContext = new PlayWebContext(request, playSessionStore);
+        final ProfileManager<CommonProfile> profileManager = new ProfileManager(playWebContext);
         final SysUser sysUser = SysUser.findByEmailSolr(userName);
         profile.setId(sysUser.getEmail());
         profile.addAttribute(Pac4jConstants.USERNAME, sysUser.getEmail());
         profile.setRoles(test.getUserRoles(sysUser));
         profile.setRemembered(true);
         profileManager.save(true, profile, true);
-        return profile;
+//        System.out.println("createUserProfile->getSessionId():"+playSessionStore.getOrCreateSessionId(playWebContext)+"\n\n");
+        application.setSessionStore(playSessionStore);
+        return playWebContext;
 
     }
 }
