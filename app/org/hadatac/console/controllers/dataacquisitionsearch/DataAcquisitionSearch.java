@@ -309,6 +309,8 @@ public class DataAcquisitionSearch extends Controller {
             sameValueSelection = name_map.get("selDupOpt")[0].toString();
         }
 
+        System.out.println("DataAcquisitionSearch.downloadAlignment : facets=[" + facets + "]");
+
         long startTime = System.currentTimeMillis();
         // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
         AcquisitionQueryResult results = null;
@@ -326,7 +328,7 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, categoricalOption, keepSameValue, null),
+                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, keepSameValue, null),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
@@ -355,6 +357,7 @@ public class DataAcquisitionSearch extends Controller {
         String email = getUserEmail(request);
 
         String facets = "";
+        String selSummaryType = "";
         String nonCategoricalVariables = "";
 
         List<String> selectedFields = new LinkedList<String>();
@@ -363,10 +366,16 @@ public class DataAcquisitionSearch extends Controller {
             if (name_map.get("facets") != null) {
                 facets = name_map.get("facets")[0];
             }
+            if (name_map.get("selSummaryType") != null) {
+                selSummaryType = name_map.get("selSummaryType")[0].toString();
+            }
             if (name_map.get("selNonCatVariable") != null) {
                 nonCategoricalVariables = name_map.get("selNonCatVariable")[0].toString();
             }
         }
+
+        System.out.println("DataAcquisitionSearch.downloadSummarization : name_map=[" + name_map.get("facets")[0] + "]");
+        System.out.println("DataAcquisitionSearch.downloadSummarization : facets=[" + facets + "]");
 
         long startTime = System.currentTimeMillis();
         // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
@@ -374,19 +383,34 @@ public class DataAcquisitionSearch extends Controller {
         log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis() - startTime) + "ms to finish");
 
         final String finalFacets = facets;
+        final String summaryType = selSummaryType;
         final String categoricalOption = nonCategoricalVariables;
 
         CompletionStage<Integer> promiseOfResult = null;
         long currentTime = System.currentTimeMillis();
 
-        promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySummarization(
-            ownerUri, finalFacets, email, categoricalOption, null),
-            databaseExecutionContext);
+        if (selSummaryType.equals(Measurement.SUMMARY_TYPE_SUBGROUP)) {
+            // for TYPE_SUBGROUP, keepSameValue is set to 'false'
+            promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
+                    ownerUri, finalFacets, email, summaryType, categoricalOption, false, null),
+                    databaseExecutionContext);
 
-        promiseOfResult.whenComplete(
-            (result, exception) -> {
-                log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
-            });
+            promiseOfResult.whenComplete(
+                    (result, exception) -> {
+                        log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis() - currentTime) + "ms to finish");
+                    });
+
+        } else {
+
+            promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySummarization(
+                    ownerUri, finalFacets, email, summaryType, categoricalOption, null),
+                    databaseExecutionContext);
+
+            promiseOfResult.whenComplete(
+                    (result, exception) -> {
+                        log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis() - currentTime) + "ms to finish");
+                    });
+        }
 
         try {
             Thread.sleep(100);

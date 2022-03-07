@@ -37,6 +37,8 @@ GET     /hadatac/acquisitions/filedownloadalignment    org.hadatac.console.contr
 POST    /hadatac/acquisitions/filedownloadalignment    org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownloadAlignment(request: Request)
 GET     /hadatac/acquisitions/filesummary              org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.downloadSummarization(request: Request)
 POST    /hadatac/acquisitions/filesummary              org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownloadSummarization(request: Request)
+GET     /hadatac/acquisitions/harmonization            org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.index(oper: String, request: Request)
+POST    /hadatac/acquisitions/harmonization            org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.postIndex(oper: String, request: Request)
 GET	    /hadatac/metadataacquisitions/solrsearch       org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
 POST	/hadatac/metadataacquisitions/solrsearch   	   org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
 GET	    /hadatac/dataacquisitionbrowser/solrsearch     org.hadatac.console.http.SolrSearchProxy.getDataAcquisition(request: Request)

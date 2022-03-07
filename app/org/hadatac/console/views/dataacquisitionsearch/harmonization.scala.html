@@ -1,0 +1,257 @@
+@(oper: String,
+        cacheList : List[String],
+        namespaces : List[org.hadatac.utils.NameSpace],
+        userName: String
+)
+
+    @import helper._
+    @import org.hadatac.console.views.html._
+    @import org.hadatac.console.controllers.triplestore._
+    @import org.hadatac.metadata.loader._
+    @import java.net._
+
+    @main("Load Ontologies into Metadata Store","",userName) {
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <style type="text/css">
+                body {
+                    color: #404E67;
+                    background: #F5F7FA;
+                    font-family: 'Open Sans', sans-serif;
+                }
+                .table-wrapper {
+                    width: 700px;
+                    margin: 30px auto;
+                    background: #fff;
+                    padding: 20px;
+                    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+                }
+                .table-title {
+                    padding-bottom: 10px;
+                    margin: 0 0 10px;
+                }
+                .table-title h2 {
+                    margin: 6px 0 0;
+                    font-size: 22px;
+                }
+                .table-title .add-new {
+                    float: right;
+                    height: 30px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-shadow: none;
+                    min-width: 100px;
+                    border-radius: 50px;
+                    line-height: 13px;
+                }
+                .table-title .add-new i {
+                    margin-right: 4px;
+                }
+                table.table {
+                    table-layout: fixed;
+                }
+                table.table tr th, table.table tr td {
+                    border-color: #e9e9e9;
+                }
+                table.table th i {
+                    font-size: 13px;
+                    margin: 0 5px;
+                    cursor: pointer;
+                }
+                table.table th:last-child {
+                    width: 100px;
+                }
+                table.table td a {
+                    cursor: pointer;
+                    display: inline-block;
+                    margin: 0 5px;
+                    min-width: 24px;
+                }
+                table.table td a.add {
+                    color: #27C46B;
+                }
+                table.table td a.edit {
+                    color: #FFC107;
+                }
+                table.table td a.delete {
+                    color: #E34724;
+                }
+                table.table td i {
+                    font-size: 19px;
+                }
+                table.table td a.add i {
+                    font-size: 24px;
+                    margin-right: -1px;
+                    position: relative;
+                    top: 3px;
+                }
+                table.table .form-control {
+                    height: 32px;
+                    line-height: 32px;
+                    box-shadow: none;
+                    border-radius: 2px;
+                }
+                table.table .form-control.error {
+                    border-color: #f50000;
+                }
+                table.table td .add {
+                    display: none;
+                }
+        </style>
+
+        <div class="container-fluid">
+
+            <div class="row">
+
+                <div class="col-md-10 col-md-offset-1">
+                    </br>
+                    <h3>Harmonization Query</h3>
+                    </br>
+                    <div>
+                        <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add new object</button>
+                        <button type="button" class="btn btn-info delete-all"><i class="fa fa-remove"></i> Delete selected objects</button>
+                    </div><br>
+                    <div id="ns-oper">
+                        <a class="btn btn-danger" role="button" id="save-changes" onclick="submitTableAsForm()" disabled>Harmonize</a>
+                    </div>
+                    </br>
+
+                    @if(oper=="init") {
+                        <h4>Current request</h4>
+                        <table id="ns-table" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;" scope="col">#</th>
+                                    <th style="width: 100px;" scope="col">Study</th>
+                                    <th style="width: 300px;" scope="col">Role</th>
+                                    <th style="width: 150px;" scope="col">Entity Type</th>
+                                    <th style="width: 220px;" scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ns-table-body">
+                            @for((ns, i) <- namespaces.zipWithIndex) {
+                                <tr>
+                                    <td style="word-break: break-all;">@(i+1)</td>
+                                    <td style="word-break: break-all;" axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
+                                    <td style="word-break: break-all;" axis="nsName@(i+1)">@ns.getName()</td>
+                                    <td style="word-break: break-all;" axis="nsType@(i+1)">@ns.getType()</td>
+                                    <td style="word-break: break-all;">
+                                        <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+                                        <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        <br>
+                        <div>
+                            <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <script>
+                $(document).ready(function() {
+                    $('[data-toggle="tooltip"]').tooltip();
+                    var actions = $("table td:last-child").html();
+
+                    checkRowCounts();
+
+                    // Append table with add row form on add new button click
+                    $(".add-new").click(function(){
+                        $(this).attr("disabled", "disabled");
+                        var index = $("table tbody tr:last-child").index();
+                        var row = '<tr>' +
+                                '<td>' + (index + 2) + '</td>' +
+                                '<td axis="nsAbbrev' + (index + 2) + '"><input type="text" class="form-control"</td>' +
+                                '<td axis="nsName' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+                                '<td axis="nsType' + (index + 2) + '"><input type="text" class="form-control"></td>' +
+                                '<td>' + actions + '</td>' +
+                                '</tr>';
+                        $("table").append(row);
+                        $("table tbody tr").eq(index + 1).find(".add, .delete").show();
+                        $("table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples-from-remote .reload-triples-from-cache").hide();
+                        $('[data-toggle="tooltip"]').tooltip();
+                    });
+
+                    // Delete all rows on delete all button click
+                    $(".delete-all").click(function(){
+                        $(this).attr("disabled", "disabled");
+                        $("table").children("tbody").remove();
+                        $("#save-changes").removeAttr("disabled");
+                        checkRowCounts();
+                    });
+
+                    // Add row on add button click
+                    $(document).on("click", ".add", function(){
+                        var empty = false;
+                        var input = $(this).parents("tr").find('input[type="text"]');
+                        $(this).parents("tr").find(".error").first().focus();
+                        if(!empty){
+                            input.each(function(){
+                                $(this).parent("td").html($(this).val());
+                            });
+                            $(this).parents("tr").find(".add, .edit").toggle();
+                            $(this).parents("tr").find(".reload-triples-from-remote .reload-triples-from-cache").show();
+                            $(".add-new").removeAttr("disabled");
+                            $("#save-changes").removeAttr("disabled");
+                        }
+                        checkRowCounts();
+                    });
+
+                    // Edit row on edit button click
+                    $(document).on("click", ".edit", function(){
+                        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
+                            $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+                        });
+                        $(this).parents("tr").find(".add, .edit").toggle();
+                        $(".add-new").attr("disabled", "disabled");
+                    });
+
+                    // Delete row on delete button click
+                    $(document).on("click", ".delete", function(){
+                        $(this).parents("tr").remove();
+                        $(".add-new").removeAttr("disabled");
+                        $("#save-changes").removeAttr("disabled");
+                        checkRowCounts();
+                    });
+                });
+
+                function submitTableAsForm() {
+                    var form = document.createElement("form");
+                    form.method = "post";
+                    form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
+                    $("#ns-table-body").find("tr").each(function() {
+                        $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+                            var input = document.createElement("input");
+                            input.type = "text";
+                            input.name = this.axis;
+                            input.value = $(this).html();
+                            form.appendChild(input);
+                        });
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                    $("#save-changes").attr("disabled", "disabled");
+                }
+
+                function checkform() {
+                    if(document.getElementById('upload').value != "") {
+                        document.getElementById('submit-div').style.display = 'inline';
+                    }
+                }
+
+                function checkRowCounts() {
+                    var rows = $('table tbody tr').length;
+                    if (rows == 0) {
+                        $(".delete-all").attr("disabled", "disabled");
+                    } else {
+                        $(".delete-all").removeAttr("disabled");
+                    }
+                }
+        </script>
+    }

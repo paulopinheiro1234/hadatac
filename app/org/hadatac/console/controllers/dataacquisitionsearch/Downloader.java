@@ -222,8 +222,10 @@ public class Downloader extends Controller {
     }
 
     public static int generateCSVFileBySubjectAlignment(String ownerUri, String facets, String ownerEmail,
-                                                        String categoricalOption, boolean keepSameValue,
-                                                        ColumnMapping columnMapping) {
+                                                        String summaryType, String categoricalOption,
+                                                        boolean keepSameValue, ColumnMapping columnMapping) {
+
+        System.out.println("generateCSVFileBySubjectAlignment: facets=[" + facets + "]");
 
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
@@ -241,7 +243,7 @@ public class Downloader extends Controller {
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
 
-        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), categoricalOption, keepSameValue, columnMapping);
+        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, keepSameValue, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;
@@ -270,10 +272,14 @@ public class Downloader extends Controller {
     }
 
     public static int generateCSVFileBySummarization(String ownerUri, String facets, String ownerEmail,
-                                                        String categoricalOption,
+                                                        String summaryType, String categoricalOption,
                                                         ColumnMapping columnMapping) {
 
+        System.out.println("generateCSVFileBySummarization: facets=[" + facets + "]");
+
+
         System.out.println("Invoked CSV generation with study summarization ...");
+        System.out.println("Summary type: [" + summaryType + "]");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
         String fileName = "summary_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
@@ -290,7 +296,7 @@ public class Downloader extends Controller {
         File file = new File(absolutePath);
 
         System.out.println("Calling summarization...");
-        Measurement.outputAsCSVBySummarization(ownerUri, facets, file, dataFile.getId(), categoricalOption, columnMapping);
+        Measurement.outputAsCSVBySummarization(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;

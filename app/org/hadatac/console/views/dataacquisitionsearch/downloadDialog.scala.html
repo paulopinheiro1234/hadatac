@@ -94,18 +94,18 @@
                 <h4 class="modal-title">Alignment</h4>
             </div>
             <div class="modal-body">
-                <form id="alignmentDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadAlignment()">
+                <form id=alignmentDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadAlignment()">
                         <!--label for="selType">Alignment criteria:</label>
 	  <select class="form-control" name="selType" id="selType" onchange="criteriaChange()">
 	    <option value="timestamp">Timestamp</option>
 	    <option value="object">Object</option>
 	  </select-->
-                    <label for="selOC">Alignment type:</label>
+                    <label for="selObjectType">Alignment type:</label>
                     <select class="form-control" name="selObjectType" id="selObjectType">
                         <option value="@Downloader.ALIGNMENT_SUBJECT">BY SUBJECT</option>
                         <option value="@Downloader.ALIGNMENT_TIME">BY TIME</option>
                     </select>
-                    <label for="selCatVal">Categorical Values:</label>
+                    <label for="selCatValue">Categorical Values:</label>
                     <select class="form-control" name="selCatValue" id="selCatValue">
                         <option value="withCodeBook">Use Codes and Generate Code Book</option>
                         <option value="withCodes">Use Codes Without Generating Code Book</option>
@@ -152,6 +152,12 @@
             </div>
             <div class="modal-body">
                 <form id="summmarizationDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadSummarization()">
+                    <label for="selSummaryType">Summarization Type:</label>
+                    <select class="form-control" name="selSummaryType" id="selSummaryType">
+                        <option value="@Measurement.SUMMARY_TYPE_VARIABLE">Variable frequency</option>
+                        <option value="@Measurement.SUMMARY_TYPE_SUBGROUP">Subgroup frequency</option>
+                    </select>
+                    <br>
                     <label for="selNonCatVariable">Handling of Non Categorical Variables:</label>
                     <select class="form-control" name="selNonCatVariable" id="selNonCatVariable">
                         <option value="@Measurement.NON_CATG_IGNORE">Ignore non-categorical variables</option>
