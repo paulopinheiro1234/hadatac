@@ -21,7 +21,7 @@
                 <div id="textTitle" class="col-md-8 col-xs-0">
                     @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
                         <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.shortname")@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.pagetitle")</font></h3>
-                        <script>showText("@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.description")", "textTitle")<a href="mailto:@ConfigFactory.load().getString("hadatac.ThirdPartyUser.contact_email")"></script>
+                        <script>showText("@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.description")", "textTitle")<a href="mailto:@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.contact_email")"></script>
                     } else{
                         <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
                         <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
