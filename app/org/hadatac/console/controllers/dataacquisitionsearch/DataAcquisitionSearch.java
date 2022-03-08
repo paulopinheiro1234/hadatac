@@ -302,11 +302,23 @@ public class DataAcquisitionSearch extends Controller {
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         if (name_map != null) {
-            facets = name_map.get("facets")[0];
-            objectType = name_map.get("selObjectType")[0].toString();
-            categoricalValues = name_map.get("selCatValue")[0].toString();
-            timeResolution = name_map.get("selTimeRes")[0].toString();
-            sameValueSelection = name_map.get("selDupOpt")[0].toString();
+            if (name_map.get("facets") != null) {
+                facets = name_map.get("facets")[0];
+            } else {
+                System.out.println("DataAcquisitionSearch.downloadAlignment - Warning: missing facets information in form.");
+            }
+            if (name_map.get("selObjectType") != null) {
+                objectType = name_map.get("selObjectType")[0].toString();
+            }
+            if (name_map.get("setCatValue") != null) {
+                categoricalValues = name_map.get("selCatValue")[0].toString();
+            }
+            if (name_map.get("selTimeRes") != null) {
+                timeResolution = name_map.get("selTimeRes")[0].toString();
+            }
+            if (name_map.get("selDupOpt") != null) {
+                sameValueSelection = name_map.get("selDupOpt")[0].toString();
+            }
         }
 
         System.out.println("DataAcquisitionSearch.downloadAlignment : facets=[" + facets + "]");
@@ -314,17 +326,16 @@ public class DataAcquisitionSearch extends Controller {
         long startTime = System.currentTimeMillis();
         // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
         AcquisitionQueryResult results = null;
-        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
+        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis() - startTime) + "ms to finish");
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
-        final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection)? false : true;
+        final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection) ? false : true;
         //System.out.println("Object type inside alignment: " + objectType);
 
         CompletionStage<Integer> promiseOfResult = null;
         long currentTime = System.currentTimeMillis();
-
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
@@ -374,7 +385,7 @@ public class DataAcquisitionSearch extends Controller {
             }
         }
 
-        System.out.println("DataAcquisitionSearch.downloadSummarization : name_map=[" + name_map.get("facets")[0] + "]");
+        //System.out.println("DataAcquisitionSearch.downloadSummarization : name_map=[" + name_map.get("facets")[0] + "]");
         System.out.println("DataAcquisitionSearch.downloadSummarization : facets=[" + facets + "]");
 
         long startTime = System.currentTimeMillis();
