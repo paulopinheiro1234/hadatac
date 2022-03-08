@@ -30,35 +30,48 @@ public class AnnotatedGroup {
 	private static List<AnnotatedValue> getGroupFromMap(Map<String, List<AnnotatedValue>> valueMap, Map<String, Variable> varMap, Alignment alignment) {
 		List<AnnotatedValue> newGroup = new ArrayList<AnnotatedValue>();
 
-		//System.out.println("In AnnotatedGroup: new group size BEFORE [" + newGroup.size() + "]");
-		// add to the group values from the list that have both valueClass and variable
-		for (Map.Entry<String,List<AnnotatedValue>> entry : valueMap.entrySet()) {
-			for (AnnotatedValue av : entry.getValue()) {
+		try {
+			//System.out.println("In AnnotatedGroup: new group size BEFORE [" + newGroup.size() + "]");
+			// add to the group values from the list that have both valueClass and variable
+			for (Map.Entry<String, List<AnnotatedValue>> entry : valueMap.entrySet()) {
+				for (AnnotatedValue av : entry.getValue()) {
 
-				//System.out.println("In AnnotatedGroup: key [" + entry.getKey() + "]");
-				//System.out.println("In AnnotatedGroup: value [" + av.getValue() + " , " + av.getValueClass() + "]");
-				// values of categorical variables have valueClass
-				if (av.getValueClass() != null && !av.getValueClass().equals("")) {
+					//System.out.println("In AnnotatedGroup: BEFORE value [" + av.getValue() + " , " + av.getValueClass() + "]");
+					//System.out.println("In AnnotatedGroup: key [" + entry.getKey() + "]");
 					Variable currVar = varMap.get(entry.getKey());
 					if (currVar != null) {
 						//System.out.println("In AnnotatedGroup: variable [" + currVar + "]");
-						String codeLabel =  Measurement.prettyCodeBookLabel(alignment, av.getValueClass());
-						av.setValue(codeLabel);
 						av.setVariable(currVar);
+					}
 
+					/*
+					if (true) {
+						av = CategorizedValue.categorize(av, alignment);
+					}
+					*/
+
+					//System.out.println("In AnnotatedGroup: AFTER value [" + av.getValue() + " , " + av.getValueClass() + "]");
+
+					// values of categorical variables have valueClass
+					if (av.getValueClass() != null && !av.getValueClass().equals("")) {
+						String codeLabel = Measurement.prettyCodeBookLabel(alignment, av.getValueClass());
+						av.setValue(codeLabel);
 						newGroup.add(av);
 					}
 				}
 			}
-		}
 
-		// order the group by the key of associated variable
-		newGroup.sort(new Comparator<AnnotatedValue>() {
-			@Override
-			public int compare(AnnotatedValue v1, AnnotatedValue v2) {
-				return v1.getVariable().getKey().compareTo(v2.getVariable().getKey());
-			}
-		});
+			// order the group by the key of associated variable
+			newGroup.sort(new Comparator<AnnotatedValue>() {
+				@Override
+				public int compare(AnnotatedValue v1, AnnotatedValue v2) {
+					return v1.getVariable().getKey().compareTo(v2.getVariable().getKey());
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		//System.out.println("In AnnotatedGroup: new group size AFTER [" + newGroup.size() + "]");
 		return newGroup;
