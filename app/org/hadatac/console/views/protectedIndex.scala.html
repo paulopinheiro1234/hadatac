@@ -19,8 +19,13 @@
             <div class="row">
                 <div class="col-md-1 col-xs-0"></div>
                 <div id="textTitle" class="col-md-8 col-xs-0">
-                    <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
-                    <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+                    @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
+                        <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.shortname")@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.pagetitle")</font></h3>
+                        <script>showText("@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.description")", "textTitle")<a href="mailto:@ConfigFactory.load().getString("hadatac.ThirdPartyUser.contact_email")"></script>
+                    } else{
+                        <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+                        <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+                    }
                     <hr>
                 </div>
                 <div class="col-md-1 col-xs-0"></div>
