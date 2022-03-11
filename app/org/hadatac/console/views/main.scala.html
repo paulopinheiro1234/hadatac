@@ -36,9 +36,9 @@
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top">
         @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
-            <div class="container-fluid ">
-        }else {
             <div class="container-fluid" style="background-color: #337ab7; padding-bottom: 15px; padding-top: 15px; border-color: #337ab7;" >
+        }else {
+            <div class="container-fluid">
         }
                 <div class="navbar-header" >
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -50,7 +50,7 @@
                     </button>
                     <div class="collapse navbar-collapse" >
                     @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
-                            <a class="navbar-brand" style="color: white" href="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionUrl")">HHEAR Portal Home</a>
+                            <a class="navbar-brand" style="color: white" href="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionHome")">HHEAR Portal Home</a>
                     } else{
                             <a class="navbar-brand " href="@org.hadatac.console.controllers.routes.Portal.index()">HADatAc Home</a>
                     }
@@ -93,7 +93,7 @@
                                 }
                             <ul class="dropdown-menu" role="menu">
                             @if(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")=="true") {
-                                <li class="@("active".when(nav == "profile"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.profile(userName)" style="color: white">Profile</a></li>
+@*                                <li class="@("active".when(nav == "profile"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.profile(userName)" style="color: white">Profile</a></li>*@
                                 <li><a href="@org.hadatac.console.controllers.routes.Application.logOutUser()" style="color: white"><i class="icon-off"></i> Log Out</a></li>
                             }else {
                                 <li class="@("active".when(nav == "profile"))"><a href="@org.hadatac.console.controllers.routes.AuthApplication.profile(userName)">Profile</a></li>
