@@ -162,6 +162,7 @@ public class Downloader extends Controller {
 
         String ALIGNMENT = "object_alignment";
         String SUMMARIZATION = "summary";
+        String SUBGROUP_SUMMARIZATION = "subgroup";
 
         //System.out.println("checkCompletion: [" + fileId + "]");
 
@@ -170,7 +171,7 @@ public class Downloader extends Controller {
         if ( fileId == null ) {
             return ok(Json.toJson(result));
         }
-        if (fileId.indexOf(ALIGNMENT) < 0 && fileId.indexOf(SUMMARIZATION) < 0) {
+        if (fileId.indexOf(ALIGNMENT) < 0 && fileId.indexOf(SUMMARIZATION) < 0 && fileId.indexOf(SUBGROUP_SUMMARIZATION) < 0) {
             return ok(Json.toJson(result));
         }
 
@@ -180,6 +181,10 @@ public class Downloader extends Controller {
 
         if (fileId.indexOf(SUMMARIZATION) >= 0 && fileId.startsWith(SUMMARIZATION) == false) {
             fileId = fileId.substring(fileId.indexOf(SUMMARIZATION));
+        }
+
+        if (fileId.indexOf(SUBGROUP_SUMMARIZATION) >= 0 && fileId.startsWith(SUBGROUP_SUMMARIZATION) == false) {
+            fileId = fileId.substring(fileId.indexOf(SUBGROUP_SUMMARIZATION));
         }
 
         //System.out.println("checkCompletion after adjustment: [" + fileId + "]");
@@ -230,7 +235,12 @@ public class Downloader extends Controller {
         System.out.println("Invoked CSV generation with object alignment ...");
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
-        String fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+        String fileName = null;
+        if (summaryType.equals(Measurement.SUMMARY_TYPE_NONE)) {
+            fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+        } else {
+            fileName = "subgroup_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+        }
 
         // will use the user email address as the directory
         DataFile dataFile = DataFile.create(fileName, ConfigProp.getPathWorking()+ "/" + DataFile.DS_GENERATION + "/"+ ownerEmail, ownerEmail, DataFile.CREATING);

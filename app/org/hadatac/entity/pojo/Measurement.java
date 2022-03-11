@@ -1709,7 +1709,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //alignment.printAlignment();
             
             // Write headers: Labels are derived from collected alignment attributes
-            List<Variable> aaList = alignment.getAlignmentAttributes();
+            List<Variable> aaList = alignment.getVariables();
             Map<String, Variable> varMap = new HashMap<String, Variable>();
             aaList.sort(new Comparator<Variable>() {
                 @Override
@@ -1771,7 +1771,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
                     } else {
 
-                        AnnotatedGroup currGroup = new AnnotatedGroup(row, varMap, alignment);
+                        AnnotatedGroup currGroup = new AnnotatedGroup(row, varMap, alignment, categoricalOption);
                         //System.out.println("Current Group size: " + currGroup.getGroup().size());
                         //System.out.println("Current Group key: " + currGroup.getKey());
                         AnnotatedGroupSummary currGroupSummary;
@@ -1800,23 +1800,40 @@ public class Measurement extends HADatAcThing implements Runnable {
                 });
 
                 System.out.println("HERE 1   size grpSummary" + ags.size());
-                boolean printHeader = true;
+                List<Variable> finalVar = new ArrayList<Variable>();
+                for (Variable var : aaList) {
+                    if (categoricalOption.equals(Measurement.NON_CATG_CATG)) {
+                        if (var.isCategorical() || CategorizedValue.isCategorizable(var)) {
+                            finalVar.add(var);
+                            FileUtils.writeStringToFile(file, "\"" + var + "\",", "utf-8", true);
+                        }
+                    } else {
+                        if (var.isCategorical()) {
+                            finalVar.add(var);
+                            FileUtils.writeStringToFile(file, "\"" + var + "\",", "utf-8", true);
+                        }
+                    }
+                }
+                FileUtils.writeStringToFile(file, "Frequency \n", "utf-8", true);
                 for (AnnotatedGroupSummary groupSummary : ags) {
-                    if (printHeader) {
+                    for (Variable var : finalVar) {
+                        boolean firstValue = true;
+                        FileUtils.writeStringToFile(file, "\"", "utf-8", true);
                         for (AnnotatedValue value : groupSummary.getAnnotatedGroup().getGroup()) {
-                            if (value != null || value.getVariable().toString() != null) {
-                                FileUtils.writeStringToFile(file, "\'" + value.getVariable().toString() + "\', ", "utf-8", true);
+                            if (value.getVariable().getKey().equals(var.getKey())) {
+                                if (value == null || value.getValue() == null) {
+                                    //System.out.println("[WARNING] Measurement: No values for variable [" + aa.toString() + "]  of object [" + obj.getUri() + "]");
+                                } else {
+                                    if (firstValue) {
+                                        firstValue = false;
+                                    } else {
+                                        FileUtils.writeStringToFile(file, " ", "utf-8", true);
+                                    }
+                                    FileUtils.writeStringToFile(file, value.getValue(), "utf-8", true);
+                                }
                             }
                         }
-                        FileUtils.writeStringToFile(file, "Frequency \n", "utf-8", true);
-                        printHeader = false;
-                    }
-                    for (AnnotatedValue value : groupSummary.getAnnotatedGroup().getGroup()) {
-                        if (value == null || value.getValue() == null) {
-                            //System.out.println("[WARNING] Measurement: No values for variable [" + aa.toString() + "]  of object [" + obj.getUri() + "]");
-                        } else {
-                            FileUtils.writeStringToFile(file, value.getValue() + ", ", "utf-8", true);
-                        }
+                        FileUtils.writeStringToFile(file, "\", ", "utf-8", true);
                     }
                     FileUtils.writeStringToFile(file, groupSummary.getFrequency() + " \n", "utf-8", true);
                 }
@@ -1839,7 +1856,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
 
                 // Write DOI list of sources
-                outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                if (summaryType.equals(SUMMARY_TYPE_NONE)) {
+                    outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                }
 
                 // finalize the main download file
                 dataFile.setCompletionPercentage(100);
@@ -1909,7 +1928,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //alignment.printAlignment();
 
             // Write headers: Labels are derived from collected alignment attributes
-            List<Variable> aaList = alignment.getAlignmentAttributes();
+            List<Variable> aaList = alignment.getVariables();
             System.out.println("Sorting variable list... " + aaList.size() + " items");
             aaList.sort(new Comparator<Variable>() {
                 @Override
@@ -2439,8 +2458,8 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static String prettyCodeBookLabel(Alignment alignment, String codeClass) {
         List<String> list = alignment.getCodeBook().get(codeClass);
-        System.out.println("CodeClass: [" + codeClass + "]");
-        System.out.println(list.get(0) + ", " + list.get(1));
+        //System.out.println("CodeClass: [" + codeClass + "]");
+        //System.out.println(list.get(0) + ", " + list.get(1));
         String pretty = list.get(1).replace("@en","");
         if (!pretty.equals("")) {
             String c0 = pretty.substring(0,1).toUpperCase();

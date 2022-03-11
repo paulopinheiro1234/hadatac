@@ -36,6 +36,7 @@ public class Variable {
     private Entity inRelationTo;
     private Unit unit;
     private Attribute timeAttr;
+    private boolean isCategorical;
 
 	// study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str
     public enum SolrPivotFacet {
@@ -68,6 +69,7 @@ public class Variable {
     	this.inRelationTo = attrInRel.getInRelationTo();
     	this.unit = unit;
     	this.timeAttr = timeAttr;
+    	this.isCategorical = false;
     }
 
     public String getKey() {
@@ -142,7 +144,15 @@ public class Variable {
     	return timeAttr.getUri();
     }
 
-    public static String upperCase(String orig) {
+	public boolean isCategorical() {
+		return isCategorical;
+	}
+
+	public void setIsCategorical(boolean isCategorical) {
+    	this.isCategorical = isCategorical;
+	}
+
+	public static String upperCase(String orig) {
     	String[] words = orig.split(" ");
     	StringBuffer sb = new StringBuffer();
 

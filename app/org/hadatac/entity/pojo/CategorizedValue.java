@@ -79,8 +79,23 @@ public class CategorizedValue {
 		return newValue;
 	}
 
+	public static boolean isCategorizable(Variable variable) {
+
+		// handle age variables
+		if (variable != null) {
+			if (variable.getAttributeListStr().equals("http://semanticscience.org/resource/SIO_001013")) {
+				String unitStr = variable.getUnitStr();
+				if (unitStr != null && unitStr.equals("http://semanticscience.org/resource/SIO_000428")) {
+					return true;
+				} else if (unitStr != null && unitStr.equals("http://semanticscience.org/resource/SIO_000429")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public static AnnotatedValue categorize(AnnotatedValue origValue, Alignment alignment) {
-		//System.out.println("inside categorize");
 		AnnotatedValue categorized = null;
 
 		// handle age variables
@@ -102,8 +117,10 @@ public class CategorizedValue {
 		}
 
 		if (categorized == null) {
+			System.out.println("inside categorize - original: [" + origValue.getValue() + "] categorized [" + origValue.getValue() + "," + origValue.getValueClass() + "]");
 			return origValue;
 		}
+		System.out.println("inside categorize - original: [" + origValue.getValue() + "] categorized [" + categorized.getValue() + "," + categorized.getValueClass() + "]");
 		return categorized;
 	}
 

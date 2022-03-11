@@ -304,6 +304,9 @@ public class Alignment {
         }*/
 
         newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
+        if (m.getValueClass() != null && m.getValueClass().startsWith("http")) {
+            newVar.setIsCategorical(true);
+        }
         //System.out.println("Align-Debug: new alignment attribute 3");
 
         //System.out.println("Align-Debug: new variable's key: [" + newVar.getKey() + "]");
@@ -493,7 +496,7 @@ public class Alignment {
         return new ArrayList<AlignmentEntityRole>(roles.values());
     }
 
-    public List<Variable> getAlignmentAttributes() {
+    public List<Variable> getVariables() {
         return new ArrayList<Variable>(variables.values());
     }
 
