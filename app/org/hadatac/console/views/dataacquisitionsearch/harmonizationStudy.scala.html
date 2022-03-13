@@ -1,0 +1,250 @@
+@(studyList : List[org.hadatac.entity.pojo.Study],
+  selection : List[org.hadatac.entity.pojo.Study],
+  userName  : String
+)
+
+    @import helper._
+    @import org.hadatac.console.views.html._
+    @import org.hadatac.console.controllers.triplestore._
+    @import org.hadatac.metadata.loader._
+    @import java.net._
+
+    @main("Harmonization Query","",userName) {
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <style type="text/css">
+                body {
+                    color: #404E67;
+                    background: #F5F7FA;
+                    font-family: 'Open Sans', sans-serif;
+                }
+                .table-wrapper {
+                    width: 700px;
+                    margin: 30px auto;
+                    background: #fff;
+                    padding: 20px;
+                    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+                }
+                .table-title {
+                    padding-bottom: 10px;
+                    margin: 0 0 10px;
+                }
+                .table-title h2 {
+                    margin: 6px 0 0;
+                    font-size: 22px;
+                }
+                .table-title .add-new {
+                    float: right;
+                    height: 30px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-shadow: none;
+                    min-width: 100px;
+                    border-radius: 50px;
+                    line-height: 13px;
+                }
+                .table-title .add-new i {
+                    margin-right: 4px;
+                }
+                table.table {
+                    table-layout: fixed;
+                }
+                table.table tr th, table.table tr td {
+                    border-color: #e9e9e9;
+                }
+                table.table th i {
+                    font-size: 13px;
+                    margin: 0 5px;
+                    cursor: pointer;
+                }
+                table.table th:last-child {
+                    width: 100px;
+                }
+                table.table td a {
+                    cursor: pointer;
+                    display: inline-block;
+                    margin: 0 5px;
+                    min-width: 24px;
+                }
+                table.table td a.add {
+                    color: #27C46B;
+                }
+                table.table td a.edit {
+                    color: #FFC107;
+                }
+                table.table td a.delete {
+                    color: #E34724;
+                }
+                table.table td i {
+                    font-size: 19px;
+                }
+                table.table td a.add i {
+                    font-size: 24px;
+                    margin-right: -1px;
+                    position: relative;
+                    top: 3px;
+                }
+                table.table .form-control {
+                    height: 32px;
+                    line-height: 32px;
+                    box-shadow: none;
+                    border-radius: 2px;
+                }
+                table.table .form-control.error {
+                    border-color: #f50000;
+                }
+                table.table td .add {
+                    display: none;
+                }
+        </style>
+
+        <div class="container-fluid">
+
+            <div class="row">
+
+                <div class="col-md-10 col-md-offset-1">
+                    </br>
+                    <h3>Harmonization Query</h3>
+                    </br>
+
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="soc" href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Harmonization.index("soc")">Object Collection Harmonization</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="study active" href="#">Full Study Harmonization</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="subgroup" href="#">Subgroup Study Harmonization</a>
+                        </li>
+                    </ul>
+
+                    <BR>
+
+                    <div>
+                        <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add new study</button>
+                    </div><br>
+
+                        <h4>Current request</h4>
+                        <table id="query-table" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;" scope="col">#</th>
+                                    <th style="width: 100px;" scope="col">Study</th>
+                                    <th style="width: 220px;" scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="query-table-body">
+                            @for((study, i) <- selection.zipWithIndex) {
+                                <tr>
+                                    <td style="word-break: break-all;">@(i+1)</td>
+                                    <td style="word-break: break-all;" axis="queryStudy@(i+1)">@study.getLabel()</td>
+                                    <td style="word-break: break-all;">
+                                        <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        <br>
+                        <div id="query-oper">
+                            <a class="btn btn-success" role="button" id="submit-query" onclick="submitTableAsForm()" disabled>Harmonize</a>
+                        </div>
+                        </br>
+                        <div>
+                            <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+                $(document).ready(function() {
+                    $('[data-toggle="tooltip"]').tooltip();
+
+                    checkRowCounts();
+
+                    // Append table with add row form on add new button click
+                    $(".add-new").click(function(){
+                        var index = $("table tbody tr:last-child").index();
+                        var row = '<tr>' +
+                                '<td>' + (index + 2) + '</td>' +
+                                '<td axis="queryStudy' + (index + 2) + '">' +
+                                '  <select name="studies' + (index + 2) + '" id="study' +  (index + 2) + '" onchange="updateSocList(' + (index + 2) + ')">' +
+                                '     <option value=""></option> ' +
+                                @for(std <- studyList) {
+                                   '     <option value="@std.getUri()">@std.getLabel()</option> ' +
+                                }
+                                ' </select></td>' +
+                                '<td><a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+                                '</tr>';
+                        $("table").append(row);
+                        $("table tbody tr").eq(index + 1).find(".delete").show();
+                        $('[data-toggle="tooltip"]').tooltip();
+                        checkRowCounts();
+                    });
+
+                    // Add row on add button click
+                    $(document).on("click", ".add", function(){
+                        var empty = false;
+                        var input = $(this).parents("tr").find('input[type="text"]');
+                        $(this).parents("tr").find(".error").first().focus();
+                        if(!empty){
+                            input.each(function(){
+                                $(this).parent("td").html($(this).val());
+                            });
+                            $(this).parents("tr").find(".add").toggle();
+                        }
+                        checkRowCounts();
+                    });
+
+                    // Delete row on delete button click
+                    $(document).on("click", ".delete", function(){
+                        $(this).parents("tr").remove();
+                        checkRowCounts();
+                    });
+                });
+
+
+                function submitTableAsForm() {
+                    var form = document.createElement("form");
+                    form.method = "post";
+                    form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
+                    $("#query-table-body").find("tr").each(function() {
+                        $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+                            var input = document.createElement("input");
+                            input.type = "text";
+                            input.name = this.axis;
+                            input.value = $(this).html();
+                            form.appendChild(input);
+                        });
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                    $("#submit-query").attr("disabled", "disabled");
+                }
+
+                function checkRowCounts() {
+                    var rows = $('table tbody tr').length;
+                    if (rows < 2) {
+                        $("#submit-query").attr("disabled", "disabled");
+                    } else {
+                        var valid = true;
+                        $("#query-table-body").find("tr").each(function() {
+                            var studySelector = $(this).find('select[name^="studies"] option:selected').text();
+                            if (valid) {
+                                valid = (studySelector != "");
+                            }
+                        });
+                        if (valid) {
+                            $("#submit-query").removeAttr("disabled");
+                        } else {
+                            $("#submit-query").attr("disabled", "disabled");
+                        }
+                    };
+
+                }
+        </script>
+    }

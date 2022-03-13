@@ -1,7 +1,7 @@
-@(oper: String,
-        cacheList : List[String],
-        namespaces : List[org.hadatac.utils.NameSpace],
-        userName: String
+@(studyList : List[org.hadatac.entity.pojo.Study],
+  socList   : List[org.hadatac.entity.pojo.ObjectCollection],
+  selection : List[org.hadatac.entity.pojo.ObjectCollection],
+  userName  : String
 )
 
     @import helper._
@@ -10,7 +10,7 @@
     @import org.hadatac.metadata.loader._
     @import java.net._
 
-    @main("Load Ontologies into Metadata Store","",userName) {
+    @main("Harmonization Query","",userName) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -109,36 +109,42 @@
                     </br>
                     <h3>Harmonization Query</h3>
                     </br>
-                    <div>
-                        <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add new object</button>
-                        <button type="button" class="btn btn-info delete-all"><i class="fa fa-remove"></i> Delete selected objects</button>
-                    </div><br>
-                    <div id="ns-oper">
-                        <a class="btn btn-danger" role="button" id="save-changes" onclick="submitTableAsForm()" disabled>Harmonize</a>
-                    </div>
-                    </br>
 
-                    @if(oper=="init") {
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="soc active" aria-current="page" href="#">Object Collection Harmonization</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="study" href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Harmonization.index("study")">Full Study Harmonization</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="subgroup" href="#">Subgroup Study Harmonization</a>
+                        </li>
+                    </ul>
+
+                    <BR>
+
+                    <div>
+                        <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add new object collection</button>
+                    </div><br>
+
                         <h4>Current request</h4>
-                        <table id="ns-table" class="table table-striped table-bordered" style="width:100%">
+                        <table id="query-table" class="table table-striped table-bordered" style="width:100%">
                             <thead>
                                 <tr>
                                     <th style="width: 50px;" scope="col">#</th>
                                     <th style="width: 100px;" scope="col">Study</th>
                                     <th style="width: 300px;" scope="col">Role</th>
-                                    <th style="width: 150px;" scope="col">Entity Type</th>
                                     <th style="width: 220px;" scope="col">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="ns-table-body">
-                            @for((ns, i) <- namespaces.zipWithIndex) {
+                            <tbody id="query-table-body">
+                            @for((soc, i) <- selection.zipWithIndex) {
                                 <tr>
                                     <td style="word-break: break-all;">@(i+1)</td>
-                                    <td style="word-break: break-all;" axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
-                                    <td style="word-break: break-all;" axis="nsName@(i+1)">@ns.getName()</td>
-                                    <td style="word-break: break-all;" axis="nsType@(i+1)">@ns.getType()</td>
+                                    <td style="word-break: break-all;" axis="queryStudy@(i+1)">@soc.getStudy().getLabel()</td>
+                                    <td style="word-break: break-all;" axis="queryRole@(i+1)">@soc.getRoleLabel()</td>
                                     <td style="word-break: break-all;">
-                                        <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
                                         <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                                     </td>
                                 </tr>
@@ -146,10 +152,13 @@
                             </tbody>
                         </table>
                         <br>
+                        <div id="query-oper">
+                            <a class="btn btn-success" role="button" id="submit-query" onclick="submitTableAsForm()" disabled>Harmonize</a>
+                        </div>
+                        </br>
                         <div>
                             <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
                         </div>
-                    }
                 </div>
             </div>
         </div>
@@ -157,32 +166,30 @@
         <script>
                 $(document).ready(function() {
                     $('[data-toggle="tooltip"]').tooltip();
-                    var actions = $("table td:last-child").html();
 
                     checkRowCounts();
 
                     // Append table with add row form on add new button click
                     $(".add-new").click(function(){
-                        $(this).attr("disabled", "disabled");
                         var index = $("table tbody tr:last-child").index();
                         var row = '<tr>' +
                                 '<td>' + (index + 2) + '</td>' +
-                                '<td axis="nsAbbrev' + (index + 2) + '"><input type="text" class="form-control"</td>' +
-                                '<td axis="nsName' + (index + 2) + '"><input type="text" class="form-control"></td>' +
-                                '<td axis="nsType' + (index + 2) + '"><input type="text" class="form-control"></td>' +
-                                '<td>' + actions + '</td>' +
+                                '<td axis="queryStudy' + (index + 2) + '">' +
+                                '  <select name="studies' + (index + 2) + '" id="study' +  (index + 2) + '" onchange="updateSocList(' + (index + 2) + ')">' +
+                                '     <option value=""></option> ' +
+                                @for(std <- studyList) {
+                                   '     <option value="@std.getUri()">@std.getLabel()</option> ' +
+                                }
+                                ' </select></td>' +
+                                '<td axis="queryRole' + (index + 2) + '">' +
+                                '  <select name="socs' + (index + 2) + '" id="soc' + (index + 2) + '" onchange="checkRowCounts()">' +
+                                '     <option value=""></option> ' +
+                                ' </select></td>' +
+                                '<td><a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
                                 '</tr>';
                         $("table").append(row);
-                        $("table tbody tr").eq(index + 1).find(".add, .delete").show();
-                        $("table tbody tr").eq(index + 1).find(".edit, .delete-triples, .reload-triples-from-remote .reload-triples-from-cache").hide();
+                        $("table tbody tr").eq(index + 1).find(".delete").show();
                         $('[data-toggle="tooltip"]').tooltip();
-                    });
-
-                    // Delete all rows on delete all button click
-                    $(".delete-all").click(function(){
-                        $(this).attr("disabled", "disabled");
-                        $("table").children("tbody").remove();
-                        $("#save-changes").removeAttr("disabled");
                         checkRowCounts();
                     });
 
@@ -195,37 +202,36 @@
                             input.each(function(){
                                 $(this).parent("td").html($(this).val());
                             });
-                            $(this).parents("tr").find(".add, .edit").toggle();
-                            $(this).parents("tr").find(".reload-triples-from-remote .reload-triples-from-cache").show();
-                            $(".add-new").removeAttr("disabled");
-                            $("#save-changes").removeAttr("disabled");
+                            $(this).parents("tr").find(".add").toggle();
                         }
                         checkRowCounts();
-                    });
-
-                    // Edit row on edit button click
-                    $(document).on("click", ".edit", function(){
-                        $(this).parents("tr").find("td:not(:first-child, :nth-child(6), :last-child)").each(function(){
-                            $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-                        });
-                        $(this).parents("tr").find(".add, .edit").toggle();
-                        $(".add-new").attr("disabled", "disabled");
                     });
 
                     // Delete row on delete button click
                     $(document).on("click", ".delete", function(){
                         $(this).parents("tr").remove();
-                        $(".add-new").removeAttr("disabled");
-                        $("#save-changes").removeAttr("disabled");
                         checkRowCounts();
                     });
                 });
+
+                // Add SOCs to selection
+                function updateSocList(idx) {
+                    var element = ' <select name="socs' + idx + '" id="soc' + idx + '" onchange="checkRowCounts()">' +
+                                  '     <option value=""></option> ' +
+                                  @for(soc <- socList) {
+                                     '     <option value="@soc.getUri()">@soc.getLabel()</option> ' +
+                                  }
+                                  ' </select></td>';
+                    $("table tbody tr:nth-child(" + idx + ") td:nth-child(3)").html(element);
+                    $("table tbody tr:nth-child(" + idx + ") td:nth-child(3)").removeAttr("disabled");
+                    checkRowCounts();
+                }
 
                 function submitTableAsForm() {
                     var form = document.createElement("form");
                     form.method = "post";
                     form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
-                    $("#ns-table-body").find("tr").each(function() {
+                    $("#query-table-body").find("tr").each(function() {
                         $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
                             var input = document.createElement("input");
                             input.type = "text";
@@ -236,22 +242,32 @@
                     });
                     document.body.appendChild(form);
                     form.submit();
-                    $("#save-changes").attr("disabled", "disabled");
-                }
-
-                function checkform() {
-                    if(document.getElementById('upload').value != "") {
-                        document.getElementById('submit-div').style.display = 'inline';
-                    }
+                    $("#submit-query").attr("disabled", "disabled");
                 }
 
                 function checkRowCounts() {
                     var rows = $('table tbody tr').length;
-                    if (rows == 0) {
-                        $(".delete-all").attr("disabled", "disabled");
+                    if (rows < 2) {
+                        $("#submit-query").attr("disabled", "disabled");
                     } else {
-                        $(".delete-all").removeAttr("disabled");
-                    }
+                        var valid = true;
+                        $("#query-table-body").find("tr").each(function() {
+                            var studySelector = $(this).find('select[name^="studies"] option:selected').text();
+                            if (valid) {
+                                valid = (studySelector != "");
+                            }
+                            var socSelector = $(this).find('select[name^="socs"] option:selected').text();
+                            if (valid) {
+                                valid = (socSelector != "");
+                            }
+                        });
+                        if (valid) {
+                            $("#submit-query").removeAttr("disabled");
+                        } else {
+                            $("#submit-query").attr("disabled", "disabled");
+                        }
+                    };
+
                 }
         </script>
     }
