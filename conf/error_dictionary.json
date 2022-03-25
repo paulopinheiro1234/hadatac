@@ -58,6 +58,16 @@
           "id": "SSD_00005",
           "detail": "SSD ingestion: Could not find the study uri <%s> in the TS, check the study uri in the SSD sheet.",
           "solution": ""
+        },
+        {
+          "id": "SSD_00006",
+          "detail": "SSD ingestion: There is no SOC of type hasco:SubjectGroup, make sure one and only one SOC is of type hasco:SubjectGroup.",
+          "solution": ""
+        },
+        {
+          "id": "SSD_00007",
+          "detail": "SSD ingestion: There is more than one SOC of type hasco:SubjectGroup, make sure one and only one SOC is of type hasco:SubjectGroup.",
+          "solution": ""
         }
       ]
     },

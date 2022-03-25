@@ -61,6 +61,7 @@ public class StudyObjectGenerator extends BaseGenerator {
         uriMap.put("hasco:SampleCollection", "SPL-");
         uriMap.put("hasco:TimeCollection", "TIME-");
         uriMap.put("hasco:LocationCollection", "LOC-");
+        uriMap.put("hasco:ObjectCollection", "OBJ-");
     }
 
     @Override

@@ -610,6 +610,24 @@ public class AnnotationWorker {
                     return null;
                 }
             }
+
+            // check the rule for hasco:SubjectGroup, there should be one and only such type
+            int subjectGroupCount = 0;
+            for ( Map.Entry<String, List<String>> entry : mapContent.entrySet() ) {
+                List<String> items = entry.getValue();
+                for ( String item : items ) {
+                    if (item.contains("SubjectGroup")) subjectGroupCount++;
+                }
+            }
+            if ( subjectGroupCount == 0 ) {
+                dataFile.getLogger().printExceptionById("SSD_00006");
+                return null;
+            }
+            if ( subjectGroupCount > 1 ) {
+                dataFile.getLogger().printExceptionById("SSD_00007");
+                return null;
+            }
+
             chain.setNamedGraphUri(studyUri.replaceAll("STD","SSD"));
             chain.setDataFile(dataFile);
 

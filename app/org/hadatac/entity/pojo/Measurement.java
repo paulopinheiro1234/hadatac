@@ -1854,16 +1854,6 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         if ( measurements == null || measurements.size() == 0 ) return;
 
-        String roles = ConfigFactory.load().getString("hadatac.download.alignment");
-        List<String> selectedRoles = new ArrayList<>();
-        if ( roles == null || roles.length() == 0 ) {
-            selectedRoles.add("Child"); // default to Child is not configured
-        } else if ( !roles.contains(",") ) {
-            selectedRoles.add(roles);
-        } else {
-            selectedRoles.addAll(Arrays.asList(roles.split(",")));
-        }
-
         updateSourceStudies(studyMap, measurements);
         List<String> values = null;
         int counter = 0, prev_ratio = 0;
@@ -1886,7 +1876,8 @@ public class Measurement extends HADatAcThing implements Runnable {
             if (alignObjs == null) {
 
                 long startTime = System.currentTimeMillis();
-                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), selectedRoles, measurement.getOriginalId());
+                // alignObjs = Alignment.alignmentObjectsWithSubjectGroupMembership(measurement.getEntryObjectUri(), measurement.getStudyUri());
+                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), "http://hadatac.org/ont/hasco/SubjectGroup");
                 duration = System.currentTimeMillis() - startTime;
                 if ( duration > threshold ) log.debug("DOWNLOAD: alignment.alignmentObject: " + duration);
 
