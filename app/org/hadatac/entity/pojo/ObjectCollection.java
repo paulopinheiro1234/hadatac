@@ -41,6 +41,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String LOCATION_COLLECTION = "http://hadatac.org/ont/hasco/LocationCollection";
     public static String TIME_COLLECTION = "http://hadatac.org/ont/hasco/TimeCollection";
     public static String MATCHING_COLLECTION = "http://hadatac.org/ont/hasco/MatchingCollection";
+    public static String OBJECT_COLLECTION = "http://hadatac.org/ont/hasco/ObjectCollection";
 
     public static String INDENT1 = "   ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -1077,7 +1078,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri WHERE { \n" + 
-                "   ?ocType rdfs:subClassOf+ hasco:ObjectCollection . \n" +
+                "   ?ocType rdfs:subClassOf* hasco:ObjectCollection . \n" +
                 "   ?uri a ?ocType . \n" +
                 "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
                 " } ";
