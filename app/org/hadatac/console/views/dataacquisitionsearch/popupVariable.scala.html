@@ -1,0 +1,53 @@
+@(suffix   : String,
+  variable : org.hadatac.entity.pojo.Variable,
+  i        : Integer)
+
+@import org.hadatac.metadata.loader.URIUtils;
+
+<!-- Modal content -->
+<div class="modal-content">
+    <span id="@suffix@(i+1)" class="close">&times;</span>
+    <h3>Variable @variable.toString()</h3>
+    <br>
+    <b>Type</b>: @variable.getClass().getSimpleName()<br><br>
+    @if(variable.getRole() != null) {
+        <b>Role</b>: @variable.getRole<br><br>
+    } else {
+        <b>Role</b>: NONE<br><br>
+    }
+    @if(variable.getEntity() != null) {
+        <b>Entity</b>: @variable.getEntity().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getEntity().getUri()))<br>
+        @variable.getEntity().getComment()<br><br>
+    } else {
+        <b>Entity</b>: NONE<br><br>
+    }
+    @if(variable.getAttributeList() != null) {
+        <b>Attribute List</b>: <br>
+        <ul>
+            @for(attr <- variable.getAttributeList()) {
+                @if(attr != null) {
+                <li>@attr.getLabel() (@URIUtils.replaceNameSpaceEx(attr.getUri()))</li>
+                }
+            }
+        </ul><br>
+    } else {
+        <b>Attribute List</b>: NONE<br><br>
+    }
+    @if(variable.getInRelationTo() != null) {
+       <b>In Relation To</b>: @variable.getInRelationTo().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getInRelationTo().getUri()))<br><br>
+    } else {
+        <b>In Relation To</b>: NONE<br><br>
+    }
+    @if(variable.getUnit() != null) {
+       <b>Unit</b>: @variable.getUnit().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getUnit().getUri()))<br><br>
+    } else {
+       <b>Unit</b>: NONE<br><br>
+    }
+    @if(variable.getTime() != null) {
+       <b>Time</b>: @variable.getTime().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getTime().getUri()))<br><br>
+    } else {
+       <b>Time</b>: NONE<br><br>
+    }
+    <br>
+</div>
+

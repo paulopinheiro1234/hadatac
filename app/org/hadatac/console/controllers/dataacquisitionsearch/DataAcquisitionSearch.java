@@ -173,6 +173,8 @@ public class DataAcquisitionSearch extends Controller {
             facets = request.body().asFormUrlEncoded().get("facets")[0];
         }
 
+        System.out.println("indexInternalAsync: facets=[" + facets + "]");
+
         // log.debug("facets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();

@@ -106,7 +106,7 @@
 
                 <div class="col-md-10 col-md-offset-1">
                     </br>
-                    <h3>Harmonization Query</h3>
+                    <h3>Harmonization Query By Study</h3>
                     </br>
 
                     <ul class="nav nav-tabs">
@@ -114,10 +114,7 @@
                             <a class="soc" href="@org.hadatac.console.controllers.dataacquisitionsearch.routes.Harmonization.index("soc")">Object Collection Harmonization</a>
                         </li>
                         <li class="nav-item">
-                            <a class="study active" href="#">Full Study Harmonization</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="subgroup" href="#">Subgroup Study Harmonization</a>
+                            <a class="study active" href="#">Study Harmonization</a>
                         </li>
                     </ul>
 
@@ -150,7 +147,7 @@
                         </table>
                         <br>
                         <div id="query-oper">
-                            <a class="btn btn-success" role="button" id="submit-query" onclick="submitTableAsForm()" disabled>Harmonize</a>
+                            <a class="btn btn-success" role="button" id="submit-query" onclick="submitTableAsForm()" disabled>Preview Harmonization</a>
                         </div>
                         </br>
                         <div>
@@ -172,7 +169,7 @@
                         var row = '<tr>' +
                                 '<td>' + (index + 2) + '</td>' +
                                 '<td axis="queryStudy' + (index + 2) + '">' +
-                                '  <select name="studies' + (index + 2) + '" id="study' +  (index + 2) + '" onchange="updateSocList(' + (index + 2) + ')">' +
+                                '  <select name="study' + (index + 2) + '" id="study' +  (index + 2) + '" onchange="checkRowCounts()">' +
                                 '     <option value=""></option> ' +
                                 @for(std <- studyList) {
                                    '     <option value="@std.getUri()">@std.getLabel()</option> ' +
@@ -211,13 +208,14 @@
                 function submitTableAsForm() {
                     var form = document.createElement("form");
                     form.method = "post";
-                    form.action = "@org.hadatac.console.controllers.triplestore.routes.LoadOnt.saveNamespaces()";
+                    form.action = "@org.hadatac.console.controllers.dataacquisitionsearch.routes.Harmonization.indexStudy()";
+                    var auxint = 0;
                     $("#query-table-body").find("tr").each(function() {
-                        $(this).find("td:not(:first-child, :nth-child(6), :last-child)").each(function() {
+                        $(this).find('select[name^="study"] option:selected').each(function() {
                             var input = document.createElement("input");
                             input.type = "text";
-                            input.name = this.axis;
-                            input.value = $(this).html();
+                            input.name = "study" + auxint++;
+                            input.value = $(this).val();
                             form.appendChild(input);
                         });
                     });
@@ -233,7 +231,7 @@
                     } else {
                         var valid = true;
                         $("#query-table-body").find("tr").each(function() {
-                            var studySelector = $(this).find('select[name^="studies"] option:selected').text();
+                            var studySelector = $(this).find('select[name^="study"] option:selected').text();
                             if (valid) {
                                 valid = (studySelector != "");
                             }

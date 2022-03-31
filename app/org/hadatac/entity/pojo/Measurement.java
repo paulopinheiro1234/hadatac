@@ -2040,7 +2040,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    private static Map<String, Map<String, List<AnnotatedValue>>> readSolrPagesAndMerge(String ownerUri, String facets,
+    public static Map<String, Map<String, List<AnnotatedValue>>> readSolrPagesAndMerge(String ownerUri, String facets,
                                                                          String fileId, int pageSize,
                                                                          Map<String, List<String>> studyMap,
                                                                          Alignment alignment, Map<String,List<String>> alignCache,

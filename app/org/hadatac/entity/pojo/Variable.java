@@ -30,9 +30,12 @@ public class Variable {
 	// patch for multi-valued attributes
 	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
 
+	// Mandatory properties for Variable
 	private Entity ent;
     private String role;
     private List<Attribute> attrList;
+
+    // Optional properties for Variables
     private Entity inRelationTo;
     private Unit unit;
     private Attribute timeAttr;
@@ -54,6 +57,9 @@ public class Variable {
 		}
 	}
 
+	public Variable() {
+	}
+
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
     	this(entRole, attrInRel, null, null);
     }
@@ -72,7 +78,28 @@ public class Variable {
     	this.isCategorical = false;
     }
 
-    public String getKey() {
+	public Variable(List<Variable> sourceList) {
+		if (sourceList != null && sourceList.get(0) != null) {
+			this.setEntity(sourceList.get(0).getEntity());
+			this.setRole(sourceList.get(0).getRole());
+			this.setAttributeList(sourceList.get(0).getAttributeList());
+			this.setInRelationTo(sourceList.get(0).getInRelationTo());
+			this.setUnit(sourceList.get(0).getUnit());
+			this.setTime(sourceList.get(0).getTime());
+		}
+	}
+
+	public Variable(Variable variable) {
+		this.ent = variable.getEntity();
+		this.role = variable.getRole();
+		this.attrList = variable.getAttributeList();
+		this.inRelationTo = variable.getInRelationTo();
+		this.unit = variable.getUnit();
+		this.timeAttr = variable.getTime();
+		this.isCategorical = variable.isCategorical();
+	}
+
+	public String getKey() {
     	return getRole() + getEntityStr() + getAttributeListStr() + getInRelationToStr() + getUnitStr() + getTimeStr();
     }
 
@@ -87,6 +114,10 @@ public class Variable {
     	return ent.getUri();
     }
 
+    public void setEntity(Entity ent) {
+    	this.ent = ent;
+	}
+
     public String getRole() {
     	if (role == null) {
     		return "";
@@ -94,9 +125,17 @@ public class Variable {
     	return role;
     }
 
+	public void setRole(String role) {
+		this.role = role;
+	}
+
     public List<Attribute> getAttributeList() {
     	return attrList;
     }
+
+	public void setAttributeList(List<Attribute> attrList) {
+    	this.attrList = attrList;
+	}
 
     public String getAttributeListStr() {
     	if (attrList == null || attrList.isEmpty()) {
@@ -115,7 +154,11 @@ public class Variable {
     	return inRelationTo;
     }
 
-    public String getInRelationToStr() {
+	public void setInRelationTo(Entity inRelationTo) {
+    	this.inRelationTo = inRelationTo;
+	}
+
+	public String getInRelationToStr() {
         if (inRelationTo == null || inRelationTo.getUri() == null ||inRelationTo.getUri().isEmpty()) { 
             return "";
         }
@@ -126,7 +169,11 @@ public class Variable {
     	return unit;
     }
 
-    public String getUnitStr() {
+	public void setUnit(Unit unit) {
+    	this.unit = unit;
+	}
+
+	public String getUnitStr() {
         if (unit == null || unit.getUri() == null || unit.getUri().isEmpty()) { 
             return "";
         }
@@ -137,7 +184,11 @@ public class Variable {
     	return timeAttr;
     }
 
-    public String getTimeStr() {
+	public void setTime(Attribute timeAttr) {
+		this.timeAttr = timeAttr;
+	}
+
+	public String getTimeStr() {
         if (timeAttr == null || timeAttr.getUri() == null || timeAttr.getUri().isEmpty()) { 
             return "";
         }

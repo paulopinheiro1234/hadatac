@@ -1,0 +1,288 @@
+@(studyList     : List[org.hadatac.entity.pojo.Study],
+  harmonization : List[org.hadatac.entity.pojo.HarmonizedVariable],
+  sourceList    : List[org.hadatac.entity.pojo.Variable],
+  userName      : String
+)
+
+@import helper._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers.triplestore._
+@import org.hadatac.metadata.loader._
+@import java.net._
+
+@main("Harmonization Query","",userName) {
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            color: #404E67;
+            background: #F5F7FA;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .table-wrapper {
+            width: 700px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        }
+        .table-title {
+            padding-bottom: 10px;
+            margin: 0 0 10px;
+        }
+        .table-title h2 {
+            margin: 6px 0 0;
+            font-size: 22px;
+        }
+        .table-title .add-new {
+            float: right;
+            height: 30px;
+            font-weight: bold;
+            font-size: 12px;
+            text-shadow: none;
+            min-width: 100px;
+            border-radius: 50px;
+            line-height: 13px;
+        }
+        .table-title .add-new i {
+            margin-right: 4px;
+        }
+        table.table {
+            table-layout: fixed;
+        }
+        table.table tr th, table.table tr td {
+            border-color: #e9e9e9;
+        }
+        table.table th i {
+            font-size: 13px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        table.table th:last-child {
+            width: 100px;
+        }
+        table.table td a {
+            cursor: pointer;
+            display: inline-block;
+            margin: 0 5px;
+            min-width: 24px;
+        }
+        table.table td a.add {
+            color: #27C46B;
+        }
+        table.table td a.edit {
+            color: #FFC107;
+        }
+        table.table td a.delete {
+            color: #E34724;
+        }
+        table.table td i {
+            font-size: 19px;
+        }
+        table.table td a.add i {
+            font-size: 24px;
+            margin-right: -1px;
+            position: relative;
+            top: 3px;
+        }
+        table.table .form-control {
+            height: 32px;
+            line-height: 32px;
+            box-shadow: none;
+            border-radius: 2px;
+        }
+        table.table .form-control.error {
+            border-color: #f50000;
+        }
+        table.table td .add {
+            display: none;
+        }
+
+        /* The Modal (background) */
+        .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          padding-top: 100px; /* Location of the box */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+          background-color: #fefefe;
+          margin: auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+        }
+
+        /* The Close Button */
+        .close {
+          color: #aaaaaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+    </style>
+
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-md-10 col-md-offset-1">
+                </br>
+                <h3>Preview Harmonization Query</h3>
+                </br>
+
+                    <h4>Current request</h4>
+                    <table id="query-table" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;" scope="col">#</th>
+                                <th style="width: 100px;" scope="col">Study</th>
+                            </tr>
+                        </thead>
+                        <tbody id="query-table-body">
+                        @for((study, i) <- studyList.zipWithIndex) {
+                            <tr>
+                                <td style="word-break: break-all;">@(i+1)</td>
+                                <td style="word-break: break-all;" axis="queryStudy@(i+1)">@study.getLabel()</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    <br>
+                    <h4>Harmonized Variables</h4>
+                    <table id="harmonization-table" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th style="width: 50px;" scope="col">#</th>
+                            <th style="width: 100px;" scope="col">Harmonized Variable</th>
+                            <th style="width: 100px;" scope="col">Source Variables</th>
+                            <th style="width: 100px;" scope="col">Source Variable Normalization</th>
+                            <th style="width: 100px;" scope="col">Source Datafiles</th>
+                            <th style="width: 100px;" scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="harmonization-body">
+                        @for((variable, i) <- harmonization.zipWithIndex) {
+                            <tr>
+                                <td style="word-break: break-all;">@(i+1)</td>
+                                <td style="word-break: break-all;">@Html(" <button id=\"HARMZ-" + variable.toString() + "\">Hmz:" + variable.toString() + "</button><br>")</td>
+                                <td style="word-break: break-all;">@Html(variable.dasaToString())</td>
+                                <td style="word-break: break-all;">@Html(variable.sourceToString())</td>
+                                <td style="word-break: break-all;">@Html(variable.datafileToString())</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    <br>
+                    <div id="query-oper">
+                        <a class="btn btn-success" role="button" id="submit-dataset" onclick="submitTableAsForm()" disabled>Generate Harmonized Dataset</a>
+                        <a class="btn btn-success" role="button" id="submit-subgroup" onclick="submitTableAsForm()" disabled>Generate Harmonized Subgroup Summary</a>
+                    </div>
+                    <br>
+                    <div>
+                        <button id="varDetails">details</button>
+                        <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class="btn btn-primary" role="button">Back to Main Menu</a>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    @for((variable, i) <- harmonization.zipWithIndex) {
+        @if(variable != null) {
+            <div id="varModal@(i+1)" class="modal">
+                @popupVariable("close",variable, i)
+            </div>
+        }
+        <script>
+            // Get the modal
+            var modal@(i+1) = document.getElementById("varModal@(i+1)");
+
+            // Get the button that opens the modal
+            var btn@(i+1) = document.getElementById("HARMZ-@variable.toString()");
+
+            // Get the <span> element that closes the modal
+            var span@(i+1) = document.getElementById("close@(i+1)");
+
+            // When the user clicks the button, open the modal
+            btn@(i+1).onclick = function() {
+                modal@(i+1).style.display = "block";
+            }
+
+            // When the user clicks on <span> (x), close the modal
+            span@(i+1).onclick = function() {
+                modal@(i+1).style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == modal@(i+1)) {
+                   modal@(i+1).style.display = "none";
+                }
+            }
+        </script>
+    }
+
+    @for((variable, i) <- sourceList.zipWithIndex) {
+        @if(variable != null) {
+        <div id="srcModal@(i+1)" class="modal">
+            @popupVariable("srcClose",variable, i)
+        </div>
+        }
+        <script>
+            // Get the modal
+            var srcModal@(i+1) = document.getElementById("srcModal@(i+1)");
+
+            // Get the button that opens the modal
+            var srcBtn@(i+1) = document.getElementById("SRC-@variable.toString()");
+
+            // Get the <span> element that closes the modal
+            var srcSpan@(i+1) = document.getElementById("srcClose@(i+1)");
+
+            // When the user clicks the button, open the modal
+            srcBtn@(i+1).onclick = function() {
+                srcModal@(i+1).style.display = "block";
+            }
+
+            // When the user clicks on <span> (x), close the modal
+            srcSpan@(i+1).onclick = function() {
+                srcModal@(i+1).style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == srcModal@(i+1)) {
+                   srcModal@(i+1).style.display = "none";
+                }
+            }
+        </script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('.var-button').on('click', function () {
+                var index = $(this).attr('data-index');
+                alert('Arg: ' + index);
+            });
+        });
+    </script>
+
+}
