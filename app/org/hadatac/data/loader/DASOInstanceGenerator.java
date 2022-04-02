@@ -670,7 +670,8 @@ public class DASOInstanceGenerator extends BaseGenerator {
             } else if (isSample(daso)) {
                 collectionType = ObjectCollection.SAMPLE_COLLECTION;
             } else {
-                collectionType = ObjectCollection.SUBJECT_COLLECTION;
+                // collectionType = ObjectCollection.SUBJECT_COLLECTION;
+                collectionType = ObjectCollection.OBJECT_COLLECTION;
             }
 
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
@@ -721,7 +722,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         if (id == null || id.equals("")) {
-            System.out.println("DASOInstanceGenerator: [ERROR] no identifier provided. See if your SDD contains an identifier," + 
+            System.out.println("DASOInstanceGenerator::generateRowInstances: [ERROR] no identifier provided. See if your SDD contains an identifier," +
                     " and if the corresponding label in ths file is a valid identifier.");
             return null;
         }
@@ -1045,7 +1046,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         if (id == null || id.equals("")) {
-            System.out.println("DASOInstanceGenerator: [ERROR] no identifier provided. See if your SDD contains an identifier," + 
+            System.out.println("DASOInstanceGenerator::retrieveGroundObject: [ERROR] no identifier provided. See if your SDD contains an identifier," +
                     " and if the corresponding label in ths file is a valid identifier.");
             return null;
         }

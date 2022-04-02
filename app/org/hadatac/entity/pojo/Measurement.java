@@ -1656,7 +1656,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    public static void outputAsCSVBySubjectAlignment(String ownerUri, String facets, File file, String fileId, String categoricalOption, boolean keepSameValue) {
+    public static void outputAsCSVBySubjectAlignment(String ownerUri, String facets, File file, String fileId,
+                                                     String categoricalOption, boolean keepSameValue,
+                                                     ColumnMapping columnMapping) {
 
         // Initiate Alignment
         Alignment alignment = new Alignment();
@@ -1672,7 +1674,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         // read backend Solr page by page and merge the results
         System.out.println("start the pagination process...pageSize = " + pageSize);
-        Map<String, Map<String, List<String>>> results = readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment,alignCache, categoricalOption, keepSameValue);
+        Map<String, Map<String, List<String>>> results = readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment,alignCache, categoricalOption, keepSameValue, columnMapping);
 
         // write the results to hard drive
         System.out.print("start to write the dataset to hard drive...");
@@ -1782,7 +1784,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                                                                          String fileId, int pageSize,
                                                                          Map<String, List<String>> studyMap,
                                                                          Alignment alignment, Map<String,List<String>> alignCache,
-                                                                         String categoricalOption, boolean keepSameValue) {
+                                                                         String categoricalOption, boolean keepSameValue, ColumnMapping columnMapping) {
 
         Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
         int page = 0;
@@ -1802,7 +1804,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             if (acquisitionQueryResult.getDocuments() == null || acquisitionQueryResult.getDocuments().size() == 0 ) break;
 
             parseAndMerge(results, acquisitionQueryResult.getDocuments(), studyMap, alignment, alignCache, fileId, page,
-                    pageSize, acquisitionQueryResult.getDocumentSize(), categoricalOption, keepSameValue);
+                    pageSize, acquisitionQueryResult.getDocumentSize(), categoricalOption, keepSameValue, columnMapping);
             page++;
 
             if ( acquisitionQueryResult.getDocuments().size() < pageSize ) break;
@@ -1847,19 +1849,10 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     private static void parseAndMerge(Map<String, Map<String, List<String>>> results, List<Measurement> measurements,
                                Map<String, List<String>> studyMap, Alignment alignment, Map<String, List<String>> alignCache,
-                               String fileId, int page, int pageSize, long totalSize, String categoricalOption, boolean keepSameValue) {
+                               String fileId, int page, int pageSize, long totalSize, String categoricalOption, boolean keepSameValue,
+                                      ColumnMapping columnMapping) {
 
         if ( measurements == null || measurements.size() == 0 ) return;
-
-        String roles = ConfigFactory.load().getString("hadatac.download.alignment");
-        List<String> selectedRoles = new ArrayList<>();
-        if ( roles == null || roles.length() == 0 ) {
-            selectedRoles.add("Child"); // default to Child is not configured
-        } else if ( !roles.contains(",") ) {
-            selectedRoles.add(roles);
-        } else {
-            selectedRoles.addAll(Arrays.asList(roles.split(",")));
-        }
 
         updateSourceStudies(studyMap, measurements);
         List<String> values = null;
@@ -1883,7 +1876,8 @@ public class Measurement extends HADatAcThing implements Runnable {
             if (alignObjs == null) {
 
                 long startTime = System.currentTimeMillis();
-                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), selectedRoles, measurement.getOriginalId());
+                // alignObjs = Alignment.alignmentObjectsWithSubjectGroupMembership(measurement.getEntryObjectUri(), measurement.getStudyUri());
+                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), "http://hadatac.org/ont/hasco/SubjectGroup");
                 duration = System.currentTimeMillis() - startTime;
                 if ( duration > threshold ) log.debug("DOWNLOAD: alignment.alignmentObject: " + duration);
 
@@ -1976,6 +1970,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                 // assign values to results
                 startTime = System.currentTimeMillis();
                 String key = alignment.measurementKey(measurement);
+                if ( columnMapping != null ) {
+                    // this is to remember the column mapping between the hormonized data file and the original DA file
+                    columnMapping.addToMappings(key, measurement.getDasaUri(), measurement.getValueClass());
+                }
+
                 duration = System.currentTimeMillis() - startTime;
                 if ( duration > threshold ) log.debug("DOWNLOAD: alignment.measurementKey " + duration);
 
@@ -2045,7 +2044,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             int current_ratio = (int)ratio;
             if (current_ratio > prev_ratio) {
                 prev_ratio = current_ratio;
-                System.out.println(Thread.currentThread() + " : Progress: " + current_ratio + "%");
+                if ( current_ratio % 20 == 0 ) System.out.println(Thread.currentThread() + " : Progress: " + current_ratio + "%");
 
                 dataFile = DataFile.findById(fileId);
                 if (dataFile != null) {
