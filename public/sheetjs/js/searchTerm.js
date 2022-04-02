@@ -43,7 +43,7 @@ var HttpClient = function() {
     this.get = function(aUrl, aCallback) {
         var anHttpRequest = new XMLHttpRequest();
         anHttpRequest.open("GET", aUrl, true);
-        anHttpRequest.onreadystatechange = function() { 
+        anHttpRequest.onreadystatechange = function() {
             if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
                 aCallback(anHttpRequest.responseText);
         }
@@ -60,33 +60,34 @@ function prehttp(termToSearch){
     var client = new HttpClient();
     var theUrl;
     var bioportal_key="";
-    
+
 
     $.ajax({
       type : 'GET',
-      url : 'http://localhost:9000/hadatac/sddeditor_v2/getBioportalKey',
+      // url : 'http://localhost:9000/hadatac/sddeditor_v2/getBioportalKey',
+      url : '/hadatac/sddeditor_v2/getBioportalKey',
       data : {
           //editValue: changeValue
       },
       success : function(data) {
          bioportal_key=data;
-         
+
 
          if(numToPage=="All"){
-           
+
              theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key;
          }
          else if(numToPage==null){
-           
+
              numToPage=5;
              theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key+"&pagesize="+numToPage
          }
          else{
-           
+
              theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey="+bioportal_key+"&pagesize="+numToPage;
          }
 
-     
+
          //var theUrl="http://data.bioontology.org/search?q="+termToSearch+"&apikey=3b6101b1-fc1a-45c2-a8a6-136a04f228c5&pagesize=5";
          client.get(theUrl, function(response) {
 
@@ -104,12 +105,12 @@ function prehttp(termToSearch){
                      def="";
                  }
 
-                 
+
                  var ontoCartName=contact.collection[i].links.ontology;
                  var ontoName=contact.collection[i]["@id"];
-                 
-                 
-                 
+
+
+
                  eachEntry.push(prefLabel_);
                  eachEntry.push(def);
                  eachEntry.push(ontoName);
@@ -119,7 +120,7 @@ function prehttp(termToSearch){
 
              }
 
-             
+
              createDisplay(resultsArray,numResults);
 
          });
@@ -138,7 +139,7 @@ function createDisplay(resultsArray,numResults){
             var des=resultsArray[i][1];
             var onto=resultsArray[i][2];
             var cartonto=resultsArray[i][3];
-           
+
 
             entryItem.termname=name;
             if(des==""){
@@ -234,7 +235,7 @@ function getPosition(e) {
     }
 }
 function positionMenu(e) {
-    
+
     clickCoords = getPosition(e);
     clickCoordsX = clickCoords.x;
 
@@ -281,7 +282,7 @@ function changePage(page,objJson){
 
     listing_table.innerHTML = "";
     var tabchar="-";
-    
+
     for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < objJson.length; i++) {
         var num=i+1;
         listing_table.style.background = "AliceBlue";
@@ -290,7 +291,7 @@ function changePage(page,objJson){
         var tempLIRI=[];
         var prefix;
         if(objJson[i].ontolink.includes("#")){
-           
+
             prefix=reference;
         }
         else if(!objJson[i].ontolink.includes("#")){
@@ -344,11 +345,11 @@ function changePage(page,objJson){
         ont.innerHTML=objJson[i].ontolink;
         tempLIRI.push(objJson[i].ontolink);
         listOfLabelAndIRI.push(tempLIRI);
-        
+
         if (document.addEventListener) { // IE >= 9; other browsers
             ont.addEventListener('contextmenu', function(e) {
                 termChosen= this.innerHTML;
-               
+
                e.preventDefault();
                 showContextMenu();
                 positionMenu(e);
@@ -367,18 +368,18 @@ function changePage(page,objJson){
                window.event.returnValue = false;
             });
          }
-        
-        
+
+
         if (document.addEventListener) { // IE >= 9; other browsers
             ont.addEventListener('click', function(e) {
                 linkChosen= this.innerHTML;
                 var win = window.open(linkChosen, '_blank');
                 win.focus();
 
-               
+
 
             }, false);
-            
+
          }
          else { // IE < 9
             document.attachEvent('oncontextmenu', function() {
@@ -389,9 +390,9 @@ function changePage(page,objJson){
         listing_table.appendChild(des);
         listing_table.appendChild(ont);
 
-      
+
     }
-    
+
     page_span.innerHTML = page + "/" + numPages(objJson);
 
     if (page == 1) {
@@ -415,15 +416,16 @@ function numPages(objJson)
 
 var additem=document.getElementById("thisitem");
     additem.addEventListener('click', function(e) {
-       
+
         stringToPass=termChosen;
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/addToCart',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/addToCart',
+            url : '/hadatac/sddeditor_v2/addToCart',
             data : {
                 ontology: stringToPass
-                
+
             },
             success : function(data) {
                 addcartlocal();
@@ -446,6 +448,6 @@ var additem=document.getElementById("thisitem");
         else{
             toRet=passage;
         }
-       
+
         return toRet;
     }

@@ -1,5 +1,6 @@
 var demo_enabled = false;
 var sdd_suggestions;
+var sdd_suggestions_organized;
 var sddgenAdress;
 var globalMenu;
 var globalHeaders=[];
@@ -75,7 +76,8 @@ function getURL(url){
 // retrieves indicator for whether the files have been downloaded already
 $.ajax({
    type : 'POST',
-   url : 'http://localhost:9000/hadatac/sddeditor_v2/getIndicator',
+   // url : 'http://localhost:9000/hadatac/sddeditor_v2/getIndicator',
+   url : '/hadatac/sddeditor_v2/getIndicator',
    data : {
 
    },
@@ -370,10 +372,12 @@ function applySuggestion(colval, rowval, menuoptns, isVirtual) {
 
    for (const sddRow of sdd_suggestions["sdd"]["Dictionary Mapping"][keyword]){
       if(sddRow["column"] == rowval){
-         for (const sddCol of sddRow[colval]){
-            menuoptns.push([sddCol.star, sddCol.value]);
+         if(colval in sddRow){
+            for (const sddCol of sddRow[colval]){
+               menuoptns.push([sddCol.star, sddCol.value]);
+            }
+            break; // After we find the correct value we can quit searching
          }
-         break; // After we find the correct value we can quit searching
       }
    }
 
@@ -418,6 +422,7 @@ cdg.addEventListener('contextmenu', function (e) {
       click: function (ev) {
          var intendedRow=e.cell.rowIndex;
          cdg.insertRow([],intendedRow);
+         createCopySheet(cdg.data);
          var copyApproval = [];
          for(var i=0; i<approvalList.length;i++){
             if(i == intendedRow){
@@ -437,7 +442,9 @@ cdg.addEventListener('contextmenu', function (e) {
          approvalList = copyApproval;
          for(var i=intendedRow; i<approvalList.length; i++){
             for(var j=0; j<approvalList[i].length; j++){
-               if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
+               // Not sure why we are checking for the cell under it, but I'm going to keep for reference
+               if(approvalList[i][j] != ""){
+               // if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
                   indicateApproval(i,j,cdg.data[i][j]);
                }
             }
@@ -449,6 +456,7 @@ cdg.addEventListener('contextmenu', function (e) {
       click: function (ev) {
          var intendedRow=parseFloat(e.cell.rowIndex);
          cdg.insertRow([],intendedRow+1);
+         createCopySheet(cdg.data);
          var copyApproval = [];
          for(var i=0; i<approvalList.length;i++){
             if(i == intendedRow+1){
@@ -468,7 +476,9 @@ cdg.addEventListener('contextmenu', function (e) {
          approvalList = copyApproval;
          for(var i=intendedRow+1; i<approvalList.length; i++){
             for(var j=0; j<approvalList[i].length; j++){
-               if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
+               // Not sure why we are checking for the cell under it, but I'm going to keep for reference
+               if(approvalList[i][j] != ""){
+               // if(approvalList[i][j] != "" || (approvalList[i+1][j] != null && approvalList[i+1][j]!="")){
                   indicateApproval(i,j,cdg.data[i][j]);
                }
             }
@@ -491,19 +501,23 @@ cdg.addEventListener('contextmenu', function (e) {
          }
          for( var i=1;i<temp.length;i++){
             $.ajax({
-               type : 'POST',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
+               type : "GET",
+               // url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
+               url : '/hadatac/sddeditor_v2/removingRow',
                data : {
-                  removedValue:temp[i]
+                  removedValue: "test" //JSON.stringify(temp[i])
                },
+               contentType: "application/json; charset=utf-8",
+               dataType : "json",
                success : function(data) {
-
+                  console.log("I worked!");
                }
             });
          }
          storeRow.push(temp);
          var intendedRow=parseFloat(e.cell.rowIndex);
          cdg.deleteRow(intendedRow);
+         createCopySheet(cdg.data);
          storeApprovalRow=approvalList[intendedRow];
          approvalList[intendedRow] = [];
          for(var i=0; i<approvalList[0].length; i++){
@@ -521,8 +535,12 @@ cdg.addEventListener('contextmenu', function (e) {
          click: function (ev) {
             var originalVal=e.cell.value;
             $.ajax({
-               type : 'POST',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/getUserName',
+               type : 'GET',
+               // url : 'http://localhost:9000/hadatac/sddeditor_v2/getUserName',
+               url : '/hadatac/sddeditor_v2/getUserName',
+               data : {
+                  email:email
+               },
                success : function(nameData) {
                   var today = new Date();
                   var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
@@ -587,8 +605,11 @@ function insertRowBelow(){
 
 var storeRow=[];
 var storeApprovalRow=[];
+
+// This seems to be duplicate code that is not run anymore
+/*
 function removeRow(){
-   // alert("Warning! You are about to delete a row.");
+   alert("Warning! You are about to delete a row.");
    var temp=[];
    temp.push(rowNum);
    for(var i=0;i<cdg.data[rowNum].length+1;i++){
@@ -601,8 +622,9 @@ function removeRow(){
    }
    for( var i=1;i<temp.length;i++){
       $.ajax({
-         type : 'POST',
-         url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
+         type : 'GET',
+         // url : 'http://localhost:9000/hadatac/sddeditor_v2/removingRow',
+         url : '/hadatac/sddeditor_v2/removingRow',
          data : {
             removedValue:temp[i]
          },
@@ -611,7 +633,6 @@ function removeRow(){
          }
       });
    }
-
 
    storeRow.push(temp);
    var intendedRow=parseFloat(rowNum);
@@ -623,6 +644,7 @@ function removeRow(){
    }
    approvalList.splice(intendedRow,1);
 }
+*/
 
 //resize
 function _resize() {
@@ -757,6 +779,8 @@ function createCopySheet(sheetCopy){
 
 function approvalFunction(sheetCopy){
    if (approvalList === undefined || approvalList.length == 0) {
+      // console.log("JSON.stringify(sheetCopy)");
+      // console.log(JSON.stringify(sheetCopy));
       approvalList = JSON.parse(JSON.stringify(sheetCopy));
    }
    for(var i=0;i<sheetCopy.length;i++){
@@ -764,7 +788,14 @@ function approvalFunction(sheetCopy){
       for(var j=0;j<sheetCopy[i].length;j++){
          var keys=sheetCopy[i][j];
          var temp2=[];
-
+         /*
+         console.log(i);
+         console.log(j);
+         console.log("approvalList");
+         console.log(approvalList);
+         console.log("sheetCopy");
+         console.log(sheetCopy);
+         */
          if(approvalList[i][j] == sheetCopy[i][j]){
             approvalList[i][j] = "";
          }
@@ -868,7 +899,9 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
                   ApproveData = false;
                }
                else{
-                  approvalList = JSON.parse(json[i][1]);
+
+                  // This adds bad approval starting data causing errors
+                  // approvalList = JSON.parse(json[i][1]);
                }
             }
          }
@@ -1025,7 +1058,8 @@ function getSuggestion(){
 
          $.ajax({
             type : 'POST',
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologiesKeys',
+            url : '/hadatac/sddeditor_v2/getOntologiesKeys',
             dataType: 'json',
             success : function(labelRequest) {
                labelsList = labelRequest
@@ -1035,7 +1069,8 @@ function getSuggestion(){
          // Get the ontologies for the Suggestion Request
          $.ajax({
             type : 'POST',
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/getOntologies',
+            url : '/hadatac/sddeditor_v2/getOntologies',
             dataType: 'json',
             success : function(ontRequest) {
                var ontologyList = ontRequest;
@@ -1096,6 +1131,16 @@ function getSuggestion(){
       }
       else {
          sdd_suggestions = data;
+         // This data is duplicated but reorganized for quicker access at runtime
+         // Someday we might completely sever the use of sdd_suggestions
+
+         sdd_suggestions_organized = {};
+         for(const i of sdd_suggestions.sdd["Dictionary Mapping"].columns){
+            sdd_suggestions_organized[i.column] = {};
+            sdd_suggestions_organized[i.column]['attribute'] = i.attribute;
+            // TODO: We need to add the other SDD columns and virtual columns
+         }
+
          spinnerStatus.stop();
          imageStatus.style.visibility = 'visible';
          imageStatus.src = imgPath + 'success.png'
@@ -1105,7 +1150,8 @@ function getSuggestion(){
    if(sddgenAdress == null){
       $.ajax({
          type : 'POST',
-         url : 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress',
+         // url : 'http://localhost:9000/hadatac/sddeditor_v2/getSDDGenAddress',
+         url : '/hadatac/sddeditor_v2/getSDDGenAddress',
          dataType: 'json',
          success : function(getSDDGenRequest) {
             sddgenAdress = getSDDGenRequest;
@@ -1119,7 +1165,7 @@ function getSuggestion(){
                dataType : 'json',
                timeout : 5000,
                success : function(ping) {
-                  console.log(ping);
+                  // console.log(ping);
                   if(ping){
                      getJSON(sddgenAdress + 'populate-sdd',  sddGenFunction);
                   }
@@ -1187,7 +1233,7 @@ function jsonparser(colval,rowval,menuoptns,isVirtual){
    };
 
 
-   getJSON('http://localhost:5000/populate-sdd/',  function(err, data) {
+   getJSON(sddgenAdress + 'populate-sdd/',  function(err, data) {
       if (err != null) {
          console.error(err);
       }
@@ -1447,11 +1493,14 @@ function populateThis(headersCol){
 
 }
 var durl_;
+
+
 function populateSDD(){
 
    $.ajax({
       type : 'POST',
-      url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
+      // url : 'http://localhost:9000/hadatac/sddeditor_v2/getHeaderLoc',
+      url : '/hadatac/sddeditor_v2/getHeaderLoc',
       data : {
 
       },
@@ -1462,7 +1511,8 @@ function populateSDD(){
    });
    $.ajax({
       type : 'POST',
-      url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
+      // url : 'http://localhost:9000/hadatac/sddeditor_v2/getCommentLoc',
+      url : '/hadatac/sddeditor_v2/getCommentLoc',
       data : {
 
       },
@@ -1473,9 +1523,8 @@ function populateSDD(){
       }
 
    });
-
-
 }
+
 
 function getHeaderData(data){
    var headersheet=data.split('-')[0];

@@ -173,7 +173,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
   }
   else{
     headerMap.set(sheetName, json[0]);
-    
+
     if(json.length==1){
       cdg.data = json;
       emptySheet=0;
@@ -183,7 +183,7 @@ var _onsheet = function(json, sheetnames, select_sheet_cb) {
     }
     changeHeader(json[0],emptySheet);
   }
- 
+
   cdg.draw();
 };
 if(document.getElementById("headerdetails").value==" "){
@@ -202,7 +202,7 @@ cdg.addEventListener('contextmenu', function (e) {
                     var header_=document.getElementById("headerdetails");
                     header_.value=header_location;
                     document.getElementById('showcarry').removeAttribute("disabled");
-                   
+
                     storeHeader(header_location);
                 }
             },
@@ -225,34 +225,36 @@ function storeHeader(header_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/dd_editor/getHeaderLoc',
+    // url : 'http://localhost:9000/hadatac/dd_editor/getHeaderLoc',
+    url : '/hadatac/dd_editor/getHeaderLoc',
     data : {
       header_loc: header_location
-      
+
     },
     success : function(data) {
-    
+
     },
-  
+
   });
-  
+
 }
 
 function storeDesc(desc_location){
 
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/dd_editor/getCommentLoc',
+    // url : 'http://localhost:9000/hadatac/dd_editor/getCommentLoc',
+    url : '/hadatac/dd_editor/getCommentLoc',
     data : {
       desc_loc: desc_location
-      
+
     },
     success : function(data) {
-     
+
     },
-  
+
   });
-  
+
 }
 // function saveLocations(){
 //   location.reload();
@@ -265,4 +267,3 @@ function storeDesc(desc_location){
 // }
 // alert(document.getElementById("headerdetails").value);
 // console.log(document.getElementById("headerdetails"));
-
