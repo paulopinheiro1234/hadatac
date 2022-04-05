@@ -1101,8 +1101,11 @@ function getSuggestion(){
                   },
                   error : function(xhr, textStatus, errorThrown) {
                      console.log('Couldnt connect to SDDgen');
-                     console.log("FAIL: " + xhr + " " + textStatus + " " + errorThrown);
-                     console.log(xhr);
+                     // console.log("FAIL: " + xhr + " " + textStatus + " " + errorThrown);
+                     console.log(xhr.responseJSON['Bad Request']);
+                     if(xhr.responseJSON['Bad Request'] === 'ontologies must be not be empty'){
+                        console.log('This error is usually caused by not loading namespace ontologies into the triple store');
+                     }
 
                      spinnerStatus.stop();
                      imageStatus.style.visibility = 'visible';
