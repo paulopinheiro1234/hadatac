@@ -1491,6 +1491,8 @@ function populateThis(headersCol){
    }
    globalR= cdg.data.length;
    createCopySheet(cdg.data);
+   approvalList = undefined; // This is to reset the approval data as we import a new DD
+   approvalFunction(cdg.data);
    getSuggestion();
 
 
