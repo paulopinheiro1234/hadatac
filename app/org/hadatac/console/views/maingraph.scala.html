@@ -3,6 +3,7 @@
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.java.utils.TemplateUtils._
 @import org.hadatac.console.controllers._
+@import com.typesafe.config.ConfigFactory
 
 <!DOCTYPE html>
 
@@ -44,7 +45,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="@org.hadatac.console.controllers.routes.Application.protectedIndex()">HADatAc Home</a>
+@*                    @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){*@
+                        <a class="navbar-brand" href="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionUrl")">HHEAR Portal Home</a>
+@*                    } else{
+                        <a class="navbar-brand" href="@org.hadatac.console.controllers.routes.Application.protectedIndex()">HADatAc Home</a>
+                    }*@
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">

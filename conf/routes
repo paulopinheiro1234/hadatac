@@ -634,4 +634,9 @@ POST        /callback                                      @org.pac4j.play.Callb
 GET         /casProxyCallback                              @org.pac4j.play.CallbackController.callback(request: Request)
 POST        /casProxyCallback                              @org.pac4j.play.CallbackController.callback(request: Request)
 GET         /logout                                        @org.pac4j.play.LogoutController.logout(request: Request)
-GET         /centralLogout                                 org.hadatac.console.controllers.CentralLogoutController.logout(request: Request)
+GET         /centralLogout                                 org.hadatac.console.controllers.Application.logOutUser(request: Request)
+
+#Single Sign-On
+GET      /receiver                                        org.hadatac.console.controllers.Application.getReceiver()
+GET      /protected/index.html/:email                     org.hadatac.console.controllers.Application.protectedInd(email: String)
+POST     /hadatac/checkUser/                              org.hadatac.console.controllers.Signup.checkUserExists( request: Request)

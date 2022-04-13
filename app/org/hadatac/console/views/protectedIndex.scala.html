@@ -1,4 +1,4 @@
-@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], userName: String)
+@(userName: String)
 @import scala.collection.JavaConverters._
     @import java.lang.System.console
     @()
@@ -11,7 +11,6 @@
     @import be.objectify.deadbolt.java.utils.TemplateUtils._
     @import play.api.Play
     @import com.typesafe.config.ConfigFactory
-@profiles() = { @profileList.toList }
     @main("HADatAc: Human-Aware Data Acquisition Framework","LoggedIn",userName) {
 
         <script type="text/javascript" src="/hadatac/assets/javascripts/portal-text.js"></script>
@@ -20,8 +19,13 @@
             <div class="row">
                 <div class="col-md-1 col-xs-0"></div>
                 <div id="textTitle" class="col-md-8 col-xs-0">
-                    <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
-                    <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+                    @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
+                        <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.shortname")@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.pagetitle")</font></h3>
+                        <script>showText("@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.description")", "textTitle")</script><a href="mailto:@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.contact_email")">@ConfigFactory.load().getString("hadatac.ThirdPartyUser.community.contact_email")</a>
+                   } else{
+                        <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
+                        <script>showText("@ConfigFactory.load().getString("hadatac.community.description")", "textTitle")</script>
+                    }
                     <hr>
                 </div>
                 <div class="col-md-1 col-xs-0"></div>

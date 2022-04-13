@@ -1,0 +1,105 @@
+@(userName: String)
+@import helper._
+@import org.hadatac.utils._
+@import org.hadatac.console.views.html._
+@import org.hadatac.console.controllers._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.java.utils.TemplateUtils._
+@import play.api.Play
+@import com.typesafe.config.ConfigFactory
+@main("", "",userName) {
+<!DOCTYPE html>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <style>
+            .loader {
+                position: absolute;
+                left: 50%;
+                top: 25%;
+                z-index: 1;
+                width: 120px;
+                height: 120px;
+                margin: -76px 0 0 -76px;
+                border: 10px solid #f3f3f3;
+                border-radius: 50%;
+                border-top: 10px solid black;
+                border-bottom: 10px solid black;
+                width: 100px;
+                height: 100px;
+                -webkit-animation: spin 2s linear infinite;
+                animation: spin 2s linear infinite;
+            }
+
+            @@-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+            }
+
+            @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+            }
+            .redirect {
+                position: absolute;
+                top: 30%;
+                /*right: 40%;*/
+                /*bottom: 20%;*/
+                left: 46%;
+                /*background: gold;*/
+                /*border: 1px solid blue;*/
+            }
+    </style>
+    <div class="text-center"></br></br></br></br></br></br></br></br></br></br></br></br>
+    </br></br></br></br></br></br></br></br></br></br></br></br></div>
+    <div class="loader"></div>
+    <div class="redirect" >Redirecting...<p id='test'></p></div>
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/style.css")"/>
+    <div id="result" hidden>
+        <form action="/callback?client_name=FormClient" method="POST">
+            <b>User Name</b></br>
+            <input type="text" id="username" value="" />
+            <p /><p />
+            <b>Password</b></br>
+            <input type="password" id="password" value="" />
+            <p />
+            <input type="submit" id="submit" value="Login now" />
+        </form>
+    </div>
+    <script type="text/javascript">
+            var data1;
+            document.onreadystatechange = function () {
+                var state = document.readyState
+                if (state == 'interactive') {
+                    document.getElementById('contents').style.visibility="hidden";
+                } else if (state == 'complete') {
+                    setTimeout(function(){
+                        document.getElementById('interactive');
+                        document.getElementById('load').style.visibility="hidden";
+                        document.getElementById('contents').style.visibility="visible";
+                    },1000);
+                }
+            }
+
+            let count =0;
+            window.addEventListener('message', function (e) {
+                var obj = JSON.parse(e.data);
+                // console.log("inside script:"+e.origin);
+                // console.log(e.data);
+                // console.log(obj);
+                // data1 = obj;
+                obj.name = obj.username;
+                obj.repeatPassword = obj.password;
+                count=count+1;
+                if(count.valueOf()<3 && e.origin =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.tokenUrl")"){
+                    $.ajax({
+                        type: 'POST',
+                        url: '/hadatac/checkUser/',
+                        data: obj,
+                        success: function (response) {
+                            location.replace(response);
+                        },
+                    });
+                }
+            }, false);
+    </script>
+}
+
