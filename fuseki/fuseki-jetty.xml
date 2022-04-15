@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<!--
+Example Jetty - you will need to configure a certificate.
+** You will need to configure this example. **
+See "sslContextFactory" below.
+Contributed by: Jason Levitt
+http://mail-archives.apache.org/mod_mbox/jena-users/201509.mbox/%3C55EB4CA2.7040803@apache.org%3E
+Use:
+   fuseki -jetty fuseki-jetty-https.xml ...
+
+External references:
+Jetty documentation on SSL:
+   http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html
+Oracle Java keytool
+   http://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html
+
+Some more tools to help manage Java certificate store:
+   https://bitbucket.org/rvesse/java-ssl-helper/overview
+(external project Rob Vesse and Paul Heinlein / License: CC-BY-NC-SA)
+-->
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+    <Get name="ThreadPool">
+        <Set name="minThreads" type="int"><Property name="jetty.threadPool.minThreads" deprecated="threads.min" default="10"/></Set>
+        <Set name="maxThreads" type="int"><Property name="jetty.threadPool.maxThreads" deprecated="threads.max" default="200"/></Set>
+        <Set name="idleTimeout" type="int"><Property name="jetty.threadPool.idleTimeout" deprecated="threads.timeout" default="60000"/></Set>
+        <Set name="detailedDump">false</Set>
+    </Get>
+
+    <!-- =========================================================== -->
+    <!-- Add shared Scheduler instance                               -->
+    <!-- =========================================================== -->
+    <Call name="addBean">
+        <Arg>
+            <New class="org.eclipse.jetty.util.thread.ScheduledExecutorScheduler"/>
+        </Arg>
+    </Call>
+
+    <!-- =========================================================== -->
+    <!-- Http Configuration.                                         -->
+    <!-- This is a common configuration instance used by all         -->
+    <!-- connectors that can carry HTTP semantics (HTTP, HTTPS, etc.)-->
+    <!-- It configures the non wire protocol aspects of the HTTP     -->
+    <!-- semantic.                                                   -->
+    <!--                                                             -->
+    <!-- This configuration is only defined here and is used by      -->
+    <!-- reference from other XML files such as jetty-http.xml,      -->
+    <!-- jetty-https.xml and other configuration files which         -->
+    <!-- instantiate the connectors.                                 -->
+    <!--                                                             -->
+    <!-- Consult the javadoc of o.e.j.server.HttpConfiguration       -->
+    <!-- for all configuration that may be set here.                 -->
+    <!-- =========================================================== -->
+    <New id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+        <Set name="outputBufferSize"><Property name="jetty.httpConfig.outputBufferSize" deprecated="jetty.output.buffer.size" default="32768" /></Set>
+        <Set name="outputAggregationSize"><Property name="jetty.httpConfig.outputAggregationSize" deprecated="jetty.output.aggregation.size" default="8192" /></Set>
+        <Set name="requestHeaderSize"><Property name="jetty.httpConfig.requestHeaderSize" deprecated="jetty.request.header.size" default="8192" /></Set>
+        <Set name="responseHeaderSize"><Property name="jetty.httpConfig.responseHeaderSize" deprecated="jetty.response.header.size" default="8192" /></Set>
+        <Set name="sendServerVersion"><Property name="jetty.httpConfig.sendServerVersion" deprecated="jetty.send.server.version" default="true" /></Set>
+        <Set name="sendDateHeader"><Property name="jetty.httpConfig.sendDateHeader" deprecated="jetty.send.date.header" default="false" /></Set>
+        <Set name="headerCacheSize"><Property name="jetty.httpConfig.headerCacheSize" default="512" /></Set>
+        <Set name="delayDispatchUntilContent"><Property name="jetty.httpConfig.delayDispatchUntilContent" deprecated="jetty.delayDispatchUntilContent" default="true"/></Set>
+        <!-- Uncomment to enable handling of X-Forwarded- style headers
+        <Call name="addCustomizer">
+          <Arg><New class="org.eclipse.jetty.server.ForwardedRequestCustomizer"/></Arg>
+        </Call>
+        -->
+    </New>
+
+    <!-- =========================================================== -->
+    <!-- Set the default handler structure for the Server            -->
+    <!-- A handler collection is used to pass received requests to   -->
+    <!-- both the ContextHandlerCollection, which selects the next   -->
+    <!-- handler by context path and virtual host, and the           -->
+    <!-- DefaultHandler, which handles any requests not handled by   -->
+    <!-- the context handlers.                                       -->
+    <!-- Other handlers may be added to the "Handlers" collection,   -->
+    <!-- for example the jetty-requestlog.xml file adds the          -->
+    <!-- RequestLogHandler after the default handler                 -->
+    <!-- =========================================================== -->
+    <Set name="handler">
+        <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+            <Set name="handlers">
+                <Array type="org.eclipse.jetty.server.Handler">
+                    <Item>
+                        <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+                    </Item>
+                    <Item>
+                        <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+                    </Item>
+                </Array>
+            </Set>
+        </New>
+    </Set>
+
+    <!-- =========================================================== -->
+    <!-- extra server options                                        -->
+    <!-- =========================================================== -->
+    <Set name="stopAtShutdown"><Property name="jetty.server.stopAtShutdown" default="true"/></Set>
+    <Set name="stopTimeout">5000</Set>
+    <Set name="dumpAfterStart"><Property name="jetty.server.dumpAfterStart" deprecated="jetty.dump.start" default="false"/></Set>
+    <Set name="dumpBeforeStop"><Property name="jetty.server.dumpBeforeStop" deprecated="jetty.dump.stop" default="false"/></Set>
+
+    <!-- ============================================================= -->
+    <!-- Configure the Jetty Server instance with an ID "Server"       -->
+    <!-- by adding a HTTP connector.                                   -->
+    <!-- This configuration must be used in conjunction with jetty.xml -->
+    <!-- ============================================================= -->
+
+    <!-- =========================================================== -->
+    <!-- Add a HTTP Connector.                                       -->
+    <!-- Configure an o.e.j.server.ServerConnector with a single     -->
+    <!-- HttpConnectionFactory instance using the common httpConfig  -->
+    <!-- instance defined in jetty.xml                               -->
+    <!--                                                             -->
+    <!-- Consult the javadoc of o.e.j.server.ServerConnector and     -->
+    <!-- o.e.j.server.HttpConnectionFactory for all configuration    -->
+    <!-- that may be set here.                                       -->
+    <!-- =========================================================== -->
+    <Call name="addConnector">
+        <Arg>
+            <New id="httpConnector" class="org.eclipse.jetty.server.ServerConnector">
+                <Arg name="server"><Ref refid="Server" /></Arg>
+                <Arg name="acceptors" type="int"><Property name="jetty.http.acceptors" deprecated="http.acceptors" default="-1"/></Arg>
+                <Arg name="selectors" type="int"><Property name="jetty.http.selectors" deprecated="http.selectors" default="-1"/></Arg>
+                <Arg name="factories">
+                    <Array type="org.eclipse.jetty.server.ConnectionFactory">
+                        <!-- uncomment to support proxy protocol
+                        <Item>
+                          <New class="org.eclipse.jetty.server.ProxyConnectionFactory"/>
+                        </Item>-->
+                        <Item>
+                            <New class="org.eclipse.jetty.server.HttpConnectionFactory">
+                                <Arg name="config"><Ref refid="httpConfig" /></Arg>
+                            </New>
+                        </Item>
+                    </Array>
+                </Arg>
+                <Set name="host"><Property name="jetty.http.host" deprecated="jetty.host" /></Set>
+                <Set name="port"><Property name="jetty.http.port" deprecated="jetty.port" default="3030" /></Set>
+                <Set name="idleTimeout"><Property name="jetty.http.idleTimeout" deprecated="http.timeout" default="30000"/></Set>
+                <Set name="acceptorPriorityDelta"><Property name="jetty.http.acceptorPriorityDelta" deprecated="http.acceptorPriorityDelta" default="0"/></Set>
+                <Set name="acceptQueueSize"><Property name="jetty.http.acceptQueueSize" deprecated="http.acceptQueueSize" default="0"/></Set>
+            </New>
+        </Arg>
+    </Call>
+
+    <Call name="setAttribute">
+        <Arg>org.eclipse.jetty.server.Request.maxFormContentSize</Arg>
+        <Arg>5000000</Arg>
+    </Call>
+
+</Configure>

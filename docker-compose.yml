@@ -21,24 +21,18 @@ services:
         ports:
             - "8983:8983"
 
-    # The Hadatac Blazegraph instance
-    blazegraph:
-        build:
-            context: ./blazegraph
-            dockerfile: Dockerfile
-        container_name: hadatac_blazegraph
+    fuseki:
+        build: ./fuseki
+        container_name: hadatac_fuseki
+        ports:
+            - "3030:3030"
         networks:
             hadatac:
                 aliases:
-                    - blazegraph
-        ports:
-            - "8080:8080"
-        restart: always
-        environment:
-            JAVA_OPTS: -Xms128m -Xmx2g
+                  - fuseki
         volumes:
-            - hadatac-blazegraph:/var/lib/jetty
-#            - /path in host server/blazegraph/bigdata.jnl:/var/lib/jetty/bigdata.jnl # Uncomment this option to use external binding
+            -   hadatac-fuseki-data:/fuseki/databases
+        restart: always
 
     # The primary hadatac web app
     hadatac:
@@ -71,18 +65,18 @@ services:
 #            - /path in host server/conf:/root/app/conf # Uncomment this option to use external binding
             - /var/log/hadatac:/hadatac/logs
         links:
-            - blazegraph
+            - fuseki
             - solr
         depends_on:
-            - blazegraph
+            - fuseki
             - solr
-  
+
     shinyproxy:
         image: tetherlessworld/hadatac-shinyproxy:latest
         container_name: hadatac_shinyproxy
         ports:
             - 8081:8080
-        environment: 
+        environment:
             - "WORK_DIR=${PWD}"
         networks:
             hadatac:
@@ -97,7 +91,7 @@ services:
 
 volumes:
     hadatac-solr:
-    hadatac-blazegraph:
+    hadatac-fuseki-data:
     hadatac-csvs:
     hadatac-working_csv:
     hadatac-conf:

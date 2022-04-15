@@ -12,7 +12,7 @@ import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.*;
 import play.mvc.Result;
 
-import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.models.SysUser;
 import controllers.routes;

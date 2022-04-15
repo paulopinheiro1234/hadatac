@@ -3,7 +3,7 @@ package org.hadatac.console.providers;
 import java.io.Serializable;
 import java.util.Locale;
 
-import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang.LocaleUtils;
 
 public abstract class AuthUser implements MyAuthUserIdentity, Serializable {
 

@@ -66,7 +66,7 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.8.0",
   //  "be.objectify" %% "deadbolt-java" % "2.6.1",
   "be.objectify" %% "deadbolt-java" % "2.8.1",
-  "com.fasterxml.jackson.module" % "jackson-module-scala_2.12" % "2.11.0",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.12" % "2.13.2",
   "org.apache.poi" % "poi-ooxml" % "3.14",
   "org.apache.commons" % "commons-configuration2" % "2.0",
   "com.typesafe.play" %% "play-mailer" % "8.0.1",
@@ -88,5 +88,6 @@ libraryDependencies ++= Seq(
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/",
   "Spring Framework Security" at "https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto")
+resolvers += Resolver.bintrayRepo("playframework", "maven")
 
 routesGenerator := InjectedRoutesGenerator

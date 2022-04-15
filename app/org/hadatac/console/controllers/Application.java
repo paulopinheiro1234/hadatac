@@ -63,7 +63,6 @@ import static org.hadatac.Constants.EMAIL_TEMPLATE_FALLBACK_LANGUAGE;
 
 public class Application extends Controller {
 
-
     @Inject
     private Config config;
 
@@ -192,14 +191,18 @@ public class Application extends Controller {
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         Optional<String> username = request.queryString("username");
         Optional<String> error = request.queryString("error");
+
         if (!error.isEmpty() && error.get().equalsIgnoreCase("CredentialsException") && !username.isEmpty()) {
+            Logger.info("credentials exception!");
             SysUser sysUser = AuthApplication.getAuthApplication().getUserProvider().getUser(username.get());
             sendVerifyEmailMailingAfterSignup(sysUser);
             return unverified();
         }
         else if(!error.isEmpty() && error.get().equalsIgnoreCase("BadCredentialsException")) {
+            Logger.info("bad credentials exception!");
             return ok(errorLogin.render());
         }
+        Logger.info("no credentials exception!");
         return ok(loginForm.render(formClient.getCallbackUrl()));
     }
 
