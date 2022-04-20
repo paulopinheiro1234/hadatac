@@ -437,7 +437,7 @@
     // Capture Right Click event
     if (document.addEventListener) { // IE >= 9; other browsers
        document.addEventListener('contextmenu', function(e) {
-       
+
           onto=(e.target.__data__.name.split(" [")[0])+","+(e.target.__data__.name.split("[")[1].split("]")[0]);
           e.preventDefault();
           showContextMenu();
@@ -469,7 +469,8 @@
          $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/addToCart',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/addToCart',
+            url : '/hadatac/sddeditor_v2/addToCart',
             data : {
                 ontology: str
             },
@@ -493,7 +494,8 @@
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+            url : '/hadatac/sddeditor_v2/getCart',
             data : {
                 //cartamount: cart_ctr
             },
@@ -505,25 +507,26 @@
      }
      function hideCart(){
         var x = document.getElementsByClassName("cart-content");
-            
+
         for (var i=0; i < x.length; i++) {
             console.log(i);
             x[i].style.display = 'none';
-        }    
+        }
      }
 
      document.getElementById("cart_button").onclick = function() {
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+            url : '/hadatac/sddeditor_v2/getCart',
             data : {
                 //cartamount: cart_ctr
             },
             success : function(data) {
              console.log(data);
-                
-                
+
+
             var select=document.getElementById("seecart"),data;
             for(var i=0;i<data.length;i++){
                 var span = document.createElement("span");
@@ -534,16 +537,16 @@
                 li.appendChild(document.createTextNode(data[i]+" "));
                 li.appendChild(span);
                 select.appendChild(li);
-                span.onclick = function() { 
+                span.onclick = function() {
                     var str=this.parentElement.innerText;
                     a = str.split("\n");
                     removeCartItem(a[0]);
                     document.getElementById("seecart").children[i].style.display = "none"
                     var li = document.querySelectorAll('.cart-content > li');
-                    li[i].parentNode.removeChild(li[i]);                
+                    li[i].parentNode.removeChild(li[i]);
                  }
             };
-            
+
             var x = document.getElementsByClassName("cart-content");
             for (var i=0; i < x.length; i++) {
                 x[i].style.display = 'block';
@@ -554,15 +557,15 @@
                 var listLength = li.length;
 
                 for (var i = listLength-1; i >=1 ; i--) {
-                    li[i].parentNode.removeChild(li[i]);   
+                    li[i].parentNode.removeChild(li[i]);
                 }
             })
             }
-            
-            
 
 
-            
+
+
+
         });
      }
 
@@ -576,7 +579,8 @@
         $.ajax({
             type : 'GET',
 
-            url : 'http://localhost:9000/hadatac/sddeditor_v2/removeFromCart',
+            // url : 'http://localhost:9000/hadatac/sddeditor_v2/removeFromCart',
+            url : '/hadatac/sddeditor_v2/removeFromCart',
             data : {
                 item: itemToBeRemoved
             },

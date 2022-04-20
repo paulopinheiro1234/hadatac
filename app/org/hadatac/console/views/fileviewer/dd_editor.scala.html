@@ -203,7 +203,8 @@ userName: String
 
                $.ajax({
                type : 'GET',
-               url : 'http://localhost:9000/hadatac/dd_editor/getCheckedSDD',
+               // url : 'http://localhost:9000/hadatac/dd_editor/getCheckedSDD',
+               url : '/hadatac/dd_editor/getCheckedSDD',
                data : {
                  sddFileName: checkedSDDName
 
@@ -211,7 +212,6 @@ userName: String
                success : function(data) {
 
                  sddId=data;
-
 
                },
 
