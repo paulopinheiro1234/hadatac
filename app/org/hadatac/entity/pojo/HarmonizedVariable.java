@@ -58,7 +58,7 @@ public class HarmonizedVariable extends Variable {
 		return sourceList;
 	}
 
-	public void getSourceList(List<Variable> sourceList) {
+	public void setSourceList(List<Variable> sourceList) {
 		this.sourceList = sourceList;
 	}
 
@@ -157,13 +157,13 @@ public class HarmonizedVariable extends Variable {
 		return auxstr;
 	}
 
-	public String dasaToString() {
+	public String dasaToString(int index) {
 		//System.out.println("inside dasaToString()");
 		String auxstr = "";
 		int i = 1;
 		for (Variable source : sourceList) {
 			if (source instanceof OriginalVariable && ((OriginalVariable) source).getDASA() != null) {
-				auxstr = auxstr + " <button id=\'srcBtn" + i++ + "\'>" +((OriginalVariable) source).getDASA().getLabel() + "</button><br>";
+				auxstr = auxstr + " <button id=\'srcBtn" + (index + i++) + "\'>" +((OriginalVariable) source).getDASA().getLabel() + "</button><br>";
 			} else {
 				auxstr = auxstr + "<br>";
 

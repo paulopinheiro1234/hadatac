@@ -3,51 +3,118 @@
   i        : Integer)
 
 @import org.hadatac.metadata.loader.URIUtils;
+@import org.hadatac.entity.pojo.HarmonizedVariable;
+@import org.hadatac.entity.pojo.OriginalVariable;
+@import org.hadatac.console.views.html.schema._
 
-<!-- Modal content -->
 <div class="modal-content">
     <span id="@suffix@(i+1)" class="close">&times;</span>
-    <h3>Variable @variable.toString()</h3>
+    <h3>Variable @variable.getName()</h3>
     <br>
-    <b>Type</b>: @variable.getClass().getSimpleName()<br><br>
-    @if(variable.getRole() != null) {
-        <b>Role</b>: @variable.getRole<br><br>
-    } else {
-        <b>Role</b>: NONE<br><br>
-    }
-    @if(variable.getEntity() != null) {
-        <b>Entity</b>: @variable.getEntity().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getEntity().getUri()))<br>
-        @variable.getEntity().getComment()<br><br>
-    } else {
-        <b>Entity</b>: NONE<br><br>
-    }
-    @if(variable.getAttributeList() != null) {
-        <b>Attribute List</b>: <br>
-        <ul>
-            @for(attr <- variable.getAttributeList()) {
-                @if(attr != null) {
-                <li>@attr.getLabel() (@URIUtils.replaceNameSpaceEx(attr.getUri()))</li>
-                }
+    <b>Type</b>: @variable.getClass().getSimpleName()
+    <br><br>
+    <div class="panel panel-default">
+        <div class="panel-heading">Provenance</div>
+        <div class="panel-body">
+            @if(variable.getClass().getSimpleName().equals("HarmonizedVariable")) {
+               <b>Harmonization Strategy</b>: Normalization Matching <br>
+               <b>Original variable List</b>:
+               <ul>
+                   @for(origVar <- variable.asInstanceOf[HarmonizedVariable].getSourceList()) {
+                        @if(origVar != null) {
+                            <li>@origVar.toString()</li>
+                        }
+                   }
+                </ul>
+            } else if(variable.getClass().getSimpleName().equals("OriginalVariable")) {
+               <b>Source Document List</b>:
+               <ul>
+               @for(dfn <- variable.asInstanceOf[OriginalVariable].getDataFileNames()) {
+                   @if(dfn != null) {
+                        <li>@dfn</li>
+                   }
+               }
+               </ul>
+            } else {
+               NONE
             }
-        </ul><br>
-    } else {
-        <b>Attribute List</b>: NONE<br><br>
-    }
-    @if(variable.getInRelationTo() != null) {
-       <b>In Relation To</b>: @variable.getInRelationTo().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getInRelationTo().getUri()))<br><br>
-    } else {
-        <b>In Relation To</b>: NONE<br><br>
-    }
-    @if(variable.getUnit() != null) {
-       <b>Unit</b>: @variable.getUnit().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getUnit().getUri()))<br><br>
-    } else {
-       <b>Unit</b>: NONE<br><br>
-    }
-    @if(variable.getTime() != null) {
-       <b>Time</b>: @variable.getTime().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getTime().getUri()))<br><br>
-    } else {
-       <b>Time</b>: NONE<br><br>
-    }
+        </div>
+    </div>
     <br>
+    <div class="panel panel-default">
+        <div class="panel-heading">Dictionary Normalization</div>
+        <div class="panel-body">
+            <b>Automated Normalized Label</b>: @variable.toString()<br>
+            @if(variable.getRole() != null) {
+                <b>Role</b>: @variable.getRole<br>
+            } else {
+                <b>Role</b>: NONE<br>
+            }
+            @if(variable.getEntity() != null) {
+                <b>Entity</b>: @variable.getEntity().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getEntity().getUri()))<br>
+                @if(variable.getEntity().getComment() != null && !variable.getEntity().getComment().equals("")) {
+                    @variable.getEntity().getComment()<br>
+                }
+            } else {
+                <b>Entity</b>: NONE<br>
+            }
+            @if(variable.getAttributeList() != null) {
+                <b>Attribute List</b>: <br>
+                <ul>
+                    @for(attr <- variable.getAttributeList()) {
+                        @if(attr != null) {
+                            <li>@attr.getLabel() (@URIUtils.replaceNameSpaceEx(attr.getUri()))</li>
+                        }
+                    }
+                </ul>
+            } else {
+                <b>Attribute List</b>: NONE<br>
+            }
+            @if(variable.getInRelationTo() != null) {
+               <b>In Relation To</b>: @variable.getInRelationTo().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getInRelationTo().getUri()))<br>
+            } else {
+                <b>In Relation To</b>: NONE<br>
+            }
+            @if(variable.getUnit() != null) {
+               <b>Unit</b>: @variable.getUnit().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getUnit().getUri()))<br>
+            } else {
+               <b>Unit</b>: NONE<br>
+            }
+            @if(variable.getTime() != null) {
+               <b>Time</b>: @variable.getTime().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getTime().getUri()))<br>
+            } else {
+               <b>Time</b>: NONE<br>
+            }
+        </div>
+    </div>
+    <br>
+    <div class="panel panel-default">
+        <div class="panel-heading">Codebook Normalization</div>
+        <div class="panel-body">
+            @if(variable.getCodebook() != null && variable.getCodebook().size() > 0) {
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Code Label</th>
+                        <th>Class</th>
+                        <th>Harmonized Code</th>
+                        <th>Resource</th>
+                        <th>Other For</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for(pv <- variable.getCodebook()){
+                    @PV_entry(pv, false)
+                    }
+                    </tbody>
+                </table>
+            } else {
+                NONE<br>
+            }
+
+        </div>
+    </div>
 </div>
+
 

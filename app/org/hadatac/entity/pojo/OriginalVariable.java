@@ -29,4 +29,20 @@ public class OriginalVariable extends Variable {
 		this.dasa = dasa;
 	}
 
+	public List<String> getDataFileNames() {
+		List<String> dfList = new ArrayList<String>();
+		String strUri = str.getUri();
+		if (str == null) {
+			return dfList;
+		}
+		List<DataFile> dataFileList = DataFile.findByDataAcquisition(strUri);
+		if (dataFileList == null || dataFileList.size() <= 0) {
+			return dfList;
+		}
+		for (DataFile df : dataFileList) {
+			dfList.add(df.getBaseName());
+		}
+		return dfList;
+	}
+
 }

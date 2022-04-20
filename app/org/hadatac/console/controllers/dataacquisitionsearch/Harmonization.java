@@ -14,6 +14,7 @@ import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
+import org.hadatac.console.models.CodeBookEntry;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.*;
 import org.pac4j.play.java.Secure;
@@ -27,11 +28,8 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
-import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
-import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -300,7 +298,18 @@ public class Harmonization extends Controller {
                     e.printStackTrace();
                 }
 
+                for (Study std : studies) {
+                    for (Variable var : vars.get(std.getUri())) {
+                        if (var instanceof OriginalVariable) {
+                            OriginalVariable origVar = ((OriginalVariable)var);
+                            if (origVar != null && origVar.getDASA() != null && origVar.getDASA().getUri() != null) {
+                                var.setCodebook(PossibleValue.findByVariable(origVar.getDASA().getUri()));
+                            }
+                        }
+                    }
+                }
             }
+
 
             for (int ind1 = 0; ind1 < studies.size(); ind1++) {
                 for (int ind2 = ind1 + 1; ind2 < studies.size(); ind2++) {
@@ -348,16 +357,6 @@ public class Harmonization extends Controller {
     // @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
     public Result postIndexStudy(Http.Request request) {
         return indexStudy(request);
-    }
-
-    public static String playLoadOntologies(String oper) {
-        NameSpaces.getInstance();
-        MetadataContext metadata = new
-                MetadataContext("user",
-                "password",
-                ConfigFactory.load().getString("hadatac.solr.triplestore"),
-                false);
-        return metadata.loadOntologies(Feedback.WEB, oper);
     }
 
     private String getUserEmail(Http.Request request) {

@@ -31,6 +31,7 @@ public class Variable {
 	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
 
 	// Mandatory properties for Variable
+	private String name = null;
 	private Entity ent;
     private String role;
     private List<Attribute> attrList;
@@ -39,6 +40,7 @@ public class Variable {
     private Entity inRelationTo;
     private Unit unit;
     private Attribute timeAttr;
+    private List<PossibleValue> codebook;
     private boolean isCategorical;
 
 	// study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str
@@ -103,7 +105,18 @@ public class Variable {
     	return getRole() + getEntityStr() + getAttributeListStr() + getInRelationToStr() + getUnitStr() + getTimeStr();
     }
 
-    public Entity getEntity() {
+	public String getName() {
+		if (name == null) {
+			return toString();
+		}
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Entity getEntity() {
     	return ent;
     }
 
@@ -194,6 +207,25 @@ public class Variable {
         }
     	return timeAttr.getUri();
     }
+
+	public List<PossibleValue> getCodebook() {
+		return codebook;
+	}
+
+	public void addPossibleValue(PossibleValue possibleValue) {
+		if (possibleValue == null) {
+			return;
+		}
+		if (codebook == null) {
+			codebook = new ArrayList<PossibleValue>();
+		}
+		codebook.add(possibleValue);
+		return;
+	}
+
+	public void setCodebook(List<PossibleValue> codebook) {
+		this.codebook = codebook;
+	}
 
 	public boolean isCategorical() {
 		return isCategorical;
@@ -393,7 +425,8 @@ public class Variable {
     	return str;
     }
 
-    // getStudyVariables()
+
+	// getStudyVariables()
 	// getStudyVariablesWithLabels(Study studyUri)
 
 }

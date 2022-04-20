@@ -1827,7 +1827,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                                     if (firstValue) {
                                         firstValue = false;
                                     } else {
-                                        FileUtils.writeStringToFile(file, " ", "utf-8", true);
+                                        FileUtils.writeStringToFile(file, " | ", "utf-8", true);
                                     }
                                     FileUtils.writeStringToFile(file, value.getValue(), "utf-8", true);
                                 }
