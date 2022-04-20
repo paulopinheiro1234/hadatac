@@ -36,7 +36,7 @@
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top">
         @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
-            <div class="container-fluid" style="margin-bottom: 0px;padding-top: 10px;margin-bottom: 0px;padding-bottom: 10px;border-color: transparent;border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;background: linear-gradient(135deg, rgba(6,123,189,1) 6%, rgba(6,123,189,1) 75%, #22663e 100%) !important;" >
+            <div class="container-fluid" style="margin-bottom: 0px;padding-top: 10px;margin-bottom: 0px;padding-bottom: 5px;border-color: transparent;border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;background: linear-gradient(135deg, rgba(6,123,189,1) 6%, rgba(6,123,189,1) 75%, #22663e 100%) !important;" >
         }else {
             <div class="container-fluid">
         }
@@ -90,7 +90,7 @@
                             <li class="dropdown">
                                 @if(user != null) {
                                     @if(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")=="true") {
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: white;background-color: #337ab7;font: 16px"><i class="glyphicon glyphicon-user"></i> @user.getName() <span class="caret"></span></a>
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: white;background-color: transparent !important;font: 16px"><i class="glyphicon glyphicon-user"></i> @user.getName() <span class="caret"></span></a>
                                     }else {
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.getName() <span class="caret"></span></a>
                                     }
