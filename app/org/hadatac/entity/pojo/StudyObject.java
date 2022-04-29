@@ -1,31 +1,32 @@
 package org.hadatac.entity.pojo;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.ByteArrayOutputStream;
-
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.NameSpaces;
-import org.hadatac.utils.FirstLabel;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
+import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.FirstLabel;
+import org.hadatac.utils.NameSpaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.hadatac.annotations.PropertyField;
-import org.hadatac.annotations.PropertyValueType;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StudyObject extends HADatAcThing {
 
@@ -39,7 +40,9 @@ public class StudyObject extends HADatAcThing {
     public static String DELETE_LINE3 = " ?p ?o . ";
     public static String LINE_LAST = "}  ";
     public static String PREFIX = "OBJ-";
-    
+
+    private static final Logger log = LoggerFactory.getLogger(StudyObject.class);
+
     // Within mapIdStudyObjects
     //    0 -> studyObject URI
     public static final String STUDY_OBJECT_URI = "STUDY_OBJECT_URI";
@@ -801,19 +804,20 @@ public class StudyObject extends HADatAcThing {
     		return resp;
     	}
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-        	  " select * where { " +
+        	  " select distinct * where { " +
         	  " <" + objUri + "> hasco:hasObjectScope+ ?obj . " +
         	  " ?obj hasco:isMemberOf ?soc . " +
-        	  " ?soc hasco:hasRoleLabel ?role . " +
+        	  " ?soc a ?socType . " +
         	  " } ";
+
         ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
             if (soln != null) {
-                if (soln.get("obj") != null && soln.get("soc") != null && soln.get("role") != null) {
+                if (soln.get("obj") != null && soln.get("soc") != null && soln.get("socType") != null) {
                     Map<String,String> entry = new HashMap<String,String>();
-                    entry.put(soln.get("obj").toString(),soln.get("role").toString());
+                    entry.put(soln.get("obj").toString(),soln.get("socType").toString());
                     resp.add(entry);
                 }
             }
@@ -827,9 +831,9 @@ public class StudyObject extends HADatAcThing {
      *           the scope of any other SOC, would not have any upstream SOC. 
      * Return: List of pairs <SOC's URI, SOC's role> 
      */
-    public static List<Map<String,String>> findDownstreamSocs(String objUri, String originalId, String alignmentType) {
+    public static List<String> findDownstreamSocs(String objUri, String socType) {
     	//System.out.println("Inside StudyObject.findDownstreamSocs");
-    	List<Map<String,String>> resp = new ArrayList<Map<String,String>>();
+    	List<String> resp = new ArrayList<>();
     	if (objUri == null || objUri.isEmpty()) {
     		return resp;
     	}
@@ -837,22 +841,55 @@ public class StudyObject extends HADatAcThing {
         		" select * where { " +
         		" ?obj hasco:hasObjectScope+ <" + objUri + "> . " +
         		" ?obj hasco:isMemberOf ?soc . " +
-        		" ?soc hasco:hasRoleLabel \"" + alignmentType + "\" ." +
+        		" ?soc a <" + socType + "> ." +
         	  	" } ";
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        // if we find some result, that must be the one we want
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if ( soln != null && soln.get("obj") != null) {
+                String item = soln.get("obj").toString();
+                if ( !resp.contains(item) ) resp.add(item);
+            }
+        }
+        return resp;
+    }
+
+    public static List<String> getAlignmentBySubjectGroupMembership(String objURI, String studyUri) {
+
+        List<String> retAlignments = new ArrayList<>();
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " SELECT DISTINCT ?obj ?soc" +
+                " WHERE {" +
+                " VALUES ?input { <" + objURI + "> }" +
+                " VALUES ?study { <" + studyUri +"> }" +
+                " VALUES ?socType { hasco:SubjectGroup }" +
+                " ?input hasco:hasObjectScope* / (^hasco:hasObjectScope)? ?obj ." +
+                " ?obj hasco:isMemberOf ?soc ." +
+                " ?soc rdf:type ?socType ." +
+                " ?soc hasco:isMemberOf ?study ." +
+                " ?input hasco:isMemberOf / rdf:type ?otherType ." +
+                " FILTER( ?obj = ?input || ?otherType != ?socType)" +
+                " }";
+                /*
+                " SELECT DISTINCT * " +
+                " WHERE { " +
+                " <" + objURI + "> hasco:hasObjectScope* / (^hasco:hasObjectScope)* ?obj . " +
+                " ?obj hasco:isMemberOf ?soc . " +
+                " ?soc a hasco:SubjectGroup . }"; */
+
         ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            if (soln != null) {
-                if (soln.get("obj") != null) {
-                    Map<String,String> entry = new HashMap<String,String>();
-                    entry.put(soln.get("obj").toString(),alignmentType);
-                    resp.add(entry);
-                    return resp;
-                }
+            if (soln != null && soln.get("obj") != null) {
+                retAlignments.add(soln.getResource("obj").getURI());
             }
         }
-        return resp;
+
+        return retAlignments;
     }
 
     public static String findUriBySocAndOriginalId(String socUri, String original_id) {
@@ -1163,7 +1200,26 @@ public class StudyObject extends HADatAcThing {
         
         return mapIdUriMappings;
     }
-    
+
+    public static boolean checkSocType(String objUri, String socType) {
+
+        if (objUri == null || objUri.isEmpty()) return false;
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                " select * where { " +
+                " <" + objUri + "> hasco:isMemberOf ?soc . " +
+                " ?soc a <" + socType + "> . " +
+                " } ";
+
+        ResultSetRewindable resultsrw = SPARQLUtilsFacetSearch.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (resultsrw.size() >= 1) return true;
+
+        log.info(String.format("the given URL, %s, does not have a SOC type of %s", objUri, socType));
+        return false;
+    }
+
     @Override
     public long getNumber(Facet facet, FacetHandler facetHandler) {
         return getNumberFromSolr(facet, facetHandler);

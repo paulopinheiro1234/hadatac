@@ -3,7 +3,8 @@ var prefixD = {};
 var newPrefix=[]
 function SDDPrefixtoJSON(){
    var prefixMapRequest = new XMLHttpRequest();
-   prefixMapRequest.open("GET", 'http://localhost:9000/hadatac/sddeditor_v2/getPrefixes', true);
+   // prefixMapRequest.open("GET", 'http://localhost:9000/hadatac/sddeditor_v2/getPrefixes', true);
+   prefixMapRequest.open("GET", '/hadatac/sddeditor_v2/getPrefixes', true);
    prefixMapRequest.responseType = 'json';
    prefixMapRequest.onload = function(e) {
       prefixD = prefixMapRequest.response;

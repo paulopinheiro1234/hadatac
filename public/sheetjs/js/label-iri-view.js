@@ -6,7 +6,8 @@ function convertToLabel(val){
   var ret;
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/sddeditor_v2/getLabelFromIri',
+    // url : 'http://localhost:9000/hadatac/sddeditor_v2/getLabelFromIri',
+    url : '/hadatac/sddeditor_v2/getLabelFromIri',
     data : {
       iricode:val
     },

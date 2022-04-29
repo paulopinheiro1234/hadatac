@@ -299,9 +299,10 @@ public class SDDEditorV2 extends Controller {
         return ok(Json.toJson(isValid));
 
     }
-    
-    public Result getUserName(Http.Request request) {
-    	return ok(Json.toJson(AuthApplication.getLocalUser(application.getUserEmail(request)).getName()));
+
+    public Result getUserName(String email) {
+    	// return ok(Json.toJson(AuthApplication.getLocalUser(application.getUserEmail(request)).getName()));
+      return ok(Json.toJson(AuthApplication.getLocalUser(email).getName()));
     }
 
 }

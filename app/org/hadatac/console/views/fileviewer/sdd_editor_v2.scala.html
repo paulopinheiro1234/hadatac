@@ -19,7 +19,7 @@ userName:String
 @main("SDD Editor Version 2","",userName){
    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
    <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
-   <script src="@controllers.routes.Assets.versioned("sheetjs/js/jquery-1.10.2.js")"></script>
+   <script src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/3.5.0/jquery-3.5.0.min.js")"></script>
 
    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
@@ -44,6 +44,8 @@ userName:String
          var durl="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
          durl_=durl;
       </script>
+      <!-- This is not implemented properly for multiple users in  server setup so has been removed to prevent data leaks -->
+      <!--
       <div class="undo-edit">
 
          <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="undoEdit()">
@@ -53,6 +55,7 @@ userName:String
          <button class="btn btn-primary" type="button" role="button" style="display: inline-block" onclick="reundoEdit()">
                <span class="glyphicon glyphicon-circle-arrow-right"> </span> Redo </button>
       </div>
+      -->
       <div class="changeView" style="display:inline-block;">
             <button class="changeViewLabel" id="showThis"> <span class="glyphicon glyphicon-list-alt"> </span> Show Labels</button>
                <button class="changeViewIri" id="hideThis">  Show Original Sheet</button>
@@ -77,16 +80,17 @@ userName:String
          <script>
 
             var fid="@dataFile.getId()";
+            var email="@userName";
 
             $.ajax({
                type : 'GET',
-               url : 'http://localhost:9000/hadatac/sddeditor_v2/getfile_ID',
+               url : '/hadatac/sddeditor_v2/getfile_ID',
+               // url : 'http://localhost:9000/hadatac/sddeditor_v2/getfile_ID',
                data : {
                   fileid: fid
                },
                success : function(data) {
                   //console.log(data);
-
                }
             });
 
@@ -101,8 +105,9 @@ userName:String
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
-
+<!--
             <button id="vsdd" onclick="verifySDD()" > <span class="glyphicon glyphicon-check"> </span> Verify SDD</button>
+         -->
             <button id="everify" onclick="external()"><span class="glyphicon glyphicon-transfer"> </span> External Verify</button>
 
 

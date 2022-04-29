@@ -594,8 +594,8 @@ search box - the end user will not know they are happening.
                         style="color:#333; font-weight:bold;" href=""><i class="icon-plus"></i> {{FILTER_DISPLAY}} \
                         </a> \
                         <div class="btn-group facetview_filteroptions" style="display:none; margin-top:5px;"> \
-                            <a class="btn btn-small facetview_learnmore" title="click to view search help information" href="#"><b>?</b></a> \
-                            <a class="btn btn-small facetview_morefacetvals" title="filter list size" rel="{{FACET_IDX}}" href="{{FILTER_EXACT}}">{{FILTER_HOWMANY}}</a> \
+                            <!-- <a class="btn btn-small facetview_learnmore" title="click to view search help information" href="#"><b>?</b></a> --> \
+                            <!-- <a class="btn btn-small facetview_morefacetvals" title="click this number to change how many indicators you would like to display here" rel="{{FACET_IDX}}" href="{{FILTER_EXACT}}">{{FILTER_HOWMANY}}</a>  -->\
                             <a class="btn btn-small facetview_sort {{FILTER_SORTTERM}}" title="filter value order" href="{{FILTER_EXACT}}">{{FILTER_SORTCONTENT}}</a> \
                             <a class="btn btn-small facetview_or" title="select another option from this filter" rel="AND" href="{{FILTER_EXACT}}" style="color:#aaa;">OR</a> \
                             ';
@@ -922,12 +922,14 @@ search box - the end user will not know they are happening.
         if (facet == options.dendrogram_field){
             dendrogramFacet = true;
         }
-    
+
+        var cnt = 0;
         for ( var item in records ) {
             var append = '<tr class="facetview_filtervalue" style="display:none;"><td><a class="facetview_filterchoice' +
                 '" rel="' + facet + '" href="' + item + '">' + item +
                 ' (' + records[item] + ')</a></td></tr>';
             facet_filter.append(append);
+            cnt++;
 
             if (lineChartFacet){
                 years.push(item);
@@ -936,6 +938,11 @@ search box - the end user will not know they are happening.
 
             }
 
+            if ( cnt > 0 ) {
+                const currentTitle = facet_filter.children().find('.facetview_filtershow').get(0).innerText;
+                if ( currentTitle.includes("variable count") == false )
+                    facet_filter.children().find('.facetview_filtershow').append(" (variable count:" + cnt + ")");
+            }
             if ( $('.facetview_filtershow[rel="' + facetclean + '"]', obj).hasClass('facetview_open') ) {
                 facet_filter.children().find('.facetview_filtervalue').show();
             }
@@ -1301,7 +1308,8 @@ search box - the end user will not know they are happening.
             var urlfilters = "";
             for (var item in options.facets) {
                 urlfilters += "facet.field=" + options.facets[item]['field'] + "&";
-                var size = options.facets[item]['size'] ? options.facets[item]['size'] : 10;
+                //prompt('options.facets[item][\'size\'] = ' + options.facets[item]['size'] );
+                var size = options.facets[item]['size'] ? options.facets[item]['size'] : 10000;
                 urlfilters += "f." + options.facets[item]['field'] + ".facet.limit=" + size + "&";
 		var sort = 'count';
 		if (options.facets[item]['order']) {
