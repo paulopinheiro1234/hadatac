@@ -173,6 +173,8 @@ public class DataAcquisitionSearch extends Controller {
             facets = request.body().asFormUrlEncoded().get("facets")[0];
         }
 
+        System.out.println("indexInternalAsync: facets=[" + facets + "]");
+
         // log.debug("facets: " + facets);
 
         FacetHandler facetHandler = new FacetHandler();
@@ -302,31 +304,44 @@ public class DataAcquisitionSearch extends Controller {
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         if (name_map != null) {
-            facets = name_map.get("facets")[0];
-            objectType = name_map.get("selObjectType")[0].toString();
-            categoricalValues = name_map.get("selCatValue")[0].toString();
-            timeResolution = name_map.get("selTimeRes")[0].toString();
-            sameValueSelection = name_map.get("selDupOpt")[0].toString();
+            if (name_map.get("facets") != null) {
+                facets = name_map.get("facets")[0];
+            } else {
+                System.out.println("DataAcquisitionSearch.downloadAlignment - Warning: missing facets information in form.");
+            }
+            if (name_map.get("selObjectType") != null) {
+                objectType = name_map.get("selObjectType")[0].toString();
+            }
+            if (name_map.get("setCatValue") != null) {
+                categoricalValues = name_map.get("selCatValue")[0].toString();
+            }
+            if (name_map.get("selTimeRes") != null) {
+                timeResolution = name_map.get("selTimeRes")[0].toString();
+            }
+            if (name_map.get("selDupOpt") != null) {
+                sameValueSelection = name_map.get("selDupOpt")[0].toString();
+            }
         }
+
+        System.out.println("DataAcquisitionSearch.downloadAlignment : facets=[" + facets + "]");
 
         long startTime = System.currentTimeMillis();
         // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
         AcquisitionQueryResult results = null;
-        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis()-startTime) + "ms to finish");
+        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis() - startTime) + "ms to finish");
 
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
-        final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection)? false : true;
+        final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection) ? false : true;
         //System.out.println("Object type inside alignment: " + objectType);
 
         CompletionStage<Integer> promiseOfResult = null;
         long currentTime = System.currentTimeMillis();
-
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, categoricalOption, keepSameValue, null),
+                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, keepSameValue, null),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
@@ -336,9 +351,79 @@ public class DataAcquisitionSearch extends Controller {
         }
 
         promiseOfResult.whenComplete(
-                (result, exeception) -> {
+                (result, exception) -> {
                     log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis()-currentTime) + "ms to finish");
                 });
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return redirect(org.hadatac.console.controllers.workingfiles.routes.WorkingFiles.index_datasetGeneration("/", "/", false));
+    }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result downloadSummarization(Http.Request request) {
+        String ownerUri = getOwnerUri(request);
+        String email = getUserEmail(request);
+
+        String facets = "";
+        String selSummaryType = "";
+        String nonCategoricalVariables = "";
+
+        List<String> selectedFields = new LinkedList<String>();
+        Map<String, String[]> name_map = request.body().asFormUrlEncoded();
+        if (name_map != null) {
+            if (name_map.get("facets") != null) {
+                facets = name_map.get("facets")[0];
+            }
+            if (name_map.get("selSummaryType") != null) {
+                selSummaryType = name_map.get("selSummaryType")[0].toString();
+            }
+            if (name_map.get("selNonCatVariable") != null) {
+                nonCategoricalVariables = name_map.get("selNonCatVariable")[0].toString();
+            }
+        }
+
+        //System.out.println("DataAcquisitionSearch.downloadSummarization : name_map=[" + name_map.get("facets")[0] + "]");
+        System.out.println("DataAcquisitionSearch.downloadSummarization : facets=[" + facets + "]");
+
+        long startTime = System.currentTimeMillis();
+        // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);
+        AcquisitionQueryResult results = null;
+        log.debug("DOWNLOAD: Measurement find takes " + (System.currentTimeMillis() - startTime) + "ms to finish");
+
+        final String finalFacets = facets;
+        final String summaryType = selSummaryType;
+        final String categoricalOption = nonCategoricalVariables;
+
+        CompletionStage<Integer> promiseOfResult = null;
+        long currentTime = System.currentTimeMillis();
+
+        if (selSummaryType.equals(Measurement.SUMMARY_TYPE_SUBGROUP)) {
+            // for TYPE_SUBGROUP, keepSameValue is set to 'false'
+            promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
+                    ownerUri, finalFacets, email, summaryType, categoricalOption, false, null),
+                    databaseExecutionContext);
+
+            promiseOfResult.whenComplete(
+                    (result, exception) -> {
+                        log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis() - currentTime) + "ms to finish");
+                    });
+
+        } else {
+
+            promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySummarization(
+                    ownerUri, finalFacets, email, summaryType, categoricalOption, null),
+                    databaseExecutionContext);
+
+            promiseOfResult.whenComplete(
+                    (result, exception) -> {
+                        log.debug("DOWNLOAD: downloading DA files is done, taking " + (System.currentTimeMillis() - currentTime) + "ms to finish");
+                    });
+        }
 
         try {
             Thread.sleep(100);
@@ -381,6 +466,11 @@ public class DataAcquisitionSearch extends Controller {
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadAlignment(Http.Request request) {
         return downloadAlignment(request);
+    }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postDownloadSummarization(Http.Request request) {
+        return downloadSummarization(request);
     }
 
     private static void printMemoryStats() {

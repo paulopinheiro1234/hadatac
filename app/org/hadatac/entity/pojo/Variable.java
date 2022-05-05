@@ -30,12 +30,18 @@ public class Variable {
 	// patch for multi-valued attributes
 	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
 
+	// Mandatory properties for Variable
+	private String name = null;
 	private Entity ent;
     private String role;
     private List<Attribute> attrList;
+
+    // Optional properties for Variables
     private Entity inRelationTo;
     private Unit unit;
     private Attribute timeAttr;
+    private List<PossibleValue> codebook;
+    private boolean isCategorical;
 
 	// study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str
     public enum SolrPivotFacet {
@@ -53,6 +59,9 @@ public class Variable {
 		}
 	}
 
+	public Variable() {
+	}
+
     public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
     	this(entRole, attrInRel, null, null);
     }
@@ -68,13 +77,46 @@ public class Variable {
     	this.inRelationTo = attrInRel.getInRelationTo();
     	this.unit = unit;
     	this.timeAttr = timeAttr;
+    	this.isCategorical = false;
     }
 
-    public String getKey() {
+	public Variable(List<Variable> sourceList) {
+		if (sourceList != null && sourceList.get(0) != null) {
+			this.setEntity(sourceList.get(0).getEntity());
+			this.setRole(sourceList.get(0).getRole());
+			this.setAttributeList(sourceList.get(0).getAttributeList());
+			this.setInRelationTo(sourceList.get(0).getInRelationTo());
+			this.setUnit(sourceList.get(0).getUnit());
+			this.setTime(sourceList.get(0).getTime());
+		}
+	}
+
+	public Variable(Variable variable) {
+		this.ent = variable.getEntity();
+		this.role = variable.getRole();
+		this.attrList = variable.getAttributeList();
+		this.inRelationTo = variable.getInRelationTo();
+		this.unit = variable.getUnit();
+		this.timeAttr = variable.getTime();
+		this.isCategorical = variable.isCategorical();
+	}
+
+	public String getKey() {
     	return getRole() + getEntityStr() + getAttributeListStr() + getInRelationToStr() + getUnitStr() + getTimeStr();
     }
 
-    public Entity getEntity() {
+	public String getName() {
+		if (name == null) {
+			return toString();
+		}
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Entity getEntity() {
     	return ent;
     }
 
@@ -85,6 +127,10 @@ public class Variable {
     	return ent.getUri();
     }
 
+    public void setEntity(Entity ent) {
+    	this.ent = ent;
+	}
+
     public String getRole() {
     	if (role == null) {
     		return "";
@@ -92,9 +138,17 @@ public class Variable {
     	return role;
     }
 
+	public void setRole(String role) {
+		this.role = role;
+	}
+
     public List<Attribute> getAttributeList() {
     	return attrList;
     }
+
+	public void setAttributeList(List<Attribute> attrList) {
+    	this.attrList = attrList;
+	}
 
     public String getAttributeListStr() {
     	if (attrList == null || attrList.isEmpty()) {
@@ -113,7 +167,11 @@ public class Variable {
     	return inRelationTo;
     }
 
-    public String getInRelationToStr() {
+	public void setInRelationTo(Entity inRelationTo) {
+    	this.inRelationTo = inRelationTo;
+	}
+
+	public String getInRelationToStr() {
         if (inRelationTo == null || inRelationTo.getUri() == null ||inRelationTo.getUri().isEmpty()) { 
             return "";
         }
@@ -124,7 +182,11 @@ public class Variable {
     	return unit;
     }
 
-    public String getUnitStr() {
+	public void setUnit(Unit unit) {
+    	this.unit = unit;
+	}
+
+	public String getUnitStr() {
         if (unit == null || unit.getUri() == null || unit.getUri().isEmpty()) { 
             return "";
         }
@@ -135,14 +197,45 @@ public class Variable {
     	return timeAttr;
     }
 
-    public String getTimeStr() {
+	public void setTime(Attribute timeAttr) {
+		this.timeAttr = timeAttr;
+	}
+
+	public String getTimeStr() {
         if (timeAttr == null || timeAttr.getUri() == null || timeAttr.getUri().isEmpty()) { 
             return "";
         }
     	return timeAttr.getUri();
     }
 
-    public static String upperCase(String orig) {
+	public List<PossibleValue> getCodebook() {
+		return codebook;
+	}
+
+	public void addPossibleValue(PossibleValue possibleValue) {
+		if (possibleValue == null) {
+			return;
+		}
+		if (codebook == null) {
+			codebook = new ArrayList<PossibleValue>();
+		}
+		codebook.add(possibleValue);
+		return;
+	}
+
+	public void setCodebook(List<PossibleValue> codebook) {
+		this.codebook = codebook;
+	}
+
+	public boolean isCategorical() {
+		return isCategorical;
+	}
+
+	public void setIsCategorical(boolean isCategorical) {
+    	this.isCategorical = isCategorical;
+	}
+
+	public static String upperCase(String orig) {
     	String[] words = orig.split(" ");
     	StringBuffer sb = new StringBuffer();
 
@@ -332,7 +425,8 @@ public class Variable {
     	return str;
     }
 
-    // getStudyVariables()
+
+	// getStudyVariables()
 	// getStudyVariablesWithLabels(Study studyUri)
 
 }

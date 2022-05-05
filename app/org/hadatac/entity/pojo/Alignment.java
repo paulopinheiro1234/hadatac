@@ -28,6 +28,7 @@ public class Alignment {
     private Map<String, List<String>> hCodeBook;
     private Map<String, String> studyId;  // key=socUri;  value=studyId
     private Map<String, STR> dataAcquisitions;
+    private Map<String, DataAcquisitionSchemaAttribute> dasas;
 
     List<Attribute> ID_LIST = new ArrayList<Attribute>();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID_LIST, null);
@@ -46,6 +47,7 @@ public class Alignment {
         hCodeBook = new HashMap<String, List<String>>();
         studyId = new HashMap<String,String>();
         dataAcquisitions = new HashMap<String,STR>();
+        dasas = new HashMap<String, DataAcquisitionSchemaAttribute>();
 
         Attribute ID = new Attribute();
         ID.setLabel("ID");
@@ -111,6 +113,8 @@ public class Alignment {
      */
     public String measurementKey(Measurement m) {
 
+        STR str = null;
+        DataAcquisitionSchemaAttribute dasa = null;
         if (variables == null) {
             System.out.println("[ERROR] Alignment: alignment attribute list not initialized ");
             return null;
@@ -178,8 +182,13 @@ public class Alignment {
 
         if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
             //System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
-            STR da = STR.findByUri(m.getAcquisitionUri());
-            dataAcquisitions.put(m.getAcquisitionUri(), da);
+            str = STR.findByUri(m.getAcquisitionUri());
+            dataAcquisitions.put(m.getAcquisitionUri(), str);
+        }
+
+        if (!dasas.containsKey(m.getDasaUri())) {
+            dasa = DataAcquisitionSchemaAttribute.find(m.getDasaUri());
+            dasas.put(m.getDasaUri(), dasa);
         }
 
         String mRole = m.getRole().replace(" ","");
@@ -304,12 +313,31 @@ public class Alignment {
         }*/
 
         newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
+        if (m.getValueClass() != null && m.getValueClass().startsWith("http")) {
+            newVar.setIsCategorical(true);
+        }
         //System.out.println("Align-Debug: new alignment attribute 3");
 
         //System.out.println("Align-Debug: new variable's key: [" + newVar.getKey() + "]");
 
         if (!variables.containsKey(newVar.getKey())) {
-            variables.put(newVar.getKey(), newVar);
+            str = dataAcquisitions.get(m.getAcquisitionUri());
+            dasa = dasas.get(m.getDasaUri());
+            if (str != null || dasa != null) {
+                OriginalVariable newOrigVar = new OriginalVariable(newVar);
+                if (str != null) {
+                    newOrigVar.setSTR(str);
+                }
+                if (dasa != null) {
+                    newOrigVar.setDASA(dasa);
+                    if (dasa.getLabel() != null && !dasa.getLabel().equals("")) {
+                        newOrigVar.setName(dasa.getLabel());
+                    }
+                }
+                variables.put(newOrigVar.getKey(), newOrigVar);
+            } else {
+                variables.put(newVar.getKey(), newVar);
+            }
             //System.out.println("Align-Debug: adding new var to variable's list");
         }
 
@@ -473,7 +501,7 @@ public class Alignment {
         return new ArrayList<AlignmentEntityRole>(roles.values());
     }
 
-    public List<Variable> getAlignmentAttributes() {
+    public List<Variable> getVariables() {
         return new ArrayList<Variable>(variables.values());
     }
 
@@ -530,7 +558,5 @@ public class Alignment {
     public void addCode(String attrUri, List<String> code) {
         hCodeBook.put(attrUri, code);
     }
-
-
 
 }
