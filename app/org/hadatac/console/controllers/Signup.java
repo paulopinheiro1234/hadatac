@@ -339,7 +339,7 @@ public class Signup {
             System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
             application.formIndex(request,user,playSessionStore,playWebContext);
-            return ok ("/protected/index.html/"+user.getEmail()).addingToSession(request ,"userValidated", "yes");
+            return ok ("/hadatac").addingToSession(request ,"userValidated", "yes");
         }
         return badRequest("what happened?");
     }
