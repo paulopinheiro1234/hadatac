@@ -1,0 +1,53 @@
+@(dasa     : org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute,
+  userName : String)
+
+@import org.hadatac.console.views.html._
+@import org.hadatac.utils._
+@import org.hadatac.console.controllers.schema._
+@import org.hadatac.entity.pojo.DataAcquisitionSchema
+@import org.hadatac.metadata.loader.URIUtils
+
+@main("View Variable","",userName) {
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.9.0/css/ol.css">
+    <script type="text/javascript" charset="utf-8" src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="@controllers.routes.Assets.versioned("javascripts/openLayersFunctions.js")"></script>
+
+    <div class="row">
+        <div class="col-md-1">
+	    </div>
+        <div class="col-md-12">
+
+            <h3>View Variable</h3>
+
+            @for(attr <- dasa.getAttributes()) {
+                @if(!DataAcquisitionSchema.METADASA.contains(URIUtils.replaceNameSpaceEx(attr))){
+                    <tr>
+                } else {
+                    <tr bgcolor='#FCEBDD'>
+                }
+            }
+
+               <td>@if(dasa != null && dasa.getLabel() != null) { <b> @dasa.getLabel() </b> }</td>
+               <td>@if(dasa != null && dasa.getPosition() != null) {
+                 @if(dasa.getPosition().equals("-1")) {
+                     any
+                 } else {
+                    @dasa.getPosition()
+                 }
+               }</td>
+               <td>@if(dasa != null && dasa.getObjectViewLabel() != null) { <a href="#@dasa.getObjectViewLabel()">@dasa.getObjectViewLabel()</a> }</td>
+               <td>@if(dasa != null && dasa.getEntityViewLabel() != null) { @dasa.getEntityViewLabel() }</td>
+               <td>@if(dasa != null && dasa.getConcatAttributeLabel() != null) { @dasa.getConcatAttributeLabel() }</td>
+               <td>@if(dasa != null && dasa.getInRelationToLabel() != null) { @dasa.getInRelationToLabel() }</td>
+               <td>@if(dasa != null && dasa.getUnitLabel() != null) { @dasa.getUnitLabel() }</td>
+               <td>@if(dasa != null && dasa.getEventViewLabel() != null) { <a href="#@dasa.getEventViewLabel()">@dasa.getEventViewLabel()</a> }</td>
+
+            </tr>
+
+            <br>
+                <a href="@org.hadatac.console.controllers.schema.routes.DASManagement.index()" class="btn btn-primary" role="button">Back to SSD Management</a>
+        </div>
+
+    </div>
+
+}
