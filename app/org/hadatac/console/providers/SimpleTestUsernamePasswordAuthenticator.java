@@ -109,7 +109,7 @@ public class SimpleTestUsernamePasswordAuthenticator implements Authenticator<Us
         return BCrypt.checkpw(candidate, hashed);
     }
 
-    private Set<String> getUserRoles(SysUser sysUser){
+    public Set<String> getUserRoles(SysUser sysUser){
         int rolesSize =sysUser.getRoles().size();
         Set<String> roles = new HashSet<String> ();
         while (rolesSize > 0){

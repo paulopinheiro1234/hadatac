@@ -35,7 +35,15 @@ GET     /hadatac/acquisitions/filedownload             org.hadatac.console.contr
 POST    /hadatac/acquisitions/filedownload             org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownload(request: Request)
 GET     /hadatac/acquisitions/filedownloadalignment    org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.downloadAlignment(request: Request)
 POST    /hadatac/acquisitions/filedownloadalignment    org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownloadAlignment(request: Request)
-GET	    /hadatac/metadataacquisitions/solrsearch        org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
+GET     /hadatac/acquisitions/filesummary              org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.downloadSummarization(request: Request)
+POST    /hadatac/acquisitions/filesummary              org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postDownloadSummarization(request: Request)
+GET     /hadatac/acquisitions/harmonization            org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.index(oper: String, request: Request)
+POST    /hadatac/acquisitions/harmonization            org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.postIndex(oper: String, request: Request)
+GET     /hadatac/acquisitions/harmonization/soc        org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.indexSoc(request: Request)
+POST    /hadatac/acquisitions/harmonization/soc        org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.postIndexSoc(request: Request)
+GET     /hadatac/acquisitions/harmonization/study      org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.indexStudy(request: Request)
+POST    /hadatac/acquisitions/harmonization/study      org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.postIndexStudy(request: Request)
+GET	    /hadatac/metadataacquisitions/solrsearch       org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
 POST	/hadatac/metadataacquisitions/solrsearch   	   org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
 GET	    /hadatac/dataacquisitionbrowser/solrsearch     org.hadatac.console.http.SolrSearchProxy.getDataAcquisition(request: Request)
 POST	/hadatac/dataacquisitionbrowser/solrsearch     org.hadatac.console.http.SolrSearchProxy.getDataAcquisition(request: Request)
@@ -445,8 +453,7 @@ GET     /hadatac/sddeditor_v2/addToEdits               org.hadatac.console.contr
 POST    /hadatac/sddeditor_v2/addToEdits               org.hadatac.console.controllers.fileviewer.SDDEditorV2.addToEdits(row:String, col:String, editValue: String)
 GET     /hadatac/sddeditor_v2/getEdit                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getEdit()
 POST    /hadatac/sddeditor_v2/getEdit                  org.hadatac.console.controllers.fileviewer.SDDEditorV2.getEdit()
-GET     /hadatac/sddeditor_v2/removingRow              org.hadatac.console.controllers.fileviewer.SDDEditorV2.removingRow(removedValue:String)
-POST    /hadatac/sddeditor_v2/removingRow              org.hadatac.console.controllers.fileviewer.SDDEditorV2.removingRow(removedValue:String)
+GET    /hadatac/sddeditor_v2/removingRow              org.hadatac.console.controllers.fileviewer.SDDEditorV2.removingRow(removedValue:String)
 GET     /hadatac/sddeditor_v2/getOldEdits              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOldEdits()
 POST    /hadatac/sddeditor_v2/getOldEdits              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getOldEdits()
 GET     /hadatac/sddeditor_v2/getLabelFromIri              org.hadatac.console.controllers.fileviewer.SDDEditorV2.getLabelFromIri(iricode:String)
@@ -459,7 +466,7 @@ GET     /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.contr
 POST    /hadatac/sddeditor_v2/validateIRI              org.hadatac.console.controllers.fileviewer.SDDEditorV2.validateIRI(s:String)
 
 #GET		/hadatac/sddeditor_v2/getUserName			   org.hadatac.console.controllers.fileviewer.SDDEditorV2.getUserName()
-#POST	        /hadatac/sddeditor_v2/getUserName			   org.hadatac.console.controllers.fileviewer.SDDEditorV2.getUserName()
+GET	        /hadatac/sddeditor_v2/getUserName			   org.hadatac.console.controllers.fileviewer.SDDEditorV2.getUserName(email: String)
 
 # dataset generation
 GET	    /hadatac/datasetGeneration	        	       org.hadatac.console.controllers.workingfiles.WorkingFiles.index_datasetGeneration(dir : String, dest: String, stayAtRoot : Boolean ?= false, request: Request)
@@ -635,4 +642,9 @@ POST        /callback                                      @org.pac4j.play.Callb
 GET         /casProxyCallback                              @org.pac4j.play.CallbackController.callback(request: Request)
 POST        /casProxyCallback                              @org.pac4j.play.CallbackController.callback(request: Request)
 GET         /logout                                        @org.pac4j.play.LogoutController.logout(request: Request)
-GET         /centralLogout                                 org.hadatac.console.controllers.CentralLogoutController.logout(request: Request)
+GET         /centralLogout                                 org.hadatac.console.controllers.Application.logOutUser(request: Request)
+
+#Single Sign-On
+GET      /receiver                                        org.hadatac.console.controllers.Application.getReceiver()
+GET      /protected/index.html/:email                     org.hadatac.console.controllers.Application.protectedInd(email: String)
+POST     /hadatac/checkUser/                              org.hadatac.console.controllers.Signup.checkUserExists( request: Request)

@@ -117,9 +117,16 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String instrumentUri;
     private String strTimestamp;
 
+    // categorical options
     public static String WITH_CODES = "withCodes";
     public static String WITH_VALUES = "withValues";
     public static String WITH_CODE_BOOK = "withCodeBook";
+    public static String SUMMARY_TYPE_VARIABLE = "typeVariable";
+    public static String SUMMARY_TYPE_SUBGROUP = "typeSubgroup";
+    public static String SUMMARY_TYPE_NONE = "typeNone";
+    public static String NON_CATG_IGNORE = "nonCategoricalIgnore";
+    public static String NON_CATG_INCLUDE = "nonCategoricalInclude";
+    public static String NON_CATG_CATG = "nonCategoricalCategorize";
 
     public Measurement() {
         characteristicUris = new ArrayList<String>();
@@ -1657,8 +1664,10 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSVBySubjectAlignment(String ownerUri, String facets, File file, String fileId,
-                                                     String categoricalOption, boolean keepSameValue,
-                                                     ColumnMapping columnMapping) {
+                                                     String summaryType, String categoricalOption,
+                                                     boolean keepSameValue, ColumnMapping columnMapping) {
+
+        System.out.println("outputAsCSVBySubjectAlignment: facets=[" + facets + "]");
 
         // Initiate Alignment
         Alignment alignment = new Alignment();
@@ -1674,7 +1683,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         // read backend Solr page by page and merge the results
         System.out.println("start the pagination process...pageSize = " + pageSize);
-        Map<String, Map<String, List<String>>> results = readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment,alignCache, categoricalOption, keepSameValue, columnMapping);
+        Map<String, Map<String, List<AnnotatedValue>>> results = readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment,alignCache, categoricalOption, keepSameValue, columnMapping);
+
+        Map<String, AnnotatedGroupSummary> groupSummaryMap = new HashMap<String, AnnotatedGroupSummary>();
 
         // write the results to hard drive
         System.out.print("start to write the dataset to hard drive...");
@@ -1688,7 +1699,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //     HashMap<base object, Map<measurement's key, List<value>>, where
             //        - base object is the object to be aligned. For example, if the alignment is a subject and the current object of the measurement is a sample 
             //          from the subject, the base object is the subject of the sample  
-            List<String> values = null;
+            List<AnnotatedValue> values = null;
             boolean processOriginalID = false;
             boolean fileCreated = false;
             
@@ -1698,7 +1709,8 @@ public class Measurement extends HADatAcThing implements Runnable {
             //alignment.printAlignment();
             
             // Write headers: Labels are derived from collected alignment attributes
-            List<Variable> aaList = alignment.getAlignmentAttributes();
+            List<Variable> aaList = alignment.getVariables();
+            Map<String, Variable> varMap = new HashMap<String, Variable>();
             aaList.sort(new Comparator<Variable>() {
                 @Override
                 public int compare(Variable o1, Variable o2) {
@@ -1707,13 +1719,20 @@ public class Measurement extends HADatAcThing implements Runnable {
             });
             //System.out.println("Phase II: variable list size: " + aaList.size());
             //System.out.print("Phase II: variable list content: ");
-            FileUtils.writeStringToFile(file, "\"STUDY-ID\"", "utf-8", true);
-            for (Variable aa : aaList) {
-                //System.out.print(aa + " ");
-            	FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
+            if (summaryType.equals(SUMMARY_TYPE_NONE)) {
+                FileUtils.writeStringToFile(file, "\"STUDY-ID\"", "utf-8", true);
+                for (Variable aa : aaList) {
+                    //System.out.print(aa + " ");
+                    FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
+                }
+                //System.out.println("");
+                FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+
             }
-            //System.out.println("");
-            FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+            for (Variable aa : aaList) {
+                varMap.put(aa.toString(), aa);
+                //System.out.println("init varMap: [" + aa.toString() + "]");
+            }
 
             // Sort collected objects by their original ID
             List<StudyObject> objects = alignment.getObjects();
@@ -1723,27 +1742,100 @@ public class Measurement extends HADatAcThing implements Runnable {
                     return o1.getOriginalId().compareTo(o2.getOriginalId());
                 }
             });
-            
+
             //System.out.println("Phase II: download objects size: " + objects.size());
             // Write rows: traverse collected object. From these objects, traverse alignment objects
             for (StudyObject obj : objects) {
                 if (results.containsKey(obj.getUri())) {
-                    Map<String, List<String>> row = results.get(obj.getUri());
-                    // write study id
-                    FileUtils.writeStringToFile(file, "\"" + getRelatedStudies(studyMap,obj.getUri()) + "\"", "utf-8", true);
-                    for (Variable aa : aaList) {
-                    	values = row.get(aa.toString());
-                		FileUtils.writeStringToFile(file, ",", "utf-8", true);
-                    	if (values == null) {
-                    		//System.out.println("[WARNING] Measurement: No values for variable [" + aa.toString() + "]  of object [" + obj.getUri() + "]");
-                    	} else {
-                    		for (String val : values) {
-                    			//FileUtils.writeStringToFile(file, "\"" + val + "\" ", "utf-8", true);
-                    			FileUtils.writeStringToFile(file, val + " ", "utf-8", true);
-                    		}
-                    	}
+                    Map<String, List<AnnotatedValue>> row = results.get(obj.getUri());
+
+                    if (summaryType.equals(SUMMARY_TYPE_NONE)) {
+
+                        // write study id
+                        FileUtils.writeStringToFile(file, "\"" + getRelatedStudies(studyMap, obj.getUri()) + "\"", "utf-8", true);
+                        for (Variable aa : aaList) {
+                            values = row.get(aa.toString());
+                            FileUtils.writeStringToFile(file, ",", "utf-8", true);
+                            if (values == null) {
+                                //System.out.println("[WARNING] Measurement: No values for variable [" + aa.toString() + "]  of object [" + obj.getUri() + "]");
+                            } else {
+                                for (AnnotatedValue val : values) {
+                                    if (val != null && val.getValue() != null) {
+                                        //FileUtils.writeStringToFile(file, "\"" + val + "\" ", "utf-8", true);
+                                        FileUtils.writeStringToFile(file, val.getValue() + " ", "utf-8", true);
+                                    }
+                                }
+                            }
+                        }
+                        FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+
+                    } else {
+
+                        AnnotatedGroup currGroup = new AnnotatedGroup(row, varMap, alignment, categoricalOption);
+                        //System.out.println("Current Group size: " + currGroup.getGroup().size());
+                        //System.out.println("Current Group key: " + currGroup.getKey());
+                        AnnotatedGroupSummary currGroupSummary;
+                        if (!groupSummaryMap.containsKey(currGroup.getKey())) {
+                             currGroupSummary = new AnnotatedGroupSummary(currGroup);
+                        } else {
+                            currGroupSummary = groupSummaryMap.get(currGroup.getKey());
+                        }
+                        currGroupSummary.increaseFrequency();
+                        groupSummaryMap.put(currGroupSummary.getAnnotatedGroup().getKey(), currGroupSummary);
+
                     }
-                    FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+                }
+            }
+
+            // Phase III - Print group summary
+            if (summaryType.equals(SUMMARY_TYPE_SUBGROUP)) {
+
+                // Sort collected objects by their original ID
+                List<AnnotatedGroupSummary> ags = new ArrayList<AnnotatedGroupSummary>(groupSummaryMap.values());
+                ags.sort(new Comparator<AnnotatedGroupSummary>() {
+                    @Override
+                    public int compare(AnnotatedGroupSummary a1,AnnotatedGroupSummary a2) {
+                        return a1.getAnnotatedGroup().getKey().compareTo(a2.getAnnotatedGroup().getKey());
+                    }
+                });
+
+                System.out.println("HERE 1   size grpSummary" + ags.size());
+                List<Variable> finalVar = new ArrayList<Variable>();
+                for (Variable var : aaList) {
+                    if (categoricalOption.equals(Measurement.NON_CATG_CATG)) {
+                        if (var.isCategorical() || CategorizedValue.isCategorizable(var)) {
+                            finalVar.add(var);
+                            FileUtils.writeStringToFile(file, "\"" + var + "\",", "utf-8", true);
+                        }
+                    } else {
+                        if (var.isCategorical()) {
+                            finalVar.add(var);
+                            FileUtils.writeStringToFile(file, "\"" + var + "\",", "utf-8", true);
+                        }
+                    }
+                }
+                FileUtils.writeStringToFile(file, "Frequency \n", "utf-8", true);
+                for (AnnotatedGroupSummary groupSummary : ags) {
+                    for (Variable var : finalVar) {
+                        boolean firstValue = true;
+                        FileUtils.writeStringToFile(file, "\"", "utf-8", true);
+                        for (AnnotatedValue value : groupSummary.getAnnotatedGroup().getGroup()) {
+                            if (value.getVariable().getKey().equals(var.getKey())) {
+                                if (value == null || value.getValue() == null) {
+                                    //System.out.println("[WARNING] Measurement: No values for variable [" + aa.toString() + "]  of object [" + obj.getUri() + "]");
+                                } else {
+                                    if (firstValue) {
+                                        firstValue = false;
+                                    } else {
+                                        FileUtils.writeStringToFile(file, " | ", "utf-8", true);
+                                    }
+                                    FileUtils.writeStringToFile(file, value.getValue(), "utf-8", true);
+                                }
+                            }
+                        }
+                        FileUtils.writeStringToFile(file, "\", ", "utf-8", true);
+                    }
+                    FileUtils.writeStringToFile(file, groupSummary.getFrequency() + " \n", "utf-8", true);
                 }
             }
 
@@ -1764,7 +1856,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
 
                 // Write DOI list of sources
-                outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                if (summaryType.equals(SUMMARY_TYPE_NONE)) {
+                    outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                }
 
                 // finalize the main download file
                 dataFile.setCompletionPercentage(100);
@@ -1780,13 +1874,181 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    private static Map<String, Map<String, List<String>>> readSolrPagesAndMerge(String ownerUri, String facets,
+    public static void outputAsCSVBySummarization(String ownerUri, String facets, File file, String fileId,
+                                                     String summaryType, String categoricalOption,
+                                                     ColumnMapping columnMapping) {
+
+        System.out.println("outputAsCSVBySummarization: facets=[" + facets + "]");
+        boolean keepSameValue = true;
+
+        // Initiate Alignment
+        Alignment alignment = new Alignment();
+        Map<String, List<String>> alignCache = new HashMap<String, List<String>>();
+        Map<String, List<String>> studyMap = new HashMap<>();
+
+        // read the page size from config
+        int pageSize = 32000;
+        try {
+            String sPageSize = ConfigFactory.load().getString("hadatac.download.pageSize");
+            pageSize = Integer.parseInt(sPageSize);
+        } catch(Exception e) {
+            e.printStackTrace();
+        };
+
+        // Initiate Summary
+        // First key (string): variable; second key (string): value; value of the inner map (Value): annotated value including frequency
+        Map<String, Map<String, AnnotatedValueSummary>> summary = new HashMap<String, Map<String, AnnotatedValueSummary>>();
+        Map<String, AnnotatedValueSummary> valuesSummary;
+
+        // read backend Solr page by page and merge the results
+        System.out.println("SummaryType [" + summaryType + "]");
+        System.out.println("CategoricalOption [" + categoricalOption + "]");
+        System.out.println("start the pagination process...pageSize = " + pageSize);
+        Map<String, Map<String, List<AnnotatedValue>>> results = readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment,alignCache, categoricalOption, keepSameValue, columnMapping);
+
+        // write the results to hard drive
+        System.out.print("start to write the dataset to hard drive...");
+        DataFile dataFile = null;
+
+        try {
+            // Write empty string to create the file
+            FileUtils.writeStringToFile(file, "", "utf-8", true);
+
+            // Initiate Results
+            //     HashMap<base object, Map<measurement's key, List<value>>, where
+            //        - base object is the object to be aligned. For example, if the alignment is a subject and the current object of the measurement is a sample
+            //          from the subject, the base object is the subject of the sample
+            List<String> values = null;
+            boolean processOriginalID = false;
+            boolean fileCreated = false;
+
+            // Prepare rows: Measurements are compared against alignment attributes from previous measurements (role/entity/attribute-list/inrelationto/unit/time)
+            //               New alignment attributes are created for measurements with no corresponding alignment attributes.
+
+            //alignment.printAlignment();
+
+            // Write headers: Labels are derived from collected alignment attributes
+            List<Variable> aaList = alignment.getVariables();
+            System.out.println("Sorting variable list... " + aaList.size() + " items");
+            aaList.sort(new Comparator<Variable>() {
+                @Override
+                public int compare(Variable o1, Variable o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+            // Sort collected objects by their original ID
+            //List<StudyObject> objects = alignment.getObjects();
+            //objects.sort(new Comparator<StudyObject>() {
+            //    @Override
+            //    public int compare(StudyObject o1, StudyObject o2) {
+            //        return o1.getOriginalId().compareTo(o2.getOriginalId());
+            //}
+            //});
+
+            System.out.println("Compute summarization into a map of maps from " + results.size() + " measurements");
+            for (String objectId : results.keySet()) {
+
+                //update variables of a given objectId
+                Map<String, List<AnnotatedValue>> variable = results.get(objectId);
+                for (String variableId : variable.keySet()) {
+                    if (!variableId.endsWith("-ID")) {
+
+                        // retrieve/create value summary for current variable
+                        if (summary.containsKey(variableId)) {
+                            valuesSummary = summary.get(variableId);
+                        } else {
+                            valuesSummary = new HashMap<String, AnnotatedValueSummary>();
+                        }
+
+                        // update values of a given variable
+                        for (AnnotatedValue value : variable.get(variableId)) {
+                            AnnotatedValueSummary vs;
+                            if (valuesSummary.containsKey(value.getValue())) {
+                                vs = valuesSummary.get(value.getValue());
+                                vs.setFrequency(vs.getFrequency() + 1);
+                                valuesSummary.put(value.getValue(), vs);
+                            } else {
+                                vs = new AnnotatedValueSummary(value);
+                                vs.setFrequency(1);
+                                valuesSummary.put(vs.getAnnotatedValue().getValue(), vs);
+                            }
+                        }
+                        summary.put(variableId, valuesSummary);
+                    }
+                }
+            }
+
+            if (categoricalOption.equals(NON_CATG_CATG)) {
+                summary = AnnotatedValueSummary.categorizeNonCategorical(alignment, aaList, summary);
+            }
+
+            Map<String, AnnotatedValueSummary> valuesResp;
+            //System.out.println("Phase II: variable list size: " + aaList.size());
+            System.out.println("Printing map of maps... ");
+            FileUtils.writeStringToFile(file, "\"Variable\",\"Code\",\"Code Label\",\"Code Class\",\"Frequency\"\n", "utf-8", true);
+            for (Variable aa : aaList) {
+                String varStr = aa.toString();
+                if (summary.get(varStr) != null) {
+                    valuesResp = summary.get(varStr);
+                    for (AnnotatedValueSummary vs : valuesResp.values()) {
+                        String valueClass = "";
+                        String codeLabel = "";
+                        if (vs.getAnnotatedValue().getValueClass() != null && vs.getAnnotatedValue().getValueClass().startsWith("http")) {
+                            valueClass = vs.getAnnotatedValue().getValueClass();
+                            codeLabel =  prettyCodeBookLabel(alignment, valueClass);
+                        }
+                        if ((categoricalOption.equals(NON_CATG_IGNORE) &&
+                                vs.getAnnotatedValue().getValueClass() != null &&
+                                vs.getAnnotatedValue().getValueClass().startsWith("http")) ||
+                                (!categoricalOption.equals(NON_CATG_IGNORE))) {
+                            if (vs != null) {
+                                FileUtils.writeStringToFile(file, "\"" + varStr + "\",\"" + vs.getAnnotatedValue().getValue() +
+                                        "\",\"" + codeLabel +
+                                        "\",\"" + valueClass +
+                                        "\"," + vs.getFrequency() + "\n", "utf-8", true);
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            //System.out.println("");
+            //FileUtils.writeStringToFile(file, "\n", "utf-8", true);
+
+            System.out.println("Finished writing!");
+
+            dataFile = DataFile.findById(fileId);
+            if (dataFile != null) {
+
+                if (dataFile.getStatus() == DataFile.DELETED) {
+                    dataFile.delete();
+                    return;
+                }
+
+                // finalize the main download file
+                dataFile.setCompletionPercentage(100);
+                dataFile.setCompletionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+                dataFile.setStatus(DataFile.CREATED);
+                dataFile.save();
+                fileCreated = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static Map<String, Map<String, List<AnnotatedValue>>> readSolrPagesAndMerge(String ownerUri, String facets,
                                                                          String fileId, int pageSize,
                                                                          Map<String, List<String>> studyMap,
                                                                          Alignment alignment, Map<String,List<String>> alignCache,
                                                                          String categoricalOption, boolean keepSameValue, ColumnMapping columnMapping) {
 
-        Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
+        System.out.println("readSolrPagesAndMerge: facets=[" + facets + "]");
+
+        Map<String, Map<String, List<AnnotatedValue>>> results = new HashMap<String, Map<String, List<AnnotatedValue>>>();
         int page = 0;
 
         AcquisitionQueryResult acquisitionQueryResult = new AcquisitionQueryResult();
@@ -1847,25 +2109,15 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    private static void parseAndMerge(Map<String, Map<String, List<String>>> results, List<Measurement> measurements,
+    private static void parseAndMerge(Map<String, Map<String, List<AnnotatedValue>>> results, List<Measurement> measurements,
                                Map<String, List<String>> studyMap, Alignment alignment, Map<String, List<String>> alignCache,
                                String fileId, int page, int pageSize, long totalSize, String categoricalOption, boolean keepSameValue,
                                       ColumnMapping columnMapping) {
 
         if ( measurements == null || measurements.size() == 0 ) return;
 
-        String roles = ConfigFactory.load().getString("hadatac.download.alignment");
-        List<String> selectedRoles = new ArrayList<>();
-        if ( roles == null || roles.length() == 0 ) {
-            selectedRoles.add("Child"); // default to Child is not configured
-        } else if ( !roles.contains(",") ) {
-            selectedRoles.add(roles);
-        } else {
-            selectedRoles.addAll(Arrays.asList(roles.split(",")));
-        }
-
         updateSourceStudies(studyMap, measurements);
-        List<String> values = null;
+        List<AnnotatedValue> values = null;
         int counter = 0, prev_ratio = 0;
         DataFile dataFile = null;
 
@@ -1886,7 +2138,8 @@ public class Measurement extends HADatAcThing implements Runnable {
             if (alignObjs == null) {
 
                 long startTime = System.currentTimeMillis();
-                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), selectedRoles, measurement.getOriginalId());
+                // alignObjs = Alignment.alignmentObjectsWithSubjectGroupMembership(measurement.getEntryObjectUri(), measurement.getStudyUri());
+                alignObjs = Alignment.alignmentObjects(measurement.getEntryObjectUri(), "http://hadatac.org/ont/hasco/SubjectGroup");
                 duration = System.currentTimeMillis() - startTime;
                 if ( duration > threshold ) log.debug("DOWNLOAD: alignment.alignmentObject: " + duration);
 
@@ -1958,12 +2211,12 @@ public class Measurement extends HADatAcThing implements Runnable {
                             }
 
                             if (results.get(referenceObj.getUri()) == null) {
-                                values = new ArrayList<String>();
-                                results.put(referenceObj.getUri(), new HashMap<String, List<String>>());
+                                values = new ArrayList<AnnotatedValue>();
+                                results.put(referenceObj.getUri(), new HashMap<String, List<AnnotatedValue>>());
                                 if (results.get(referenceObj.getUri()) != null && alignment.objectKey(referenceEntRole) != null) {
                                     if (referenceObj.getOriginalId() != null) {
                                         //System.out.println("Phase I: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole));
-                                        values.add(referenceObj.getOriginalId());
+                                        values.add(new AnnotatedValue(referenceObj.getOriginalId(), null));
                                         results.get(referenceObj.getUri()).put(alignment.objectKey(referenceEntRole), values);
                                     }
                                 }
@@ -1990,9 +2243,9 @@ public class Measurement extends HADatAcThing implements Runnable {
                 //System.out.println("Phase I: computed measurement key [" + key + "]");
                 if (key != null) {
 
-                    String finalValue = "";
+                    AnnotatedValue finalValue = null;
                     if (categoricalOption.equals(WITH_VALUES)){
-                        finalValue = measurement.getValue();
+                        finalValue = new AnnotatedValue(measurement.getValue(), measurement.getValueClass());
                     } else {
                         //System.out.println("Phase I: valueClass :[" + m.getValueClass() + "]    value: [" + m.getValue() + "]");
                         if (measurement.getValueClass() != null && !measurement.getValueClass().equals("") && URIUtils.isValidURI(measurement.getValueClass())) {
@@ -2016,20 +2269,20 @@ public class Measurement extends HADatAcThing implements Runnable {
                         if (alignment.containsCode(measurement.getValueClass())) {
                             // get code for qualitative variables
                             List<String> entry = alignment.getCode(measurement.getValueClass());
-                            finalValue = entry.get(0);
+                            finalValue = new AnnotatedValue(entry.get(0), measurement.getValueClass());
                         } else {
                             // get actual value for quantitative variables
-                            finalValue = measurement.getValueClass();
+                            finalValue = new AnnotatedValue(measurement.getValueClass(), null);
                         }
                     }
 
                     if (referenceObj != null && finalValue != null) {
-                        if ( measurement.isAllNumerical(finalValue) && finalValue.contains(",") ) {
-                            finalValue = finalValue.replaceAll(",", "");
+                        if ( measurement.isAllNumerical(finalValue.getValue()) && finalValue.getValue().contains(",") ) {
+                            finalValue.setValue(finalValue.getValue().replaceAll(",", ""));
                         }
                         values = results.get(referenceObj.getUri()).get(key);
                         if (values == null) {
-                            values = new ArrayList<String>();
+                            values = new ArrayList<AnnotatedValue>();
                             values.add(finalValue);
                         } else {
                             if ( values.contains(finalValue) == false || keepSameValue ) values.add(finalValue);
@@ -2053,7 +2306,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             int current_ratio = (int)ratio;
             if (current_ratio > prev_ratio) {
                 prev_ratio = current_ratio;
-                if ( current_ratio % 20 == 0 ) System.out.println(Thread.currentThread() + " : Progress: " + current_ratio + "%");
+                if ( current_ratio % 20 == 0 ) {
+                    System.out.println(Thread.currentThread() + " : Progress: " + current_ratio + "%");
+                }
 
                 dataFile = DataFile.findById(fileId);
                 if (dataFile != null) {
@@ -2190,6 +2445,22 @@ public class Measurement extends HADatAcThing implements Runnable {
             e.printStackTrace();
         }
 	  	return fileCreated;
+    }
+
+    public static String prettyCodeBookLabel(Alignment alignment, String codeClass) {
+        List<String> list = alignment.getCodeBook().get(codeClass);
+        //System.out.println("CodeClass: [" + codeClass + "]");
+        //System.out.println(list.get(0) + ", " + list.get(1));
+        String pretty = list.get(1).replace("@en","");
+        if (!pretty.equals("")) {
+            String c0 = pretty.substring(0,1).toUpperCase();
+            if (pretty.length() == 1) {
+                pretty = c0;
+            } else {
+                pretty = c0 + pretty.substring(1);
+            }
+        }
+        return pretty;
     }
 
     public static void outputProvenance(Alignment alignment, File file, String ownerEmail, String dataDir) {

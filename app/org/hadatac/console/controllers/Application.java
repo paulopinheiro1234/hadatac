@@ -5,24 +5,16 @@ import javax.inject.Inject;
 
 import com.feth.play.module.mail.Mailer;
 import com.typesafe.config.ConfigFactory;
-import org.apache.commons.configuration2.Configuration;
-import org.hadatac.console.models.JsonContent;
 import module.SecurityModule;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TokenAction;
-import org.hadatac.console.providers.AuthUser;
-import org.hadatac.console.providers.MyService;
-import org.hadatac.console.providers.MyUsernamePasswordAuthProvider;
-import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.account.errorLogin;
-import org.hadatac.console.views.html.error401;
 import org.hadatac.console.views.html.loginForm;
 import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
@@ -35,29 +27,21 @@ import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.java.Secure;
+import org.pac4j.play.store.PlayCacheSessionStore;
 import org.pac4j.play.store.PlaySessionStore;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import play.Logger;
-import play.api.data.Form;
-import play.api.libs.Files;
 import play.api.libs.mailer.MailerClient;
 import play.libs.mailer.Email;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.twirl.api.Content;
 //import providers.MyUsernamePasswordAuthProvider;
 import org.hadatac.utils.Utils;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import play.libs.Files.TemporaryFile;
+import java.util.*;
+import java.util.concurrent.CompletionStage;
 
 import static org.hadatac.Constants.EMAIL_TEMPLATE_FALLBACK_LANGUAGE;
 
@@ -68,8 +52,10 @@ public class Application extends Controller {
 
     @Inject
     private PlaySessionStore playSessionStore;
-    @Inject
-    private MailerClient mailerClient;
+    @Inject CentralLogoutController centralLogoutController;
+    @Inject private MailerClient mailerClient;
+    private static SysUser sysUser;
+    private PlayWebContext playWebContext;
 
     private List<CommonProfile> getProfiles(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
@@ -77,29 +63,44 @@ public class Application extends Controller {
         return profileManager.getAll(true);
     }
 
-    //TODo: fix it for all users
-    private  CommonProfile getProfile(Http.Request request) {
+    private CommonProfile getProfile(Http.Request request) {
+        final CommonProfile profile = new CommonProfile();
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
-        return (profileManager.getAll(true).isEmpty()? null : profileManager.getAll(true).get(0));
+        if (null != sysUser && null != sysUser.getEmail()) {
+            profile.setId(sysUser.getEmail());
+            profile.addAttribute(Pac4jConstants.USERNAME, sysUser.getEmail());
+            profile.setRoles(getUserRoles(sysUser));
+            profile.setRemembered(true);
+            profileManager.save(true, profile, true);
+        }
+        return (profileManager.getAll(true).isEmpty() ? null : profileManager.getAll(true).get(0));
     }
 
     public String getSessionId (Http.Request request){
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
-        System.out.println("sessionId :"+ sessionId);
+//        System.out.println("sessionId :"+ sessionId);
         return sessionId;
     }
 
-    public String getUserEmail(Http.Request request){
-        final String userEmail = (getProfile(request)==null)? "" : getProfile(request).getUsername();
+    public String getUserEmail(Http.Request request) {
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
+            final PlayWebContext context = getPlayWebContext()!=null? getPlayWebContext():new PlayWebContext(request, playSessionStore);
+            final ProfileManager<CommonProfile> profileManager = new ProfileManager(context,playSessionStore);
+            final String userEmail =  profileManager.get(true).isEmpty() ? "": profileManager.get(true).get().getUsername();
+            System.out.println("getUserEmail:"+userEmail+"\n sessionId:"+playSessionStore.getOrCreateSessionId(context));
+            return userEmail;
+        }
+        final String userEmail = (getProfile(request) == null) ? "" : getProfile(request).getUsername();
         return userEmail;
     }
 
     private Result protectedIndexView(Http.Request request) {
 //        getUserEmail(request);
 //        getProfiles(request);
-          return ok(protectedIndex.render(getProfiles(request),getUserEmail(request)));
+        String userEmail =getUserEmail(request);
+        return ok(protectedIndex.render(userEmail));
     }
 
     private Result notProtectedIndexView(Http.Request request) {
@@ -130,13 +131,11 @@ public class Application extends Controller {
         return protectedIndexView(request);
     }
 
-
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
-//        System.out.println("user is Admin :"+ user.isDataManager());
         if(null != user && user.isDataManager()){
-            return protectedIndexView(request);
+            return ok(protectedIndex.render(user.getEmail()));
         }
         return ok(portal.render(getUserEmail(request)));
     }
@@ -188,6 +187,10 @@ public class Application extends Controller {
     }
 
     public Result loginForm(Http.Request request) throws TechnicalException {
+        //If The user has been redirected from portal to Hadatac. To login we go back to the redirected portal
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")))
+            return redirect(ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionUrl"));
+
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         Optional<String> username = request.queryString("username");
         Optional<String> error = request.queryString("error");
@@ -307,4 +310,53 @@ public class Application extends Controller {
         }
         return ret;
     }
+    public Result getReceiver() {
+        return ok(org.hadatac.console.views.html.receiver.render(""));
+    }
+    private Set<String> getUserRoles(SysUser sysUser){
+        int rolesSize =sysUser.getRoles().size();
+        Set<String> roles = new HashSet<String>();
+        while (rolesSize > 0){
+            roles.add(sysUser.getRoles().get(rolesSize-1).getName());
+            rolesSize--;
+        }
+        return roles;
+    }
+
+    public Result protectedInd(String email) {
+        SysUser user = SysUser.findByEmail(email);
+        if(null != user && user.isDataManager()){
+            return ok(protectedIndex.render(user.getEmail()));
+        }
+        return ok(portal.render(email));
+    }
+
+    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext){
+        sysUser = sysUserValue;
+        playSessionStore = sessionStore;
+        setSessionStore(sessionStore);
+        setPlayWebContext(webContext);
+        formIndex(request);
+
+    }
+    private SysUser getSysUser(){return sysUser;}
+    private void setSysUser(SysUser sysUserNew){ sysUser=sysUserNew;}
+
+    public CompletionStage<Result> logOutUser (Http.Request request){
+        setSysUser(null);
+        return centralLogoutController.logout(request);
+    }
+    public void setSessionStore ( PlaySessionStore sessionStore){
+        playSessionStore =sessionStore;
+    }
+    public PlaySessionStore getSessionStore (){
+        return  playSessionStore ;
+    }
+    public void setPlayWebContext ( PlayWebContext webContext){
+        playWebContext =webContext;
+    }
+    public PlayWebContext getPlayWebContext (){
+        return  playWebContext ;
+    }
+
 }

@@ -28,6 +28,7 @@ public class Alignment {
     private Map<String, List<String>> hCodeBook;
     private Map<String, String> studyId;  // key=socUri;  value=studyId
     private Map<String, STR> dataAcquisitions;
+    private Map<String, DataAcquisitionSchemaAttribute> dasas;
 
     List<Attribute> ID_LIST = new ArrayList<Attribute>();
     AttributeInRelationTo ID_IRT = new AttributeInRelationTo(ID_LIST, null);
@@ -46,6 +47,7 @@ public class Alignment {
         hCodeBook = new HashMap<String, List<String>>();
         studyId = new HashMap<String,String>();
         dataAcquisitions = new HashMap<String,STR>();
+        dasas = new HashMap<String, DataAcquisitionSchemaAttribute>();
 
         Attribute ID = new Attribute();
         ID.setLabel("ID");
@@ -111,6 +113,8 @@ public class Alignment {
      */
     public String measurementKey(Measurement m) {
 
+        STR str = null;
+        DataAcquisitionSchemaAttribute dasa = null;
         if (variables == null) {
             System.out.println("[ERROR] Alignment: alignment attribute list not initialized ");
             return null;
@@ -178,8 +182,13 @@ public class Alignment {
 
         if (!dataAcquisitions.containsKey(m.getAcquisitionUri())) {
             //System.out.println("getDOI(): adding da " + m.getAcquisitionUri());
-            STR da = STR.findByUri(m.getAcquisitionUri());
-            dataAcquisitions.put(m.getAcquisitionUri(), da);
+            str = STR.findByUri(m.getAcquisitionUri());
+            dataAcquisitions.put(m.getAcquisitionUri(), str);
+        }
+
+        if (!dasas.containsKey(m.getDasaUri())) {
+            dasa = DataAcquisitionSchemaAttribute.find(m.getDasaUri());
+            dasas.put(m.getDasaUri(), dasa);
         }
 
         String mRole = m.getRole().replace(" ","");
@@ -304,12 +313,31 @@ public class Alignment {
         }*/
 
         newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
+        if (m.getValueClass() != null && m.getValueClass().startsWith("http")) {
+            newVar.setIsCategorical(true);
+        }
         //System.out.println("Align-Debug: new alignment attribute 3");
 
         //System.out.println("Align-Debug: new variable's key: [" + newVar.getKey() + "]");
 
         if (!variables.containsKey(newVar.getKey())) {
-            variables.put(newVar.getKey(), newVar);
+            str = dataAcquisitions.get(m.getAcquisitionUri());
+            dasa = dasas.get(m.getDasaUri());
+            if (str != null || dasa != null) {
+                OriginalVariable newOrigVar = new OriginalVariable(newVar);
+                if (str != null) {
+                    newOrigVar.setSTR(str);
+                }
+                if (dasa != null) {
+                    newOrigVar.setDASA(dasa);
+                    if (dasa.getLabel() != null && !dasa.getLabel().equals("")) {
+                        newOrigVar.setName(dasa.getLabel());
+                    }
+                }
+                variables.put(newOrigVar.getKey(), newOrigVar);
+            } else {
+                variables.put(newVar.getKey(), newVar);
+            }
             //System.out.println("Align-Debug: adding new var to variable's list");
         }
 
@@ -321,18 +349,18 @@ public class Alignment {
      *           GRAPH OPERATIONS
      * ========================================== */
 
-    public static List<String> alignmentObjects(String currentObj, List<String> selectedRoles, String originalId) {
-        //System.out.println("Align-Debug: Current Object [" + currentObj + "]");
+    public static List<String> alignmentObjects(String currentObj, String targetType) {
+
+        // for now, targetType == hasco:SubjectGroup. Eventually, this should be something coming from GUI selection
+
         List<String> alignObjs = new ArrayList<String>();
-        if (currentObj == null || currentObj.isEmpty() || selectedRoles == null || selectedRoles.size() == 0 ) {
+        if (currentObj == null || currentObj.isEmpty() ) {
             log.debug("Current Obj or Selected Role are empty");
             return alignObjs;
         }
 
-        /*
-         * Test if the current object is already the alignment object
-         */
-        if (selectedRoles.contains(StudyObject.findSocRole(currentObj)) ) {
+        // Test if the current object is already the alignment object
+        if ( StudyObject.checkSocType(currentObj, targetType) ) {
             alignObjs.add(currentObj);
             log.debug("Already ALIGNMENT object");
             return alignObjs;
@@ -343,12 +371,12 @@ public class Alignment {
          */
         List<Map<String,String>> upstream = StudyObject.findUpstreamSocs(currentObj);
         if (upstream.size() > 0) {
-            // iteration stops for first obj with matching role
+            // iteration and stop if soctype == targetType
             for (Map<String,String> socRoleTuple :  upstream) {
                 Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
                 if (itr.hasNext()) {
                     Map.Entry<String, String> entry = itr.next();
-                    if ( selectedRoles.contains(entry.getValue()) ) {
+                    if ( targetType.contains(entry.getValue()) ) {
                         alignObjs.add(entry.getKey());
                         //System.out.println("Align-Debug: UPSTREAM object");
                         return new ArrayList<>(new HashSet<>(alignObjs));
@@ -357,62 +385,38 @@ public class Alignment {
             }
         }
 
-        /*
-         * Test if alignment object(s) is(are) downstream
-         */
-        for ( String selectedRole : selectedRoles ) {
-            List<Map<String, String>> downstream = StudyObject.findDownstreamSocs(currentObj, originalId, selectedRole);
-            if (downstream.size() > 0) {
-                // iteration is not interrupted and selects all objs with matching role
-                for (Map<String, String> socRoleTuple : downstream) {
-                    Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
-                    if (itr.hasNext()) {
-                        Map.Entry<String, String> entry = itr.next();
-                        if (entry.getValue().equals(selectedRole)) {
-                            alignObjs.add(entry.getKey());
-                        }
-                    }
-                }
-                if (alignObjs.size() > 1) {
-
-                }
-                if (alignObjs.size() > 0) {
-                    //System.out.println("Align-Debug: DOWNSTREAM objects of size " + alignObjs.size());
-                    return new ArrayList<>(new HashSet<>(alignObjs));
-                }
-            }
+        // Test if alignment object(s) is(are) downstream
+        List<String> downstream = StudyObject.findDownstreamSocs(currentObj, targetType);
+        if ( downstream.size() > 1) {
+            System.out.println(String.format("ERROR: for %s, more than 1 aligned subjects have been found.", currentObj));
+            return alignObjs;
+        }
+        if ( downstream.size() == 1 ) {
+            alignObjs.add(downstream.get(0));
+            return new ArrayList<>(new HashSet<>(alignObjs));
         }
 
-        /*
-         * Test if alignment object(s) is(are) downstream from some upstream object
-         */
+        // Test if alignment object(s) is(are) downstream from some upstream object
         if (upstream.size() > 0) {
 
-            for (Map<String,String> socRoleTuple :  upstream) {
+            for (Map<String,String> tuple :  upstream) {
 
-                Iterator<Map.Entry<String, String>> itr = socRoleTuple.entrySet().iterator();
+                Iterator<Map.Entry<String, String>> itr = tuple.entrySet().iterator();
 
                 if (itr.hasNext()) {
 
                     Map.Entry<String, String> entry = itr.next();
                     String upstreamObj = entry.getKey();
 
-                    for ( String selectedRole : selectedRoles ) {
-                        List<Map<String, String>> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, originalId, selectedRole);
-                        if (downstreamFromUpstream.size() > 0) {
-                            // iteration is not interrupted and selects all objs with matching role
-                            for (Map<String, String> socRoleTuple2 : downstreamFromUpstream) {
-                                Iterator<Map.Entry<String, String>> itr2 = socRoleTuple2.entrySet().iterator();
-                                if (itr2.hasNext()) {
-                                    Map.Entry<String, String> entry2 = itr2.next();
-                                    if (entry2.getValue().equals(selectedRole) && !alignObjs.contains(entry2.getKey())) {
-                                        alignObjs.add(entry2.getKey());
-                                        return new ArrayList<>(new HashSet<>(alignObjs));
-                                    }
-                                }
-                            }
-                        }
-                    }  // end of for
+                    List<String> downstreamFromUpstream = StudyObject.findDownstreamSocs(upstreamObj, targetType);
+                    if ( downstreamFromUpstream.size() > 1) {
+                        System.out.println(String.format("ERROR: for %s, more than 1 aligned subjects have been found.", upstreamObj));
+                        continue;
+                    }
+                    if ( downstreamFromUpstream.size() == 1 ) {
+                        alignObjs.add(downstreamFromUpstream.get(0));
+                        return new ArrayList<>(new HashSet<>(alignObjs));
+                    }
 
                 } // end of hasNext()
 
@@ -424,7 +428,11 @@ public class Alignment {
         return alignObjs;
     }
 
+    public static List<String> alignmentObjectsWithSubjectGroupMembership(String currentObj, String studyUri) {
 
+        //System.out.println("Align-Debug: Current Object [" + currentObj + "]");
+        return StudyObject.getAlignmentBySubjectGroupMembership(currentObj, studyUri);
+    }
 
     /* ------------------------------------------ *
      *           CONTAINS METHODS
@@ -493,7 +501,7 @@ public class Alignment {
         return new ArrayList<AlignmentEntityRole>(roles.values());
     }
 
-    public List<Variable> getAlignmentAttributes() {
+    public List<Variable> getVariables() {
         return new ArrayList<Variable>(variables.values());
     }
 
@@ -550,7 +558,5 @@ public class Alignment {
     public void addCode(String attrUri, List<String> code) {
         hCodeBook.put(attrUri, code);
     }
-
-
 
 }

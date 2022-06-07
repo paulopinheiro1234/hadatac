@@ -6,7 +6,7 @@ function checkRecs (L,R,checker){
     var colIndex=0;
     var rowIndex=0;
     var isVirtual=0;
-    console.log("Check Recs");
+    // console.log("Check Recs");
     for (var i=0;i<R;i++){
       for(var j=1;j<L;j++){
         //cdg.data[i][j]=cdg.data[i][j]+" * ";
@@ -15,8 +15,7 @@ function checkRecs (L,R,checker){
         var colval=cdg.schema[colIndex].title;
         colval=colval.charAt(0).toLowerCase() + colval.slice(1);
         var rowval=cdg.data[rowIndex][0];
-	//console.log(cdg);
-	//console.log(cdg.schema);
+
         if(checker==1){
           if(colval=="Attribute"||colval=="Role"||colval=="Unit"||colval=="attribute"){
             isVirtual=0;
@@ -39,7 +38,6 @@ function checkRecs (L,R,checker){
     }
 
   }
-
 }
 
 function starRec(colval, rowval, menuoptns, isVirtual, L, R, rowIndex, colIndex){
@@ -56,7 +54,7 @@ function starRec(colval, rowval, menuoptns, isVirtual, L, R, rowIndex, colIndex)
 }
 
 
-var isSuggestion=0;
+// var isSuggestion=0;
 function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R, rowIndex, colIndex){
    var virtualarray=Object.keys(data["sdd"]["Dictionary Mapping"][keyword]);
    var index=0;
@@ -80,32 +78,10 @@ function helperStarRec(keyword, rowval, colval, data, menuoptns, isVirtual, L, R
                   menuoptns.push(temp);
                }
             }
-
-            if(menuoptns.length>0){
-              isSuggestion=1
-              drawStars(rowIndex,colIndex,isSuggestion,menuoptns);
-            }
             break; // leave for loop early
          }
       }
    }
-}
-
-function drawStars(rowIndex,colIndex,isSuggestion,menuoptns){
-    if(isSuggestion==0){
-
-    }
-    else{
-      //cdg.data[rowIndex][colIndex]+=" * ";
-      //cdg.draw();
-      if(sheetName=="Dictionary Mapping"){
-        drawCheck(rowIndex,colIndex);
-        //autoPopulateSDD(menuoptns,rowIndex,colIndex);
-      }
-    }
-
-
-
 }
 
 
@@ -226,7 +202,8 @@ function getDescription(cval){
   var ret;
       $.ajax({
         type : 'GET',
-        url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
+        // url : 'http://localhost:9000/hadatac/sddeditor_v2/getDescriptionFromIri',
+        url : '/hadatac/sddeditor_v2/getDescriptionFromIri',
         data : {iricode: cellVal},
         success : function(data) {
           console.log(data);
@@ -239,48 +216,66 @@ function getDescription(cval){
 	}
       });
 }
-function drawCheck(rowIndex,colIndex){
 
-  var imgs={};
-  cdg.addEventListener('rendertext', function (e) {
-    if (e.cell.rowIndex > -1 && sheetName==="Dictionary Mapping") {
-        if (e.cell.rowIndex === rowIndex && e.cell.columnIndex===colIndex) {
-            e.cell.formattedValue = e.cell.value ? '' : 'No Image';
-        }
-    }
-  });
-  var d=imgPath + 'blue-corner-triangle.png';
-  //'https://www.starfall.com/h/_images/green-corner-triangle.png'
-  cdg.addEventListener('afterrendercell', function (e) {
 
-    var i, contextGrid = this;
-    if (sheetName==="Dictionary Mapping"&& e.cell.rowIndex === rowIndex && e.cell.columnIndex===colIndex
-             && e.cell.rowIndex > -1) {
-        // if we haven't already made an image for this, do it now
-        if (!imgs[d]) {
-            // create a new image object and store it in the imgs objiect
-            i = imgs[d] = new Image();
-            // get the image path from the cell's value
-            i.src = d;
-            // when the image finally loads
-            // call draw() again to run the else path
-            i.onload = function (parentNode) {
-                contextGrid.draw();
-            };
-            return;
-        }
-        // if we have an image already, draw it.
-        i = imgs[d];
-        if (i.width !== 0) {
-            i.targetHeight = e.cell.height/2;
-            i.targetWidth = (e.cell.height * (i.width / i.height))/2;
-            e.ctx.drawImage(i, e.cell.x, e.cell.y, i.targetWidth, i.targetHeight);
-        }
-    }
-  });
+// sdd_suggestions_organized must not be null
+var enableDebugMessage = false;
+function hasSuggestion(sddTerm, suggestType){
+   if(sddTerm.startsWith('??')){
+      // we need to add support later
+      if(enableDebugMessage) console.log("We don't support virtual columns yet: " + sddTerm);
+      return false;
+   }
+
+   if(!(sddTerm in sdd_suggestions_organized)){
+      // we couldn't find it Jim...
+      if(enableDebugMessage) console.log("Suggestion term not found: " + sddTerm);
+      return false;
+   }
+
+   if(suggestType in sdd_suggestions_organized[sddTerm]){
+      return sdd_suggestions_organized[sddTerm][suggestType].length > 0;
+   }
+   else{
+      if(enableDebugMessage) console.log("Suggestion Type not supported yet: " + suggestType);
+      return false;
+   }
 }
 
+/*
+The goal here is to add a listener for suggestions at every cell on startup,
+this listener would check to make sure we are on the right page and that
+they have a suggestion before they display
 
+There will be a listener for each cell and we need to be able to add more and less, probably a full remove and reload
+*/
+
+var ribbonListenArray = [];
+const d = imgPath + 'blue-corner-triangle.png';
+var img = new Image();
+img.src = d;
+updateRibbonListener();
+
+function updateRibbonListener(){
+   // This runs every time the mouse moves over the grid, so it needs to be quick
+   cdg.addEventListener('afterrendercell', function (e) {
+      // We only show flags if we have suggestions
+      if ( sdd_suggestions != null ){
+         // We only display flags on the DM sheet and only in cells, not header cells
+         if (sheetName === "Dictionary Mapping"){
+            if(!e.cell.isRowHeader && !e.cell.isColumnHeader && !e.cell.isCorner) { // These are broken up for speed
+
+               // We only paint the flags if we have suggestions
+               if ( hasSuggestion(cdg.data[e.cell.rowIndex][0], e.cell.header.title.toLowerCase()) ) {
+                  img.targetHeight = e.cell.height/2;
+                  img.targetWidth = (e.cell.height * (img.width / img.height))/2;
+                  e.ctx.drawImage(img, e.cell.x, e.cell.y, img.targetWidth, img.targetHeight);
+               }
+            }
+         }
+      }
+   });
+}
 
 
 addcartlocal()
@@ -288,13 +283,14 @@ function addcartlocal(){
   clearCart();
     $.ajax({
       type : 'POST',
-      url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+      //url : 'http://localhost:9000/hadatac/sddeditor_v2/getCart',
+      url : '/hadatac/sddeditor_v2/getCart',
       data : {
         //  s: str
-        
+
       },
       success : function(data) {
-    
+
         //console.log(data)
 
     var select=document.getElementById("seecart"),data;
@@ -307,25 +303,25 @@ function addcartlocal(){
 
           var newOntology=e.target.innerHTML;
           var ret=getUri(newOntology);
- 
-          
+
+
           if(ret!=""){
             cdg.data[rowNum][colNum] = ret;
             var label=convertToLabel(ret);
             sheetStorage[rowNum][colNum]=label;
           }
           else{
-            
+
               ret=newOntology;
-              
+
               cdg.data[rowNum][colNum] = ret;
               sheetStorage[rowNum][colNum]=ret;
-            
+
           }
-          
+
 
            //cdg.data[rowNum][colNum]=part1;
-           
+
            //fromCarttoLabel();
 
           var colNum_str=colNum.toString();
@@ -358,14 +354,15 @@ function clearCart(){
 function storeThisEdit(rowNum_str,colNum_str,changeValue){
   $.ajax({
     type : 'GET',
-    url : 'http://localhost:9000/hadatac/sddeditor_v2/addToEdits',
+    // url : 'http://localhost:9000/hadatac/sddeditor_v2/addToEdits',
+    url : '/hadatac/sddeditor_v2/addToEdits',
     data : {
       row: rowNum_str,
       col:colNum_str,
       editValue: changeValue
     },
     success : function(data) {
-    	if(sheetName == "Dictionary Mapping") { 
+    	if(sheetName == "Dictionary Mapping") {
     		getEditValue(parseInt(rowNum_str), parseInt(colNum_str), 1, changeValue);
     	}
     }
@@ -375,7 +372,8 @@ function storeThisEdit(rowNum_str,colNum_str,changeValue){
 function undoEdit(){
   $.ajax({
     type : 'POST',
-    url : 'http://localhost:9000/hadatac/sddeditor_v2/getEdit',
+    // url : 'http://localhost:9000/hadatac/sddeditor_v2/getEdit',
+    url : '/hadatac/sddeditor_v2/getEdit',
     data : {
        //editValue: changeValue
     },
@@ -384,7 +382,7 @@ function undoEdit(){
       var cnum=Number(data[1]);
       var valueRevert=data[2];
       cdg.data[rnum][cnum]=valueRevert;
-      if(sheetName == "Dictionary Mapping") { 
+      if(sheetName == "Dictionary Mapping") {
     	  getEditValue(rnum, cnum, 1, valueRevert);
   	  }
       cdg.draw();
@@ -395,7 +393,8 @@ function undoEdit(){
 function reundoEdit(){
   $.ajax({
     type : 'POST',
-    url : 'http://localhost:9000/hadatac/sddeditor_v2/getOldEdits',
+    // url : 'http://localhost:9000/hadatac/sddeditor_v2/getOldEdits',
+    url : '/hadatac/sddeditor_v2/getOldEdits',
     data : {
        //editValue: changeValue
     },
@@ -404,7 +403,7 @@ function reundoEdit(){
       var cnum=Number(data[1]);
       var valueRevert=data[2];
       cdg.data[rnum][cnum]=valueRevert;
-      if(sheetName == "Dictionary Mapping") { 
+      if(sheetName == "Dictionary Mapping") {
     	  getEditValue(rnum, cnum, 1, valueRevert);
   	  }
       cdg.draw();
@@ -497,7 +496,7 @@ function indicateApproval(r,c,prop){
 		     //e.ctx.drawImage(i, e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
 		    e.ctx.fillStyle = "rgba(0, 0, 0, 0)";
 		    e.ctx.fillRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
-		    //e.ctx.clearRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);		   
+		    //e.ctx.clearRect(e.cell.x + (e.cell.width-i.targetWidth), e.cell.y, i.targetWidth, i.targetHeight);
 		}
       	}
       });
