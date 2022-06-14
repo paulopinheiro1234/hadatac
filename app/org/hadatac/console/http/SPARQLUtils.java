@@ -46,4 +46,21 @@ public class SPARQLUtils {
             throw e;
         }
     }
+
+    /**
+     * Execute a describe query returning the model as a SELECT result set
+     *
+     * @param sparqlService String sparql service URL
+     * @param queryString String query string
+     * @return ResultSetRewindable
+     */
+    public static ResultSetRewindable describeAsRs(String sparqlService, String queryString) {
+        final String selectAllQuery = "SELECT ?subject ?predicate ?object WHERE { ?subject ?predicate ?object . }";
+        Model model = describe(sparqlService, queryString);
+        try (QueryExecution qexec = QueryExecutionFactory.create(selectAllQuery, model)) {
+            ResultSet results = qexec.execSelect();
+            ResultSetRewindable resultsrw = ResultSetFactory.copyResults(results);
+            return resultsrw;
+        }
+    }
 }
