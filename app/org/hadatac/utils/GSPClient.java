@@ -37,14 +37,14 @@ public class GSPClient {
                 requestUriBuilder.addParameter("graph", graph);
             }
             URI requestUri = requestUriBuilder.build();
-            System.out.println("REQUEST URI: " + requestUri);
+//            System.out.println("REQUEST URI: " + requestUri);
             HttpRequest request = HttpRequest.newBuilder(requestUri)
                     .POST(HttpRequest.BodyPublishers.ofInputStream(streamSupplier))
                     .header("Content-Type", mimeType)
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Resp: " + response.statusCode() + ". '" + response.body() + "'");
+//            System.out.println("Resp: " + response.statusCode() + ". '" + response.body() + "'");
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
