@@ -68,6 +68,7 @@ public class UserManagement extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    private boolean userWasEdited = false;
     @Inject
     Application application;
     @Inject
@@ -200,6 +201,7 @@ public class UserManagement extends Controller {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        userWasEdited=true;
         return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri),application.getUserEmail(request)));
     }
 
@@ -382,6 +384,22 @@ public class UserManagement extends Controller {
 
             User.deleteUser(usr_uri, false, false);
             message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
+            if(userWasEdited){
+                System.out.println("User is being edited");
+                try{
+                    SysUser updateUser = AuthApplication.getLocalUser(email);
+                    updateUser.setUri(usr_uri);
+                    updateUser.setFirstName(given_name);
+                    updateUser.setLastName(family_name);
+                    updateUser.setName(given_name+" "+family_name);
+                    updateUser.save();
+
+                }
+                catch (Exception e){
+                    System.out.println("Error: Could not find the User in solr db"+e);
+
+                }
+            }
         }
         return message;
     }

@@ -387,4 +387,33 @@ public class User implements Comparable<User> {
     public int compareTo(User another) {
         return this.getUri().compareTo(another.getUri());
     }
+
+//    public static void updateUser(String uri, boolean updateUser, boolean deleteMember) {
+//        if (deleteMember) {
+//            for(User user : UserGroup.findMembers(uri)){
+//                changeAccessLevel(user.getUri(), User.find(uri).getImmediateGroupUri());
+//            }
+//        }
+//
+//        if (deleteAuth){
+//            User user = User.find(uri);
+//            if(null != user){
+//                SysUser sys_user = SysUser.findByEmail(user.getEmail());
+//                if(null != sys_user){
+//                    for (LinkedAccount acc : LinkedAccount.findByIdSolr(sys_user)) {
+//                        acc.delete();
+//                    }
+//                    sys_user.delete();
+//                }
+//            }
+//        }
+//
+//        String queryString = "";
+//        queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
+//        queryString += "DELETE WHERE { <" + uri + "> ?p ?o . } ";
+//        UpdateRequest req = UpdateFactory.create(queryString);
+//        UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+//                req, CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
+//        processor.execute();
+//    }
 }
