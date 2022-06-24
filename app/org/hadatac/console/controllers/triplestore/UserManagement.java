@@ -396,7 +396,7 @@ public class UserManagement extends Controller {
 
                 }
                 catch (Exception e){
-                    System.out.println("Error: Could not find the User in solr db"+e);
+                    System.out.println("Error: Could not find the User in solr db, check if validation is pending: "+e);
 
                 }
             }
