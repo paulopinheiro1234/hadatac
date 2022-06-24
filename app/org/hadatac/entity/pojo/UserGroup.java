@@ -116,6 +116,7 @@ public class UserGroup extends User {
         List<User> users = new ArrayList<User>();
         String queryString =
                 "PREFIX prov: <http://www.w3.org/ns/prov#>  " +
+                        "PREFIX sio: <http://semanticscience.org/resource/>"+
                         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
                         "PREFIX hadatac: <http://hadatac.org/ont/hadatac#> " +
                         "SELECT ?uri WHERE { " +
