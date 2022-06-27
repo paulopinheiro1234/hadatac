@@ -1,0 +1,41 @@
+code, value, class
+100758,"No use prenatal vitamins during pregnancy month 1", http://hadatac.org/kb/hhear#189963ac4b458e991b7e3ab10e9b1b4fbc0a7121895d918faac9ec3b9123adb2
+102364,"No Type-2 Diabetes", http://hadatac.org/kb/hhear#18fdc6484997397c903f19bbd8b8cde908e2badec42c0c60679af9f5d0fe450f
+110,"Female", http://semanticscience.org/resource/SIO_010052
+111,"Male", http://semanticscience.org/resource/SIO_010048
+12,"College Graduate", http://purl.org/twc/HHEAR_00043
+143,"Master's Degree", http://purl.obolibrary.org/obo/NCIT_C39453
+144,"Doctorate Degree", http://purl.obolibrary.org/obo/NCIT_C39392
+145,"White Hispanic", http://purl.org/twc/HHEAR_00513
+146,"Non-White Hispanic", http://purl.org/twc/HHEAR_00514
+147,"Owns Home", http://purl.org/twc/HHEAR_00519
+149,"Prenatal Vitamin Use", http://purl.org/twc/HHEAR_00525
+150,"Autism Spectrum Disorder related condition", http://purl.org/autism-ontology/1.0/autism-core.owl#AUTISMC1000015
+151,"Autism spectrum disorder", http://purl.obolibrary.org/obo/DOID_0060041
+177,"Pre-eclampsia", http://purl.obolibrary.org/obo/DOID_10591
+178,"Hypertension", http://purl.obolibrary.org/obo/DOID_10763
+179,"Gestational diabetes", http://purl.obolibrary.org/obo/DOID_11714
+180,"Type 1 diabetes mellitus", http://purl.obolibrary.org/obo/DOID_9744
+181,"Type 2 diabetes mellitus", http://purl.obolibrary.org/obo/DOID_9352
+182,"Earth", http://www.wikidata.org/wiki/Q2
+183,"Mexico", http://www.wikidata.org/wiki/Q96
+184,"United States of America ", http://www.wikidata.org/wiki/Q30
+185,"California", http://www.wikidata.org/wiki/Q99
+20,"Caesarian Section", http://purl.org/twc/HHEAR_00267
+214,"White Non-Hispanic", http://purl.org/twc/HHEAR_00575
+216,"Black Non-Hispanic", http://purl.org/twc/HHEAR_00577
+217,"Asian Non-Hispanic", http://purl.org/twc/HHEAR_00578
+24,"Vaginal Birth", http://purl.org/twc/HHEAR_00430
+242,"Pacific Islander or Native Hawaiian, non-Hispanic", http://purl.org/twc/HHEAR_00610
+32,"Graduated From High School", http://purl.org/twc/HHEAR_00464
+54,"Multiracial", http://purl.obolibrary.org/obo/NCIT_C67109
+619529,"No Chronic Hypertension", http://hadatac.org/kb/hhear#97409aa975422970499828eb82b2b7ececf375526b9ff5692a36c29a7c60e158
+621181,"No Type-1 Diabetes", http://hadatac.org/kb/hhear#97a7dd43dd797e90c8c0ae07b8d7bfc9703991854192d0a3c756d618ef424982
+716230,"No autism (either DSM-based or ADOS/Mullens score-based diagnosis)", http://hadatac.org/kb/hhear#aedc662ccccc93ca13cc3ba7a0384bf213b66a059c4ea4b053b2293a4e19f8c4
+85,"Some College", http://purl.obolibrary.org/obo/NCIT_C67137
+87,"Some High School", http://purl.org/twc/HHEAR_00475
+886861,"No Gestational Diabetes", http://hadatac.org/kb/hhear#d884d01bee2e7fd4b3ea8e8369c57968a19978ad54992a5e8485a4250c289911
+90,"Some Middle School", http://purl.org/twc/HHEAR_00476
+902849,"No PreEclampsia", http://hadatac.org/kb/hhear#dc6c1ea5d9e19980ca98c8fbc8c372d74f397ca78732bcf57728368dc0922e30
+93,"Technical Post Junior College", http://purl.org/twc/HHEAR_00478
+99932,"Doesn't Own Home", http://hadatac.org/kb/hhear#1865c6dc131d000e9e4980356c08697f57108e066de6a8bf078f6f2554a8b923
