@@ -1,0 +1,22 @@
+code, value, class
+102,"White", http://purl.obolibrary.org/obo/NCIT_C41261
+145,"White Hispanic", http://purl.org/twc/HHEAR_00513
+146,"Non-White Hispanic", http://purl.org/twc/HHEAR_00514
+149,"Non-White", http://purl.org/twc/HHEAR_00522
+214,"White Non-Hispanic", http://purl.org/twc/HHEAR_00575
+216,"Black Non-Hispanic", http://purl.org/twc/HHEAR_00577
+217,"Asian Non-Hispanic", http://purl.org/twc/HHEAR_00578
+218,"American Indian Non-Hispanic", http://purl.org/twc/HHEAR_00579
+242,"Pacific Islander or Native Hawaiian, non-Hispanic", http://purl.org/twc/HHEAR_00610
+326,"Non-White Non-Hispanic", http://purl.org/twc/HHEAR_00736
+47,"Hispanic or Latino Ethnicity", http://purl.obolibrary.org/obo/NCIT_C17459
+489542,"Not Black/African American Race", http://hadatac.org/kb/hhear#7784621631b799e45997317bc7ca5424fb88811f0e03b62887b521bcaf0589e4
+5,"American Indian Or Alaskan Native", http://purl.obolibrary.org/obo/NCIT_C41259
+54,"Multiracial", http://purl.obolibrary.org/obo/NCIT_C67109
+55,"Native Hawaiian or Other Pacific Islander", http://purl.obolibrary.org/obo/NCIT_C41219
+58,"Non-Hispanic Ethnicity", http://purl.org/twc/HHEAR_00289
+6,"Asian", http://purl.obolibrary.org/obo/NCIT_C41260
+8,"African American", http://purl.obolibrary.org/obo/NCIT_C16352
+855824,"Other race/ethnicity than white/black/hispanic/asian/american indian/multiracial", http://hadatac.org/kb/hhear#d0f109674c2f607d55184bb7c743eebe18d79fb848967236ae3eab8f9f1d06c0
+884548,"Other race than Native American/Asian/Black/Native Hawaiian/White/Multiracial", http://hadatac.org/kb/hhear#d7f4412892c69e06e6d53f84d730ce61fec1109a1bf6725b956757bddfa7e5dc
+976207,"Race other than Black or White", http://hadatac.org/kb/hhear#ee54fed1cb8eb95d7a5f41a001c3b872602eaeaee6e7ad68f253627ff827233f
