@@ -35,6 +35,7 @@ import org.pac4j.play.store.PlaySessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.api.libs.mailer.MailerClient;
+import play.filters.headers.SecurityHeadersFilter;
 import play.i18n.MessagesApi;
 import play.data.validation.Constraints;
 import play.mvc.Http;
@@ -273,7 +274,8 @@ public class Signup {
         final Form<MyUsernamePasswordAuthProvider> boundForm = form.bindFromRequest(request);
         if (boundForm.hasErrors()) {
             return redirect(org.hadatac.console.controllers.routes.WidgetController.listWidgets())
-                    .flashing("error", String.valueOf(boundForm.errors()));
+                    .flashing("error", String.valueOf(boundForm.errors()))
+                    .withHeader(SecurityHeadersFilter.X_FRAME_OPTIONS_HEADER(),"DENY");
         }
         if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
             if (!UserManagement.isPreRegistered(boundForm.get().getEmail())) {
