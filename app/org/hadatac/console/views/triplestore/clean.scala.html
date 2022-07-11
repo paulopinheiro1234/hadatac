@@ -54,7 +54,7 @@
                  <h4>Data Repository</h4>
                  <div id="rcorners">  
                      Status: 
-                     @if(Repository.operational(Repository.DATA)) {
+                     @if(org.hadatac.utils.Repository.operational(org.hadatac.utils.Repository.DATA)) {
                          <b><font color="green">OPERATIONAL</font></b> 
                          <br>    		
                          Data Acquisitions:  <b>@DataContext.playTotalDataAcquisitions() documents.</b>  
@@ -77,7 +77,7 @@
                  <h4>Metadata Repository</h4>
                  <div id="rcorners">  
                      Status: 
-                     @if(Repository.operational(Repository.METADATA)) {
+                     @if(org.hadatac.utils.Repository.operational(org.hadatac.utils.Repository.METADATA)) {
                          <b><font color="green">OPERATIONAL</font></b>
                          <br>
                          Metadata Content:  <b>@MetadataContext.playTotalTriples() triples.</b> User Graph Content:  <b>@PermissionsContext.playTotalTriples() triples.</b>
