@@ -6,6 +6,7 @@ import java.util.Map;
 
 import java.io.ByteArrayOutputStream;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.text.WordUtils;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
@@ -20,9 +21,11 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.hadatac.annotations.ObjectProperty;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.utils.HASCO;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
@@ -36,13 +39,6 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
 
     private static final Logger log = LoggerFactory.getLogger(ObjectCollection.class);
 
-    public static String SUBJECT_COLLECTION = "http://hadatac.org/ont/hasco/SubjectGroup";
-    public static String SAMPLE_COLLECTION = "http://hadatac.org/ont/hasco/SampleCollection";
-    public static String LOCATION_COLLECTION = "http://hadatac.org/ont/hasco/LocationCollection";
-    public static String TIME_COLLECTION = "http://hadatac.org/ont/hasco/TimeCollection";
-    public static String MATCHING_COLLECTION = "http://hadatac.org/ont/hasco/MatchingCollection";
-    public static String OBJECT_COLLECTION = "http://hadatac.org/ont/hasco/ObjectCollection";
-
     public static String INDENT1 = "   ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
@@ -50,6 +46,8 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String DELETE_LINE4 = "  hasco:hasLastCounter ?o . ";
     public static String LINE_LAST = "}  ";
+
+    public static int DEFAULT_PAGE_SIZE = 5;
 
     private String studyUri = "";
     private String hasVirtualColumnUri = "";
@@ -66,6 +64,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
     public ObjectCollection() {
         this.uri = "";
         this.typeUri = "";
+        this.hascoTypeUri = HASCO.OBJECT_COLLECTION;
         this.label = "";
         this.comment = "";
         this.studyUri = "";
@@ -93,6 +92,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String hasLastCounter) {
         this.setUri(uri);
         this.setTypeUri(typeUri);
+        this.hascoTypeUri = HASCO.OBJECT_COLLECTION;
         this.setLabel(label);
         this.setComment(comment);
         this.setStudyUri(studyUri);
@@ -112,6 +112,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
             String studyUri) {
         this.setUri(uri);
         this.setTypeUri(typeUri);
+        this.hascoTypeUri = HASCO.OBJECT_COLLECTION;
         this.setLabel(label);
         this.setComment(comment);
         this.setStudyUri(studyUri);
@@ -152,11 +153,13 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return ocType;    
     }
 
+    @JsonIgnore
     public String getNextCounter() {
         increaseNextCounter();
         return hasLastCounter;
     }
 
+    @JsonIgnore
     public void setLastCounter(String hasLastCounter) {
         this.hasLastCounter = hasLastCounter;
     }
@@ -210,7 +213,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                     request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
-            System.out.println("QueryParseException due to update query: " + insert);
+            System.out.println("[ERROR] QueryParseException due to update query: " + insert);
             throw e;
         }
 
@@ -220,6 +223,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return studyUri;
     }
 
+    @JsonIgnore
     public Study getStudy() {
         if (studyUri == null || studyUri.equals("")) {
             return null;
@@ -231,27 +235,28 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         if (typeUri == null || typeUri.equals("")) {
             return false;
         }
-        return (typeUri.equals(SUBJECT_COLLECTION) || typeUri.equals(SAMPLE_COLLECTION));
+        return (typeUri.equals(HASCO.SUBJECT_COLLECTION) || typeUri.equals(HASCO.SAMPLE_COLLECTION));
     }
 
     public boolean isLocationCollection() {
         if (typeUri == null || typeUri.equals("")) {
             return false;
         }
-        return typeUri.equals(LOCATION_COLLECTION);
+        return typeUri.equals(HASCO.LOCATION_COLLECTION);
     }
 
     public boolean isTimeCollection() {
         if (typeUri == null || typeUri.equals("")) {
             return false;
         }
-        return typeUri.equals(TIME_COLLECTION);
+        return typeUri.equals(HASCO.TIME_COLLECTION);
     }
 
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
     }
 
+    @JsonIgnore
     public List<String> getObjectUris() {
         return objectUris;
     }
@@ -268,6 +273,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return "";
     }
 
+    @ObjectProperty(cardinality=2, objectTypeUri="http://hadatac.org/ont/hasco/StudyObject")
+    public List<StudyObject> getObjectsWithPages() {
+        return StudyObject.findByCollectionWithPages(this, DEFAULT_PAGE_SIZE + 1, 0);
+    }
+
+    @JsonIgnore
     public List<StudyObject> getObjects() {
         List<StudyObject> resp = new ArrayList<StudyObject>();
         if (objectUris == null || objectUris.size() <=0) {
@@ -282,6 +293,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return resp;
     }
 
+    @JsonIgnore
     public Map<String, StudyObject> getObjectsMap() {
         Map<String, StudyObject> resp = new HashMap<String, StudyObject>();
         if (objectUris == null || objectUris.size() <=0) {
@@ -304,6 +316,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return hasScopeUri;
     }
 
+    @JsonIgnore
     public ObjectCollection getHasScope() {
         if (hasScopeUri == null || hasScopeUri.equals("")) {
             return null;
@@ -319,6 +332,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return hasVirtualColumnUri;
     }
 
+    @JsonIgnore
     public VirtualColumn getVirtualColumn() {
         if (null == virtualColumn || !virtualColumn.getUri().equals(hasVirtualColumnUri)) {
             virtualColumn = VirtualColumn.find(hasVirtualColumnUri);
@@ -354,10 +368,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return hasRoleLabel;
     }
 
+    @JsonIgnore
     public List<String> getSpaceScopeUris() {
         return spaceScopeUris;
     }
 
+    @JsonIgnore
     public List<ObjectCollection> getSpaceScopes() {
         if (spaceScopeUris == null || spaceScopeUris.isEmpty()) {
             return null;
@@ -376,10 +392,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.spaceScopeUris = spaceScopeUris;
     }
 
+    @JsonIgnore
     public List<String> getTimeScopeUris() {
         return timeScopeUris;
     }
 
+    @JsonIgnore
     public List<ObjectCollection> getTimeScopes() {
         if (timeScopeUris == null || timeScopeUris.equals("")) {
             return null;
@@ -398,10 +416,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         this.timeScopeUris = timeScopeUris;
     }
 
+    @JsonIgnore
     public List<String> getGroupUris() {
         return groupUris;
     }
 
+    @JsonIgnore
     public List<SOCGroup> getGroups() {
         if (groupUris == null || groupUris.equals("")) {
             return null;
@@ -502,13 +522,14 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                 count += soln.getLiteral("count").getInt();
             }
             else {
-                System.out.println("[ObjectCollection] getCollectionSize(): Error!");
+                System.out.println("[ERROR][ObjectCollection] getCollectionSize() is unavailable");
                 return -1;
             }
         }
         return count;
     }// /getCollectionSize()
 
+    @JsonIgnore
     private static List<String> retrieveSpaceScope(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = ""; 
@@ -531,6 +552,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                         }
                     }
                 } catch (Exception e1) {
+                    e1.printStackTrace();
                 }
             }
         }
@@ -538,6 +560,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    @JsonIgnore
     private static List<String> retrieveSpaceScopeFacetSearch(String oc_uri) {
 
         List<String> scopeUris = new ArrayList<String>();
@@ -561,6 +584,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                         }
                     }
                 } catch (Exception e1) {
+                    e1.printStackTrace();
                 }
             }
         }
@@ -568,6 +592,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    @JsonIgnore
     private static List<String> retrieveTimeScope(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = "";
@@ -597,6 +622,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    @JsonIgnore
     private static List<String> retrieveTimeScopeFacetSearch(String oc_uri) {
         List<String> scopeUris = new ArrayList<String>();
         String scopeUri = "";
@@ -626,6 +652,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return scopeUris;
     }
 
+    @JsonIgnore
     private static List<String> retrieveGroup(String oc_uri) {
         List<String> groupUris = new ArrayList<String>();
         String groupUri = "";
@@ -655,6 +682,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return groupUris;
     }
 
+    @JsonIgnore
     private static List<String> retrieveGroupFacetSearch(String oc_uri) {
         List<String> groupUris = new ArrayList<String>();
         String groupUri = "";
@@ -690,7 +718,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?matchingUri WHERE { \n" + 
                 "  ?matchingUri hasco:hasScope <" + oc_uri + "> . \n" + 
-                "  ?matchingUri a <" + ObjectCollection.MATCHING_COLLECTION + "> . \n" + 
+                "  ?matchingUri a <" + HASCO.MATCHING_COLLECTION + "> . \n" +
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -714,7 +742,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return matchingSOCs;
     }
 
-    public static ObjectCollection find(String oc_uri) {
+    private static ObjectCollection findInternal(String oc_uri, boolean full) {
         ObjectCollection oc = null;
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
@@ -810,11 +838,12 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                     lastCounterStr = "";
                 }
 
-                spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
-
-                timeScopeUrisStr = retrieveTimeScope(oc_uri);
-
-                groupUrisStr = retrieveGroup(oc_uri);
+                if (full) {
+                    //System.out.println("ObjectCollection: Retrieving objects");
+                    spaceScopeUrisStr = retrieveSpaceScope(oc_uri);
+                    timeScopeUrisStr = retrieveTimeScope(oc_uri);
+                    groupUrisStr = retrieveGroup(oc_uri);
+                }
 
                 oc = new ObjectCollection(
                         oc_uri, 
@@ -829,37 +858,48 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
                         timeScopeUrisStr,
                         groupUrisStr,
                         lastCounterStr);
+
             }
         }
 
-        // retrieve URIs of objects that are member of the collection
-        String queryMemberStr = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT  ?uriMember WHERE { \n" + 
-                "    ?uriMember hasco:isMemberOf <" + oc_uri + "> . \n" + 
-                "}";
+        if (full) {
+            // retrieve URIs of objects that are member of the collection
+            String queryMemberStr = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                    "SELECT  ?uriMember WHERE { \n" +
+                    "    ?uriMember hasco:isMemberOf <" + oc_uri + "> . \n" +
+                    "}";
 
-        ResultSetRewindable resultsrwMember = SPARQLUtils.select(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryMemberStr);
+            ResultSetRewindable resultsrwMember = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryMemberStr);
 
-        if (resultsrwMember.hasNext()) {
-            String uriMemberStr = "";
+            if (resultsrwMember.hasNext()) {
+                String uriMemberStr = "";
 
-            while (resultsrwMember.hasNext()) {
-                QuerySolution soln = resultsrwMember.next();
-                if (soln != null) {
-                    try {
-                        if (soln.getResource("uriMember") != null && soln.getResource("uriMember").getURI() != null) {
-                            uriMemberStr = soln.getResource("uriMember").getURI();
-                            oc.getObjectUris().add(uriMemberStr);
+                while (resultsrwMember.hasNext()) {
+                    QuerySolution soln = resultsrwMember.next();
+                    if (soln != null) {
+                        try {
+                            if (soln.getResource("uriMember") != null && soln.getResource("uriMember").getURI() != null) {
+                                uriMemberStr = soln.getResource("uriMember").getURI();
+                                oc.getObjectUris().add(uriMemberStr);
+                            }
+                        } catch (Exception e1) {
+                            uriMemberStr = "";
                         }
-                    } catch (Exception e1) {
-                        uriMemberStr = "";
                     }
                 }
             }
         }
 
         return oc;
+    }
+
+    public static ObjectCollection find(String oc_uri) {
+        return findInternal(oc_uri, true);
+    }
+
+    public static ObjectCollection findForBrowser(String oc_uri) {
+        return findInternal(oc_uri, false);
     }
 
     public static ObjectCollection findFacetSearch(String oc_uri) {
@@ -1010,6 +1050,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return oc;
     }
 
+    @JsonIgnore
     public static List<ObjectCollection> findAll() {
 
         long currentTime = System.currentTimeMillis();
@@ -1035,6 +1076,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return oc_list;
     }
 
+    @JsonIgnore
     public static List<ObjectCollection> findAllFacetSearch() {
 
         long currentTime = System.currentTimeMillis();
@@ -1060,6 +1102,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return oc_list;
     }
 
+    @JsonIgnore
     public static List<ObjectCollection> findDomainByStudyUri(String studyUri) {
         List<ObjectCollection> ocList = new ArrayList<ObjectCollection>();
         for (ObjectCollection oc : ObjectCollection.findByStudyUri(studyUri)) {
@@ -1095,6 +1138,59 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         return ocList;
     }
 
+    public static List<GenericInstance> findGenericInstanceByStudyWithPages(String studyUri, int pageSize, int offset) {
+        System.out.println("creating GenericInstance. Study URI is [" + studyUri + "]");
+        if (studyUri == null) {
+            return null;
+        }
+
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri ?ocType ?hascoType ?label ?comment WHERE { \n" +
+                "   ?ocType rdfs:subClassOf* hasco:ObjectCollection . \n" +
+                "   ?uri a ?ocType . \n" +
+                "   ?uri hasco:isMemberOf <" + studyUri + "> . \n" +
+                "   OPTIONAL { ?uri hasco:hascoType ?hascoType } . \n" +
+                "   OPTIONAL { ?uri rdfs:label ?label } . \n" +
+                "   OPTIONAL { ?uri rdfs:comment ?comment } . \n" +
+                " } " +
+                " LIMIT " + pageSize +
+                " OFFSET " + offset;;
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        List<GenericInstance> ocList = new ArrayList<GenericInstance>();
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            GenericInstance oc = new GenericInstance();
+            String uri = "";
+            String type = "";
+            String hascoType = "";
+            String label = "";
+            String comment = "";
+            if (soln != null) {
+                if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+                    uri = soln.getResource("uri").getURI();
+                }
+                if (soln.getLiteral("label") != null && soln.getLiteral("label").getString() != null) {
+                    label = soln.getLiteral("label").getString();
+                }
+                if (soln.getResource("ocType") != null && soln.getResource("ocType").getURI() != null) {
+                    type = soln.getResource("ocType").getURI();
+                }
+                if (soln.getResource("hascoType") != null && soln.getResource("hascoType").getURI() != null) {
+                    hascoType = soln.getResource("hascoType").getURI();
+                }
+                if (soln.getLiteral("comment") != null && soln.getLiteral("comment").getString() != null) {
+                    comment = soln.getLiteral("comment").getString();
+                }
+                System.out.println("creating GenericInstance with URI " + uri + " " + label);
+                oc = new GenericInstance(uri, type, hascoType, label, comment);
+                ocList.add(oc);
+            }
+        }
+        return ocList;
+    }
+
     public static Map<String, String> labelsByStudyUri(String studyUri) {
         if (studyUri == null) {
             return null;
@@ -1110,6 +1206,28 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         }
 
         return labelsMap;
+    }
+
+    public static int getNumberCollectionsByStudy(String study_uri) {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "SELECT (count(?uri) as ?tot) WHERE { \n" +
+                "   ?ocType rdfs:subClassOf* hasco:ObjectCollection . \n" +
+                "   ?uri a ?ocType . \n" +
+                "   ?uri hasco:isMemberOf <" + study_uri + "> . \n" +
+                " } ";
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public static String findByStudyUriJSON(String studyUri) {
@@ -1252,6 +1370,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         }
 
         insert += oc_uri + " a <" + typeUri + "> . ";
+        insert += oc_uri + " hasco:hascoType <" + hascoTypeUri + "> . ";
         insert += oc_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
         if (this.getStudyUri().startsWith("http")) {
             insert += oc_uri + " hasco:isMemberOf  <" + this.getStudyUri() + "> . ";
@@ -1375,7 +1494,7 @@ public class ObjectCollection extends HADatAcThing implements Comparable<ObjectC
         	}
         }
     	super.deleteFromTripleStore();
-    	System.out.println("ObjectCollection: deleted SOC " + this.getLabel() + " and its " + totObj + " objects.");
+    	//System.out.println("ObjectCollection: deleted SOC " + this.getLabel() + " and its " + totObj + " objects.");
     }
 
     @Override

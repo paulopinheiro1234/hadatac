@@ -57,6 +57,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
         if (studyUri.contains("STD")){
             vcUri = studyUri.replace("STD", "VC") + "-" + hasSOCReference.replace("??", "");
         }
+        //System.out.println("inside VC's construct: vcUri = [" + vcUri + "] and studyUri is [" + studyUri + "]");
         this.setUri(vcUri);
         this.setStudyUri(studyUri);
         this.setGroundingLabel(hasGroundingLabel);
@@ -107,7 +108,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
         List<VirtualColumn> vcs = new ArrayList<VirtualColumn>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* hasco:VisrtualColumn . " + 
+                " ?uri rdfs:subClassOf* hasco:VirtualColumn . " +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -262,6 +263,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
         }
         if (className != null && !className.equals("")) {
             insert += vc_uri + " a <" + URIUtils.replacePrefixEx(className) + "> . ";
+            insert += vc_uri + " hasco:hascoType <" + URIUtils.replacePrefixEx(className) + "> . ";
         }
         if (this.getLabel() != null && !this.getLabel().equals("")) {
             insert += vc_uri + " rdfs:label  \"" + this.getLabel() + "\" . ";
@@ -297,6 +299,7 @@ public class VirtualColumn extends HADatAcClass implements Comparable<VirtualCol
             throw e;
         }
 
+        //System.out.println("VC with uri [" + vc_uri + ", " + this.getUri() + "] and SOCReference [" + this.getSOCReference() + "] and study uri [" + this.getStudyUri() + "] has been saved");
         return true;
     }
     

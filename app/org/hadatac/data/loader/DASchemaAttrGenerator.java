@@ -308,6 +308,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             logger.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)));
             row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
+            row.put("hasco:hascoType", "hasco:DASchemaAttribute");
             row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(0));
             row.put("rdfs:comment", mergedEA.get(getLabel(rec)).get(1));
             row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
@@ -352,6 +353,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             }
             row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:DASchemaAttribute");
+            row.put("hasco:hascoType", "hasco:DASchemaAttribute");
             row.put("rdfs:label", getLabel(rec));
             row.put("rdfs:comment", getLabel(rec));
             row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);

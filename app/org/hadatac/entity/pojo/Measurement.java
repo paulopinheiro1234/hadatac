@@ -35,6 +35,7 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Feedback;
 import org.slf4j.Logger;
@@ -47,6 +48,10 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     @Field("uri")
     private String uri;
+    @Field("type_uri_str")
+    private String typeUri;
+    @Field("hasco_type_uri_str")
+    private String hascoTypeUri;
     @Field("owner_uri_str")
     private String ownerUri;
     @Field("acquisition_uri_str")
@@ -129,6 +134,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     public static String NON_CATG_CATG = "nonCategoricalCategorize";
 
     public Measurement() {
+        typeUri = HASCO.VALUE;
+        hascoTypeUri = HASCO.VALUE;
         characteristicUris = new ArrayList<String>();
     }
 
@@ -1295,6 +1302,31 @@ public class Measurement extends HADatAcThing implements Runnable {
         return 0;
     }
 
+    public static Measurement find(String uri) {
+        List<Measurement> listMeasurement = new ArrayList<Measurement>();
+
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+        SolrQuery query = new SolrQuery();
+        query.set("q", "uri:\"" + uri + "\"");
+        query.set("rows", "1");
+
+        try {
+            QueryResponse response = solr.query(query);
+            solr.close();
+            SolrDocumentList results = response.getResults();
+            Iterator<SolrDocument> i = results.iterator();
+            if (i.hasNext()) {
+                return convertFromSolr(i.next(), null, new HashMap<>());
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Measurement.findByDataAcquisitionUri(acquisition_uri) - Exception message: "
+                    + e.getMessage());
+        }
+
+        return null;
+    }
+
     public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
         List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
@@ -1526,6 +1558,13 @@ public class Measurement extends HADatAcThing implements Runnable {
             Map<String, STR> cachedDA, Map<String, String> cachedURILabels) {
         Measurement m = new Measurement();
         m.setUri(SolrUtils.getFieldValue(doc, "uri"));
+        if (SolrUtils.getFieldValue(doc, "type_uri_str") != null) {
+            m.setTypeUri(SolrUtils.getFieldValue(doc, "type_uri_str"));
+        }
+        if (SolrUtils.getFieldValue(doc, "hasco_type_uri_str") != null) {
+            m.setHascoTypeUri(SolrUtils.getFieldValue(doc, "hasco_type_uri_str"));
+        }
+        m.setUri(SolrUtils.getFieldValue(doc, "uri"));
         m.setOwnerUri(SolrUtils.getFieldValue(doc, "owner_uri_str"));
         m.setDatasetUri(SolrUtils.getFieldValue(doc, "dataset_uri_str"));
         m.setAcquisitionUri(SolrUtils.getFieldValue(doc, "acquisition_uri_str"));
@@ -1552,6 +1591,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         m.setOriginalId(SolrUtils.getFieldValue(doc, "original_id_str"));
 
         m.setValueClass(SolrUtils.getFieldValue(doc, "value_str"));
+        m.setLabel(SolrUtils.getFieldValue(doc, "value_str"));
         if (cachedURILabels.containsKey(m.getValueClass())) {
             m.setValue(cachedURILabels.get(m.getValueClass()));
         } else {
@@ -1709,11 +1749,11 @@ public class Measurement extends HADatAcThing implements Runnable {
             //alignment.printAlignment();
             
             // Write headers: Labels are derived from collected alignment attributes
-            List<Variable> aaList = alignment.getVariables();
-            Map<String, Variable> varMap = new HashMap<String, Variable>();
-            aaList.sort(new Comparator<Variable>() {
+            List<VariableSpec> aaList = alignment.getVariables();
+            Map<String, VariableSpec> varMap = new HashMap<String, VariableSpec>();
+            aaList.sort(new Comparator<VariableSpec>() {
                 @Override
-                public int compare(Variable o1, Variable o2) {
+                public int compare(VariableSpec o1, VariableSpec o2) {
                     return o1.toString().compareTo(o2.toString());
                 }
             });
@@ -1721,7 +1761,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //System.out.print("Phase II: variable list content: ");
             if (summaryType.equals(SUMMARY_TYPE_NONE)) {
                 FileUtils.writeStringToFile(file, "\"STUDY-ID\"", "utf-8", true);
-                for (Variable aa : aaList) {
+                for (VariableSpec aa : aaList) {
                     //System.out.print(aa + " ");
                     FileUtils.writeStringToFile(file, ",\"" + aa + "\"", "utf-8", true);
                 }
@@ -1729,7 +1769,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 FileUtils.writeStringToFile(file, "\n", "utf-8", true);
 
             }
-            for (Variable aa : aaList) {
+            for (VariableSpec aa : aaList) {
                 varMap.put(aa.toString(), aa);
                 //System.out.println("init varMap: [" + aa.toString() + "]");
             }
@@ -1753,7 +1793,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
                         // write study id
                         FileUtils.writeStringToFile(file, "\"" + getRelatedStudies(studyMap, obj.getUri()) + "\"", "utf-8", true);
-                        for (Variable aa : aaList) {
+                        for (VariableSpec aa : aaList) {
                             values = row.get(aa.toString());
                             FileUtils.writeStringToFile(file, ",", "utf-8", true);
                             if (values == null) {
@@ -1800,8 +1840,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                 });
 
                 System.out.println("HERE 1   size grpSummary" + ags.size());
-                List<Variable> finalVar = new ArrayList<Variable>();
-                for (Variable var : aaList) {
+                List<VariableSpec> finalVar = new ArrayList<VariableSpec>();
+                for (VariableSpec var : aaList) {
                     if (categoricalOption.equals(Measurement.NON_CATG_CATG)) {
                         if (var.isCategorical() || CategorizedValue.isCategorizable(var)) {
                             finalVar.add(var);
@@ -1816,7 +1856,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
                 FileUtils.writeStringToFile(file, "Frequency \n", "utf-8", true);
                 for (AnnotatedGroupSummary groupSummary : ags) {
-                    for (Variable var : finalVar) {
+                    for (VariableSpec var : finalVar) {
                         boolean firstValue = true;
                         FileUtils.writeStringToFile(file, "\"", "utf-8", true);
                         for (AnnotatedValue value : groupSummary.getAnnotatedGroup().getGroup()) {
@@ -1928,11 +1968,11 @@ public class Measurement extends HADatAcThing implements Runnable {
             //alignment.printAlignment();
 
             // Write headers: Labels are derived from collected alignment attributes
-            List<Variable> aaList = alignment.getVariables();
+            List<VariableSpec> aaList = alignment.getVariables();
             System.out.println("Sorting variable list... " + aaList.size() + " items");
-            aaList.sort(new Comparator<Variable>() {
+            aaList.sort(new Comparator<VariableSpec>() {
                 @Override
-                public int compare(Variable o1, Variable o2) {
+                public int compare(VariableSpec o1, VariableSpec o2) {
                     return o1.toString().compareTo(o2.toString());
                 }
             });
@@ -1986,7 +2026,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             //System.out.println("Phase II: variable list size: " + aaList.size());
             System.out.println("Printing map of maps... ");
             FileUtils.writeStringToFile(file, "\"Variable\",\"Code\",\"Code Label\",\"Code Class\",\"Frequency\"\n", "utf-8", true);
-            for (Variable aa : aaList) {
+            for (VariableSpec aa : aaList) {
                 String varStr = aa.toString();
                 if (summary.get(varStr) != null) {
                     valuesResp = summary.get(varStr);

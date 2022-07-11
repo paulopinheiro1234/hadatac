@@ -3,14 +3,14 @@ package org.hadatac.entity.pojo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OriginalVariable extends Variable {
+public class OriginalVariableSpec extends VariableSpec {
 
 	private STR str;
 
 	private DataAcquisitionSchemaAttribute dasa;
 
-	public OriginalVariable(Variable variable) {
-		super(variable);
+	public OriginalVariableSpec(VariableSpec variableSpec) {
+		super(variableSpec);
     }
 
     public STR getSTR() {

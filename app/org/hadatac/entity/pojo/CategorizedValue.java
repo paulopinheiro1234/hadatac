@@ -1,9 +1,7 @@
 package org.hadatac.entity.pojo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CategorizedValue {
 
@@ -79,12 +77,12 @@ public class CategorizedValue {
 		return newValue;
 	}
 
-	public static boolean isCategorizable(Variable variable) {
+	public static boolean isCategorizable(VariableSpec variableSpec) {
 
 		// handle age variables
-		if (variable != null) {
-			if (variable.getAttributeListStr().equals("http://semanticscience.org/resource/SIO_001013")) {
-				String unitStr = variable.getUnitStr();
+		if (variableSpec != null) {
+			if (variableSpec.getAttributeListStr().equals("http://semanticscience.org/resource/SIO_001013")) {
+				String unitStr = variableSpec.getUnitStr();
 				if (unitStr != null && unitStr.equals("http://semanticscience.org/resource/SIO_000428")) {
 					return true;
 				} else if (unitStr != null && unitStr.equals("http://semanticscience.org/resource/SIO_000429")) {

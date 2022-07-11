@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.HASCO;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import org.hadatac.console.controllers.AuthApplication;
@@ -28,10 +29,12 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
 
     public GenericInstance(String uri,
                            String typeUri,
+                           String hascoTypeUri,
                            String label,
                            String comment) {
         this.uri = uri;
         this.typeUri = typeUri;
+        this.hascoTypeUri = typeUri;
         this.label = label;
         this.comment = comment;
     }
@@ -39,6 +42,7 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
     public GenericInstance() {
         this.uri = "";
         this.typeUri = "";
+        this.hascoTypeUri = "";
         this.label = "";
         this.comment = "";
     }
@@ -76,6 +80,8 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
                 instance.setLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
                 instance.setTypeUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
+                instance.setHascoTypeUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
                 instance.setComment(object.asLiteral().getString());
             }

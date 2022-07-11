@@ -134,6 +134,7 @@ public class DeploymentGenerator extends BaseGenerator {
 
 	@Override
 	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
+		//System.out.println("inside DeploymentGenerator.createRow ");
 		Map<String, Object> row = new HashMap<String, Object>();
 
 		String tempDA = getDataAcquisitionName(rec);
@@ -156,6 +157,7 @@ public class DeploymentGenerator extends BaseGenerator {
 
 		row.put("hasURI", kbPrefix + "DPL-" + tempDA);
 		row.put("a", "vstoi:Deployment");
+		row.put("hasco:hascoType", "vstoi:Deployment");
 		row.put("vstoi:hasPlatform", tempDeployment);
 		row.put("hasco:hasInstrument", tempInstrument);
 		if (startTime.isEmpty()) {

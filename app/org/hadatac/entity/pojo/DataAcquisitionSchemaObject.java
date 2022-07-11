@@ -13,6 +13,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.console.http.SPARQLUtils;
@@ -71,6 +72,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                                        String wasDerivedFrom,
                                        String relation) {
         this.uri = uri;
+        this.hascoTypeUri = HASCO.DA_SCHEMA_OBJECT;
         this.label = label;
         this.partOfSchema = partOfSchema;
         this.position = position;
@@ -299,13 +301,13 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" +
                 "   OPTIONAL { <" + uri + "> sio:SIO_000668 ?inRelationTo } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:Relation ?relation } . \n" +
-                "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo  . ?inRelationTo a hasco:DASchemaObject } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:inRelationToLabel ?inRelationToStr } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:wasDerivedFrom ?wasDerivedFrom } . \n" +
                 "   OPTIONAL { <" + uri + "> dcterms:alternativeName ?alternativeName } . \n" +
                 "}";
 
-//        System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
+        // System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
                 CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -317,6 +319,50 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         }
 
         QuerySolution soln = resultsrw.next();
+        object = convertFromSolr(soln, uri);
+        DataAcquisitionSchemaObject.getCache().put(uri, object);
+        return object;
+    }
+
+    public static List<DataAcquisitionSchemaObject> findWithPages(int pageSize, int offset) {
+
+        List<DataAcquisitionSchemaObject> objects = new ArrayList<DataAcquisitionSchemaObject>();
+        DataAcquisitionSchemaObject object = null;
+        String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?uri ?entity ?partOfSchema ?role ?inRelationTo ?relation ?inRelationToStr ?wasDerivedFrom ?alternativeName WHERE { \n" +
+                "   ?uri a hasco:DASchemaObject . \n" +
+                "   ?uri hasco:partOfSchema ?partOfSchema . \n" +
+                "   OPTIONAL { ?uri  hasco:hasEntity ?entity } . \n" +
+                "   OPTIONAL { ?uri  hasco:hasRole ?role } .  \n" +
+                "   OPTIONAL { ?uri  hasco:wasDerivedFrom ?wasDerivedFrom } . \n" +
+                "   OPTIONAL { ?uri  dcterms:alternativeName ?alternativeName } . \n" +
+                "}" +
+                " LIMIT " + pageSize +
+                " OFFSET " + offset;
+        ;
+
+        // System.out.println("DataAcquisitionSchemaObject find(String uri) query: " + queryString);
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        if (!resultsrw.hasNext()) {
+            System.out.println("[WARNING] DataAcquisitionSchemaObject. Could not find entities.");
+            return null;
+        }
+
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            object = convertFromSolr(soln, null);
+            objects.add(object);
+            DataAcquisitionSchemaObject.getCache().put(object.getUri(), object);
+        }
+        return objects;
+    }
+
+    private static DataAcquisitionSchemaObject convertFromSolr(QuerySolution soln, String uri) {
+
+        DataAcquisitionSchemaObject object = null;
         String labelStr = "";
         String partOfSchemaStr = "";
         String positionStr = "";
@@ -330,6 +376,16 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
 
         try {
             if (soln != null) {
+
+                if (uri == null || uri.isEmpty()) {
+                    if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
+                        uri = soln.getResource("uri").getURI();
+                    }
+                }
+
+                if (uri == null || uri.isEmpty()) {
+                    return null;
+                }
 
                 labelStr = FirstLabel.getPrettyLabel(uri);
 
@@ -408,13 +464,34 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                         wasDerivedFromStr,
                         relationStr);
                 object.setAlternativeName(alternativeName);
+                object.setTypeUri(HASCO.DA_SCHEMA_OBJECT);
             }
         } catch (Exception e) {
             System.out.println("[ERROR] DataAcquisitionSchemaObject.find() e.Message: " + e.getMessage());
         }
-
-        DataAcquisitionSchemaObject.getCache().put(uri, object);
         return object;
+    }
+
+    public static int getNumberDASOs() {
+        String query = "";
+        query += NameSpaces.getInstance().printSparqlNameSpaceList();
+        query += "select distinct (COUNT(?x) AS ?tot) where {" +
+                " ?x a <" + HASCO.DA_SCHEMA_OBJECT + "> } ";
+
+        //System.out.println("Study query: " + query);
+
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+            if (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                return Integer.parseInt(soln.getLiteral("tot").getString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public static List<String> findUriBySchema(String schemaUri) {
@@ -538,6 +615,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
             insert += " GRAPH <" + getNamedGraph() + "> { ";
         }
 
+        insert += this.getUri() + " a hasco:DASchemaObject . ";
         insert += this.getUri() + " a hasco:DASchemaObject . ";
         insert += this.getUri() + " rdfs:label  \"" + label + "\" . ";
         if (partOfSchema.startsWith("http")) {

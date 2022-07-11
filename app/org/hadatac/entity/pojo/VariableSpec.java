@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class Variable {
+public class VariableSpec {
 
-	private static final Logger log = LoggerFactory.getLogger(Variable.class);
+	private static final Logger log = LoggerFactory.getLogger(VariableSpec.class);
 	public static final String LABEL_SEPARATOR = "|";
 	public static final String VARIABLE_SEPARATOR = ";";
 	public static final String VARIABLE_EMPTY_LABEL = "**";
@@ -59,18 +59,18 @@ public class Variable {
 		}
 	}
 
-	public Variable() {
+	public VariableSpec() {
 	}
 
-    public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
+    public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
     	this(entRole, attrInRel, null, null);
     }
 
-    public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit) {
+    public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit) {
     	this(entRole, attrInRel, unit, null);
     }
 
-    public Variable(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
+    public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
     	this.ent = entRole.getEntity();
     	this.role = entRole.getRole();
     	this.attrList = attrInRel.getAttributeList();
@@ -80,7 +80,7 @@ public class Variable {
     	this.isCategorical = false;
     }
 
-	public Variable(List<Variable> sourceList) {
+	public VariableSpec(List<VariableSpec> sourceList) {
 		if (sourceList != null && sourceList.get(0) != null) {
 			this.setEntity(sourceList.get(0).getEntity());
 			this.setRole(sourceList.get(0).getRole());
@@ -91,14 +91,14 @@ public class Variable {
 		}
 	}
 
-	public Variable(Variable variable) {
-		this.ent = variable.getEntity();
-		this.role = variable.getRole();
-		this.attrList = variable.getAttributeList();
-		this.inRelationTo = variable.getInRelationTo();
-		this.unit = variable.getUnit();
-		this.timeAttr = variable.getTime();
-		this.isCategorical = variable.isCategorical();
+	public VariableSpec(VariableSpec variableSpec) {
+		this.ent = variableSpec.getEntity();
+		this.role = variableSpec.getRole();
+		this.attrList = variableSpec.getAttributeList();
+		this.inRelationTo = variableSpec.getInRelationTo();
+		this.unit = variableSpec.getUnit();
+		this.timeAttr = variableSpec.getTime();
+		this.isCategorical = variableSpec.isCategorical();
 	}
 
 	public String getKey() {

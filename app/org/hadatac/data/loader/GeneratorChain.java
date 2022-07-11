@@ -92,11 +92,11 @@ public class GeneratorChain {
 
         int i = 0;
         for (BaseGenerator generator : chain) {
-        	log.info("GeneratorChain: Position " + i++ + " has generator of type [" + generator.getClass(). getSimpleName() + "]");
+        	log.info("GeneratorChain: Position " + i++ + " has generator of type [" + generator.getClass().getSimpleName() + "]");
         }
 
         for (BaseGenerator generator : chain) {
-        	//System.out.println("GeneratorChain: Executing generator of type [" + generator.getClass(). getSimpleName() + "]");
+        	System.out.println("GeneratorChain: Executing generator of type [" + generator.getClass().getSimpleName() + "]");
             try {
                 generator.preprocess();
                 generator.createRows();

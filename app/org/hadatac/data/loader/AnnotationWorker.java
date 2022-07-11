@@ -557,6 +557,7 @@ public class AnnotationWorker {
         row.put("hasURI", sddUri);
         dataFile.getLogger().println("This SDD is assigned with uri: " + sddUri + " and is of type hasco:DASchema");
         row.put("a", "hasco:DASchema");
+        row.put("hasco:hascoType", "hasco:DASchema");
         row.put("rdfs:label", "SDD-" + sddName);
         row.put("rdfs:comment", "");
         row.put("hasco:hasVersion", sddVersion);
@@ -648,6 +649,10 @@ public class AnnotationWorker {
                     if (mapContent == null || mapContent.get(i) == null) {
                         dataFile.getLogger().printException("No value for MapContent with index [" + i + "]");
                     } else {
+                        //System.out.println("In AnnotationWorker: Adding new Study Object Generator.");
+                        //System.out.println("    - dataFileForSheet: [" + dataFileForSheet.getFileName() + "]");
+                        //System.out.println("    - mapContent.get(i): [" + mapContent.get(i) + "]");
+                        //System.out.println("    - study_uri: [" + study_uri + "]");
                     	chain.addGenerator(new StudyObjectGenerator(dataFileForSheet, mapContent.get(i), mapContent, study_uri, study.getId()));
                     }
                 } catch (CloneNotSupportedException e) {

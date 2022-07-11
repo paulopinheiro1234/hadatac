@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 
 public class Detector extends HADatAcThing implements Comparable<Detector>  {
@@ -167,11 +168,15 @@ public class Detector extends HADatAcThing implements Comparable<Detector>  {
 			object = statement.getObject();
 			if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
 				detector.setLabel(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
+			} else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+				detector.setTypeUri(object.asResource().getURI());
+			} else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
+				detector.setHascoTypeUri(object.asResource().getURI());
+			} else if (statement.getPredicate().getURI().equals(HASCO.HAS_SERIAL_NUMBER)) {
 				detector.setSerialNumber(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasImage")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_IMAGE)) {
                 detector.setImage(object.asLiteral().getString());
-			} else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#isInstrumentAttachment")) {
+			} else if (statement.getPredicate().getURI().equals(HASCO.IS_INSTRUMENT_ATTACHMENT)) {
 				detector.setIsInstrumentAttachment(object.asResource().getURI());
 			}
 		}

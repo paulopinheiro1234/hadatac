@@ -1,7 +1,5 @@
 package org.hadatac.console.controllers.metadataacquisition;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -9,7 +7,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.util.NamedList;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
@@ -19,24 +16,19 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.metadataacquisition.metadataacquisition;
 import org.hadatac.entity.pojo.Pair;
 import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.Variable;
+import org.hadatac.entity.pojo.VariableSpec;
 import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import org.hadatac.console.views.html.metadataacquisition.*;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import play.mvc.Controller;
-import play.mvc.Result;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,7 +94,7 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 		Map<String, Map<String,String>> studies = Study.retrieveStudiesAndAtttributes();
 
 		// retrieve the facet results from Solr
-		List<String> facetResult = Variable.retrieveStudySearchFacetResult(null);
+		List<String> facetResult = VariableSpec.retrieveStudySearchFacetResult(null);
 
 		// combine the above two search results and prepare for the GUI side display
 
@@ -118,19 +110,19 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 		 */
 		for (String facetLine : facetResult ) {
 
-			String[] items = facetLine.split(Variable.HIERARCHICAL_FACET_SEPARATOR);
+			String[] items = facetLine.split(VariableSpec.HIERARCHICAL_FACET_SEPARATOR);
 
-			if ( items == null || items.length < Variable.SolrPivotFacet.DASA_URI_STR.ordinal() + 1 ) {
+			if ( items == null || items.length < VariableSpec.SolrPivotFacet.DASA_URI_STR.ordinal() + 1 ) {
 				log.warn("Study Search skips this line because it is too short: " + facetLine);
 				continue;
 			}
 
-			if ( items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()] == null ) {
+			if ( items[VariableSpec.SolrPivotFacet.DASA_URI_STR.ordinal()] == null ) {
 				log.warn("Study Search skips this line since it does not have a DASA URI: " + facetLine);
 				continue;
 			}
 
-			String studyUri = items[Variable.SolrPivotFacet.STUDY_URI_STR.ordinal()];
+			String studyUri = items[VariableSpec.SolrPivotFacet.STUDY_URI_STR.ordinal()];
 			Map<String, String> studyDetails = studies.get(studyUri);
 
 			if ( studyDetails == null ) {
@@ -174,9 +166,9 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 
 			// for each component in the facet line, get their labels
 
-			List<Pair<String, String>> indicators = Variable.computeIndicatorList(items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()]);
+			List<Pair<String, String>> indicators = VariableSpec.computeIndicatorList(items[VariableSpec.SolrPivotFacet.DASA_URI_STR.ordinal()]);
 			if ( indicators == null || indicators.size() == 0 ) {
-				indicators = Variable.computeIndicatorList(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
+				indicators = VariableSpec.computeIndicatorList(items[VariableSpec.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]);
 			}
 			if ( indicators == null || indicators.size() == 0 ) {
 				log.warn("Study Search encounters empty indicator URI(s) for this facet search result line: " + facetLine);
@@ -184,7 +176,7 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 			}
 
 			boolean multipleIndicators = indicators.size() > 1 ? true : false;
-			boolean hasStandardTestScore = Variable.constainsStandardTestScore(indicators);
+			boolean hasStandardTestScore = VariableSpec.constainsStandardTestScore(indicators);
 
 			for ( Pair<String, String> labelAndIndcator : indicators ) {
 
@@ -192,7 +184,7 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 
 				if ( hasStandardTestScore == false ) value = FirstLabel.getPrettyLabel(labelAndIndcator.getLeft());
 				else {
-					final String testScoreTag = Variable.retrieveTestScoreLabel(indicators);
+					final String testScoreTag = VariableSpec.retrieveTestScoreLabel(indicators);
 					if ( testScoreTag != null ) {
 						if ( testScoreTag.equalsIgnoreCase(FirstLabel.getPrettyLabel(labelAndIndcator.getLeft())) ) continue;
 						value = testScoreTag + " (" + FirstLabel.getPrettyLabel(labelAndIndcator.getLeft()) + ")";
@@ -201,7 +193,7 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 				key = FirstLabel.getPrettyLabel(labelAndIndcator.getRight());
 
 				if ( multipleIndicators ) {
-					log.info("multiple indicators detected: " + items[Variable.SolrPivotFacet.DASA_URI_STR.ordinal()] + " :" + value + " | " + key);
+					log.info("multiple indicators detected: " + items[VariableSpec.SolrPivotFacet.DASA_URI_STR.ordinal()] + " :" + value + " | " + key);
 				}
 
 				key = key.replace(",", "").replace(" ", "") + "_str_multi";
@@ -212,16 +204,16 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 					value = "";  // targeted analyte uses this format: In_Relation_To *in* Entity *from* Role *at* Time”.
 
 					// get the role label
-					value = "from " + items[Variable.SolrPivotFacet.ROLE_STR.ordinal()] + value;
+					value = "from " + items[VariableSpec.SolrPivotFacet.ROLE_STR.ordinal()] + value;
 
 					// get named-time label
-					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
-						value = value + " at " + FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
+					if ( !VariableSpec.EMPTY_CONTENT.equalsIgnoreCase(items[VariableSpec.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
+						value = value + " at " + FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
 					}
 
 					// get entity label
-					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
-						labelContent = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
+					if ( !VariableSpec.EMPTY_CONTENT.equalsIgnoreCase(items[VariableSpec.SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
+						labelContent = FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
 						if (labelContent != null && labelContent.length() > 0) {
 							if (!labelContent.toLowerCase().equals("human") && !labelContent.toLowerCase().equals("human@en") && !labelContent.toLowerCase().equals("sample")) {
 								value = labelContent + " " + value;
@@ -230,8 +222,8 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 					}
 
 					// get the inRelationTo label
-					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
-						value = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + " in " + value;
+					if ( !VariableSpec.EMPTY_CONTENT.equalsIgnoreCase(items[VariableSpec.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
+						value = FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + " in " + value;
 					} else {
 						value = FirstLabel.getPrettyLabel(labelAndIndcator.getLeft()) + " of " + value;
 					}
@@ -239,18 +231,18 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 				} else {
 
 					// role label
-					temp = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.ROLE_STR.ordinal()]) + "'s " + value;
+					temp = FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.ROLE_STR.ordinal()]) + "'s " + value;
 					value = temp;
 
 					// get named time label
-					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
-						temp = value + " at " + FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
+					if ( !VariableSpec.EMPTY_CONTENT.equalsIgnoreCase(items[VariableSpec.SolrPivotFacet.NAMED_TIME_STR.ordinal()]) ) {
+						temp = value + " at " + FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.NAMED_TIME_STR.ordinal()]);
 						value = temp;
 					}
 
 					// get entity label
-					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
-						labelContent = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
+					if ( !VariableSpec.EMPTY_CONTENT.equalsIgnoreCase(items[VariableSpec.SolrPivotFacet.ENTITY_URI_STR.ordinal()]) ) {
+						labelContent = FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.ENTITY_URI_STR.ordinal()]);
 						if (labelContent != null && labelContent.length() > 0) {
 							if (!labelContent.toLowerCase().equals("human") && !labelContent.toLowerCase().equals("human@en") && !labelContent.toLowerCase().equals("sample")) {
 								value = labelContent + " " + value;
@@ -259,8 +251,8 @@ private static final Logger log = LoggerFactory.getLogger(MetadataAcquisition.cl
 					}
 
 					// get inRelationTo label
-					if ( !Variable.EMPTY_CONTENT.equalsIgnoreCase(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
-						temp = FirstLabel.getPrettyLabel(items[Variable.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + "'s " + value;
+					if ( !VariableSpec.EMPTY_CONTENT.equalsIgnoreCase(items[VariableSpec.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) ) {
+						temp = FirstLabel.getPrettyLabel(items[VariableSpec.SolrPivotFacet.IN_RELATION_TO_URI_STR.ordinal()]) + "'s " + value;
 						value = temp;
 					}
 

@@ -42,6 +42,9 @@ public abstract class HADatAcThing implements Facetable {
     @PropertyField(uri="rdf:type")
     String typeUri = "";
 
+    @PropertyField(uri="hasco:hascoType")
+    String hascoTypeUri = "";
+
     @PropertyField(uri="rdfs:label")
     String label = "";
 
@@ -127,6 +130,10 @@ public abstract class HADatAcThing implements Facetable {
         return typeUri;
     }
 
+    public void setTypeUri(String typeUri) {
+        this.typeUri = typeUri;
+    }
+
     public String getTypeLabel() {
         if (typeUri == null) {
             return "";
@@ -138,8 +145,21 @@ public abstract class HADatAcThing implements Facetable {
         return ent.getLabel();
     }
 
-    public void setTypeUri(String typeUri) {
-        this.typeUri = typeUri;
+    public String getHascoTypeUri() { return hascoTypeUri; }
+
+    public void setHascoTypeUri(String hascoTypeUri) {
+        this.hascoTypeUri = hascoTypeUri;
+    }
+
+    public String getHascoTypeLabel() {
+        if (hascoTypeUri == null) {
+            return "";
+        }
+        Entity ent = Entity.find(hascoTypeUri);
+        if (ent == null || ent.getLabel() == null) {
+            return "";
+        }
+        return ent.getLabel();
     }
 
     public String getTypeNamespace() {

@@ -19,6 +19,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
@@ -34,8 +35,10 @@ public class Deployment extends HADatAcThing {
     public static String INSERT_LINE1 = "INSERT DATA {  ";
     public static String DELETE_LINE1 = "DELETE WHERE {  ";
     public static String LINE3 = INDENT1 + "a         vstoi:Deployment;  ";
+    public static String LINE3_HASCO = INDENT1 + "hasco:hascoType         vstoi:Deployment;  ";
     public static String DELETE_LINE3 = INDENT1 + " ?p ?o . ";
     public static String LINE3_LEGACY = INDENT1 + "a         vstoi:Deployment;  ";
+    public static String LINE3_HASCO_LEGACY = INDENT1 + "hasco:hascoType         vstoi:Deployment;  ";
     public static String PLATFORM_PREDICATE =     INDENT1 + "vstoi:hasPlatform        ";
     public static String INSTRUMENT_PREDICATE =   INDENT1 + "hasco:hasInstrument    ";
     public static String DETECTOR_PREDICATE =     INDENT1 + "hasco:hasDetector      ";
@@ -243,17 +246,19 @@ public class Deployment extends HADatAcThing {
         while (stmtIterator.hasNext()) {
             Statement statement = stmtIterator.next();
             RDFNode object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasInstrument")) {
+            if (statement.getPredicate().getURI().equals(HASCO.HAS_INSTRUMENT)) {
                 deployment.instrument = Instrument.find(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasPlatform")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_PLATFORM)) {
                 deployment.platform = Platform.find(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasDetector")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_DETECTOR)) {
                 deployment.detectors.add(Detector.find(object.asResource().getURI()));
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/ns/prov#startedAtTime")) {
                 deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
             }
         }
-        
+        deployment.setTypeUri(HASCO.DEPLOYMENT);
+        deployment.setHascoTypeUri(HASCO.DEPLOYMENT);
+
         Deployment.getCache().put(deployment_uri, deployment);
         return deployment;
     }
@@ -566,6 +571,12 @@ public class Deployment extends HADatAcThing {
         } else {
             insert += LINE3;
         }
+        insert += "<" + this.getUri() + ">  ";
+        if (this.isLegacy()) {
+            insert += LINE3_HASCO_LEGACY;
+        } else {
+            insert += LINE3_HASCO;
+        }
         insert += PLATFORM_PREDICATE + "<" + this.platform.getUri() + "> ;   ";
         insert += INSTRUMENT_PREDICATE + "<" + this.instrument.getUri() + "> ;   ";
         Iterator<Detector> i = this.detectors.iterator();
@@ -582,6 +593,8 @@ public class Deployment extends HADatAcThing {
         }
         
         insert += LINE_LAST;
+
+        System.out.println("Deployment update query [" + insert + "]");
 
         try {
             UpdateRequest request = UpdateFactory.create(insert);

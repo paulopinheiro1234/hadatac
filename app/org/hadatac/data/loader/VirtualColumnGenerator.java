@@ -3,15 +3,12 @@ package org.hadatac.data.loader;
 import java.lang.String;
 
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.ConfigProp;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.HADatAcThing;
 import org.hadatac.entity.pojo.VirtualColumn;
 
 
 public class VirtualColumnGenerator extends BaseGenerator {
-
-    final String kbPrefix = ConfigProp.getKbPrefix();
 
     public VirtualColumnGenerator(DataFile dataFile) {
         super(dataFile);
@@ -22,6 +19,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
         mapCol.clear();
         mapCol.put("sheet", "sheet");
         mapCol.put("typeUri", "type");
+        mapCol.put("hascoTypeUri", "hascoType");
         mapCol.put("hasSOCReference", "hasSOCReference");
         mapCol.put("studyUri", "isMemberOf");
         mapCol.put("groundingLabel", "groundingLabel");
@@ -52,6 +50,7 @@ public class VirtualColumnGenerator extends BaseGenerator {
     	String typeUri = this.getTypeUri(record);
         this.studyUri = this.getStudyUri(record);
         String SOCReference = this.getSOCReference(record);
+        //System.out.println("createVirtualColumn: typeUri [" + typeUri + "] StudyUri [" + studyUri + "] SOCReference [" + SOCReference + "]");
         if ((typeUri == null || typeUri.equals("")) && 
         	(this.studyUri == null || this.studyUri.equals("")) && 
         	(SOCReference == null || SOCReference.equals(""))) {

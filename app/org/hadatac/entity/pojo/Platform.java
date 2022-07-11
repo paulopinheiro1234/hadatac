@@ -16,6 +16,7 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.HASCO;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
@@ -460,49 +461,51 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
                 platform.setLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
                 platform.setTypeUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
+                platform.setHascoTypeUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
                 platform.setComment(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SERIAL_NUMBER)) {
                 platform.setSerialNumber(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinate")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_FIRST_COORDINATE)) {
                 platform.setFirstCoordinate(object.asLiteral().getFloat());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinateUnit")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_FIRST_COORDINATE_UNIT)) {
                 platform.setFirstCoordinateUnit(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasFirstCoordinateCharacteristic")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_FIRST_COORDINATE_CHARACTERISTIC)) {
                 platform.setFirstCoordinateCharacteristic(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinate")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SECOND_COORDINATE)) {
                 platform.setSecondCoordinate(object.asLiteral().getFloat());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinateUnit")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SECOND_COORDINATE_UNIT)) {
                 platform.setSecondCoordinateUnit(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasSecondCoordinateCharacteristic")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SECOND_COORDINATE_CHARACTERISTIC)) {
                 platform.setSecondCoordinateCharacteristic(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinate")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_THIRD_COORDINATE)) {
                 platform.setThirdCoordinate(object.asLiteral().getFloat());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinateUnit")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_THIRD_COORDINATE_UNIT)) {
             	platform.setThirdCoordinateUnit(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasThirdCoordinateCharacteristic")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SECOND_COORDINATE_CHARACTERISTIC)) {
             	platform.setThirdCoordinateCharacteristic(object.asResource().getURI());
-            } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/partOf")) {
+            } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals(HASCO.PART_OF_SCHEMA)) {
             	platform.setPartOf(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasImage")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_IMAGE)) {
                 platform.setImage(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayout")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT)) {
                 platform.setLayout(object.asLiteral().getString());
-            } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasReferenceLayout")) {
+            } else if (statement.getSubject().getURI().equals(uri) && statement.getPredicate().getURI().equals(HASCO.HAS_REFERENCE_LAYOUT)) {
                 platform.setReferenceLayout(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutWidth")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT_WIDTH)) {
                 platform.setWidth(object.asLiteral().getFloat());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutWidthUnit")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT_WIDTH_UNIT)) {
                 platform.setWidthUnit(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutDepth")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT_DEPTH)) {
                 platform.setDepth(object.asLiteral().getFloat());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutDepthUnit")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT_DEPTH_UNIT)) {
                 platform.setDepthUnit(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutHeight")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT_HEIGHT)) {
                 platform.setHeight(object.asLiteral().getFloat());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasLayoutHeightUnit")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_LAYOUT_HEIGHT_UNIT)) {
                 platform.setHeightUnit(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasURL")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_URL)) {
                 platform.setURL(object.asLiteral().getString());
             }
         }

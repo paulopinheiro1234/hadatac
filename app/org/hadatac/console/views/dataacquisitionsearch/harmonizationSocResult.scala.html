@@ -1,5 +1,5 @@
 @(socList       : List[org.hadatac.entity.pojo.ObjectCollection],
-  harmonization : List[org.hadatac.entity.pojo.HarmonizedVariable],
+  harmonization : List[org.hadatac.entity.pojo.HarmonizedVariableSpec],
   userName      : String
 )
 
@@ -139,11 +139,11 @@
                             </tr>
                             </thead>
                             <tbody id="harmonization-body">
-                            @for((variable, i) <- harmonization.zipWithIndex) {
+                            @for((variableSpec, i) <- harmonization.zipWithIndex) {
                             <tr>
                                 <td style="word-break: break-all;">@(i+1)</td>
-                                <td style="word-break: break-all;">@Html(variable.sourceToString())</td>
-                                <td style="word-break: break-all;">@variable.toString()</td>
+                                <td style="word-break: break-all;">@Html(variableSpec.sourceToString())</td>
+                                <td style="word-break: break-all;">@variableSpec.toString()</td>
                             </tr>
                             }
                             </tbody>

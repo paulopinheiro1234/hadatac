@@ -15,6 +15,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
@@ -57,6 +58,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private Map<String, String> relations = new HashMap<String, String>();
     private boolean isMeta;
     private DataAcquisitionSchema das;
+    private VariableSpec varSpec;
     private String socUri;
 
     private static Map<String, DataAcquisitionSchemaAttribute> getCache() {
@@ -72,6 +74,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
     public DataAcquisitionSchemaAttribute(String uri, String partOfSchema) {
         this.uri = uri;
+        this.hascoTypeUri = HASCO.DA_SCHEMA_ATTRIBUTE;
         this.partOfSchema = partOfSchema;
         this.localName = "";
         this.label = "";
@@ -82,6 +85,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.setUnit("");
         this.daseUri = "";
         this.dasoUri = "";
+        this.varSpec = new VariableSpec();
         this.isMeta = false;
 	DataAcquisitionSchemaAttribute.getCache();
     }
@@ -97,6 +101,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             String daseUri, 
             String dasoUri) {
         this.uri = uri;
+        this.hascoTypeUri = HASCO.DA_SCHEMA_ATTRIBUTE;
         this.localName = localName;
         this.label = label;
         this.partOfSchema = partOfSchema;
@@ -115,7 +120,30 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.setUnit(unit);
         this.daseUri = daseUri;
         this.dasoUri = dasoUri;
-	DataAcquisitionSchemaAttribute.getCache();
+
+        this.varSpec = new VariableSpec();
+        if (entity != null && !entity.isEmpty()) {
+            this.varSpec.setEntity(Entity.find(entity));
+        }
+        List<Attribute> listAttr = new ArrayList<Attribute>();
+        for (String attrUri : attributes) {
+            if (attrUri != null && !attrUri.isEmpty()) {
+                Attribute attrInstance = Attribute.find(attrUri);
+                if (attrInstance != null) {
+                    listAttr.add(attrInstance);
+                }
+            }
+        }
+        this.varSpec.setAttributeList(listAttr);
+        this.varSpec.setRole("");
+        //this.varSpec.setInRelationTo();
+        if (unit != null && !unit.isEmpty()) {
+            this.varSpec.setUnit(Unit.find(unit));
+        }
+        //this.varSpec.setTime();
+        this.varSpec.setName(this.varSpec.toString());
+
+        DataAcquisitionSchemaAttribute.getCache();
     }
 
     public String getUri() {
@@ -529,11 +557,15 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    public VariableSpec getVariableSpec() {
+        return varSpec;
+    }
+
     public static int getNumberDASAs() {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
         query += "select distinct (COUNT(?x) AS ?tot) where {" + 
-                " ?x a <http://hadatac.org/ont/hasco/DASchemaAttribute> } ";
+                " ?x a <" + HASCO.DA_SCHEMA_ATTRIBUTE + "> } ";
 
         //System.out.println("Study query: " + query);
 
@@ -549,6 +581,49 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static List<DataAcquisitionSchemaAttribute> findWithPages(int pageSize, int offset) {
+        List<DataAcquisitionSchemaAttribute> varSpecs = new ArrayList<DataAcquisitionSchemaAttribute>();
+        String queryString = "";
+        queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?dasaUri ?dasaLabel ?dasUri ?subUri ?hascoTypeUri WHERE { " +
+                "   ?subUri rdfs:subClassOf* hasco:DASchemaAttribute . " +
+                "   ?dasaUri a ?subUri . " +
+                "   ?dasaUri hasco:hascoType ?hascoTypeUri . " +
+                "   ?dasaUri hasco:partOfSchema ?dasUri . " +
+                "   ?dasaUri rdfs:label ?dasaLabel . " +
+                " }" +
+                " LIMIT " + pageSize +
+                " OFFSET " + offset;
+
+        try {
+            ResultSetRewindable resultsrw = SPARQLUtils.select(
+                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+            DataAcquisitionSchemaAttribute varSpec = null;
+            while (resultsrw.hasNext()) {
+                QuerySolution soln = resultsrw.next();
+                if (soln != null && soln.getResource("dasaUri").getURI()!= null) {
+                    String dasaUri = soln.get("dasaUri").toString();
+                    String dasUri = soln.get("dasUri").toString();
+                    varSpec = new DataAcquisitionSchemaAttribute(dasaUri, dasUri);
+                    if (soln.get("dasaLabel") != null) {
+                        varSpec.setLabel(soln.get("dasaLabel").toString());
+                    }
+                    if (soln.get("hascoTypeUri") != null) {
+                        varSpec.setHascoTypeUri(soln.get("hascoTypeUri").toString());
+                    }
+                    //System.out.println("Study URI: " + soln.get("studyUri").toString());
+                }
+                varSpecs.add(varSpec);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return varSpecs;
+
     }
 
     public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
@@ -572,10 +647,10 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         //System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?partOfSchema ?hasEntity ?hasAttribute " + 
+                "SELECT ?partOfSchema ?hasEntity ?hasAttribute ?hascoTypeUri " +
                 " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed ?relation ?inRelationTo ?label WHERE { \n" + 
-                "    <" + dasa_uri + "> a hasco:DASchemaAttribute . \n" + 
-                "    <" + dasa_uri + "> hasco:partOfSchema ?partOfSchema . \n" + 
+                "    <" + dasa_uri + "> a hasco:DASchemaAttribute . \n" +
+                "    <" + dasa_uri + "> hasco:partOfSchema ?partOfSchema . \n" +
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasEntity ?hasEntity } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasAttribute/rdf:rest*/rdf:first ?hasAttribute } . \n" +
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasUnit ?hasUnit } . \n" + 
@@ -599,6 +674,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
         String localNameStr = "";
         String labelStr = "";
+        String hascoTypeUriStr = "";
         String partOfSchemaStr = "";
         String positionStr = "";
         String entityStr = "";
@@ -621,6 +697,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
              */
             labelStr = soln.get("label").toString();
 
+            if (soln.get("hascoTypeUri") != null) {
+                hascoTypeUriStr = soln.get("hascoTypeUri").toString();
+            }
             if (soln.get("partOfSchema") != null) {
                 partOfSchemaStr = soln.get("partOfSchema").toString();
             }
@@ -677,6 +756,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 unitStr,
                 daseUriStr,
                 dasoUriStr);
+
+        dasa.setTypeUri("http://hadatac.org/ont/hasco/DASchemaAttribute");
 
         for ( Map.Entry<String, String> entry : relationMap.entrySet() ) {
             dasa.addRelation(entry.getKey(), entry.getValue());

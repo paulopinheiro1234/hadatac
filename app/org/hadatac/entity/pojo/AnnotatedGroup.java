@@ -12,7 +12,7 @@ public class AnnotatedGroup {
 	// AnnotatedValues in AnnotatedGroup must have valueClass.
 	private List<AnnotatedValue> group;
 
-    public AnnotatedGroup(Map<String, List<AnnotatedValue>> valueMap, Map<String, Variable> varMap, Alignment alignment, String categoricalOption) {
+    public AnnotatedGroup(Map<String, List<AnnotatedValue>> valueMap, Map<String, VariableSpec> varMap, Alignment alignment, String categoricalOption) {
     	this.group = getGroupFromMap(valueMap, varMap, alignment, categoricalOption);
     }
 
@@ -20,7 +20,7 @@ public class AnnotatedGroup {
 		return group;
 	}
 
-	public void setGroup(Map<String, List<AnnotatedValue>> valueMap, Map<String, Variable> varMap, Alignment alignment, String categoricalOption) {
+	public void setGroup(Map<String, List<AnnotatedValue>> valueMap, Map<String, VariableSpec> varMap, Alignment alignment, String categoricalOption) {
     	this.group = getGroupFromMap(valueMap, varMap, alignment, categoricalOption);
     }
 
@@ -29,7 +29,7 @@ public class AnnotatedGroup {
 	// AnnotatedValues without valueClasses are dropped. In a list, the first annotatedValue with a valueClass is selected.
 	// key of input map: string key of variable
 	// key of output map: string of the concatenation of all values ordered by the string keuy of associated variables
-	private static List<AnnotatedValue> getGroupFromMap(Map<String, List<AnnotatedValue>> valueMap, Map<String, Variable> varMap, Alignment alignment, String categoricalOption) {
+	private static List<AnnotatedValue> getGroupFromMap(Map<String, List<AnnotatedValue>> valueMap, Map<String, VariableSpec> varMap, Alignment alignment, String categoricalOption) {
 		List<AnnotatedValue> newGroup = new ArrayList<AnnotatedValue>();
 
 		try {
@@ -40,7 +40,7 @@ public class AnnotatedGroup {
 
 					//System.out.println("In AnnotatedGroup: BEFORE value [" + av.getValue() + " , " + av.getValueClass() + "]");
 					//System.out.println("In AnnotatedGroup: key [" + entry.getKey() + "]");
-					Variable currVar = varMap.get(entry.getKey());
+					VariableSpec currVar = varMap.get(entry.getKey());
 					if (currVar != null) {
 						//System.out.println("In AnnotatedGroup: variable [" + currVar + "]");
 						av.setVariable(currVar);

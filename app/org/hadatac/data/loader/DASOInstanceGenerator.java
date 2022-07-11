@@ -13,6 +13,7 @@ import org.hadatac.entity.pojo.StudyObjectMatching;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.HASCO;
 
 import java.lang.String;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +27,7 @@ import java.util.Iterator;
 
 public class DASOInstanceGenerator extends BaseGenerator {
 
-	private final boolean DEBUG_MODE = false;
+	private final boolean DEBUG_MODE = true;
 	private final int ID_LENGTH = 5;
 	
 	private final String SIO_OBJECT = "sio:SIO_000776";
@@ -672,12 +673,12 @@ public class DASOInstanceGenerator extends BaseGenerator {
             String newLabel = daso.getLabel().replace("??","");
             String collectionType = null;
             if (daso.getEntity().equals(URIUtils.replacePrefixEx("hasco:StudyObjectMatching"))) {
-            	collectionType = ObjectCollection.MATCHING_COLLECTION;
+            	collectionType = HASCO.MATCHING_COLLECTION;
             } else if (isSample(daso)) {
-                collectionType = ObjectCollection.SAMPLE_COLLECTION;
+                collectionType = HASCO.SAMPLE_COLLECTION;
             } else {
-                // collectionType = ObjectCollection.SUBJECT_COLLECTION;
-                collectionType = ObjectCollection.OBJECT_COLLECTION;
+                // collectionType = HASCO.SUBJECT_COLLECTION;
+                collectionType = HASCO.OBJECT_COLLECTION;
             }
 
             VirtualColumn newVc = VirtualColumn.find(studyUri, daso.getLabel());
@@ -869,9 +870,9 @@ public class DASOInstanceGenerator extends BaseGenerator {
         String newTypeUri = "";
         DataAcquisitionSchemaObject daso = dasoFromSoc(nextSoc, dasos);
         if (daso == null || daso.getEntity() == null || daso.getEntity().equals("")) {
-            if (nextSoc.getTypeUri().equals(ObjectCollection.MATCHING_COLLECTION)) {
+            if (nextSoc.getTypeUri().equals(HASCO.MATCHING_COLLECTION)) {
                 newTypeUri = URIUtils.replacePrefixEx(StudyObjectMatching.className);
-            } else if (nextSoc.getTypeUri().equals(ObjectCollection.SUBJECT_COLLECTION)) {
+            } else if (nextSoc.getTypeUri().equals(HASCO.SUBJECT_COLLECTION)) {
                 newTypeUri = URIUtils.replacePrefixEx(SIO_OBJECT);
             } else {
                 newTypeUri = URIUtils.replacePrefixEx(SIO_SAMPLE);
@@ -910,7 +911,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     
     private String createObjectUri(String originalID, String socUri, String socTypeUri) {
         String labelPrefix = "";
-        if (socTypeUri.equals(ObjectCollection.SUBJECT_COLLECTION)) {
+        if (socTypeUri.equals(HASCO.SUBJECT_COLLECTION)) {
             labelPrefix = "SBJ-";
         } else {
             labelPrefix = "SPL-";
@@ -926,7 +927,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
         	return soc.getRoleLabel() + " " + originalID;
         } 
         String labelPrefix = "";
-        if (soc.getTypeUri().equals(ObjectCollection.SUBJECT_COLLECTION)) {
+        if (soc.getTypeUri().equals(HASCO.SUBJECT_COLLECTION)) {
             labelPrefix = "SBJ ";
         } else {
             labelPrefix = "SPL ";
@@ -966,7 +967,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	Study study = Study.find(study_uri);
     	//if (mainSoc != null) {
     		System.out.println("INITIATE CACHE BEING CALLED!");
-    		addCache(new Cache<String, StudyObject>("cacheObject", true, study.getObjectsMapInBatch()));
+    		addCache(new Cache<String, StudyObject>("cacheObject", true, Study.getObjectsMapInBatch(study_uri)));
     		addCache(new Cache<String, String>("cacheObjectBySocAndScopeUri", false, StudyObject.buildCachedObjectBySocAndScopeUri()));
     		addCache(new Cache<String, String>("cacheObjectBySocAndOriginalId", false, StudyObject.buildCachedObjectBySocAndOriginalId()));
     		addCache(new Cache<String, String>("cacheScopeBySocAndObjectUri", false, StudyObject.buildCachedScopeBySocAndObjectUri()));

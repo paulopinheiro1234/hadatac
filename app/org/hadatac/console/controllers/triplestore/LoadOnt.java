@@ -52,27 +52,33 @@ public class LoadOnt extends Controller {
         List<String> cacheList = new ArrayList<String>();
         File folder = new File(NameSpaces.CACHE_PATH);
 
-        // if the directory does not exist, create it
-        if (!folder.exists()) {
-            System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
-            try{
-                folder.mkdir();
-            } catch(SecurityException se){
-                System.out.println("Failed to create directory.");
+        try {
+            // if the directory does not exist, create it
+            if (!folder.exists()) {
+                System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
+                try{
+                    folder.mkdir();
+                } catch(SecurityException se){
+                    System.out.println("Failed to create directory.");
+                }
+                System.out.println("DIR created");
             }
-            System.out.println("DIR created");
-        }
 
-        String name = "";
-        System.out.println("folder.listFiles:"+folder.listFiles());
-        for (final File fileEntry : folder.listFiles()) {
-            if (!fileEntry.isDirectory()) {
-                name = fileEntry.getName();
-                if (name.startsWith(NameSpaces.CACHE_PREFIX)) {
-                    name = name.substring(NameSpaces.CACHE_PREFIX.length());
-                    cacheList.add(name);
+            String name = "";
+            if (folder.listFiles() != null) {
+                System.out.println("folder.listFiles:" + folder.listFiles());
+                for (final File fileEntry : folder.listFiles()) {
+                    if (!fileEntry.isDirectory()) {
+                        name = fileEntry.getName();
+                        if (name.startsWith(NameSpaces.CACHE_PREFIX)) {
+                            name = name.substring(NameSpaces.CACHE_PREFIX.length());
+                            cacheList.add(name);
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));

@@ -102,11 +102,9 @@ public class SSDGenerator extends BaseGenerator {
     }
 
     private List<String> getTimeScopeUris(Record rec) {
-        System.out.println("getTimeScopeUris:  timeScopeUris is [" + mapCol.get("timeScopeUris") + "]");
         if (mapCol.get("timeScopeUris") == null || rec.getValueByColumnName(mapCol.get("timeScopeUris")) == null) {
             return new ArrayList<String>();
         }
-        System.out.println("getTimeScopeUris: getValueByColumnName: [" + rec.getValueByColumnName(mapCol.get("timeScopeUris")) + "]");
         List<String> ans = Arrays.asList(rec.getValueByColumnName(mapCol.get("timeScopeUris")).split(","))
                 .stream()
                 .map(s -> URIUtils.replacePrefixEx(s))
@@ -142,7 +140,7 @@ public class SSDGenerator extends BaseGenerator {
         if (typeUri.isEmpty() && SOCReference.isEmpty()) {
         	return null;
         }
-        
+
         System.out.println("SSDGenerator: row's type: [" + typeUri + "]   [" + SOCReference + "]");
 
         if (this.studyUri == null || this.studyUri.equals("")) {
@@ -168,7 +166,7 @@ public class SSDGenerator extends BaseGenerator {
                 getTimeScopeUris(record),
                 getGroupUris(record),
                 "0");
-        
+
         return oc;
     }   
         

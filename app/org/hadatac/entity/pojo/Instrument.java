@@ -17,6 +17,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,9 +256,11 @@ public class Instrument extends HADatAcThing implements Comparable<Instrument> {
 		    	instrument.setLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
                 instrument.setTypeUri(object.asResource().getURI());
-		    } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/vstoi#hasSerialNumber")) {
+			} else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
+				instrument.setHascoTypeUri(object.asResource().getURI());
+		    } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SERIAL_NUMBER)) {
 		    	instrument.setSerialNumber(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasImage")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_IMAGE)) {
                 instrument.setImage(object.asLiteral().getString());
 		    } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
 		    	instrument.setComment(object.asLiteral().getString());

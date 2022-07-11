@@ -19,6 +19,7 @@ import org.hadatac.annotations.PropertyField;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -337,27 +338,27 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
             object = statement.getObject();
             if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
                 code.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/isPossibleValueOf")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.IS_POSSIBLE_VALUE_OF)) {
                 code.setHasDASAUri(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCode")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_CODE)) {
                 code.setHasCode(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasVariable")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_VARIABLE)) {
                 code.setHasVariable(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasCodeLabel")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_CODE_LABEL)) {
                 code.setHasCodeLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
                 code.setSuperUri(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasClass")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_CLASS)) {
             	try {
             		code.setHasClass(object.asResource().getURI());
             	} catch (Exception e) {
             	}
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/otherFor")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_OTHER_FOR)) {
             	try {
             	   code.setHasOtherFor(object.asResource().getURI());
             	} catch (Exception e) {
             	}
-            } else if (statement.getPredicate().getURI().equals("http://hadatac.org/ont/hasco/hasResource")) {
+            } else if (statement.getPredicate().getURI().equals(HASCO.HAS_RESOURCE)) {
                 code.setHasResource(object.asResource().getURI());
             }
         }

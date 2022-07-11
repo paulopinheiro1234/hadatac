@@ -7,17 +7,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Iterator;
 
-import org.hadatac.utils.ApiUtil;
-import org.hadatac.utils.NameSpaces;
-import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.StudyObject;
-import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.entity.pojo.Platform;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.FieldOfView;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.hadatac.entity.pojo.*;
 import org.hadatac.entity.pojo.STR;
+import org.hadatac.utils.ApiUtil;
+import org.hadatac.utils.HASCO;
+import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.console.models.Pivot;
@@ -99,6 +97,7 @@ public class RestApi extends Controller {
     private List<String> getUsedVarsInStudy(String studyUri){
         SolrQuery solrQuery = new SolrQuery();
         // restrict to the study provided by parameter
+        System.out.println("[RespApi.getUsedVarsInStudy] Study URI: " + studyUri);
         solrQuery.setQuery("study_uri_str:\"" + studyUri + "\"");
         solrQuery.setRows(0);
         solrQuery.setFacet(true);
@@ -796,16 +795,22 @@ public class RestApi extends Controller {
             return notFound(ApiUtil.createResponse("No studies found", false));
         }
         ArrayNode theResults = mapper.createArrayNode();
-        for(Study st : theStudies){
+        for (Study st : theStudies){
             ObjectNode temp = mapper.createObjectNode();
             List<String> vars = getUsedVarsInStudy(st.getUri());
-            ArrayNode anode = mapper.convertValue(vars, ArrayNode.class);
-            //ArrayNode anode = variableQuery(formatQueryValues(uris));
-            if(anode == null){
-                System.out.println("[RestApi] WARN: no variables found for study " + st.getUri());
+            System.out.println("[getAllStudies] back from getUsedVarsInStudy");
+            ArrayNode anode = null;
+            if (vars.size() > 0) {
+                anode = mapper.convertValue(vars, ArrayNode.class);
             }
-            temp.set("study_info", mapper.convertValue(theStudies, JsonNode.class));
-            temp.set("variable_uris", anode);
+            //ArrayNode anode = variableQuery(formatQueryValues(uris));
+            //temp.set("study_info", mapper.convertValue(theStudies, JsonNode.class));
+            temp.set("study_info", mapper.convertValue(st, JsonNode.class));
+            if (anode == null) {
+                System.out.println("[RestApi] WARN: no variables found for study " + st.getUri());
+            } else {
+                temp.set("variable_uris", anode);
+            }
             theResults.add(temp);
         }
         JsonNode jsonObject = mapper.convertValue(theResults, JsonNode.class);
@@ -1063,6 +1068,211 @@ public class RestApi extends Controller {
 //GET SPECIFIC:
 //*************
 
+    public Result getUri(String uri){
+        if (!uri.startsWith("http://") && !uri.startsWith("https://")) {
+            return badRequest(ApiUtil.createResponse("[" + uri + "] is an invalid URI", false));
+        }
+
+        try {
+
+            /*
+             *   Process URI against SOLR entities first
+             */
+
+            Measurement measurementResult = Measurement.find(uri);
+            if (measurementResult != null && measurementResult.getTypeUri() != null && measurementResult.getTypeUri().equals(HASCO.VALUE)) {
+                return processResult(measurementResult, measurementResult.getUri());
+            }
+
+            DataFile dataFileResult = DataFile.findByUri(uri);
+            if (dataFileResult != null && dataFileResult.getTypeUri() != null && dataFileResult.getTypeUri().equals(HASCO.DATA_FILE)) {
+                return processResult(dataFileResult, dataFileResult.getUri());
+            }
+
+            /*
+             *  Now uses GenericInstance to process URI against TripleStore content
+             */
+
+            Object finalResult = null;
+            String typeUri = null;
+            GenericInstance result = GenericInstance.find(uri);
+            System.out.println("inside getUri(): URI [" + uri + "]");
+
+            if (result == null) {
+                    return notFound(ApiUtil.createResponse("No instance found for uri [" + uri + "]", false));
+            }
+
+            if (result.getHascoTypeUri() == null || result.getHascoTypeUri().isEmpty()) {
+                return notFound(ApiUtil.createResponse("No valid HASCO type found for uri [" + uri + "]", false));
+            }
+
+            if (result.getHascoTypeUri().equals(HASCO.STUDY)) {
+                finalResult = Study.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((Study) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.OBJECT_COLLECTION)) {
+                finalResult = ObjectCollection.findForBrowser(uri);
+                if (finalResult != null) {
+                    typeUri = ((ObjectCollection) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.VIRTUAL_COLUMN)) {
+                finalResult = VirtualColumn.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((VirtualColumn) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.DATA_ACQUISITION)) {
+                finalResult = STR.findByUri(uri);
+                if (finalResult != null) {
+                    typeUri = ((STR) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.STUDY_OBJECT)) {
+                finalResult = StudyObject.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((StudyObject) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.DA_SCHEMA)) {
+                finalResult = DataAcquisitionSchema.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((DataAcquisitionSchema) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.DA_SCHEMA_ATTRIBUTE)) {
+                finalResult = DataAcquisitionSchemaAttribute.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((DataAcquisitionSchemaAttribute) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.DA_SCHEMA_OBJECT)) {
+                finalResult = DataAcquisitionSchemaObject.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((DataAcquisitionSchemaObject) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.DEPLOYMENT)) {
+                finalResult = Deployment.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((Deployment) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.PLATFORM)) {
+                finalResult = Platform.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((Platform) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.INSTRUMENT)) {
+                finalResult = Instrument.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((Instrument) finalResult).getHascoTypeUri();
+                }
+            } else if (result.getHascoTypeUri().equals(HASCO.DETECTOR)) {
+                finalResult = Detector.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((Detector) finalResult).getHascoTypeUri();
+                }
+            } else {
+                finalResult = result;
+                if (finalResult != null) {
+                    typeUri = ((GenericInstance) finalResult).getHascoTypeUri();
+                }
+            }
+            if (finalResult == null || typeUri == null || typeUri.equals("")){
+                return notFound(ApiUtil.createResponse("No instance found for uri [" + uri + "]", false));
+            }
+
+            // list object properties and associated classes
+
+            return processResult(finalResult, uri);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return badRequest(ApiUtil.createResponse("Error processing URI [" + uri + "]", false));
+        }
+
+        //System.out.println("[RestAPI] type inside getUri(uri): " + typeUri);
+        // get the list of variables in that study
+        // serialize the Study object first as ObjectNode
+        //   as JsonNode is immutable and meant to be read-only
+        //JsonNode jsonObject = null;
+        //try {
+        //    ObjectNode obj = mapper.convertValue(finalResult, ObjectNode.class);
+        //    jsonObject = mapper.convertValue(obj, JsonNode.class);
+            //System.out.println(prettyPrintJsonString(jsonObject));
+        //} catch (Exception e) {
+        //    return badRequest(ApiUtil.createResponse("Error processing the json object for URI [" + uri + "]", false));
+        //}
+        //return ok(ApiUtil.createResponse(jsonObject, true));
+    }// /getUri()
+
+    private Result processResult(Object result, String uri) {
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println("[RestAPI] processing object: " + uri);
+        JsonNode jsonObject = null;
+        try {
+            ObjectNode obj = mapper.convertValue(result, ObjectNode.class);
+            jsonObject = mapper.convertValue(obj, JsonNode.class);
+            System.out.println(prettyPrintJsonString(jsonObject));
+        } catch (Exception e) {
+            return badRequest(ApiUtil.createResponse("Error processing the json object for URI [" + uri + "]", false));
+        }
+        return ok(ApiUtil.createResponse(jsonObject, true));
+    }
+
+    public String prettyPrintJsonString(JsonNode jsonNode) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Object json = mapper.readValue(jsonNode.toString(), Object.class);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /*
+    public Result getHADatAcClass(String classUri){
+        ObjectMapper mapper = new ObjectMapper();
+        Statement statement;
+        RDFNode object;
+
+        String queryString = "DESCRIBE <" + classUri + ">";
+        Model model = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        StmtIterator stmtIterator = model.listStatements();
+
+        // returns null if not statement is found
+        if (!stmtIterator.hasNext()) {
+            return notFound(ApiUtil.createResponse("No class found for uri [" + classUri + "]", false));
+        }
+
+        Object typeClass = new Object();
+
+        System.out.println("Inside getHADatAcClass");
+
+        while (stmtIterator.hasNext()) {
+            statement = stmtIterator.next();
+            object = statement.getObject();
+            System.out.println("predicate: " + statement.getPredicate().getURI());
+            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+                object.asLiteral().getString());
+            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+                object.asResource().getURI());
+            }
+        }
+
+        String typeUri = null;
+
+        System.out.println("[RestAPI] class: " + classUri);
+        try {
+            // get the list of variables in that study
+            // serialize the Study object first as ObjectNode
+            //   as JsonNode is immutable and meant to be read-only
+            ObjectNode obj = mapper.convertValue(model, ObjectNode.class);
+            JsonNode jsonObject = mapper.convertValue(obj, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return badRequest(ApiUtil.createResponse("Error parsing class", false));
+        }
+    }// /getHADatAcClass()
+    */
+
     // ******
     // Study!
     // ******
@@ -1083,7 +1293,7 @@ public class RestApi extends Controller {
             return notFound(ApiUtil.createResponse("Encountered Blazegraph error!", false));
         } else{
             JsonNode jsonObject = mapper.convertValue(anode, JsonNode.class);
-            System.out.println("[getVariable] done");
+            //System.out.println("[getVariable] done");
             return ok(ApiUtil.createResponse(jsonObject, true));
         }
     }// /getVariable()
@@ -1119,8 +1329,16 @@ public class RestApi extends Controller {
 
     //total_count, page, size
     public Result getObjectsInCollection(String ocUri, int offset){
+        return getObjectsInCollection(ocUri, offset, 250);
+    }// /getObjectsInCollection
+
+    //total_count, page, size
+    public Result getObjectsInCollection(String ocUri, int offset, int pageSize){
+        if(pageSize < 1) {
+            pageSize = 250;
+            //System.out.println("[RestAPI] getObjectsInCollection : Yikes! Resetting that page size for you!");
+        }
         ObjectMapper mapper = new ObjectMapper();
-        int pageSize = 250;
         ObjectCollection objs = ObjectCollection.find(ocUri);
         if(objs == null){
             return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
@@ -1128,10 +1346,6 @@ public class RestApi extends Controller {
         int totalResultSize = objs.getCollectionSize();
         if(totalResultSize < 1){
             return notFound(ApiUtil.createResponse("ObjectCollection with uri " + ocUri + " not found", false));
-        }
-        if(pageSize > 250 || pageSize < 1) {
-            pageSize = 250;
-            System.out.println("[RestAPI] getObjectsInCollection : Yikes! Resetting that page size for you!");
         }
         List<StudyObject> results = StudyObject.findByCollectionWithPages(objs, pageSize, offset);
         if(results == null){
@@ -1280,7 +1494,7 @@ public class RestApi extends Controller {
             return badRequest(ApiUtil.createResponse("No study specified", false));
         }
         // Solr query
-        System.out.println("[RestAPI] Getting measurements for " + objUri);
+        //System.out.println("[RestAPI] Getting measurements for " + objUri);
         SolrDocumentList solrResults = getSolrMeasurements(OBJ, studyUri, variableUri, objUri);
         if(solrResults.size() < 1){
             return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));
@@ -1310,7 +1524,7 @@ public class RestApi extends Controller {
             return badRequest(ApiUtil.createResponse("No todatetime specified", false));
         }
         // Solr query
-        System.out.println("[RestAPI] Getting measurements for " + objUri);
+        //.out.println("[RestAPI] Getting measurements for " + objUri);
         SolrDocumentList solrResults = getSolrMeasurements(OBJ, studyUri, variableUri, objUri, fromdatetime, todatetime);
         if(solrResults.size() < 1){
             return notFound(ApiUtil.createResponse("Solr Message: no measurements found", false));

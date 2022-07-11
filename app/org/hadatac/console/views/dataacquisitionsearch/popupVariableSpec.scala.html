@@ -1,35 +1,35 @@
 @(suffix   : String,
-  variable : org.hadatac.entity.pojo.Variable,
+  variableSpec : org.hadatac.entity.pojo.VariableSpec,
   i        : Integer)
 
 @import org.hadatac.metadata.loader.URIUtils;
-@import org.hadatac.entity.pojo.HarmonizedVariable;
-@import org.hadatac.entity.pojo.OriginalVariable;
+@import org.hadatac.entity.pojo.HarmonizedVariableSpec;
+@import org.hadatac.entity.pojo.OriginalVariableSpec;
 @import org.hadatac.console.views.html.schema._
 
 <div class="modal-content">
     <span id="@suffix@(i+1)" class="close">&times;</span>
-    <h3>Variable @variable.getName()</h3>
+    <h3>Variable @variableSpec.getName()</h3>
     <br>
-    <b>Type</b>: @variable.getClass().getSimpleName()
+    <b>Type</b>: @variableSpec.getClass().getSimpleName()
     <br><br>
     <div class="panel panel-default">
         <div class="panel-heading">Provenance</div>
         <div class="panel-body">
-            @if(variable.getClass().getSimpleName().equals("HarmonizedVariable")) {
+            @if(variableSpec.getClass().getSimpleName().equals("HarmonizedVariableSpec")) {
                <b>Harmonization Strategy</b>: Normalization Matching <br>
-               <b>Original variable List</b>:
+               <b>Original variableSpec List</b>:
                <ul>
-                   @for(origVar <- variable.asInstanceOf[HarmonizedVariable].getSourceList()) {
+                   @for(origVar <- variableSpec.asInstanceOf[HarmonizedVariableSpec].getSourceList()) {
                         @if(origVar != null) {
                             <li>@origVar.toString()</li>
                         }
                    }
                 </ul>
-            } else if(variable.getClass().getSimpleName().equals("OriginalVariable")) {
+            } else if(variableSpec.getClass().getSimpleName().equals("OriginalVariableSpec")) {
                <b>Source Document List</b>:
                <ul>
-               @for(dfn <- variable.asInstanceOf[OriginalVariable].getDataFileNames()) {
+               @for(dfn <- variableSpec.asInstanceOf[OriginalVariableSpec].getDataFileNames()) {
                    @if(dfn != null) {
                         <li>@dfn</li>
                    }
@@ -44,24 +44,24 @@
     <div class="panel panel-default">
         <div class="panel-heading">Dictionary Normalization</div>
         <div class="panel-body">
-            <b>Automated Normalized Label</b>: @variable.toString()<br>
-            @if(variable.getRole() != null) {
-                <b>Role</b>: @variable.getRole<br>
+            <b>Automated Normalized Label</b>: @variableSpec.toString()<br>
+            @if(variableSpec.getRole() != null) {
+                <b>Role</b>: @variableSpec.getRole<br>
             } else {
                 <b>Role</b>: NONE<br>
             }
-            @if(variable.getEntity() != null) {
-                <b>Entity</b>: @variable.getEntity().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getEntity().getUri()))<br>
-                @if(variable.getEntity().getComment() != null && !variable.getEntity().getComment().equals("")) {
-                    @variable.getEntity().getComment()<br>
+            @if(variableSpec.getEntity() != null) {
+                <b>Entity</b>: @variableSpec.getEntity().getLabel() (@URIUtils.replaceNameSpaceEx(variableSpec.getEntity().getUri()))<br>
+                @if(variableSpec.getEntity().getComment() != null && !variableSpec.getEntity().getComment().equals("")) {
+                    @variableSpec.getEntity().getComment()<br>
                 }
             } else {
                 <b>Entity</b>: NONE<br>
             }
-            @if(variable.getAttributeList() != null) {
+            @if(variableSpec.getAttributeList() != null) {
                 <b>Attribute List</b>: <br>
                 <ul>
-                    @for(attr <- variable.getAttributeList()) {
+                    @for(attr <- variableSpec.getAttributeList()) {
                         @if(attr != null) {
                             <li>@attr.getLabel() (@URIUtils.replaceNameSpaceEx(attr.getUri()))</li>
                         }
@@ -70,18 +70,18 @@
             } else {
                 <b>Attribute List</b>: NONE<br>
             }
-            @if(variable.getInRelationTo() != null) {
-               <b>In Relation To</b>: @variable.getInRelationTo().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getInRelationTo().getUri()))<br>
+            @if(variableSpec.getInRelationTo() != null) {
+               <b>In Relation To</b>: @variableSpec.getInRelationTo().getLabel() (@URIUtils.replaceNameSpaceEx(variableSpec.getInRelationTo().getUri()))<br>
             } else {
                 <b>In Relation To</b>: NONE<br>
             }
-            @if(variable.getUnit() != null) {
-               <b>Unit</b>: @variable.getUnit().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getUnit().getUri()))<br>
+            @if(variableSpec.getUnit() != null) {
+               <b>Unit</b>: @variableSpec.getUnit().getLabel() (@URIUtils.replaceNameSpaceEx(variableSpec.getUnit().getUri()))<br>
             } else {
                <b>Unit</b>: NONE<br>
             }
-            @if(variable.getTime() != null) {
-               <b>Time</b>: @variable.getTime().getLabel() (@URIUtils.replaceNameSpaceEx(variable.getTime().getUri()))<br>
+            @if(variableSpec.getTime() != null) {
+               <b>Time</b>: @variableSpec.getTime().getLabel() (@URIUtils.replaceNameSpaceEx(variableSpec.getTime().getUri()))<br>
             } else {
                <b>Time</b>: NONE<br>
             }
@@ -91,7 +91,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">Codebook Normalization</div>
         <div class="panel-body">
-            @if(variable.getCodebook() != null && variable.getCodebook().size() > 0) {
+            @if(variableSpec.getCodebook() != null && variableSpec.getCodebook().size() > 0) {
                 <table class="table">
                     <thead>
                     <tr>
@@ -104,7 +104,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @for(pv <- variable.getCodebook()){
+                    @for(pv <- variableSpec.getCodebook()){
                     @PV_entry(pv, false)
                     }
                     </tbody>

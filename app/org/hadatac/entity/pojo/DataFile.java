@@ -23,6 +23,7 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.HASCO;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DataFile implements Cloneable {
+public class DataFile extends HADatAcThing implements Cloneable {
 
     // Process status for auto-annotator
     public static final String UNPROCESSED = "UNPROCESSED";
@@ -364,11 +365,41 @@ public class DataFile implements Cloneable {
         this.dataAcquisitionUri = dataAcquisitionUri;
     }
 
+    @Override
+    public String getTypeUri() {
+        return HASCO.DATA_FILE;
+    }
+
+    @Override
+    public String getHascoTypeUri() {
+        return HASCO.DATA_FILE;
+    }
+
+    @Override
+    public void setUri(String uri) {
+        setDatasetUri(uri);
+    }
+
+    @Override
+    public String getUri() {
+        return this.datasetUri;
+    }
+
     public String getDatasetUri() {
         return datasetUri;
     }
     public void setDatasetUri(String datasetUri) {
         this.datasetUri = datasetUri;
+    }
+
+    @Override
+    public void setLabel(String label) {
+        setFileName(label);
+    }
+
+    @Override
+    public String getLabel() {
+        return this.fileName;
     }
 
     public String getFileName() {
@@ -474,7 +505,13 @@ public class DataFile implements Cloneable {
         this.log = log;
     }
 
-    public int save() {
+    @Override
+    public void save() {
+        saveToSolr();
+    }
+
+    @Override
+    public boolean saveToSolr() {
         log = getLogger().getLog();
 
         try {
@@ -484,14 +521,22 @@ public class DataFile implements Cloneable {
             int status = client.addBean(this).getStatus();
             client.commit();
             client.close();
-            return status;
+            return true;
+            //return status;
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] DataFile.save() - e.Message: " + e.getMessage());
-            return -1;
+            return false;
+            //return -1;
         }
     }
 
-    public int delete() {
+    @Override
+    public void delete() {
+        deleteFromSolr();
+    }
+
+    @Override
+    public int deleteFromSolr() {
         try {
             SolrClient solr = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.CSV_DATASET)).build();
@@ -560,6 +605,10 @@ public class DataFile implements Cloneable {
 
     public static DataFile convertFromSolr(SolrDocument doc) {
         DataFile object = new DataFile(SolrUtils.getFieldValue(doc, "file_name_str").toString());
+        object.setUri(SolrUtils.getFieldValue(doc, "dataset_uri_str").toString());
+        object.setLabel(SolrUtils.getFieldValue(doc, "file_name_str").toString());
+        object.setTypeUri(HASCO.DATA_FILE);
+        object.setHascoTypeUri(HASCO.DATA_FILE);
 
         object.setId(SolrUtils.getFieldValue(doc, "id").toString());
         object.setViewableId(SolrUtils.getFieldValue(doc, "viewable_id_str").toString());
@@ -705,6 +754,19 @@ public class DataFile implements Cloneable {
             query.set("q", "owner_email_str:\"" + ownerEmail + "\"" + " AND " + "id:\"" + id + "\"");
         }
         query.set("rows", "10000000");
+
+        List<DataFile> results = findByQuery(query);
+        if (!results.isEmpty()) {
+            return results.get(0);
+        }
+
+        return null;
+    }
+
+    public static DataFile findByUri(String dataset_uri) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "dataset_uri_str:\"" + dataset_uri + "\"");
+        query.set("rows", "10");
 
         List<DataFile> results = findByQuery(query);
         if (!results.isEmpty()) {

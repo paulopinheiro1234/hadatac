@@ -63,8 +63,40 @@
             </tbody>
         </table>
       </div>
-	
-      <h4>Sample Collections</h4>
+
+      <h4>Object Collection</h4>
+
+      <div id="rcorners">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Grounding</th>
+                    <th>Reference</th>
+                    <th>Role</th>
+                    <th>Description</th>
+                    <th>Domain Scope</th>
+                    <th>Location Scope</th>
+                    <th>Time Scope</th>
+                    <th># Objects</th>
+                    <th>Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(ocList != null) {
+                    @for(oc <- ocList) {
+                        @for(vc <- vcList) {
+                            @if(oc.getVirtualColumnUri().equals(vc.getUri())) {
+                                @oc_entry("objectCollection", dir, fileId, da_uri, study, oc, vc)
+                            }
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+        </div>
+
+        <h4>Sample Collections</h4>
    
       <div id="rcorners">
         <table class="table">

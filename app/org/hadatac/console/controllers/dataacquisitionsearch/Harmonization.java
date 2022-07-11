@@ -1,40 +1,21 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.jena.base.Sys;
-import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
-import org.hadatac.console.models.CodeBookEntry;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.entity.pojo.*;
-import org.pac4j.play.java.Secure;
-import play.libs.Files.TemporaryFile;
 import play.mvc.*;
 import play.data.Form;
 import play.data.FormFactory;
-import play.mvc.Http.MultipartFormData.FilePart;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
-import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.Feedback;
 
 import com.typesafe.config.ConfigFactory;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 
 public class Harmonization extends Controller {
@@ -70,8 +51,8 @@ public class Harmonization extends Controller {
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
         List<ObjectCollection> socs = new ArrayList<ObjectCollection>();
-        Map<String, List<Variable>> vars = new HashMap<String, List<Variable>>();
-        Map<String, HarmonizedVariable> harmonization = new HashMap<String, HarmonizedVariable>();
+        Map<String, List<VariableSpec>> vars = new HashMap<String, List<VariableSpec>>();
+        Map<String, HarmonizedVariableSpec> harmonization = new HashMap<String, HarmonizedVariableSpec>();
 
         try {
             Form form = formFactory.form().bindFromRequest(request);
@@ -105,7 +86,7 @@ public class Harmonization extends Controller {
                 System.out.println("  - Selected SOC: [" + soc.getUri() + "]");
             }
             if (socs.size() < 2) {
-                return ok(harmonizationSocResult.render(new ArrayList<ObjectCollection>(), new ArrayList<HarmonizedVariable>(), application.getUserEmail(request)));
+                return ok(harmonizationSocResult.render(new ArrayList<ObjectCollection>(), new ArrayList<HarmonizedVariableSpec>(), application.getUserEmail(request)));
             }
             String summaryType = Measurement.SUMMARY_TYPE_NONE;
             String categoricalOption = Measurement.NON_CATG_IGNORE;
@@ -146,10 +127,10 @@ public class Harmonization extends Controller {
 
                     // Write headers: Labels are derived from collected alignment attributes
                     vars.put(soc.getUri(), alignment.getVariables());
-                    Map<String, Variable> varMap = new HashMap<String, Variable>();
-                    vars.get(soc.getUri()).sort(new Comparator<Variable>() {
+                    Map<String, VariableSpec> varMap = new HashMap<String, VariableSpec>();
+                    vars.get(soc.getUri()).sort(new Comparator<VariableSpec>() {
                         @Override
-                        public int compare(Variable o1, Variable o2) {
+                        public int compare(VariableSpec o1, VariableSpec o2) {
                             return o1.toString().compareTo(o2.toString());
                         }
                     });
@@ -163,17 +144,17 @@ public class Harmonization extends Controller {
             for (int ind1 = 0; ind1 < socs.size(); ind1++) {
                 for (int ind2 = ind1 + 1; ind2 < socs.size(); ind2++) {
                     System.out.println("Processing SOCS [" + socs.get(ind1).getUri() + "] and [" + socs.get(ind2).getUri() + "]");
-                    for (Variable var1 : vars.get(socs.get(ind1).getUri())) {
-                        for (Variable var2 : vars.get(socs.get(ind2).getUri())) {
+                    for (VariableSpec var1 : vars.get(socs.get(ind1).getUri())) {
+                        for (VariableSpec var2 : vars.get(socs.get(ind2).getUri())) {
                             System.out.print("Var1: " + var1 + "  Var2: " + var2 + "    ");
-                            if (HarmonizedVariable.harmonizable(var1,var2)) {
-                                List<Variable> sourceVars = new ArrayList<Variable>();
+                            if (HarmonizedVariableSpec.harmonizable(var1,var2)) {
+                                List<VariableSpec> sourceVars = new ArrayList<VariableSpec>();
                                 sourceVars.add(var1);
                                 sourceVars.add(var2);
-                                String concatKeys = HarmonizedVariable.concatenatedKeys(sourceVars);
+                                String concatKeys = HarmonizedVariableSpec.concatenatedKeys(sourceVars);
                                 System.out.println("Concat Roles: [" + concatKeys + "]");
                                 if (!harmonization.containsKey(concatKeys)) {
-                                    harmonization.put(concatKeys, new HarmonizedVariable(sourceVars));
+                                    harmonization.put(concatKeys, new HarmonizedVariableSpec(sourceVars));
                                 }
                             }
                         }
@@ -185,13 +166,13 @@ public class Harmonization extends Controller {
             e.printStackTrace();
         }
 
-        List<HarmonizedVariable> harmonizationList = new ArrayList<HarmonizedVariable>();
-        for (HarmonizedVariable var : harmonization.values()) {
+        List<HarmonizedVariableSpec> harmonizationList = new ArrayList<HarmonizedVariableSpec>();
+        for (HarmonizedVariableSpec var : harmonization.values()) {
             harmonizationList.add(var);
         }
-        harmonizationList.sort(new Comparator<Variable>() {
+        harmonizationList.sort(new Comparator<VariableSpec>() {
             @Override
-            public int compare(Variable o1, Variable o2) {
+            public int compare(VariableSpec o1, VariableSpec o2) {
                 return o1.toString().compareTo(o2.toString());
             }
         });
@@ -209,8 +190,8 @@ public class Harmonization extends Controller {
         String ownerUri = getOwnerUri(request);
         String email = getUserEmail(request);
         List<Study> studies = new ArrayList<Study>();
-        Map<String, List<Variable>> vars = new HashMap<String, List<Variable>>();
-        Map<String, HarmonizedVariable> harmonization = new HashMap<String, HarmonizedVariable>();
+        Map<String, List<VariableSpec>> vars = new HashMap<String, List<VariableSpec>>();
+        Map<String, HarmonizedVariableSpec> harmonization = new HashMap<String, HarmonizedVariableSpec>();
 
         try {
             Form form = formFactory.form().bindFromRequest(request);
@@ -245,7 +226,7 @@ public class Harmonization extends Controller {
             }
             if (studies.size() < 2) {
                 // send results back with an empty soc list
-                return ok(harmonizationStudyResult.render(new ArrayList<Study>(), new ArrayList<HarmonizedVariable>(), new ArrayList<Variable>(), application.getUserEmail(request)));
+                return ok(harmonizationStudyResult.render(new ArrayList<Study>(), new ArrayList<HarmonizedVariableSpec>(), new ArrayList<VariableSpec>(), application.getUserEmail(request)));
             }
             String summaryType = Measurement.SUMMARY_TYPE_NONE;
             String categoricalOption = Measurement.NON_CATG_IGNORE;
@@ -286,10 +267,10 @@ public class Harmonization extends Controller {
 
                     // Write headers: Labels are derived from collected alignment attributes
                     vars.put(study.getUri(), alignment.getVariables());
-                    Map<String, Variable> varMap = new HashMap<String, Variable>();
-                    vars.get(study.getUri()).sort(new Comparator<Variable>() {
+                    Map<String, VariableSpec> varMap = new HashMap<String, VariableSpec>();
+                    vars.get(study.getUri()).sort(new Comparator<VariableSpec>() {
                         @Override
-                        public int compare(Variable o1, Variable o2) {
+                        public int compare(VariableSpec o1, VariableSpec o2) {
                             return o1.toString().compareTo(o2.toString());
                         }
                     });
@@ -299,9 +280,9 @@ public class Harmonization extends Controller {
                 }
 
                 for (Study std : studies) {
-                    for (Variable var : vars.get(std.getUri())) {
-                        if (var instanceof OriginalVariable) {
-                            OriginalVariable origVar = ((OriginalVariable)var);
+                    for (VariableSpec var : vars.get(std.getUri())) {
+                        if (var instanceof OriginalVariableSpec) {
+                            OriginalVariableSpec origVar = ((OriginalVariableSpec)var);
                             if (origVar != null && origVar.getDASA() != null && origVar.getDASA().getUri() != null) {
                                 var.setCodebook(PossibleValue.findByVariable(origVar.getDASA().getUri()));
                             }
@@ -314,17 +295,17 @@ public class Harmonization extends Controller {
             for (int ind1 = 0; ind1 < studies.size(); ind1++) {
                 for (int ind2 = ind1 + 1; ind2 < studies.size(); ind2++) {
                     //System.out.println("Processing SOCS [" + studies.get(ind1).getUri() + "] and [" + studies.get(ind2).getUri() + "]");
-                    for (Variable var1 : vars.get(studies.get(ind1).getUri())) {
-                        for (Variable var2 : vars.get(studies.get(ind2).getUri())) {
+                    for (VariableSpec var1 : vars.get(studies.get(ind1).getUri())) {
+                        for (VariableSpec var2 : vars.get(studies.get(ind2).getUri())) {
                             //System.out.print("Var1: " + var1 + "  Var2: " + var2 + "    ");
-                            if (HarmonizedVariable.harmonizable(var1,var2)) {
-                                List<Variable> sourceVars = new ArrayList<Variable>();
+                            if (HarmonizedVariableSpec.harmonizable(var1,var2)) {
+                                List<VariableSpec> sourceVars = new ArrayList<VariableSpec>();
                                 sourceVars.add(var1);
                                 sourceVars.add(var2);
-                                String concatKeys = HarmonizedVariable.concatenatedKeys(sourceVars);
+                                String concatKeys = HarmonizedVariableSpec.concatenatedKeys(sourceVars);
                                 System.out.println("ConcatKey: [" + concatKeys + "]");
                                 if (!harmonization.containsKey(concatKeys)) {
-                                    harmonization.put(concatKeys, new HarmonizedVariable(sourceVars));
+                                    harmonization.put(concatKeys, new HarmonizedVariableSpec(sourceVars));
                                 }
                             }
                         }
@@ -339,15 +320,15 @@ public class Harmonization extends Controller {
             e.printStackTrace();
         }
 
-        List<HarmonizedVariable> harmonizationList = new ArrayList<HarmonizedVariable>();
-        List<Variable> sourceList = new ArrayList<Variable>();
-        for (HarmonizedVariable var : harmonization.values()) {
+        List<HarmonizedVariableSpec> harmonizationList = new ArrayList<HarmonizedVariableSpec>();
+        List<VariableSpec> sourceList = new ArrayList<VariableSpec>();
+        for (HarmonizedVariableSpec var : harmonization.values()) {
             harmonizationList.add(var);
             sourceList.addAll(var.getSourceList());
         }
-        harmonizationList.sort(new Comparator<Variable>() {
+        harmonizationList.sort(new Comparator<VariableSpec>() {
             @Override
-            public int compare(Variable o1, Variable o2) {
+            public int compare(VariableSpec o1, VariableSpec o2) {
                 return o1.toString().compareTo(o2.toString());
             }
         });

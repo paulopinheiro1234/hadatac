@@ -174,11 +174,13 @@ public abstract class BaseGenerator {
     }
 
     public void createObjects() throws Exception {
+        //System.out.println("BaseGenerator.createObjects: records is NULL");
         if (records == null) {
             return;
         }
 
         int rowNumber = 0;
+        //System.out.println("BaseGenerator.createObjects: total of records is " + records.size());
         for (Record record : records) {
             HADatAcThing obj = createObject(record, ++rowNumber, null);
             if (obj != null) {
@@ -270,9 +272,9 @@ public abstract class BaseGenerator {
         
         for (String name : caches.keySet()) {
             if (caches.get(name).getNeedCommit()) {
-                System.out.println("cache " + name + " size: Initial " + caches.get(name).getInitialCache().values().size());
-                System.out.println("cache " + name + " size: New " + caches.get(name).getNewCache().values().size());
-                System.out.println("cache " + name + " size: Total " + caches.get(name).getMapCache().values().size());
+                //System.out.println("cache " + name + " size: Initial " + caches.get(name).getInitialCache().values().size());
+                //System.out.println("cache " + name + " size: New " + caches.get(name).getNewCache().values().size());
+                //System.out.println("cache " + name + " size: Total " + caches.get(name).getMapCache().values().size());
                 for (Object obj : caches.get(name).getNewCache().values()) {
                     if (obj instanceof HADatAcThing) {
                         ((HADatAcThing) obj).saveToTripleStore();

@@ -1,6 +1,6 @@
 @(studyList     : List[org.hadatac.entity.pojo.Study],
-  harmonization : List[org.hadatac.entity.pojo.HarmonizedVariable],
-  sourceList    : List[org.hadatac.entity.pojo.Variable],
+  harmonization : List[org.hadatac.entity.pojo.HarmonizedVariableSpec],
+  sourceList    : List[org.hadatac.entity.pojo.VariableSpec],
   userName      : String
 )
 
@@ -183,19 +183,19 @@
                         </tr>
                         </thead>
                         <tbody id="harmonization-body">
-                            @for((variable, i) <- harmonization.zipWithIndex) {
+                            @for((variableSpec, i) <- harmonization.zipWithIndex) {
                                 <tr>
                                     <td style="word-break: break-all;">@(i+1)</td>
-                                    <td style="word-break: break-all;">@Html(" <button id=\"HARMZ-" + variable.toString() + "\">Hmz:" + variable.toString() + "</button><br>")</td>
-                                    <td style="word-break: break-all;">@Html(variable.dasaToString(auxint))</td>
-                                    <td style="word-break: break-all;">@Html(variable.sourceToString())</td>
-                                    <td style="word-break: break-all;">@Html(variable.datafileToString())</td>
+                                    <td style="word-break: break-all;">@Html(" <button id=\"HARMZ-" + variableSpec.toString() + "\">Hmz:" + variableSpec.toString() + "</button><br>")</td>
+                                    <td style="word-break: break-all;">@Html(variableSpec.dasaToString(auxint))</td>
+                                    <td style="word-break: break-all;">@Html(variableSpec.sourceToString())</td>
+                                    <td style="word-break: break-all;">@Html(variableSpec.datafileToString())</td>
                                     <td style="word-break: break-all;">
                                         <a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                                     </td>
 
                                 </tr>
-                                @{ auxint = auxint + variable.getSourceList().size() }
+                                @{ auxint = auxint + variableSpec.getSourceList().size() }
                             }
                         </tbody>
                     </table>
@@ -213,10 +213,10 @@
         </div>
     </div>
 
-    @for((variable, i) <- harmonization.zipWithIndex) {
-        @if(variable != null) {
+    @for((variableSpec, i) <- harmonization.zipWithIndex) {
+        @if(variableSpec != null) {
             <div id="varModal@(i+1)" class="modal">
-                @popupVariable("close",variable, i)
+                @popupVariableSpec("close",variableSpec, i)
             </div>
         }
         <script>
@@ -224,7 +224,7 @@
             var modal@(i+1) = document.getElementById("varModal@(i+1)");
 
             // Get the button that opens the modal
-            var btn@(i+1) = document.getElementById("HARMZ-@variable.toString()");
+            var btn@(i+1) = document.getElementById("HARMZ-@variableSpec.toString()");
 
             // Get the <span> element that closes the modal
             var span@(i+1) = document.getElementById("close@(i+1)");
@@ -247,10 +247,10 @@
             }
         </script>
 
-        @for((origvar, k) <- variable.getSourceList().zipWithIndex) {
+        @for((origvar, k) <- variableSpec.getSourceList().zipWithIndex) {
             @if(origvar != null) {
             <div id="srcModal@(j+k+1)" class="modal">
-                @popupVariable("srcClose",origvar, j+k)
+                @popupVariableSpec("srcClose",origvar, j+k)
             </div>
             }
             <script>
@@ -281,7 +281,7 @@
                 }
             </script>
         }
-        @(j = j + variable.getSourceList().size())
+        @(j = j + variableSpec.getSourceList().size())
     }
 
     <script>

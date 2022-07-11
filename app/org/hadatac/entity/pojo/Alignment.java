@@ -2,8 +2,6 @@ package org.hadatac.entity.pojo;
 
 import java.util.*;
 
-import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.STR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +22,7 @@ public class Alignment {
     private Map<String, Entity> entityCache;
     private Map<String, Unit> unitCache;
     private Map<String, AlignmentEntityRole> roles;
-    private Map<String, Variable> variables;
+    private Map<String, VariableSpec> variables;
     private Map<String, List<String>> hCodeBook;
     private Map<String, String> studyId;  // key=socUri;  value=studyId
     private Map<String, STR> dataAcquisitions;
@@ -43,7 +41,7 @@ public class Alignment {
         entityCache = new HashMap<String, Entity>();
         unitCache = new HashMap<String, Unit>();
         roles = new HashMap<String, AlignmentEntityRole>();
-        variables = new HashMap<String, Variable>();
+        variables = new HashMap<String, VariableSpec>();
         hCodeBook = new HashMap<String, List<String>>();
         studyId = new HashMap<String,String>();
         dataAcquisitions = new HashMap<String,STR>();
@@ -61,7 +59,7 @@ public class Alignment {
     public void printAlignment() {
         System.out.println("Alignment Content: ");
         if (variables != null && variables.size() > 0) {
-            for (Variable aa : variables.values()) {
+            for (VariableSpec aa : variables.values()) {
                 System.out.println("Label: " + aa);
             }
         }
@@ -94,7 +92,7 @@ public class Alignment {
      * objectKey adds a new object identifier into variables
      */
     public String objectKey(AlignmentEntityRole entRole) {
-        Variable aa = new Variable(entRole, ID_IRT);
+        VariableSpec aa = new VariableSpec(entRole, ID_IRT);
         return aa.toString();
     }
 
@@ -214,7 +212,7 @@ public class Alignment {
          * create new variable
          */
 
-        Variable newVar;
+        VariableSpec newVar;
 
         Entity entity = entityCache.get(m.getEntityUri());
         if (entity == null || !entity.getUri().equals(m.getEntityUri())) {
@@ -312,7 +310,7 @@ public class Alignment {
             System.out.println("Adding the following time " + mAbstractTime);
         }*/
 
-        newVar = new Variable(newRole, newAttrInRel, unit, timeAttr);
+        newVar = new VariableSpec(newRole, newAttrInRel, unit, timeAttr);
         if (m.getValueClass() != null && m.getValueClass().startsWith("http")) {
             newVar.setIsCategorical(true);
         }
@@ -324,7 +322,7 @@ public class Alignment {
             str = dataAcquisitions.get(m.getAcquisitionUri());
             dasa = dasas.get(m.getDasaUri());
             if (str != null || dasa != null) {
-                OriginalVariable newOrigVar = new OriginalVariable(newVar);
+                OriginalVariableSpec newOrigVar = new OriginalVariableSpec(newVar);
                 if (str != null) {
                     newOrigVar.setSTR(str);
                 }
@@ -501,8 +499,8 @@ public class Alignment {
         return new ArrayList<AlignmentEntityRole>(roles.values());
     }
 
-    public List<Variable> getVariables() {
-        return new ArrayList<Variable>(variables.values());
+    public List<VariableSpec> getVariables() {
+        return new ArrayList<VariableSpec>(variables.values());
     }
 
     public List<List<String>> getCodes() {
@@ -549,7 +547,7 @@ public class Alignment {
     public void addRole(AlignmentEntityRole entRole) {
         roles.put(entRole.getKey(), entRole);
         //System.out.println("Adding NEW ROLE: " + entRole);
-        Variable newVar = new Variable(entRole,ID_IRT);
+        VariableSpec newVar = new VariableSpec(entRole,ID_IRT);
         variables.put(newVar.getKey(),newVar);
         //Variable newGroupVar = new Variable(entRole,GROUPID_IRT);
         //variables.put(newVar.getKey() + "GROUP",newGroupVar);

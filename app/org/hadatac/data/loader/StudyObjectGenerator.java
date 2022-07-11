@@ -45,18 +45,18 @@ public class StudyObjectGenerator extends BaseGenerator {
         
         setStudyUri(study_uri);       
         this.listCache = listContent;
-        //System.out.println(listContent);
+        System.out.println(listContent);
         this.mapContent = mapContent;
         this.oc_uri = listContent.get(0);
-        //System.out.println("oc_uri : " + oc_uri);
+        System.out.println("oc_uri : " + oc_uri);
         this.oc_type = listContent.get(1);
-        //System.out.println("oc_type : " + oc_type);
+        System.out.println("oc_type : " + oc_type);
         this.oc_scope = listContent.get(2);
-        //System.out.println("oc_scope : " + oc_scope);
+        System.out.println("oc_scope : " + oc_scope);
         this.oc_timescope = listContent.get(3);
-        //System.out.println("oc_timescope : " + oc_timescope);
+        System.out.println("oc_timescope : " + oc_timescope);
         this.role = listContent.get(4);
-        //System.out.println("role : " + role);
+        System.out.println("role : " + role);
         uriMap.put("hasco:SubjectGroup", "SBJ-");
         uriMap.put("hasco:SampleCollection", "SPL-");
         uriMap.put("hasco:TimeCollection", "TIME-");
@@ -75,13 +75,13 @@ public class StudyObjectGenerator extends BaseGenerator {
 
     private String getUri(Record rec) {
         String originalID = rec.getValueByColumnName(mapCol.get("originalID"));
-        // System.out.println("StudyObjectGenerator: " + originalID);
+        //System.out.println("StudyObjectGenerator: " + originalID);
         if (URIUtils.isValidURI(originalID)) {
             //System.out.println("StudyObjectGenerator: VALID URI");
             return URIUtils.replaceNameSpaceEx(originalID);
         }
 
-        // System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
+        //System.out.println("StudyObjectGenerator: " + kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id);
         if ( uriMap.get(oc_type).contains("SBJ-") && "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.graph.uniqueIdentifiers")) ) {
             return kbPrefix + uriMap.get(oc_type) + originalID;
         } else return kbPrefix + uriMap.get(oc_type) + originalID + "-" + study_id;
@@ -189,10 +189,11 @@ public class StudyObjectGenerator extends BaseGenerator {
     }
     
     public StudyObject createStudyObject(Record record) throws Exception {
+        //System.out.println("StudyObjectGenerator.createStudyObject: originalID is [" + getOriginalID(record) + "]");
     	if (getOriginalID(record) == null || getOriginalID(record).isEmpty()) {
     		return null;
     	}
-    	StudyObject obj = new StudyObject(getUri(record), getType(record), 
+    	StudyObject obj = new StudyObject(getUri(record), getType(record),
 					  getOriginalID(record), getLabel(record), 
 					  getSocUri(), getLabel(record));
         obj.setRoleUri(URIUtils.replacePrefixEx(role));

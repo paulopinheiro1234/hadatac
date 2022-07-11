@@ -31,6 +31,7 @@ public class DPL {
         }
 	    
 	    for (Record record : file.getRecords()) {
+	    	System.out.println("Inside DPL.readCatalog: " + record.getValueByColumnIndex(0) + " " + record.getValueByColumnIndex(1));
 	        mapCatalog.put(record.getValueByColumnIndex(0), record.getValueByColumnIndex(1));
 	    }
 	}	

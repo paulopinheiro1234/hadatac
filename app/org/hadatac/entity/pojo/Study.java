@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -22,12 +23,15 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
+import org.hadatac.annotations.ObjectProperty;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
+import org.hadatac.console.controllers.restapi.ObjectPropertyResponse;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.URIUtils;
@@ -45,6 +49,8 @@ public class Study extends HADatAcThing {
     private static final Logger log = LoggerFactory.getLogger(Study.class);
 
     private static String className = "hasco:Study";
+
+    private static final int FIRST_PAGE_SIZE = 5;
 
     private static final String kbPrefix = ConfigProp.getKbPrefix();
 
@@ -116,6 +122,7 @@ public class Study extends HADatAcThing {
         this.id = id;
         this.studyUri = studyUri;
         this.typeUri = studyType;
+        this.hascoTypeUri = HASCO.STUDY;
         this.label = label;
         this.title = title;
         this.project = project;
@@ -133,6 +140,8 @@ public class Study extends HADatAcThing {
     public Study() {
         this.id = "";
         this.studyUri = "";
+        this.typeUri = "";
+        this.hascoTypeUri = HASCO.STUDY;
         this.label = "";
         this.title = "";
         this.project = "";
@@ -171,6 +180,7 @@ public class Study extends HADatAcThing {
         return externalSource;
     }
 
+    @JsonIgnore
     public String getInstitutionUri() {
         return institutionUri;
     }
@@ -185,6 +195,7 @@ public class Study extends HADatAcThing {
         return Agent.find(institutionUri);
     }
 
+    @JsonIgnore
     public String getAgentUri() {
         return agentUri;
     }
@@ -357,8 +368,13 @@ public class Study extends HADatAcThing {
         this.dataAcquisitionUris = dataAcquisitionUris;
     }
 
+    @JsonIgnore
     public List<String> getDataAcquisitionUris() {
         return this.dataAcquisitionUris;
+    }
+
+    public List<GenericInstance> getDataStreams() {
+        return STR.findGenericInstanceByStudyWithPages(this.studyUri, FIRST_PAGE_SIZE + 1, 0);
     }
 
     public void addDataAcquisitionUri(String da_uri) {
@@ -369,8 +385,35 @@ public class Study extends HADatAcThing {
         this.objectCollectionUris = objectCollectionUris;
     }
 
+    @JsonIgnore
     public List<String>  getObjectCollectionUris() {
         return this.objectCollectionUris;
+    }
+
+    public List<GenericInstance> getObjectCollections() {
+
+        /*
+        List<GenericInstance> list = new ArrayList<>();
+        boolean hasMore = false;
+        try {
+             list = ObjectCollection.findGenericInstanceByStudyWithPages(this.studyUri, FIRST_PAGE_SIZE + 1, 0);
+             if (list == null) {
+                 System.out.println("in Study's getObjectCollections: LIST is EMPTY");
+             } else {
+                 System.out.println("in Study's getObjectCollections: LIST has size " + list.size());
+             }
+             hasMore = (list.size() == FIRST_PAGE_SIZE + 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ObjectPropertyResponse(
+                list.subList(0, FIRST_PAGE_SIZE),
+                HASCO.STUDY,
+                hasMore);
+         */
+
+        //System.out.println("inside Study.getObjectCollections. StudyURI is [" + this.studyUri + "]");
+        return ObjectCollection.findGenericInstanceByStudyWithPages(this.studyUri, FIRST_PAGE_SIZE + 1, 0);
     }
 
     public void addObjectCollectionUri(String oc_uri) {
@@ -488,13 +531,13 @@ public class Study extends HADatAcThing {
         return study;
     }
 
-    public Map<String, StudyObject> getObjectsMap() {
+    public static Map<String, StudyObject> getObjectsMap(String studyUri) {
         Map<String, StudyObject> resp = new HashMap<String, StudyObject>();
         String queryString = "";
         queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "SELECT ?objUri " +
                 " WHERE {  ?objUri hasco:isMemberOf ?socUri . " +
-                "          ?socUri hasco:isMemberOf <" + getUri() + "> . " +
+                "          ?socUri hasco:isMemberOf <" + studyUri + "> . " +
                 " }";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -515,13 +558,13 @@ public class Study extends HADatAcThing {
         return resp;
     }
 
-    public Map<String, StudyObject> getObjectsMapInBatch() {
+    public static Map<String, StudyObject> getObjectsMapInBatch(String studyUri) {
         Map<String, StudyObject> results = new HashMap<String, StudyObject>();
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 "DESCRIBE ?objUri WHERE { \n" +
                 "  ?objUri hasco:isMemberOf ?socUri . \n" +
-                "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
+                "  ?socUri hasco:isMemberOf <" + studyUri + "> . \n" +
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -530,7 +573,7 @@ public class Study extends HADatAcThing {
             queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                     "DESCRIBE ?objUri WHERE { \n" +
                     "  ?objUri hasco:isMemberOf ?socUri . \n" +
-                    "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
+                    "  ?socUri hasco:isMemberOf <" + studyUri + "> . \n" +
                     "}";
             resultsrw = SPARQLUtils.select(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
@@ -550,11 +593,10 @@ public class Study extends HADatAcThing {
             }
         }
 
-        /*
-        for (Map.Entry<String, StudyObject> entry : results.entrySet()) {
-             System.out.println("getObjectsMapInBatch(): Key = " + entry.getKey() + ", Value = " + ((StudyObject)entry.getValue()).getUri());
-        }
-        */
+
+        //for (Map.Entry<String, StudyObject> entry : results.entrySet()) {
+        //     System.out.println("getObjectsMapInBatch(): Key = " + entry.getKey() + ", Value = " + ((StudyObject)entry.getValue()).getUri());
+        //}
 
         return results;
     }
@@ -618,10 +660,11 @@ public class Study extends HADatAcThing {
             adjustedUri = "<" + adjustedUri + ">";
         }
         String studyQueryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
-                "SELECT DISTINCT ?id ?studyType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" +
+                "SELECT DISTINCT ?id ?studyType ?studyHascoType ?studyLabel ?title ?proj ?studyComment ?external ?agentUri ?institutionUri ?lastId" +
                 " WHERE {  \n" +
                 "      ?studyType rdfs:subClassOf* hasco:Study . \n" +
                 "      " + adjustedUri + " a ?studyType . \n" +
+                "      " + adjustedUri + " hasco:hascoType ?studyHascoType . \n" +
                 "      OPTIONAL { " + adjustedUri + " hasco:hasId ?id } . \n" +
                 "      OPTIONAL { " + adjustedUri + " rdfs:label ?studyLabel } . \n" +
                 "      OPTIONAL { " + adjustedUri + " hasco:hasTitle ?title } . \n" +
@@ -654,6 +697,9 @@ public class Study extends HADatAcThing {
                 }
                 if (soln.contains("studyType")) {
                     returnStudy.setTypeUri(soln.get("studyType").toString());
+                }
+                if (soln.contains("studyHascoType")) {
+                    returnStudy.setHascoTypeUri(soln.get("studyHascoType").toString());
                 }
                 if (soln.contains("title")) {
                     returnStudy.setTitle(soln.get("title").toString());
@@ -987,6 +1033,38 @@ public class Study extends HADatAcThing {
         }
 
         return studies;
+    }
+
+    public static List<Study> findWithPages(int pageSize, int offset) {
+        List<Study> studies = new ArrayList<Study>();
+        String queryString = "";
+        queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+                "SELECT ?studyUri ?studyLabel ?subUri WHERE { " +
+                "   ?subUri rdfs:subClassOf* hasco:Study . " +
+                "   ?studyUri a ?subUri . " +
+                "   ?studyUri rdfs:label ?studyLabel . " +
+                " }" +
+                " LIMIT " + pageSize +
+                " OFFSET " + offset;
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+        Study study = null;
+        while (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            if (soln != null && soln.getResource("studyUri").getURI()!= null) {
+                //study = Study.find(soln.get("studyUri").toString());
+                study = new Study();
+                study.setUri(soln.get("studyUri").toString());
+                study.setLabel(soln.get("studyLabel").toString());
+                //System.out.println("Study URI: " + soln.get("studyUri").toString());
+            }
+            studies.add(study);
+        }
+
+        return studies;
+
     }
 
     public static List<String> findIds() {

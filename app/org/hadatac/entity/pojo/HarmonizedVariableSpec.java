@@ -1,38 +1,22 @@
 package org.hadatac.entity.pojo;
 
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.util.NamedList;
-import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.FirstLabel;
-import org.hadatac.utils.NameSpaces;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 
-public class HarmonizedVariable extends Variable {
+public class HarmonizedVariableSpec extends VariableSpec {
 
-	private List<Variable> sourceList;
+	private List<VariableSpec> sourceList;
 
-	public HarmonizedVariable(List<Variable> sourceList) {
+	public HarmonizedVariableSpec(List<VariableSpec> sourceList) {
 		super(sourceList);
-		sourceList.sort(new Comparator<Variable>() {
+		sourceList.sort(new Comparator<VariableSpec>() {
 			@Override
-			public int compare(Variable o1, Variable o2) {
+			public int compare(VariableSpec o1, VariableSpec o2) {
 				return o1.toString().compareTo(o2.toString());
 			}
 		});
 		this.sourceList = sourceList;
 		List<String> roles = new ArrayList<String>();
-		for (Variable var : sourceList) {
+		for (VariableSpec var : sourceList) {
 			if (!roles.contains(var.getRole())) {
 				roles.add(var.getRole());
 			}
@@ -54,25 +38,25 @@ public class HarmonizedVariable extends Variable {
 		}
 	}
 
-	public List<Variable> getSourceList() {
+	public List<VariableSpec> getSourceList() {
 		return sourceList;
 	}
 
-	public void setSourceList(List<Variable> sourceList) {
+	public void setSourceList(List<VariableSpec> sourceList) {
 		this.sourceList = sourceList;
 	}
 
-	public void addSource(Variable newVar) {
+	public void addSource(VariableSpec newVar) {
 		this.sourceList.add(newVar);
 	}
 
-	public static String concatenatedKeys(List<Variable> sourceList) {
+	public static String concatenatedKeys(List<VariableSpec> sourceList) {
 		if (sourceList == null) {
 			return null;
 		}
-		sourceList.sort(new Comparator<Variable>() {
+		sourceList.sort(new Comparator<VariableSpec>() {
 			@Override
-			public int compare(Variable o1, Variable o2) {
+			public int compare(VariableSpec o1, VariableSpec o2) {
 				return o1.toString().compareTo(o2.toString());
 			}
 		});
@@ -81,7 +65,7 @@ public class HarmonizedVariable extends Variable {
 		} else if (sourceList.size() > 1) {
 			boolean first = true;
 			String finalKey = "";
-			for (Variable var : sourceList) {
+			for (VariableSpec var : sourceList) {
 				if (first) {
 					first = false;
 				} else {
@@ -95,7 +79,7 @@ public class HarmonizedVariable extends Variable {
 
 	}
 
-	public static boolean harmonizable(Variable v1, Variable v2) {
+	public static boolean harmonizable(VariableSpec v1, VariableSpec v2) {
 		if (v1.getEntityStr() != null && v2.getEntityStr() != null && !v1.getEntityStr().equals(v2.getEntityStr())) {
 			return false;
 		}
@@ -122,7 +106,7 @@ public class HarmonizedVariable extends Variable {
 	public String sourceToString() {
 		//System.out.println("inside sourceToString()");
 		String auxstr = "";
-		for (Variable source : sourceList) {
+		for (VariableSpec source : sourceList) {
 			auxstr = auxstr + source.toString() + "<br>";
 		}
 		return auxstr;
@@ -131,9 +115,9 @@ public class HarmonizedVariable extends Variable {
 	public String datafileToString() {
 		//System.out.println("inside datafileToString()");
 		String auxstr = "";
-		for (Variable source : sourceList) {
-			if (source instanceof OriginalVariable) {
-				String strUri = ((OriginalVariable) source).getSTR().getUri();
+		for (VariableSpec source : sourceList) {
+			if (source instanceof OriginalVariableSpec) {
+				String strUri = ((OriginalVariableSpec) source).getSTR().getUri();
 				List<DataFile> dataFileList = DataFile.findByDataAcquisition(strUri);
 				String fileNameList = "";
 				if (dataFileList != null && dataFileList.size() > 0) {
@@ -161,9 +145,9 @@ public class HarmonizedVariable extends Variable {
 		//System.out.println("inside dasaToString()");
 		String auxstr = "";
 		int i = 1;
-		for (Variable source : sourceList) {
-			if (source instanceof OriginalVariable && ((OriginalVariable) source).getDASA() != null) {
-				auxstr = auxstr + " <button id=\'srcBtn" + (index + i++) + "\'>" +((OriginalVariable) source).getDASA().getLabel() + "</button><br>";
+		for (VariableSpec source : sourceList) {
+			if (source instanceof OriginalVariableSpec && ((OriginalVariableSpec) source).getDASA() != null) {
+				auxstr = auxstr + " <button id=\'srcBtn" + (index + i++) + "\'>" +((OriginalVariableSpec) source).getDASA().getLabel() + "</button><br>";
 			} else {
 				auxstr = auxstr + "<br>";
 
@@ -172,8 +156,8 @@ public class HarmonizedVariable extends Variable {
 		return auxstr;
 	}
 
-	public static HarmonizedVariable selectFromList(List<HarmonizedVariable> list, String key) {
-		for (HarmonizedVariable var : list) {
+	public static HarmonizedVariableSpec selectFromList(List<HarmonizedVariableSpec> list, String key) {
+		for (HarmonizedVariableSpec var : list) {
 			if (var.toString().equals(key)) {
 				return var;
 			}

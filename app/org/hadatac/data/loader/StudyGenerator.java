@@ -65,6 +65,10 @@ public class StudyGenerator extends BaseGenerator {
         return "hasco:Study";
     }
 
+    private String getHascoType() {
+        return "hasco:Study";
+    }
+
     private String getTitle(Record rec) {
         return rec.getValueByColumnName(mapCol.get("studyTitle"));
     }
@@ -96,6 +100,7 @@ public class StudyGenerator extends BaseGenerator {
             row.put("hasco:hasId", getId(rec));
             row.put("hasURI", getUri(rec));
             row.put("a", getType());
+            row.put("hasco:hascoType", getHascoType());
             row.put("rdfs:label", getTitle(rec));
             row.put("skos:definition", getAims(rec));
             row.put("rdfs:comment", getSignificance(rec));

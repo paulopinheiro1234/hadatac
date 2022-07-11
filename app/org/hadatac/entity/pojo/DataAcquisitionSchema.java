@@ -18,6 +18,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
@@ -498,6 +499,8 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
         DataAcquisitionSchema schema = new DataAcquisitionSchema();
         schema.setUri(schemaUri);
+        schema.setTypeUri(HASCO.DA_SCHEMA);
+        schema.setHascoTypeUri(HASCO.DA_SCHEMA);
         schema.setLabel(FirstLabel.getLabel(schemaUri));
 
         if (resultsrw.hasNext()) {
@@ -624,6 +627,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
 
         insert += this.getUri() + " a hasco:DASchema . ";
+        insert += this.getUri() + " hasco:hascoType hasco:DASchema . ";
         insert += this.getUri() + " rdfs:label  \"" + this.getLabel() + "\" . ";
 
         if (!getNamedGraph().isEmpty()) {

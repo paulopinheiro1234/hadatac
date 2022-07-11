@@ -4,7 +4,7 @@ public class AnnotatedValue {
 
 	private String value;
     private String valueClass;
-    private Variable variable;
+    private VariableSpec variableSpec;
 
     public AnnotatedValue(String value) {
     	this(value, null, null);
@@ -12,10 +12,10 @@ public class AnnotatedValue {
 
     public AnnotatedValue(String value, String valueClass) { this(value, valueClass, null); }
 
-	public AnnotatedValue(String value, String valueClass, Variable variable) {
+	public AnnotatedValue(String value, String valueClass, VariableSpec variableSpec) {
     	this.value = value;
     	this.valueClass = valueClass;
-    	this.variable = variable;
+    	this.variableSpec = variableSpec;
     }
 
 	public String getValue() {
@@ -30,11 +30,11 @@ public class AnnotatedValue {
 
 	public void setValueClass(String valueClass) { this.valueClass = valueClass; }
 
-	public Variable getVariable() {
-		return variable;
+	public VariableSpec getVariable() {
+		return variableSpec;
 	}
 
-	public void setVariable(Variable variable) { this.variable = variable; }
+	public void setVariable(VariableSpec variableSpec) { this.variableSpec = variableSpec; }
 
 	public String toString() { return value; }
 

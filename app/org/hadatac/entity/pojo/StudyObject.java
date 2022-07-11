@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.hadatac.annotations.ObjectProperty;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.http.SPARQLUtils;
@@ -30,6 +31,7 @@ import java.util.Map;
 
 public class StudyObject extends HADatAcThing {
 
+    public static String HASCO_TYPE_URI = "http://hadatac.org/ont/hasco/StudyObject";
     public static String LOCATION = "http://semanticscience.org/resource/SIO_000317";
     public static String TIME = "http://semanticscience.org/resource/SIO_000417";
 
@@ -86,6 +88,7 @@ public class StudyObject extends HADatAcThing {
     public StudyObject(String uri, String isMemberOf) {
         setUri(uri);
         setTypeUri("");
+        this.hascoTypeUri = HASCO_TYPE_URI;
         setOriginalId("");
         setLabel("");
         setIsMemberOf(isMemberOf);
@@ -103,6 +106,7 @@ public class StudyObject extends HADatAcThing {
             List<String> spaceScopeUris) {
         setUri(uri);
         setTypeUri(typeUri);
+        this.hascoTypeUri = HASCO_TYPE_URI;
         setOriginalId(originalId);
         setLabel(label);
         setIsMemberOf(isMemberOf);
@@ -120,6 +124,7 @@ public class StudyObject extends HADatAcThing {
             String comment) { 
         setUri(uri);
         setTypeUri(typeUri);
+        this.hascoTypeUri = HASCO_TYPE_URI;
         setOriginalId(originalId);
         setLabel(label);
         setIsMemberOf(isMemberOf);
@@ -590,6 +595,10 @@ public class StudyObject extends HADatAcThing {
         }
 
         return obj;
+    }
+
+    public List<Measurement> getMeasurements() {
+        return Measurement.findByObjectUri(uri);
     }
 
     public static StudyObject findFacetSearch(String obj_uri, String studyId) {

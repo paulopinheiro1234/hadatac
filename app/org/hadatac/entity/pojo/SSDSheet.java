@@ -50,7 +50,7 @@ public class SSDSheet {
         	    (record.getValueByColumnIndex(0) == null || record.getValueByColumnIndex(0).isEmpty())) {
         		return;
         	}
-        	//System.out.println("Catalog: [" + record.getValueByColumnIndex(1) + "]  [" + record.getValueByColumnIndex(0) + "]");
+        	System.out.println("SSD Catalog: [" + record.getValueByColumnIndex(1) + "]  [" + record.getValueByColumnIndex(0) + "]");
         	mapCatalog.put(record.getValueByColumnIndex(1), record.getValueByColumnIndex(0));
         }
     }

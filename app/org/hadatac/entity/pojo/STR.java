@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.WordUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -28,6 +29,7 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -368,6 +370,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return study;
     }
 
+    @JsonIgnore
     public void setStudyUri(String study_uri) {
         this.studyUri = study_uri;
     }
@@ -511,6 +514,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.methodUri = methodUri;
     }
 
+    @JsonIgnore
     public String getSchemaUri() {
         return schemaUri;
     }
@@ -538,6 +542,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         getSchema();
     }
 
+    @JsonIgnore
     public String getDeploymentUri() {
         return deploymentUri;
     }
@@ -592,6 +597,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         topicsMap = null;
     }
 
+    @JsonIgnore
     public List<String> getHeaders() {
         if (headers != null) {
             return headers;
@@ -613,6 +619,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         getHeaders();
     }
 
+    @JsonIgnore
     public String getInstrumentModel() {
         return instrumentModel;
     }
@@ -621,6 +628,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.instrumentModel = instrumentModel;
     }
 
+    @JsonIgnore
     public String getInstrumentUri() {
         return instrumentUri;
     }
@@ -629,6 +637,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.instrumentUri = instrumentUri;
     }
 
+    @JsonIgnore
     public String getPlatformName() {
         return platformName;
     }
@@ -637,6 +646,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.platformName = platformName;
     }
 
+    @JsonIgnore
     public String getPlatformUri() {
         return platformUri;
     }
@@ -645,6 +655,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.platformUri = platformUri;
     }
 
+    @JsonIgnore
     public String getLocation() {
         return location;
     }
@@ -668,6 +679,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return false;
     }
 
+    @JsonIgnore
     public List<String> getCellScopeUri() {
         return cellScopeUri;
     }
@@ -704,8 +716,13 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.cellScopeName.add(cellScopeName);
     }
 
+    @JsonIgnore
     public List<String> getDatasetUri() {
         return datasetURIs;
+    }
+
+    public List<DataFile> getDataFiles() {
+        return DataFile.findByDataAcquisition(uri);
     }
 
     public void setDatasetUri(List<String> datasetURIs) {
@@ -901,6 +918,8 @@ public class STR extends HADatAcThing implements Comparable<STR> {
             if (doc.getFieldValue("uri") != null) {
                 dataAcquisition.setUri(doc.getFieldValue("uri").toString());
             }
+            dataAcquisition.setTypeUri(HASCO.DATA_ACQUISITION);
+            dataAcquisition.setHascoTypeUri(HASCO.DATA_ACQUISITION);
             if (doc.getFieldValue("owner_uri_str") != null) {
                 dataAcquisition.setOwnerUri(doc.getFieldValue("owner_uri_str").toString());
             }
@@ -1020,6 +1039,36 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return dataAcquisition;
     }
 
+    public static GenericInstance convertGenericInstanceFromSolr(SolrDocument doc) {
+        Iterator<Object> i;
+        DateTime date;
+
+        String uri = "";
+        String typeUri = "";
+        String hascoTypeUri = "";
+        String label = "";
+        String comment = "";
+
+        try {
+            if (doc.getFieldValue("uri") != null) {
+                uri = doc.getFieldValue("uri").toString();
+            }
+            typeUri = HASCO.DATA_ACQUISITION;
+            hascoTypeUri = HASCO.DATA_ACQUISITION;
+            if (doc.getFieldValue("label_str") != null) {
+                label = doc.getFieldValue("label_str").toString();
+            }
+            if (doc.getFieldValue("comment_str") != null) {
+                comment = doc.getFieldValue("comment_str").toString();
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] DataAcquisition.convertFromSolr(SolrDocument) - e.Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return new GenericInstance(uri, typeUri, hascoTypeUri, label, comment);
+    }
+
     public static List<STR> find(String ownerUri, State state) {
         SolrQuery query = new SolrQuery();
         if (state.getCurrent() == State.ALL) {
@@ -1114,6 +1163,14 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return findByQuery(query);
     }
 
+    public static List<GenericInstance> findGenericInstanceByStudyWithPages(String studyUri, int pageSize, int offset) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "study_uri_str:\"" + studyUri + "\"");
+        query.set("rows", pageSize);
+        query.set("start", offset);
+        return findGenericInstanceByQuery(query);
+    }
+
     /* Open streams are those with ended_at_date =  9999-12-31T23:59:59.999Z */
     public static List<STR> findOpenStreams() {
         SolrQuery query = new SolrQuery();
@@ -1148,6 +1205,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         query.set("sort", "started_at_date asc");
         query.set("rows", "10000000");
 
+        System.out.println("STR.findByUri() [" + dataAcquisitionUri + "]");
         List<STR> results = findByQuery(query);
         if (!results.isEmpty()) {
             return results.get(0);
@@ -1180,15 +1238,42 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
         try {
             QueryResponse response = solr.query(query);
+            System.out.println("STR query executed");
             solr.close();
             SolrDocumentList docs = response.getResults();
             Iterator<SolrDocument> i = docs.iterator();
             while (i.hasNext()) {
+                System.out.println("Retrieving STR");
                 results.add(convertFromSolr(i.next()));
             }
         } catch (Exception e) {
             results.clear();
             System.out.println("[ERROR] DataAcquisition.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    public static List<GenericInstance> findGenericInstanceByQuery(SolrQuery query) {
+        List<GenericInstance> results = new ArrayList<GenericInstance>();
+
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_COLLECTION)).build();
+
+        try {
+            QueryResponse response = solr.query(query);
+            System.out.println("STR as GenericInstance query executed");
+            solr.close();
+            SolrDocumentList docs = response.getResults();
+            Iterator<SolrDocument> i = docs.iterator();
+            while (i.hasNext()) {
+                System.out.println("Retrieving STR as GenericInstance");
+                results.add(convertGenericInstanceFromSolr(i.next()));
+            }
+        } catch (Exception e) {
+            results.clear();
+            System.out.println("[ERROR] DataAcquisition.findGenericInstanceByQuery(SolrQuery) - Exception message: " + e.getMessage());
             e.printStackTrace();
         }
 

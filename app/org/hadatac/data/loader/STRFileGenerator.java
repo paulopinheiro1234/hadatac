@@ -100,6 +100,7 @@ public class STRFileGenerator extends BaseGenerator {
 		dataFile.getLogger().println("STRFileGenerator: At createRow. Row Number " + rowNumber + "  record size: " + rec.size());
 		row.put("hasURI", kbPrefix + "DA-" + getSTRName(rec));
 		row.put("a", "hasco:DataAcquisition");
+        row.put("hasco:hascoType", "hasco:DataAcquisition");
 		row.put("rdfs:label", getSTRName(rec));
 		row.put("hasco:hasDeployment", getDeployment(rec));
 		row.put("hasco:isDataAcquisitionOf", study.getUri());

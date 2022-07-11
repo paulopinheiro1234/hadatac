@@ -178,6 +178,7 @@ public class DASchemaObjectGenerator extends BaseGenerator {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("hasURI", kbPrefix + "DASO-" + SDDName + "-" + getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		row.put("a", "hasco:DASchemaObject");
+		row.put("hasco:hascoType", "hasco:DASchemaObject");
 		row.put("rdfs:label", getLabel(rec));
 		row.put("rdfs:comment", getLabel(rec).trim().replace(" ","").replace("_","-").replace("??", ""));
 		row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);

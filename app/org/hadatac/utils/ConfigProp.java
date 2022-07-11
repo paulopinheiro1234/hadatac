@@ -62,12 +62,29 @@ public class ConfigProp {
 		}
 	}
 
+	public static String getBaseURL() {
+		return ConfigFactory.load().getString("hadatac.console.host_deploy");
+	}
+
 	public static String getBasePrefix() {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix");
 	}
 
 	public static String getKbPrefix() {
 		return ConfigFactory.load().getString("hadatac.community.ont_prefix") + "-kb:";
+	}
+
+	public static String getPageTitle() {
+		return ConfigFactory.load().getString("hadatac.community.pagetitle");
+	}
+	public static String getShortName() {
+		return ConfigFactory.load().getString("hadatac.community.shortname");
+	}
+	public static String getFullName() {
+		return ConfigFactory.load().getString("hadatac.community.fullname");
+	}
+	public static String getDescription() {
+		return ConfigFactory.load().getString("hadatac.community.description");
 	}
 
 	public static String getTmp() {

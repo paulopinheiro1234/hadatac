@@ -29,6 +29,7 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.HASCO;
 
 public class MeasurementGenerator extends BaseGenerator {
 
@@ -482,7 +483,7 @@ public class MeasurementGenerator extends BaseGenerator {
                             measurement.setObjectUri(objUri);
                             measurement.setObjectCollectionType(objList.get(reference).get(StudyObject.SOC_TYPE));
                             measurement.setRole(objList.get(reference).get(StudyObject.SOC_LABEL));
-                            if (objList.get(reference).get(StudyObject.SOC_TYPE).equals(ObjectCollection.SAMPLE_COLLECTION)) {
+                            if (objList.get(reference).get(StudyObject.SOC_TYPE).equals(HASCO.SAMPLE_COLLECTION)) {
                                 measurement.setSID(objList.get(reference).get(StudyObject.OBJECT_ORIGINAL_ID));
                             }
                             if (objList.get(reference).get(StudyObject.OBJECT_TIME) != null && !objList.get(reference).get(StudyObject.OBJECT_TIME).equals("")) {

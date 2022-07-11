@@ -7,6 +7,8 @@ import java.util.List;
 public class TreeNode {
 
     private String name;
+    private String uri;
+    private String comment;
     private boolean firstVisit;
     private ArrayList<TreeNode> children;
 
@@ -34,6 +36,22 @@ public class TreeNode {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getUri() {
+        return this.uri;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getComment() {
+        return this.comment;
     }
 
     public boolean getFirstVisit() {

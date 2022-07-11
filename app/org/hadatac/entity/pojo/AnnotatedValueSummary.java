@@ -150,22 +150,22 @@ public class AnnotatedValueSummary {
 		return categVS;
 	}
 
-	public static Map<String, Map<String, AnnotatedValueSummary>> categorizeNonCategorical(Alignment alignment, List<Variable> vars, Map<String, Map<String, AnnotatedValueSummary>> summary) {
+	public static Map<String, Map<String, AnnotatedValueSummary>> categorizeNonCategorical(Alignment alignment, List<VariableSpec> vars, Map<String, Map<String, AnnotatedValueSummary>> summary) {
 		System.out.println("inside categorizeNonCategorical");
 		Map<String, Map<String, AnnotatedValueSummary>> categorizedSummary = new HashMap<String, Map<String, AnnotatedValueSummary>>();
 		Map<String, AnnotatedValueSummary> categorizedVariable;
 
-		Map<String, Variable> varsMap = new HashMap<String, Variable>();
-		for (Variable variable : vars) {
+		Map<String, VariableSpec> varsMap = new HashMap<String, VariableSpec>();
+		for (VariableSpec variableSpec : vars) {
 			//System.out.println("avail vars: " + variable.toString());
-			varsMap.put(variable.toString(), variable);
+			varsMap.put(variableSpec.toString(), variableSpec);
 		}
 
 		for (Map.Entry<String, Map<String, AnnotatedValueSummary>> entry: summary.entrySet()) {
 			//System.out.println("key: " + entry.getKey() + " value: " + entry.getValue());
 
 			// get Variable from variable's key
-			Variable var = varsMap.get(entry.getKey());
+			VariableSpec var = varsMap.get(entry.getKey());
 			categorizedVariable = entry.getValue();
 
 			// handle age variables
