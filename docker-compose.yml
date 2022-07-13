@@ -53,7 +53,11 @@ services:
                 aliases:
                     - hadatac
         environment:
-            JAVA_OPTS: -Xms128m -Xmx12g -Dsolr.httpclient.builder.factory=org.apache.solr.client.solrj.impl.PreemptiveBasicAuthClientBuilderFactory -Dbasicauth=solr:SolrRocks
+            # Uncomment below setting when using Solr Authentication. Then rename security.json.template under solr/solr-home/ folder to security.json. Both the changes are mandatory for Solr Authentication to work.
+            # JAVA_OPTS: -Xms128m -Xmx12g -Dsolr.httpclient.builder.factory=org.apache.solr.client.solrj.impl.PreemptiveBasicAuthClientBuilderFactory -Dbasicauth=solr:SolrRocks
+            # Comment out below setting when using Solr Authentication
+            JAVA_OPTS: -Xms128m -Xmx12g
+
         volumes:
             # Creates a volume to store the various csv files. This allows the data
             #   to be persisted when the container is removed or when Hadatac is rebuilt.
