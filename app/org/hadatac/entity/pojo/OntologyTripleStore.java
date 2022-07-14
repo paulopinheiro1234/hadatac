@@ -17,22 +17,50 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-public class Ontology extends HADatAcThing {
+public class OntologyTripleStore {
 
     static String className = "owl:Ontology";
 
-    private String version = "";
+    private String uri;
 
-    public Ontology() {
-        setUri("");
-        setLabel("");
-        setComment("");
+    private String typeUri;
+
+    private String label;
+
+    private String version;
+
+    private String comment;
+
+    public OntologyTripleStore(String uri) {
+        this.uri = uri;
+        this.typeUri = uri;
+        this.label = "";
+        this.version = "";
+        this.comment = "";
     }
 
-    public Ontology(String uri) {
-        setUri(uri);
-        setLabel("");
-        setComment("");
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getTypeUri() {
+        return typeUri;
+    }
+
+    public void setTypeUri(String typeUri) {
+        this.typeUri = typeUri;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getVersion() {
@@ -43,8 +71,16 @@ public class Ontology extends HADatAcThing {
         this.version = version;
     }
 
-    public static Ontology find(String uri) {
-        Ontology ontology = null;
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public static OntologyTripleStore find(String uri) {
+        OntologyTripleStore ontology = null;
         Model model;
         Statement statement;
         RDFNode object;
@@ -56,7 +92,7 @@ public class Ontology extends HADatAcThing {
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
         model = qexec.execDescribe();
 
-        ontology = new Ontology();
+        ontology = new OntologyTripleStore(uri);
         StmtIterator stmtIterator = model.listStatements();
 
         while (stmtIterator.hasNext()) {
@@ -85,7 +121,7 @@ public class Ontology extends HADatAcThing {
         if (uri == null || uri.isEmpty()) {
             return "";
         }
-        Ontology ont = Ontology.find(uri);
+        OntologyTripleStore ont = OntologyTripleStore.find(uri);
         if (ont == null || ont.getVersion() == null) {
             System.out.println("OntVersion ont: is null");
             return "";
@@ -94,8 +130,8 @@ public class Ontology extends HADatAcThing {
         return ont.getVersion();
     }
 
-    public static List<Ontology> find() {
-        List<Ontology> ontologies = new ArrayList<Ontology>();
+    public static List<OntologyTripleStore> find() {
+        List<OntologyTripleStore> ontologies = new ArrayList<OntologyTripleStore>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
                 " ?ont rdfs:subClassOf* owl:Ontology . " +
@@ -107,23 +143,11 @@ public class Ontology extends HADatAcThing {
 
         while (resultsrw.hasNext()) {
             QuerySolution soln = resultsrw.next();
-            Ontology ontology = find(soln.getResource("uri").getURI());
+            OntologyTripleStore ontology = find(soln.getResource("uri").getURI());
             ontologies.add(ontology);
         }
 
         return ontologies;
-    }
-
-    @Override
-    public boolean saveToSolr() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public int deleteFromSolr() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 }

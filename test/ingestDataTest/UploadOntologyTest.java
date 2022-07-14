@@ -6,10 +6,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,10 +15,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import org.hadatac.console.controllers.triplestore.LoadOnt;
 import org.hadatac.metadata.loader.MetadataContext;
-import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.NameSpaces;
 import com.typesafe.config.ConfigFactory;
 

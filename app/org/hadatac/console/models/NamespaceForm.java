@@ -3,7 +3,7 @@ package org.hadatac.console.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 
 public class NamespaceForm {
 

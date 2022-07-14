@@ -7,11 +7,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.base.Sys;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.pac4j.play.java.Secure;
@@ -28,13 +26,10 @@ import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 
 public class LoadOnt extends Controller {
@@ -81,7 +76,7 @@ public class LoadOnt extends Controller {
             e.printStackTrace();
         }
 
-        return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));
+        return ok(loadOnt.render(oper, cacheList, NameSpaces.getInstance().getOntologyList(),application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
@@ -114,7 +109,7 @@ public class LoadOnt extends Controller {
             }
         }
 
-        return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getOrderedNamespacesAsList(),application.getUserEmail(request)));
+        return ok(loadOnt.render("init", cacheList, NameSpaces.getInstance().getOntologyList(),application.getUserEmail(request)));
     }
 
     @Secure(authorizers = Constants.DATA_MANAGER_ROLE)
@@ -126,7 +121,8 @@ public class LoadOnt extends Controller {
         if (!url.isEmpty()) {
             ns.loadTriples(url, true);
         }
-        ns.updateLoadedTripleSize();
+        ns.updateNumberOfLoadedTriples();
+        ns.updateFromTripleStore();
 
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
@@ -140,7 +136,8 @@ public class LoadOnt extends Controller {
         File localFile = new File(filePath);
         if (localFile.exists()) {
             ns.loadTriples(filePath, false);
-            ns.updateLoadedTripleSize();
+            ns.updateNumberOfLoadedTriples();
+            ns.updateFromTripleStore();
         } else {
             return badRequest("No cache for this namespace!");
         }
@@ -152,7 +149,8 @@ public class LoadOnt extends Controller {
     public Result deleteNamedGraph(String abbreviation) {
         NameSpace ns = NameSpaces.getInstance().getNamespaces().get(abbreviation);
         ns.deleteTriples();
-        ns.updateLoadedTripleSize();
+        ns.updateNumberOfLoadedTriples();
+        ns.updateFromTripleStore();
 
         return redirect(routes.LoadOnt.loadOnt("init"));
     }
@@ -161,7 +159,8 @@ public class LoadOnt extends Controller {
     public Result deleteAllNamedGraphs() {
         for (NameSpace ns : NameSpaces.getInstance().getNamespaces().values()) {
             ns.deleteTriples();
-            ns.updateLoadedTripleSize();
+            ns.updateNumberOfLoadedTriples();
+            ns.updateFromTripleStore();
         }
 
         return redirect(routes.LoadOnt.loadOnt("init"));
@@ -184,7 +183,7 @@ public class LoadOnt extends Controller {
             NameSpace ns = new NameSpace();
             ns.setAbbreviation(data.get("nsAbbrev" + String.valueOf(i + 1)));
             ns.setName(data.get("nsName" + String.valueOf(i + 1)));
-            ns.setType(data.get("nsType" + String.valueOf(i + 1)));
+            ns.setMimeType(data.get("nsType" + String.valueOf(i + 1)));
             ns.setURL(data.get("nsURL" + String.valueOf(i + 1)));
             ns.save();
         }
@@ -261,9 +260,9 @@ public class LoadOnt extends Controller {
         try {
             List<String> lines = new ArrayList<String>();
 
-            for (NameSpace ns : NameSpaces.getInstance().getOrderedNamespacesAsList()) {
+            for (NameSpace ns : NameSpaces.getInstance().getOntologyList()) {
                 lines.add(ns.getAbbreviation() + "=" + String.join(",", Arrays.asList(
-                        ns.getName(), ns.getType(), ns.getURL())));
+                        ns.getName(), ns.getMimeType(), ns.getURL())));
             }
 
             FileOutputStream outputStream = new FileOutputStream(file);

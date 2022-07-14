@@ -16,7 +16,7 @@ import play.mvc.Result;
 //import controllers.AuthApplication;
 import org.hadatac.console.models.DataAcquisitionSchemaForm;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 
 
 public class DeleteDAS extends Controller {

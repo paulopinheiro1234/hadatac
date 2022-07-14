@@ -1,6 +1,6 @@
 @(oper: String,
         cacheList : List[String],
-        namespaces : List[org.hadatac.utils.NameSpace],
+        namespaces : List[org.hadatac.entity.pojo.NameSpace],
         userName: String
 )
 
@@ -186,7 +186,7 @@
                                     <td style="word-break: break-all;">@(i+1)</td>
                                     <td style="word-break: break-all;" axis="nsAbbrev@(i+1)">@ns.getAbbreviation()</td>
                                     <td style="word-break: break-all;" axis="nsName@(i+1)">@ns.getName()</td>
-                                    <td style="word-break: break-all;" axis="nsType@(i+1)">@ns.getType()</td>
+                                    <td style="word-break: break-all;" axis="nsMimeType@(i+1)">@ns.getMimeType()</td>
                                     <td style="word-break: break-all;" axis="nsURL@(i+1)">@ns.getURL()</td>
                                     <td style="word-break: break-all;" axis="nsTripleSize@(i+1)">@ns.getNumberOfLoadedTriples()</td>
                                     <td style="word-break: break-all;">

@@ -5,7 +5,7 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
 public class URIUtils {

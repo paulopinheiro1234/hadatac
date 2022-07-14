@@ -6,7 +6,6 @@ import org.hadatac.entity.pojo.PossibleValue;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.console.controllers.annotator.AnnotationLogger;
-import org.hadatac.utils.NameSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
-import java.util.Base64;
 import java.math.BigInteger;  
 import java.nio.charset.StandardCharsets; 
-import java.security.MessageDigest;  
-import java.security.NoSuchAlgorithmException;  
+import java.security.MessageDigest;
 
 public class PVGenerator extends BaseGenerator {
 

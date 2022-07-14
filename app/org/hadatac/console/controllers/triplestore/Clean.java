@@ -8,7 +8,6 @@ import org.hadatac.console.controllers.Application;
 import org.pac4j.play.java.Secure;
 import play.mvc.*;
 
-import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.loader.DataContext;
@@ -16,15 +15,13 @@ import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 import javax.inject.Inject;
 

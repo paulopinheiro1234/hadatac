@@ -19,7 +19,7 @@ import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
@@ -166,7 +166,7 @@ public class MetadataContext implements RDFContext {
             for (String abbrev : namespaces.keySet()) {
                 NameSpace ns = namespaces.get(abbrev);
                 String nsURL = ns.getURL();
-                if (abbrev != null && nsURL != null && !nsURL.equals("") && ns.getType() != null) {
+                if (abbrev != null && nsURL != null && !nsURL.equals("") && ns.getMimeType() != null) {
                     String path = "";
                     if ("confirmed".equals(oper)) {
                         ns.loadTriples(nsURL, true);
@@ -177,7 +177,7 @@ public class MetadataContext implements RDFContext {
                         for (int i = filePath.length(); i < 50; i++) {
                             message += Feedback.print(mode, ".");
                         }
-                        loadLocalFile(mode, filePath, ns.getType(), ns.getName());
+                        loadLocalFile(mode, filePath, ns.getMimeType(), ns.getName());
                         path = filePath;
                     }
 

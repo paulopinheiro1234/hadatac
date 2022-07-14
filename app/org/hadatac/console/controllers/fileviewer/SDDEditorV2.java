@@ -15,22 +15,14 @@ import org.hadatac.console.views.html.fileviewer.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.utils.ConfigProp;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 import org.pac4j.play.java.Secure;
-import org.w3c.dom.html.HTMLTableCaptionElement;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import play.libs.Json;
-import org.hadatac.console.controllers.workingfiles.FileHeadersIntoSDD;
-import play.core.j.JavaResultExtractor;
-import org.hadatac.console.controllers.fileviewer.DDEditor;
-import org.hadatac.console.controllers.workingfiles.WorkingFiles;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.entity.pojo.Ontology;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QueryParseException;
 

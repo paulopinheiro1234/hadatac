@@ -16,13 +16,12 @@ import org.hadatac.entity.pojo.DataAcquisitionSchema;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
 import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 import org.hadatac.entity.pojo.Deployment;
-import org.hadatac.entity.pojo.Entity;
 import org.hadatac.entity.pojo.Instrument;
 import org.hadatac.entity.pojo.STR;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
 
@@ -53,7 +52,7 @@ public class KGForceFieldGraph {
         // Ontologies need to be added before than studies
         if (includeOntologies) {
             //System.out.println("=========================================== ONTOLOGIES");
-            ontologies = NameSpaces.getInstance().getOrderedNamespacesAsList();
+            ontologies = NameSpaces.getInstance().getOntologyList();
             if (ontologies != null && ontologies.size() > 0) {
                 for (NameSpace ont: ontologies) {
                     addOntology(ont);
@@ -302,7 +301,7 @@ public class KGForceFieldGraph {
         } else {
             html += "<b>URL</b>: " + ont.getURL() + "<br>";
             html += "<b># loaded triples</b>: " + ont.getNumberOfLoadedTriples() + "<br>";
-            html += "<b>Type</b>: " + ont.getType() + "<br>";
+            html += "<b>Type</b>: " + ont.getMimeType() + "<br>";
         }
         return html;
     }

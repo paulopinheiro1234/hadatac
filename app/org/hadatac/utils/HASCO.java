@@ -22,6 +22,7 @@ public class HASCO {
     public static final String LOCATION_COLLECTION                    = "http://hadatac.org/ont/hasco/LocationCollection";
     public static final String MATCHING_COLLECTION                    = "http://hadatac.org/ont/hasco/MatchingCollection";
     public static final String OBJECT_COLLECTION                      = "http://hadatac.org/ont/hasco/ObjectCollection";
+    public static final String ONTOLOGY                               = "http://hadatac.org/ont/hasco/Ontology";
     public static final String PLATFORM                               = "http://hadatac.org/ont/vstoi#Platform";
     public static final String REPOSITORY                             = "http://hadatac.org/ont/hasco/Repository";
     public static final String SAMPLE_COLLECTION                      = "http://hadatac.org/ont/hasco/SampleCollection";

@@ -1,10 +1,8 @@
 package org.hadatac.console.controllers.annotator;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,45 +15,30 @@ import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.annotator.routes;
 import org.hadatac.console.http.ResumableUpload;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.annotator.*;
-import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.data.loader.AnnotationWorker;
-import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.GeneratorChain;
-import org.hadatac.data.loader.RecordFile;
-import org.hadatac.data.loader.SpreadsheetRecordFile;
-import org.hadatac.console.views.html.*;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.STR;
-import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.User;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.FileManager;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.typesafe.config.ConfigException.Null;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 import org.pac4j.play.java.Secure;
-import play.twirl.api.Html;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;

@@ -1,4 +1,4 @@
-package org.hadatac.utils;
+package org.hadatac.entity.pojo;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +31,13 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
+import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.HASCO;
+import org.hadatac.utils.NameSpaces;
 
-public class NameSpace {
+public class NameSpace extends HADatAcThing {
+
+    static String className = HASCO.ONTOLOGY;
 
     @Field("abbreviation")
     private String nsAbbrev = "";
@@ -47,6 +51,12 @@ public class NameSpace {
     @Field("url_str")
     private String nsURL = "";
 
+    @Field("comment_str")
+    private String nsComment = "";
+
+    @Field("version_str")
+    private String version = "";
+
     @Field("number_of_loaded_triples_int")
     private int numberOfLoadedTriples = 0;
 
@@ -56,11 +66,13 @@ public class NameSpace {
     public NameSpace () {
     }
 
-    public NameSpace (String abbrev, String name, String type, String url, int priority) {
-        nsAbbrev = abbrev;
-        nsName = name;
-        nsType = type;
-        nsURL = url;
+    public NameSpace (String abbrev, String name, String type, String url, String comment, String version, int priority) {
+        this.nsAbbrev = abbrev;
+        this.nsName = name;
+        this.nsType = type;
+        this.nsURL = url;
+        this.nsComment = comment;
+        this.version = version;
         this.priority = priority;
     }
 
@@ -72,20 +84,59 @@ public class NameSpace {
         nsAbbrev = abbrev;
     }
 
+    @Override
+    public String getLabel() {
+        return nsAbbrev;
+    }
+
+    @Override
+    public void setLabel(String abbrev) {
+        nsAbbrev = abbrev;
+    }
+
     public String getName() {
         return nsName;
     }
 
     public void setName(String name) {
         nsName = name;
+        uri = name;
     }
 
-    public String getType() {
+    @Override
+    public String getUri() {
+        return nsName;
+    }
+
+    @Override
+    public void setUri(String name) {
+        nsName = name;
+    }
+
+    public String getMimeType() {
         return nsType;
     }
 
-    public void setType(String type) {
+    public void setMimeType(String type) {
         nsType = type;
+    }
+
+    @Override
+    public String getComment() {
+        return nsComment;
+    }
+
+    @Override
+    public void setComment(String comment) {
+        nsComment = comment;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public void setPriority(int priority) {
@@ -125,7 +176,14 @@ public class NameSpace {
             return "<" + nsAbbrev + ":> " + nsName + " (" + showType + ", " + nsURL + ")";
     }
 
-    public void updateLoadedTripleSize() {
+    public void updateFromTripleStore() {
+        OntologyTripleStore ont = OntologyTripleStore.find(this.getUri());
+        this.setComment(ont.getComment());
+        this.setVersion(ont.getVersion());
+        this.save();
+    }
+
+    public void updateNumberOfLoadedTriples() {
         try {
             String queryString = "SELECT (COUNT(*) as ?tot) \n"
                     + "FROM <" + getName() + "> \n"
@@ -135,12 +193,12 @@ public class NameSpace {
                     CollectionUtil.Collection.METADATA_SPARQL), queryString);
             QuerySolution soln = resultsrw.next();
 
-            setNumberOfLoadedTriples(Integer.valueOf(soln.getLiteral("tot").getValue().toString()).intValue());
-            save();
+            this.setNumberOfLoadedTriples(Integer.valueOf(soln.getLiteral("tot").getValue().toString()).intValue());
+            this.save();
         } catch (Exception e) {
-	    System.out.println("NameSpace.updateLoadedTripleSize()");
- 	    System.out.println("  - Value of CollectionUtil.Collection.METADATA_SPARQL=[" + CollectionUtil.Collection.METADATA_SPARQL + "]");
- 	    System.out.println("  - Value of CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL)=[" + CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL) + "]");
+            System.out.println("NameSpace.updateLoadedTripleSize()");
+ 	        System.out.println("  - Value of CollectionUtil.Collection.METADATA_SPARQL=[" + CollectionUtil.Collection.METADATA_SPARQL + "]");
+ 	        System.out.println("  - Value of CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL)=[" + CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL) + "]");
             e.printStackTrace();
         }
     }
@@ -178,9 +236,9 @@ public class NameSpace {
 
             System.out.println("Loading triples from " + address);
             if (fromRemote) {
-                con.add(new URL(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
+                con.add(new URL(address), "", getRioFormat(getMimeType()), (Resource)factory.createIRI(getName()));
             } else {
-                con.add(new File(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
+                con.add(new File(address), "", getRioFormat(getMimeType()), (Resource)factory.createIRI(getName()));
             }
             System.out.println("Loaded triples from " + address + " \n");
         } catch (NotFoundException e) {
@@ -219,7 +277,13 @@ public class NameSpace {
         }
     }
 
-    public int save() {
+    @Override
+    public void save() {
+        this.saveToSolr();
+    }
+
+    @Override
+    public boolean saveToSolr() {
         if (priority == -1) {
             System.out.println("Warning priority was never initialized through the NameSpace file");
         }
@@ -230,14 +294,20 @@ public class NameSpace {
             int status = client.addBean(this).getStatus();
             client.commit();
             client.close();
-            return status;
+            return (status == 0);
         } catch (IOException | SolrServerException e) {
             System.out.println("[ERROR] Namespace.save() - e.Message: " + e.getMessage());
-            return -1;
+            return false;
         }
     }
 
-    public int delete() {
+    @Override
+    public void delete() {
+        this.deleteFromTripleStore();
+    }
+
+    @Override
+    public int deleteFromSolr() {
         try {
             SolrClient client = new HttpSolrClient.Builder(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.NAMESPACE)).build();
@@ -277,13 +347,40 @@ public class NameSpace {
 
     public static NameSpace convertFromSolr(SolrDocument doc) {
         NameSpace object = new NameSpace();
-        object.setAbbreviation(doc.getFieldValue("abbreviation").toString());
-        object.setName(doc.getFieldValue("name_str").toString());
-        object.setType(doc.getFieldValue("mime_type_str").toString());
-        object.setURL(doc.getFieldValue("url_str").toString());
-        object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
-        object.setPriority(Integer.valueOf(doc.getFieldValue("priority_int").toString()).intValue());
+        if (doc != null) {
+            if (doc.getFieldValue("abbreviation") != null) {
+                object.setAbbreviation(doc.getFieldValue("abbreviation").toString());
+            }
+            if (doc.getFieldValue("name_str") != null) {
+                object.setName(doc.getFieldValue("name_str").toString());
+            }
+            if (doc.getFieldValue("mime_type_str") != null) {
+                object.setMimeType(doc.getFieldValue("mime_type_str").toString());
+            }
+            if (doc.getFieldValue("url_str") != null) {
+                object.setURL(doc.getFieldValue("url_str").toString());
+            }
+            if (doc.getFieldValue("comment_str") != null) {
+                object.setComment(doc.getFieldValue("comment_str").toString());
+            }
+            if (doc.getFieldValue("number_of_loaded_triples_int") != null) {
+                object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
+            }
+            if (doc.getFieldValue("priority_int") != null) {
+                object.setPriority(Integer.valueOf(doc.getFieldValue("priority_int").toString()).intValue());
+            }
+            object.setTypeUri(HASCO.ONTOLOGY);
+            object.setHascoTypeUri(HASCO.ONTOLOGY);
+        }
         return object;
+    }
+
+    public static List<NameSpace> findAll() {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "*:*");
+        query.set("rows", "10000000");
+
+        return findByQuery(query);
     }
 
     public static List<NameSpace> findByQuery(SolrQuery query) {
@@ -302,24 +399,43 @@ public class NameSpace {
             }
         } catch (Exception e) {
             list.clear();
-            System.out.println("[ERROR] OperationMode.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
+            System.out.println("[ERROR] NameSpace.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
         }
 
         return list;
     }
 
-    public static List<NameSpace> findAll() {
-        SolrQuery query = new SolrQuery();
-        query.set("q", "*:*");
-        query.set("rows", "10000000");
+    public static List<NameSpace> findWithPages(int pageSize, int offset) {
+        List<NameSpace> listOntologies = NameSpaces.getInstance().getOntologyList();
+        if (listOntologies == null || pageSize < 1 || offset < 0) {
+            return new ArrayList<NameSpace>();
+        }
+        return listOntologies.subList(offset, offset + pageSize - 1);
+    }
 
-        return findByQuery(query);
+    public static int getNumberOntologies() {
+        List<NameSpace> listOntologies = NameSpaces.getInstance().getOntologyList();
+        if (listOntologies == null) {
+            return 0;
+        }
+        return listOntologies.size();
+    }
+
+    public static NameSpace find(String uri) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "name_str:\"" + uri + "\"");
+        query.set("rows", "10");
+        List<NameSpace> namespaces = findByQuery(query);
+        if (namespaces.isEmpty()) {
+            return null;
+        }
+        return namespaces.get(0);
     }
 
     public static NameSpace findByAbbreviation(String abbreviation) {
         SolrQuery query = new SolrQuery();
         query.set("q", "abbreviation:\"" + abbreviation + "\"");
-        query.set("rows", "10000000");
+        query.set("rows", "10");
         List<NameSpace> namespaces = findByQuery(query);
         if (namespaces.isEmpty()) {
             return null;

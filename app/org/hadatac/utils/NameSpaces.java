@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
-import org.hadatac.utils.ConfigProp;
+import org.hadatac.entity.pojo.NameSpace;
 
 public class NameSpaces {
 
@@ -23,6 +23,7 @@ public class NameSpaces {
     public static String CACHE_PREFIX = "copy-";
 
     private ConcurrentHashMap<String, NameSpace> table = new ConcurrentHashMap<String, NameSpace>();
+    private List<NameSpace> ontologyList = new ArrayList<NameSpace>();
 
     private String turtleNameSpaceList = "";
     private String sparqlNameSpaceList = "";
@@ -37,17 +38,36 @@ public class NameSpaces {
     }
 
     private NameSpaces() {
+
+        System.out.println("Instantiating NameSpaces");
+        System.out.println("  - Reading ontologies from Triple Store");
+        // LOAD FROM TRIPLESTORE AND THEN FROM NAMESPACE.PROPERTIES
         List<NameSpace> namespaces = NameSpace.findAll();
         if (namespaces.isEmpty()) {
+            System.out.println("     = Had to read from namespace.properties");
             InputStream inputStream = getClass().getClassLoader()
                     .getResourceAsStream("namespaces.properties");
             namespaces = loadFromFile(inputStream);
         }
 
+        System.out.println("  - Updating the " + namespaces.size() + " ontologies with number of Triples");
+        // LOAD NUMBER OF TRIPLES PER NAMESPACE
         for (NameSpace ns : namespaces) {
-            ns.updateLoadedTripleSize();
+            ns.updateNumberOfLoadedTriples();
+            System.out.println("       =>Updated " + ns.getAbbreviation());
             table.put(ns.getAbbreviation(), ns);
         }
+
+        System.out.println("  - Generating ordered list of ontologies");
+        // CREATE AN ORDERED LIST OF NAMESPACES (ONTOLOGIES)
+        ontologyList = getOrderedNamespacesAsList();
+
+        System.out.println("  - Update ontologies with content from the ontology itself");
+        // UPDATE THE NAMESPACES WITH CONTENT COMING FROM THE ONTOLOGIES AS PUBLISHED ON THE WEB
+        for (NameSpace ns: ontologyList) {
+            ns.updateFromTripleStore();
+        }
+
     }
 
     public String getNameByAbbreviation(String abbr) {
@@ -70,14 +90,19 @@ public class NameSpaces {
         return loadedOntologies;
     }
 
+    public List<NameSpace> getOntologyList() {
+        return ontologyList;
+    }
+
     public void reload() {
         table.clear();
         List<NameSpace> namespaces = NameSpace.findAll();
         for (NameSpace ns : namespaces) {
-            ns.updateLoadedTripleSize();
+            ns.updateFromTripleStore();
             table.put(ns.getAbbreviation(), ns);
         }
 
+        ontologyList = getOrderedNamespacesAsList();
         sparqlNameSpaceList = getSparqlNameSpaceList();
         turtleNameSpaceList = getTurtleNameSpaceList();
     }
@@ -91,7 +116,7 @@ public class NameSpaces {
             for (Map.Entry<Object, Object> nsEntry : prop.entrySet()) {
                 String nsAbbrev = ((String)nsEntry.getKey());
 
-                System.out.println("nsAbbrev = " + nsAbbrev);
+                System.out.println("NameSpaces.loadFromFile() nsAbbrev = " + nsAbbrev);
 
                 if (nsAbbrev != null) {
                     String[] tmpList = prop.getProperty(nsAbbrev).split(",");
@@ -101,7 +126,7 @@ public class NameSpaces {
                         tmpNS.setAbbreviation(nsAbbrev);
                         tmpNS.setName(tmpList[0]);
                         if (tmpList.length >= 2 && tmpList[1] != null && !tmpList[1].equals("")) {
-                            tmpNS.setType(tmpList[1]);
+                            tmpNS.setMimeType(tmpList[1]);
                         }
                         if (tmpList.length >= 3 && tmpList[2] != null && !tmpList[2].equals("")) {
                             tmpNS.setURL(tmpList[2]);
@@ -135,9 +160,8 @@ public class NameSpaces {
         return table;
     }
 
-    public List<NameSpace> getOrderedNamespacesAsList() {
+    private List<NameSpace> getOrderedNamespacesAsList() {
         List<NameSpace> nameSpaces = new ArrayList<NameSpace>(table.values());
-
         nameSpaces.sort(new Comparator<NameSpace>() {
             @Override
             public int compare(NameSpace o1, NameSpace o2) {
@@ -145,7 +169,6 @@ public class NameSpaces {
                         o2.getAbbreviation().toLowerCase());
             }
         });
-
         return nameSpaces;
     }
 

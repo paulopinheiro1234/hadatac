@@ -17,7 +17,7 @@ import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.Indicator;
 import org.hadatac.metadata.loader.*;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 
 
 public class DynamicFunctions extends Controller {

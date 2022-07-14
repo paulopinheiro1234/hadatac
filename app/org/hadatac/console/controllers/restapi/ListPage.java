@@ -13,7 +13,6 @@ import java.util.List;
 public class ListPage extends Controller {
 
     private final static int MAX_PAGE_SIZE = 80;
-    private final static String DATAFILE_URI = "http://hadatac.org/ont/hasco/DataFile";
 
     public Result getPage(String classUri, int offset, int pageSize) {
         switch (classUri) {
@@ -23,6 +22,8 @@ public class ListPage extends Controller {
                 return getVariables(offset, pageSize);
             case HASCO.DA_SCHEMA_OBJECT:
                 return getEntities(offset, pageSize);
+            case HASCO.ONTOLOGY:
+                return getOntologies(offset, pageSize);
         }
         return notFound(ApiUtil.createResponse("/api/page doss not recognize class uri " + classUri + ".", false));
     }
@@ -76,6 +77,21 @@ public class ListPage extends Controller {
         }
     }
 
+    private Result getOntologies(int offset, int pageSize) {
+        if(pageSize < 1) {
+            pageSize = MAX_PAGE_SIZE;
+            System.out.println("[RestAPI] getOntologies : Yikes! Resetting that page size for you!");
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        List<NameSpace> results = NameSpace.findWithPages(pageSize, offset);
+        if (results == null) {
+            return notFound(ApiUtil.createResponse("No ontology has been found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }
+
     public Result getPageSize(String classUri) {
         switch (classUri) {
             case HASCO.STUDY:
@@ -84,6 +100,8 @@ public class ListPage extends Controller {
                 return getVariablesSize();
             case HASCO.DA_SCHEMA_OBJECT:
                 return getEntitiesSize();
+            case HASCO.ONTOLOGY:
+                return getOntologiesSize();
         }
         return notFound(ApiUtil.createResponse("/api/page doss not recognize class uri " + classUri + ".", false));
     }
@@ -115,6 +133,17 @@ public class ListPage extends Controller {
         int results = DataAcquisitionSchemaObject.getNumberDASOs();
         if(results <= 0){
             return notFound(ApiUtil.createResponse("No entity has been found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }
+
+    private Result getOntologiesSize() {
+        ObjectMapper mapper = new ObjectMapper();
+        int results = NameSpace.getNumberOntologies();
+        if(results <= 0){
+            return notFound(ApiUtil.createResponse("No ontology has been found", false));
         } else {
             JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
             return ok(ApiUtil.createResponse(jsonObject, true));

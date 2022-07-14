@@ -1089,6 +1089,11 @@ public class RestApi extends Controller {
                 return processResult(dataFileResult, dataFileResult.getUri());
             }
 
+            NameSpace nameSpaceResult = NameSpace.find(uri);
+            if (nameSpaceResult != null && nameSpaceResult.getTypeUri() != null && nameSpaceResult.getTypeUri().equals(HASCO.ONTOLOGY)) {
+                return processResult(nameSpaceResult, nameSpaceResult.getUri());
+            }
+
             /*
              *  Now uses GenericInstance to process URI against TripleStore content
              */

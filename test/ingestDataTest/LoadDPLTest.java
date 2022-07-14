@@ -13,13 +13,11 @@ import org.hadatac.console.controllers.annotator.AutoAnnotator;
 import org.hadatac.data.loader.AnnotationWorker;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Deployment;
-import org.hadatac.entity.pojo.Instrument;
-import org.hadatac.entity.pojo.InstrumentType;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.Platform;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.NameSpace;
+import org.hadatac.entity.pojo.NameSpace;
 import org.hadatac.utils.State;
 
 public class LoadDPLTest extends StepTest{
