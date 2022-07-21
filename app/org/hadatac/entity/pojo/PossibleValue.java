@@ -19,7 +19,7 @@ import org.hadatac.annotations.PropertyField;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

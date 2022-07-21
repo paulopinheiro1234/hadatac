@@ -13,12 +13,15 @@ import org.apache.solr.common.util.NamedList;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.vocabularies.HASCO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class VariableSpec {
+public class VariableSpec extends HADatAcThing {
+
+	private static final String className = "hasco:VariableSpec";
 
 	private static final Logger log = LoggerFactory.getLogger(VariableSpec.class);
 	public static final String LABEL_SEPARATOR = "|";
@@ -60,6 +63,8 @@ public class VariableSpec {
 	}
 
 	public VariableSpec() {
+    	this.typeUri = HASCO.VARIABLE_SPEC;
+    	this.hascoTypeUri = HASCO.VARIABLE_SPEC;
 	}
 
     public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
@@ -71,6 +76,8 @@ public class VariableSpec {
     }
 
     public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
+		this.typeUri = HASCO.VARIABLE_SPEC;
+		this.hascoTypeUri = HASCO.VARIABLE_SPEC;
     	this.ent = entRole.getEntity();
     	this.role = entRole.getRole();
     	this.attrList = attrInRel.getAttributeList();
@@ -113,7 +120,11 @@ public class VariableSpec {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+    	this.name = name;
+	}
+
+	public String getLabel() {
+    	return this.name;
 	}
 
 	public Entity getEntity() {
@@ -425,8 +436,17 @@ public class VariableSpec {
     	return str;
     }
 
-
 	// getStudyVariables()
 	// getStudyVariablesWithLabels(Study studyUri)
+
+	@Override
+	public boolean saveToSolr() {
+		return true;
+	}
+
+	@Override
+	public int deleteFromSolr() {
+		return 0;
+	}
 
 }

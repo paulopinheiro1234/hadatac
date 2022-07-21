@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -13,12 +15,13 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 
+@JsonFilter("sddObjectFilter")
 public class DataAcquisitionSchemaObject extends HADatAcThing {
 
     public static String INDENT1 = "     ";
@@ -113,12 +116,20 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         this.label = label;
     }
 
+    @JsonIgnore
     public String getPartOfSchema() {
         return partOfSchema;
     }
 
     public void setPartOfSchema(String partOfSchema) {
         this.partOfSchema = partOfSchema;
+    }
+
+    public DataAcquisitionSchema getSDD() {
+        if (partOfSchema == null) {
+            return null;
+        }
+        return DataAcquisitionSchema.find(partOfSchema);
     }
 
     public String getPosition() {
@@ -284,6 +295,11 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
         //System.out.println("RELATION label : <" + relationLabel + ">");
         return relationLabel;
     }
+
+    public List<Measurement> getValues() {
+        return Measurement.findByConceptAndUri(HASCO.DA_SCHEMA_OBJECT, uri);
+    }
+
 
     public static DataAcquisitionSchemaObject find(String uri) {
         if (DataAcquisitionSchemaObject.getCache().containsKey(uri)) {

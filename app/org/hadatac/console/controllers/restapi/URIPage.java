@@ -3,9 +3,11 @@ package org.hadatac.console.controllers.restapi;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.hadatac.entity.pojo.*;
 import org.hadatac.utils.ApiUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -25,12 +27,17 @@ public class URIPage extends Controller {
 
             Measurement measurementResult = Measurement.find(uri);
             if (measurementResult != null && measurementResult.getTypeUri() != null && measurementResult.getTypeUri().equals(HASCO.VALUE)) {
-                return processResult(measurementResult, measurementResult.getUri());
+                return processResult(measurementResult, HASCO.VALUE, measurementResult.getUri());
             }
 
             DataFile dataFileResult = DataFile.findByUri(uri);
             if (dataFileResult != null && dataFileResult.getTypeUri() != null && dataFileResult.getTypeUri().equals(HASCO.DATA_FILE)) {
-                return processResult(dataFileResult, dataFileResult.getUri());
+                return processResult(dataFileResult, HASCO.DATA_FILE, dataFileResult.getUri());
+            }
+
+            NameSpace nameSpaceResult = NameSpace.find(uri);
+            if (nameSpaceResult != null && nameSpaceResult.getTypeUri() != null && nameSpaceResult.getTypeUri().equals(HASCO.ONTOLOGY)) {
+                return processResult(nameSpaceResult, HASCO.ONTOLOGY, nameSpaceResult.getUri());
             }
 
             /*
@@ -40,15 +47,20 @@ public class URIPage extends Controller {
             Object finalResult = null;
             String typeUri = null;
             GenericInstance result = GenericInstance.find(uri);
-            //System.out.println("inside getUri(): URI [" + uri + "]");
+            System.out.println("inside getUri(): URI [" + uri + "]");
 
             if (result == null) {
                 return notFound(ApiUtil.createResponse("No instance found for uri [" + uri + "]", false));
             }
 
+            /*
             if (result.getHascoTypeUri() == null || result.getHascoTypeUri().isEmpty()) {
-                return notFound(ApiUtil.createResponse("No valid HASCO type found for uri [" + uri + "]", false));
+                System.out.println("inside getUri(): typeUri [" + result.getTypeUri() + "]");
+                if (!result.getTypeUri().equals("http://www.w3.org/2002/07/owl#Class")) {
+                    return notFound(ApiUtil.createResponse("No valid HASCO type found for uri [" + uri + "]", false));
+                }
             }
+             */
 
             if (result.getHascoTypeUri().equals(HASCO.STUDY)) {
                 finalResult = Study.find(uri);
@@ -110,6 +122,14 @@ public class URIPage extends Controller {
                 if (finalResult != null) {
                     typeUri = ((Detector) finalResult).getHascoTypeUri();
                 }
+                /*
+            } else if (result.getTypeUri().equals("http://www.w3.org/2002/07/owl#Class")) {
+                finalResult = HADatAcClass.find(uri);
+
+                if (finalResult != null) {
+                    typeUri = ((HADatAcClass) finalResult).getHascoTypeUri();
+                }
+                 */
             } else {
                 finalResult = result;
                 if (finalResult != null) {
@@ -122,7 +142,7 @@ public class URIPage extends Controller {
 
             // list object properties and associated classes
 
-            return processResult(finalResult, uri);
+            return processResult(finalResult, result.getHascoTypeUri(), uri);
         } catch (Exception e) {
             e.printStackTrace();
             return badRequest(ApiUtil.createResponse("Error processing URI [" + uri + "]", false));
@@ -130,15 +150,87 @@ public class URIPage extends Controller {
 
     }
 
-    private Result processResult(Object result, String uri) {
+    private Result processResult(Object result, String typeResult, String uri) {
         ObjectMapper mapper = new ObjectMapper();
-        //System.out.println("[RestAPI] processing object: " + uri);
+        SimpleFilterProvider filterProvider = new SimpleFilterProvider();
+
+        // STUDY OBJECT
+        if (typeResult.equals(HASCO.STUDY)) {
+            filterProvider.addFilter("studyFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("studyFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // STUDY OBJECT
+        if (typeResult.equals(HASCO.OBJECT_COLLECTION)) {
+            filterProvider.addFilter("studyObjectFilter", SimpleBeanPropertyFilter.serializeAllExcept("measurements"));
+        } else if (typeResult.equals(HASCO.STUDY_OBJECT)) {
+            filterProvider.addFilter("studyObjectFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("studyObjectFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // DEPLOYMENT
+        if (typeResult.equals(HASCO.DEPLOYMENT)) {
+            filterProvider.addFilter("deploymentFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("deploymentFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // STR
+        if (typeResult.equals(HASCO.DATA_ACQUISITION)) {
+            filterProvider.addFilter("strFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("strFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // DATA FILE
+        if (typeResult.equals(HASCO.DATA_FILE)) {
+            filterProvider.addFilter("dataFileFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("dataFileFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // DA_SCHEMA
+        if (typeResult.equals(HASCO.DA_SCHEMA)) {
+            filterProvider.addFilter("sddFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("sddFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // DA_SCHEMA_ATTRIBUTE
+        if (typeResult.equals(HASCO.DA_SCHEMA_ATTRIBUTE)) {
+            filterProvider.addFilter("variableFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("variableFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        // DA_SCHEMA_OBJECT
+        if (typeResult.equals(HASCO.DA_SCHEMA_OBJECT)) {
+            filterProvider.addFilter("sddObjectFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("sddObjectFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
+        mapper.setFilterProvider(filterProvider);
+
+
+        System.out.println("[RestAPI] generating JSON for following object: " + uri);
         JsonNode jsonObject = null;
         try {
             ObjectNode obj = mapper.convertValue(result, ObjectNode.class);
             jsonObject = mapper.convertValue(obj, JsonNode.class);
-            //System.out.println(prettyPrintJsonString(jsonObject));
+            System.out.println(prettyPrintJsonString(jsonObject));
         } catch (Exception e) {
+            e.printStackTrace();
             return badRequest(ApiUtil.createResponse("Error processing the json object for URI [" + uri + "]", false));
         }
         return ok(ApiUtil.createResponse(jsonObject, true));

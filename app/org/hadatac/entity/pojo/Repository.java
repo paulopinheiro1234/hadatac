@@ -1,20 +1,12 @@
 package org.hadatac.entity.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocument;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
-import org.hadatac.console.controllers.metadata.DynamicFunctions;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
@@ -22,7 +14,7 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -32,7 +24,6 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

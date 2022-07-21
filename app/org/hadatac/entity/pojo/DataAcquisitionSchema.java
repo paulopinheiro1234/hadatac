@@ -6,10 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -18,14 +15,13 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
 
+@JsonFilter("sddFilter")
 public class DataAcquisitionSchema extends HADatAcThing {
     public static String INDENT1 = "     ";
     public static String INSERT_LINE1 = "INSERT DATA {  ";
@@ -258,6 +254,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
             return -1;
         }
         return objects.size();
+    }
+
+    public List<STR> getUsedByStreams() {
+        return STR.findBySDD(this.uri);
     }
 
     public List<DataAcquisitionSchemaAttribute> getAttributes() {

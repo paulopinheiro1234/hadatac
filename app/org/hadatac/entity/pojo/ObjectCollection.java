@@ -25,7 +25,7 @@ import org.hadatac.annotations.ObjectProperty;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;

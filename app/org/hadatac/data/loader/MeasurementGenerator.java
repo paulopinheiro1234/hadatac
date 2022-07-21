@@ -29,7 +29,7 @@ import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 
 public class MeasurementGenerator extends BaseGenerator {
 

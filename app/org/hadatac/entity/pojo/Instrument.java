@@ -17,7 +17,7 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

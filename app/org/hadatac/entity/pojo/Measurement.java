@@ -35,7 +35,7 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Feedback;
 import org.slf4j.Logger;
@@ -1327,6 +1327,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         return null;
     }
 
+    /**
     public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
         List<Measurement> listMeasurement = new ArrayList<Measurement>();
 
@@ -1352,7 +1353,52 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         return listMeasurement;
     }
+     */
 
+    /* Possible concepts:
+         - HASCO.DATA_ACQUISITION
+         - HASCO.STUDY_OBJECT
+         - HASCO.DA_SCHEMA_ATTRIBUTE
+         - HASCO.DA_SCHEMA_OBJECT
+         - HASCO.DATA_FILE
+     */
+    public static List<Measurement> findByConceptAndUri(String concept_uri, String uri) {
+        List<Measurement> listMeasurement = new ArrayList<Measurement>();
+
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+        SolrQuery query = new SolrQuery();
+        if (concept_uri.equals(HASCO.DATA_ACQUISITION)) {
+            query.set("q", "acquisition_uri_str:\"" + uri + "\"");
+        } else if (concept_uri.equals(HASCO.STUDY_OBJECT)) {
+            query.set("q", "object_uri_str:\"" + uri + "\"");
+        } else if (concept_uri.equals(HASCO.DA_SCHEMA_ATTRIBUTE)) {
+            query.set("q", "dasa_uri_str:\"" + uri + "\"");
+        } else if (concept_uri.equals(HASCO.DA_SCHEMA_OBJECT)) {
+            query.set("q", "daso_uri_str:\"" + uri + "\"");
+        } else if (concept_uri.equals(HASCO.DATA_FILE)) {
+            query.set("q", "dataset_uri_str:\"" + uri + "\"");
+        }
+        query.set("rows", "10000000");
+
+        try {
+            QueryResponse response = solr.query(query);
+            solr.close();
+            SolrDocumentList results = response.getResults();
+            Iterator<SolrDocument> i = results.iterator();
+            while (i.hasNext()) {
+                Measurement measurement = convertFromSolr(i.next(), null, new HashMap<>());
+                listMeasurement.add(measurement);
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Measurement.findByDataAcquisitionUri(acquisition_uri) - Exception message: "
+                    + e.getMessage());
+        }
+
+        return listMeasurement;
+    }
+
+    /*
     public static List<Measurement> findByObjectUri(String obj_uri) {
 
     	List<Measurement> listMeasurement = new ArrayList<Measurement>();
@@ -1379,6 +1425,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         return listMeasurement;
     }
+     */
 
     public static Map<String, String> generateCachedLabel(List<String> uris) {
         Map<String, String> results = new HashMap<String, String>();

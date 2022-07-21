@@ -385,8 +385,8 @@ public class HADatAcClass extends HADatAcThing {
             }
 
             TreeNode result = buildTree(branchCollection);
-            if (result.getChildren() == null) {
-                return null;
+            if (result.getChildren() == null || result.getChildren().size() <= 0) {
+                return new TreeNode("");
             }
             return result.getChildren().get(0);
 

@@ -1,5 +1,6 @@
 package org.hadatac.entity.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.ResultSetRewindable;
@@ -9,7 +10,6 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.hadatac.annotations.ObjectProperty;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
 import org.hadatac.console.http.SPARQLUtils;
@@ -19,6 +19,7 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@JsonFilter("studyObjectFilter")
 public class StudyObject extends HADatAcThing {
 
     public static String HASCO_TYPE_URI = "http://hadatac.org/ont/hasco/StudyObject";
@@ -598,7 +600,7 @@ public class StudyObject extends HADatAcThing {
     }
 
     public List<Measurement> getMeasurements() {
-        return Measurement.findByObjectUri(uri);
+        return Measurement.findByConceptAndUri(HASCO.STUDY_OBJECT, uri);
     }
 
     public static StudyObject findFacetSearch(String obj_uri, String studyId) {

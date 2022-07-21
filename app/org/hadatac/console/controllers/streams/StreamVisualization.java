@@ -1,34 +1,20 @@
 package org.hadatac.console.controllers.streams;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
+import org.hadatac.vocabularies.HASCO;
 import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 
 import org.hadatac.console.views.html.streams.*;
-import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.http.DeploymentQueries;
-import org.hadatac.console.models.DeploymentForm;
-import org.hadatac.console.models.SparqlQueryResults;
-import org.hadatac.console.models.TripleDocument;
-import org.hadatac.entity.pojo.STR;
-import org.hadatac.entity.pojo.Deployment;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.Platform;
-import org.hadatac.utils.State;
-
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 
 import javax.inject.Inject;
 
@@ -54,7 +40,7 @@ public class StreamVisualization extends Controller {
         if (da_uri == null || da_uri.isEmpty()) {
             return ok(genericVisualization.render(dir, filename, da_uri, "[]", "", "", application.getUserEmail(request)));
         }
-        List<Measurement> measurements = Measurement.findByDataAcquisitionUri(da_uri);
+        List<Measurement> measurements = Measurement.findByConceptAndUri(HASCO.DATA_ACQUISITION, da_uri);
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-05:00"));
         System.out.println("Stream Visualization: da_uri=" + da_uri);
         System.out.println("Stream Visualization: size measurements =" + measurements.size());

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hadatac.vocabularies.HASCO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.hadatac.entity.pojo.Measurement;
@@ -82,7 +83,7 @@ public class ObjectForceFieldGraph {
     }
 
     private void addObjectProperties(StudyObject obj, OCNode dependedOn) {
-        List<Measurement> measurements = Measurement.findByObjectUri(obj.getUri());
+        List<Measurement> measurements = Measurement.findByConceptAndUri(HASCO.STUDY_OBJECT, obj.getUri());
         //System.out.println("ObjectForceField: total_properties=" + measurements.size());
         for (Measurement m : measurements) {
             //System.out.println("ObjectForceField: label=" + m.getLabel());

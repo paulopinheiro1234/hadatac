@@ -32,7 +32,7 @@ import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 
 public class NameSpace extends HADatAcThing {
@@ -234,13 +234,13 @@ public class NameSpace extends HADatAcThing {
             RepositoryConnection con = repo.getConnection();
             ValueFactory factory = repo.getValueFactory();
 
-            System.out.println("Loading triples from " + address);
+            //System.out.println("Loading triples from " + address);
             if (fromRemote) {
                 con.add(new URL(address), "", getRioFormat(getMimeType()), (Resource)factory.createIRI(getName()));
             } else {
                 con.add(new File(address), "", getRioFormat(getMimeType()), (Resource)factory.createIRI(getName()));
             }
-            System.out.println("Loaded triples from " + address + " \n");
+            //System.out.println("Loaded triples from " + address + " \n");
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: address " + address);
             System.out.println("NotFoundException: " + e.getMessage());

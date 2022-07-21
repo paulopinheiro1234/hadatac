@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -19,16 +20,18 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.State;
+import org.hadatac.vocabularies.PROV;
+import org.hadatac.vocabularies.RDF;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-
+@JsonFilter("deploymentFilter")
 public class Deployment extends HADatAcThing {
 
     public static String INDENT1 = "     ";
@@ -252,7 +255,11 @@ public class Deployment extends HADatAcThing {
                 deployment.platform = Platform.find(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals(HASCO.HAS_DETECTOR)) {
                 deployment.detectors.add(Detector.find(object.asResource().getURI()));
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/ns/prov#startedAtTime")) {
+            } else if (statement.getPredicate().getURI().equals(RDF.TYPE)) {
+                deployment.setTypeUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
+                deployment.setHascoTypeUri(object.asResource().getURI());
+            } else if (statement.getPredicate().getURI().equals(PROV.START_AT_TIME)) {
                 deployment.setStartedAtXsdWithMillis(object.asLiteral().getString());
             }
         }

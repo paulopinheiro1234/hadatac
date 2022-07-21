@@ -13,7 +13,7 @@ import org.hadatac.entity.pojo.StudyObjectMatching;
 import org.hadatac.entity.pojo.Study;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 
 import java.lang.String;
 import java.util.concurrent.ConcurrentHashMap;

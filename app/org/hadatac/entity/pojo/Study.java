@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -23,15 +24,13 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.hadatac.annotations.PropertyField;
 import org.hadatac.annotations.PropertyValueType;
-import org.hadatac.annotations.ObjectProperty;
 import org.hadatac.console.controllers.metadata.DynamicFunctions;
-import org.hadatac.console.controllers.restapi.ObjectPropertyResponse;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.metadata.loader.URIUtils;
@@ -43,7 +42,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@JsonFilter("studyFilter")
 public class Study extends HADatAcThing {
 
     private static final Logger log = LoggerFactory.getLogger(Study.class);

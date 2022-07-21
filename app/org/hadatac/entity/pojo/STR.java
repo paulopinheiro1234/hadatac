@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.WordUtils;
@@ -29,7 +30,7 @@ import org.hadatac.console.models.Facetable;
 import org.hadatac.console.models.Pivot;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.State;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -38,6 +39,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 //import io.ebeaninternal.server.lib.util.Str;
 
+@JsonFilter("strFilter")
 public class STR extends HADatAcThing implements Comparable<STR> {
     private static final String className = "hasco:DataAcquisition";
 
@@ -752,6 +754,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return datasetURIs.contains(uri);
     }
 
+    public List<Measurement> getValues() {
+        return Measurement.findByConceptAndUri(HASCO.DATA_ACQUISITION, uri);
+    }
+
     public void addNumberDataPoints(long number) {
         numberDataPoints += number;
     }
@@ -1149,6 +1155,15 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     public static List<STR> find(String ownerUri) {
         SolrQuery query = new SolrQuery();
         query.set("q", "owner_uri_str:\"" + ownerUri + "\"");
+        query.set("sort", "started_at_date asc");
+        query.set("rows", "10000000");
+
+        return findByQuery(query);
+    }
+
+    public static List<STR> findBySDD(String sddUri) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "schema_uri_str:\"" + sddUri + "\"");
         query.set("sort", "started_at_date asc");
         query.set("rows", "10000000");
 

@@ -1,5 +1,6 @@
 package org.hadatac.entity.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.io.FilenameUtils;
@@ -23,7 +24,7 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@JsonFilter("dataFileFilter")
 public class DataFile extends HADatAcThing implements Cloneable {
 
     // Process status for auto-annotator
@@ -147,6 +148,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         return false;
     }
 
+    @JsonIgnore
     public boolean getAllowViewing() {
         return allowViewing;
     }
@@ -154,6 +156,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowViewing = allowViewing;
     }
 
+    @JsonIgnore
     public boolean getAllowEditing() {
         return allowEditing;
     }
@@ -161,6 +164,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowEditing = allowEditing;
     }
 
+    @JsonIgnore
     public boolean getAllowRenaming() {
         return allowRenaming;
     }
@@ -168,6 +172,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowRenaming = allowRenaming;
     }
 
+    @JsonIgnore
     public boolean getAllowMoving() {
         return allowMoving;
     }
@@ -175,6 +180,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowMoving = allowMoving;
     }
 
+    @JsonIgnore
     public boolean getAllowDeleting() {
         return allowDeleting;
     }
@@ -182,6 +188,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowDeleting = allowDeleting;
     }
 
+    @JsonIgnore
     public boolean getAllowSharing() {
         return allowSharing;
     }
@@ -189,6 +196,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowSharing = allowSharing;
     }
 
+    @JsonIgnore
     public boolean getAllowDownloading() {
         return allowDownloading;
     }
@@ -196,6 +204,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowDownloading = allowDownloading;
     }
 
+    @JsonIgnore
     public boolean getAllowIngesting() {
         return allowIngesting;
     }
@@ -203,6 +212,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.allowIngesting = allowIngesting;
     }
 
+    @JsonIgnore
     public boolean getAllowVerifying() {
         return allowVerifying;
     }
@@ -237,6 +247,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         }
     }
 
+    @JsonIgnore
     public String getId() {
         return id;
     }
@@ -244,6 +255,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.id = id;
     }
 
+    @JsonIgnore
     public String getViewableId() {
         return viewableId;
     }
@@ -251,6 +263,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.viewableId = viewableId;
     }
 
+    @JsonIgnore
     public String getEditableId() {
         return editableId;
     }
@@ -258,6 +271,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.editableId = editableId;
     }
 
+    @JsonIgnore
     public String getAbsolutePath() {
         if (Arrays.asList(UNPROCESSED, FREEZED).contains(getStatus())) {
             return Paths.get(ConfigProp.getPathUnproc(), getDir(), getStorageFileName()).toString();
@@ -274,6 +288,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         return "";
     }
 
+    @JsonIgnore
     public static String getMediaUrl(String filename) {
     	if (filename == null || !filename.startsWith("file:///media/")) {
     		return "";
@@ -283,6 +298,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
     			filename.replace("file:///", "");
     }
 
+    @JsonIgnore
     public AnnotationLogger getLogger() {
         return logger;
     }
@@ -290,6 +306,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.logger = logger;
     }
 
+    @JsonIgnore
     public RecordFile getRecordFile() {
         return recordFile;
     }
@@ -302,14 +319,17 @@ public class DataFile extends HADatAcThing implements Cloneable {
         return file;
     }
 
+    @JsonIgnore
     public String getBaseName() {
         return FilenameUtils.getBaseName(fileName);
     }
 
+    @JsonIgnore
     public String getFileExtention() {
         return FilenameUtils.getExtension(fileName);
     }
 
+    @JsonIgnore
     public String getOwnerEmail() {
         return ownerEmail;
     }
@@ -317,6 +337,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.ownerEmail = ownerEmail;
     }
 
+    @JsonIgnore
     public List<String> getViewerEmails() {
         return viewerEmails;
     }
@@ -334,6 +355,7 @@ public class DataFile extends HADatAcThing implements Cloneable {
         }
     }
 
+    @JsonIgnore
     public List<String> getEditorEmails() {
         return editorEmails;
     }
@@ -351,18 +373,30 @@ public class DataFile extends HADatAcThing implements Cloneable {
         }
     }
 
+    @JsonIgnore
     public String getStudyUri() {
         return studyUri;
     }
+
+    public Study getStudy() {
+        return Study.find(studyUri);
+    }
+
     public void setStudyUri(String studyUri) {
         this.studyUri = studyUri;
     }
 
+    @JsonIgnore
     public String getDataAcquisitionUri() {
         return dataAcquisitionUri;
     }
+
     public void setDataAcquisitionUri(String dataAcquisitionUri) {
         this.dataAcquisitionUri = dataAcquisitionUri;
+    }
+
+    public STR getDataStream() {
+        return STR.findByUri(URIUtils.replacePrefixEx(dataAcquisitionUri));
     }
 
     @Override
@@ -385,9 +419,11 @@ public class DataFile extends HADatAcThing implements Cloneable {
         return this.datasetUri;
     }
 
+    @JsonIgnore
     public String getDatasetUri() {
         return datasetUri;
     }
+
     public void setDatasetUri(String datasetUri) {
         this.datasetUri = datasetUri;
     }
@@ -400,6 +436,10 @@ public class DataFile extends HADatAcThing implements Cloneable {
     @Override
     public String getLabel() {
         return this.fileName;
+    }
+
+    public List<Measurement> getValues() {
+        return Measurement.findByConceptAndUri(HASCO.DATA_FILE, this.datasetUri);
     }
 
     public String getFileName() {
@@ -420,10 +460,12 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.dir = dir;
     }
 
+    @JsonIgnore
     public String getPureFileName() {
         return Paths.get(fileName).getFileName().toString();
     }
 
+    @JsonIgnore
     public String getStorageFileName() {
         if (FilenameUtils.getExtension(fileName).isEmpty()) {
             return fileName;

@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -15,12 +17,13 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.HASCO;
+import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.http.SPARQLUtils;
 
+@JsonFilter("variableFilter")
 public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
     public static String INDENT1 = "     ";
@@ -121,7 +124,14 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.daseUri = daseUri;
         this.dasoUri = dasoUri;
 
+        populateVariableSpec();
+
+        DataAcquisitionSchemaAttribute.getCache();
+    }
+
+    private void populateVariableSpec() {
         this.varSpec = new VariableSpec();
+        this.varSpec.setUri(uri.replace("DASA-","VAR-SPEC-"));
         if (entity != null && !entity.isEmpty()) {
             this.varSpec.setEntity(Entity.find(entity));
         }
@@ -142,8 +152,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
         //this.varSpec.setTime();
         this.varSpec.setName(this.varSpec.toString());
-
-        DataAcquisitionSchemaAttribute.getCache();
     }
 
     public String getUri() {
@@ -186,12 +194,20 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.label = label;
     }
 
+    @JsonIgnore
     public String getPartOfSchema() {
         if (partOfSchema == null) {
             return "";
         } else {
             return partOfSchema;
         }
+    }
+
+    public DataAcquisitionSchema getSDD() {
+        if (partOfSchema == null) {
+            return null;
+        }
+        return DataAcquisitionSchema.find(partOfSchema);
     }
 
     public void setPartOfSchema(String partOfSchema) {
@@ -266,6 +282,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getAnnotatedEntity() {
         String annotation;
         if (entityLabel.equals("")) {
@@ -323,6 +340,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return result;
     }
 
+    @JsonIgnore
     public List<String> getAttributeNamespace() {
         if (attributes == Arrays.asList("")) {
             return attributes;
@@ -558,7 +576,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public VariableSpec getVariableSpec() {
-        return varSpec;
+        populateVariableSpec();
+        return this.varSpec;
     }
 
     public static int getNumberDASAs() {
@@ -594,6 +613,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 "   ?dasaUri hasco:partOfSchema ?dasUri . " +
                 "   ?dasaUri rdfs:label ?dasaLabel . " +
                 " }" +
+                " ORDER BY ASC(?dasaLabel)" +
                 " LIMIT " + pageSize +
                 " OFFSET " + offset;
 
@@ -767,6 +787,11 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return dasa;
     }
 
+    public List<Measurement> getValues() {
+        return Measurement.findByConceptAndUri(HASCO.DA_SCHEMA_ATTRIBUTE, uri);
+    }
+
+
     // Given a study URI, 
     // returns a list of DASA's
     // (we need to go study -> data acqusition(s) -> data acqusition schema(s) -> data acquisition schema attributes)
@@ -853,7 +878,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     public static List<DataAcquisitionSchemaAttribute> findBySchema(String schemaUri) {
         //System.out.println("Looking for data acquisition schema attributes for <" + schemaUri + ">");
 
-        List<DataAcquisitionSchemaAttribute> attributes = new ArrayList<DataAcquisitionSchemaAttribute>();
+        List<DataAcquisitionSchemaAttribute> variables = new ArrayList<DataAcquisitionSchemaAttribute>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT ?uri ?label WHERE { \n" + 
                 " ?uri a hasco:DASchemaAttribute . \n" + 
@@ -866,8 +891,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
-            System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find attributes for schema: <" + schemaUri + ">");
-            return attributes;
+            System.out.println("[WARNING] DataAcquisitionSchemaAttribute. Could not find variables for schema: <" + schemaUri + ">");
+            return variables;
         }
 
         while (resultsrw.hasNext()) {
@@ -875,17 +900,17 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             try {
                 if (soln.getResource("uri") != null && soln.getResource("uri").getURI() != null) {
                     String uri = soln.getResource("uri").getURI();
-                    DataAcquisitionSchemaAttribute attr = find(uri);
-                    attributes.add(attr);
+                    DataAcquisitionSchemaAttribute variable = find(uri);
+                    variables.add(variable);
                 }
             } catch (Exception e1) {
                 System.out.println("[ERROR] DataAcquisitionSchemaAttribute.findBySchema() URI: <" + schemaUri + ">");
                 e1.printStackTrace();
             }
         }
-        attributes.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
+        variables.sort(Comparator.comparing(DataAcquisitionSchemaAttribute::getPositionInt));
 
-        return attributes;
+        return variables;
     }
 
     @Override
