@@ -337,6 +337,10 @@ public class DataFile extends HADatAcThing implements Cloneable {
         this.ownerEmail = ownerEmail;
     }
 
+    public User getDataOwner() {
+        return User.findByEmail(this.ownerEmail);
+    }
+
     @JsonIgnore
     public List<String> getViewerEmails() {
         return viewerEmails;

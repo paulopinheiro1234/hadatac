@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -35,50 +36,19 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.vocabularies.FOAF;
+import org.hadatac.vocabularies.HASCO;
+import org.hadatac.vocabularies.RDFS;
 
-public class User implements Comparable<User> {
-    private String uri;
-    private String given_name;
-    private String family_name;
-    private String name;
+public class User extends Agent {
+
     private String email;
     private String homepage;
     private String comment;
     private String org_uri;
     private String immediateGroupUri;
 
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public String getGivenName() {
-        return given_name;
-    }
-
-    public void setGivenName(String name) {
-        this.given_name = name;
-    }
-
-    public String getFamilyName() {
-        return family_name;
-    }
-
-    public void setFamilyName(String name) {
-        this.family_name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    @JsonIgnore
     public String getEmail() {
         return email;
     }
@@ -103,6 +73,31 @@ public class User implements Comparable<User> {
         this.comment = comment;
     }
 
+    @Override
+    public String getLabel() {
+        if (this.label == null || label.isEmpty()) {
+            return this.name;
+        }
+        return this.label;
+    }
+
+    @Override
+    public String getTypeUri() {
+        if (this.typeUri == null || typeUri.isEmpty()) {
+            return FOAF.PERSON;
+        }
+        return this.typeUri;
+    }
+
+    @Override
+    public String getHascoTypeUri() {
+        if (this.hascoTypeUri == null || hascoTypeUri.isEmpty()) {
+            return HASCO.USER;
+        }
+        return this.hascoTypeUri;
+    }
+
+    @JsonIgnore
     public String getImmediateGroupUri() {
         return immediateGroupUri;
     }
@@ -119,6 +114,7 @@ public class User implements Comparable<User> {
         org_uri = uri;
     }
 
+    @JsonIgnore
     public boolean isAdministrator() {
         SysUser user = SysUser.findByEmail(getEmail());
         if(null != user){
@@ -127,6 +123,7 @@ public class User implements Comparable<User> {
         return false;
     }
 
+    @JsonIgnore
     public boolean isValidated() {
         SysUser user = SysUser.findByEmail(getEmail());
         if(null != user) {
@@ -135,6 +132,7 @@ public class User implements Comparable<User> {
         return false;
     }
 
+    @JsonIgnore
     public void getGroupNames(List<String> accessLevels) {
         if(getImmediateGroupUri() != null) {
             User user = UserGroup.find(getImmediateGroupUri());
@@ -150,13 +148,12 @@ public class User implements Comparable<User> {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += "INSERT DATA {  ";
-        insert += "<" + this.getUri() + "> a foaf:Person . \n";
-        insert += "<" + this.getUri() + ">  ";
-        insert += " foaf:mbox " + "\"" + this.email + "\" . ";
-        insert += "<" + this.getUri() + ">  ";
-        insert += " sio:SIO_000095 " + "\"Public\" . ";
+        insert += "<" + this.getUri() + "> a <" + FOAF.PERSON + "> . \n";
+        insert += "<" + this.getUri() + "> hasco:hascoType <" + HASCO.USER + "> . \n";
+        insert += "<" + this.getUri() + "> foaf:mbox \"" + this.email + "\" . ";
+        insert += "<" + this.getUri() + "> sio:SIO_000095 \"Public\" . ";
         insert += "}  ";
-        System.out.println("!!!! INSERT USER");
+        //System.out.println("!!!! INSERT USER");
 
         try {
             UpdateRequest request = UpdateFactory.create(insert);
@@ -202,6 +199,7 @@ public class User implements Comparable<User> {
         return result;
     }
 
+    @JsonIgnore
     public static List<String> getUserEmails() {
         List<String> emails = new ArrayList<String>();
         for (User user : find()) {
@@ -211,6 +209,7 @@ public class User implements Comparable<User> {
         return emails;
     }
 
+    @JsonIgnore
     public static List<String> getUserURIs() {
         List<String> listUri = new ArrayList<String>();
         for (User user : find()) {
@@ -222,8 +221,7 @@ public class User implements Comparable<User> {
 
     public static List<User> find() {
         List<User> users = new ArrayList<User>();
-        String queryString = 
-                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+        String queryString = "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
                         "SELECT ?uri WHERE { " +
                         "  ?uri a foaf:Person . " +
@@ -243,6 +241,29 @@ public class User implements Comparable<User> {
         java.util.Collections.sort((List<User>) users);
         return users;
     }
+
+    public static User findByEmail(String email) {
+        String queryString =
+                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+                "SELECT ?uri WHERE { " +
+                "  ?uri a foaf:Person . " +
+                "  ?uri foaf:mbox \"" + email + "\" . " +
+                "} ";
+
+        ResultSetRewindable resultsrw = SPARQLUtils.select(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
+
+        if (resultsrw.hasNext()) {
+            QuerySolution soln = resultsrw.next();
+            User user = find(soln.getResource("uri").getURI());
+            if (null != user) {
+                return user;
+            }
+        }
+        return null;
+    }
+
 
     public static User find(String uri) {	
         User user = null;
@@ -268,7 +289,7 @@ public class User implements Comparable<User> {
             }
 
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+            if (statement.getPredicate().getURI().equals(RDFS.COMMENT)) {
                 user.setComment(object.asLiteral().getString());
             }
             else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("sio:SIO_000095"))) {
@@ -279,20 +300,20 @@ public class User implements Comparable<User> {
                     user.setImmediateGroupUri(object.asResource().toString());
                 }
             }
-            else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/givenName")) {
+            else if (statement.getPredicate().getURI().equals(FOAF.GIVEN_NAME)) {
                 user.setGivenName(object.asLiteral().getString());
             }
-            else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/familyName")) {
+            else if (statement.getPredicate().getURI().equals(FOAF.FAMILY_NAME)) {
                 user.setFamilyName(object.asLiteral().getString());
             }
-            else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/name")) {
+            else if (statement.getPredicate().getURI().equals(FOAF.NAME)) {
                 user.setName(object.asLiteral().getString());
             }
-            else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/mbox")) {
+            else if (statement.getPredicate().getURI().equals(FOAF.MBOX)) {
                 user.setEmail(object.asLiteral().getString());
                 bHasEmail = true;
             }
-            else if (statement.getPredicate().getURI().equals("http://xmlns.com/foaf/0.1/homepage")) {
+            else if (statement.getPredicate().getURI().equals(FOAF.HOMEPAGE)) {
                 String homepage = object.asLiteral().getString();
                 if(homepage.startsWith("<") && homepage.endsWith(">")){
                     homepage = homepage.replace("<", "");
@@ -321,7 +342,7 @@ public class User implements Comparable<User> {
             }
         }
 
-        if(bHasEmail){
+        if (bHasEmail) {
             user.setUri(uri);
             return user;
         }
@@ -383,8 +404,4 @@ public class User implements Comparable<User> {
         processor.execute();
     }
 
-    @Override
-    public int compareTo(User another) {
-        return this.getUri().compareTo(another.getUri());
-    }
 }

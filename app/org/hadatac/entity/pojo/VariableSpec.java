@@ -257,7 +257,7 @@ public class VariableSpec extends HADatAcThing {
     	return sb.toString().trim();
     }      
 
-    public String prep(String orig) {
+    public static String prep(String orig) {
     	String aux = upperCase(orig);
     	return aux.replaceAll(" ","-").replaceAll("[()]","");
     }
@@ -399,41 +399,42 @@ public class VariableSpec extends HADatAcThing {
 					seen.add(attributeUri.toLowerCase() + "-" + indicatorUri.toLowerCase().toLowerCase());
 				}
 			}
-
 		} catch (QueryExceptionHTTP e) {
 			e.printStackTrace();
 		}
-
 		return labelPairs;
-
 	}
 
-    public String toString() {
-    	//System.out.println("[" + attr.getLabel() + "]");
-    	String str = "";
-    	if (role != null && !role.isEmpty()) {
-    		str += prep(role) + "-";
-    	}
-    	if (ent != null && ent.getLabel() != null && !ent.getLabel().isEmpty()) {
-    		str += prep(ent.getLabel());
-    	}
-    	if (attrList != null && attrList.size() > 0) {
-	    	for (Attribute attr : attrList) {
-	    		if (attr != null && attr.getLabel() != null && !attr.getLabel().isEmpty()) {
-	    			str += "-" + prep(attr.getLabel());
-	    		}
-	    	}
-    	}
-    	if (inRelationTo != null && !inRelationTo.getLabel().isEmpty()) {
-    		str += "-" + prep(inRelationTo.getLabel());
-    	}
-    	if (unit != null && unit.getLabel() != null && !unit.getLabel().isEmpty()) {
-    		str += "-" + prep(unit.getLabel());
-    	}
-    	if (timeAttr != null && timeAttr.getLabel() != null && !timeAttr.getLabel().isEmpty()) {
-    		str += "-" + prep(timeAttr.getLabel());
-    	}
-    	return str;
+	public static String toString(String role, Entity ent, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr) {
+		//System.out.println("[" + attr.getLabel() + "]");
+		String str = "";
+		if (role != null && !role.isEmpty()) {
+			str += prep(role) + "-";
+		}
+		if (ent != null && ent.getLabel() != null && !ent.getLabel().isEmpty()) {
+			str += prep(ent.getLabel());
+		}
+		if (attrList != null && attrList.size() > 0) {
+			for (Attribute attr : attrList) {
+				if (attr != null && attr.getLabel() != null && !attr.getLabel().isEmpty()) {
+					str += "-" + prep(attr.getLabel());
+				}
+			}
+		}
+		if (inRelationTo != null && !inRelationTo.getLabel().isEmpty()) {
+			str += "-" + prep(inRelationTo.getLabel());
+		}
+		if (unit != null && unit.getLabel() != null && !unit.getLabel().isEmpty()) {
+			str += "-" + prep(unit.getLabel());
+		}
+		if (timeAttr != null && timeAttr.getLabel() != null && !timeAttr.getLabel().isEmpty()) {
+			str += "-" + prep(timeAttr.getLabel());
+		}
+		return str;
+	}
+
+	public String toString() {
+		return VariableSpec.toString(role, ent, attrList, inRelationTo, unit, timeAttr);
     }
 
 	// getStudyVariables()
@@ -445,8 +446,18 @@ public class VariableSpec extends HADatAcThing {
 	}
 
 	@Override
+	public boolean saveToTripleStore() {
+		return true;
+	}
+
+	@Override
 	public int deleteFromSolr() {
 		return 0;
+	}
+
+	@Override
+	public void deleteFromTripleStore() {
+
 	}
 
 }

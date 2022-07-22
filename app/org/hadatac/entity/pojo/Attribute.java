@@ -22,6 +22,9 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.vocabularies.DCTERMS;
+import org.hadatac.vocabularies.RDFS;
+import org.hadatac.vocabularies.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +98,7 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
                 "    ?daUri hasco:isDataAcquisitionOf <" + study_uri + "> . " +
                 "    ?daUri hasco:hasSchema ?sddUsi . " +
                 "    ?dasaUri hasco:partOfSchema ?sddUsi . " +
-                "    ?dasaUri hasco:hasAttribute ?attUri . " +
+                "    ?dasaUri hasco:hasAttribute/rdf:rest*/rdf:first ?attUri . " +
                 "    ?attUri rdfs:label ?attLabel . " +
                 " } ";
 
@@ -238,13 +241,13 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 attribute.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.SUBCLASS_OF)) {
                 attribute.setSuperUri(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://purl.org/dc/terms/identifier")) {
+            } else if (statement.getPredicate().getURI().equals(DCTERMS.IDENTIFIER)) {
                 attribute.setHasDCTerms(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2004/02/skos/core#notation")) {
+            } else if (statement.getPredicate().getURI().equals(SKOS.NOTATION)) {
                 attribute.setHasSkosNotation(object.asLiteral().getString());
             }
         }
@@ -274,10 +277,10 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
             uri += this.getUri();
         }
 
-        query += uri + " <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?o . \n";
-        query += uri + " <http://www.w3.org/2000/01/rdf-schema#label> ?o . \n";
-        query += uri + " <http://purl.org/dc/terms/identifier> ?o . \n";
-        query += uri + " <http://www.w3.org/2004/02/skos/core#notation> ?o . \n";
+        query += uri + " <" + RDFS.SUBCLASS_OF + "> ?o . \n";
+        query += uri + " <" + RDFS.LABEL + "> ?o . \n";
+        query += uri + " <" + DCTERMS.IDENTIFIER + "> ?o . \n";
+        query += uri + " <" + SKOS.NOTATION + "> ?o . \n";
         query += " } ";
 
         try {
@@ -316,16 +319,16 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
         insert += LINE3;
 
         if (this.getSuperUri() != null && !this.getSuperUri().isEmpty()) {
-        	insert += " <http://www.w3.org/2000/01/rdf-schema#subClassOf> <" + this.getSuperUri() + "> ;   ";
+        	insert += " <" + RDFS.SUBCLASS_OF + "> <" + this.getSuperUri() + "> ;   ";
         }
         if (this.getLabel() != null && !this.getLabel().isEmpty()) {
-        	insert += " <http://www.w3.org/2000/01/rdf-schema#label> \"" + this.getLabel() + "\" ;   ";
+        	insert += " <" + RDFS.LABEL + "> \"" + this.getLabel() + "\" ;   ";
         }
         if (this.getHasDCTerms() != null && !this.getHasDCTerms().isEmpty()) {
-        	insert += " <http://purl.org/dc/terms/identifier> \"" + this.getHasDCTerms() + "\" ;   ";
+        	insert += " <" + DCTERMS.IDENTIFIER + "> \"" + this.getHasDCTerms() + "\" ;   ";
         }
         if (this.getHasSkosNotation() != null && !this.getHasSkosNotation().isEmpty()) {
-        	insert += " <http://www.w3.org/2004/02/skos/core#notation> \"" + this.getHasSkosNotation() + "\" ;   ";
+        	insert += " <" + SKOS.NOTATION + "> \"" + this.getHasSkosNotation() + "\" ;   ";
         }
         
         if (!getNamedGraph().isEmpty()) {

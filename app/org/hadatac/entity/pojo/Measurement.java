@@ -2348,6 +2348,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                                     List<String> newEntry = new ArrayList<String>();
                                     newEntry.add(code);
                                     newEntry.add(measurement.getValue());
+                                    newEntry.add(key);
                                     alignment.addCode(measurement.getValueClass(), newEntry);
                                 }
                             }
@@ -2479,7 +2480,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	    
 	    System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
 	    
-	    FileUtils.writeStringToFile(codeBookFile, "code, value, class\n", "utf-8", true);
+	    FileUtils.writeStringToFile(codeBookFile, "code, value, class, varSpec\n", "utf-8", true);
 	    // Write code book
 	    List<CodeBookEntry> codeBook = new ArrayList<CodeBookEntry>();
 	    for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
@@ -2498,7 +2499,8 @@ public class Measurement extends HADatAcThing implements Runnable {
     		if (codeStr.length() > 7) {
     			codeStr = codeStr.substring(0,7);
     		}
-	    	CodeBookEntry cbe = new CodeBookEntry(codeStr, pretty, entry.getKey());
+    		String varSpecKey = list.get(2).trim();
+	    	CodeBookEntry cbe = new CodeBookEntry(codeStr, pretty, entry.getKey(), varSpecKey);
 	    	codeBook.add(cbe);
 	    }
 	    if (codeBook != null && codeBook.size() > 0) {
@@ -2518,7 +2520,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 	            }
 	        });
 		    for (CodeBookEntry cbe : codeBook) {
-		    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() + "\n", "utf-8", true);
+		    	FileUtils.writeStringToFile(codeBookFile, cbe.getCode() + ",\"" + cbe.getValue() + "\", " + cbe.getCodeClass() +  "\", " + cbe.getVariableSpecKey() + "\n" , "utf-8", true);
 		    }
 	    }
 	    	
@@ -2699,6 +2701,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                 						List<String> newEntry = new ArrayList<String>();
                 						newEntry.add(code);
                 						newEntry.add(m.getValue());
+                						newEntry.add(key);
                 						timeAlignment.addCode(m.getValueClass(), newEntry);
                 					}	
                 				}

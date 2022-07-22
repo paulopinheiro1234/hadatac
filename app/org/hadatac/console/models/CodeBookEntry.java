@@ -5,11 +5,13 @@ public class CodeBookEntry {
     public String code;
     public String value;
     public String codeClass;
+    public String variableSpecKey;
     
-    public CodeBookEntry (String code, String value, String codeClass) {
+    public CodeBookEntry (String code, String value, String codeClass, String variableSpecKey) {
     	this.code = code;
     	this.value = value;
     	this.codeClass = codeClass;
+    	this.variableSpecKey = variableSpecKey;
     }
     
     public String getCode() {
@@ -35,5 +37,13 @@ public class CodeBookEntry {
     public void setCodeClass(String codeClass) {
     	this.codeClass = codeClass;
     }
-    
+
+    public String getVariableSpecKey() {
+        return variableSpecKey;
+    }
+
+    public void setVariableSpecKey(String variableSpecKey) {
+        this.variableSpecKey = variableSpecKey;
+    }
+
 }

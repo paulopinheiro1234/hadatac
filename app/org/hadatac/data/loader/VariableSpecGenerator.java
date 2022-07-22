@@ -1,27 +1,14 @@
 package org.hadatac.data.loader;
 
-import java.lang.String;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.metadata.api.MetadataFactory;
+import org.hadatac.entity.pojo.*;
 import org.hadatac.metadata.loader.URIUtils;
-import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.Templates;
 
-public class DASchemaAttrGenerator extends BaseGenerator {
+import java.util.*;
+
+public class VariableSpecGenerator extends BaseGenerator {
 
     final String kbPrefix = ConfigProp.getKbPrefix();
     String startTime = "";
@@ -34,7 +21,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
     List<String> AttrList = new ArrayList<String>();
     Map<String, String> currentHasEntity = new HashMap<String, String>();
 
-    public DASchemaAttrGenerator(DataFile dataFile, String SDDName, Map<String, String> codeMap, List<Map<String, List<String>>> merging) {
+    public VariableSpecGenerator(DataFile dataFile, String SDDName, Map<String, String> codeMap, List<Map<String, List<String>>> merging) {
         super(dataFile);
         this.codeMap = codeMap;
         this.SDDName = SDDName;
@@ -168,7 +155,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             List<String> items = Arrays.asList(derivedFrom.split("\\s*,\\s*"));
             for (String item : items) {
                 if (AttrList.contains(item)) {
-                    tbd.add(kbPrefix + "DASA-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
+                    tbd.add(kbPrefix + "Var-Spec-" + SDDName + "-" + item.replace(" ", "").replace("_","-").replace("??", ""));
                 }
             }
             return tbd;
@@ -216,7 +203,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                 return str;
             }
         } else if (AttrList.contains(str)) {
-            return kbPrefix + "DASA-" + SDDName + "-" + str.replace(" ", "").replace("_","-").replace("??", "");
+            return kbPrefix + "Var-Spec-" + SDDName + "-" + str.replace(" ", "").replace("_","-").replace("??", "");
         } else {
             return "";
         }
@@ -279,7 +266,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             if (getAttribute(record)  == null || getAttribute(record).equals("")){
                 continue;
             } else {
-                result.add(kbPrefix + "DASA-" + SDDName + "-" + getLabel(record).trim().replace(" ", "").replace("_","-").replace("??", ""));
+                result.add(kbPrefix + "Var-Spec-" + SDDName + "-" + getLabel(record).trim().replace(" ", "").replace("_","-").replace("??", ""));
             }
         }
         return result;
@@ -305,15 +292,32 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             tmp.add(mergedEA.get(i).get(0));
         }
 
+        Entity ent = Entity.find(URIUtils.replacePrefixEx(getEntity(rec)));
+        Entity inRelationTo = Entity.find(URIUtils.replacePrefixEx(getInRelationTo(rec)));
+        Unit unit = Unit.find(URIUtils.replacePrefixEx(getUnit(rec)));
+        Attribute timeAttr = Attribute.find(URIUtils.replacePrefixEx(getTime(rec)));
         String lineLabel = getLabel(rec);
-        if (mergedEA.containsKey(getLabel(rec))) {
+        List<String> attrListUri = retrieveAttributes(rec, lineLabel);
+        System.out.println("Spec line label: [" + lineLabel + "]");
+        List<Attribute> attrList = new ArrayList<Attribute>();
+        if (attrListUri != null || attrListUri.size() > 0) {
+            for (String attrUri : attrListUri) {
+                System.out.println("Spec attribute uri: [" + attrUri + "]");
+                Attribute attrTemp = Attribute.find(URIUtils.replacePrefixEx(attrUri));
+                if (attrTemp != null) {
+                    attrList.add(attrTemp);
+                }
+            }
+        }
+        String specLabel = VariableSpec.toString(null, ent, attrList, inRelationTo, unit, timeAttr);
+        System.out.print("Spec Label: " + specLabel);
+        if (mergedEA.containsKey(specLabel)) {
             logger.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)));
-            row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
-            row.put("a", "hasco:DASchemaAttribute");
-            row.put("hasco:hascoType", "hasco:DASchemaAttribute");
+            row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
+            row.put("a", "hasco:VariableSpec");
+            row.put("hasco:hascoType", "hasco:VariableSpec");
             row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(0));
             row.put("rdfs:comment", mergedEA.get(getLabel(rec)).get(1));
-            row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
             if (!currentHasEntity.containsKey(getLabel(rec))){
                 row.put("hasco:hasEntity", getEntity(rec));
             }
@@ -338,7 +342,6 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             row.put("hasco:hasSource", "");
             row.put("hasco:isAttributeOf", getAttributeOf(rec));
             row.put("hasco:isVirtual", checkVirtual(rec).toString());
-            row.put("hasco:isPIConfirmed", "false");
             if (getWasGeneratedBy(rec).length() > 0) {
                 row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
             }
@@ -353,12 +356,12 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                 row.put("hasco:isAttributeOf", getAttributeOf(rec));
                 row.put("hasco:hasAttribute", getAttribute(rec));
             }
-            row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
-            row.put("a", "hasco:DASchemaAttribute");
-            row.put("hasco:hascoType", "hasco:DASchemaAttribute");
-            row.put("rdfs:label", getLabel(rec));
+            row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+            row.put("a", "hasco:VariableSpec");
+            row.put("hasco:hascoType", "hasco:VariableSpec");
+            //row.put("rdfs:label", getLabel(rec));
+            row.put("rdfs:label", specLabel);
             row.put("rdfs:comment", getLabel(rec));
-            row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
             if (!currentHasEntity.containsKey(getLabel(rec))){
                 row.put("hasco:hasEntity", getEntity(rec));
             }
@@ -378,12 +381,11 @@ public class DASchemaAttrGenerator extends BaseGenerator {
             row.put("hasco:hasEvent", getTime(rec));
             row.put("hasco:hasSource", "");
             row.put("hasco:isVirtual", checkVirtual(rec).toString());
-            row.put("hasco:isPIConfirmed", "false");
             if (getWasGeneratedBy(rec).length() > 0) {
                 row.put("prov:wasGeneratedBy", getWasGeneratedBy(rec));	
             }
         } else {
-            row.put("hasURI", kbPrefix + "DASA-merged-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+            row.put("hasURI", kbPrefix + "Var-Spec-merged-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
         }
 
         return row;
@@ -407,7 +409,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
 
     Map<String, Object> createRelationRow(Record rec, int rowNumber) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+        row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
         if (getRelation(rec).length() > 0) {
             row.put(getRelation(rec), getInRelationTo(rec));
         } else {
@@ -426,7 +428,7 @@ public class DASchemaAttrGenerator extends BaseGenerator {
 
     Map<String, Object> createDerivedFromRow(String item, Record rec) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
+        row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", ""));
         row.put("prov:wasDerivedFrom", item);
 
         return row;
@@ -434,26 +436,26 @@ public class DASchemaAttrGenerator extends BaseGenerator {
 
     Map<String, Object> createMergeEAAttrRow(String attr, Map<String, List<String>> mergedEA) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(attr).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
+        row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + mergedEA.get(attr).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
         row.put("hasco:hasAttribute", mergedEA.get(attr).get(4));
         return row;
     }
 
     Map<String, Object> createMergeAAAttrRow(String attr, Map<String, List<String>> mergedAA) throws Exception {
         Map<String, Object> row = new HashMap<String, Object>();
-        row.put("hasURI", kbPrefix + "DASA-" + SDDName + "-" + attr.trim().replace(" ", "").replace("_","-").replace("??", ""));
+        row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + attr.trim().replace(" ", "").replace("_","-").replace("??", ""));
         row.put("hasco:hasAttribute", mergedAA.get(attr).get(1));
         return row;
     }
 
     @Override
     public String getTableName() {
-        return "DASchemaAttribute";
+        return "VariableSpec";
     }
 
     @Override
     public String getErrorMsg(Exception e) {
-        return "Error in DASchemaAttrGenerator: " + e.getMessage();
+        return "Error in VariableSpecGenerator: " + e.getMessage();
     }
 
     @Override

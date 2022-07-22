@@ -377,8 +377,13 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         this.studyUri = study_uri;
     }
 
+    @JsonIgnore
     public String getOwnerUri() {
         return ownerUri;
+    }
+
+    public User getDataOwner() {
+        return User.find(ownerUri);
     }
 
     public void setOwnerUri(String ownerUri) {

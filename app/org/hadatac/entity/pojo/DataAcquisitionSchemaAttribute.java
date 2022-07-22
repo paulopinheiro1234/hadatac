@@ -777,7 +777,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 daseUriStr,
                 dasoUriStr);
 
-        dasa.setTypeUri("http://hadatac.org/ont/hasco/DASchemaAttribute");
+        dasa.setTypeUri(HASCO.DA_SCHEMA_ATTRIBUTE);
 
         for ( Map.Entry<String, String> entry : relationMap.entrySet() ) {
             dasa.addRelation(entry.getKey(), entry.getValue());

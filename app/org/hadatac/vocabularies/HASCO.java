@@ -2,6 +2,8 @@ package org.hadatac.vocabularies;
 
 public class HASCO {
 
+    public static final String HASCO                                  = "http://hadatac.org/ont/hasco/";
+
     /*
      *    CLASSES
      */
@@ -26,6 +28,7 @@ public class HASCO {
     public static final String STUDY_OBJECT                           = "http://hadatac.org/ont/hasco/StudyObject";
     public static final String SUBJECT_COLLECTION                     = "http://hadatac.org/ont/hasco/SubjectGroup";
     public static final String TIME_COLLECTION                        = "http://hadatac.org/ont/hasco/TimeCollection";
+    public static final String USER                                   = "http://hadatac.org/ont/hasco/User";
     public static final String VALUE                                  = "http://hadatac.org/ont/hasco/Value";
     public static final String VARIABLE_SPEC                          = "http://hadatac.org/ont/hasco/VariableSpec";
     public static final String VIRTUAL_COLUMN                         = "http://hadatac.org/ont/hasco/VirtualColumn";

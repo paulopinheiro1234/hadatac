@@ -107,7 +107,7 @@ public class Alignment {
 	*/
 
     /*
-     * returns a key to retrieve variables. if needed, measuremtnKey adds new variables
+     * returns a key to retrieve variables. if needed, measurementKey adds new variables
      */
     public String measurementKey(Measurement m) {
 

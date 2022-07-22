@@ -27,7 +27,7 @@ import org.hadatac.utils.NameSpaces;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import java.util.*;
+import java.util.List;
 
 public class PropPage extends Controller {
 

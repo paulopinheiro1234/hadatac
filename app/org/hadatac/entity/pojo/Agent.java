@@ -13,14 +13,12 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 
-public class Agent implements Comparable<Agent> {
+public class Agent extends HADatAcThing implements Comparable<Agent> {
 
-    private String uri;
-    private String agentType;
-    private String label;
-    private String name;
-    private String familyName;
-    private String givenName;
+    protected String agentType;
+    protected String name;
+    protected String familyName;
+    protected String givenName;
 
     public String getUri() {
         return uri;
@@ -141,6 +139,16 @@ public class Agent implements Comparable<Agent> {
             return 0;
         }
         return this.getName().compareTo(another.getName());
+    }
+
+    @Override
+    public boolean saveToSolr() {
+        return true;
+    }
+
+    @Override
+    public int deleteFromSolr() {
+        return 0;
     }
 
 }
