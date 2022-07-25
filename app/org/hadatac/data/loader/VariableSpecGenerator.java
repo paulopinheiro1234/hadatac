@@ -311,7 +311,7 @@ public class VariableSpecGenerator extends BaseGenerator {
         }
         String specLabel = VariableSpec.toString(null, ent, attrList, inRelationTo, unit, timeAttr);
         System.out.print("Spec Label: " + specLabel);
-        if (mergedEA.containsKey(specLabel)) {
+        if (mergedEA.containsKey(getLabel(rec))) {
             logger.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)));
             row.put("hasURI", kbPrefix + "Var-Spec-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", ""));
             row.put("a", "hasco:VariableSpec");

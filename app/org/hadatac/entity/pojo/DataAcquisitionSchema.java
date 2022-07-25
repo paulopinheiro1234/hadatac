@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -203,6 +204,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.matchingLabel = matchingLabel;
     }
 
+    @JsonIgnore
     public String getElevationLabel() {
         return elevationLabel;
     }
@@ -211,6 +213,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.elevationLabel = elevationLabel;
     }
 
+    @JsonIgnore
     public String getEntityLabel() {
         return entityLabel;
     }
@@ -219,6 +222,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.entityLabel = entityLabel;
     }
 
+    @JsonIgnore
     public String getUnitLabel() {
         return unitLabel;
     }
@@ -227,6 +231,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.unitLabel = unitLabel;
     }
 
+    @JsonIgnore
     public String getInRelationToLabel() {
         return inRelationToLabel;
     }
@@ -235,6 +240,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.inRelationToLabel = inRelationToLabel;
     }
 
+    @JsonIgnore
     public int getTotalDASA() {
         if (attributes == null) {
             return -1;
@@ -242,6 +248,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return attributes.size();
     }
 
+    @JsonIgnore
     public int getTotalDASE() {
         if (events == null) {
             return -1;
@@ -249,6 +256,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return events.size();
     }
 
+    @JsonIgnore
     public int getTotalDASO() {
         if (objects == null) {
             return -1;
@@ -265,6 +273,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
             attributesCache = DataAcquisitionSchemaAttribute.findBySchema(getUri());
         }
         return attributesCache;
+    }
+
+    public List<PossibleValue> getCodes() {
+        return PossibleValue.findBySchema(this.uri);
     }
 
     public void setAttributes(List<String> attributes) {
@@ -369,6 +381,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public DataAcquisitionSchemaObject getObject(String dasoUri) {
         for (String daso : objects) {
             if (daso.equals(dasoUri)) {
@@ -378,6 +391,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return null;
     }
 
+    @JsonIgnore
     public DataAcquisitionSchemaObject getEvent(String daseUri) {
         return DataAcquisitionSchemaObject.find(daseUri);
     }
