@@ -5,6 +5,7 @@
 
 @import org.hadatac.console.views.html.dataacquisitionsearch.downloadDialog
 @import org.hadatac.console.views.html.dataacquisitionsearch.facetTree
+@import com.typesafe.config.ConfigFactory
 @(	page : Int,
         rows : Int,
         ownerUri : String,
@@ -43,7 +44,9 @@
                 }
                 <button type="button" class="btn btn-primary" onClick="showData(1);">Show Data</button>
                 <button type="button" class="btn btn-primary" id="toggleCharts">Hide Charts</button>
-                <button type="button" class="btn btn-primary" onClick="openShiny();">HADatAc Shiny</button>
+                @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.hadatacShinyShow"))){
+                    <button type="button" class="btn btn-primary" onClick="openShiny();">HADatAc Shiny</button>
+                }
 
                 <div id="panel_options"></div>
 
