@@ -595,7 +595,7 @@ GET     /hadatac/api/uri/:uri                          org.hadatac.console.contr
 GET     /hadatac/api/class/:classuri                   org.hadatac.console.controllers.restapi.ClassPage.getHADatAcClass(classuri: String)
 GET     /hadatac/api/proppage/:classuri/:grouperuri/:offset/:pagesize  org.hadatac.console.controllers.restapi.PropPage.getPage(classuri : String, grouperuri: String, offset: Integer, pagesize: Integer)
 GET     /hadatac/api/proppage/size/:classuri/:grouperuri  org.hadatac.console.controllers.restapi.PropPage.getPageSize(classuri : String, grouperuri: String)
-GET     /hadatac/api/list/:classuri                    org.hadatac.console.controllers.restapi.List.getList(classuri : String)
+GET     /hadatac/api/list/:classuri                    org.hadatac.console.controllers.restapi.ListConcept.getList(classuri : String)
 GET     /hadatac/api/listpage/:classuri/:offset/:pagesize  org.hadatac.console.controllers.restapi.ListPage.getPage(classuri : String, offset: Integer, pagesize: Integer)
 GET     /hadatac/api/listpage/size/:classuri           org.hadatac.console.controllers.restapi.ListPage.getPageSize(classuri : String)
 GET     /hadatac/api/repo                              org.hadatac.console.controllers.restapi.RepoPage.getRepository()

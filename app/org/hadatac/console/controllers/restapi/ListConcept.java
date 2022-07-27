@@ -13,7 +13,7 @@ import org.hadatac.vocabularies.HASCO;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-public class List extends Controller {
+public class ListConcept extends Controller {
 
     public Result getList(String classUri) {
         switch (classUri) {
