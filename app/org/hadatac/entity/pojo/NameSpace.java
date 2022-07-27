@@ -37,7 +37,7 @@ import org.hadatac.utils.NameSpaces;
 
 public class NameSpace extends HADatAcThing {
 
-    static String className = HASCO.ONTOLOGY;
+    static String className = HASCO.MANAGED_ONTOLOGY;
 
     @Field("abbreviation")
     private String nsAbbrev = "";
