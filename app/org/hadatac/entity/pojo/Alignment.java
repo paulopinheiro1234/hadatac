@@ -329,7 +329,7 @@ public class Alignment {
                 if (dasa != null) {
                     newOrigVar.setDASA(dasa);
                     if (dasa.getLabel() != null && !dasa.getLabel().equals("")) {
-                        newOrigVar.setName(dasa.getLabel());
+                        newOrigVar.setLabel(dasa.getLabel());
                     }
                 }
                 variables.put(newOrigVar.getKey(), newOrigVar);

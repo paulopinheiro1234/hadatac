@@ -303,7 +303,7 @@ public class NameSpace extends HADatAcThing {
 
     @Override
     public void delete() {
-        this.deleteFromTripleStore();
+        this.deleteFromSolr();
     }
 
     @Override

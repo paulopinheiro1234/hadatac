@@ -693,6 +693,7 @@
       -->
     <requestParsers enableRemoteStreaming="true"
                     multipartUploadLimitInKB="2048000"
+                    enableStreamBody="true"
                     formdataUploadLimitInKB="2048"
                     addHttpRequestToContext="false"/>
 

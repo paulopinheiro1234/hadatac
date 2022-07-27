@@ -16,7 +16,7 @@ public class GeneratorChain {
     private DataFile dataFile = null;
     private DataFile codebookFile = null;
     private boolean bValid = true;
-    private boolean pv = false;
+    private boolean pvAndVarSpec = false;
     private String sddName = "";
     private String studyUri = "";
     private String namedGraphUri = "";
@@ -61,12 +61,12 @@ public class GeneratorChain {
         bValid = false;
     }
 
-    public boolean getPV() {
-        return pv;
+    public boolean getPVandVarSpec() {
+        return pvAndVarSpec;
     }
 
-    public void setPV(boolean pv) {
-        this.pv = pv;
+    public void setPVandVarSpec(boolean pvAndVarSpec) {
+        this.pvAndVarSpec = pvAndVarSpec;
     }
 
     public String getSddName() {

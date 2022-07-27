@@ -41,6 +41,7 @@ public class Clean extends Controller {
     }
 
     public static String playClean(String oper) {
+        System.out.println("OPER: " + oper);
         String result = "";
         if (oper.equals("metadata")) {
             MetadataContext metadata = new 
@@ -79,12 +80,20 @@ public class Clean extends Controller {
                             false);
             result = collection.cleanDataAcquisitions(Feedback.WEB);
         } else if (oper.equals("acquisitions")) {
-            DataContext acquisition = new 
+            DataContext acquisitions = new
                     DataContext("user", 
                             "password",
                             ConfigFactory.load().getString("hadatac.solr.data"), 
                             false);
-            result = acquisition.cleanAcquisitionData(Feedback.WEB);
+            result = acquisitions.cleanAcquisitionData(Feedback.WEB);
+        } else if (oper.equals("namespaces")) {
+            System.out.println("inside clean(namespaces)");
+            DataContext namespaces = new
+                    DataContext("user",
+                    "password",
+                    ConfigFactory.load().getString("hadatac.solr.data"),
+                    false);
+            result = namespaces.cleanNameSpaces(Feedback.WEB);
         } else if (oper.equals("unprocessed")) {
         	List<DataFile> selected = DataFile.findByStatus(DataFile.UNPROCESSED);
         	String message = "0 unprocessed datafiles deleted";

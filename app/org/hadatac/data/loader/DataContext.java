@@ -57,6 +57,15 @@ public class DataContext {
         return data.totalDataFiles();
     }
 
+    public static Long playTotalNameSpaces() {
+        DataContext data = new DataContext( "user",
+                "password",
+                ConfigFactory.load().getString("hadatac.solr.data"),
+                false);
+
+        return data.totalNameSpaces();
+    }
+
     private Long totalDocuments(String solrCoreName) {
         SolrClient solr = new HttpSolrClient.Builder(kbURL + solrCoreName).build();
         SolrQuery parameters = new SolrQuery();
@@ -92,7 +101,12 @@ public class DataContext {
         return totalDocuments(CollectionUtil.getCollectionName(Collection.CSV_DATASET.get()));
     }
 
+    public Long totalNameSpaces() {
+        return totalDocuments(CollectionUtil.getCollectionName(Collection.NAMESPACE.get()));
+    }
+
     private String cleanAllDocuments(int mode, Collection solrCoreName) {
+        System.out.println("inside cleanAllDocuments: " + solrCoreName.toString());
         String message = "";
         String straux = "";
 
@@ -107,6 +121,9 @@ public class DataContext {
         try {
             url1 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query1, "UTF-8");
             url2 = CollectionUtil.getCollectionPath(solrCoreName) + "/update?stream.body=" + URLEncoder.encode(query2, "UTF-8");
+
+            System.out.println("url1: " + url1);
+            System.out.println("url2: " + url2);
 
             if (verbose) {
                 message += Feedback.println(mode, url1);
@@ -200,6 +217,10 @@ public class DataContext {
 
     public String cleanDataFiles(int mode) {
         return cleanAllDocuments(mode, Collection.CSV_DATASET);
+    }
+
+    public String cleanNameSpaces(int mode) {
+        return cleanAllDocuments(mode, Collection.NAMESPACE);
     }
 
     public String cleanStudy(int mode, String studyURI) {

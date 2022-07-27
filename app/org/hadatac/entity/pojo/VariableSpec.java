@@ -1,5 +1,6 @@
 package org.hadatac.entity.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
@@ -10,7 +11,12 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
+import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.vocabularies.HASCO;
@@ -19,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+@JsonFilter("variableSpecFilter")
 public class VariableSpec extends HADatAcThing {
 
 	private static final String className = "hasco:VariableSpec";
@@ -34,17 +41,50 @@ public class VariableSpec extends HADatAcThing {
 	private static final String[] multiAttributeTag = { "Z-Score", "T-Score", "standard score", "Age Equivalent" };
 
 	// Mandatory properties for Variable
-	private String name = null;
-	private Entity ent;
-    private String role;
-    private List<Attribute> attrList;
 
-    // Optional properties for Variables
-    private Entity inRelationTo;
-    private Unit unit;
-    private Attribute timeAttr;
+	@PropertyField(uri="hasco:hasEntity", valueType=PropertyValueType.URI)
+	private String entUri;
+	private String entLabel;
+
+	@PropertyField(uri="hasco:hasRole")
+	private String role;
+
+	@PropertyField(uri="hasco:hasAttribute")
+	private List<String> attrListUri;
+	private String attrListLabel;
+
+	// Optional properties for Variables
+	@PropertyField(uri="hasco:hasInRelationTo", valueType=PropertyValueType.URI)
+    private String inRelationToUri;
+	private String inRelationToLabel;
+
+    private String relation;
+
+	@PropertyField(uri="hasco:hasUnit", valueType=PropertyValueType.URI)
+	private String unitUri;
+	private String unitLabel;
+
+	@PropertyField(uri="hasco:hasEvent", valueType=PropertyValueType.URI)
+    private String timeAttrUri;
+	private String timeAttrLabel;
+
+	@PropertyField(uri="hasco:isCategorical")
+	private boolean isCategorical;
+
     private List<PossibleValue> codebook;
-    private boolean isCategorical;
+	private Map<String, String> relations = new HashMap<String, String>();
+
+	private static Map<String, VariableSpec> varSpecCache;
+
+	private static Map<String, VariableSpec> getCache() {
+		if (varSpecCache == null) {
+			varSpecCache = new HashMap<String, VariableSpec>();
+		}
+		return varSpecCache;
+	}
+	public static void resetCache() {
+		varSpecCache = null;
+	}
 
 	// study_uri_str,role_str,entity_uri_str,dasa_uri_str,in_relation_to_uri_str,named_time_str
     public enum SolrPivotFacet {
@@ -76,70 +116,125 @@ public class VariableSpec extends HADatAcThing {
     }
 
     public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
-		this.typeUri = HASCO.VARIABLE_SPEC;
-		this.hascoTypeUri = HASCO.VARIABLE_SPEC;
-    	this.ent = entRole.getEntity();
-    	this.role = entRole.getRole();
-    	this.attrList = attrInRel.getAttributeList();
-    	this.inRelationTo = attrInRel.getInRelationTo();
-    	this.unit = unit;
-    	this.timeAttr = timeAttr;
-    	this.isCategorical = false;
+		this(HASCO.VARIABLE_SPEC, HASCO.VARIABLE_SPEC, entRole.getEntity(), entRole.getRole(), attrInRel.getAttributeList(),
+				attrInRel.getInRelationTo(), unit, timeAttr, false);
     }
 
-	public VariableSpec(List<VariableSpec> sourceList) {
-		if (sourceList != null && sourceList.get(0) != null) {
-			this.setEntity(sourceList.get(0).getEntity());
-			this.setRole(sourceList.get(0).getRole());
-			this.setAttributeList(sourceList.get(0).getAttributeList());
-			this.setInRelationTo(sourceList.get(0).getInRelationTo());
-			this.setUnit(sourceList.get(0).getUnit());
-			this.setTime(sourceList.get(0).getTime());
+	public VariableSpec(String typeUri, String hascoTypeUri , Entity ent, String role, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr, boolean isCategorical) {
+		this.typeUri = typeUri;
+		this.hascoTypeUri = hascoTypeUri;
+		this.entUri = ent.getUri();
+		this.role = role;
+		for (Attribute attr : attrList) {
+			this.attrListUri.add(attr.getUri());
+		}
+		this.inRelationToUri = inRelationTo.getUri();
+		this.unitUri = unit.getUri();
+		this.timeAttrUri = timeAttr.getUri();
+		this.isCategorical = false;
+	}
+
+	public VariableSpec(VariableSpec varSpec) {
+		this.typeUri = varSpec.getTypeUri();
+		this.hascoTypeUri = varSpec.getHascoTypeUri();
+		this.entUri = varSpec.getEntityUri();
+		this.role = varSpec.getRole();
+		this.attrListUri = varSpec.getAttributeListUri();
+		this.inRelationToUri = varSpec.getInRelationToUri();
+		this.unitUri = varSpec.getUnitUri();
+		this.timeAttrUri = varSpec.getTimeUri();
+		this.isCategorical = varSpec.getIsCategorical();
+	}
+
+	public VariableSpec(DataAcquisitionSchemaAttribute dasa) {
+		try {
+			this.typeUri = HASCO.VARIABLE_SPEC;
+			this.hascoTypeUri = HASCO.VARIABLE_SPEC;
+			if (dasa.getEntity() != null && !dasa.getEntity().isEmpty()) {
+				this.entUri = dasa.getEntity();
+			}
+			//this.role = dasa.getRole();
+			if (dasa.getAttributes() != null && dasa.getAttributes().size() > 0) {
+				this.attrListUri = dasa.getAttributes();
+			}
+			if (dasa.getInRelationToUri() != null && !dasa.getInRelationToUri().isEmpty()) {
+				this.inRelationToUri = dasa.getInRelationToUri();
+			}
+			if (dasa.getUnit() != null && !dasa.getUnit().isEmpty()) {
+				this.unitUri = dasa.getUnit();
+			}
+			if (dasa.getEventUri() != null && !dasa.getEventUri().isEmpty()) {
+				this.timeAttrUri = dasa.getEventUri();
+			}
+			this.setLabel();
+			this.setUri();
+			System.out.println("Inside VariableSpec(dasa). label is [" + this.label + "]  uri is [" + this.uri + "]");
+			this.comment = "A variable specification";
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	public VariableSpec(VariableSpec variableSpec) {
-		this.ent = variableSpec.getEntity();
-		this.role = variableSpec.getRole();
-		this.attrList = variableSpec.getAttributeList();
-		this.inRelationTo = variableSpec.getInRelationTo();
-		this.unit = variableSpec.getUnit();
-		this.timeAttr = variableSpec.getTime();
-		this.isCategorical = variableSpec.isCategorical();
+	public VariableSpec(List<VariableSpec> sourceList) {
+		if (sourceList != null && sourceList.get(0) != null) {
+			this.setEntityUri(sourceList.get(0).getEntityUri());
+			this.setRole(sourceList.get(0).getRole());
+			this.setAttributeListUri(sourceList.get(0).getAttributeListUri());
+			this.setInRelationToUri(sourceList.get(0).getInRelationToUri());
+			this.setUnitUri(sourceList.get(0).getUnitUri());
+			this.setTimeUri(sourceList.get(0).getTimeUri());
+		}
 	}
 
 	public String getKey() {
     	return getRole() + getEntityStr() + getAttributeListStr() + getInRelationToStr() + getUnitStr() + getTimeStr();
     }
 
-	public String getName() {
-		if (name == null) {
-			return toString();
+    public void setUri() {
+		final String kbPrefix = ConfigProp.getKbPrefix();
+		String uriNs;
+		if (this.label == null || this.label.isEmpty()) {
+			uriNs = kbPrefix + "Var-Spec-" + this.toString();
+		} else {
+			uriNs = kbPrefix + "Var-Spec-" + this.label;
 		}
-		return name;
+		this.uri = URIUtils.replacePrefixEx(uriNs);
 	}
 
-	public void setName(String name) {
-    	this.name = name;
-	}
-
-	public String getLabel() {
-    	return this.name;
+	public void setLabel() {
+		this.label = this.toString();
 	}
 
 	public Entity getEntity() {
+		Entity ent = Entity.find(this.entUri);
     	return ent;
     }
 
-    public String getEntityStr() {
-        if (ent == null || ent.getUri() == null || ent.getUri().isEmpty()) { 
+    public String getEntityLabel() {
+		if (this.entLabel != null) {
+			return this.entLabel;
+		}
+		Entity ent = getEntity();
+		if (ent == null) {
+			this.entLabel = "";
+			return this.entLabel;
+		}
+		return ent.getLabel();
+	}
+
+	public String getEntityUri() {
+		return this.entUri;
+	}
+
+	public String getEntityStr() {
+        if (entUri == null || entUri.isEmpty()) {
         	return "";
         }
-    	return ent.getUri();
+    	return entUri;
     }
 
-    public void setEntity(Entity ent) {
-    	this.ent = ent;
+    public void setEntityUri(String entUri) {
+    	this.entUri = entUri;
 	}
 
     public String getRole() {
@@ -154,70 +249,170 @@ public class VariableSpec extends HADatAcThing {
 	}
 
     public List<Attribute> getAttributeList() {
+		List<Attribute> attrList = new ArrayList<Attribute>();
+		if (attrListUri == null || attrListUri.size() <= 0) {
+			return attrList;
+		}
+		for (String attrUri: attrListUri) {
+			Attribute attr = Attribute.find(attrUri);
+			if (attr != null) {
+				attrList.add(attr);
+			}
+		}
     	return attrList;
     }
 
-	public void setAttributeList(List<Attribute> attrList) {
-    	this.attrList = attrList;
+	public void setAttributeListUri(List<String> attrListUri) {
+    	this.attrListUri = attrListUri;
 	}
 
-    public String getAttributeListStr() {
-    	if (attrList == null || attrList.isEmpty()) {
+	public List<String> getAttributeListUri() {
+		return this.attrListUri;
+	}
+
+	public String getAttributeListStr() {
+    	if (attrListUri == null || attrListUri.isEmpty()) {
     		return "";
     	}
     	String resp = "";
-    	for (Attribute attr : attrList) {
-    		if (attr != null && attr.getUri() != null && !attr.getUri().isEmpty()) { 
-        		resp = resp + attr.getUri();
+    	for (String attrUri : attrListUri) {
+    		if (attrUri != null && !attrUri.isEmpty()) {
+        		resp = resp + attrUri;
     		}
     	}
         return resp;
     }
 
-    public Entity getInRelationTo() {
-    	return inRelationTo;
+	public List<String> getAttributeListLabel() {
+		List<String> attrListLabel = new ArrayList<String>();
+		if (attrListUri == null || attrListUri.isEmpty()) {
+			return attrListLabel;
+		}
+		List<Attribute> attrList = this.getAttributeList();
+		if (attrList == null || attrList.size() <= 0) {
+			return attrListLabel;
+		}
+		for (Attribute attr : attrList) {
+			if (attr != null && attr.getLabel() != null) {
+				attrListLabel.add(attr.getLabel());
+			}
+		}
+		return attrListLabel;
+	}
+
+	public Entity getInRelationTo() {
+		if (this.inRelationToUri == null || this.inRelationToUri.isEmpty()) {
+			return null;
+		}
+		return Entity.find(this.inRelationToUri);
     }
 
-	public void setInRelationTo(Entity inRelationTo) {
-    	this.inRelationTo = inRelationTo;
+	public String getInRelationToUri() {
+		return inRelationToUri;
+	}
+
+	public void setInRelationToUri(String inRelationToUri) {
+    	this.inRelationToUri = inRelationToUri;
 	}
 
 	public String getInRelationToStr() {
-        if (inRelationTo == null || inRelationTo.getUri() == null ||inRelationTo.getUri().isEmpty()) { 
+        if (inRelationToUri == null || inRelationToUri.isEmpty()) {
             return "";
         }
-    	return inRelationTo.getUri();
+    	return inRelationToUri;
     }
 
-    public Unit getUnit() {
-    	return unit;
+	public String getInRelationToLabel() {
+		if (this.inRelationToLabel != null) {
+			return this.inRelationToLabel;
+		}
+		Entity inRelationTo = getInRelationTo();
+		if (inRelationTo == null) {
+			this.inRelationToLabel = "";
+			return this.inRelationToLabel;
+		}
+		return inRelationTo.getLabel();
+	}
+
+	public List<String> getRelationsList() {
+		return new ArrayList(relations.values());
+	}
+
+	public void addRelation(String key, String relation) {
+		relations.put(key, relation);
+	}
+
+	public Unit getUnit() {
+		if (unitUri == null || unitUri.isEmpty()) {
+			return null;
+		}
+    	return Unit.find(unitUri);
     }
 
-	public void setUnit(Unit unit) {
-    	this.unit = unit;
+	public void setUnitUri(String unitUri) {
+    	this.unitUri = unitUri;
+	}
+
+	public String getUnitUri() {
+		return unitUri;
 	}
 
 	public String getUnitStr() {
-        if (unit == null || unit.getUri() == null || unit.getUri().isEmpty()) { 
+        if (unitUri == null || unitUri.isEmpty()) {
             return "";
         }
-    	return unit.getUri();
+    	return unitUri;
     }
 
-    public Attribute getTime() {
-    	return timeAttr;
+	public String getUnitLabel() {
+		if (this.unitLabel != null) {
+			return this.unitLabel;
+		}
+		Unit unit = getUnit();
+		if (unit == null) {
+			this.unitLabel = "";
+			return this.unitLabel;
+		}
+		return unit.getLabel();
+	}
+
+	public Attribute getTime() {
+  		if (timeAttrUri == null || timeAttrUri.isEmpty()) {
+  			return null;
+		}
+    	return Attribute.find(timeAttrUri);
     }
 
-	public void setTime(Attribute timeAttr) {
-		this.timeAttr = timeAttr;
+	public void setTimeUri(String timeAttrUri) {
+		this.timeAttrUri = timeAttrUri;
+	}
+
+	public String getTimeUri() {
+		return timeAttrUri;
 	}
 
 	public String getTimeStr() {
-        if (timeAttr == null || timeAttr.getUri() == null || timeAttr.getUri().isEmpty()) { 
+        if (timeAttrUri == null || timeAttrUri.isEmpty()) {
             return "";
         }
-    	return timeAttr.getUri();
+    	return timeAttrUri;
     }
+
+	public String getTimeLabel() {
+		if (this.timeAttrLabel != null) {
+			return this.timeAttrLabel;
+		}
+		Attribute timeAttr = getTime();
+		if (timeAttr == null) {
+			this.timeAttrLabel = "";
+			return this.timeAttrLabel;
+		}
+		return timeAttr.getLabel();
+	}
+
+	public boolean getIsCategorical() {
+		return isCategorical;
+	}
 
 	public List<PossibleValue> getCodebook() {
 		return codebook;
@@ -405,6 +600,123 @@ public class VariableSpec extends HADatAcThing {
 		return labelPairs;
 	}
 
+	public static VariableSpec find(String spec_uri) {
+
+		try {
+			if (VariableSpec.getCache().get(spec_uri) != null) {
+				return VariableSpec.getCache().get(spec_uri);
+			}
+			VariableSpec varSpec = null;
+			//System.out.println("Looking for variable spec with URI <" + spec_uri + ">");
+
+			String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+					"SELECT ?hasEntity ?hasAttribute ?hascoTypeUri " +
+					" ?hasUnit ?hasDASO ?hasDASE ?relation ?inRelationTo ?label WHERE { \n" +
+					"    <" + spec_uri + "> a hasco:VariableSpec . \n" +
+					"    <" + spec_uri + "> hasco:hascoType hasco:VariableSpec . \n" +
+					"    OPTIONAL { <" + spec_uri + "> hasco:hasEntity ?hasEntity } . \n" +
+					"    OPTIONAL { <" + spec_uri + "> hasco:hasAttribute/rdf:rest*/rdf:first ?hasAttribute } . \n" +
+					"    OPTIONAL { <" + spec_uri + "> hasco:hasUnit ?hasUnit } . \n" +
+					"    OPTIONAL { <" + spec_uri + "> hasco:hasEvent ?hasDASE } . \n" +
+					"    OPTIONAL { <" + spec_uri + "> hasco:isAttributeOf ?hasDASO } . \n" +
+					"    OPTIONAL { <" + spec_uri + "> hasco:Relation ?relation . \n" +
+					"               <" + spec_uri + "> ?relation ?inRelationTo . } . \n" +
+					"    OPTIONAL { <" + spec_uri + "> rdfs:label ?label } . \n" +
+					"}";
+
+			//System.out.println("VariableSpec find() queryString: \n" + queryString);
+
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+			if (!resultsrw.hasNext()) {
+				System.out.println("[WARNING] VariableSpec. Could not find VarSpec with URI: <" + spec_uri + ">");
+				return varSpec;
+			}
+
+			String localNameStr = "";
+			String labelStr = "";
+			String entityStr = "";
+			String attributeStr = "";
+			List<String> attributeList = new ArrayList<String>();
+			String unitStr = "";
+			String dasoUriStr = "";
+			String daseUriStr = "";
+			String inRelationToUri = "";
+			String relationUri = "";
+
+			Map<String, String> relationMap = new HashMap<>();
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+
+				/*
+				 *  The label should be the exact value in the SDD, e.g., cannot be altered be something like
+				 *  FirstLabel.getPrettyLabel(spec_uri) since that would prevent the matching of the label with
+				 *  the column header of the data acquisition file/message
+				 */
+				labelStr = soln.get("label").toString();
+
+				if (soln.get("hasEntity") != null) {
+					entityStr = soln.get("hasEntity").toString();
+				}
+				if (soln.get("hasAttribute") != null) {
+					attributeList.add(soln.get("hasAttribute").toString());
+				}
+				if (soln.get("hasUnit") != null) {
+					unitStr = soln.get("hasUnit").toString();
+				}
+				if (soln.get("hasDASO") != null) {
+					dasoUriStr = soln.get("hasDASO").toString();
+				}
+				if (soln.get("hasDASE") != null) {
+					daseUriStr = soln.get("hasDASE").toString();
+				}
+				if (soln.get("inRelationTo") != null) {
+					inRelationToUri = soln.get("inRelationTo").toString();
+				}
+				if (soln.get("relation") != null) {
+					relationUri = soln.get("relation").toString();
+				}
+
+				if (relationUri != null && relationUri.length() > 0 && inRelationToUri != null && inRelationToUri.length() > 0) {
+					relationMap.put(relationUri, inRelationToUri);
+					relationUri = "";
+					inRelationToUri = "";
+				}
+
+			}
+
+			//System.out.println("Variable spec [" + spec_uri + "]. Entity Str is [" + entityStr + "]");
+
+			Entity entity = Entity.find(entityStr);
+			Entity inRelationTo = Entity.find(inRelationToUri);
+			List<Attribute> attrList = new ArrayList<Attribute>();
+			for (String attrUri : attributeList) {
+				Attribute attr = Attribute.find(attrUri);
+				if (attr != null) {
+					attrList.add(attr);
+				}
+			}
+			Unit unit = Unit.find(unitStr);
+			Attribute timeAttr = Attribute.find(daseUriStr);
+
+			varSpec = new VariableSpec(HASCO.VARIABLE_SPEC, HASCO.VARIABLE_SPEC, entity, "", attrList, inRelationTo, unit, timeAttr, false);
+
+			varSpec.setUri(spec_uri);
+
+			for (Map.Entry<String, String> entry : relationMap.entrySet()) {
+				varSpec.addRelation(entry.getKey(), entry.getValue());
+			}
+
+			VariableSpec.getCache().put(spec_uri, varSpec);
+
+			return varSpec;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static String toString(String role, Entity ent, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr) {
 		//System.out.println("[" + attr.getLabel() + "]");
 		String str = "";
@@ -434,11 +746,15 @@ public class VariableSpec extends HADatAcThing {
 	}
 
 	public String toString() {
-		return VariableSpec.toString(role, ent, attrList, inRelationTo, unit, timeAttr);
+		String toString = VariableSpec.toString(role, this.getEntity(), this.getAttributeList(), this.getInRelationTo(), this.getUnit(), this.getTime());
+		return toString;
     }
 
-	// getStudyVariables()
-	// getStudyVariablesWithLabels(Study studyUri)
+	@Override
+	public void save() {
+		System.out.println("inside VariableSpec.save()");
+		this.saveToTripleStore();
+	}
 
 	@Override
 	public boolean saveToSolr() {
@@ -446,18 +762,8 @@ public class VariableSpec extends HADatAcThing {
 	}
 
 	@Override
-	public boolean saveToTripleStore() {
-		return true;
-	}
-
-	@Override
 	public int deleteFromSolr() {
 		return 0;
-	}
-
-	@Override
-	public void deleteFromTripleStore() {
-
 	}
 
 }

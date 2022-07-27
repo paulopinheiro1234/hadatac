@@ -358,7 +358,10 @@ public abstract class HADatAcThing implements Facetable {
         try {
             Class<?> currentClass = getClass();
             while(currentClass != null) {
+                //System.out.println("inside HADatAcThing.saveToTripleStore(): currentClass: " + currentClass.getName());
+
                 for (Field field: currentClass.getDeclaredFields()) {
+                    //System.out.println("inside HADatAcThing.saveToTripleStore(): field [" + field.getName() + "] or type [" + field.getType() + "]");
                     field.setAccessible(true);
                     if (field.isAnnotationPresent(Subject.class)) {
                         String uri = (String)field.get(this);
@@ -390,21 +393,27 @@ public abstract class HADatAcThing implements Facetable {
 
                         if (field.getType().equals(String.class)) {
                             String value = (String)field.get(this);
-                            if (!value.isEmpty()) {
+                            if (value != null && !value.isEmpty()) {
+                                //System.out.println("in String assigned [" + value + "] to [" + propertyUri + "]");
                                 row.put(propertyUri, value);
                             }
                         }
+
+                        //System.out.println("inside HADatAcThing.saveToTripleStore() (1) ");
 
                         if (field.getType().equals(List.class)) {
                             List<?> list = (List<?>)field.get(this);
                             if (!list.isEmpty() && list.get(0) instanceof String) {
                                 for (String element : (List<String>)list) {
-                                    if (!element.isEmpty()) {
+                                    if (element != null && !element.isEmpty()) {
+                                        //System.out.println("in List assigned [" + element + "] to [" + propertyUri + "]");
                                         row.put(propertyUri, element);
                                     }
                                 }
                             }
                         }
+
+                        //System.out.println("inside HADatAcThing.saveToTripleStore() (2) ");
 
                         if (field.getType().equals(Integer.class)) {
                             row.put(propertyUri, ((Integer)field.get(this)).toString());
@@ -417,6 +426,8 @@ public abstract class HADatAcThing implements Facetable {
                         if (field.getType().equals(Long.class)) {
                             row.put(propertyUri, ((Long)field.get(this)).toString());
                         }
+
+                        //System.out.println("inside HADatAcThing.saveToTripleStore() (3) ");
                     }
                 }
 
@@ -430,9 +441,14 @@ public abstract class HADatAcThing implements Facetable {
             e.printStackTrace();
         }
 
+        //System.out.println("inside HADatAcThing.saveToTripleStore() (4) ");
+
         if (!row.containsKey("hasURI")) {
             return false;
         }
+
+        //System.out.println("inside HADatAcThing.saveToTripleStore() (5) ");
+
 
         String objUri = (String)row.get("hasURI");
         for (Map<String, Object> rvs_row : reversed_rows) {
@@ -453,6 +469,8 @@ public abstract class HADatAcThing implements Facetable {
         int numCommitted = MetadataFactory.commitModelToTripleStore(
                 model, CollectionUtil.getCollectionPath(
                         CollectionUtil.Collection.METADATA_GRAPH));
+
+        //System.out.println("inside HADatAcThing.saveToTripleStore() (6) ");
 
         return numCommitted >= 0;
     }

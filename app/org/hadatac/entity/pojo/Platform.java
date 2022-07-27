@@ -22,6 +22,8 @@ import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.vocabularies.RDF;
+import org.hadatac.vocabularies.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -457,13 +459,13 @@ public class Platform extends HADatAcThing implements Comparable<Platform> {
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 platform.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+            } else if (statement.getPredicate().getURI().equals(RDF.TYPE)) {
                 platform.setTypeUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
                 platform.setHascoTypeUri(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.COMMENT)) {
                 platform.setComment(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals(HASCO.HAS_SERIAL_NUMBER)) {
                 platform.setSerialNumber(object.asLiteral().getString());

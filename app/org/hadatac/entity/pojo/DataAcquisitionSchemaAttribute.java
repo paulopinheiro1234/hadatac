@@ -1,11 +1,6 @@
 package org.hadatac.entity.pojo;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,12 +11,16 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.hadatac.annotations.PropertyField;
+import org.hadatac.annotations.PropertyValueType;
+import org.hadatac.annotations.Subject;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.vocabularies.RDF;
 
 @JsonFilter("variableFilter")
 public class DataAcquisitionSchemaAttribute extends HADatAcThing {
@@ -36,9 +35,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
     private static Map<String, DataAcquisitionSchemaAttribute> DASACache;
 
-    private String uri;
     private String localName;
-    private String label;
     private String partOfSchema;
     private String position;
     private int    positionInt;
@@ -61,7 +58,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private Map<String, String> relations = new HashMap<String, String>();
     private boolean isMeta;
     private DataAcquisitionSchema das;
-    private VariableSpec varSpec;
+    private String varSpecUri;
     private String socUri;
 
     private static Map<String, DataAcquisitionSchemaAttribute> getCache() {
@@ -88,7 +85,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.setUnit("");
         this.daseUri = "";
         this.dasoUri = "";
-        this.varSpec = new VariableSpec();
+        this.varSpecUri = "";
         this.isMeta = false;
 	DataAcquisitionSchemaAttribute.getCache();
     }
@@ -124,34 +121,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.daseUri = daseUri;
         this.dasoUri = dasoUri;
 
-        populateVariableSpec();
-
         DataAcquisitionSchemaAttribute.getCache();
-    }
-
-    private void populateVariableSpec() {
-        this.varSpec = new VariableSpec();
-        this.varSpec.setUri(uri.replace("DASA-","VAR-SPEC-"));
-        if (entity != null && !entity.isEmpty()) {
-            this.varSpec.setEntity(Entity.find(entity));
-        }
-        List<Attribute> listAttr = new ArrayList<Attribute>();
-        for (String attrUri : attributes) {
-            if (attrUri != null && !attrUri.isEmpty()) {
-                Attribute attrInstance = Attribute.find(attrUri);
-                if (attrInstance != null) {
-                    listAttr.add(attrInstance);
-                }
-            }
-        }
-        this.varSpec.setAttributeList(listAttr);
-        this.varSpec.setRole("");
-        //this.varSpec.setInRelationTo();
-        if (unit != null && !unit.isEmpty()) {
-            this.varSpec.setUnit(Unit.find(unit));
-        }
-        //this.varSpec.setTime();
-        this.varSpec.setName(this.varSpec.toString());
     }
 
     public String getUri() {
@@ -234,6 +204,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.tempPositionInt = tempPositionInt;
     }
 
+    @JsonIgnore
     public String getEntity() {
         if (entity == null) {
             return "";
@@ -242,6 +213,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getEntityNamespace() {
         if (entity == "") {
             return "";
@@ -258,6 +230,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getEntityLabel() {
         if (entityLabel.equals("")) {
             return URIUtils.replaceNameSpaceEx(entity);
@@ -265,6 +238,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return entityLabel;
     }
 
+    @JsonIgnore
     public String getEntityViewLabel() {
         if (isMeta) {
             return "";
@@ -299,6 +273,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return annotation;
     }
 
+    @JsonIgnore
     public List<String> getAttributes() {
         if (attributes == null) {
             return new ArrayList<String>();
@@ -306,7 +281,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             return attributes;
         }
     }
-    
+
+    @JsonIgnore
     public String getAttributeString() {
         if (attributes == null) {
             return "";
@@ -314,7 +290,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         
         return String.join("; ", attributes);
     }
-    
+
+    @JsonIgnore
     public String getReversedAttributeString() {
         if (attributes == null) {
             return "";
@@ -377,6 +354,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }      
     }
 
+    @JsonIgnore
     public List<String> getAttributeLabels() {
         return attributeLabels;
     }
@@ -385,6 +363,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return String.join(" ", attributeLabels);
     }
 
+    @JsonIgnore
     public List<String> getAnnotatedAttribute() {
         List<String> annotation;
         if (attributeLabels.equals(Arrays.asList(""))) {
@@ -403,6 +382,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return annotation;
     }
 
+    @JsonIgnore
     public String getInRelationToUri() {
         String inRelationToUri = "";
         for (String key : relations.keySet()) {
@@ -412,6 +392,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return inRelationToUri;
     }
 
+    @JsonIgnore
     public String getInRelationToLabel() {
         String inRelationTo = getInRelationToUri();
         if (inRelationTo == null || inRelationTo.equals("")) {
@@ -421,6 +402,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getInRelationToUri(String relationUri) {
         //System.out.println("[DASA] relations: " + relations);
         if (relations.containsKey(relationUri)) {
@@ -434,6 +416,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         relations.put(relationUri, inRelationToUri);
     }
 
+    @JsonIgnore
     public String getUnit() {
         if (unit == null) {
             return "";
@@ -442,6 +425,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getUnitNamespace() {
         if (unit == "") {
             return "";
@@ -458,6 +442,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getUnitLabel() {
         if (unitLabel.equals("")) {
             return URIUtils.replaceNameSpaceEx(unit);
@@ -465,6 +450,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return unitLabel;
     }
 
+    @JsonIgnore
     public String getAnnotatedUnit() {
         String annotation;
         if (unitLabel.equals("")) {
@@ -526,10 +512,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
+    @JsonIgnore
     public String getEventUri() {
         return daseUri;
     }
 
+    @JsonIgnore
     public void setEventUri(String daseUri) {
         this.daseUri = daseUri;
     }
@@ -541,14 +529,16 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
         return DataAcquisitionSchemaEvent.find(daseUri);
 	}*/
-    
+
+    @JsonIgnore
     public DataAcquisitionSchemaObject getEvent() {
         if (daseUri == null || daseUri.equals("")) {
             return null;
         }
         return DataAcquisitionSchemaObject.find(daseUri);
     }
-    
+
+    @JsonIgnore
     public String getEventNamespace() {
         if (daseUri == null || daseUri.equals("")) {
             return "";
@@ -556,6 +546,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         return URIUtils.replaceNameSpaceEx(daseUri.replace("<","").replace(">",""));
     }
 
+    @JsonIgnore
     public String getEventViewLabel() {
         if (isMeta) {
             return "";
@@ -575,9 +566,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
-    public VariableSpec getVariableSpec() {
-        populateVariableSpec();
-        return this.varSpec;
+    public void setVariableSpec(String varSpecUri) {
+        this.varSpecUri = varSpecUri;
+    }
+
+    public String getVariableSpec() {
+        return this.varSpecUri;
     }
 
     public static int getNumberDASAs() {
@@ -647,18 +641,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     }
 
     public static DataAcquisitionSchemaAttribute find(String dasa_uri) {
-
-        // debug
-        if ( dasa_uri.contains("zvalue-bwt-gage-sex-d")) {
-            int x = 1;
-        }
-        if ( dasa_uri.contains("ZBFA")) {
-            int x = 1;
-        }
-        if ( dasa_uri.contains("ZHFA")) {
-            int x = 1;
-        }
-        // end of debug
 
         if (DataAcquisitionSchemaAttribute.getCache().get(dasa_uri) != null) {
             return DataAcquisitionSchemaAttribute.getCache().get(dasa_uri);
@@ -752,18 +734,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             }
 
         }
-
-        // debug
-        if ( dasa_uri.contains("zvalue-bwt-gage-sex-d")) {
-            int x = 1;
-        }
-        if ( dasa_uri.contains("ZBFA")) {
-            int x = 1;
-        }
-        if ( dasa_uri.contains("ZHFA")) {
-            int x = 1;
-        }
-        // end of debug
 
         dasa = new DataAcquisitionSchemaAttribute(
                 dasa_uri,
@@ -992,6 +962,47 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             processor.execute();
         } catch (QueryParseException e) {
             System.out.println("[ERROR] QueryParseException due to update query: " + insert);
+            throw e;
+        }
+
+        return true;
+    }
+
+    public boolean saveHasVariableSpec(String varSpecUri) {
+        String insert = "";
+        insert += NameSpaces.getInstance().printSparqlNameSpaceList();
+        insert +=  "INSERT DATA {  ";
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " GRAPH <" + this.getNamedGraph() + "> { ";
+        }
+
+        // the URI is of type DA_SCHEMA_ATTRIBUTE
+        insert += " <" + this.uri + "> ";
+        insert += " <" + RDF.TYPE + ">";
+        insert += " <" + HASCO.DA_SCHEMA_ATTRIBUTE + "> .  ";
+
+        // the HAS_VARIABLE_SPEC TRIPLE
+        insert += " <" + this.uri + "> ";
+        insert += " <" + HASCO.HAS_VARIABLE_SPEC + ">";
+        insert += " <" + varSpecUri + "> .  ";
+
+        if (!getNamedGraph().isEmpty()) {
+            insert += " } ";
+        }
+
+        insert += " }  ";
+
+        //System.out.println("DASA update query [" + insert + "]");
+
+        try {
+            UpdateRequest request = UpdateFactory.create(insert);
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(
+                    request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
+            processor.execute();
+        } catch (QueryParseException e) {
+            System.out.println("QueryParseException due to update query: " + insert);
+            e.printStackTrace();
             throw e;
         }
 

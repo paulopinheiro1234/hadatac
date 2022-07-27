@@ -21,17 +21,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.data.api.DataFactory;
-import org.hadatac.entity.pojo.STR;
-import org.hadatac.entity.pojo.DataFile;
-import org.hadatac.entity.pojo.DOI;
-import org.hadatac.entity.pojo.DPL;
-import org.hadatac.entity.pojo.DataAcquisitionSchema;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaAttribute;
-import org.hadatac.entity.pojo.DataAcquisitionSchemaObject;
-import org.hadatac.entity.pojo.SDD;
-import org.hadatac.entity.pojo.SSDSheet;
-import org.hadatac.entity.pojo.Study;
-import org.hadatac.entity.pojo.ObjectCollection;
+import org.hadatac.entity.pojo.*;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
@@ -153,10 +143,10 @@ public class AnnotationWorker {
             if (bSucceed) {
             	
             	// if chain includes PVGenerator, executes PVGenerator.generateOthers()
-            	if (chain.getPV()) {
-            		
+            	if (chain.getPVandVarSpec()) {
             		PVGenerator.generateOthers(chain.getCodebookFile(), chain.getSddName(), ConfigProp.getKbPrefix());
-            	}
+                    VariableSpecGenerator.createVarSpecFromSdd(chain.getSddName());
+                }
             	
                 //Move the file to the folder for processed files
                 String study = URIUtils.getBaseName(chain.getStudyUri());
@@ -521,7 +511,7 @@ public class AnnotationWorker {
         }
 
         GeneratorChain chain = new GeneratorChain();
-        chain.setPV(true);
+        chain.setPVandVarSpec(true);
         
         if (dictionaryRecordFile != null && dictionaryRecordFile.isValid()) {
             DataFile dictionaryFile;
@@ -529,7 +519,7 @@ public class AnnotationWorker {
                 dictionaryFile = (DataFile)dataFile.clone();
                 dictionaryFile.setRecordFile(dictionaryRecordFile);
                 chain.addGenerator(new DASchemaAttrGenerator(dictionaryFile, sddName, sdd.getCodeMapping(), sdd.readDDforEAmerge(dictionaryRecordFile)));
-                chain.addGenerator(new VariableSpecGenerator(dictionaryFile, sddName, sdd.getCodeMapping(), sdd.readDDforEAmerge(dictionaryRecordFile)));
+                //chain.addGenerator(new VariableSpecGenerator(dictionaryFile, sddName, sdd.getCodeMapping(), sdd.readDDforEAmerge(dictionaryRecordFile)));
                 chain.addGenerator(new DASchemaObjectGenerator(dictionaryFile, sddName, sdd.getCodeMapping()));
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();

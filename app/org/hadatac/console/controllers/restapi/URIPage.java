@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.hadatac.entity.pojo.*;
 import org.hadatac.utils.ApiUtil;
 import org.hadatac.vocabularies.HASCO;
+import org.hadatac.vocabularies.SIO;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -50,7 +51,7 @@ public class URIPage extends Controller {
             System.out.println("inside getUri(): URI [" + uri + "]");
 
             if (result == null) {
-                return notFound(ApiUtil.createResponse("No instance found for uri [" + uri + "]", false));
+                return notFound(ApiUtil.createResponse("No generic instance found for uri [" + uri + "]", false));
             }
 
             /*
@@ -102,6 +103,14 @@ public class URIPage extends Controller {
                 if (finalResult != null) {
                     typeUri = ((DataAcquisitionSchemaObject) finalResult).getHascoTypeUri();
                 }
+            } else if (result.getHascoTypeUri().equals(HASCO.VARIABLE_SPEC)) {
+                finalResult = VariableSpec.find(uri);
+                if (finalResult != null) {
+                    typeUri = ((VariableSpec) finalResult).getHascoTypeUri();
+                    System.out.println("typeUri for Variable Spec is [" + typeUri + "]");
+                } else {
+                    System.out.println("FinalResult is null for Variable Spec.");
+                }
             } else if (result.getHascoTypeUri().equals(HASCO.DEPLOYMENT)) {
                 finalResult = Deployment.find(uri);
                 if (finalResult != null) {
@@ -137,7 +146,7 @@ public class URIPage extends Controller {
                 }
             }
             if (finalResult == null || typeUri == null || typeUri.equals("")){
-                return notFound(ApiUtil.createResponse("No instance found for uri [" + uri + "]", false));
+                return notFound(ApiUtil.createResponse("No type-specific instance found for uri [" + uri + "]", false));
             }
 
             // list object properties and associated classes
@@ -212,6 +221,14 @@ public class URIPage extends Controller {
                     SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
         }
 
+        // VARIABLE_SPEC
+        if (typeResult.equals(HASCO.VARIABLE_SPEC)) {
+            filterProvider.addFilter("variableSpecFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("variableSpecFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
+
         // DA_SCHEMA_OBJECT
         if (typeResult.equals(HASCO.DA_SCHEMA_OBJECT)) {
             filterProvider.addFilter("sddObjectFilter", SimpleBeanPropertyFilter.serializeAll());
@@ -220,8 +237,15 @@ public class URIPage extends Controller {
                     SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
         }
 
-        mapper.setFilterProvider(filterProvider);
+        // ENTITY
+        if (typeResult.equals(SIO.ENTITY)) {
+            filterProvider.addFilter("entityFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("entityFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+        }
 
+        mapper.setFilterProvider(filterProvider);
 
         System.out.println("[RestAPI] generating JSON for following object: " + uri);
         JsonNode jsonObject = null;

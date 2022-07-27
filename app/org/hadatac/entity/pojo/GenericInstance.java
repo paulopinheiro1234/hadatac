@@ -17,6 +17,8 @@ import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.vocabularies.HASCO;
 import org.hadatac.console.http.SPARQLUtils;
+import org.hadatac.vocabularies.RDF;
+import org.hadatac.vocabularies.RDFS;
 
 public class GenericInstance extends HADatAcThing implements Comparable<GenericInstance> {
 
@@ -69,13 +71,13 @@ public class GenericInstance extends HADatAcThing implements Comparable<GenericI
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 instance.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+            } else if (statement.getPredicate().getURI().equals(RDF.TYPE)) {
                 instance.setTypeUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals(HASCO.HASCO_TYPE)) {
                 instance.setHascoTypeUri(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.COMMENT)) {
                 instance.setComment(object.asLiteral().getString());
             }
         }

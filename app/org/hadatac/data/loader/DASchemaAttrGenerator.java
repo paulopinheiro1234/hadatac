@@ -309,11 +309,9 @@ public class DASchemaAttrGenerator extends BaseGenerator {
         if (mergedEA.containsKey(getLabel(rec))) {
             logger.println("[Merged Attribute] : " + getLabel(rec) + " ---> " + mergedEA.get(getLabel(rec)));
             String dasaUri = kbPrefix + "DASA-" + SDDName + "-" + mergedEA.get(getLabel(rec)).get(0).trim().replace(" ", "").replace("_","-").replace("??", "");
-            String varSpecUri = dasaUri.replace("DASA-", "Var-Spec-");
             row.put("hasURI", dasaUri);
             row.put("a", "hasco:DASchemaAttribute");
             row.put("hasco:hascoType", "hasco:DASchemaAttribute");
-            row.put("hasco:hasVarSpec", varSpecUri);
             row.put("rdfs:label", mergedEA.get(getLabel(rec)).get(0));
             row.put("rdfs:comment", mergedEA.get(getLabel(rec)).get(1));
             row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);
@@ -357,11 +355,9 @@ public class DASchemaAttrGenerator extends BaseGenerator {
                 row.put("hasco:hasAttribute", getAttribute(rec));
             }
             String dasaUri = kbPrefix + "DASA-" + SDDName + "-" + getLabel(rec).trim().replace(" ", "").replace("_","-").replace("??", "");
-            String varSpecUri = dasaUri.replace("DASA-", "Var-Spec-");
             row.put("hasURI", dasaUri);
             row.put("a", "hasco:DASchemaAttribute");
             row.put("hasco:hascoType", "hasco:DASchemaAttribute");
-            row.put("hasco:hasVarSpec", varSpecUri);
             row.put("rdfs:label", getLabel(rec));
             row.put("rdfs:comment", getLabel(rec));
             row.put("hasco:partOfSchema", kbPrefix + "DAS-" + SDDName);

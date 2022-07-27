@@ -21,6 +21,7 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.vocabularies.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -336,7 +337,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 code.setLabel(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals(HASCO.IS_POSSIBLE_VALUE_OF)) {
                 code.setHasDASAUri(object.asResource().getURI());
@@ -346,7 +347,7 @@ public class PossibleValue extends HADatAcClass implements Comparable<PossibleVa
                 code.setHasVariable(object.asLiteral().getString());
             } else if (statement.getPredicate().getURI().equals(HASCO.HAS_CODE_LABEL)) {
                 code.setHasCodeLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.SUBCLASS_OF)) {
                 code.setSuperUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals(HASCO.HAS_CLASS)) {
             	try {

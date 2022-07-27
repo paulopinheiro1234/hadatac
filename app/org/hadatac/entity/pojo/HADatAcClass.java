@@ -25,6 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.models.TreeNode;
+import org.hadatac.vocabularies.PROV;
+import org.hadatac.vocabularies.RDF;
+import org.hadatac.vocabularies.RDFS;
 
 public class HADatAcClass extends HADatAcThing {
 
@@ -219,40 +222,40 @@ public class HADatAcClass extends HADatAcThing {
             object = statement.getObject();
             //System.out.println("pred: " + statement.getPredicate().getURI());
             String predUri = statement.getPredicate().getURI();
-            if (predUri.equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            if (predUri.equals(RDFS.LABEL)) {
                 typeClass.setLabel(object.asLiteral().getString());
-            } else if (predUri.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+            } else if (predUri.equals(RDF.TYPE)) {
                 String objUri = object.asResource().getURI();
                 //System.out.println("obj: " + objUri);
                 if (objUri != null && !objUri.equals(classUri)) {
                     typeClass.setTypeUri(objUri);
                 }
-            } else if (predUri.equals("http://www.w3.org/2000/01/rdf-schema#subClassOf")) {
+            } else if (predUri.equals(RDFS.SUBCLASS_OF)) {
                 String objUri = object.asResource().getURI();
                 //System.out.println("obj: " + objUri);
                 if (objUri != null && !objUri.equals(classUri)) {
                     typeClass.setSuperUri(objUri);
                 }
-            } else if (predUri.equals("http://www.w3.org/2000/01/rdf-schema#domain")) {
+            } else if (predUri.equals(RDFS.DOMAIN)) {
                 String subUri = subject.asResource().getURI();
                 //System.out.println("sub: " + subUri);
                 if (subUri != null && !subUri.equals(classUri)) {
                     typeClass.addDomain(subUri);
                 }
-            } else if (predUri.equals("http://www.w3.org/2000/01/rdf-schema#range")) {
+            } else if (predUri.equals(RDFS.RANGE)) {
                 String subUri = subject.asResource().getURI();
                 //System.out.println("sub: " + subUri);
                 if (subUri != null && !subUri.equals(classUri)) {
                     typeClass.addRange(subUri);
                 }
-            } else if (predUri.equals("http://www.w3.org/2002/07/owl#disjointWith")) {
+            } else if (predUri.equals(RDFS.DISJOINT_WITH)) {
                 String objUri = object.asResource().getURI();
                 if (objUri != null && !objUri.equals(classUri)) {
                     //System.out.println("obj: " + objUri);
                     typeClass.addDisjointWith(objUri);
                 }
-            } else if (predUri.equals("http://www.w3.org/2000/01/rdf-schema#comment") ||
-                       predUri.equals("http://www.w3.org/ns/prov#definition")) {
+            } else if (predUri.equals(RDFS.COMMENT) ||
+                       predUri.equals(PROV.DEFINITION)) {
                 String textStr = object.asLiteral().getString();
                 if (textStr != null) {
                     typeClass.setComment(textStr);
@@ -320,6 +323,9 @@ public class HADatAcClass extends HADatAcThing {
 
     public TreeNode getSuperClasses() {
         ArrayList<TreeNode> branchCollection = new ArrayList<TreeNode>();
+        if (this.uri == null) {
+            return null;
+        }
         HADatAcClass current = find(this.uri);
         while (current != null) {
             //System.out.println("Class: " + current.getUri() + " (" + current.getLabel() + ")" +
@@ -330,10 +336,14 @@ public class HADatAcClass extends HADatAcThing {
             childBranch.setUri(current.getUri());
             currentBranch.addChild(childBranch);
             branchCollection.add(currentBranch);
-            current = find(current.getSuperUri());
+            if (current.getSuperUri() != null && !current.getSuperUri().isEmpty()) {
+                current = find(current.getSuperUri());
+            } else {
+                current = null;
+            }
         }
         TreeNode result = buildTree(branchCollection);
-        if (result.getChildren() == null) {
+        if (result.getChildren() == null || result.getChildren().size() <= 0) {
             return null;
         }
         return result.getChildren().get(0);

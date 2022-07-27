@@ -58,7 +58,7 @@
                          <b><font color="green">OPERATIONAL</font></b> 
                          <br>    		
                          Data Acquisitions:  <b>@DataContext.playTotalDataAcquisitions() documents.</b>  
-						 <!--   Data Files:  <b>@DataContext.playTotalDataFiles() documents.</b>  -->
+						 Namespaces:  <b>@DataContext.playTotalNameSpaces() documents.</b>
                          Data Content:  <b>@DataContext.playTotalMeasurements() documents.</b>
                      } else {
                          <b><font color="red">DOWN</font></b>
@@ -67,7 +67,7 @@
  
                      <div id="question-box">
                          <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("collections")" class="btn btn-primary" role="button">Clean Data Acquisitions</a>
-                         <!--   <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("files")" class="btn btn-primary" role="button">Clean Data Files</a>  -->
+                         <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("namespaces")" class="btn btn-primary" role="button">Clean NameSpaces</a>
                          <a href="@org.hadatac.console.controllers.triplestore.routes.Clean.clean("acquisitions")" class="btn btn-primary" role="button">Clean Data</a>
                      </div>
                  </div>
@@ -121,7 +121,7 @@
 	       </div>
 
 	     @if((oper=="collections") || (oper=="acquisitions") || (oper=="files") || (oper=="metadata") || (oper=="usergraph") ||
-	         (oper=="unprocessed") || (oper=="processed") || (oper=="working")) {
+             (oper=="namespaces") || (oper=="unprocessed") || (oper=="processed") || (oper=="working")) {
                 <script> 
                     var msg = "@Clean.playClean(oper)";
                     $('#msgarea').html(msg.replace(/&lt;br&gt;/g, '<br>'));

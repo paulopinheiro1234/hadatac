@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
@@ -15,11 +16,13 @@ import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.vocabularies.RDFS;
+import org.hadatac.vocabularies.SIO;
 
-
+@JsonFilter("entityFilter")
 public class Entity extends HADatAcClass implements Comparable<Entity> {
 
-    static String className = "sio:SIO_000776";
+    static String className = SIO.ENTITY;
 
     public List<Characteristic> characteristics;
 
@@ -32,7 +35,7 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         List<Entity> entities = new ArrayList<Entity>();
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
                 " SELECT ?uri WHERE { " +
-                " ?uri rdfs:subClassOf* sio:SIO_000776 . " +
+                " ?uri rdfs:subClassOf* <" + SIO.ENTITY + "> . " +
                 "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
@@ -89,14 +92,14 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         while (stmtIterator.hasNext()) {
             Statement statement = stmtIterator.next();
             RDFNode object = statement.getObject();
-            if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:label"))) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 String label = object.asLiteral().getString();
 
                 // prefer longer one
                 if (label.length() > entity.getLabel().length()) {
                     entity.setLabel(label);
                 }
-            } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:subClassOf"))) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.SUBCLASS_OF)) {
                 entity.setSuperUri(object.asResource().getURI());
             }
         }
@@ -118,14 +121,14 @@ public class Entity extends HADatAcClass implements Comparable<Entity> {
         while (stmtIterator.hasNext()) {
             Statement statement = stmtIterator.next();
             RDFNode object = statement.getObject();
-            if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:label"))) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 String label = object.asLiteral().getString();
 
                 // prefer longer one
                 if (label.length() > entity.getLabel().length()) {
                     entity.setLabel(label);
                 }
-            } else if (statement.getPredicate().getURI().equals(URIUtils.replacePrefixEx("rdfs:subClassOf"))) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.SUBCLASS_OF)) {
                 entity.setSuperUri(object.asResource().getURI());
             }
         }
