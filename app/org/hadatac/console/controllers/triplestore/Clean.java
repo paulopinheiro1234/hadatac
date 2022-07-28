@@ -94,6 +94,7 @@ public class Clean extends Controller {
                     ConfigFactory.load().getString("hadatac.solr.data"),
                     false);
             result = namespaces.cleanNameSpaces(Feedback.WEB);
+            NameSpaces.getInstance().reload();
         } else if (oper.equals("unprocessed")) {
         	List<DataFile> selected = DataFile.findByStatus(DataFile.UNPROCESSED);
         	String message = "0 unprocessed datafiles deleted";

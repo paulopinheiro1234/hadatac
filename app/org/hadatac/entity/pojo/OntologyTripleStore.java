@@ -16,6 +16,9 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
+import org.hadatac.vocabularies.OWL;
+import org.hadatac.vocabularies.RDF;
+import org.hadatac.vocabularies.RDFS;
 
 public class OntologyTripleStore {
 
@@ -98,13 +101,13 @@ public class OntologyTripleStore {
         while (stmtIterator.hasNext()) {
             statement = stmtIterator.next();
             object = statement.getObject();
-            if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+            if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
                 ontology.setLabel(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+            } else if (statement.getPredicate().getURI().equals(RDF.TYPE)) {
                 ontology.setTypeUri(object.asResource().getURI());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#comment")) {
+            } else if (statement.getPredicate().getURI().equals(RDFS.COMMENT)) {
                 ontology.setComment(object.asLiteral().getString());
-            } else if (statement.getPredicate().getURI().equals("http://www.w3.org/2002/07/owl#versionIRI")) {
+            } else if (statement.getPredicate().getURI().equals(OWL.VERSION_IRI)) {
                 ontology.setVersion(object.asResource().getURI());
             }
         }

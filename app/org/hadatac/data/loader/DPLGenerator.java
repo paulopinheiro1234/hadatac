@@ -19,7 +19,7 @@ public class DPLGenerator extends BaseGenerator {
 
 	@Override
 	public Map<String, Object> createRow(Record rec, int rowNumber) throws Exception {
-		System.out.println("inside DPLGenerator.createRow ");
+		//System.out.println("inside DPLGenerator.createRow ");
 		Map<String, Object> row = new HashMap<String, Object>();
 		
 		for (String header : file.getHeaders()) {
@@ -40,7 +40,7 @@ public class DPLGenerator extends BaseGenerator {
 
 	@Override
 	public void createRows() throws Exception {
-		System.out.println("inside DPLGenerator.createRows() ");
+		//System.out.println("inside DPLGenerator.createRows() ");
 		if (records == null) {
 			return;
 		}
@@ -66,11 +66,8 @@ public class DPLGenerator extends BaseGenerator {
 
 	@Override
 	public boolean commitRowsToTripleStore(List<Map<String, Object>> rows) {
-		System.out.println("inside DPLGenerator.commitRowsToTripleStore");
 		for (Map<String, Object> row : rows) {
-			System.out.println("  new row");
 			for (Map.Entry<String, Object> entry : row.entrySet()) {
-				System.out.println("    " + entry.getKey() + "=>" + entry.getValue().toString());
 			}
 		}
 		Model model = MetadataFactory.createModel(rows, getNamedGraphUri());

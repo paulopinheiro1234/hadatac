@@ -39,35 +39,39 @@ public class NameSpaces {
 
     private NameSpaces() {
 
-        //System.out.println("Instantiating NameSpaces");
-        //System.out.println("  - Reading ontologies from Triple Store");
-        // LOAD FROM TRIPLESTORE AND THEN FROM NAMESPACE.PROPERTIES
+        System.out.println("Instantiating NameSpaces");
+        System.out.println("  - Reading ontologies from SOLR");
+        // LOAD NAMESPACES FROM SOLR NAMESPACE COLLECTION
         List<NameSpace> namespaces = NameSpace.findAll();
+
+        // IF NAMESPACES IS EMPTY THEN LOAD FROM NAMESPACE.PROPERTIES
         if (namespaces.isEmpty()) {
-            //System.out.println("     = Had to read from namespace.properties");
+            System.out.println("Reading namespaces from namespace.properties");
             InputStream inputStream = getClass().getClassLoader()
                     .getResourceAsStream("namespaces.properties");
             namespaces = loadFromFile(inputStream);
+            for (NameSpace ns : namespaces) {
+                System.out.println("  - Updating " + namespaces.size() + " namespaces with number of Triples");
+                ns.updateNumberOfLoadedTriples();
+            }
         }
 
-        //System.out.println("  - Updating the " + namespaces.size() + " ontologies with number of Triples");
-        // LOAD NUMBER OF TRIPLES PER NAMESPACE
+        // ADD NAMESPACES INTO CACHE
         for (NameSpace ns : namespaces) {
-            ns.updateNumberOfLoadedTriples();
-            //System.out.println("       =>Updated " + ns.getAbbreviation());
             table.put(ns.getAbbreviation(), ns);
         }
 
-        //System.out.println("  - Generating ordered list of ontologies");
+        System.out.println("  - Generating ordered list of ontologies");
         // CREATE AN ORDERED LIST OF NAMESPACES (ONTOLOGIES)
         ontologyList = getOrderedNamespacesAsList();
 
         //System.out.println("  - Update ontologies with content from the ontology itself");
         // UPDATE THE NAMESPACES WITH CONTENT COMING FROM THE ONTOLOGIES AS PUBLISHED ON THE WEB
+        /**
         for (NameSpace ns: ontologyList) {
             ns.updateFromTripleStore();
         }
-
+         **/
     }
 
     public String getNameByAbbreviation(String abbr) {
@@ -98,7 +102,7 @@ public class NameSpaces {
         table.clear();
         List<NameSpace> namespaces = NameSpace.findAll();
         for (NameSpace ns : namespaces) {
-            ns.updateFromTripleStore();
+            ns.updateNumberOfLoadedTriples();
             table.put(ns.getAbbreviation(), ns);
         }
 
@@ -161,15 +165,15 @@ public class NameSpaces {
     }
 
     private List<NameSpace> getOrderedNamespacesAsList() {
-        List<NameSpace> nameSpaces = new ArrayList<NameSpace>(table.values());
-        nameSpaces.sort(new Comparator<NameSpace>() {
+        List<NameSpace> orderedList = new ArrayList<NameSpace>(table.values());
+        orderedList.sort(new Comparator<NameSpace>() {
             @Override
             public int compare(NameSpace o1, NameSpace o2) {
                 return o1.getAbbreviation().toLowerCase().compareTo(
                         o2.getAbbreviation().toLowerCase());
             }
         });
-        return nameSpaces;
+        return orderedList;
     }
 
     private String getTurtleNameSpaceList() {

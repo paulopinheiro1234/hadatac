@@ -176,6 +176,129 @@ public class NameSpace extends HADatAcThing {
             return "<" + nsAbbrev + ":> " + nsName + " (" + showType + ", " + nsURL + ")";
     }
 
+    public List<String> getOntologyURIs() {
+        List<String> uris = new ArrayList<String>();
+        try {
+            String queryString = "SELECT ?uri \n"
+                    + "FROM <" + getName() + "> \n"
+                    + "WHERE { \n"
+                    + " ?ont <http://www.w3.org/2000/01/rdf-schema#subClassOf>* <http://www.w3.org/2002/07/owl#Ontology> . \n"
+                    + " ?uri a ?ont . \n"
+                    + "} ";
+
+            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
+                    CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+            while(resultsrw.hasNext()){
+                QuerySolution soln = resultsrw.next();
+                uris.add(soln.getResource("uri").getURI());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+        return uris;
+    }
+
+
+    public static List<NameSpace> findWithPages(int pageSize, int offset) {
+        List<NameSpace> listOntologies = NameSpaces.getInstance().getOntologyList();
+        if (listOntologies == null || pageSize < 1 || offset < 0) {
+            return new ArrayList<NameSpace>();
+        }
+        return listOntologies.subList(offset, offset + pageSize - 1);
+    }
+
+    public static int getNumberOntologies() {
+        List<NameSpace> listOntologies = NameSpaces.getInstance().getOntologyList();
+        if (listOntologies == null) {
+            return 0;
+        }
+        return listOntologies.size();
+    }
+
+    public static NameSpace find(String uri) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "name_str:\"" + uri + "\"");
+        query.set("rows", "10");
+        List<NameSpace> namespaces = findByQuery(query);
+        if (namespaces.isEmpty()) {
+            return null;
+        }
+        return namespaces.get(0);
+    }
+
+    public static NameSpace findByAbbreviation(String abbreviation) {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "abbreviation:\"" + abbreviation + "\"");
+        query.set("rows", "10");
+        List<NameSpace> namespaces = findByQuery(query);
+        if (namespaces.isEmpty()) {
+            return null;
+        }
+
+        return namespaces.get(0);
+    }
+
+    public static List<NameSpace> findAll() {
+        SolrQuery query = new SolrQuery();
+        query.set("q", "*:*");
+        query.set("rows", "10000000");
+
+        return findByQuery(query);
+    }
+
+    public static List<NameSpace> findByQuery(SolrQuery query) {
+        List<NameSpace> list = new ArrayList<NameSpace>();
+
+        SolrClient solr = new HttpSolrClient.Builder(
+                CollectionUtil.getCollectionPath(CollectionUtil.Collection.NAMESPACE)).build();
+
+        try {
+            QueryResponse response = solr.query(query);
+            solr.close();
+            SolrDocumentList results = response.getResults();
+            Iterator<SolrDocument> i = results.iterator();
+            while (i.hasNext()) {
+                list.add(convertFromSolr(i.next()));
+            }
+        } catch (Exception e) {
+            list.clear();
+            System.out.println("[ERROR] NameSpace.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
+        }
+
+        return list;
+    }
+
+    private static NameSpace convertFromSolr(SolrDocument doc) {
+        NameSpace object = new NameSpace();
+        if (doc != null) {
+            if (doc.getFieldValue("abbreviation") != null) {
+                object.setAbbreviation(doc.getFieldValue("abbreviation").toString());
+            }
+            if (doc.getFieldValue("name_str") != null) {
+                object.setName(doc.getFieldValue("name_str").toString());
+            }
+            if (doc.getFieldValue("mime_type_str") != null) {
+                object.setMimeType(doc.getFieldValue("mime_type_str").toString());
+            }
+            if (doc.getFieldValue("url_str") != null) {
+                object.setURL(doc.getFieldValue("url_str").toString());
+            }
+            if (doc.getFieldValue("comment_str") != null) {
+                object.setComment(doc.getFieldValue("comment_str").toString());
+            }
+            if (doc.getFieldValue("number_of_loaded_triples_int") != null) {
+                object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
+            }
+            if (doc.getFieldValue("priority_int") != null) {
+                object.setPriority(Integer.valueOf(doc.getFieldValue("priority_int").toString()).intValue());
+            }
+            object.setTypeUri(HASCO.ONTOLOGY);
+            object.setHascoTypeUri(HASCO.ONTOLOGY);
+        }
+        return object;
+    }
+
     public void updateFromTripleStore() {
         OntologyTripleStore ont = OntologyTripleStore.find(this.getUri());
         this.setComment(ont.getComment());
@@ -201,29 +324,6 @@ public class NameSpace extends HADatAcThing {
  	        System.out.println("  - Value of CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL)=[" + CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL) + "]");
             e.printStackTrace();
         }
-    }
-
-    public List<String> getOntologyURIs() {
-        List<String> uris = new ArrayList<String>();
-        try {
-            String queryString = "SELECT ?uri \n"
-                    + "FROM <" + getName() + "> \n"
-                    + "WHERE { \n"
-                    + " ?ont <http://www.w3.org/2000/01/rdf-schema#subClassOf>* <http://www.w3.org/2002/07/owl#Ontology> . \n"
-                    + " ?uri a ?ont . \n"
-                    + "} ";
-
-            ResultSetRewindable resultsrw = SPARQLUtils.select(CollectionUtil.getCollectionPath(
-                    CollectionUtil.Collection.METADATA_SPARQL), queryString);
-
-            while(resultsrw.hasNext()){
-                QuerySolution soln = resultsrw.next();
-                uris.add(soln.getResource("uri").getURI());
-            }
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-        return uris;
     }
 
     public void loadTriples(String address, boolean fromRemote) {
@@ -344,106 +444,6 @@ public class NameSpace extends HADatAcThing {
 
         return -1;
     }
-
-    public static NameSpace convertFromSolr(SolrDocument doc) {
-        NameSpace object = new NameSpace();
-        if (doc != null) {
-            if (doc.getFieldValue("abbreviation") != null) {
-                object.setAbbreviation(doc.getFieldValue("abbreviation").toString());
-            }
-            if (doc.getFieldValue("name_str") != null) {
-                object.setName(doc.getFieldValue("name_str").toString());
-            }
-            if (doc.getFieldValue("mime_type_str") != null) {
-                object.setMimeType(doc.getFieldValue("mime_type_str").toString());
-            }
-            if (doc.getFieldValue("url_str") != null) {
-                object.setURL(doc.getFieldValue("url_str").toString());
-            }
-            if (doc.getFieldValue("comment_str") != null) {
-                object.setComment(doc.getFieldValue("comment_str").toString());
-            }
-            if (doc.getFieldValue("number_of_loaded_triples_int") != null) {
-                object.setNumberOfLoadedTriples(Integer.valueOf(doc.getFieldValue("number_of_loaded_triples_int").toString()).intValue());
-            }
-            if (doc.getFieldValue("priority_int") != null) {
-                object.setPriority(Integer.valueOf(doc.getFieldValue("priority_int").toString()).intValue());
-            }
-            object.setTypeUri(HASCO.ONTOLOGY);
-            object.setHascoTypeUri(HASCO.ONTOLOGY);
-        }
-        return object;
-    }
-
-    public static List<NameSpace> findAll() {
-        SolrQuery query = new SolrQuery();
-        query.set("q", "*:*");
-        query.set("rows", "10000000");
-
-        return findByQuery(query);
-    }
-
-    public static List<NameSpace> findByQuery(SolrQuery query) {
-        List<NameSpace> list = new ArrayList<NameSpace>();
-
-        SolrClient solr = new HttpSolrClient.Builder(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.NAMESPACE)).build();
-
-        try {
-            QueryResponse response = solr.query(query);
-            solr.close();
-            SolrDocumentList results = response.getResults();
-            Iterator<SolrDocument> i = results.iterator();
-            while (i.hasNext()) {
-                list.add(convertFromSolr(i.next()));
-            }
-        } catch (Exception e) {
-            list.clear();
-            System.out.println("[ERROR] NameSpace.findByQuery(SolrQuery) - Exception message: " + e.getMessage());
-        }
-
-        return list;
-    }
-
-    public static List<NameSpace> findWithPages(int pageSize, int offset) {
-        List<NameSpace> listOntologies = NameSpaces.getInstance().getOntologyList();
-        if (listOntologies == null || pageSize < 1 || offset < 0) {
-            return new ArrayList<NameSpace>();
-        }
-        return listOntologies.subList(offset, offset + pageSize - 1);
-    }
-
-    public static int getNumberOntologies() {
-        List<NameSpace> listOntologies = NameSpaces.getInstance().getOntologyList();
-        if (listOntologies == null) {
-            return 0;
-        }
-        return listOntologies.size();
-    }
-
-    public static NameSpace find(String uri) {
-        SolrQuery query = new SolrQuery();
-        query.set("q", "name_str:\"" + uri + "\"");
-        query.set("rows", "10");
-        List<NameSpace> namespaces = findByQuery(query);
-        if (namespaces.isEmpty()) {
-            return null;
-        }
-        return namespaces.get(0);
-    }
-
-    public static NameSpace findByAbbreviation(String abbreviation) {
-        SolrQuery query = new SolrQuery();
-        query.set("q", "abbreviation:\"" + abbreviation + "\"");
-        query.set("rows", "10");
-        List<NameSpace> namespaces = findByQuery(query);
-        if (namespaces.isEmpty()) {
-            return null;
-        }
-
-        return namespaces.get(0);
-    }
-
     public static RDFFormat getRioFormat(String contentType) {
         if (contentType.contains("turtle")) {
             return RDFFormat.TURTLE;

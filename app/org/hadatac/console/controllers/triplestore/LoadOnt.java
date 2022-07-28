@@ -50,7 +50,7 @@ public class LoadOnt extends Controller {
         try {
             // if the directory does not exist, create it
             if (!folder.exists()) {
-                System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
+                //System.out.println("creating directory: " + NameSpaces.CACHE_PATH);
                 try{
                     folder.mkdir();
                 } catch(SecurityException se){
@@ -61,7 +61,7 @@ public class LoadOnt extends Controller {
 
             String name = "";
             if (folder.listFiles() != null) {
-                System.out.println("folder.listFiles:" + folder.listFiles());
+                //System.out.println("folder.listFiles:" + folder.listFiles());
                 for (final File fileEntry : folder.listFiles()) {
                     if (!fileEntry.isDirectory()) {
                         name = fileEntry.getName();
