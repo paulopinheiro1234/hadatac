@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+import com.typesafe.config.ConfigFactory;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.utils.CollectionUtil;
@@ -25,6 +26,8 @@ import play.data.DynamicForm;
 import play.data.FormFactory;
 
 import javax.inject.Inject;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 public class SolrSearchProxy extends Controller {
 
@@ -45,6 +48,14 @@ public class SolrSearchProxy extends Controller {
             con.setRequestMethod("POST");
             con.setRequestProperty("Accept-Charset", "utf-8");
             con.setDoOutput(true);
+            if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.solr.solrAuth.enableSolrAuth"))){
+                String user= ConfigFactory.load().getString("hadatac.solr.solrAuth.user");
+                String password= ConfigFactory.load().getString("hadatac.solr.solrAuth.password");
+                String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString((user+":"+password).getBytes(StandardCharsets.UTF_8));
+                con.setRequestProperty("Authorization", authHeaderValue);
+            }
+            String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString("solr:SolrRocks".getBytes(StandardCharsets.UTF_8));
+            con.setRequestProperty("Authorization", authHeaderValue);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(path.substring(path.indexOf('?')+1, path.length()));
             wr.flush();
