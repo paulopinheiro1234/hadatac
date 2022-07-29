@@ -242,7 +242,11 @@ public class Attribute extends HADatAcClass implements Comparable<Attribute> {
             statement = stmtIterator.next();
             object = statement.getObject();
             if (statement.getPredicate().getURI().equals(RDFS.LABEL)) {
-                attribute.setLabel(object.asLiteral().getString());
+                if (object.isLiteral()) {
+                    attribute.setLabel(object.asLiteral().getString());
+                } else {
+                    attribute.setLabel(object.asResource().getURI());
+                }
             } else if (statement.getPredicate().getURI().equals(RDFS.SUBCLASS_OF)) {
                 attribute.setSuperUri(object.asResource().getURI());
             } else if (statement.getPredicate().getURI().equals(DCTERMS.IDENTIFIER)) {

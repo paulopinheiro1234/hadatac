@@ -603,8 +603,29 @@ public class StudyObject extends HADatAcThing {
         return Measurement.findByConceptAndUri(HASCO.STUDY_OBJECT, uri);
     }
 
-    public static StudyObject findFacetSearch(String obj_uri, String studyId) {
+    public static StudyObject findFacetSearch(String objUri, String studyUri) {
 
+        System.out.println("Inside findFacetSearch");
+        StudyObject so = StudyObject.find(objUri);
+        if (so == null) {
+            System.out.println("[ERROR] StudyObject.findFacetSearch(): Could not find object with URI [" + objUri + "].");
+            return null;
+        }
+        ObjectCollection soc = ObjectCollection.find(so.getIsMemberOf());
+        if (soc == null) {
+            System.out.println("[ERROR] StudyObject.findFacetSearch(): Could not find SOC with URI [" + so.getIsMemberOf() + "].");
+            return null;
+        }
+        if (soc.getStudyUri() != null && soc.getStudyUri().equals(studyUri)) {
+            return so;
+        } else {
+            System.out.println("[ERROR]  StudyObject.findFacetSearch(): Could not find object with URI [" + objUri + "] belonging to study [" + studyUri + "]");
+            return null;
+        }
+
+        /*
+        System.out.println("studyId is [" + studyUri + "]");
+        System.out.println("so.getIsMemberOf() is [" +so.getIsMemberOf() + "]");
         StudyObject obj = null;
         if (obj_uri == null || obj_uri.trim().equals("")) {
             return obj;
@@ -624,7 +645,7 @@ public class StudyObject extends HADatAcThing {
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
 
         if (!resultsrw.hasNext()) {
-            //System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: <" + obj_uri + ">");
+            System.out.println("[WARNING] StudyObject. Could not find OBJ with URI: <" + obj_uri + ">");
             return obj;
         }
 
@@ -634,9 +655,11 @@ public class StudyObject extends HADatAcThing {
         String commentStr = "";
 
         String studyTag = "";
-        if ( studyId.contains("STD-") ) {
-            studyTag = studyId.substring(studyId.indexOf("STD-") + "STD-".length());
+        if ( studyUri.contains("STD-") ) {
+            studyTag = studyUri.substring(studyUri.indexOf("STD-") + "STD-".length());
         }
+
+        System.out.println("Inside findFacetSearch. Start casting object");
 
         boolean matchFound = false;
         while (resultsrw.hasNext()) {
@@ -690,8 +713,11 @@ public class StudyObject extends HADatAcThing {
                 }
             }
         }
+        System.out.println("Inside findFacetSearch. End casting object");
 
-        return obj;
+        return obj
+        ;
+         */
     }
 
     public static Map<String, String> buildCachedUriByOriginalId() {
@@ -699,7 +725,6 @@ public class StudyObject extends HADatAcThing {
         
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
                 "SELECT DISTINCT ?objUri ?originalId WHERE { \n" + 
-                " ?objUri hasco:originalID ?originalId . \n" + 
                 "}";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(

@@ -1225,7 +1225,7 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         query.set("sort", "started_at_date asc");
         query.set("rows", "10000000");
 
-        System.out.println("STR.findByUri() [" + dataAcquisitionUri + "]");
+        //System.out.println("STR.findByUri() [" + dataAcquisitionUri + "]");
         List<STR> results = findByQuery(query);
         if (!results.isEmpty()) {
             return results.get(0);
@@ -1258,12 +1258,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
         try {
             QueryResponse response = solr.query(query);
-            System.out.println("STR query executed");
             solr.close();
             SolrDocumentList docs = response.getResults();
             Iterator<SolrDocument> i = docs.iterator();
             while (i.hasNext()) {
-                System.out.println("Retrieving STR");
                 results.add(convertFromSolr(i.next()));
             }
         } catch (Exception e) {
@@ -1283,12 +1281,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
         try {
             QueryResponse response = solr.query(query);
-            System.out.println("STR as GenericInstance query executed");
             solr.close();
             SolrDocumentList docs = response.getResults();
             Iterator<SolrDocument> i = docs.iterator();
             while (i.hasNext()) {
-                System.out.println("Retrieving STR as GenericInstance");
                 results.add(convertGenericInstanceFromSolr(i.next()));
             }
         } catch (Exception e) {

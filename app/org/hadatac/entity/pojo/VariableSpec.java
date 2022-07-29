@@ -123,55 +123,70 @@ public class VariableSpec extends HADatAcThing {
 	public VariableSpec(String typeUri, String hascoTypeUri , Entity ent, String role, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr, boolean isCategorical) {
 		this.typeUri = typeUri;
 		this.hascoTypeUri = hascoTypeUri;
-		this.entUri = ent.getUri();
-		this.role = role;
-		for (Attribute attr : attrList) {
-			this.attrListUri.add(attr.getUri());
+		if (ent != null) {
+			this.entUri = ent.getUri();
 		}
-		this.inRelationToUri = inRelationTo.getUri();
-		this.unitUri = unit.getUri();
-		this.timeAttrUri = timeAttr.getUri();
+		this.role = role;
+		this.attrListUri = new ArrayList<String>();
+		if (attrList != null) {
+			for (Attribute attr : attrList) {
+				this.attrListUri.add(attr.getUri());
+			}
+		}
+		if (inRelationTo != null) {
+			this.inRelationToUri = inRelationTo.getUri();
+		}
+		if (unit != null) {
+			this.unitUri = unit.getUri();
+		}
+		if (timeAttr != null) {
+			this.timeAttrUri = timeAttr.getUri();
+		}
 		this.isCategorical = false;
 	}
 
 	public VariableSpec(VariableSpec varSpec) {
-		this.typeUri = varSpec.getTypeUri();
-		this.hascoTypeUri = varSpec.getHascoTypeUri();
-		this.entUri = varSpec.getEntityUri();
-		this.role = varSpec.getRole();
-		this.attrListUri = varSpec.getAttributeListUri();
-		this.inRelationToUri = varSpec.getInRelationToUri();
-		this.unitUri = varSpec.getUnitUri();
-		this.timeAttrUri = varSpec.getTimeUri();
-		this.isCategorical = varSpec.getIsCategorical();
+		if (varSpec != null) {
+			this.typeUri = varSpec.getTypeUri();
+			this.hascoTypeUri = varSpec.getHascoTypeUri();
+			this.entUri = varSpec.getEntityUri();
+			this.role = varSpec.getRole();
+			this.attrListUri = varSpec.getAttributeListUri();
+			this.inRelationToUri = varSpec.getInRelationToUri();
+			this.unitUri = varSpec.getUnitUri();
+			this.timeAttrUri = varSpec.getTimeUri();
+			this.isCategorical = varSpec.getIsCategorical();
+		}
 	}
 
 	public VariableSpec(DataAcquisitionSchemaAttribute dasa) {
-		try {
-			this.typeUri = HASCO.VARIABLE_SPEC;
-			this.hascoTypeUri = HASCO.VARIABLE_SPEC;
-			if (dasa.getEntity() != null && !dasa.getEntity().isEmpty()) {
-				this.entUri = dasa.getEntity();
+		if (dasa != null) {
+			try {
+				this.typeUri = HASCO.VARIABLE_SPEC;
+				this.hascoTypeUri = HASCO.VARIABLE_SPEC;
+				if (dasa.getEntity() != null && !dasa.getEntity().isEmpty()) {
+					this.entUri = dasa.getEntity();
+				}
+				//this.role = dasa.getRole();
+				if (dasa.getAttributes() != null && dasa.getAttributes().size() > 0) {
+					this.attrListUri = dasa.getAttributes();
+				}
+				if (dasa.getInRelationToUri() != null && !dasa.getInRelationToUri().isEmpty()) {
+					this.inRelationToUri = dasa.getInRelationToUri();
+				}
+				if (dasa.getUnit() != null && !dasa.getUnit().isEmpty()) {
+					this.unitUri = dasa.getUnit();
+				}
+				if (dasa.getEventUri() != null && !dasa.getEventUri().isEmpty()) {
+					this.timeAttrUri = dasa.getEventUri();
+				}
+				this.setLabel();
+				this.setUri();
+				System.out.println("Inside VariableSpec(dasa). label is [" + this.label + "]  uri is [" + this.uri + "]");
+				this.comment = "A variable specification";
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			//this.role = dasa.getRole();
-			if (dasa.getAttributes() != null && dasa.getAttributes().size() > 0) {
-				this.attrListUri = dasa.getAttributes();
-			}
-			if (dasa.getInRelationToUri() != null && !dasa.getInRelationToUri().isEmpty()) {
-				this.inRelationToUri = dasa.getInRelationToUri();
-			}
-			if (dasa.getUnit() != null && !dasa.getUnit().isEmpty()) {
-				this.unitUri = dasa.getUnit();
-			}
-			if (dasa.getEventUri() != null && !dasa.getEventUri().isEmpty()) {
-				this.timeAttrUri = dasa.getEventUri();
-			}
-			this.setLabel();
-			this.setUri();
-			System.out.println("Inside VariableSpec(dasa). label is [" + this.label + "]  uri is [" + this.uri + "]");
-			this.comment = "A variable specification";
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 
