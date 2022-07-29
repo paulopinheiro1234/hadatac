@@ -49,13 +49,9 @@ public class SolrSearchProxy extends Controller {
             con.setRequestProperty("Accept-Charset", "utf-8");
             con.setDoOutput(true);
             if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.solr.solrAuth.enableSolrAuth"))){
-                String user= ConfigFactory.load().getString("hadatac.solr.solrAuth.user");
-                String password= ConfigFactory.load().getString("hadatac.solr.solrAuth.password");
-                String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString((user+":"+password).getBytes(StandardCharsets.UTF_8));
+                String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString((ConfigFactory.load().getString("hadatac.solr.solrAuth.user")+":"+ConfigFactory.load().getString("hadatac.solr.solrAuth.password")).getBytes(StandardCharsets.UTF_8));
                 con.setRequestProperty("Authorization", authHeaderValue);
             }
-            String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString("solr:SolrRocks".getBytes(StandardCharsets.UTF_8));
-            con.setRequestProperty("Authorization", authHeaderValue);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(path.substring(path.indexOf('?')+1, path.length()));
             wr.flush();
