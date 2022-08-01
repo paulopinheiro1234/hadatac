@@ -2,7 +2,7 @@
 @import org.hadatac.console.views.html._
 @import org.hadatac.console.models.FacetHandler
 @import org.hadatac.console.controllers.dataacquisitionsearch.Downloader
-@import org.hadatac.entity.pojo.Measurement
+@import org.hadatac.data.dsgen.GenConst
 
 @(	    page         : Int,
         rows         : Int,
@@ -146,15 +146,15 @@
                 <form id="summarizationDialogForm" method="post" action="@org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.downloadSummarization()">
                     <label for="selSummaryType">Summarization Type:</label>
                     <select class="form-control" name="selSummaryType" id="selSummaryType">
-                        <option value="@Measurement.SUMMARY_TYPE_VARIABLE">Variable frequency</option>
-                        <option value="@Measurement.SUMMARY_TYPE_SUBGROUP">Subgroup frequency</option>
+                        <option value="@GenConst.SUMMARY_TYPE_VARIABLE">Variable frequency</option>
+                        <option value="@GenConst.SUMMARY_TYPE_SUBGROUP">Subgroup frequency</option>
                     </select>
                     <br>
                     <label for="selNonCatVariable">Handling of Non Categorical Variables:</label>
                     <select class="form-control" name="selNonCatVariable" id="selNonCatVariable">
-                        <option value="@Measurement.NON_CATG_IGNORE">Ignore non-categorical variables</option>
-                        <option value="@Measurement.NON_CATG_INCLUDE">Summarize values of non-categorical variables</option>
-                        <option value="@Measurement.NON_CATG_CATG">Categorize non-categorical variables</option>
+                        <option value="@GenConst.NON_CATG_IGNORE">Ignore non-categorical variables</option>
+                        <option value="@GenConst.NON_CATG_INCLUDE">Summarize values of non-categorical variables</option>
+                        <option value="@GenConst.NON_CATG_CATG">Categorize non-categorical variables</option>
                     </select>
                     <br>
                     <input class="btn btn-info" type="submit" id="submitSummarization" value="Confirm" />

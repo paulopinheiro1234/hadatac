@@ -1,5 +1,8 @@
 package org.hadatac.entity.pojo;
 
+import org.hadatac.data.dsgen.GenCodeBook;
+import org.hadatac.data.dsgen.GenConst;
+
 import java.util.*;
 
 /*
@@ -50,9 +53,9 @@ public class AnnotatedGroup {
 
 					// values of categorical variables have valueClass
 					if (av.getValueClass() != null && !av.getValueClass().equals("")) {
-						String codeLabel = Measurement.prettyCodeBookLabel(alignment, av.getValueClass());
+						String codeLabel = GenCodeBook.prettyCodeBookLabel(alignment, av.getValueClass());
 						av.setValue(codeLabel);
-					} else if (categoricalOption.equals(Measurement.NON_CATG_CATG)) {
+					} else if (categoricalOption.equals(GenConst.NON_CATG_CATG)) {
 						av = CategorizedValue.categorize(av,alignment);
 					}
 

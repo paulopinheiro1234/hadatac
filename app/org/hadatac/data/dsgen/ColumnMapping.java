@@ -1,4 +1,4 @@
-package org.hadatac.entity.pojo;
+package org.hadatac.data.dsgen;
 
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.FirstLabel;

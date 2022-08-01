@@ -1,6 +1,5 @@
 package org.hadatac.entity.pojo;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -10,9 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
-import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
@@ -27,7 +24,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.console.http.SolrUtils;
-import org.hadatac.console.models.CodeBookEntry;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.FacetTree;
@@ -37,10 +33,8 @@ import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.vocabularies.HASCO;
 import org.hadatac.utils.NameSpaces;
-import org.hadatac.utils.Feedback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class Measurement extends HADatAcThing implements Runnable {
 
@@ -121,17 +115,6 @@ public class Measurement extends HADatAcThing implements Runnable {
     private String instrumentModel;
     private String instrumentUri;
     private String strTimestamp;
-
-    // categorical options
-    public static String WITH_CODES = "withCodes";
-    public static String WITH_VALUES = "withValues";
-    public static String WITH_CODE_BOOK = "withCodeBook";
-    public static String SUMMARY_TYPE_VARIABLE = "typeVariable";
-    public static String SUMMARY_TYPE_SUBGROUP = "typeSubgroup";
-    public static String SUMMARY_TYPE_NONE = "typeNone";
-    public static String NON_CATG_IGNORE = "nonCategoricalIgnore";
-    public static String NON_CATG_INCLUDE = "nonCategoricalInclude";
-    public static String NON_CATG_CATG = "nonCategoricalCategorize";
 
     public Measurement() {
         typeUri = HASCO.VALUE;
@@ -411,16 +394,6 @@ public class Measurement extends HADatAcThing implements Runnable {
     public void setEntityUri(String entityUri) {
         this.entityUri = entityUri;
     }
-
-    /*
-    public String getCharacteristic() {
-        return characteristic;
-    }
-
-    public void setCharacteristic(String characteristic) {
-        this.characteristic = characteristic;
-    }
-    */
 
     public List<String> getCharacteristicUris() {
         return characteristicUris;
@@ -850,111 +823,6 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    public static AcquisitionQueryResult readSolrByPage(String user_uri, int page, int pageSize, String facets,
-                                                        AcquisitionQueryResult acquisitionQueryResult, String solrQuery)  {
-
-        /*AcquisitionQueryResult acquisitionQueryResult = new AcquisitionQueryResult();
-
-        long startTime = System.currentTimeMillis();
-        List<String> ownedDAs = STR.findAllAccessibleDataAcquisition(user_uri);
-        log.info("STR.findAllAccessibleDataAcquisition(user_uri) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
-
-        if (ownedDAs.isEmpty()) {
-            System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
-            return acquisitionQueryResult;
-        }
-
-        startTime = System.currentTimeMillis();
-        FacetHandler facetHandler = new FacetHandler();
-        facetHandler.loadFacetsFromString(facets);
-        log.info("facetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
-
-        startTime = System.currentTimeMillis();
-        FacetHandler retFacetHandler = new FacetHandler();
-        retFacetHandler.loadFacetsFromString(facets);
-        log.info("retFacetHandler.loadFacetsFromString(facets) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
-
-        // System.out.println("\nfacetHandler before: " + facetHandler.toSolrQuery());
-        // System.out.println("\nfacetHandler before: " + facetHandler.toJSON());
-
-        // Run one time
-        // getAllFacetStats(facetHandler, retFacetHandler, acquisitionQueryResult, false);
-
-        // Get facet statistics
-        // getAllFacetStats(retFacetHandler, retFacetHandler, acquisitionQueryResult, true);
-        startTime = System.currentTimeMillis();
-        getAllFacetStats(facetHandler, retFacetHandler, acquisitionQueryResult, true);
-        log.info("getAllFacetStats() takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
-
-        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.bottommostFacetsToSolrQuery());
-        //System.out.println("\n\n\nfacetHandler after: " + retFacetHandler.toJSON());
-        */
-
-        // Get documents
-        long docSize = 0;
-        SolrQuery query = new SolrQuery();
-        query.setQuery(solrQuery);
-        query.setStart(page * pageSize);
-        query.setRows(pageSize);
-        //query.setFacet(true);     // not sure about these two line
-        //query.setFacetLimit(-1);  // not sure about these two line
-
-        // prepare query result
-        if ( acquisitionQueryResult == null ) return null;
-        acquisitionQueryResult.clearDocument();
-
-        long startTime = System.currentTimeMillis();
-        try {
-            SolrClient solr = new HttpSolrClient.Builder(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
-            QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
-            solr.close();
-
-            SolrDocumentList docs = queryResponse.getResults();
-
-            docSize = docs.getNumFound();
-            System.out.println("<" + user_uri + "> is reading Solr backend with page =  " + page + ", with pageSize = " + pageSize + ", # of results: " + docs.size() ) ;
-
-            Set<String> uri_set = new HashSet<String>();
-            Map<String, STR> cachedDA = new HashMap<String, STR>();
-            Map<String, String> mapClassLabel = generateCodeClassLabelFacetSearch();
-
-            System.out.println("HERE TTT1");
-
-            Iterator<SolrDocument> iterDoc = docs.iterator();
-            while (iterDoc.hasNext()) {
-                Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
-                acquisitionQueryResult.addDocument(measurement);
-                uri_set.add(measurement.getEntityUri());
-                uri_set.addAll(measurement.getCharacteristicUris());
-                uri_set.add(measurement.getUnitUri());
-            }
-
-            // Assign labels of entity, characteristic, and units collectively
-            Map<String, String> cachedLabels = Measurement.generateCachedLabelFacetSearch(new ArrayList<String>(uri_set));
-            for (Measurement measurement : acquisitionQueryResult.getDocuments()) {
-                measurement.setLabels(cachedLabels);
-            }
-
-        } catch (SolrServerException e) {
-            System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        System.out.println("HERE TTT2");
-
-        acquisitionQueryResult.setDocumentSize(docSize);
-
-        log.info("quering solr back for a single takes: " + (System.currentTimeMillis()-startTime));
-
-        return acquisitionQueryResult;
-
-    }
-
     public static AcquisitionQueryResult getAllFacetStatsWrapper(AcquisitionQueryResult result, String facets, DatabaseExecutionContext databaseExecutionContext) {
 
         long startTime = System.currentTimeMillis();
@@ -975,7 +843,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    private static void getAllFacetStats(
+    public static void getAllFacetStats(
             FacetHandler facetHandler, 
             FacetHandler retFacetHandler,
             AcquisitionQueryResult result,
@@ -1330,6 +1198,76 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         return null;
     }
+
+    /**
+     public static AcquisitionQueryResult readSolrByPage(String user_uri, int page, int pageSize, String facets,
+     AcquisitionQueryResult acquisitionQueryResult, String solrQuery)  {
+
+     // Get documents
+     long docSize = 0;
+     SolrQuery query = new SolrQuery();
+     query.setQuery(solrQuery);
+     query.setStart(page * pageSize);
+     query.setRows(pageSize);
+     //query.setFacet(true);     // not sure about these two line
+     //query.setFacetLimit(-1);  // not sure about these two line
+
+     // prepare query result
+     if ( acquisitionQueryResult == null ) return null;
+     acquisitionQueryResult.clearDocument();
+
+     long startTime = System.currentTimeMillis();
+     try {
+     SolrClient solr = new HttpSolrClient.Builder(
+     CollectionUtil.getCollectionPath(CollectionUtil.Collection.DATA_ACQUISITION)).build();
+     QueryResponse queryResponse = solr.query(query, SolrRequest.METHOD.POST);
+     solr.close();
+
+     SolrDocumentList docs = queryResponse.getResults();
+
+     docSize = docs.getNumFound();
+     System.out.println("<" + user_uri + "> is reading Solr backend with page =  " + page + ", with pageSize = " + pageSize + ", # of results: " + docs.size() ) ;
+
+     Set<String> uri_set = new HashSet<String>();
+     Map<String, STR> cachedDA = new HashMap<String, STR>();
+     Map<String, String> mapClassLabel = generateCodeClassLabelFacetSearch();
+
+     System.out.println("HERE TTT1");
+
+     Iterator<SolrDocument> iterDoc = docs.iterator();
+     while (iterDoc.hasNext()) {
+     Measurement measurement = convertFromSolr(iterDoc.next(), cachedDA, mapClassLabel);
+     acquisitionQueryResult.addDocument(measurement);
+     uri_set.add(measurement.getEntityUri());
+     uri_set.addAll(measurement.getCharacteristicUris());
+     uri_set.add(measurement.getUnitUri());
+     }
+
+     // Assign labels of entity, characteristic, and units collectively
+     Map<String, String> cachedLabels = Measurement.generateCachedLabelFacetSearch(new ArrayList<String>(uri_set));
+     for (Measurement measurement : acquisitionQueryResult.getDocuments()) {
+     measurement.setLabels(cachedLabels);
+     }
+
+     } catch (SolrServerException e) {
+     System.out.println("[ERROR] Measurement.find() - SolrServerException message: " + e.getMessage());
+     } catch (IOException e) {
+     System.out.println("[ERROR] Measurement.find() - IOException message: " + e.getMessage());
+     } catch (Exception e) {
+     System.out.println("[ERROR] Measurement.find() - Exception message: " + e.getMessage());
+     e.printStackTrace();
+     }
+
+     System.out.println("HERE TTT2");
+
+     acquisitionQueryResult.setDocumentSize(docSize);
+
+     log.info("quering solr back for a single takes: " + (System.currentTimeMillis()-startTime));
+
+     return acquisitionQueryResult;
+
+     }
+     **/
 
     /**
     public static List<Measurement> findByDataAcquisitionUri(String acquisition_uri) {
@@ -1704,6 +1642,16 @@ public class Measurement extends HADatAcThing implements Runnable {
         return results;
     }
 
+    // helper function to check if a give string has all digital and ","
+    public boolean isAllNumerical(String strValue) {
+        if ( strValue == null || strValue.length() == 0 ) return false;
+        for ( char c : strValue.toCharArray() ) {
+            if ( !Character.isDigit(c) && c != ',' && c != '.' ) return false;
+        }
+        return true;
+    }
+
+    /**
     public static void outputAsCSV(List<Measurement> measurements, 
             List<String> fieldNames, File file, String fileId) {
         try {
@@ -1753,7 +1701,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             e.printStackTrace();
         }
     }
+     **/
 
+    /**
     public static void outputAsCSVBySubjectAlignment(String ownerUri, String facets, File file, String fileId,
                                                      String summaryType, String categoricalOption,
                                                      boolean keepSameValue, ColumnMapping columnMapping) {
@@ -1967,7 +1917,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
     }
+     **/
 
+    /**
     public static void outputAsCSVBySummarization(String ownerUri, String facets, File file, String fileId,
                                                      String summaryType, String categoricalOption,
                                                      ColumnMapping columnMapping) {
@@ -2135,7 +2087,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
     }
+     **/
 
+    /**
     public static Map<String, Map<String, List<AnnotatedValue>>> readSolrPagesAndMerge(String ownerUri, String facets,
                                                                          String fileId, int pageSize,
                                                                          Map<String, List<String>> studyMap,
@@ -2178,7 +2132,9 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         return results;
     }
+     **/
 
+    /**
     private static String prepareQueryAndResult(String user_uri, String facets, AcquisitionQueryResult acquisitionQueryResult) {
 
         long startTime = System.currentTimeMillis();
@@ -2186,10 +2142,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         log.info("STR.findAllAccessibleDataAcquisition(user_uri) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
 
         if (ownedDAs.isEmpty()) {
-            /*
-             * an empty query happens when current user is not allowed to see any
-             * data acquisition
-             */
+             // an empty query happens when current user is not allowed to see any
+             // data acquisition
             System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
             return null;
         }
@@ -2211,7 +2165,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         return buildQuery(ownedDAs, facetHandler);
 
     }
+    **/
 
+    /**
     private static void parseAndMerge(Map<String, Map<String, List<AnnotatedValue>>> results, List<Measurement> measurements,
                                Map<String, List<String>> studyMap, Alignment alignment, Map<String, List<String>> alignCache,
                                String fileId, int page, int pageSize, long totalSize, String categoricalOption, boolean keepSameValue,
@@ -2273,7 +2229,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
             for (String currentAlignmentObjectUri : alignObjs) {
 
-                /* START OF REFERENCE OBJECT SCOPE */
+                // START OF REFERENCE OBJECT SCOPE
                 long startTime = System.currentTimeMillis();
                 referenceObj = alignment.getObject(currentAlignmentObjectUri);
                 duration = System.currentTimeMillis() - startTime;
@@ -2434,7 +2390,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                                 measurement.getEntityUri() + " " + measurement.getCharacteristicUris().get(0));
                 }
 
-                    /* END OF REFERENCE OBJECT SCOPE */
+                    // END OF REFERENCE OBJECT SCOPE
             }
 
             // compute and show progress
@@ -2464,8 +2420,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         System.out.println("parseAndMerge: finished one page");
 
     }
+    **/
 
-
+    /**
     private static void addToStudyMap(Map<String, List<String>> studyMap, Alignment alignment, StudyObject referenceObj) {
 
         if ( studyMap == null || alignment == null || referenceObj == null ) return;
@@ -2476,7 +2433,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         studyMap.put(referenceObj.getUri(), list);
 
     }
+     **/
 
+    /**
     private static void updateSourceStudies(Map<String, List<String>> map, List<Measurement> measurements) {
 
         if ( measurements == null || measurements.size() == 0 ) return;
@@ -2490,7 +2449,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
     }
+     **/
 
+    /**
     private static String getRelatedStudies(Map<String, List<String>> studyMap, String subject) {
         if ( studyMap == null || studyMap.size() == 0 ) return "";
         if ( subject == null || subject.length() == 0 ) return "";
@@ -2498,16 +2459,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         String ans = studyMap.get(subject).toString();
         return ans.substring(1, ans.length()-1);
     }
+     **/
 
-    // helper function to check if a give string has all digital and ","
-    private boolean isAllNumerical(String strValue) {
-        if ( strValue == null || strValue.length() == 0 ) return false;
-        for ( char c : strValue.toCharArray() ) {
-            if ( !Character.isDigit(c) && c != ',' && c != '.' ) return false;
-        }
-        return true;
-    }
-
+    /**
     public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail, String dataDir) {
       boolean fileCreated = false; 
 	  try {
@@ -2583,7 +2537,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 	  	return fileCreated;
     }
+    **/
 
+    /**
     public static String prettyCodeBookLabel(Alignment alignment, String codeClass) {
         List<String> list = alignment.getCodeBook().get(codeClass);
         //System.out.println("CodeClass: [" + codeClass + "]");
@@ -2599,7 +2555,9 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
         return pretty;
     }
+     **/
 
+    /**
     public static void outputProvenance(Alignment alignment, File file, String ownerEmail, String dataDir) {
 	try {
 	    String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
@@ -2631,7 +2589,9 @@ public class Measurement extends HADatAcThing implements Runnable {
             e.printStackTrace();
         }
     }
+     **/
 
+    /**
     public static void outputAsCSVByTimeAlignment(List<Measurement> measurements, File file, String fileId, String categoricalOption, String timeResolution) {        
         DataFile dataFile = null;
         try {
@@ -2716,13 +2676,12 @@ public class Measurement extends HADatAcThing implements Runnable {
 			    
                 				if (results.get(referenceTS) == null) {
                 					results.put(referenceTS, new HashMap<String, String>());
-                					/*
-                					if (results.get(referenceTS) != null && timeAlignment.objectKey(referenceEntRole) != null) {
-                						if (referenceObj.getOriginalId() != null) { 
-                							//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole)); 
-                							results.get(referenceTS).put(timeAlignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
-                						}
-                					} */
+                					//if (results.get(referenceTS) != null && timeAlignment.objectKey(referenceEntRole) != null) {
+                					//	if (referenceObj.getOriginalId() != null) {
+                					//		//System.out.println("Align-Debug: adding PID " + referenceObj.getOriginalId() + " to result's map as a key: " + alignment.objectKey(referenceEntRole));
+                					//		results.get(referenceTS).put(timeAlignment.objectKey(referenceEntRole), referenceObj.getOriginalId());
+                					//	}
+                					//}
                 				}
 
                 	        } 
@@ -2843,11 +2802,10 @@ public class Measurement extends HADatAcThing implements Runnable {
             dataFile = DataFile.findById(fileId);
             if (dataFile != null) {
 
-            	/*
-            	// Write harmonized code book
-            	if (categoricalOption.equals(WITH_CODE_BOOK)) {
-            		outputHarmonizedCodebook(timeAlignment, file, dataFile.getOwnerEmail());
-            	}*/
+            	//// Write harmonized code book
+            	//if (categoricalOption.equals(WITH_CODE_BOOK)) {
+            	//	outputHarmonizedCodebook(timeAlignment, file, dataFile.getOwnerEmail());
+            	//}
 		
                 if (dataFile.getStatus() == DataFile.DELETED) {
                     dataFile.delete();
@@ -2863,6 +2821,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             e.printStackTrace();
         }
     }
+    **/
 
     public String toCSVRow(List<String> fieldNames) {
         List<String> values = new ArrayList<String>();

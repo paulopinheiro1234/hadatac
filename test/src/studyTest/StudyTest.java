@@ -5,7 +5,7 @@ import org.hadatac.console.controllers.dataacquisitionsearch.Downloader;
 import org.hadatac.data.loader.CSVRecordFile;
 import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
-import org.hadatac.entity.pojo.ColumnMapping;
+import org.hadatac.data.dsgen.ColumnMapping;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.ConfigProp;

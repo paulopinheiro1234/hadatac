@@ -12,6 +12,7 @@ import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.*;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
+import org.hadatac.data.dsgen.GenConst;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
@@ -341,7 +342,7 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, keepSameValue, null),
+                    ownerUri, finalFacets, email, GenConst.SUMMARY_TYPE_NONE, categoricalOption, keepSameValue, null),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
@@ -402,7 +403,7 @@ public class DataAcquisitionSearch extends Controller {
         CompletionStage<Integer> promiseOfResult = null;
         long currentTime = System.currentTimeMillis();
 
-        if (selSummaryType.equals(Measurement.SUMMARY_TYPE_SUBGROUP)) {
+        if (selSummaryType.equals(GenConst.SUMMARY_TYPE_SUBGROUP)) {
             // for TYPE_SUBGROUP, keepSameValue is set to 'false'
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
                     ownerUri, finalFacets, email, summaryType, categoricalOption, false, null),

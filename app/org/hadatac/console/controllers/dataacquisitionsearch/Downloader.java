@@ -9,24 +9,19 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.FileUtils;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
-import org.hadatac.console.controllers.dataacquisitionsearch.routes;
-import org.hadatac.console.controllers.annotator.AnnotationLogger;
 import org.hadatac.console.models.AssignOptionForm;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
 import org.hadatac.console.views.html.annotator.annotation_log;
 import org.hadatac.console.views.html.annotator.assignOption;
+import org.hadatac.data.dsgen.*;
 import org.hadatac.entity.pojo.*;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.Feedback;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import org.hadatac.utils.FileManager;
 import org.pac4j.play.java.Secure;
 import play.data.Form;
 import play.data.FormFactory;
@@ -220,7 +215,7 @@ public class Downloader extends Controller {
 
         File file = new File(dataFile.getAbsolutePath());
 
-        Measurement.outputAsCSV(measurements, selectedFields, file, dataFile.getId());
+        GenCSV.exec(measurements, selectedFields, file, dataFile.getId());
         System.out.println("Generated CSV files ...");
 
         return 0;
@@ -236,7 +231,7 @@ public class Downloader extends Controller {
         System.out.println("Categorical option: [" + categoricalOption + "]");
         Date date = new Date();
         String fileName = null;
-        if (summaryType.equals(Measurement.SUMMARY_TYPE_NONE)) {
+        if (summaryType.equals(GenConst.SUMMARY_TYPE_NONE)) {
             fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         } else {
             fileName = "subgroup_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
@@ -253,7 +248,7 @@ public class Downloader extends Controller {
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
 
-        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, keepSameValue, columnMapping);
+        GenConceptAlignment.exec(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, keepSameValue, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;
@@ -275,7 +270,7 @@ public class Downloader extends Controller {
 
         File file = new File(dataFile.getAbsolutePath());
 
-        Measurement.outputAsCSVByTimeAlignment(measurements, file, dataFile.getId(), categoricalOption, timeResolution);
+        GenTimeAlignment.exec(measurements, file, dataFile.getId(), categoricalOption, timeResolution);
         System.out.println("Generated CSV files ...");
 
         return 0;
@@ -306,7 +301,7 @@ public class Downloader extends Controller {
         File file = new File(absolutePath);
 
         System.out.println("Calling summarization...");
-        Measurement.outputAsCSVBySummarization(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, columnMapping);
+        GenSummarization.exec(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;

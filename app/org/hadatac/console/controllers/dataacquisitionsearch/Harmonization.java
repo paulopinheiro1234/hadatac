@@ -6,6 +6,9 @@ import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.SysUser;
+import org.hadatac.data.dsgen.ColumnMapping;
+import org.hadatac.data.dsgen.GenConst;
+import org.hadatac.data.dsgen.SolrReader;
 import org.hadatac.entity.pojo.*;
 import play.mvc.*;
 import play.data.Form;
@@ -16,7 +19,6 @@ import javax.inject.Inject;
 import org.hadatac.console.views.html.dataacquisitionsearch.*;
 
 import com.typesafe.config.ConfigFactory;
-
 
 public class Harmonization extends Controller {
 
@@ -88,8 +90,8 @@ public class Harmonization extends Controller {
             if (socs.size() < 2) {
                 return ok(harmonizationSocResult.render(new ArrayList<ObjectCollection>(), new ArrayList<HarmonizedVariableSpec>(), application.getUserEmail(request)));
             }
-            String summaryType = Measurement.SUMMARY_TYPE_NONE;
-            String categoricalOption = Measurement.NON_CATG_IGNORE;
+            String summaryType = GenConst.SUMMARY_TYPE_NONE;
+            String categoricalOption = GenConst.NON_CATG_IGNORE;
             boolean keepSameValue = false;
             String fileId = "";
             String facets;
@@ -114,7 +116,7 @@ public class Harmonization extends Controller {
 
                 // read backend Solr page by page and merge the results
                 System.out.println("start the pagination process...pageSize = " + pageSize);
-                Map<String, Map<String, List<AnnotatedValue>>> results = Measurement.readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment, alignCache, categoricalOption, keepSameValue, columnMapping);
+                Map<String, Map<String, List<AnnotatedValue>>> results = SolrReader.readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment, alignCache, categoricalOption, keepSameValue, columnMapping);
 
                 Map<String, AnnotatedGroupSummary> groupSummaryMap = new HashMap<String, AnnotatedGroupSummary>();
 
@@ -228,8 +230,8 @@ public class Harmonization extends Controller {
                 // send results back with an empty soc list
                 return ok(harmonizationStudyResult.render(new ArrayList<Study>(), new ArrayList<HarmonizedVariableSpec>(), new ArrayList<VariableSpec>(), application.getUserEmail(request)));
             }
-            String summaryType = Measurement.SUMMARY_TYPE_NONE;
-            String categoricalOption = Measurement.NON_CATG_IGNORE;
+            String summaryType = GenConst.SUMMARY_TYPE_NONE;
+            String categoricalOption = GenConst.NON_CATG_IGNORE;
             boolean keepSameValue = false;
             String fileId = "";
             String facets;
@@ -254,7 +256,7 @@ public class Harmonization extends Controller {
 
                 // read backend Solr page by page and merge the results
                 System.out.println("start the pagination process...pageSize = " + pageSize);
-                Map<String, Map<String, List<AnnotatedValue>>> results = Measurement.readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment, alignCache, categoricalOption, keepSameValue, columnMapping);
+                Map<String, Map<String, List<AnnotatedValue>>> results = SolrReader.readSolrPagesAndMerge(ownerUri, facets, fileId, pageSize, studyMap, alignment, alignCache, categoricalOption, keepSameValue, columnMapping);
 
                 Map<String, AnnotatedGroupSummary> groupSummaryMap = new HashMap<String, AnnotatedGroupSummary>();
 
