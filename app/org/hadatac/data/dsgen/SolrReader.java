@@ -217,7 +217,7 @@ public class SolrReader {
                     if ( duration > threshold ) log.debug("DOWNLOAD: studyObject.find: " + duration);
 
                     if (referenceObj != null) {
-                        System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
+                        //System.out.println("Phase I: Caching object [" + referenceObj.getUri() + "]");
                         alignment.addObject(referenceObj);
                         addToStudyMap(studyMap, alignment, referenceObj); // we need to add the studyId to the studyMap collection
                     }
@@ -339,7 +339,7 @@ public class SolrReader {
                             if ( values.contains(finalValue) == false || keepSameValue ) values.add(finalValue);
                         }
                         results.get(referenceObj.getUri()).put(key, values);
-                        System.out.println("Phase I: final value [" + finalValue + "]");
+                        //System.out.println("Phase I: final value [" + finalValue + "]");
                     }
 
                 } else {

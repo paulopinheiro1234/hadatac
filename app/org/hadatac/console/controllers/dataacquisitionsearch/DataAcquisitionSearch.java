@@ -313,7 +313,7 @@ public class DataAcquisitionSearch extends Controller {
             if (name_map.get("selObjectType") != null) {
                 objectType = name_map.get("selObjectType")[0].toString();
             }
-            if (name_map.get("setCatValue") != null) {
+            if (name_map.get("selCatValue") != null) {
                 categoricalValues = name_map.get("selCatValue")[0].toString();
             }
             if (name_map.get("selTimeRes") != null) {
@@ -325,6 +325,8 @@ public class DataAcquisitionSearch extends Controller {
         }
 
         System.out.println("DataAcquisitionSearch.downloadAlignment : facets=[" + facets + "]");
+        //System.out.println("DataAcquisitionSearch.downloadAlignment : objectType=[" + objectType + "]");
+        //System.out.println("DataAcquisitionSearch.downloadAlignment : categoricalValues=[" + categoricalValues + "]");
 
         long startTime = System.currentTimeMillis();
         // AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets,databaseExecutionContext);

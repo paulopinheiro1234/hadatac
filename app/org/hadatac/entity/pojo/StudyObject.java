@@ -605,7 +605,7 @@ public class StudyObject extends HADatAcThing {
 
     public static StudyObject findFacetSearch(String objUri, String studyUri) {
 
-        System.out.println("Inside findFacetSearch");
+        //System.out.println("Inside findFacetSearch");
         StudyObject so = StudyObject.find(objUri);
         if (so == null) {
             System.out.println("[ERROR] StudyObject.findFacetSearch(): Could not find object with URI [" + objUri + "].");

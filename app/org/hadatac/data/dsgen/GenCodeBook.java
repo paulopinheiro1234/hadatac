@@ -29,14 +29,14 @@ public class GenCodeBook {
         File codeBookFile = new File(dataFile.getAbsolutePath());
         FileUtils.writeStringToFile(codeBookFile, "", "utf-8", true);
 
-	    //System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
+	    System.out.println("Harmonized code book [" + codeBookFile.getName() + "]");
 
 	    FileUtils.writeStringToFile(codeBookFile, "code, value, class, varSpec\n", "utf-8", true);
 	    // Write code book
 	    List<CodeBookEntry> codeBook = new ArrayList<CodeBookEntry>();
 	    for (Map.Entry<String, List<String>> entry : alignment.getCodeBook().entrySet()) {
 	    	List<String> list = entry.getValue();
-	    	//System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
+	    	System.out.println(list.get(0) + ", " + list.get(1) + ", " + entry.getKey());
 	    	String pretty = list.get(1).replace("@en","");
 	    	if (!pretty.equals("")) {
 	    		String c0 = pretty.substring(0,1).toUpperCase();
