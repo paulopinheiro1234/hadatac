@@ -33,6 +33,7 @@ import org.hadatac.utils.FirstLabel;
 import org.hadatac.entity.pojo.Ontology;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QueryParseException;
+import java.nio.file.Paths;
 
 import javax.inject.Inject;
 
@@ -305,4 +306,51 @@ public class SDDEditorV2 extends Controller {
       return ok(Json.toJson(AuthApplication.getLocalUser(email).getName()));
     }
 
+    public Result getDDFiles(Http.Request request){
+        String relPath = request.body().asFormUrlEncoded().get("path")[0];
+
+        // Gets all files registered in solr
+        List<DataFile> wkFiles = new ArrayList<DataFile>();
+        wkFiles.addAll(DataFile.findDownloadedFilesInDir(relPath, DataFile.CREATING));
+        wkFiles.addAll(DataFile.findDownloadedFilesInDir(relPath, DataFile.WORKING));
+        List<String> filenames = new ArrayList<String>(wkFiles.size());
+        for(DataFile f : wkFiles){
+           filenames.add(f.getFileName());
+        }
+        System.out.println("filenames");
+        System.out.println(filenames);
+
+        // Gets the folder structure from the file system
+        List<String> foldersWithSub = new ArrayList<String>();
+        List<String> foldersWithNoSub = new ArrayList<String>();
+        String absPath = Paths.get(ConfigProp.getPathWorking(), relPath).toString();
+        // List<String> folders = DataFile.findFolders(absPath, false);
+        for(String folder : DataFile.findFolders(absPath, false)) {
+           List<String> subFolders = DataFile.findFolders(Paths.get(absPath, folder).toString(), false);
+           if(subFolders.size() == 0) {
+             foldersWithNoSub.add(folder);
+          }
+          else{
+             foldersWithSub.add(folder);
+          }
+        }
+        System.out.println("foldersWithSub");
+        System.out.println(foldersWithSub);
+
+        System.out.println("foldersWithNoSub");
+        System.out.println(foldersWithNoSub);
+
+        // converts data to json
+        String jsonRep = "{\"files\" : ";
+        jsonRep += Json.toJson(filenames);
+        jsonRep += ", \"foldersWithSub\" : ";
+        jsonRep += Json.toJson(foldersWithSub);
+        jsonRep += ", \"foldersWithNoSub\" : ";
+        jsonRep += Json.toJson(foldersWithNoSub);
+        jsonRep += "}";
+
+        System.out.println(jsonRep);
+        return ok(Json.parse(jsonRep));
+        // return ok(Json.toJson(DataFile.getHierarchy(relPath, "", false)));
+    }
 }

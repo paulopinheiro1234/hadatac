@@ -12,6 +12,7 @@ userName:String
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
 @import org.hadatac.utils._
+@import org.hadatac.entity.pojo.DataFile
 
 
 @import java.net._
@@ -20,10 +21,15 @@ userName:String
    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
    <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
    <script src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/3.5.0/jquery-3.5.0.min.js")"></script>
+   <script src="@controllers.routes.Assets.versioned("javascripts/vendor/split/1.5.11/Split.js")"></script>
 
    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
+   <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/setDDForm.css")">
    <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+
+   <script src="@controllers.routes.Assets.versioned("javascripts/jQueryFileExplorer/jQueryFileExplorer.js")"></script>
+   <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/jQueryFileExplorer/jQueryFileExplorer.css")">
 
    <div id="rcorners" >
 
@@ -31,7 +37,7 @@ userName:String
       <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
       @if(bSavable) {
 
-         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
+         <input class="btn btn-primary" type="button" id="upload" role="button" value="Save">
       }
       <a  href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
          <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
@@ -61,6 +67,12 @@ userName:String
                <button class="changeViewIri" id="hideThis">  Show Original Sheet</button>
 
       </div>
+
+      <button type="button" class="btn btn-primary" role="button" id="set_DD">
+         <span class="glyphicon glyphicon-book"> </span>
+         Set Data Dictionary
+      </button>
+
 
       <div class= shopbutton>
          <button class="cart" >
@@ -105,6 +117,7 @@ userName:String
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
+
 <!--
             <button id="vsdd" onclick="verifySDD()" > <span class="glyphicon glyphicon-check"> </span> Verify SDD</button>
          -->
@@ -200,11 +213,61 @@ userName:String
 
 
                      <div><a id="error_msg"></a></div>
+
+                     <div class = "setDDForm">
+                        <form id="regForm" action="">
+
+                        <h1>Register:</h1>
+
+
+                        <div class="tab">Name:
+                          <div id="fileexplorer"></div>
+
+                          <p><input placeholder="First name..." oninput="this.className = ''" class="ddInput"></p>
+                          <p><input placeholder="Last name..." oninput="this.className = ''" class="ddInput"></p>
+                        </div>
+
+                        <div class="tab">Contact Info:
+                          <p><input placeholder="E-mail..." oninput="this.className = ''" class="ddInput"></p>
+                          <p><input placeholder="Phone..." oninput="this.className = ''" class="ddInput"></p>
+                        </div>
+
+                        <div class="tab">Birthday:
+                          <p><input placeholder="dd" oninput="this.className = ''" class="ddInput"></p>
+                          <p><input placeholder="mm" oninput="this.className = ''" class="ddInput"></p>
+                          <p><input placeholder="yyyy" oninput="this.className = ''" class="ddInput"></p>
+                        </div>
+
+                        <div class="tab">Login Info:
+                          <p><input placeholder="Username..." oninput="this.className = ''" class="ddInput"></p>
+                          <p><input placeholder="Password..." oninput="this.className = ''" class="ddInput"></p>
+                        </div>
+
+                        <div style="overflow:auto;">
+                          <div style="float:right;">
+                            <button type="button" id="prevBtn" class="btn btn-primary" onclick="nextPrev(-1)">Previous</button>
+                            <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Next</button>
+                          </div>
+                        </div>
+
+
+                        <div style="text-align:center;margin-top:40px;">
+                          <span class="step"></span>
+                          <span class="step"></span>
+                          <span class="step"></span>
+                          <span class="step"></span>
+                        </div>
+
+                        </form>
+                     </div>
+
                      <div id="grid"></div>
 
                      <div id="gridcopy"></div>
                      <div id="footnote"></div>
                      <div id="buttons"></div>
+
+                     <script src="@controllers.routes.Assets.versioned("sheetjs/js/setDDForm.js")"></script>
                   </div>
 
                   <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
