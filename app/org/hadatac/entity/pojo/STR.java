@@ -535,8 +535,8 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         }
         DataAcquisitionSchema schema = DataAcquisitionSchema.find(schemaUri);
         headers = new ArrayList<String>();
-        if (schema != null && schema.getAttributes() != null) {
-            for (DataAcquisitionSchemaAttribute attr : schema.getAttributes()) {
+        if (schema != null && schema.getVariables() != null) {
+            for (DataAcquisitionSchemaAttribute attr : schema.getVariables()) {
                 headers.add(attr.getLabel());
             }
         }

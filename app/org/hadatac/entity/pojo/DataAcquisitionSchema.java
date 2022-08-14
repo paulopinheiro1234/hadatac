@@ -108,7 +108,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         this.label = label;
         isRefreshed = false;
         DataAcquisitionSchema.getCache();
-        getAttributes();
+        getVariables();
         getObjects();
     }
 
@@ -264,11 +264,19 @@ public class DataAcquisitionSchema extends HADatAcThing {
         return objects.size();
     }
 
-    public List<STR> getUsedByStreams() {
+    public String getStreamsJSONArrayType() {
+        return HASCO.DATA_ACQUISITION;
+    }
+
+    public List<STR> getStreams() {
         return STR.findBySDD(this.uri);
     }
 
-    public List<DataAcquisitionSchemaAttribute> getAttributes() {
+    public String getVariablesJSONArrayType() {
+        return HASCO.DA_SCHEMA_ATTRIBUTE;
+    }
+
+    public List<DataAcquisitionSchemaAttribute> getVariables() {
         if (attributesCache == null || attributesCache.isEmpty()) {
             attributesCache = DataAcquisitionSchemaAttribute.findBySchema(getUri());
         }
@@ -362,6 +370,10 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
     }
 
+    public String getObjectsJSONArrayType() {
+        return HASCO.DA_SCHEMA_OBJECT;
+    }
+
     public List<DataAcquisitionSchemaObject> getObjects() {
         if (objectsCache == null || objectsCache.isEmpty()) {
             objectsCache = DataAcquisitionSchemaObject.findBySchema(getUri());
@@ -398,7 +410,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
 
     public List<String> defineTemporaryPositions(List<String> csvHeaders) {
         List<String> unknownHeaders = new ArrayList<String>(csvHeaders);
-        List<DataAcquisitionSchemaAttribute> listDasa = getAttributes();
+        List<DataAcquisitionSchemaAttribute> listDasa = getVariables();
         
         /*
         // list positions
@@ -467,7 +479,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         }
 
         int position = -1;
-        for (DataAcquisitionSchemaAttribute dasa : getAttributes()) {
+        for (DataAcquisitionSchemaAttribute dasa : getVariables()) {
             if (dasa.getLabel().equalsIgnoreCase(label)) {
                 position = dasa.getTempPositionInt();
                 break;
@@ -492,7 +504,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         if (DataAcquisitionSchema.getCache().get(schemaUri) != null) {
         	
             DataAcquisitionSchema sdd = DataAcquisitionSchema.getCache().get(schemaUri);
-            sdd.getAttributes();
+            sdd.getVariables();
             return sdd;
         }
 
@@ -543,7 +555,7 @@ public class DataAcquisitionSchema extends HADatAcThing {
         //        schema.getObjects().size() + " objects, and " + 
         //        schema.getEvents().size() + " events.");
 
-        schema.getAttributes();
+        schema.getVariables();
         schema.getObjects();
         DataAcquisitionSchema.getCache().put(schemaUri,schema);
         return schema;

@@ -134,7 +134,7 @@ public class MeasurementGenerator extends BaseGenerator {
         }
 
         //System.out.println("DASA after defineTemporaryPositions]");
-    	for (DataAcquisitionSchemaAttribute dasa : schema.getAttributes()) {
+    	for (DataAcquisitionSchemaAttribute dasa : schema.getVariables()) {
             //System.out.println("DASA URI: [" + dasa.getUri() + "]   Position: [" + dasa.getTempPositionInt() + "]");
     	}
 
@@ -257,7 +257,7 @@ public class MeasurementGenerator extends BaseGenerator {
             // socUri and objUri for row scope is defined later under measurement processing
         }
 
-        Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getAttributes().iterator();
+        Iterator<DataAcquisitionSchemaAttribute> iterAttributes = schema.getVariables().iterator();
         while (iterAttributes.hasNext()) {
             DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
 

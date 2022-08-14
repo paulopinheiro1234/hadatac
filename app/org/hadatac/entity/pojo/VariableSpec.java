@@ -107,22 +107,23 @@ public class VariableSpec extends HADatAcThing {
     	this.hascoTypeUri = HASCO.VARIABLE_SPEC;
 	}
 
-    public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
-    	this(entRole, attrInRel, null, null);
+    public VariableSpec(String label, AlignmentEntityRole entRole, AttributeInRelationTo attrInRel) {
+    	this(label, entRole, attrInRel, null, null);
     }
 
-    public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit) {
-    	this(entRole, attrInRel, unit, null);
+    public VariableSpec(String label, AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit) {
+    	this(label, entRole, attrInRel, unit, null);
     }
 
-    public VariableSpec(AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
-		this(HASCO.VARIABLE_SPEC, HASCO.VARIABLE_SPEC, entRole.getEntity(), entRole.getRole(), attrInRel.getAttributeList(),
+    public VariableSpec(String label, AlignmentEntityRole entRole, AttributeInRelationTo attrInRel, Unit unit, Attribute timeAttr) {
+		this(HASCO.VARIABLE_SPEC, HASCO.VARIABLE_SPEC, label, entRole.getEntity(), entRole.getRole(), attrInRel.getAttributeList(),
 				attrInRel.getInRelationTo(), unit, timeAttr, false);
     }
 
-	public VariableSpec(String typeUri, String hascoTypeUri , Entity ent, String role, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr, boolean isCategorical) {
+	public VariableSpec(String typeUri, String hascoTypeUri , String label, Entity ent, String role, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr, boolean isCategorical) {
 		this.typeUri = typeUri;
 		this.hascoTypeUri = hascoTypeUri;
+		this.label = label;
 		if (ent != null) {
 			this.entUri = ent.getUri();
 		}
@@ -149,6 +150,7 @@ public class VariableSpec extends HADatAcThing {
 		if (varSpec != null) {
 			this.typeUri = varSpec.getTypeUri();
 			this.hascoTypeUri = varSpec.getHascoTypeUri();
+			this.label = varSpec.getLabel();
 			this.entUri = varSpec.getEntityUri();
 			this.role = varSpec.getRole();
 			this.attrListUri = varSpec.getAttributeListUri();
@@ -164,6 +166,9 @@ public class VariableSpec extends HADatAcThing {
 			try {
 				this.typeUri = HASCO.VARIABLE_SPEC;
 				this.hascoTypeUri = HASCO.VARIABLE_SPEC;
+				if (dasa.getLabel() != null && !dasa.getLabel().isEmpty()) {
+					this.label = dasa.getLabel();
+				}
 				if (dasa.getEntity() != null && !dasa.getEntity().isEmpty()) {
 					this.entUri = dasa.getEntity();
 				}
@@ -214,6 +219,14 @@ public class VariableSpec extends HADatAcThing {
 			uriNs = kbPrefix + "Var-Spec-" + this.label;
 		}
 		this.uri = URIUtils.replacePrefixEx(uriNs);
+	}
+
+	@Override
+	public String getLabel() {
+		if (this.label == null || this.label.isEmpty()) {
+			return this.toString();
+		}
+		return this.label;
 	}
 
 	public void setLabel() {
@@ -715,7 +728,7 @@ public class VariableSpec extends HADatAcThing {
 			Unit unit = Unit.find(unitStr);
 			Attribute timeAttr = Attribute.find(daseUriStr);
 
-			varSpec = new VariableSpec(HASCO.VARIABLE_SPEC, HASCO.VARIABLE_SPEC, entity, "", attrList, inRelationTo, unit, timeAttr, false);
+			varSpec = new VariableSpec(HASCO.VARIABLE_SPEC, HASCO.VARIABLE_SPEC, labelStr, entity, "", attrList, inRelationTo, unit, timeAttr, false);
 
 			varSpec.setUri(spec_uri);
 
@@ -730,6 +743,62 @@ public class VariableSpec extends HADatAcThing {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static List<VariableSpec> findWithPages(int pageSize, int offset) {
+		List<VariableSpec> varSpecs = new ArrayList<VariableSpec>();
+		String queryString = "";
+		queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
+				"SELECT ?uri WHERE { " +
+				"   ?subUri rdfs:subClassOf* hasco:VariableSpec . " +
+				"   ?uri a ?subUri . " +
+				"   ?uri rdfs:label ?label . " +
+				" }" +
+				" ORDER BY ASC(?label)" +
+				" LIMIT " + pageSize +
+				" OFFSET " + offset;
+
+		try {
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
+			VariableSpec varSpec = null;
+			while (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				if (soln != null && soln.getResource("uri").getURI()!= null) {
+					String uri = soln.get("uri").toString();
+					if (uri != null && !uri.isEmpty()) {
+						varSpec = VariableSpec.find(uri);
+					}
+				}
+				varSpecs.add(varSpec);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return varSpecs;
+
+	}
+
+	public static int getNumberVariableSpecs() {
+		String query = "";
+		query += NameSpaces.getInstance().printSparqlNameSpaceList();
+		query += "select distinct (COUNT(?x) AS ?tot) where {" +
+				" ?x a <" + HASCO.VARIABLE_SPEC + "> } ";
+
+		try {
+			ResultSetRewindable resultsrw = SPARQLUtils.select(
+					CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), query);
+
+			if (resultsrw.hasNext()) {
+				QuerySolution soln = resultsrw.next();
+				return Integer.parseInt(soln.getLiteral("tot").getString());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 
 	public static String toString(String role, Entity ent, List<Attribute> attrList, Entity inRelationTo, Unit unit, Attribute timeAttr) {

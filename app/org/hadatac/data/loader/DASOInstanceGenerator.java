@@ -155,7 +155,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
          */
 
         mainDasoUri = "";
-        Iterator<DataAcquisitionSchemaAttribute> iterAttributes = sdd.getAttributes().iterator();
+        Iterator<DataAcquisitionSchemaAttribute> iterAttributes = sdd.getVariables().iterator();
         while (iterAttributes.hasNext()) {
             DataAcquisitionSchemaAttribute dasa = iterAttributes.next();
             String dasoUri = dasa.getObjectUri(); 
@@ -966,7 +966,7 @@ public class DASOInstanceGenerator extends BaseGenerator {
     	}
     	Study study = Study.find(study_uri);
     	//if (mainSoc != null) {
-    		System.out.println("INITIATE CACHE BEING CALLED!");
+    		//System.out.println("INITIATE CACHE BEING CALLED!");
     		addCache(new Cache<String, StudyObject>("cacheObject", true, Study.getObjectsMapInBatch(study_uri)));
     		addCache(new Cache<String, String>("cacheObjectBySocAndScopeUri", false, StudyObject.buildCachedObjectBySocAndScopeUri()));
     		addCache(new Cache<String, String>("cacheObjectBySocAndOriginalId", false, StudyObject.buildCachedObjectBySocAndOriginalId()));

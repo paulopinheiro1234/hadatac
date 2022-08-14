@@ -11,21 +11,21 @@ public class VariableSpecGenerator {
         System.out.println("Inside createVarSpecFromSdd");
         DataAcquisitionSchema sdd = DataAcquisitionSchema.find(sddUri);
         if (sdd != null) {
-            System.out.println("  - FOUND Sdd " + sdd.getUri());
-            List<DataAcquisitionSchemaAttribute> dasaList = sdd.getAttributes();
+            //System.out.println("  - FOUND Sdd " + sdd.getUri());
+            List<DataAcquisitionSchemaAttribute> dasaList = sdd.getVariables();
             if (dasaList != null && dasaList.size() > 0) {
-                System.out.println("  - SIZE ATTRIBUTE LIST " + dasaList.size());
+                //System.out.println("  - SIZE ATTRIBUTE LIST " + dasaList.size());
                 for (DataAcquisitionSchemaAttribute dasa : dasaList) {
-                    System.out.println("     + ATTRIBUTE (1) DASA URI [" + dasa.getUri() + "]");
+                    //System.out.println("     + ATTRIBUTE (1) DASA URI [" + dasa.getUri() + "]");
                     VariableSpec varSpec = new VariableSpec(dasa);
-                    System.out.println("     + ATTRIBUTE (2) VAR SPEC [" + varSpec.toString() + "]");
+                    //System.out.println("     + ATTRIBUTE (2) VAR SPEC [" + varSpec.toString() + "]");
                     String varSpecUri = URIUtils.replacePrefixEx(varSpec.getUri());
                     dasa.setVariableSpec(varSpecUri);
-                    System.out.println("     + ATTRIBUTE (3) VAR SPEC URI IN DASA [" + dasa.getVariableSpec() + "]");
+                    //System.out.println("     + ATTRIBUTE (3) VAR SPEC URI IN DASA [" + dasa.getVariableSpec() + "]");
                     varSpec.save();
-                    System.out.println("     + ATTRIBUTE (4) VAR SPEC SAVED");
+                    //System.out.println("     + ATTRIBUTE (4) VAR SPEC SAVED");
                     dasa.saveHasVariableSpec(varSpecUri);
-                    System.out.println("     + ATTRIBUTE (5) STEP DASA UPDATED");
+                    //System.out.println("     + ATTRIBUTE (5) STEP DASA UPDATED");
                 }
                 return 0;
             }

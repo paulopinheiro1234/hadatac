@@ -31,8 +31,8 @@
                  </tr>
                  </thead>
                  <tbody>
-		   @if(das.getAttributes() != null) {
-                       @for(dasa <- das.getAttributes()){
+		   @if(das.getVariables() != null) {
+                       @for(dasa <- das.getVariables()){
                           @DASA_entry("edit", dasa)
                        }
 		   }

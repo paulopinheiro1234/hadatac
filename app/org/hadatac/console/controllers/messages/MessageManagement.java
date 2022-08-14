@@ -317,7 +317,7 @@ public class MessageManagement extends Controller {
                 }
                 Collections.sort(results);
                 if (stream != null && stream.getSchema() != null) {
-                    for (DataAcquisitionSchemaAttribute dasa : stream.getSchema().getAttributes()) {
+                    for (DataAcquisitionSchemaAttribute dasa : stream.getSchema().getVariables()) {
                         specified.add(dasa.getLabel().toLowerCase());
                     }
                 }

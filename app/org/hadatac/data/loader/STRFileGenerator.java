@@ -308,7 +308,7 @@ public class STRFileGenerator extends BaseGenerator {
         Map<String, String> dasoPL = new HashMap<String, String>();
         List<DataAcquisitionSchemaObject> dasos = new ArrayList<DataAcquisitionSchemaObject>();
         List<String> roles = new ArrayList<String>();
-        for (DataAcquisitionSchemaAttribute attr : str.getSchema().getAttributes()) {
+        for (DataAcquisitionSchemaAttribute attr : str.getSchema().getVariables()) {
             if (attr.getObjectViewLabel().length() > 0) {
                 if (!roles.contains(attr.getObjectViewLabel())) {
                     roles.add(attr.getObjectViewLabel());

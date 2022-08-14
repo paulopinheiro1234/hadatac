@@ -92,7 +92,7 @@ public class Alignment {
      * objectKey adds a new object identifier into variables
      */
     public String objectKey(AlignmentEntityRole entRole) {
-        VariableSpec aa = new VariableSpec(entRole, ID_IRT);
+        VariableSpec aa = new VariableSpec("", entRole, ID_IRT);
         return aa.toString();
     }
 
@@ -310,7 +310,7 @@ public class Alignment {
             System.out.println("Adding the following time " + mAbstractTime);
         }*/
 
-        newVar = new VariableSpec(newRole, newAttrInRel, unit, timeAttr);
+        newVar = new VariableSpec("", newRole, newAttrInRel, unit, timeAttr);
         if (m.getValueClass() != null && m.getValueClass().startsWith("http")) {
             newVar.setIsCategorical(true);
         }
@@ -547,7 +547,7 @@ public class Alignment {
     public void addRole(AlignmentEntityRole entRole) {
         roles.put(entRole.getKey(), entRole);
         //System.out.println("Adding NEW ROLE: " + entRole);
-        VariableSpec newVar = new VariableSpec(entRole,ID_IRT);
+        VariableSpec newVar = new VariableSpec("", entRole,ID_IRT);
         variables.put(newVar.getKey(),newVar);
         //Variable newGroupVar = new Variable(entRole,GROUPID_IRT);
         //variables.put(newVar.getKey() + "GROUP",newGroupVar);

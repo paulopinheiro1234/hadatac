@@ -17,6 +17,7 @@ public class ListPage extends Controller {
     private final static int MAX_PAGE_SIZE = 80;
 
     public Result getPage(String classUri, int offset, int pageSize) {
+        System.out.println("[RestAPI] inside ListPage. ClassUri is [" + classUri + "]");
         switch (classUri) {
             case HASCO.STUDY:
                 return getStudies(offset, pageSize);
@@ -24,6 +25,8 @@ public class ListPage extends Controller {
                 return getVariables(offset, pageSize);
             case HASCO.DA_SCHEMA_OBJECT:
                 return getEntities(offset, pageSize);
+            case HASCO.VARIABLE_SPEC:
+                return getVariableSpecs(offset, pageSize);
             case HASCO.ONTOLOGY:
                 return getOntologies(offset, pageSize);
         }
@@ -55,9 +58,7 @@ public class ListPage extends Controller {
             System.out.println("[RestAPI] getVariables : Yikes! Resetting that page size for you!");
         }
         ObjectMapper mapper = new ObjectMapper();
-        System.out.println("Inside API/ListPage calling getVariables()");
         List<DataAcquisitionSchemaAttribute> results = DataAcquisitionSchemaAttribute.findWithPages(pageSize, offset);
-        System.out.println("Result of getVariables(): " + results);
         if (results == null) {
             return notFound(ApiUtil.createResponse("No variable has been found", false));
         } else {
@@ -76,14 +77,33 @@ public class ListPage extends Controller {
             System.out.println("[RestAPI] getEntities : Yikes! Resetting that page size for you!");
         }
         ObjectMapper mapper = new ObjectMapper();
-        System.out.println("Inside API/ListPage calling getEntities()");
         List<DataAcquisitionSchemaObject> results = DataAcquisitionSchemaObject.findWithPages(pageSize, offset);
-        System.out.println("Result of getEntities(): " + results);
         if (results == null) {
             return notFound(ApiUtil.createResponse("No entity has been found", false));
         } else {
             SimpleFilterProvider filterProvider = new SimpleFilterProvider();
             filterProvider.addFilter("sddObjectFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+            mapper.setFilterProvider(filterProvider);
+            JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }
+
+    private Result getVariableSpecs(int offset, int pageSize) {
+        if (pageSize < 1) {
+            pageSize = MAX_PAGE_SIZE;
+            System.out.println("[RestAPI] getVariables : Yikes! Resetting that page size for you!");
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println("[RestAPI] getVariableSpecs");
+        List<VariableSpec> results = VariableSpec.findWithPages(pageSize, offset);
+        if (results == null) {
+            return notFound(ApiUtil.createResponse("No variable spec has been found", false));
+        } else {
+            System.out.println("[RestAPI] getVariableSpecs. Size of results [" + results.size() + "]");
+            SimpleFilterProvider filterProvider = new SimpleFilterProvider();
+            filterProvider.addFilter("variableSpecFilter",
                     SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
             mapper.setFilterProvider(filterProvider);
             JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
@@ -114,6 +134,8 @@ public class ListPage extends Controller {
                 return getVariablesSize();
             case HASCO.DA_SCHEMA_OBJECT:
                 return getEntitiesSize();
+            case HASCO.VARIABLE_SPEC:
+                return getVariableSpecsSize();
             case HASCO.ONTOLOGY:
                 return getOntologiesSize();
         }
@@ -147,6 +169,17 @@ public class ListPage extends Controller {
         int results = DataAcquisitionSchemaObject.getNumberDASOs();
         if(results <= 0){
             return notFound(ApiUtil.createResponse("No entity has been found", false));
+        } else {
+            JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
+            return ok(ApiUtil.createResponse(jsonObject, true));
+        }
+    }
+
+    private Result getVariableSpecsSize() {
+        ObjectMapper mapper = new ObjectMapper();
+        int results = VariableSpec.getNumberVariableSpecs();
+        if(results <= 0){
+            return notFound(ApiUtil.createResponse("No variable spec has been found", false));
         } else {
             JsonNode jsonObject = mapper.convertValue(results, JsonNode.class);
             return ok(ApiUtil.createResponse(jsonObject, true));

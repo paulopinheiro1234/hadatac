@@ -47,6 +47,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
      */
 
     private int    tempPositionInt;
+    private String varSpecUri;
     private String entity;
     private String entityLabel;
     private List<String> attributes;
@@ -58,7 +59,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
     private Map<String, String> relations = new HashMap<String, String>();
     private boolean isMeta;
     private DataAcquisitionSchema das;
-    private String varSpecUri;
     private String socUri;
 
     private static Map<String, DataAcquisitionSchemaAttribute> getCache() {
@@ -80,6 +80,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         this.label = "";
         this.position = "";
         this.positionInt = -1;
+        this.setVariableSpec("");
         this.setEntity("");
         this.setAttributes(Arrays.asList(""));
         this.setUnit("");
@@ -94,7 +95,8 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             String localName, 
             String label,
             String partOfSchema,
-            String position, 
+            String position,
+            String variableSpec,
             String entity, 
             List<String> attributes, 
             String unit, 
@@ -116,6 +118,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             positionInt = -1;
         }
         this.setEntity(entity);
+        this.setVariableSpec(variableSpec);
         this.setAttributes(attributes);
         this.setUnit(unit);
         this.daseUri = daseUri;
@@ -202,6 +205,23 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
     public void setTempPositionInt(int tempPositionInt) {
         this.tempPositionInt = tempPositionInt;
+    }
+
+    public void setVariableSpec(String varSpecUri) {
+        this.varSpecUri = varSpecUri;
+    }
+
+    @JsonIgnore
+    public String getVariableSpecUri() {
+        return this.varSpecUri;
+    }
+
+    public VariableSpec getVariableSpec() {
+        if (this.varSpecUri == null || this.varSpecUri.isEmpty()) {
+            return null;
+        }
+        return VariableSpec.find(this.varSpecUri);
+
     }
 
     @JsonIgnore
@@ -566,14 +586,6 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         }
     }
 
-    public void setVariableSpec(String varSpecUri) {
-        this.varSpecUri = varSpecUri;
-    }
-
-    public String getVariableSpec() {
-        return this.varSpecUri;
-    }
-
     public static int getNumberDASAs() {
         String query = "";
         query += NameSpaces.getInstance().printSparqlNameSpaceList();
@@ -649,11 +661,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         //System.out.println("Looking for data acquisition schema attribute with URI <" + dasa_uri + ">");
 
         String queryString = NameSpaces.getInstance().printSparqlNameSpaceList() + 
-                "SELECT ?partOfSchema ?hasEntity ?hasAttribute ?hascoTypeUri " +
+                "SELECT ?partOfSchema ?hasVariableSpec ?hasEntity ?hasAttribute ?hascoTypeUri " +
                 " ?hasUnit ?hasDASO ?hasDASE ?hasSource ?isPIConfirmed ?relation ?inRelationTo ?label WHERE { \n" + 
                 "    <" + dasa_uri + "> a hasco:DASchemaAttribute . \n" +
                 "    <" + dasa_uri + "> hasco:partOfSchema ?partOfSchema . \n" +
-                "    OPTIONAL { <" + dasa_uri + "> hasco:hasEntity ?hasEntity } . \n" + 
+                "    OPTIONAL { <" + dasa_uri + "> hasco:hasVariableSpec ?hasVariableSpec } . \n" +
+                "    OPTIONAL { <" + dasa_uri + "> hasco:hasEntity ?hasEntity } . \n" +
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasAttribute/rdf:rest*/rdf:first ?hasAttribute } . \n" +
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasUnit ?hasUnit } . \n" + 
                 "    OPTIONAL { <" + dasa_uri + "> hasco:hasEvent ?hasDASE } . \n" + 
@@ -679,6 +692,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
         String hascoTypeUriStr = "";
         String partOfSchemaStr = "";
         String positionStr = "";
+        String variableSpecStr = "";
         String entityStr = "";
         String attributeStr = "";
         List<String> attributeList = new ArrayList<String>();
@@ -704,6 +718,9 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             }
             if (soln.get("partOfSchema") != null) {
                 partOfSchemaStr = soln.get("partOfSchema").toString();
+            }
+            if (soln.get("hasVariableSpec") != null) {
+                variableSpecStr = soln.get("hasVariableSpec").toString();
             }
             if (soln.get("hasEntity") != null) {
                 entityStr = soln.get("hasEntity").toString();
@@ -741,6 +758,7 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
                 labelStr,
                 partOfSchemaStr,
                 positionStr,
+                variableSpecStr,
                 entityStr,
                 attributeList,
                 unitStr,
@@ -755,6 +773,10 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
 
 	    DataAcquisitionSchemaAttribute.getCache().put(dasa_uri,dasa);
         return dasa;
+    }
+
+    public String getValuesJSONArrayType() {
+        return HASCO.VALUE;
     }
 
     public List<Measurement> getValues() {
@@ -916,6 +938,12 @@ public class DataAcquisitionSchemaAttribute extends HADatAcThing {
             insert += this.getUri() + " hasco:partOfSchema <" + partOfSchema + "> .  "; 
         } else {
             insert += this.getUri() + " hasco:partOfSchema " + partOfSchema + " .  "; 
+        }
+
+        if (varSpecUri.startsWith("http")) {
+            insert += this.getUri() + " hasco:hasVariableSpec <" + varSpecUri + "> .  ";
+        } else {
+            insert += this.getUri() + " hasco:hasVariableSpec " + varSpecUri + " .  ";
         }
 
         if (entity.startsWith("http")) {

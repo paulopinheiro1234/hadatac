@@ -218,7 +218,7 @@ public class URIPage extends Controller {
             filterProvider.addFilter("variableFilter", SimpleBeanPropertyFilter.serializeAll());
         } else {
             filterProvider.addFilter("variableFilter",
-                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment", "variableSpec"));
         }
 
         // VARIABLE_SPEC
