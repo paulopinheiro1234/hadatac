@@ -34,6 +34,22 @@ services:
             -   hadatac-fuseki-data:/fuseki/databases
         restart: always
 
+    fuseki-yasgui:
+        build: fuseki-yasgui
+        container_name: hadatac_fuseki_yasgui
+        ports:
+            - "8888:8888"
+        networks:
+            hadatac:
+                aliases:
+                    - fuseki-yasgui
+        environment:
+            # This should be a url that points to this container
+            # Proxies to the /store/sparql endpoint for fuseki
+            DEFAULT_SPARQL_ENDPOINT: "http://localhost:8888/sparql"
+        depends_on:
+            -   fuseki
+
     # The primary hadatac web app
     hadatac:
         build: ./
