@@ -20,6 +20,14 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GSPClient {
+
+    /**
+     * Any submissions without a valid graph uri will be stored under this graph.
+     *
+     * We aren't posting to the standard default graph
+     * because it isn't included in default queries with fuseki's tdb2 unionDefaultGraph setting
+     */
+    private static final String defaultGraphUri = "http://hadatac.org/ont/graph#DEFAULT";
     private final URI endpoint;
 
     public GSPClient(URI endpoint) {
@@ -33,9 +41,10 @@ public class GSPClient {
     public void postInputStream(Supplier<? extends InputStream> streamSupplier, String mimeType, String graph) {
         try {
             URIBuilder requestUriBuilder = new URIBuilder(endpoint);
-            if (StringUtils.isNotBlank(graph)) {
-                requestUriBuilder.addParameter("graph", graph);
+            if (StringUtils.isBlank(graph)) {
+                graph = defaultGraphUri;
             }
+            requestUriBuilder.addParameter("graph", graph);
             URI requestUri = requestUriBuilder.build();
 //            System.out.println("REQUEST URI: " + requestUri);
             HttpRequest request = HttpRequest.newBuilder(requestUri)
@@ -52,6 +61,7 @@ public class GSPClient {
 
     public void postFile(File file, String mimeType, String graph) throws FileNotFoundException {
         FileInputStream fileInputStream = new FileInputStream(file);
+        System.out.println("Posting file input stream. Type: " + mimeType + "  graph: " + graph + "  file: " + file);
         postInputStream(() -> fileInputStream, mimeType, graph);
     }
 
