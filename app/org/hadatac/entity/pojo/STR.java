@@ -526,6 +526,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return schemaUri;
     }
 
+    public String getSchemaJSONArrayType() {
+        return HASCO.DA_SCHEMA;
+    }
+
     public DataAcquisitionSchema getSchema() {
         if (sdd != null) {
             return sdd;
@@ -552,6 +556,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
     @JsonIgnore
     public String getDeploymentUri() {
         return deploymentUri;
+    }
+
+    public String getDeploymentJSONArrayType() {
+        return HASCO.DEPLOYMENT;
     }
 
     public Deployment getDeployment() {
@@ -728,6 +736,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
         return datasetURIs;
     }
 
+    public String getDataFilesJSONArrayType() {
+        return HASCO.DATA_FILE;
+    }
+
     public List<DataFile> getDataFiles() {
         return DataFile.findByDataAcquisition(uri);
     }
@@ -757,6 +769,10 @@ public class STR extends HADatAcThing implements Comparable<STR> {
 
     public boolean containsDataset(String uri) {
         return datasetURIs.contains(uri);
+    }
+
+    public String getValuesJSONArrayType() {
+        return HASCO.VALUE;
     }
 
     public List<Measurement> getValues() {

@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import module.DatabaseExecutionContext;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
@@ -36,6 +37,7 @@ import org.hadatac.utils.NameSpaces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@JsonFilter("valueFilter")
 public class Measurement extends HADatAcThing implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(Measurement.class);
@@ -361,6 +363,13 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public void setDasoUri(String dasoUri) {
         this.dasoUri = dasoUri;
+    }
+
+    public DataAcquisitionSchemaAttribute getVariable() {
+        if (this.dasaUri == null) {
+            return null;
+        }
+        return DataAcquisitionSchemaAttribute.find(this.dasaUri);
     }
 
     public String getDasaUri() {

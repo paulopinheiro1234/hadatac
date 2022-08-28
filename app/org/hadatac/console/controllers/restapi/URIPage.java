@@ -181,6 +181,14 @@ public class URIPage extends Controller {
                     SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment"));
         }
 
+        // VALUE
+        if (typeResult.equals(HASCO.VALUE)) {
+            filterProvider.addFilter("valueFilter", SimpleBeanPropertyFilter.serializeAll());
+        } else {
+            filterProvider.addFilter("valueFilter",
+                    SimpleBeanPropertyFilter.filterOutAllExcept("uri", "label", "typeUri", "typeLabel", "hascoTypeUri", "hascoTypeLabel", "comment", "studyObjectUri", "variable"));
+        }
+
         // DEPLOYMENT
         if (typeResult.equals(HASCO.DEPLOYMENT)) {
             filterProvider.addFilter("deploymentFilter", SimpleBeanPropertyFilter.serializeAll());
