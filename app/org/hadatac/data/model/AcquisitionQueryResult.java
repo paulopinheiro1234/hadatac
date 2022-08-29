@@ -11,6 +11,8 @@ import org.hadatac.console.models.Pivot;
 import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hadatac.utils.HAScOMapper;
+import org.hadatac.vocabularies.HASCO;
 
 public class AcquisitionQueryResult {
     private long nDocSize = 0;
@@ -51,11 +53,12 @@ public class AcquisitionQueryResult {
     }
 
     public String toJSON() {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = HAScOMapper.getFiltered(HASCO.VALUE);
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {
             System.out.println("[ERROR] AcquisitionQueryResult.toJSON() - Exception message: " + e.getMessage());
+            e.printStackTrace();
         }
         return "";
     }
