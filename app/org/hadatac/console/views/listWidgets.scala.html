@@ -27,12 +27,12 @@
     <div id="signup" class="row">
     <div class="col-xs-6 col-xs-offset-1 col-sm-4">
     @helper.form(org.hadatac.console.controllers.routes.Signup.createUser) {
-        @helper.inputText(form("name"), '_label->"Your name")
+        @helper.inputText(form("name"), '_label->"Your name", 'autocomplete -> "off")
 
-        @helper.inputText(form("email"), '_label->"Your e-mail address")
+        @helper.inputText(form("email"), '_label->"Your e-mail address", 'autocomplete -> "off")
 
-        @helper.inputPassword(form("password"), '_label->"Password")
-        @helper.inputPassword(form("repeatPassword"), '_label->"Repeat Password")
+        @helper.inputPassword(form("password"), '_label->"Password", 'autocomplete -> "off")
+        @helper.inputPassword(form("repeatPassword"), '_label->"Repeat Password", 'autocomplete -> "off")
 
         <button type="submit">Sign up now</button>
     }
