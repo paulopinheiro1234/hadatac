@@ -50,6 +50,8 @@ public class SPARQLUtilsFacetSearch {
             visited.add(queryString);
         }*/
 
+        //log.debug("requested query: [" + queryString + "]");
+
         totalQueries ++;
 
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {
@@ -119,6 +121,8 @@ public class SPARQLUtilsFacetSearch {
         } else {
             visited.add(queryString);
         }*/
+
+        //log.debug("requested query: [" + queryString + "]");
 
         totalQueries++;
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {

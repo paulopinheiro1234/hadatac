@@ -562,7 +562,8 @@ public class MeasurementGenerator extends BaseGenerator {
 
         	/*=====================================*
              *                                     *
-             *   SET MATCHING                      *
+             *   SET MATCHING
+             *                  *
              *                                     *
              *=====================================*/
 
