@@ -43,6 +43,8 @@ GET     /hadatac/acquisitions/harmonization/soc        org.hadatac.console.contr
 POST    /hadatac/acquisitions/harmonization/soc        org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.postIndexSoc(request: Request)
 GET     /hadatac/acquisitions/harmonization/study      org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.indexStudy(request: Request)
 POST    /hadatac/acquisitions/harmonization/study      org.hadatac.console.controllers.dataacquisitionsearch.Harmonization.postIndexStudy(request: Request)
+GET     /hadatac/acquisitions/update/:fs/:fo/:fec/:fu/:ft/:fsp/:fp  org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.preferences(fs: Boolean, fo: Boolean, fec: Boolean, fu: Boolean, ft: Boolean, fsp: Boolean, fp: Boolean, request: Request)
+POST    /hadatac/acquisitions/update/:fs/:fo/:fec/:fu/:ft/:fsp/:fp  org.hadatac.console.controllers.dataacquisitionsearch.DataAcquisitionSearch.postPreferences(fs: Boolean, fo: Boolean, fec: Boolean, fu: Boolean, ft: Boolean, fsp: Boolean, fp: Boolean, request: Request)
 GET	    /hadatac/metadataacquisitions/solrsearch       org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
 POST	/hadatac/metadataacquisitions/solrsearch   	   org.hadatac.console.http.SolrSearchProxy.getStudyAcquisition(request: Request)
 GET	    /hadatac/dataacquisitionbrowser/solrsearch     org.hadatac.console.http.SolrSearchProxy.getDataAcquisition(request: Request)
