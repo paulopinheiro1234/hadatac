@@ -42,7 +42,6 @@ public class DataAcquisitionSearch extends Controller {
     @Inject
     Application application;
 
-    private static SysUser sysUser1=null;
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
     public static FacetsWithCategories query_facets = new FacetsWithCategories();
