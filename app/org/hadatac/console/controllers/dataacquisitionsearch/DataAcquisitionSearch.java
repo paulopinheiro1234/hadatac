@@ -42,6 +42,7 @@ public class DataAcquisitionSearch extends Controller {
     @Inject
     Application application;
 
+    private static SysUser sysUser1=null;
     public static FacetFormData facet_form = new FacetFormData();
     public static FacetsWithCategories field_facets = new FacetsWithCategories();
     public static FacetsWithCategories query_facets = new FacetsWithCategories();
@@ -187,6 +188,7 @@ public class DataAcquisitionSearch extends Controller {
 
             long startTime = System.currentTimeMillis();
             final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+            Measurement.setCurrentUser(user);
             log.debug("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
             if (null == user) {
