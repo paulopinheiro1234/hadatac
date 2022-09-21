@@ -1091,40 +1091,10 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         AtomicReference<Pivot> pEC = new AtomicReference<>();
         AtomicReference<Pivot> pEC2 = new AtomicReference<>();
-        CompletableFuture<FacetTree> promiseOfTreeS = CompletableFuture.supplyAsync((
-                () -> {
-                    long startTime = System.currentTimeMillis();
-                    FacetTree fTreeS = new FacetTree();
-                    fTreeS.setTargetFacet(STR.class);
-                    fTreeS.addUpperFacet(Study.class);
-                    Pivot pivotS = getFacetStats(fTreeS,
-                            retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET),
-                            facetHandler);
-                    if (bAddToResults) {
-                        result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
-                    }
-                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeS = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                    return fTreeS;
-                }
-        ), databaseExecutionContext);
 
-        CompletableFuture<FacetTree> promiseOfTreeOC = CompletableFuture.supplyAsync((
-                () -> {
-                    long startTime = System.currentTimeMillis();
-                    FacetTree fTreeOC = new FacetTree();
-                    fTreeOC.setTargetFacet(StudyObjectType.class);
-                    //fTreeOC.addUpperFacet(ObjectCollectionType.class);
-                    fTreeOC.addUpperFacet(StudyObjectRole.class);
-                    Pivot pivotOC = getFacetStats(fTreeOC,
-                            retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET),
-                            facetHandler);
-                    if (bAddToResults) {
-                        result.extra_facets.put(FacetHandler.OBJECT_COLLECTION_FACET, pivotOC);
-                    }
-                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeOC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                    return fTreeOC;
-                }
-        ), databaseExecutionContext);
+        log.debug("inside getAllFacetStatsAsync");
+        CompletableFuture<FacetTree> promiseOfTreeS = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.STUDY_FACET);
+        CompletableFuture<FacetTree> promiseOfTreeOC = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.OBJECT_COLLECTION_FACET);
 
         CompletableFuture<FacetTree> promiseOfTreeEC = CompletableFuture.supplyAsync((
                 () -> {
@@ -1171,56 +1141,9 @@ public class Measurement extends HADatAcThing implements Runnable {
          *  Merging the computation result of pivotEC2 into pivotEC
          */
 
-        CompletableFuture<FacetTree> promiseOfTreeU = CompletableFuture.supplyAsync((
-                () -> {
-                    long startTime = System.currentTimeMillis();
-                    FacetTree fTreeU = new FacetTree();
-                    fTreeU.setTargetFacet(UnitInstance.class);
-                    Pivot pivotU = getFacetStats(fTreeU,
-                            retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
-                            facetHandler);
-                    if (bAddToResults) {
-                        result.extra_facets.put(FacetHandler.UNIT_FACET, pivotU);
-                    }
-                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeU = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                    return fTreeU;
-                }
-        ), databaseExecutionContext);
-
-        CompletableFuture<FacetTree> promiseOfTreeT = CompletableFuture.supplyAsync((
-                () -> {
-                    long startTime = System.currentTimeMillis();
-                    FacetTree fTreeT = new FacetTree();
-                    fTreeT.setTargetFacet(TimeInstance.class);
-                    //fTreeT.addUpperFacet(DASEType.class);
-                    Pivot pivotT = getFacetStats(fTreeT,
-                            retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
-                            facetHandler);
-                    if (bAddToResults) {
-                        result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
-                    }
-                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreeT = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                    return fTreeT;
-                }
-        ), databaseExecutionContext);
-
-        CompletableFuture<FacetTree> promiseOfTreePI = CompletableFuture.supplyAsync((
-                () -> {
-                    long startTime = System.currentTimeMillis();
-                    FacetTree fTreePI = new FacetTree();
-                    fTreePI.setTargetFacet(STR.class);
-                    fTreePI.addUpperFacet(Platform.class);
-                    fTreePI.addUpperFacet(Instrument.class);
-                    Pivot pivotPI = getFacetStats(fTreePI,
-                            retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
-                            facetHandler);
-                    if (bAddToResults) {
-                        result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
-                    }
-                    log.debug("getAllFacetStatsAsync - getFacetStats(fTreePI = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                    return fTreePI;
-                }
-        ),databaseExecutionContext);
+        CompletableFuture<FacetTree> promiseOfTreeU = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.UNIT_FACET);
+        CompletableFuture<FacetTree> promiseOfTreeT = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.TIME_FACET);
+        CompletableFuture<FacetTree> promiseOfTreePI = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.PLATFORM_INSTRUMENT_FACET);
 
         try {
 
@@ -1257,28 +1180,13 @@ public class Measurement extends HADatAcThing implements Runnable {
         AtomicReference<Pivot> pEC = new AtomicReference<>();
         AtomicReference<Pivot> pEC2 = new AtomicReference<>();
 
-
         String userSearchPreferences = ConfigProp.toGuiJson(getCurrentUser().getEmail());
         String[] userPreferences = userSearchPreferences.split(",");
-        System.out.println("Config settings:" + ConfigProp.toGuiJson(getCurrentUser().getEmail()));
+//        System.out.println("Config settings:" + ConfigProp.toGuiJson(getCurrentUser().getEmail()));
+        long currentTime = System.currentTimeMillis();
 
         if (userPreferences[0].contains("true")) {
-            CompletableFuture<FacetTree> promiseOfTreeS = CompletableFuture.supplyAsync((
-                    () -> {
-                        long startTime = System.currentTimeMillis();
-                        FacetTree fTreeS = new FacetTree();
-                        fTreeS.setTargetFacet(STR.class);
-                        fTreeS.addUpperFacet(Study.class);
-                        Pivot pivotS = getFacetStats(fTreeS,
-                                retFacetHandler.getFacetByName(FacetHandler.STUDY_FACET),
-                                facetHandler);
-                        if (bAddToResults) {
-                            result.extra_facets.put(FacetHandler.STUDY_FACET, pivotS);
-                        }
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreeS = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                        return fTreeS;
-                    }
-            ), databaseExecutionContext);
+            CompletableFuture<FacetTree> promiseOfTreeS = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.STUDY_FACET);
             try {
                 FacetTree fTreeS = promiseOfTreeS.get();
             } catch (InterruptedException e) {
@@ -1289,23 +1197,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
         if (userPreferences[1].contains("true")) {
-            CompletableFuture<FacetTree> promiseOfTreeOC = CompletableFuture.supplyAsync((
-                    () -> {
-                        long startTime = System.currentTimeMillis();
-                        FacetTree fTreeOC = new FacetTree();
-                        fTreeOC.setTargetFacet(StudyObjectType.class);
-                        //fTreeOC.addUpperFacet(ObjectCollectionType.class);
-                        fTreeOC.addUpperFacet(StudyObjectRole.class);
-                        Pivot pivotOC = getFacetStats(fTreeOC,
-                                retFacetHandler.getFacetByName(FacetHandler.OBJECT_COLLECTION_FACET),
-                                facetHandler);
-                        if (bAddToResults) {
-                            result.extra_facets.put(FacetHandler.OBJECT_COLLECTION_FACET, pivotOC);
-                        }
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreeOC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                        return fTreeOC;
-                    }
-            ), databaseExecutionContext);
+            CompletableFuture<FacetTree> promiseOfTreeOC = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.OBJECT_COLLECTION_FACET);
             try {
                 FacetTree fTreeOC = promiseOfTreeOC.get();
             } catch (InterruptedException e) {
@@ -1333,7 +1225,7 @@ public class Measurement extends HADatAcThing implements Runnable {
                             result.extra_facets.put(FacetHandler.ENTITY_CHARACTERISTIC_FACET, pivotEC);
                         }
                         pEC.set(pivotEC);
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreeEC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                        log.debug("getSelectedFacetStatsAsync - getFacetStats(fTreeEC = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                         return fTreeEC;
                     }
             ), databaseExecutionContext);
@@ -1352,13 +1244,15 @@ public class Measurement extends HADatAcThing implements Runnable {
                                 retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET2),
                                 facetHandler);
                         pEC2.set(pivotEC2);
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreeEC2 = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                        log.debug("getSelectedFacetStatsAsync - getFacetStats(fTreeEC2 = " + (System.currentTimeMillis() - startTime) + " sms to finish");
                         return fTreeEC2;
                     }
             ), databaseExecutionContext);
             try {
                 FacetTree fTreeEC = promiseOfTreeEC.get();
                 FacetTree fTreeEC2 = promiseOfTreeEC2.get();
+                pEC.get().addChildrenFromPivot(pEC2.get());
+                pEC.get().normalizeCategoricalVariableLabelsFacetSearch(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -1371,21 +1265,7 @@ public class Measurement extends HADatAcThing implements Runnable {
          */
 
         if (userPreferences[3].contains("true")) {
-            CompletableFuture<FacetTree> promiseOfTreeU = CompletableFuture.supplyAsync((
-                    () -> {
-                        long startTime = System.currentTimeMillis();
-                        FacetTree fTreeU = new FacetTree();
-                        fTreeU.setTargetFacet(UnitInstance.class);
-                        Pivot pivotU = getFacetStats(fTreeU,
-                                retFacetHandler.getFacetByName(FacetHandler.UNIT_FACET),
-                                facetHandler);
-                        if (bAddToResults) {
-                            result.extra_facets.put(FacetHandler.UNIT_FACET, pivotU);
-                        }
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreeU = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                        return fTreeU;
-                    }
-            ), databaseExecutionContext);
+            CompletableFuture<FacetTree> promiseOfTreeU = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.UNIT_FACET);
             try {
                 FacetTree fTreeU = promiseOfTreeU.get();
             } catch (InterruptedException e) {
@@ -1396,22 +1276,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
         if (userPreferences[4].contains("true")) {
-            CompletableFuture<FacetTree> promiseOfTreeT = CompletableFuture.supplyAsync((
-                    () -> {
-                        long startTime = System.currentTimeMillis();
-                        FacetTree fTreeT = new FacetTree();
-                        fTreeT.setTargetFacet(TimeInstance.class);
-                        //fTreeT.addUpperFacet(DASEType.class);
-                        Pivot pivotT = getFacetStats(fTreeT,
-                                retFacetHandler.getFacetByName(FacetHandler.TIME_FACET),
-                                facetHandler);
-                        if (bAddToResults) {
-                            result.extra_facets.put(FacetHandler.TIME_FACET, pivotT);
-                        }
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreeT = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                        return fTreeT;
-                    }
-            ), databaseExecutionContext);
+            CompletableFuture<FacetTree> promiseOfTreeT = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.TIME_FACET);
             try {
                 FacetTree fTreeT = promiseOfTreeT.get();
             } catch (InterruptedException e) {
@@ -1421,24 +1286,8 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
         }
 
-        if (userPreferences[6].contains("true")) {
-            CompletableFuture<FacetTree> promiseOfTreePI = CompletableFuture.supplyAsync((
-                    () -> {
-                        long startTime = System.currentTimeMillis();
-                        FacetTree fTreePI = new FacetTree();
-                        fTreePI.setTargetFacet(STR.class);
-                        fTreePI.addUpperFacet(Platform.class);
-                        fTreePI.addUpperFacet(Instrument.class);
-                        Pivot pivotPI = getFacetStats(fTreePI,
-                                retFacetHandler.getFacetByName(FacetHandler.PLATFORM_INSTRUMENT_FACET),
-                                facetHandler);
-                        if (bAddToResults) {
-                            result.extra_facets.put(FacetHandler.PLATFORM_INSTRUMENT_FACET, pivotPI);
-                        }
-                        log.debug("getAllFacetStatsAsync - getFacetStats(fTreePI = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                        return fTreePI;
-                    }
-            ), databaseExecutionContext);
+        if (userPreferences[5].contains("true")) {
+            CompletableFuture<FacetTree> promiseOfTreePI = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.PLATFORM_INSTRUMENT_FACET);
             try {
                 FacetTree fTreePI = promiseOfTreePI.get();
             } catch (InterruptedException e) {
@@ -1447,11 +1296,6 @@ public class Measurement extends HADatAcThing implements Runnable {
                 e.printStackTrace();
             }
         }
-
-        long currentTime = System.currentTimeMillis();
-
-        pEC.get().addChildrenFromPivot(pEC2.get());
-        pEC.get().normalizeCategoricalVariableLabelsFacetSearch(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
         log.debug("getAllFacetStatsAsync - final stage: " + (System.currentTimeMillis() - currentTime));
         System.out.println("getAllFacetStatsAsync - final stage: " + (System.currentTimeMillis() - currentTime));
     }
@@ -2966,6 +2810,27 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     public static SysUser getCurrentUser() {
         return currentUser;
+    }
+
+    public static CompletableFuture<FacetTree> getPromiseOfTree(FacetHandler facetHandler, FacetHandler retFacetHandler, AcquisitionQueryResult result,
+                                                         boolean bAddToResults, DatabaseExecutionContext databaseExecutionContext, String facet){
+        CompletableFuture<FacetTree> promiseOfTreeS = CompletableFuture.supplyAsync((
+                () -> {
+                    long startTime = System.currentTimeMillis();
+                    FacetTree fTreeS = new FacetTree();
+                    fTreeS.setTargetFacet(STR.class);
+                    fTreeS.addUpperFacet(Study.class);
+                    Pivot pivotS = getFacetStats(fTreeS,
+                            retFacetHandler.getFacetByName(facet),
+                            facetHandler);
+                    if (bAddToResults) {
+                        result.extra_facets.put(facet, pivotS);
+                    }
+                    log.debug("getSelectedFacetStatsAsync - getFacetStats("+facet+" = " + (System.currentTimeMillis() - startTime) + " sms to finish");
+                    return fTreeS;
+                }
+        ), databaseExecutionContext);
+        return promiseOfTreeS;
     }
 }
 
