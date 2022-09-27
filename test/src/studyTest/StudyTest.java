@@ -8,7 +8,7 @@ import org.hadatac.data.loader.RecordFile;
 import org.hadatac.entity.pojo.ColumnMapping;
 import org.hadatac.entity.pojo.DataFile;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+import org.hadatac.data.model.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONArray;
@@ -18,15 +18,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-import scala.io.Source;
 import src.multiStudyTest.MultiStudyTest;
 
 import java.io.File;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;

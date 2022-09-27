@@ -9,12 +9,7 @@ import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.entity.pojo.ColumnMapping;
 import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.ConfigProp;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import src.domain.MultiStudyTestConfig;
 

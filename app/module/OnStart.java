@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 
 import org.hadatac.console.models.SecurityRole;
 import org.hadatac.data.loader.mqtt.MqttMessageWorker;
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+import org.hadatac.data.model.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 
 import org.hadatac.utils.ConfigProp;

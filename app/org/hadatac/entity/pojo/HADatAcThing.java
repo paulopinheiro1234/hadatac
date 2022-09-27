@@ -13,6 +13,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
+import org.hadatac.data.model.SPARQLUtilsFacetSearch;
 import org.hadatac.metadata.api.MetadataFactory;
 import org.hadatac.metadata.loader.URIUtils;
 import org.apache.jena.query.QuerySolution;

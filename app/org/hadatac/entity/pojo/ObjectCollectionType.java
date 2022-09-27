@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
+import org.hadatac.data.model.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.NameSpaces;
 import org.hadatac.console.http.SPARQLUtils;

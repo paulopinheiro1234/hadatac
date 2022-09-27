@@ -1,10 +1,8 @@
-package org.hadatac.entity.pojo;
+package org.hadatac.data.model;
 
 import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.*;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-
 import org.hadatac.utils.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +13,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-public class SPARQLUtilsFacetSearch {
+public class LuceneUtilsFacetSearch {
 
-    private static final Logger log = LoggerFactory.getLogger(SPARQLUtilsFacetSearch.class);
+    private static final Logger log = LoggerFactory.getLogger(LuceneUtilsFacetSearch.class);
     private static Set<String> visited = new HashSet<>();
 
     private static Model kgModel = null;
@@ -111,68 +109,6 @@ public class SPARQLUtilsFacetSearch {
         }
     }
 
-    public static Model describe(String sparqlService, String queryString) {
-        // System.out.println("\nqueryString: " + queryString + "\n");
-        /*log.info("in SPARQLUtilsFacetSearch.describe");
-        if ( visited.contains(queryString) ) {
-            log.info("describe encountered!!!!!!");
-        } else {
-            visited.add(queryString);
-        }*/
-
-        totalQueries++;
-        if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {
-
-            // System.out.println("desscribe: using in-memory model");
-            if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
-                if (describeCache.containsKey(queryString)) {
-                    cachedQueries++;
-                    return describeCache.get(queryString);
-                }
-            }
-
-            freshCalls++;
-            long startTime = System.currentTimeMillis();
-            Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
-            Model model = qexec.execDescribe();
-            totalTimeTaken += (System.currentTimeMillis()-startTime);
-
-            if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode")) ) {
-                describeCache.put(queryString, model);
-            }
-            return model;
-
-        } else {
-
-            if ("ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode"))) {
-                if (describeCache.containsKey(queryString)) {
-                    return describeCache.get(queryString);
-                }
-            }
-
-            try {
-                // System.out.println("NOT using in-memory model");
-                freshCalls++;
-                long startTime = System.currentTimeMillis();
-                Query query = QueryFactory.create(queryString);
-                QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlService, query);
-                Model model = qexec.execDescribe();
-                qexec.close();
-                totalTimeTaken += (System.currentTimeMillis()-startTime);
-
-                if ("ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.readOnlyMode"))) {
-                    describeCache.put(queryString, model);
-                }
-                return model;
-
-            } catch (QueryParseException e) {
-                System.out.println("[ERROR] queryString: " + queryString);
-                throw e;
-            }
-        }
-    }
-
     public static void reportStats() {
 
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.inMemoryModel")) ) {
@@ -211,12 +147,3 @@ public class SPARQLUtilsFacetSearch {
         return kgModel;
     }
 }
-
-
-/*
- Query query = QueryFactory.create(
-        "select ?f ?k WHERE {?f <http://example.com/fatherOf> ?k .}");
-    QueryExecution qexec = QueryExecutionFactory.create(query, model);
-    ResultSet results = qexec.execSelect();
-    https://docs.oracle.com/database/121/RDFRM/rdf-jena.htm#RDFRM275
- */

@@ -12,7 +12,8 @@ import org.hadatac.entity.pojo.Measurement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AcquisitionQueryResult {
+public class
+AcquisitionQueryResult {
     private long nDocSize = 0;
     public List<Measurement> documents;
     public Map<String, Map<String, Long>> field_facets;
