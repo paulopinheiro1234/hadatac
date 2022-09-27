@@ -1,6 +1,6 @@
 package org.hadatac.console.controllers.objectcollections;
 
-//import java.awt.desktop.AppForegroundListener;
+import java.awt.desktop.AppForegroundListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
