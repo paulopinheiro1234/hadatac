@@ -6,14 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import javax.inject.Inject;
 
-import module.DatabaseExecutionContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
-import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.data.model.SPARQLUtilsFacetSearch;
+import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
@@ -24,6 +23,8 @@ import org.hadatac.utils.NameSpaces;
 
 import com.typesafe.config.ConfigFactory;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import org.pac4j.play.java.Secure;
 import play.data.FormFactory;
 import play.libs.Files;
@@ -35,8 +36,6 @@ import play.mvc.Result;
 
 public class LoadKB extends Controller {
 
-	@Inject
-	private DatabaseExecutionContext databaseExecutionContext;
 	private static final String UPLOAD_NAME = ConfigProp.getTmp() + "uploads/hasneto-spreadsheet.xls";
 	private static final String UPLOAD_TURTLE_NAME = ConfigProp.getTmp() + "uploads/turtle.ttl";
 
@@ -53,12 +52,7 @@ public class LoadKB extends Controller {
 	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
 	public Result createInMemoryDataset(String oper,Http.Request request) {
 		Model model = SPARQLUtilsFacetSearch.createInMemoryModel();
-		String msg = "in-memory model created, with # of triples = " + model.size() + "\n";
-		AcquisitionQueryResult initialResponse = SPARQLUtilsFacetSearch.createInitialResponse(databaseExecutionContext);
-		if (initialResponse == null) {
-			msg += "System failed to cache initial response cached\n";
-		}
-		msg += "Initial response cached, with # of pivot facets = " + initialResponse.pivot_facets.size() + "\n";
+		String msg = "in-memory model created, with # of triples = " + model.size();
 		System.out.println(msg);
 		return ok(loadInMemory.render(msg,application.getUserEmail(request)));
 	}

@@ -19,8 +19,6 @@ public class FacetHandler {
 
     public Map<String, Facet> facetCatalog = new HashMap<String, Facet>();
 
-    public static final String DEFAULT_FACETS = "{\"facetsEC\":[],\"facetsEC2\":[],\"facetsS\":[],\"facetsOC\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
-
     public static final String ENTITY_CHARACTERISTIC_FACET = "facetsEC";
     public static final String ENTITY_CHARACTERISTIC_FACET2 = "facetsEC2";
     public static final String STUDY_FACET = "facetsS";
@@ -92,7 +90,7 @@ public class FacetHandler {
     public void loadFacetsFromString(String str) {
         if (str == null || str.equals("")) {
             // Default facets
-            str = DEFAULT_FACETS;
+            str = "{\"facetsEC\":[],\"facetsEC2\":[],\"facetsS\":[],\"facetsOC\":[],\"facetsU\":[],\"facetsT\":[],\"facetsPI\":[]}";
         }
 
         try {

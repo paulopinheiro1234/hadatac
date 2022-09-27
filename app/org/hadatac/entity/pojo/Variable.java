@@ -10,7 +10,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
-import org.hadatac.data.model.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.FirstLabel;
 import org.hadatac.utils.NameSpaces;

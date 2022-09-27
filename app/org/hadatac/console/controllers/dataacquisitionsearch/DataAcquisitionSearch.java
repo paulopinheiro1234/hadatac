@@ -1,5 +1,7 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
 import org.hadatac.Constants;
@@ -13,7 +15,7 @@ import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.data.model.SPARQLUtilsFacetSearch;
+import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.entity.pojo.User;
 import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;

@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.data.model.SPARQLUtilsFacetSearch;
+import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
