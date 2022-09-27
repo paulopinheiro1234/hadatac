@@ -187,6 +187,7 @@ public class DataAcquisitionSearch extends Controller {
 
             long startTime = System.currentTimeMillis();
             final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+            Measurement.setCurrentUser(user);
             log.debug("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
 
             if (null == user) {
