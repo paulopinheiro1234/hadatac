@@ -2813,24 +2813,46 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static CompletableFuture<FacetTree> getPromiseOfTree(FacetHandler facetHandler, FacetHandler retFacetHandler, AcquisitionQueryResult result,
-                                                         boolean bAddToResults, DatabaseExecutionContext databaseExecutionContext, String facet){
-        CompletableFuture<FacetTree> promiseOfTreeS = CompletableFuture.supplyAsync((
+                                                                boolean bAddToResults, DatabaseExecutionContext databaseExecutionContext, String facet){
+        CompletableFuture<FacetTree> promiseOfTree = CompletableFuture.supplyAsync((
                 () -> {
                     long startTime = System.currentTimeMillis();
-                    FacetTree fTreeS = new FacetTree();
-                    fTreeS.setTargetFacet(STR.class);
-                    fTreeS.addUpperFacet(Study.class);
-                    Pivot pivotS = getFacetStats(fTreeS,
+                    FacetTree fTree = new FacetTree();
+                    switch (facet){
+                        case FacetHandler.STUDY_FACET:
+                            fTree.setTargetFacet(STR.class);
+                            fTree.addUpperFacet(Study.class);
+                            break;
+                        case FacetHandler.OBJECT_COLLECTION_FACET:
+                            fTree.setTargetFacet(StudyObjectType.class);
+                            fTree.addUpperFacet(StudyObjectRole.class);
+                            break;
+                        case FacetHandler.UNIT_FACET:
+                            fTree.setTargetFacet(UnitInstance.class);
+                            break;
+                        case FacetHandler.TIME_FACET:
+                            fTree.setTargetFacet(TimeInstance.class);
+                            break;
+                        case FacetHandler.PLATFORM_INSTRUMENT_FACET:
+                            fTree.setTargetFacet(STR.class);
+                            fTree.addUpperFacet(Platform.class);
+                            fTree.addUpperFacet(Instrument.class);
+                            break;
+                        default:
+                            System.out.println("nothing was returned");
+
+                    }
+                    Pivot pivot = getFacetStats(fTree,
                             retFacetHandler.getFacetByName(facet),
                             facetHandler);
                     if (bAddToResults) {
-                        result.extra_facets.put(facet, pivotS);
+                        result.extra_facets.put(facet, pivot);
                     }
                     log.debug("getSelectedFacetStatsAsync - getFacetStats("+facet+" = " + (System.currentTimeMillis() - startTime) + " sms to finish");
-                    return fTreeS;
+                    return fTree;
                 }
         ), databaseExecutionContext);
-        return promiseOfTreeS;
+        return promiseOfTree;
     }
 }
 
