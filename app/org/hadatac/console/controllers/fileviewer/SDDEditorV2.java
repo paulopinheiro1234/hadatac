@@ -79,9 +79,9 @@ public class SDDEditorV2 extends Controller {
         DataFile finalDF=new DataFile("");
         if (indicator == 1 && dataFile != null) {
             headerSheetColumn=DDEditor.headerSheetColumn;
-            System.out.println(headerSheetColumn);
+            // System.out.println(headerSheetColumn);
             commentSheetColumn=DDEditor.commentSheetColumn;
-            System.out.println(commentSheetColumn);
+            // System.out.println(commentSheetColumn);
 
             ddDF=DDEditor.dd_df;
             finalDF=ddDF;
@@ -150,13 +150,11 @@ public class SDDEditorV2 extends Controller {
     }
     public Result getddFileKey(String fID) {
         bioportalKey=ConfigProp.getBioportalApiKey();
-        System.out.println("bioportalKey = " + bioportalKey);
         return ok(Json.toJson(bioportalKey));
     }
 
     public Result getBioportalKey() {
         bioportalKey=ConfigProp.getBioportalApiKey();
-        System.out.println("bioportalKey = " + bioportalKey);
         return ok(Json.toJson(bioportalKey));
     }
 
@@ -212,9 +210,7 @@ public class SDDEditorV2 extends Controller {
     }
     public Result sizeOfCart(int cartamount){
         cartamount= currentCart.size();
-        System.out.println(cartamount);
         return ok(Json.toJson(cartamount));
-
     }
 
     public Result addToEdits(String row, String col,String editValue){
@@ -240,7 +236,6 @@ public class SDDEditorV2 extends Controller {
         ArrayList<String> temp=storeEdits.get(storeEdits.size()-1);
 
         //String lastKnown=;
-        System.out.println(temp);
         oldEdits.add(temp);
         storeEdits.remove(storeEdits.size()-1);
 
@@ -313,12 +308,15 @@ public class SDDEditorV2 extends Controller {
         List<DataFile> wkFiles = new ArrayList<DataFile>();
         wkFiles.addAll(DataFile.findDownloadedFilesInDir(relPath, DataFile.CREATING));
         wkFiles.addAll(DataFile.findDownloadedFilesInDir(relPath, DataFile.WORKING));
-        List<String> filenames = new ArrayList<String>(wkFiles.size());
-        for(DataFile f : wkFiles){
-           filenames.add(f.getFileName());
-        }
-        System.out.println("filenames");
-        System.out.println(filenames);
+
+        // List<String> filenames = new ArrayList<String>(wkFiles.size());
+        // for(DataFile f : wkFiles){
+        //    filenames.add(f.getFileName());
+        // }
+        List<FileJson> filenames = new ArrayList<FileJson>(wkFiles.size());
+         for(DataFile f : wkFiles){
+             filenames.add(new FileJson(f.getFileName(), f.getId()));
+         }
 
         // Gets the folder structure from the file system
         List<String> foldersWithSub = new ArrayList<String>();
@@ -334,11 +332,6 @@ public class SDDEditorV2 extends Controller {
              foldersWithSub.add(folder);
           }
         }
-        System.out.println("foldersWithSub");
-        System.out.println(foldersWithSub);
-
-        System.out.println("foldersWithNoSub");
-        System.out.println(foldersWithNoSub);
 
         // converts data to json
         String jsonRep = "{\"files\" : ";
@@ -349,8 +342,26 @@ public class SDDEditorV2 extends Controller {
         jsonRep += Json.toJson(foldersWithNoSub);
         jsonRep += "}";
 
-        System.out.println(jsonRep);
         return ok(Json.parse(jsonRep));
         // return ok(Json.toJson(DataFile.getHierarchy(relPath, "", false)));
     }
+
+    // This class is used to create a json dict representation of files with their name and id
+    private class FileJson{
+      private String name;
+      private String loc;
+
+      public FileJson(String n, String l){
+         name = n;
+         loc = l;
+      }
+
+      public String toString(){
+         String out = "{";
+         out += "\"name\" : " + name + ", ";
+         out += "\"loc\" : " + loc + ", ";
+         out += "}";
+         return out;
+      }
+   }
 }

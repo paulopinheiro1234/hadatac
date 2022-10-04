@@ -217,30 +217,25 @@ userName:String
                      <div class = "setDDForm">
                         <form id="regForm" action="">
 
-                        <h1>Register:</h1>
 
+                        <div class="ddtab">Select Data Dictionary File:
+                          <div class="ddfile" id="fileexplorer"></div>
 
-                        <div class="tab">Name:
-                          <div id="fileexplorer"></div>
-
-                          <p><input placeholder="First name..." oninput="this.className = ''" class="ddInput"></p>
-                          <p><input placeholder="Last name..." oninput="this.className = ''" class="ddInput"></p>
+                          <p><input placeholder="Data Dictionary..." oninput="this.className = ''" class="ddInput" id="dd_path_field" disabled></p>
                         </div>
 
-                        <div class="tab">Contact Info:
-                          <p><input placeholder="E-mail..." oninput="this.className = ''" class="ddInput"></p>
-                          <p><input placeholder="Phone..." oninput="this.className = ''" class="ddInput"></p>
+                        <div class="ddtab">Select Data Dictionary Sheet (SheetName ["header1", "header2", ...]):
+                          <div id="sheetexplorer" class="headtab"></div>
                         </div>
 
-                        <div class="tab">Birthday:
-                          <p><input placeholder="dd" oninput="this.className = ''" class="ddInput"></p>
-                          <p><input placeholder="mm" oninput="this.className = ''" class="ddInput"></p>
-                          <p><input placeholder="yyyy" oninput="this.className = ''" class="ddInput"></p>
+                        <div class="ddtab">Select Header Column:
+                          <div id="headerexplorer" class="headtab"></div>
                         </div>
 
-                        <div class="tab">Login Info:
-                          <p><input placeholder="Username..." oninput="this.className = ''" class="ddInput"></p>
-                          <p><input placeholder="Password..." oninput="this.className = ''" class="ddInput"></p>
+                        <div class="ddtab">Select Description Column:
+                          <div id="descriptionexplorer" class="headtab"></div>
+                          <input type="checkbox" id="importDD" name="importDD" value="true">
+                          <label for="importDD">Import missing columns</label><br>
                         </div>
 
                         <div style="overflow:auto;">
@@ -266,8 +261,6 @@ userName:String
                      <div id="gridcopy"></div>
                      <div id="footnote"></div>
                      <div id="buttons"></div>
-
-                     <script src="@controllers.routes.Assets.versioned("sheetjs/js/setDDForm.js")"></script>
                   </div>
 
                   <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/spin.js")"></script>
@@ -276,8 +269,10 @@ userName:String
                   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/prefixesHandler.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/loadDD.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/setDDForm.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/label-iri-view.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/searchTerm.js")"></script>
@@ -287,13 +282,19 @@ userName:String
                   <script type="text/javascript">
                      /* set up async GET request */
                      var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
-
+                     var runDDinit = true;
                      var workbook;
                      var _formData = JSON.stringify({"fileId": "@dataFile.getId()"});
                      var _upload_url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()";
                      var _filetype = "@dataFile.getFileExtention()";
                      var _onWb = function(wb, sheet){
                         workbook = wb;
+                        // Load up DD if we have a valid one and if we havn't loaded 1 before
+                        if(runDDinit){
+                           runDDinit = false;
+                           initDataDictionary();
+                           getSuggestion();
+                        }
                      };
 
                      // var _upload = document.getElementById('upload');
@@ -345,20 +346,23 @@ userName:String
                   <script>
                      var sdd_url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
                      getSDDUrl(sdd_url);
-                     if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
-                        alert("Please upload a valid Data Dictionary")
-                     }
-                     else{
-                        if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
-                           alert("Could not find a Data Dictionary")
-                        }
-                        else{
-                           var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+                     // This is old depricated code use to trigger suggestion off of DDs passed as page arguments
+                     // This suggestion trigger is now set on initDataDictionary
 
-                           //getSDDURL()
-                           getURL(url);
-                        }
-                     }
+                     // if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
+                     //    alert("Please upload a valid Data Dictionary")
+                     // }
+                     // else{
+                     //    if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
+                     //       alert("Could not find a Data Dictionary")
+                     //    }
+                     //    else{
+                     //       var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+                     //
+                     //       //getSDDURL()
+                     //       getURL(url);
+                     //    }
+                     // }
                   </script>
 
 

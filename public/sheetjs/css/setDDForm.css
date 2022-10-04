@@ -33,6 +33,31 @@ input.invalid {
   border: 1px solid #aaaaaa;
 }
 
+.radiolabel{
+  font-size: 17px;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
+.radiolabel_invalid{
+  font-size: 17px;
+  margin-left: 10px;
+  font-weight: normal;
+  background-color: #ffdddd;
+}
+
+.radiobox{
+  vertical-align: text-middle;
+}
+
+.ddInput_finish{
+  padding: 10px;
+  width: 100%;
+  font-size: 17px;
+  font-family: Raleway;
+  border: 1px solid #aaaaaa;
+}
+
 .ddInput_invalid {
   padding: 10px;
   width: 100%;
@@ -42,9 +67,21 @@ input.invalid {
   background-color: #ffdddd;
 }
 
+.headtab{
+   overflow-x: hidden;
+   overflow-y: auto;
+   height: 400px;
+}
+
 /* Hide all steps by default: */
-.tab {
+.ddtab {
   display: none;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ddfile {
+   font-weight: normal;
 }
 
 /* Make circles that indicate the steps of the form: */
