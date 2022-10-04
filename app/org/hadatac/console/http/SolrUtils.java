@@ -1,11 +1,11 @@
 package org.hadatac.console.http;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
+import com.typesafe.config.ConfigFactory;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -25,6 +25,10 @@ public class SolrUtils {
 		    HttpPost post = new HttpPost(solrCollection + "/update?commit=true");
 		    StringEntity entity  = new StringEntity(content, "UTF-8");
 		    entity.setContentType("application/json");
+			if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.solr.solrAuth.enableSolrAuth"))){
+				String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString((ConfigFactory.load().getString("hadatac.solr.solrAuth.user")+":"+ConfigFactory.load().getString("hadatac.solr.solrAuth.password")).getBytes(StandardCharsets.UTF_8));
+				post.setHeader(HttpHeaders.AUTHORIZATION,authHeaderValue);
+			}
 		    post.setEntity(entity);
 		    HttpResponse response = httpClient.execute(post);
 		    /*System.out.println(post.toString());
