@@ -214,6 +214,7 @@ cdg.addEventListener('click', function (e) {
 
    // Don't change anything if we are clicking on things that are not data cells
    if (!e.cell) { return; }
+   if (e.cell.style != "cell") { return; }
    if (e.cell.columnIndex < 0) { return; }
    if (e.cell.rowIndex < 0) { return; }
 
@@ -1085,7 +1086,7 @@ function getSuggestion(){
       spinnerStatus.stop();
       imageStatus.src = imgPath + 'fail.png';
       imageStatus.style.visibility = 'visible';
-      alert("Error: Set Data Dictionary in the SDD-Editor!");
+      alert("Warning: Data Dictionary has not been set");
       return false;
    }
 
@@ -1618,6 +1619,7 @@ function clearTextbox(){
 function DDExceltoJSON(varnameElement){
    if (dd_data == null) {
       document.getElementById("varDescription").value = "Data Dictionary is not set...";
+      return false;
    }
 
    if (varnameElement in dd_data['descMap']) {
