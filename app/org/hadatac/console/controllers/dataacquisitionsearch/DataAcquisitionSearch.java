@@ -98,12 +98,16 @@ public class DataAcquisitionSearch extends Controller {
         SPARQLUtilsFacetSearch.clearCache();
         // SolrUtilsFacetSearch.clearCache();
 
+        return indexInternalAsync(0, page, rows,request);
+
+        /*
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.concurrency")) ) {
             log.debug("using async calls for facet search....");
             return indexInternalAsync(0, page, rows,request);
         } else {
             return indexInternal(0, page, rows,request);
         }
+         */
     }
 
     // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
@@ -111,16 +115,21 @@ public class DataAcquisitionSearch extends Controller {
         return index(page, rows, request);
     }
 
+    /*
     // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result indexData(int page, int rows, Http.Request request) {
         return indexInternal(1, page, rows, request);
     }
+     */
 
+    /*
     // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndexData(int page, int rows, Http.Request request) {
         return indexData(page, rows, request);
     }
+     */
 
+    /*
     private Result indexInternal(int mode, int page, int rows, Http.Request request) {
         String facets = "";
         if (request.body().asFormUrlEncoded() != null) {
@@ -146,7 +155,7 @@ public class DataAcquisitionSearch extends Controller {
         }
         //System.out.println("OwnerURI: " + ownerUri);
 
-        results = Measurement.find(ownerUri, page, rows, facets);
+        results = Measurement.findAsync(ownerUri, page, rows, facets);
 
         ObjectDetails objDetails = getObjectDetails(results);
 
@@ -166,8 +175,11 @@ public class DataAcquisitionSearch extends Controller {
                     Measurement.getFieldNames(), objectCollections,application.getUserEmail(request)));
         }
     }
+     */
 
     private Result indexInternalAsync(int mode, int page, int rows, Http.Request request) {
+
+        Boolean initialQuery = false;
 
         try {
             String facets = "";
@@ -176,6 +188,10 @@ public class DataAcquisitionSearch extends Controller {
             }
 
             System.out.println("indexInternalAsync: facets=[" + facets + "]");
+
+            if (facets == null || facets.isEmpty() || facets.equals(FacetHandler.DEFAULT_FACET)) {
+                initialQuery = true;
+            }
 
             // log.debug("facets: " + facets);
 
@@ -211,11 +227,13 @@ public class DataAcquisitionSearch extends Controller {
 
             String finalFacets = facets;
             String finalOwnerUri = ownerUri;
+            Boolean finalInitialQuery = initialQuery;
             CompletableFuture<AcquisitionQueryResult> promiseOfFacetStats = CompletableFuture.supplyAsync((
                     () -> {
-                        return Measurement.findAsync(finalOwnerUri, page, rows, finalFacets, databaseExecutionContext);
+                        return Measurement.findAsync(finalInitialQuery, finalOwnerUri, page, rows, finalFacets, databaseExecutionContext);
                     }
             ), databaseExecutionContext);
+
 
             List<String> fileNames = Measurement.getFieldNames();
             log.debug("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
@@ -261,7 +279,8 @@ public class DataAcquisitionSearch extends Controller {
 
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    /*
+    //@Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result download(Http.Request request) {
         System.out.println("inside download");
         String ownerUri = getOwnerUri(request);
@@ -280,7 +299,7 @@ public class DataAcquisitionSearch extends Controller {
         }
         //System.out.println("selectedFields: " + selectedFields);
 
-        AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
+        AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets);
 
         final String finalFacets = facets;
         CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
@@ -295,6 +314,7 @@ public class DataAcquisitionSearch extends Controller {
 
         return redirect(routes.Downloader.index());
     }
+     */
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadAlignment(Http.Request request) {
@@ -464,10 +484,12 @@ public class DataAcquisitionSearch extends Controller {
         return ownerUri;
     }
 
+    /*
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownload(Http.Request request) {
         return download(request);
     }
+     */
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadAlignment(Http.Request request) {

@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.Model;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.Application;
 import org.hadatac.console.controllers.AuthApplication;
+import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.console.views.html.triplestore.*;
 import org.hadatac.metadata.loader.MetadataContext;
@@ -52,7 +53,13 @@ public class LoadKB extends Controller {
 	@Secure(authorizers = Constants.DATA_MANAGER_ROLE)
 	public Result createInMemoryDataset(String oper,Http.Request request) {
 		Model model = SPARQLUtilsFacetSearch.createInMemoryModel();
-		String msg = "in-memory model created, with # of triples = " + model.size();
+		AcquisitionQueryResult initialResult = SPARQLUtilsFacetSearch.createInMemoryInitialResult();
+		String msg = "in-memory model created, with # of triples = " + model.size() + ". ";
+		if (initialResult == null) {
+			msg += "Failed to cache initial result.";
+		} else {
+			msg += "Initial result successfully cached.";
+		}
 		System.out.println(msg);
 		return ok(loadInMemory.render(msg,application.getUserEmail(request)));
 	}

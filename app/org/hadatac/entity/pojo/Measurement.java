@@ -621,6 +621,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         return result;
     }
 
+    /*
     public static AcquisitionQueryResult find(String user_uri, int page, int qtd, String facets) {
         AcquisitionQueryResult result = new AcquisitionQueryResult();
 
@@ -628,10 +629,7 @@ public class Measurement extends HADatAcThing implements Runnable {
         List<String> ownedDAs = STR.findAllAccessibleDataAcquisition(user_uri);
         log.debug("STR.findAllAccessibleDataAcquisition(user_uri) takes " + (System.currentTimeMillis()-startTime) + "sms to finish");
         if (ownedDAs.isEmpty()) {
-            /*
-             * an empty query happens when current user is not allowed to see any
-             * data acquisition
-             */
+             // an empty query happens when current user is not allowed to see any data acquisition
             System.out.println("User with this URL: " + user_uri + ": Not allowed to access any Data Acquisition!");
             return result;
         }
@@ -732,9 +730,14 @@ public class Measurement extends HADatAcThing implements Runnable {
 
         return result;
     }
+    */
 
 
-    public static AcquisitionQueryResult findAsync(String user_uri, int page, int qtd, String facets, DatabaseExecutionContext databaseExecutionContext)  {
+    public static AcquisitionQueryResult findAsync(Boolean initialQuery, String user_uri, int page, int qtd, String facets, DatabaseExecutionContext databaseExecutionContext)  {
+
+        if (initialQuery) {
+            System.out.println("Inside INITIAL QUERY");
+        }
 
         AcquisitionQueryResult resultAsync = new AcquisitionQueryResult();
 
@@ -742,21 +745,23 @@ public class Measurement extends HADatAcThing implements Runnable {
                 () -> { return STR.findAllAccessibleDataAcquisition(user_uri); }
         ), databaseExecutionContext);
 
-        CompletableFuture<AcquisitionQueryResult> promiseOfFacetStats = CompletableFuture.supplyAsync((
-                () -> { return getAllFacetStatsWrapper(resultAsync, facets, databaseExecutionContext); }
-        ), databaseExecutionContext);
-
         List<String> ownedDAs = null;
+        AcquisitionQueryResult result = null;
+        CompletableFuture<AcquisitionQueryResult> promiseOfFacetStats = CompletableFuture.supplyAsync((
+                () -> {
+                    return getAllFacetStatsWrapper(initialQuery, resultAsync, facets, databaseExecutionContext);
+                }
+        ), databaseExecutionContext);
         try {
-            ownedDAs = promiseOfOwnedDAs.get();
+            result = promiseOfFacetStats.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        AcquisitionQueryResult result = null;
+
         try {
-            result = promiseOfFacetStats.get();
+            ownedDAs = promiseOfOwnedDAs.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -938,7 +943,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 
     }
 
-    public static AcquisitionQueryResult getAllFacetStatsWrapper(AcquisitionQueryResult result, String facets, DatabaseExecutionContext databaseExecutionContext) {
+    public static AcquisitionQueryResult getAllFacetStatsWrapper(boolean initialQuery, AcquisitionQueryResult result, String facets, DatabaseExecutionContext databaseExecutionContext) {
 
         long startTime = System.currentTimeMillis();
 
@@ -951,14 +956,27 @@ public class Measurement extends HADatAcThing implements Runnable {
         log.debug("findAsync -> getAllFacetStatsWrapper-1: " + (System.currentTimeMillis()-startTime));
 
         startTime = System.currentTimeMillis();
-        getSelectedFacetStatsAsync(facetHandler, retFacetHandler, result, true, databaseExecutionContext);
+        long currentTime = System.currentTimeMillis();
+        if (initialQuery) {
+            if (SPARQLUtilsFacetSearch.getInitialResult() == null) {
+                getSelectedFacetStatsAsync(initialQuery, facetHandler, retFacetHandler, result, true, databaseExecutionContext);
+                SPARQLUtilsFacetSearch.setInitialResult(result);
+            } else {
+                System.out.println("getAllFacets REUSING Initial Result");
+            }
+            result = SPARQLUtilsFacetSearch.getInitialResult();
+            System.out.println("getAllFacets with Initial Result - final stage: " + (System.currentTimeMillis() - currentTime));
+        } else {
+            getSelectedFacetStatsAsync(initialQuery, facetHandler, retFacetHandler, result, true, databaseExecutionContext);
+            System.out.println("getAllFacets without Initial Result - final stage: " + (System.currentTimeMillis() - currentTime));
+        }
         log.debug("findAsync -> getAllFacetStatsWrapper-2: " + (System.currentTimeMillis()-startTime));
 
         return result;
 
     }
 
-    private static void getAllFacetStats(
+    public static void getAllFacetStats(
             FacetHandler facetHandler,
             FacetHandler retFacetHandler,
             AcquisitionQueryResult result,
@@ -984,9 +1002,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
         log.debug("getFacetStats(fTreeOC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
-        /*
-         *  The facet tree EC computes the entity-attribute indicators for indicators based on property's main attribute
-         */
+        //  The facet tree EC computes the entity-attribute indicators for indicators based on property's main attribute
+
         FacetTree fTreeEC = new FacetTree();
         fTreeEC.setTargetFacet(AttributeInstance.class);
         fTreeEC.addUpperFacet(Indicator.class);
@@ -1001,9 +1018,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         log.debug("getFacetStats(fTreeEC = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
 
-        /*
-         *  The facet tree EC computes the entity-attribute indicators for indicators based on property's in-relation-to attribute
-         */
+        //  The facet tree EC computes the entity-attribute indicators for indicators based on property's in-relation-to attribute
+
         FacetTree fTreeEC2 = new FacetTree();
         fTreeEC2.setTargetFacet(AttributeInstance.class);
         fTreeEC2.addUpperFacet(Indicator.class);
@@ -1017,35 +1033,11 @@ public class Measurement extends HADatAcThing implements Runnable {
                 facetHandler);
         log.debug("getFacetStats(fTreeEC2 = " + (System.currentTimeMillis()-startTime) + " sms to finish");
 
-        /*
-         *  Merging the computation result of pivotEC2 into pivotEC
-         */
+        //  Merging the computation result of pivotEC2 into pivotEC
+
         pivotEC.addChildrenFromPivot(pivotEC2);
         pivotEC.normalizeCategoricalVariableLabels(retFacetHandler.getFacetByName(FacetHandler.ENTITY_CHARACTERISTIC_FACET), facetHandler);
         
-    	/*
-        System.out.println("measurement - >>>>>>>>>>> EC Content");
-        for (Pivot pivot1 : pivotEC.children) {
-        	System.out.println("measurement - EC_1: field: " + pivot1.getField() + "  value: " + pivot1.getValue() + "   count: " + pivot1.getCount() + "    tooltip: " + pivot1.getTooltip());
-            for (Pivot pivot2 : pivot1.children) {
-            	System.out.println("  measurement - EC_2: field: " + pivot2.getField() + "   value: " + pivot2.getValue() + "  count: " + pivot2.getCount() + "    tooltip: " + pivot2.getTooltip());
-                for (Pivot pivot3 : pivot2.children) {
-                	System.out.println("    measurement - EC_3: field: " + pivot2.getField() + "   value: " + pivot3.getValue() + "  count: " + pivot3.getCount() + "    tooltip: " + pivot3.getTooltip());
-                	for (Pivot pivot4 : pivot3.children) {
-                    	System.out.println("      measurement - EC_4: field: " + pivot4.getField() + "   value: " + pivot4.getValue() + "  count: " + pivot4.getCount() + "    tooltip: " + pivot4.getTooltip());
-                        for (Pivot pivot5 : pivot4.children) {
-                        	System.out.println("        measurement - EC_5: field: " + pivot5.getField() + "   value: " + pivot5.getValue() + "  count: " + pivot5.getCount() + "    tooltip: " + pivot5.getTooltip());
-                            for (Pivot pivot6 : pivot5.children) {
-                            	System.out.println("          measurement - EC_6: field: " + pivot6.getField() + "   value: " + pivot6.getValue() + "  count: " + pivot6.getCount() + "    tooltip: " + pivot6.getTooltip());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    	System.out.println("measurement - <<<<<<<<<<<< EC Content");
-		*/
-
         FacetTree fTreeU = new FacetTree();
         fTreeU.setTargetFacet(UnitInstance.class);
         startTime = System.currentTimeMillis();
@@ -1083,7 +1075,8 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
     }
 
-    private static void getAllFacetStatsAsync(
+    /*
+    private static void AsyncgetAllFacetStats(
             FacetHandler facetHandler,
             FacetHandler retFacetHandler,
             AcquisitionQueryResult result,
@@ -1137,9 +1130,8 @@ public class Measurement extends HADatAcThing implements Runnable {
                 }
         ), databaseExecutionContext);
 
-        /*
-         *  Merging the computation result of pivotEC2 into pivotEC
-         */
+
+        //  Merging the computation result of pivotEC2 into pivotEC
 
         CompletableFuture<FacetTree> promiseOfTreeU = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.UNIT_FACET);
         CompletableFuture<FacetTree> promiseOfTreeT = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.TIME_FACET);
@@ -1170,8 +1162,10 @@ public class Measurement extends HADatAcThing implements Runnable {
         }
 
     }
+    */
 
     private static void getSelectedFacetStatsAsync(
+            boolean initialResult,
             FacetHandler facetHandler,
             FacetHandler retFacetHandler,
             AcquisitionQueryResult result,
@@ -1185,7 +1179,7 @@ public class Measurement extends HADatAcThing implements Runnable {
 //        System.out.println("Config settings:" + ConfigProp.toGuiJson(getCurrentUser().getEmail()));
         long currentTime = System.currentTimeMillis();
 
-        if (userPreferences[0].contains("true")) {
+        if ((initialResult) || userPreferences[0].contains("true")) {
             CompletableFuture<FacetTree> promiseOfTreeS = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.STUDY_FACET);
             try {
                 FacetTree fTreeS = promiseOfTreeS.get();
@@ -1196,7 +1190,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
         }
 
-        if (userPreferences[1].contains("true")) {
+        if ((initialResult) || userPreferences[1].contains("true")) {
             CompletableFuture<FacetTree> promiseOfTreeOC = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.OBJECT_COLLECTION_FACET);
             try {
                 FacetTree fTreeOC = promiseOfTreeOC.get();
@@ -1207,7 +1201,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
         }
 
-        if (userPreferences[2].contains("true")) {
+        if ((initialResult) || userPreferences[2].contains("true")) {
             CompletableFuture<FacetTree> promiseOfTreeEC = CompletableFuture.supplyAsync((
                     () -> {
                         long startTime = System.currentTimeMillis();
@@ -1264,7 +1258,7 @@ public class Measurement extends HADatAcThing implements Runnable {
          *  Merging the computation result of pivotEC2 into pivotEC
          */
 
-        if (userPreferences[3].contains("true")) {
+        if ((initialResult) || userPreferences[3].contains("true")) {
             CompletableFuture<FacetTree> promiseOfTreeU = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.UNIT_FACET);
             try {
                 FacetTree fTreeU = promiseOfTreeU.get();
@@ -1275,7 +1269,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
         }
 
-        if (userPreferences[4].contains("true")) {
+        if ((initialResult) || userPreferences[4].contains("true")) {
             CompletableFuture<FacetTree> promiseOfTreeT = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.TIME_FACET);
             try {
                 FacetTree fTreeT = promiseOfTreeT.get();
@@ -1286,7 +1280,7 @@ public class Measurement extends HADatAcThing implements Runnable {
             }
         }
 
-        if (userPreferences[5].contains("true")) {
+        if ((initialResult) || userPreferences[5].contains("true")) {
             CompletableFuture<FacetTree> promiseOfTreePI = getPromiseOfTree(facetHandler, retFacetHandler, result, bAddToResults, databaseExecutionContext, FacetHandler.PLATFORM_INSTRUMENT_FACET);
             try {
                 FacetTree fTreePI = promiseOfTreePI.get();
