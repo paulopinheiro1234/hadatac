@@ -338,7 +338,7 @@ public class DataAcquisitionSearch extends Controller {
             if (name_map.get("selObjectType") != null) {
                 objectType = name_map.get("selObjectType")[0].toString();
             }
-            if (name_map.get("setCatValue") != null) {
+            if (name_map.get("selCatValue") != null) {
                 categoricalValues = name_map.get("selCatValue")[0].toString();
             }
             if (name_map.get("selTimeRes") != null) {
