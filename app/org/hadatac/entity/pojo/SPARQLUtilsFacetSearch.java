@@ -1,27 +1,37 @@
 package org.hadatac.entity.pojo;
 
 import com.typesafe.config.ConfigFactory;
+import module.DatabaseExecutionContext;
 import org.apache.jena.query.*;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
+import org.hadatac.console.models.FacetHandler;
+import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.utils.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 @Singleton
 public class SPARQLUtilsFacetSearch {
+
+    static DatabaseExecutionContext databaseExecutionContext;
 
     private static final Logger log = LoggerFactory.getLogger(SPARQLUtilsFacetSearch.class);
     private static Set<String> visited = new HashSet<>();
 
     private static Model kgModel = null;
     private static Dataset dataset = null;
+    private static AcquisitionQueryResult initialResult = null;
     public static int totalQueries = 0;
     public static int cachedQueries = 0;
     public static int freshCalls = 0;
@@ -38,6 +48,14 @@ public class SPARQLUtilsFacetSearch {
         cachedQueries = 0;
         freshCalls = 0;
         totalTimeTaken = 0;
+    }
+
+    public static AcquisitionQueryResult getInitialResult() {
+        return initialResult;
+    }
+
+    public static void setInitialResult(AcquisitionQueryResult ir) {
+        initialResult = ir;
     }
 
     public static ResultSetRewindable select(String sparqlService, String queryString) {
@@ -210,6 +228,26 @@ public class SPARQLUtilsFacetSearch {
         // dataset = DatasetFactory.assemble(kgModel);
         return kgModel;
     }
+
+    public static AcquisitionQueryResult createInMemoryInitialResult() {
+
+        AcquisitionQueryResult initialResult = new AcquisitionQueryResult();
+
+        String facets = "";
+        FacetHandler facetHandler = new FacetHandler();
+        facetHandler.loadFacetsFromString(facets);
+
+        FacetHandler retFacetHandler = new FacetHandler();
+        retFacetHandler.loadFacetsFromString(facets);
+
+        Measurement.getAllFacetStats(facetHandler, retFacetHandler, initialResult, true);
+
+        // Stores initialResult in SPARQLUtilsFacetSearch
+        SPARQLUtilsFacetSearch.setInitialResult(initialResult);
+
+        return initialResult;
+    }
+
 }
 
 

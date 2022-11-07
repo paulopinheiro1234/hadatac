@@ -81,6 +81,12 @@ function clearSearch() {
 	window.location.href = encodeURI(url);
 }
 
+function updatePreferences(pref_array) {
+    var values = pref_array.toString().replace(/,/g, "/");
+	var url = location.protocol + '//' + location.host + location.pathname + "/update/" + values;
+	window.location.href = encodeURI(url);
+}
+
 function openShiny() {
 	var url = location.protocol + '//' + location.hostname + ':8081';
 	window.open(encodeURI(url), '_blank');
