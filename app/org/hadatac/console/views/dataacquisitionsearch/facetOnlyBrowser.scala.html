@@ -25,7 +25,7 @@
     <script type="text/javascript" src="/hadatac/assets/javascripts/datasearch.js"></script>
     <div id="query" data-documents="@documentJson"/>
     <div id="facetDiv" data-documents="@handler.toJSON()"/>
-    <div id="preferences" data-results="@ConfigProp.toGuiJson()"/>
+    <div id="preferences" data-results="@ConfigProp.toGuiJson(userName)"/>
 
     <div class="container-fluid">
         <div class="row">
@@ -118,12 +118,32 @@
                 $("#panels").children().each(function () {
                     $("#panel_options").append($('<label/>').html(this.id.replace(/_/g, ' ') + '&nbsp;&nbsp;').prepend($('<input/>').attr(
                             { type: 'checkbox', name: this.id, 'checked': pref.value[i++]}).change(function () {
+                        if (this.name.startsWith("Studies")) {
+                           pref.value[0] = this.checked;
+                        }
+                        if (this.name.startsWith("Object")) {
+                           pref.value[1] = this.checked;
+                        }
+                        if (this.name.startsWith("Entities")) {
+                           pref.value[2] = this.checked;
+                        }
+                        if (this.name.startsWith("Units")) {
+                           pref.value[3] = this.checked;
+                        }
+                        if (this.name.startsWith("Times")) {
+                           pref.value[4] = this.checked;
+                        }
+                        if (this.name.startsWith("Platforms")) {
+                           pref.value[5] = this.checked;
+                        }
+                        updatePreferences(pref.value);
+                        /*
                         if (this.checked) {
                             $("#" + this.name).show();
                         } else {
                             $("#" + this.name).hide();
                         }
-                        updatePanelWidths();
+                        updatePanelWidths();*/
                     })));
                 });
                 i = 0;

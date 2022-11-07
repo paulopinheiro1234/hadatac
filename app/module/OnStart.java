@@ -47,6 +47,7 @@ public class OnStart {
 		// also populate the in-memory model
 		log.warn("building in-memory model ... : ");
 		SPARQLUtilsFacetSearch.createInMemoryModel();
+		SPARQLUtilsFacetSearch.createInMemoryInitialResult();
 		log.warn("finished building in-memory model.");
     
     }

@@ -8,6 +8,13 @@ public class UserPreRegistrationForm {
     public String comment = "";
     public String homepage = "";
     public String group_uri = "";
+    public String facet_study = "";
+    public String facet_object = "";
+    public String facet_entity_characteristic = "";
+    public String facet_unit = "";
+    public String facet_time = "";
+    public String facet_space = "";
+    public String facet_platform = "";
 
     public String getUserUri() {
         return usr_uri;
@@ -30,4 +37,12 @@ public class UserPreRegistrationForm {
     public String getGroupUri() {
         return group_uri;
     }
+    public String getFacetStudy() { return facet_study; }
+    public String getFacetObject() { return facet_object; }
+    public String getFacetEntityCharacteristic() { return facet_entity_characteristic; }
+    public String getFacetUnit() { return facet_unit; }
+    public String getFacetTime() { return facet_time; }
+    public String getFacetSpace() { return facet_space; }
+    public String getFacetPlatform() { return facet_platform; }
+
 }
