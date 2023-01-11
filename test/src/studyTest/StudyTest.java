@@ -7,6 +7,7 @@ import org.hadatac.data.loader.Record;
 import org.hadatac.data.loader.RecordFile;
 import org.hadatac.entity.pojo.ColumnMapping;
 import org.hadatac.entity.pojo.DataFile;
+import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
 import org.hadatac.utils.ConfigProp;
 import org.hadatac.utils.NameSpaces;
@@ -17,10 +18,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import scala.io.Source;
+import src.multiStudyTest.MultiStudyTest;
 
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -45,8 +51,6 @@ public class StudyTest {
     @Before
     public void initialize()  {
         SPARQLUtilsFacetSearch.createInMemoryModel();
-        // retrieveTestConfig();
-        createTestCases();
     }
 
     @After
@@ -60,11 +64,24 @@ public class StudyTest {
 
         /*
         here is how to run:
-        sbt "testOnly *StudyTest -- -DdataFileName=DA-2016-1523-Lab-CRE"
+        sbt "testOnly *StudyTest -- -DdataFileName=DA-2016-34-Lab-Metals"
         sbt "testOnly *StudyTest -- -DstudyID=2016-34"
         sbt "testOnly *StudyTest"
+        sbt "testOnly *StudyTest -- -Dtarget=multiStudy"
         reference: https://stackoverflow.com/questions/37978961/passing-command-line-argument-to-sbt-test
         */
+
+        String target = System.getProperty("target");
+        if ( target != null && target.equalsIgnoreCase("multiStudy") ) {
+            System.out.println("Tests will be done for multi-study cases.");
+            MultiStudyTest multiStudyTest = new MultiStudyTest(collector);
+            multiStudyTest.retrieveTestConfig();
+            multiStudyTest.multiStudyTest();
+            return;
+        }
+
+        System.out.println("Tests will be done for single study cases.");
+        createTestCases();
 
         String dataFileName = System.getProperty("dataFileName");
         if  ( dataFileName == null || dataFileName.length() == 0 ) System.out.println("NO datafile is provided.");
@@ -88,10 +105,14 @@ public class StudyTest {
                 if ( test.contains(studyID) == false ) continue;
             }
 
+            // debug
+            // if ( test.contains("DA-2018-2273-PD-DemoHealth") == false ) continue;
+            // end of debug
+
             // execute the main codebase to download the data file
             System.out.println("\n\n\n====> working on " + test);
             ColumnMapping columnMapping = new ColumnMapping();
-            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, categoricalOption, true, columnMapping);
+            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, Measurement.SUMMARY_TYPE_NONE, categoricalOption, true, columnMapping);
             testDetails.put("columnMapping", columnMapping);
             System.out.println("-------------------------------------------");
             System.out.println(columnMapping.toString());
@@ -335,7 +356,7 @@ public class StudyTest {
     }
 
     private void checkCompositeCategoricalColumn(String testURL, List<Record> recordsOriginal, List<Record> recordsDownloaded,
-                                              List<String> originalColumnNames, String downloadedColumnName) {
+                                                 List<String> originalColumnNames, String downloadedColumnName) {
 
         StringBuilder originalColumnHeader = new StringBuilder();
         for ( String originalColumnName : originalColumnNames ) originalColumnHeader.append(originalColumnName).append(",");
@@ -405,7 +426,7 @@ public class StudyTest {
     }
 
     private void checkSingleCategoricalColumn(String testURL, List<Record> recordsOriginal, List<Record> recordsDownloaded,
-                                           List<String> originalColumnNames, String downloadedColumnName) {
+                                              List<String> originalColumnNames, String downloadedColumnName) {
 
         String originalColumnName = originalColumnNames.get(0);
         List<String> original = new ArrayList<>();
@@ -620,3 +641,9 @@ public class StudyTest {
         return bd.doubleValue();
     }
 }
+
+
+/*
+https://stackoverflow.com/questions/12762969/resource-directory-for-tests-in-a-play-application
+https://stackoverflow.com/questions/52268681/how-to-read-resources-in-test-code-with-play-framework
+ */

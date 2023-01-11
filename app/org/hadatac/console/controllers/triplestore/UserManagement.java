@@ -68,6 +68,7 @@ public class UserManagement extends Controller {
 
     @Inject
     private FormFactory formFactory;
+    private boolean userWasEdited = false;
     @Inject
     Application application;
     @Inject
@@ -200,6 +201,7 @@ public class UserManagement extends Controller {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        userWasEdited=true;
         return ok(editregister.render("edit", UserGroup.find(), User.find(user_uri),application.getUserEmail(request)));
     }
 
@@ -369,6 +371,34 @@ public class UserManagement extends Controller {
             String email = data.getEmail();
             String homepage = data.getHomepage();
             String group_uri = data.getGroupUri();
+            String facet_study = data.getFacetStudy();
+            if (facet_study == null || facet_study.isEmpty()) {
+                facet_study = "on";
+            }
+            String facet_object = data.getFacetObject();
+            if (facet_object == null || facet_object.isEmpty()) {
+                facet_object = "on";
+            }
+            String facet_entity_characteristic = data.getFacetEntityCharacteristic();
+            if (facet_entity_characteristic == null || facet_entity_characteristic.isEmpty()) {
+                facet_entity_characteristic = "on";
+            }
+            String facet_unit = data.getFacetUnit();
+            if (facet_unit == null || facet_unit.isEmpty()) {
+                facet_unit = ConfigProp.getFacetedDataUnit();  // get the default value from hadatac.conf
+            }
+            String facet_time = data.getFacetTime();
+            if (facet_time == null || facet_time.isEmpty()) {
+                facet_time = ConfigProp.getFacetedDataTime();  // get the default value from hadatac.conf
+            }
+            String facet_space = data.getFacetSpace();
+            if (facet_space == null || facet_space.isEmpty()) {
+                facet_space = ConfigProp.getFacetedDataSpace();  // get the default value from hadatac.conf
+            }
+            String facet_platform = data.getFacetPlatform();
+            if (facet_platform == null || facet_platform.isEmpty()) {
+                facet_platform = ConfigProp.getFacetedDataPlatform();  // get the default value from hadatac.conf
+            }
 
             Map<String, String> pred_value_map = new HashMap<String, String>();
             pred_value_map.put("a", "foaf:Person, prov:Person");
@@ -379,9 +409,32 @@ public class UserManagement extends Controller {
             pred_value_map.put("foaf:mbox", email);
             pred_value_map.put("foaf:homepage", "<" + homepage + ">");
             pred_value_map.put("sio:SIO_000095", group_uri);
+            pred_value_map.put("hasco:hasStudyFacetStatus", facet_study);
+            pred_value_map.put("hasco:hasObjectFacetStatus", facet_object);
+            pred_value_map.put("hasco:hasEntityCharacteristicFacetStatus", facet_entity_characteristic);
+            pred_value_map.put("hasco:hasUnitFacetStatus", facet_unit);
+            pred_value_map.put("hasco:hasTimeFacetStatus", facet_time);
+            pred_value_map.put("hasco:hasSpaceFacetStatus", facet_space);
+            pred_value_map.put("hasco:hasPlatformFacetStatus", facet_platform);
 
             User.deleteUser(usr_uri, false, false);
             message = generateTTL(mode, oper, rdf, usr_uri, pred_value_map);
+            if(userWasEdited){
+                System.out.println("User is being edited");
+                try{
+                    SysUser updateUser = AuthApplication.getLocalUser(email);
+                    updateUser.setUri(usr_uri);
+                    updateUser.setFirstName(given_name);
+                    updateUser.setLastName(family_name);
+                    updateUser.setName(given_name+" "+family_name);
+                    updateUser.save();
+
+                }
+                catch (Exception e){
+                    System.out.println("Error: Could not find the User in solr db, check if validation is pending: "+e);
+
+                }
+            }
         }
         return message;
     }

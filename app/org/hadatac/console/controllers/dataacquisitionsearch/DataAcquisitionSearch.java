@@ -16,6 +16,7 @@ import org.hadatac.data.model.AcquisitionQueryResult;
 import org.hadatac.entity.pojo.Measurement;
 import org.hadatac.entity.pojo.ObjectCollection;
 import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
+import org.hadatac.entity.pojo.User;
 import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,12 +98,16 @@ public class DataAcquisitionSearch extends Controller {
         SPARQLUtilsFacetSearch.clearCache();
         // SolrUtilsFacetSearch.clearCache();
 
+        return indexInternalAsync(0, page, rows,request);
+
+        /*
         if ( "ON".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.facet_search.concurrency")) ) {
             log.debug("using async calls for facet search....");
             return indexInternalAsync(0, page, rows,request);
         } else {
             return indexInternal(0, page, rows,request);
         }
+         */
     }
 
     // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
@@ -110,16 +115,21 @@ public class DataAcquisitionSearch extends Controller {
         return index(page, rows, request);
     }
 
+    /*
     // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result indexData(int page, int rows, Http.Request request) {
         return indexInternal(1, page, rows, request);
     }
+     */
 
+    /*
     // @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postIndexData(int page, int rows, Http.Request request) {
         return indexData(page, rows, request);
     }
+     */
 
+    /*
     private Result indexInternal(int mode, int page, int rows, Http.Request request) {
         String facets = "";
         if (request.body().asFormUrlEncoded() != null) {
@@ -145,7 +155,7 @@ public class DataAcquisitionSearch extends Controller {
         }
         //System.out.println("OwnerURI: " + ownerUri);
 
-        results = Measurement.find(ownerUri, page, rows, facets);
+        results = Measurement.findAsync(ownerUri, page, rows, facets);
 
         ObjectDetails objDetails = getObjectDetails(results);
 
@@ -165,97 +175,112 @@ public class DataAcquisitionSearch extends Controller {
                     Measurement.getFieldNames(), objectCollections,application.getUserEmail(request)));
         }
     }
+     */
 
     private Result indexInternalAsync(int mode, int page, int rows, Http.Request request) {
 
-        String facets = "";
-        if (request.body().asFormUrlEncoded() != null) {
-            facets = request.body().asFormUrlEncoded().get("facets")[0];
-        }
+        Boolean initialQuery = false;
 
-        System.out.println("indexInternalAsync: facets=[" + facets + "]");
-
-        // log.debug("facets: " + facets);
-
-        FacetHandler facetHandler = new FacetHandler();
-        facetHandler.loadFacetsFromString(facets);
-
-        AcquisitionQueryResult results = null;
-        String ownerUri;
-
-        long startTime = System.currentTimeMillis();
-        final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
-        log.debug("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
-
-        if (null == user) {
-            ownerUri = "Public";
-        }
-        else {
-            ownerUri = UserManagement.getUriByEmail(user.getEmail());
-            if (null == ownerUri){
-                ownerUri = "Public";
+        try {
+            String facets = "";
+            if (request.body().asFormUrlEncoded() != null) {
+                facets = request.body().asFormUrlEncoded().get("facets")[0];
             }
-        }
 
-        // do the following two concurrently
+            System.out.println("indexInternalAsync: facets=[" + facets + "]");
 
-        startTime = System.currentTimeMillis();
+            if (facets == null || facets.isEmpty() || facets.equals(FacetHandler.DEFAULT_FACET)) {
+                initialQuery = true;
+            }
 
-        CompletableFuture<List<ObjectCollection>> promiseOfObjs = CompletableFuture.supplyAsync((
-                () -> { return ObjectCollection.findAllFacetSearch(); }
-        ), databaseExecutionContext);
+            // log.debug("facets: " + facets);
 
-        String finalFacets = facets;
-        String finalOwnerUri = ownerUri;
-        CompletableFuture<AcquisitionQueryResult> promiseOfFacetStats = CompletableFuture.supplyAsync((
-                () -> { return Measurement.findAsync(finalOwnerUri, page, rows, finalFacets, databaseExecutionContext); }
-        ), databaseExecutionContext);
+            FacetHandler facetHandler = new FacetHandler();
+            facetHandler.loadFacetsFromString(facets);
 
-        List<String> fileNames = Measurement.getFieldNames();
-        log.debug("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+            AcquisitionQueryResult results = null;
+            String ownerUri;
 
-        List<ObjectCollection> objs = null;
-        try {
+            long startTime = System.currentTimeMillis();
+            final SysUser user = AuthApplication.getLocalUser(application.getUserEmail(request));
+            Measurement.setCurrentUser(user);
+            log.debug("---> AuthApplication.getLocalUser() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+
+            if (null == user) {
+                ownerUri = "Public";
+            } else {
+                ownerUri = UserManagement.getUriByEmail(user.getEmail());
+                if (null == ownerUri) {
+                    ownerUri = "Public";
+                }
+            }
+
+            // do the following two concurrently
+
+            startTime = System.currentTimeMillis();
+
+            CompletableFuture<List<ObjectCollection>> promiseOfObjs = CompletableFuture.supplyAsync((
+                    () -> {
+                        return ObjectCollection.findAllFacetSearch();
+                    }
+            ), databaseExecutionContext);
+
+            String finalFacets = facets;
+            String finalOwnerUri = ownerUri;
+            Boolean finalInitialQuery = initialQuery;
+            CompletableFuture<AcquisitionQueryResult> promiseOfFacetStats = CompletableFuture.supplyAsync((
+                    () -> {
+                        return Measurement.findAsync(finalInitialQuery, finalOwnerUri, page, rows, finalFacets, databaseExecutionContext);
+                    }
+            ), databaseExecutionContext);
+
+
+            List<String> fileNames = Measurement.getFieldNames();
+            log.debug("---> Measurement.getFieldNames() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+
+            List<ObjectCollection> objs = null;
+
             objs = promiseOfObjs.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
 
-        try {
             results = promiseOfFacetStats.get();
+
+            log.debug("---> ObjectCollection.findAllFacetSearch() + Measurement.findAsync() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+
+            startTime = System.currentTimeMillis();
+
+            // System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
+            ObjectDetails objDetails = getObjectDetails(results);
+            log.debug("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+
+            // System.out.println("\n\n\n\nresults to JSON 1: " + results.toJSON());
+
+            SPARQLUtilsFacetSearch.reportStats();
+            // SolrUtilsFacetSearch.reportStats();
+
+            if (mode == 0) {
+                return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
+                        results, results.toJSON(), facetHandler, objDetails.toJSON(),
+                        fileNames, objs,application.getUserEmail(request)));
+            } else {
+                return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
+                        results, results.toJSON(), facetHandler, objDetails.toJSON(),
+                        fileNames, objs,application.getUserEmail(request)));
+            }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        log.debug("---> ObjectCollection.findAllFacetSearch() + Measurement.findAsync() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
+        return ok();
 
-        startTime = System.currentTimeMillis();
-
-        // System.out.println("\n\n\n\nresults to JSON: " + results.toJSON());
-        ObjectDetails objDetails = getObjectDetails(results);
-        log.debug("---> getObjectDetails() takes " + (System.currentTimeMillis() - startTime) + "sms to finish");
-
-        // System.out.println("\n\n\n\nresults to JSON 1: " + results.toJSON());
-
-        SPARQLUtilsFacetSearch.reportStats();
-        // SolrUtilsFacetSearch.reportStats();
-
-        if (mode == 0) {
-            return ok(facetOnlyBrowser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
-                    results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    fileNames, objs,application.getUserEmail(request)));
-        } else {
-            return ok(dataacquisition_browser.render(page, rows, ownerUri, facets, results.getDocumentSize(),
-                    results, results.toJSON(), facetHandler, objDetails.toJSON(),
-                    fileNames, objs,application.getUserEmail(request)));
-        }
     }
 
-    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    /*
+    //@Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result download(Http.Request request) {
         System.out.println("inside download");
         String ownerUri = getOwnerUri(request);
@@ -274,7 +299,7 @@ public class DataAcquisitionSearch extends Controller {
         }
         //System.out.println("selectedFields: " + selectedFields);
 
-        AcquisitionQueryResult results = Measurement.find(ownerUri, -1, -1, facets);
+        AcquisitionQueryResult results = Measurement.findAsync(ownerUri, -1, -1, facets);
 
         final String finalFacets = facets;
         CompletableFuture.supplyAsync(() -> Downloader.generateCSVFile(
@@ -289,6 +314,7 @@ public class DataAcquisitionSearch extends Controller {
 
         return redirect(routes.Downloader.index());
     }
+     */
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result downloadAlignment(Http.Request request) {
@@ -312,7 +338,7 @@ public class DataAcquisitionSearch extends Controller {
             if (name_map.get("selObjectType") != null) {
                 objectType = name_map.get("selObjectType")[0].toString();
             }
-            if (name_map.get("setCatValue") != null) {
+            if (name_map.get("selCatValue") != null) {
                 categoricalValues = name_map.get("selCatValue")[0].toString();
             }
             if (name_map.get("selTimeRes") != null) {
@@ -458,10 +484,12 @@ public class DataAcquisitionSearch extends Controller {
         return ownerUri;
     }
 
+    /*
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownload(Http.Request request) {
         return download(request);
     }
+     */
 
     @Secure (authorizers = Constants.DATA_OWNER_ROLE)
     public Result postDownloadAlignment(Http.Request request) {
@@ -493,4 +521,56 @@ public class DataAcquisitionSearch extends Controller {
                 Runtime.getRuntime().totalMemory());
 
     }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result preferences(Boolean fs, Boolean fo, Boolean fec, Boolean fu, Boolean ft, Boolean fsp, Boolean fp, Http.Request request) {
+        String userEmail = application.getUserEmail(request);
+        User user = User.findByEmail(userEmail);
+        if (user != null) {
+            if (fs == true) {
+                user.setFacetedDataStudy("on");
+            } else {
+                user.setFacetedDataStudy("off");
+            }
+            if (fo == true) {
+                user.setFacetedDataObject("on");
+            } else {
+                user.setFacetedDataObject("off");
+            }
+            if (fec == true) {
+                user.setFacetedDataEntityCharacteristic("on");
+            } else {
+                user.setFacetedDataEntityCharacteristic("off");
+            }
+            if (fu == true) {
+                user.setFacetedDataUnit("on");
+            } else {
+                user.setFacetedDataUnit("off");
+            }
+            if (ft == true) {
+                user.setFacetedDataTime("on");
+            } else {
+                user.setFacetedDataTime("off");
+            }
+            if (fsp == true) {
+                user.setFacetedDataSpace("on");
+            } else {
+                user.setFacetedDataSpace("off");
+            }
+            if (fp == true) {
+                user.setFacetedDataPlatform("on");
+            } else {
+                user.setFacetedDataPlatform("off");
+            }
+            user.updateFacetPreferences();
+        }
+        return redirect(org.hadatac.console.controllers.dataacquisitionsearch.routes.DataAcquisitionSearch.index(1, 15));
+    }
+
+    @Secure (authorizers = Constants.DATA_OWNER_ROLE)
+    public Result postPreferences(Boolean fs, Boolean fo, Boolean fec, Boolean fu, Boolean ft, Boolean fsp, Boolean fp, Http.Request request) {
+        return preferences(fs, fo, fec, fu, ft, fsp, fp, request);
+    }
+
+
 }
