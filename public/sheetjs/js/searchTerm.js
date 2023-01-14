@@ -1,5 +1,5 @@
 var current_page = 1;
-var records_per_page = 3;
+var records_per_page = 5;
 var numToPage;
 var listOfLabelAndIRI=[]
 function showTop(){
@@ -117,7 +117,6 @@ function prehttp(termToSearch){
                  eachEntry.push(ontoCartName);
 
                  resultsArray.push(eachEntry);
-
              }
 
 
@@ -167,6 +166,9 @@ function createDisplay(resultsArray,numResults){
     numRes(numResults);
      var pgekey = document.getElementById("pagekey");
     pgekey.style.display="block";
+
+    // Need to reset the current page to 1 in case we had a previous search
+    current_page = 1
 
     changePage(1,objJson);
 
@@ -270,7 +272,6 @@ var termdict=new Map();
 
 
 function changePage(page,objJson){
-    console.log("reched")
     var btn_next = document.getElementById("btn_next");
     var btn_prev = document.getElementById("btn_prev");
     var listing_table = document.getElementById("listingTable");
