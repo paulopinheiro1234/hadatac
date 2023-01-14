@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.hadatac.console.controllers.sandbox.Sandbox;
+import org.hadatac.entity.pojo.User;
 import org.json.simple.JSONArray;
 
 import com.typesafe.config.ConfigFactory;
@@ -201,33 +202,45 @@ public class ConfigProp {
       return !sddAddress.isEmpty();
     }
 
+	public static String defaultGuiJson() {
+
+		JSONArray gui = new JSONArray();
+
+		gui.add(true);
+		gui.add(true);
+		gui.add(true);
+		if (ConfigProp.getFacetedDataUnit().equals("on")) {
+			gui.add(true);
+		} else {
+			gui.add(false);
+		}
+		if (ConfigProp.getFacetedDataTime().equals("on")) {
+			gui.add(true);
+		} else {
+			gui.add(false);
+		}
+		if (ConfigProp.getFacetedDataPlatform().equals("on")) {
+			gui.add(true);
+		} else {
+			gui.add(false);
+		}
+
+		return gui.toJSONString();
+	}
 
 
 	@SuppressWarnings("unchecked")
-	public static String toGuiJson() {
+	public static String toGuiJson(String userEmail) {
 
-    	JSONArray gui = new JSONArray();
+		if (userEmail != null && !userEmail.isEmpty()) {
+			User user = User.findByEmail(userEmail);
+			if (user != null) {
+				return user.toGuiJson();
+			}
+		}
+		return ConfigProp.defaultGuiJson();
 
-    	gui.add(true);
-    	gui.add(true);
-    	gui.add(true);
-    	if (ConfigProp.getFacetedDataUnit().equals("on")) {
-    		gui.add(true);
-    	} else {
-    		gui.add(false);
-    	}
-    	if (ConfigProp.getFacetedDataTime().equals("on")) {
-    		gui.add(true);
-    	} else {
-    		gui.add(false);
-    	}
-    	if (ConfigProp.getFacetedDataPlatform().equals("on")) {
-    		gui.add(true);
-    	} else {
-    		gui.add(false);
-    	}
-
-    	return gui.toJSONString();
     }
+
 
 }

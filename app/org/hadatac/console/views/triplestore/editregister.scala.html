@@ -63,7 +63,7 @@
 
 		<div class="form-group">
 			<label for="homepage">Homepage:</label>
-			<input type="text" value="@user.getHomepage()" class="form-control" name="homepage" id="homepage"" >
+			<input type="text" value="@user.getHomepage()" class="form-control" name="homepage" id="homepage" >
 		</div>
 
 		<div class="form-group">
@@ -81,7 +81,98 @@
             </select>
 		</div>
 
-     	<div class="form-group" class="col-sm-6 col-offset-3">
+	  <div class="form-group">
+		  <label for="facet_study">Show Study Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_study" name="facet_study" >
+			  @if((user.getFacetedDataStudy() != null) && (user.getFacetedDataStudy().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group">
+		  <label for="facet_object">Show Object Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_object" name="facet_object" >
+			  @if((user.getFacetedDataObject() != null) && (user.getFacetedDataObject().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group">
+		  <label for="facet_entity_characteristic">Show Entity-Characteristic Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_entity_characteristic" name="facet_entity_characteristic" >
+			  @if((user.getFacetedDataEntityCharacteristic() != null) && (user.getFacetedDataEntityCharacteristic().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group">
+		  <label for="facet_unit">Show Unit Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_unit" name="facet_unit" >
+			  @if((user.getFacetedDataUnit() != null) && (user.getFacetedDataUnit().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group">
+		  <label for="facet_time">Show Time Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_time" name="facet_time" >
+			  @if((user.getFacetedDataTime() != null) && (user.getFacetedDataTime().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group">
+		  <label for="facet_space">Show Space Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_space" name="facet_space" >
+			  @if((user.getFacetedDataSpace() != null) && (user.getFacetedDataSpace().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group">
+		  <label for="facet_platform">Show Platform-Instrument Facet:</label>
+		  <select class="form-control col-sm-6" id="facet_platform" name="facet_platform" >
+			  @if((user.getFacetedDataPlatform() != null) && (user.getFacetedDataPlatform().equals("off"))){
+			  <option selected value="off">off</option>
+			  <option value="on">on</option>
+			  } else {
+			  <option value="off">off</option>
+			  <option selected value="on">on</option>
+			  }
+		  </select>
+	  </div>
+
+	  <div class="form-group" class="col-sm-6 col-offset-3">
         	<input class="btn btn-success" role="button" id="submitbutton" type="submit" value="Submit" />
      	</div>
    	</form>
