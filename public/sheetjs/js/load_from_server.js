@@ -64,14 +64,17 @@ var _failed = function(e) {
 };
 
 var dd_url;
-var sdd_url
+var sdd_url;
 function getSDDUrl(url){
    sdd_url=url;
 }
+
+/*
 function getURL(url){
    dd_url = url;
    getSuggestion();
 }
+*/
 
 // retrieves indicator for whether the files have been downloaded already
 $.ajax({
@@ -208,6 +211,13 @@ cdg.addEventListener('contextmenu', function (e) {
 var origVal;
 cdg.addEventListener('click', function (e) {
    returnToView();
+
+   // Don't change anything if we are clicking on things that are not data cells
+   if (!e.cell) { return; }
+   if (e.cell.style != "cell") { return; }
+   if (e.cell.columnIndex < 0) { return; }
+   if (e.cell.rowIndex < 0) { return; }
+
    colNum = e.cell.columnIndex;
    rowNum = e.cell.rowIndex;
    origVal = cdg.data[rowNum][colNum];
@@ -215,11 +225,6 @@ cdg.addEventListener('click', function (e) {
 
    var colNum_str=colNum.toString();
    var rowNum_str=rowNum.toString();
-
-   // Don't change anything if we are clicking on things that are not data cells
-   if (!e.cell) { return; }
-   if (e.cell.columnIndex < 0) { return; }
-   if (e.cell.rowIndex < 0) { return; }
 
    if(e.cell.value==null){
       cdg.data[rowNum][colNum]=" ";
@@ -352,13 +357,15 @@ function getEditValue(rowNum,colNum,ind,cellvalue){
 cdg.addEventListener('click', function (e) {
    returnToView();
    if (!e.cell) { return; }
+   if (e.cell.isHeader) { return; }
+   if (e.cell.isCorner) { return; }
    if(e.cell.value==null){ return; }
    else{
       colNum=e.cell.columnIndex;
       rowNum=e.cell.rowIndex;
       var varnameElement=cdg.data[rowNum][0];
 
-      DDExceltoJSON(dd_url,varnameElement);
+      DDExceltoJSON(varnameElement);
    }
 
 });
@@ -510,7 +517,7 @@ cdg.addEventListener('contextmenu', function (e) {
                contentType: "application/json; charset=utf-8",
                dataType : "json",
                success : function(data) {
-                  console.log("I worked!");
+                  console.log("Row Deleted!");
                }
             });
          }
@@ -777,17 +784,45 @@ function createCopySheet(sheetCopy){
    }
 }
 
+// This function intializes the approval data
 function approvalFunction(sheetCopy){
+   // Check if data is currently loaded
    if (approvalList === undefined || approvalList.length == 0) {
-      // console.log("JSON.stringify(sheetCopy)");
-      // console.log(JSON.stringify(sheetCopy));
-      approvalList = JSON.parse(JSON.stringify(sheetCopy));
-   }
-   for(var i=0;i<sheetCopy.length;i++){
+      // Check for old data
+      var aoaData = null; // Get the latest data
+      if(sheetName == "InfoSheet"){ // we are on the page so grab grid data
+         aoaData = cdg.data
+      }
+      else{ // We are on another page so grab the data from the worksheet
+         aoaData = XLSX.utils.sheet_to_json(workbook.Sheets["InfoSheet"], {header: 1});
+      }
 
-      for(var j=0;j<sheetCopy[i].length;j++){
-         var keys=sheetCopy[i][j];
-         var temp2=[];
+      if(aoaData == null){
+         console.log("Bad SDD, missing the InfoSheet sheet. Can't pull old approval data, creating new data");
+      }
+
+      // Look for Approval Data
+      var approvalString = null;
+      for (var row of aoaData){
+         if (row.length > 1){
+            if(row[0] == "Approval Data"){
+               approvalString = row[1];
+               break; // found it why keep looking
+            }
+         }
+      }
+
+      if ( (approvalString == null) || (approvalString == "[]")){ // No data found
+         approvalList = JSON.parse(JSON.stringify(sheetCopy));
+      }
+      else{
+         approvalList = JSON.parse(approvalString);
+      }
+   }
+
+   // Check to see if this is a
+   for (var i = 0;i < sheetCopy.length; i++){
+      for (var j = 0; j < sheetCopy[i].length; j++){
          /*
          console.log(i);
          console.log(j);
@@ -796,11 +831,14 @@ function approvalFunction(sheetCopy){
          console.log("sheetCopy");
          console.log(sheetCopy);
          */
+
          if(approvalList[i][j] == sheetCopy[i][j]){
+            // This handles the case where we copy the sheet and it has data
+            // and we need to replace the data in the approval list with blanks
             approvalList[i][j] = "";
          }
          else{
-            if(approvalList[i][j] != ""){
+            if(approvalList[i][j] != ""){ // So we have an actual approval so display it
                indicateApproval(i,j,sheetCopy[i][j]);
             }
          }
@@ -988,9 +1026,198 @@ function parseJson_(keyword,rowval,colval,data,menuoptns,isVirtual){
    createNewMenu(menuoptns,colval,isVirtual);
 }
 
-var labelsList=[];
-var ontsList=[];
+// var labelsList=[];
+var ontsList = [];
+
 function getSuggestion(){
+   // Start spinning the spinner
+   spinnerStatus.stop()
+   spinnerStatus = new Spinner(spinnerOpts).spin(spinnerTarget);
+   imageStatus.style.visibility = 'hidden';
+
+   // Check to see if we have an sdd-gen address
+   var errorFound = false;
+   if ( sddgenAdress == null ){
+      // Request it from hadatac
+      $.ajax({
+         type : 'POST',
+         url : '/hadatac/sddeditor_v2/getSDDGenAddress',
+         async: false,
+         dataType: 'json',
+         success : function(getSDDGenRequest) {
+            sddgenAdress = getSDDGenRequest;
+            // Add trailing slash if its missing from the config file
+            if (sddgenAdress.substr(-1) != '/') {  // If the last character is not a slash
+               sddgenAdress = sddgenAdress + '/'; // Append a slash to it.
+            }
+         },
+         error : function() {
+            errorFound = true;
+         }
+      });
+
+      if(errorFound){
+         spinnerStatus.stop();
+         imageStatus.src = imgPath + 'fail.png';
+         imageStatus.style.visibility = 'visible';
+         alert("Error: Missing SDD-Gen URL in config!");
+         return !errorFound;
+      }
+   }
+
+   // Try pinging the SDD-gen server
+   $.ajax({
+      type : 'POST',
+      url : sddgenAdress + 'ping',
+      // async: false,
+      dataType : 'json',
+      timeout : 5000, // Can't be synchronus and have a timeout. JS technical limitation
+      // It times out after ~75 s, which should be fine as long as were
+      success : function(ping) {
+         errorFound = ! ping;
+      },
+      error : function() {
+         errorFound = true;
+      }
+   });
+
+   // Check to make sure we have the DD
+   if ( dd_data == null ){
+      spinnerStatus.stop();
+      imageStatus.src = imgPath + 'fail.png';
+      imageStatus.style.visibility = 'visible';
+      alert("Warning: Data Dictionary has not been set");
+      return false;
+   }
+
+   // Convert DD to SDD-Gen param
+   var dataDictionary = [];
+   var columnsAdded = [];
+   for (let varName in dd_data['descMap']) {
+      dataDictionary.push(
+         {
+            "column": varName,
+            "description": dd_data['descMap'][varName]
+         }
+      );
+      columnsAdded.push(varName);
+   }
+
+   // Get the latest SDD column data
+   var aoaData = null; // Get the latest data
+   if(sheetName == "Dictionary Mapping"){ // we are on the page so grab grid data
+      aoaData = cdg.data
+   }
+   else{ // We are on another page so grab the data from the worksheet
+      aoaData = XLSX.utils.sheet_to_json(workbook.Sheets["Dictionary Mapping"], {header: 1});
+   }
+
+   // Add columns not in the data dictionary
+   if(aoaData != null){
+      // Find the Data Dictionary Link row
+      var ddLink = null;
+      for(row in aoaData){
+         if(!(aoaData[row][0] == null)){ // This checks for undefined rows, which occur when you import new rows set DD
+            if(!(aoaData[row][0] == "Column")){ // Ignore the SDD schema column
+               if(!columnsAdded.includes(aoaData[row][0])){
+                  dataDictionary.push(
+                     {
+                        "column": aoaData[row][0],
+                        "description": ""
+                     }
+                  );
+                  columnsAdded.push(aoaData[row][0]);
+               }
+            }
+         }
+      }
+   }
+
+   // Get the ontologies for the Suggestion Request
+   $.ajax({
+      type : 'POST',
+      url : '/hadatac/sddeditor_v2/getOntologies',
+      async: false,
+      dataType: 'json',
+      success : function(ontRequest) {
+         ontsList = ontRequest;
+      }
+   });
+
+   // This loads the prefix, not sure if this is still needed
+   SDDPrefixtoJSON();
+
+   // Check if SDDGen ping failed
+   if(errorFound){
+      spinnerStatus.stop();
+      imageStatus.src = imgPath + 'fail.png';
+      imageStatus.style.visibility = 'visible';
+      alert("Error: SDD-Gen not running or bad SDD-Gen URL in config!");
+      return !errorFound;
+   }
+
+
+   // Generating Suggestion Request
+   var request = {};
+   request["source-urls"] = ontsList;
+   request["N"] = 4;
+   request["data-dictionary"] = dataDictionary;
+
+   $.ajax({
+      type : 'POST',
+      url : sddgenAdress + 'populate-sdd',
+      data : JSON.stringify(request),
+      dataType : 'json',
+      contentType : "application/json",
+      cache : false,
+      success : function(data, stat, xhr) {
+         var status = xhr.status;
+         if (status == 200) {
+            sdd_suggestions = data;
+            // This data is duplicated but reorganized for quicker access at runtime
+            // Someday we might completely sever the use of sdd_suggestions
+
+            sdd_suggestions_organized = {};
+            for(const i of sdd_suggestions.sdd["Dictionary Mapping"].columns){
+               sdd_suggestions_organized[i.column] = {};
+               sdd_suggestions_organized[i.column]['attribute'] = i.attribute;
+               // TODO: We need to add the other SDD columns and virtual columns
+            }
+
+            spinnerStatus.stop();
+            imageStatus.style.visibility = 'visible';
+            imageStatus.src = imgPath + 'success.png'
+
+         } else {
+            console.error(err);
+            console.log(data);
+            spinnerStatus.stop();
+            imageStatus.style.visibility = 'visible';
+            imageStatus.src = imgPath + 'fail.png';
+
+            if(err == 400){
+               alert("Error: SDDGen is " + data['Bad Request'] + ': ' + data['Miss']);
+            }
+         }
+      },
+      error : function(xhr, textStatus, errorThrown) {
+         console.log('Couldnt connect to SDDgen');
+         console.log(xhr.responseJSON['Bad Request']);
+         if(xhr.responseJSON['Bad Request'] === 'ontologies must be not be empty'){
+            console.log('This error is usually caused by not loading namespace ontologies into the triple store');
+         }
+
+         spinnerStatus.stop();
+         imageStatus.style.visibility = 'visible';
+         imageStatus.src = imgPath + 'fail.png'
+      }
+   });
+
+   return true;
+}
+
+
+function getOldSuggestion(){
    spinnerStatus.stop()
 
    spinnerStatus = new Spinner(spinnerOpts).spin(spinnerTarget);
@@ -1207,6 +1434,7 @@ function getSuggestion(){
    checkRecs(globalL, globalR, 1);
 }
 
+
 function jsonparser(colval,rowval,menuoptns,isVirtual){
    var getJSON = function(url, callback) {
       $.ajax({
@@ -1388,43 +1616,55 @@ function clearTextbox(){
 }
 
 
-function DDExceltoJSON(dd_url,varnameElement){
-
-   var oReq = new XMLHttpRequest();
-   oReq.open("POST", dd_url, true);
-   oReq.responseType = "arraybuffer";
-
-   oReq.onload = function(e) {
-      var arraybuffer = oReq.response;
-
-      /* convert data to binary string */
-      var data = new Uint8Array(arraybuffer);
-      var arr = new Array();
-      for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
-      var bstr = arr.join("");
-
-      /* Call XLSX */
-      var workbook = XLSX.read(bstr, {
-         type: "binary"
-      });
-
-      var first_sheet_name = workbook.SheetNames[2];
-
-      /* Get worksheet */
-      var worksheet = workbook.Sheets[first_sheet_name];
-      var xlarray=XLSX.utils.sheet_to_json(worksheet, {
-         raw: true
-      });
-      var indx=0;
-      clearTextbox();
-      for(var i=0;i<xlarray.length;i++){
-         if(xlarray[i]['VARNAME ']==varnameElement){
-            indx=i;
-            document.getElementById("varDescription").value=xlarray[indx]['VARDESC '];
-         }
-      }
+function DDExceltoJSON(varnameElement){
+   if (dd_data == null) {
+      document.getElementById("varDescription").value = "Data Dictionary is not set...";
+      return false;
    }
-   oReq.send();
+
+   if (varnameElement in dd_data['descMap']) {
+      document.getElementById("varDescription").value = dd_data['descMap'][varnameElement];
+   }
+   else{
+      document.getElementById("varDescription").value = "";
+   }
+
+
+   // var oReq = new XMLHttpRequest();
+   // oReq.open("POST", dd_url, true);
+   // oReq.responseType = "arraybuffer";
+   //
+   // oReq.onload = function(e) {
+   //    var arraybuffer = oReq.response;
+   //
+   //    /* convert data to binary string */
+   //    var data = new Uint8Array(arraybuffer);
+   //    var arr = new Array();
+   //    for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
+   //    var bstr = arr.join("");
+   //
+   //    /* Call XLSX */
+   //    var workbook = XLSX.read(bstr, {
+   //       type: "binary"
+   //    });
+   //
+   //    var first_sheet_name = workbook.SheetNames[2];
+   //
+   //    /* Get worksheet */
+   //    var worksheet = workbook.Sheets[first_sheet_name];
+   //    var xlarray=XLSX.utils.sheet_to_json(worksheet, {
+   //       raw: true
+   //    });
+   //    var indx=0;
+   //    clearTextbox();
+   //    for(var i=0;i<xlarray.length;i++){
+   //       if(xlarray[i]['VARNAME ']==varnameElement){
+   //          indx=i;
+   //          document.getElementById("varDescription").value=xlarray[indx]['VARDESC '];
+   //       }
+   //    }
+   // }
+   // oReq.send();
 }
 
 
@@ -1493,7 +1733,7 @@ function populateThis(headersCol){
    createCopySheet(cdg.data);
    approvalList = undefined; // This is to reset the approval data as we import a new DD
    approvalFunction(cdg.data);
-   getSuggestion();
+   // getSuggestion(); //No longer needed becasue of the new DD import
 
 
 }

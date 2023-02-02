@@ -12,18 +12,29 @@ userName:String
 @import org.hadatac.console.controllers.annotator._
 @import org.hadatac.metadata.loader._
 @import org.hadatac.utils._
+@import org.hadatac.entity.pojo.DataFile
 
 
 @import java.net._
+
+<link rel="apple-touch-icon" sizes="180x180" href="/hadatac/assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/hadatac/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/hadatac/assets/icons/favicon-16x16.png">
+<link rel="manifest" href="/hadatac/assets/icons/site.webmanifest">
 
 @main("SDD Editor Version 2","",userName){
    <script src="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.js")"></script>
    <script src="@controllers.routes.Assets.versioned("sheetjs/js/canvas-datagrid.js")"></script>
    <script src="@controllers.routes.Assets.versioned("javascripts/vendor/jquery/3.5.0/jquery-3.5.0.min.js")"></script>
+   <script src="@controllers.routes.Assets.versioned("javascripts/vendor/split/1.5.11/Split.js")"></script>
 
    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheetjs.css")">
    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/sheet2js.css")">
+   <link rel="stylesheet" href="@controllers.routes.Assets.versioned("sheetjs/css/setDDForm.css")">
    <link rel="stylesheet" media="screen" href="@controllers.routes.Assets.versioned("sheetjs/vendor/alertify.css")">
+
+   <script src="@controllers.routes.Assets.versioned("javascripts/jQueryFileExplorer/jQueryFileExplorer.js")"></script>
+   <link rel="stylesheet" href="@controllers.routes.Assets.versioned("javascripts/jQueryFileExplorer/jQueryFileExplorer.css")">
 
    <div id="rcorners" >
 
@@ -31,7 +42,7 @@ userName:String
       <div class="col-md-12 col-sm-12" style="margin-bottom:0px;">
       @if(bSavable) {
 
-         <input class="btn btn-primary" type="button" id="upload" value="Save"/>
+         <input class="btn btn-primary" type="button" id="upload" role="button" value="Save">
       }
       <a  href="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())" class="btn btn-primary" role="button">
          <span class="glyphicon glyphicon-download-alt"> </span> Download</a>
@@ -62,7 +73,13 @@ userName:String
 
       </div>
 
-      <div class= shopbutton>
+      <button type="button" class="btn btn-primary" role="button" id="set_DD">
+         <span class="glyphicon glyphicon-book"> </span>
+         Set Data Dictionary
+      </button>
+
+
+      <!-- <div class= shopbutton>
          <button class="cart" >
 
             <span class="glyphicon glyphicon-globe"> </span> Browse Ontologies</button>
@@ -75,7 +92,7 @@ userName:String
                }
 
             </ul>
-         </div>
+         </div> -->
 
          <script>
 
@@ -105,6 +122,7 @@ userName:String
                <li class="cartitem" id="cart_item">Cart Items: </span></li>
             </ul>
          </div>
+
 <!--
             <button id="vsdd" onclick="verifySDD()" > <span class="glyphicon glyphicon-check"> </span> Verify SDD</button>
          -->
@@ -200,6 +218,49 @@ userName:String
 
 
                      <div><a id="error_msg"></a></div>
+
+                     <div class = "setDDForm">
+                        <form id="regForm" action="">
+
+
+                        <div class="ddtab">Select Data Dictionary File:
+                          <div class="ddfile" id="fileexplorer"></div>
+
+                          <p><input placeholder="Data Dictionary..." oninput="this.className = ''" class="ddInput" id="dd_path_field" disabled></p>
+                        </div>
+
+                        <div class="ddtab">Select Data Dictionary Sheet (SheetName ["header1", "header2", ...]):
+                          <div id="sheetexplorer" class="headtab"></div>
+                        </div>
+
+                        <div class="ddtab">Select Header Column:
+                          <div id="headerexplorer" class="headtab"></div>
+                        </div>
+
+                        <div class="ddtab">Select Description Column:
+                          <div id="descriptionexplorer" class="headtab"></div>
+                          <input type="checkbox" id="importDD" name="importDD" value="true">
+                          <label for="importDD">Import missing columns</label><br>
+                        </div>
+
+                        <div style="overflow:auto;">
+                          <div style="float:right;">
+                            <button type="button" id="prevBtn" class="btn btn-primary" onclick="nextPrev(-1)">Previous</button>
+                            <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Next</button>
+                          </div>
+                        </div>
+
+
+                        <div style="text-align:center;margin-top:40px;">
+                          <span class="step"></span>
+                          <span class="step"></span>
+                          <span class="step"></span>
+                          <span class="step"></span>
+                        </div>
+
+                        </form>
+                     </div>
+
                      <div id="grid"></div>
 
                      <div id="gridcopy"></div>
@@ -213,8 +274,10 @@ userName:String
                   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/dropsheet.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/prefixesHandler.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/loadDD.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/load_from_server2.js")"></script>
+                  <script src="@controllers.routes.Assets.versioned("sheetjs/js/setDDForm.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/sddValidation.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/label-iri-view.js")"></script>
                   <script src="@controllers.routes.Assets.versioned("sheetjs/js/searchTerm.js")"></script>
@@ -224,13 +287,19 @@ userName:String
                   <script type="text/javascript">
                      /* set up async GET request */
                      var url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
-
+                     var runDDinit = true;
                      var workbook;
                      var _formData = JSON.stringify({"fileId": "@dataFile.getId()"});
                      var _upload_url = "@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.saveDataFile()";
                      var _filetype = "@dataFile.getFileExtention()";
                      var _onWb = function(wb, sheet){
                         workbook = wb;
+                        // Load up DD if we have a valid one and if we havn't loaded 1 before
+                        if(runDDinit){
+                           runDDinit = false;
+                           initDataDictionary();
+                           getSuggestion();
+                        }
                      };
 
                      // var _upload = document.getElementById('upload');
@@ -282,20 +351,23 @@ userName:String
                   <script>
                      var sdd_url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dataFile.getId())".replace(/&amp;/g, '&');
                      getSDDUrl(sdd_url);
-                     if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
-                        alert("Please upload a valid Data Dictionary")
-                     }
-                     else{
-                        if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
-                           alert("Could not find a Data Dictionary")
-                        }
-                        else{
-                           var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+                     // This is old depricated code use to trigger suggestion off of DDs passed as page arguments
+                     // This suggestion trigger is now set on initDataDictionary
 
-                           //getSDDURL()
-                           getURL(url);
-                        }
-                     }
+                     // if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())" == "" ){
+                     //    alert("Please upload a valid Data Dictionary")
+                     // }
+                     // else{
+                     //    if("@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getFileName())"=="" ){
+                     //       alert("Could not find a Data Dictionary")
+                     //    }
+                     //    else{
+                     //       var url="@org.hadatac.console.controllers.annotator.routes.AutoAnnotator.downloadDataFile(dd_dataFile.getId())".replace(/&amp;/g, '&') ;
+                     //
+                     //       //getSDDURL()
+                     //       getURL(url);
+                     //    }
+                     // }
                   </script>
 
 
