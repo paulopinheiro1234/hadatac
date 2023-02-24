@@ -38,6 +38,10 @@ public class GSPClient {
         this(new URI(endpointUri));
     }
 
+    public static String getDefaultGraphUri() {
+        return defaultGraphUri;
+    }
+
     public void postInputStream(Supplier<? extends InputStream> streamSupplier, String mimeType, String graph) {
         try {
             URIBuilder requestUriBuilder = new URIBuilder(endpoint);
