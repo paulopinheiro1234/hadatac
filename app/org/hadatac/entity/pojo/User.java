@@ -36,6 +36,7 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
+import org.hadatac.utils.GSPClient;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONArray;
 
@@ -221,7 +222,7 @@ public class User implements Comparable<User> {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += "INSERT DATA {  ";
-        //insert += "  GRAPH <" + USER_GRAPH + "> { ";
+        insert += "  GRAPH <" + GSPClient.getDefaultGraphUri() + "> { ";
         insert += "     <" + this.getUri() + "> a foaf:Person . \n";
         insert += "     <" + this.getUri() + "> foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "     <" + this.getUri() + "> sio:SIO_000095 " + "\"Public\" . ";
@@ -246,13 +247,13 @@ public class User implements Comparable<User> {
         if (this.faceted_data_platform != null && !this.faceted_data_platform.isEmpty()) {
             insert += "     <" + this.getUri() + "> hasco:hasPlatformFacetStatus " + "\"" + this.faceted_data_platform + "\" . ";
         }
-        //insert += "  }";
+        insert += "  }";
         insert += "}  ";
         //System.out.println("!!!! INSERT USER");
 
         try {
             UpdateRequest request = UpdateFactory.create(insert);
-            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, 
+            UpdateProcessor processor = UpdateExecutionFactory.createRemote(request,
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
             processor.execute();
         } catch (QueryParseException e) {
@@ -314,13 +315,13 @@ public class User implements Comparable<User> {
 
     public static List<User> find() {
         List<User> users = new ArrayList<User>();
-        String queryString = 
+        String queryString =
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
                         "SELECT ?uri WHERE { " +
                         "  ?uri a foaf:Person . " +
                         "} ";
-        
+
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
 
@@ -330,13 +331,13 @@ public class User implements Comparable<User> {
             if(null != user){
                 users.add(user);
             }
-        }			
+        }
 
         java.util.Collections.sort((List<User>) users);
         return users;
     }
 
-    public static User find(String uri) {	
+    public static User find(String uri) {
         User user = null;
 
         boolean bHasEmail = false;
@@ -347,7 +348,7 @@ public class User implements Comparable<User> {
 
         Model modelPrivate = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
                 CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
-        
+
         if (!modelPrivate.isEmpty()) {
             user = new User();
         }
@@ -416,8 +417,8 @@ public class User implements Comparable<User> {
         }
 
         Model modelPublic = SPARQLUtils.describe(CollectionUtil.getCollectionPath(
-                CollectionUtil.Collection.METADATA_SPARQL), queryString);        
-        
+                CollectionUtil.Collection.METADATA_SPARQL), queryString);
+
         if (!modelPublic.isEmpty() && user == null) {
             user = new User();
         }
@@ -444,11 +445,11 @@ public class User implements Comparable<User> {
 
     public static User findByEmail(String email) {
         String queryString =
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
-            "SELECT ?uri WHERE { " +
-            "  ?uri a foaf:Person . " +
-            "  ?uri foaf:mbox \"" + email + "\" . " +
-            "} ";
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+                        "SELECT ?uri WHERE { " +
+                        "  ?uri a foaf:Person . " +
+                        "  ?uri foaf:mbox \"" + email + "\" . " +
+                        "} ";
 
         ResultSetRewindable resultsrw = SPARQLUtils.select(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_SPARQL), queryString);
@@ -471,26 +472,26 @@ public class User implements Comparable<User> {
         String command = NameSpaces.getInstance().printSparqlNameSpaceList();
         if (group_uri.equals("Public")) {
             command += "DELETE { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
+                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
                     + "      <" + uri + "> sio:SIO_000095 \"" + group_uri + "\" . "
-                    //+ "    } "
+                    + "    } "
                     + "} \n"
                     + "INSERT { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
+                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
                     + "      <" + uri + "> sio:SIO_000095 \"" + group_uri + "\" . "
-                    //+ "    } "
+                    + "    } "
                     + "} \n "
                     + "WHERE { } \n";
         } else{
             command += "DELETE { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
+                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
                     + "      <" + uri + "> sio:SIO_000095 <" + group_uri + "> .  "
-                    //+ "    } "
+                    + "    } "
                     + "} \n"
                     + "INSERT { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
+                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
                     + "      <" + uri + "> sio:SIO_000095 <" + group_uri + "> . "
-                    //+ "    } "
+                    + "    } "
                     + "} \n "
                     + "WHERE { } \n";
         }
@@ -505,7 +506,7 @@ public class User implements Comparable<User> {
         try {
             String command = NameSpaces.getInstance().printSparqlNameSpaceList();
             command += "DELETE { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
+                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
                     + "      <" + uri + "> hasco:hasStudyFacetStatus ?o1 . "
                     + "      <" + uri + "> hasco:hasObjectFacetStatus ?o2 . "
                     + "      <" + uri + "> hasco:hasEntityCharacteristicFacetStatus ?o3 . "
@@ -513,7 +514,7 @@ public class User implements Comparable<User> {
                     + "      <" + uri + "> hasco:hasTimeFacetStatus ?o5 . "
                     + "      <" + uri + "> hasco:hasSpaceFacetStatus ?o6 . "
                     + "      <" + uri + "> hasco:hasPlatformFacetStatus ?o7 . "
-                    //+ "    } "
+                    + "    } "
                     + "} \n"
                     + "WHERE { "
                     + "      <" + uri + "> hasco:hasStudyFacetStatus ?o1 . "
@@ -531,7 +532,7 @@ public class User implements Comparable<User> {
             processor1.execute();
             command = NameSpaces.getInstance().printSparqlNameSpaceList();
             command += "INSERT { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
+                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
                     + "      <" + uri + "> hasco:hasStudyFacetStatus \"" + this.faceted_data_study + "\"  . "
                     + "      <" + uri + "> hasco:hasObjectFacetStatus  \"" + this.faceted_data_object + "\"  . "
                     + "      <" + uri + "> hasco:hasEntityCharacteristicFacetStatus  \"" + this.faceted_data_entity_characteristic + "\"  . "
@@ -539,7 +540,7 @@ public class User implements Comparable<User> {
                     + "      <" + uri + "> hasco:hasTimeFacetStatus  \"" + this.faceted_data_time + "\"  . "
                     + "      <" + uri + "> hasco:hasSpaceFacetStatus  \"" + this.faceted_data_space + "\"  . "
                     + "      <" + uri + "> hasco:hasPlatformFacetStatus  \"" + this.faceted_data_platform + "\"  . "
-                    //+ "    } "
+                    + "    } "
                     + "} \n "
                     + "WHERE { "
                     + "} \n";
@@ -576,10 +577,10 @@ public class User implements Comparable<User> {
         String queryString = "";
         queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
         queryString += "DELETE WHERE { "
-                    //+ "    GRAPH <" + USER_GRAPH + "> { "
-                    + "      <" + uri + "> ?p ?o . "
-                    //+ "    } "
-                    + " } ";
+                + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                + "      <" + uri + "> ?p ?o . "
+                + "    } "
+                + " } ";
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(
                 req, CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_UPDATE));
