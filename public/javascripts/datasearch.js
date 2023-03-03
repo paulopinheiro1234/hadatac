@@ -64,9 +64,9 @@ function search() {
 	$.redirect(location.pathname, {'facets': facets});
 }
 
-function showData(page) {
-	$.redirect(location.pathname + '/data?start=' + page, {'facets': getSelectedFacets()});
-}
+// function showData(page) {
+// 	$.redirect(location.pathname + '/data?start=' + page, {'facets': getSelectedFacets()});
+// }
 
 function goToPage(page) {
 	$.redirect(location.pathname + '?start=' + page, {'facets': getSelectedFacets()});
