@@ -70,7 +70,7 @@ public class MetadataContext implements RDFContext {
 
         String queryString = "";
         queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-        queryString += "DELETE WHERE { ?s ?p ?o . } ";
+        queryString += "DELETE WHERE { GRAPH ?g { ?s ?p ?o . } } ";
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(req,
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
