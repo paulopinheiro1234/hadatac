@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang.NotImplementedException;
 import org.hadatac.console.models.Facet;
 import org.hadatac.console.models.FacetHandler;
 import org.hadatac.console.models.Facetable;
@@ -24,6 +24,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.eclipse.rdf4j.model.Model;
 import org.hadatac.utils.CollectionUtil;
+import org.hadatac.utils.GSPClient;
 import org.hadatac.utils.NameSpaces;
 
 import org.hadatac.annotations.PropertyField;
@@ -526,13 +527,15 @@ public abstract class HADatAcThing implements Facetable {
         } else {
             // if ( getUri().contains("3539947") ) System.out.println("find 3539947!!!! delete without namespace!!!");
 
-            String query1 = query+ " DELETE WHERE { \n";
-            if (getUri().startsWith("http")) {
-                query1 += "<" + this.getUri() + ">";
+            String query1 = query+ " DELETE WHERE { \n" + " " +
+                                   "     GRAPH <" + GSPClient.getDefaultGraphUri() + "> { \n";
+            if (getUri().startsWith( "http")) {
+                query1 += "         <" + this.getUri() + ">";
             } else {
-                query1 += this.getUri();
+                query1 += "         " + this.getUri();
             }
             query1 += " ?p ?o . \n";
+            query1 += "     } ";
             query1 += " } ";
             UpdateRequest request = UpdateFactory.create(query1);
             UpdateProcessor processor = UpdateExecutionFactory.createRemote(
@@ -540,6 +543,7 @@ public abstract class HADatAcThing implements Facetable {
             processor.execute();
 
             // Added for deleting Virtual Columns
+            /*
             String query2 = query +" DELETE WHERE { \n";
             query2 += " ?o ?p ";
             if (getUri().startsWith("http")) {
@@ -566,6 +570,7 @@ public abstract class HADatAcThing implements Facetable {
             processor = UpdateExecutionFactory.createRemote(
                     request, CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
             processor.execute();
+            */
         }
 
         //System.out.println("Deleted <" + getUri() + "> from triple store");

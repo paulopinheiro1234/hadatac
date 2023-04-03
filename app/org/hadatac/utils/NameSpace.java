@@ -1,16 +1,8 @@
 package org.hadatac.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
-import org.apache.jena.riot.RiotNotFoundException;
-import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -24,14 +16,17 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.entity.pojo.DataAcquisitionSchema;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 public class NameSpace {
 
@@ -169,30 +164,28 @@ public class NameSpace {
     }
 
     public void loadTriples(String address, boolean fromRemote) {
+        Optional<File> tempFileOpt = Optional.empty();
+        RDFFormat format = getRioFormat(getType());
         try {
-            Repository repo = new SPARQLRepository(
-                    CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
-            repo.init();
-            RepositoryConnection con = repo.getConnection();
-            ValueFactory factory = repo.getValueFactory();
-
             System.out.println("Loading triples from " + address);
+            File tripleFile;
             if (fromRemote) {
-                con.add(new URL(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
+                tempFileOpt = Optional.of(File.createTempFile("remoteTriples", "." + format.getDefaultFileExtension()));
+
+                tripleFile = tempFileOpt.get();
+                FileUtils.copyURLToFile(new URL(address), tripleFile);
             } else {
-                con.add(new File(address), "", getRioFormat(getType()), (Resource)factory.createIRI(getName()));
+                tripleFile = new File(address);
             }
+            String endpointUrl = CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_GRAPH);
+            GSPClient gspClient = new GSPClient(endpointUrl);
+            gspClient.postFile(tripleFile, format.getDefaultMIMEType(), getName());
             System.out.println("Loaded triples from " + address + " \n");
-        } catch (NotFoundException e) {
-            System.out.println("NotFoundException: address " + address);
-            System.out.println("NotFoundException: " + e.getMessage());
-        } catch (RiotNotFoundException e) {
-            System.out.println("RiotNotFoundException: address " + address);
-            System.out.println("RiotNotFoundException: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Exception: address " + address);
-            System.out.println("Exception: " + e.getMessage());
+            throw new RuntimeException(e);
+        } finally {
+            tempFileOpt.ifPresent(FileUtils::deleteQuietly);
         }
     }
 

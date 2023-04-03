@@ -1,4 +1,0 @@
-*.md
-.dockerignore
-Dockerfile
-Dockerfile-data

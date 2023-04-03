@@ -1,5 +1,7 @@
 package org.hadatac;
 
+import org.hadatac.utils.ConfigProp;
+
 public class Constants {
     public static final String FLASH_MESSAGE_KEY = "message";
     public static final String FLASH_ERROR_KEY = "error";
@@ -13,4 +15,5 @@ public class Constants {
     public static final String SETTING_KEY_PASSWORD_RESET_LINK_SECURE = SETTING_KEY_MAIL
             + "." + "passwordResetLink.secure";
     public static final String SETTING_KEY_LINK_LOGIN_AFTER_PASSWORD_RESET = "loginAfterPasswordReset";
+    public static final String USER_GRAPH = "http://hadatac.org/kb/" + ConfigProp.getBasePrefix() + "/users";
 }

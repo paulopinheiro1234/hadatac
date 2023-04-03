@@ -1,5 +1,6 @@
 package org.hadatac.metadata.api;
 
+import java.net.URISyntaxException;
 import java.util.*;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.*;
@@ -9,6 +10,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.metadata.loader.URIUtils;
+import org.hadatac.utils.GSPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,20 +130,13 @@ public class MetadataFactory {
 	}
 
     public static int commitModelToTripleStore(Model model, String endpointUrl) {
-        Repository repo = new SPARQLRepository(endpointUrl);
-        repo.init();
-        
-        RepositoryConnection con = null;
-        try {
-            con = repo.getConnection();
-			con.add(model);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-            return -1;
-        } finally {
-            con.close();
-        }
-        
+		try {
+			GSPClient gspClient = new GSPClient(endpointUrl);
+			gspClient.postModel(model);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+
         return model.size();
     }
 }

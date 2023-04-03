@@ -524,7 +524,7 @@ public class Study extends HADatAcThing {
                 "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
                 "}";
 
-        ResultSetRewindable resultsrw = SPARQLUtils.select(
+        ResultSetRewindable resultsrw = SPARQLUtils.describeAsRs(
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         if (resultsrw.size() <1){
             queryString = NameSpaces.getInstance().printSparqlNameSpaceList() +
@@ -532,7 +532,7 @@ public class Study extends HADatAcThing {
                     "  ?objUri hasco:isMemberOf ?socUri . \n" +
                     "  ?socUri hasco:isMemberOf <" + getUri() + "> . \n" +
                     "}";
-            resultsrw = SPARQLUtils.select(
+            resultsrw = SPARQLUtils.describeAsRs(
                     CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_SPARQL), queryString);
         }
 

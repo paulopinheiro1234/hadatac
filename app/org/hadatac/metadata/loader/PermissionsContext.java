@@ -1,14 +1,7 @@
 package org.hadatac.metadata.loader;
 
-import org.apache.jena.query.DatasetAccessor;
-import org.apache.jena.query.DatasetAccessorFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
+import com.typesafe.config.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -21,9 +14,10 @@ import org.apache.jena.update.UpdateRequest;
 import org.hadatac.console.http.SPARQLUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.Feedback;
+import org.hadatac.utils.GSPClient;
 import org.hadatac.utils.NameSpaces;
 
-import com.typesafe.config.ConfigFactory;
+import java.io.File;
 
 public class PermissionsContext implements RDFContext {
 
@@ -101,14 +95,15 @@ public class PermissionsContext implements RDFContext {
      */
     public Long loadLocalFile(int mode, String filePath, String contentType, String graphUri) {
         Model model = ModelFactory.createDefaultModel();
-        DatasetAccessor accessor = DatasetAccessorFactory.createHTTP(
-                CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_GRAPH));
+
+        final String permGraphPath = CollectionUtil.getCollectionPath(CollectionUtil.Collection.PERMISSIONS_GRAPH);
 
         loadFileMessage = "";
         Long total = totalTriples();
+
         try {
-            model.read(filePath, getLang(contentType));
-            accessor.add(model);
+            GSPClient gspClient = new GSPClient(permGraphPath);
+            gspClient.postFile(new File(filePath), contentType, graphUri);
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: file " + filePath);
             System.out.println("NotFoundException: " + e.getMessage());

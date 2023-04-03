@@ -34,8 +34,11 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-text" % "1.6",
   "commons-validator" % "commons-validator" % "1.5.0",
   "org.apache.solr" % "solr-solrj" % "7.5.0",
-  "org.apache.jena" % "jena-core" % "3.0.1",
-  "org.apache.jena" % "jena-arq" % "3.0.1",
+  "org.apache.jena" % "jena-core" % "4.4.0",
+  "org.apache.jena" % "jena-arq" % "4.4.0",
+  "org.apache.jena" % "jena-rdfconnection" % "4.6.0",
+  //Optional
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.12" % "2.13.1",
   "org.eclipse.rdf4j" % "rdf4j-model" % "3.0.0",
   "org.eclipse.rdf4j" % "rdf4j-repository-api" % "3.0.0",
   "org.eclipse.rdf4j" % "rdf4j-runtime" % "3.0.0",
@@ -66,7 +69,7 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.8.0",
   //  "be.objectify" %% "deadbolt-java" % "2.6.1",
   "be.objectify" %% "deadbolt-java" % "2.8.1",
-  "com.fasterxml.jackson.module" % "jackson-module-scala_2.12" % "2.11.0",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.12" % "2.13.2",
   "org.apache.poi" % "poi-ooxml" % "3.14",
   "org.apache.commons" % "commons-configuration2" % "2.0",
   "com.typesafe.play" %% "play-mailer" % "8.0.1",
@@ -88,5 +91,6 @@ libraryDependencies ++= Seq(
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/",
   "Spring Framework Security" at "https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto")
+resolvers += Resolver.bintrayRepo("playframework", "maven")
 
 routesGenerator := InjectedRoutesGenerator

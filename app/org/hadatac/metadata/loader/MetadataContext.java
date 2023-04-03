@@ -17,10 +17,7 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.hadatac.console.http.SPARQLUtils;
-import org.hadatac.utils.CollectionUtil;
-import org.hadatac.utils.Feedback;
-import org.hadatac.utils.NameSpace;
-import org.hadatac.utils.NameSpaces;
+import org.hadatac.utils.*;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -73,7 +70,7 @@ public class MetadataContext implements RDFContext {
 
         String queryString = "";
         queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
-        queryString += "DELETE WHERE { ?s ?p ?o . } ";
+        queryString += "DELETE WHERE { GRAPH ?g { ?s ?p ?o . } } ";
         UpdateRequest req = UpdateFactory.create(queryString);
         UpdateProcessor processor = UpdateExecutionFactory.createRemote(req,
                 CollectionUtil.getCollectionPath(CollectionUtil.Collection.METADATA_UPDATE));
@@ -118,16 +115,9 @@ public class MetadataContext implements RDFContext {
         try {
             File file = new File(filePath);
             if (file.exists()) {
-                Repository repo = new SPARQLRepository(
-                        kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get()));
-                repo.init();
-                RepositoryConnection con = repo.getConnection();
-                ValueFactory factory = repo.getValueFactory();
-                if (graphUri.isEmpty()) {
-                    con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createBNode());
-                } else {
-                    con.add(file, "", NameSpace.getRioFormat(contentType), (Resource)factory.createIRI(graphUri));
-                }
+                String kbUrl = kbURL + CollectionUtil.getCollectionName(CollectionUtil.Collection.METADATA_GRAPH.get());
+                GSPClient gspClient = new GSPClient(kbUrl);
+                gspClient.postFile(file, contentType, graphUri);
             }
         } catch (NotFoundException e) {
             System.out.println("NotFoundException: file " + filePath);

@@ -24,7 +24,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 
-import static org.hamcrest.CoreMatchers.nullValue;
+//import static org.hamcrest.CoreMatchers.nullValue;
 
 import java.io.IOException;
 import java.time.Instant;

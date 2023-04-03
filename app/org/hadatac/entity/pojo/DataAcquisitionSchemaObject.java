@@ -299,7 +299,7 @@ public class DataAcquisitionSchemaObject extends HADatAcThing {
                 "   OPTIONAL { <" + uri + "> hasco:hasRole ?role } .  \n" +
                 "   OPTIONAL { <" + uri + "> sio:SIO_000668 ?inRelationTo } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:Relation ?relation } . \n" +
-                "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo } . \n" +
+                "   OPTIONAL { <" + uri + "> ?relation ?inRelationTo . ?inRelationTo a hasco:DASchemaObject } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:inRelationToLabel ?inRelationToStr } . \n" +
                 "   OPTIONAL { <" + uri + "> hasco:wasDerivedFrom ?wasDerivedFrom } . \n" +
                 "   OPTIONAL { <" + uri + "> dcterms:alternativeName ?alternativeName } . \n" +
