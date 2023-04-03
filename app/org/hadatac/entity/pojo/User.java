@@ -36,15 +36,11 @@ import org.hadatac.console.models.SysUser;
 import org.hadatac.metadata.loader.URIUtils;
 import org.hadatac.utils.CollectionUtil;
 import org.hadatac.utils.ConfigProp;
-import org.hadatac.utils.GSPClient;
 import org.hadatac.utils.NameSpaces;
 import org.json.simple.JSONArray;
+import org.hadatac.Constants;
 
 public class User implements Comparable<User> {
-
-    private static final String basePrefix = ConfigProp.getBasePrefix();
-
-    //public static String USER_GRAPH = "http://hadatac.org/kb/" + basePrefix + "/users";
 
     private String uri;
     private String given_name;
@@ -222,7 +218,7 @@ public class User implements Comparable<User> {
         String insert = "";
         insert += NameSpaces.getInstance().printSparqlNameSpaceList();
         insert += "INSERT DATA {  ";
-        insert += "  GRAPH <" + GSPClient.getDefaultGraphUri() + "> { ";
+        insert += "  GRAPH <" + Constants.USER_GRAPH + "> { ";
         insert += "     <" + this.getUri() + "> a foaf:Person . \n";
         insert += "     <" + this.getUri() + "> foaf:mbox " + "\"" + this.email + "\" . ";
         insert += "     <" + this.getUri() + "> sio:SIO_000095 " + "\"Public\" . ";
@@ -472,24 +468,24 @@ public class User implements Comparable<User> {
         String command = NameSpaces.getInstance().printSparqlNameSpaceList();
         if (group_uri.equals("Public")) {
             command += "DELETE { "
-                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                    + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                     + "      <" + uri + "> sio:SIO_000095 \"" + group_uri + "\" . "
                     + "    } "
                     + "} \n"
                     + "INSERT { "
-                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                    + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                     + "      <" + uri + "> sio:SIO_000095 \"" + group_uri + "\" . "
                     + "    } "
                     + "} \n "
                     + "WHERE { } \n";
         } else{
             command += "DELETE { "
-                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                    + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                     + "      <" + uri + "> sio:SIO_000095 <" + group_uri + "> .  "
                     + "    } "
                     + "} \n"
                     + "INSERT { "
-                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                    + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                     + "      <" + uri + "> sio:SIO_000095 <" + group_uri + "> . "
                     + "    } "
                     + "} \n "
@@ -506,7 +502,7 @@ public class User implements Comparable<User> {
         try {
             String command = NameSpaces.getInstance().printSparqlNameSpaceList();
             command += "DELETE { "
-                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                    + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                     + "      <" + uri + "> hasco:hasStudyFacetStatus ?o1 . "
                     + "      <" + uri + "> hasco:hasObjectFacetStatus ?o2 . "
                     + "      <" + uri + "> hasco:hasEntityCharacteristicFacetStatus ?o3 . "
@@ -532,7 +528,7 @@ public class User implements Comparable<User> {
             processor1.execute();
             command = NameSpaces.getInstance().printSparqlNameSpaceList();
             command += "INSERT { "
-                    + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                    + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                     + "      <" + uri + "> hasco:hasStudyFacetStatus \"" + this.faceted_data_study + "\"  . "
                     + "      <" + uri + "> hasco:hasObjectFacetStatus  \"" + this.faceted_data_object + "\"  . "
                     + "      <" + uri + "> hasco:hasEntityCharacteristicFacetStatus  \"" + this.faceted_data_entity_characteristic + "\"  . "
@@ -577,7 +573,7 @@ public class User implements Comparable<User> {
         String queryString = "";
         queryString += NameSpaces.getInstance().printSparqlNameSpaceList();
         queryString += "DELETE WHERE { "
-                + "    GRAPH <" + GSPClient.getDefaultGraphUri() + "> { "
+                + "    GRAPH <" + Constants.USER_GRAPH + "> { "
                 + "      <" + uri + "> ?p ?o . "
                 + "    } "
                 + " } ";
