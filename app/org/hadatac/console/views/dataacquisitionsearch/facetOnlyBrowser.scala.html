@@ -26,6 +26,7 @@
     <div id="query" data-documents="@documentJson"/>
     <div id="facetDiv" data-documents="@handler.toJSON()"/>
     <div id="preferences" data-results="@ConfigProp.toGuiJson(userName)"/>
+    <input type="hidden" id="resultsSize" name="studyId" value="@resultsSize" />
 
     <div class="container-fluid">
         <div class="row">
@@ -34,9 +35,10 @@
             </div>
 
             <div class="col-md-2 sidebar">
-                <center><font size="4"> Selected data values: <b>@resultsSize</b></font> </center> <br></br>
-            </div>
-            <div class="col-md-7 sidebar">
+		<center><font size="4"> Selected data values: <b><span id="formattedResultSize"></span></b></font> </center> <br></br>
+                @*<center><font size="4"> Selected data values: <b>@resultsSize</b></font> </center> <br></br>*@
+	    </div>
+	    <div class="col-md-7 sidebar">
                 <button type="button" class="btn btn-primary" onClick="search();">Search</button>
                 <button type="button" class="btn btn-primary" onClick="clearSearch();">Clear Search</button>
                 @if(ownerUri != "Public") {
@@ -153,7 +155,13 @@
                         updatePanelWidths();
                     }
                 });
-            });
+
+
+                var resultsSize = $('#resultsSize').val();
+                let formatted = formatNumber(resultsSize);
+                $('#formattedResultSize').text(formatted);
+
+	    });
 
             function updatePanelWidths() {
                 var num_visible = $('#panels .sidebar:visible').length;

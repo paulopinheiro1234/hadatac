@@ -227,7 +227,7 @@ public class Downloader extends Controller {
     }
 
     public static int generateCSVFileBySubjectAlignment(String ownerUri, String facets, String ownerEmail,
-                                                        String summaryType, String categoricalOption,
+                                                        String summaryType, String categoricalOption, boolean renameFiles,
                                                         boolean keepSameValue, ColumnMapping columnMapping) {
 
         System.out.println("generateCSVFileBySubjectAlignment: facets=[" + facets + "]");
@@ -237,7 +237,12 @@ public class Downloader extends Controller {
         Date date = new Date();
         String fileName = null;
         if (summaryType.equals(Measurement.SUMMARY_TYPE_NONE)) {
-            fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+            if(renameFiles) {
+                //fileName = "DataSet_object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+                fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";            }
+            else {
+                fileName = "object_alignment_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
+            }
         } else {
             fileName = "subgroup_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + ".csv";
         }
@@ -253,7 +258,7 @@ public class Downloader extends Controller {
         System.out.println("downloaded file... absolute path = " + absolutePath);
         File file = new File(absolutePath);
 
-        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, keepSameValue, columnMapping);
+        Measurement.outputAsCSVBySubjectAlignment(ownerUri, facets, file, dataFile.getId(), summaryType, categoricalOption, renameFiles, keepSameValue, columnMapping);
         System.out.println("download finished, CSV files are generated...");
 
         return 0;
