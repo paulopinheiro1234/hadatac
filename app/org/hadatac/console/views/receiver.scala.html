@@ -66,7 +66,7 @@
     </div>
     <script type="text/javascript">
             var data1;
-            document.onreadystatechange = function () {
+            /*document.onreadystatechange = function () {
                 var state = document.readyState
                 if (state == 'interactive') {
                     document.getElementById('contents').style.visibility="hidden";
@@ -77,14 +77,14 @@
                         document.getElementById('contents').style.visibility="visible";
                     },1000);
                 }
-            }
+            }*/
 
             let count =0;
             window.addEventListener('message', function (e) {
                 var obj = JSON.parse(e.data);
                 // console.log("inside script:"+e.origin);
                 // console.log(e.data);
-                // console.log(obj);
+                console.log(obj);
                 // data1 = obj;
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
