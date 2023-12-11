@@ -20,7 +20,9 @@ function create_item(data, selected_elems) {
 		var element = {};
 		element.id = tree_id;
 		tree_id++;
-		element.text = children[i_child].value + ' (' + children[i_child].count + ')';
+
+		element.text = children[i_child].value + ' (' + formatNumber(children[i_child].count) + ')';
+
 		element.tooltip = children[i_child].tooltip;
 		element.label = children[i_child].value;
 		element.count = children[i_child].count;
@@ -136,8 +138,9 @@ function create_merged_item(data, selected_elems, curLevel,
 			new_text.push(text[order[i]]);
 			new_tooltips.push(tooltips[order[i]]);
 		}
-		
-		pivot.text = new_text.join(' ') + ' (' + data.count + ')';
+	
+		pivot.text = new_text.join(' ') + ' (' + formatNumber(data.count) + ')';
+
 		pivot.tooltip = new_tooltips.join(' ');
 		pivot.label = new_text.join(' ');
 		pivot.count = data.count;
@@ -150,7 +153,9 @@ function create_merged_item(data, selected_elems, curLevel,
 			element.id = tree_id++;
 			// element.text = getNodeText(children[i_child])
 			// disable the hyperlink on the indicators
-			element.text = (children[i_child]).value + ' (' + (children[i_child]).count + ')'
+
+			element.text = (children[i_child]).value + ' (' + formatNumber((children[i_child]).count) + ')';
+			
 			element.tooltip = '<' + children[i_child].tooltip + '>';
 			element.label = children[i_child].value;
 			element.count = children[i_child].count;
@@ -209,5 +214,13 @@ function create_merged_item(data, selected_elems, curLevel,
 	});
 	
 	return items;
+}
+
+
+function formatNumber(num)
+{
+	let nf = new Intl.NumberFormat('en-US');
+	let formatted = nf.format(num);
+	return formatted;
 }
 

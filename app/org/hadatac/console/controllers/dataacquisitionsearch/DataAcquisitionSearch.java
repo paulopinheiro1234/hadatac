@@ -326,6 +326,7 @@ public class DataAcquisitionSearch extends Controller {
         String categoricalValues = "";
         String timeResolution = "";
         String sameValueSelection = "";
+        boolean renameFiles = false;
 
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
@@ -347,6 +348,9 @@ public class DataAcquisitionSearch extends Controller {
             if (name_map.get("selDupOpt") != null) {
                 sameValueSelection = name_map.get("selDupOpt")[0].toString();
             }
+            if (name_map.get("renameFiles") != null && name_map.get("renameFiles")[0].toString().equals("true")) {
+                renameFiles = true;
+            }
         }
 
         System.out.println("DataAcquisitionSearch.downloadAlignment : facets=[" + facets + "]");
@@ -359,6 +363,7 @@ public class DataAcquisitionSearch extends Controller {
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
+        final boolean finalRenameFiles = renameFiles;
         final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection) ? false : true;
         //System.out.println("Object type inside alignment: " + objectType);
 
@@ -367,7 +372,7 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, keepSameValue, null),
+                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, finalRenameFiles, keepSameValue, null),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
@@ -398,6 +403,7 @@ public class DataAcquisitionSearch extends Controller {
         String facets = "";
         String selSummaryType = "";
         String nonCategoricalVariables = "";
+        boolean renameFiles = false;
 
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
@@ -410,6 +416,9 @@ public class DataAcquisitionSearch extends Controller {
             }
             if (name_map.get("selNonCatVariable") != null) {
                 nonCategoricalVariables = name_map.get("selNonCatVariable")[0].toString();
+            }
+            if (name_map.get("renameFiles") != null && name_map.get("renameFiles")[0].toString().equals("true")) {
+                renameFiles = true;
             }
         }
 
@@ -424,6 +433,7 @@ public class DataAcquisitionSearch extends Controller {
         final String finalFacets = facets;
         final String summaryType = selSummaryType;
         final String categoricalOption = nonCategoricalVariables;
+        final boolean finalRenameFiles = renameFiles;
 
         CompletionStage<Integer> promiseOfResult = null;
         long currentTime = System.currentTimeMillis();
@@ -431,7 +441,7 @@ public class DataAcquisitionSearch extends Controller {
         if (selSummaryType.equals(Measurement.SUMMARY_TYPE_SUBGROUP)) {
             // for TYPE_SUBGROUP, keepSameValue is set to 'false'
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, summaryType, categoricalOption, false, null),
+                    ownerUri, finalFacets, email, summaryType, categoricalOption, finalRenameFiles, false, null),
                     databaseExecutionContext);
 
             promiseOfResult.whenComplete(
