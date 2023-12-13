@@ -134,7 +134,9 @@ public class Application extends Controller {
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
+        System.out.println("Application.formIndex, formIndex user= " + user.getEmail());
         if(null != user && user.isDataManager()){
+            System.out.println("Application->formIndex->DataManager:"+user.getEmail());
             return ok(protectedIndex.render(user.getEmail()));
         }
         return ok(portal.render(getUserEmail(request)));
@@ -331,14 +333,22 @@ public class Application extends Controller {
         return ok(portal.render(email));
     }
 
-    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext){
+    public Result formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext){
         sysUser = sysUserValue;
         playSessionStore = sessionStore;
+
+        System.out.println("Application.formIndex sysUser = " + sysUser.getEmail()+ request.host());
+
         setSessionStore(sessionStore);
         setPlayWebContext(webContext);
-        formIndex(request);
+
+        System.out.println("Application.formIndex checkUserExists->getSessionId():"+playSessionStore.getOrCreateSessionId(webContext)+"\n\n");
+        System.out.println("Applicationform.Index playWebContext = " + webContext);
+
+        return ok ("/hadatac/form/index.html");
 
     }
+
     private SysUser getSysUser(){return sysUser;}
     private void setSysUser(SysUser sysUserNew){ sysUser=sysUserNew;}
 

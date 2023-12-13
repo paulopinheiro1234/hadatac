@@ -1,5 +1,6 @@
 package org.hadatac.console.controllers;
 
+import com.typesafe.config.ConfigFactory;
 import org.hadatac.console.views.html.landingPage;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -38,8 +39,12 @@ public class Portal extends Controller {
         }
         SysUser user = AuthApplication.getAuthApplication().getUserProvider().getUser(application.getUserEmail(request));
 
+        System.out.println("Portal user= " + user);
         if (user == null) {
-            return ok(landingPage.render(application.getUserEmail(request)));
+            if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
+                return ok(landingPage.render(application.getUserEmail(request)));
+            } else
+                return ok(portal.render(application.getUserEmail(request)));
         } else {
             return ok(portal.render(application.getUserEmail(request)));
         }

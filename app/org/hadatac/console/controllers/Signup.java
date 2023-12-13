@@ -281,10 +281,10 @@ public class Signup {
         if (SysUser.existsSolr()) { // only check for pre-registration if it is not the first user signing up
             if (!UserManagement.isPreRegistered(boundForm.get().getEmail())) {
                 return ok(notRegistered.render());
-                }
             }
-            MyUsernamePasswordAuthProvider data = boundForm.get();
-             return settingUpAccount(data, false);
+        }
+        MyUsernamePasswordAuthProvider data = boundForm.get();
+        return settingUpAccount(data, false);
     }
 
     public Result settingUpAccount (MyUsernamePasswordAuthProvider data, Boolean redirectedUser){
@@ -327,6 +327,14 @@ public class Signup {
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
             System.out.println("\n Redirected from Third party Portal:"+request.host());
+            try {
+                System.out.println("\n Thread:"+Thread.currentThread().getName());
+                Thread.sleep(10000);
+            }
+            catch(Exception e)
+            {
+                System.out.println("\n Exception Thread:"+Thread.currentThread().getName());
+            }
             if (SysUser.findByEmail(formData.get().getEmail()) == null && !formData.get().getEmail().isEmpty()) {
                 System.out.println("User Does not exist, Signing up");
                 MyUsernamePasswordAuthProvider data = formData.get();
@@ -336,12 +344,12 @@ public class Signup {
             }
             //Create profile for user trying to login
             final PlayWebContext playWebContext = createUserProfile(request,formData.get().getEmail());
-//            System.out.println("checkUserExists create user profile:"+userEmail+"\n application.getSessionStore()):"+application.getSessionStore().getOrCreateSessionId(playWebContext));
+            System.out.println("checkUserExists create user profile:"+formData.get().getEmail()+"\n application.getSessionStore()):"+application.getSessionStore().getOrCreateSessionId(playWebContext));
 
             //Login user
             System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
-            application.formIndex(request,user,playSessionStore,playWebContext);
+//            application.formIndex(request,user,playSessionStore,playWebContext);
 
             /*Map params = request.queryString();
             params.forEach((K,V) -> System.out.println(K + ", value : " + V));
@@ -364,9 +372,12 @@ public class Signup {
                 return ok (pageRef).addingToSession(request ,"userValidated", "yes");
             }
 
-            System.out.println("formData= " + formData);
-            return ok ("/hadatac").addingToSession(request ,"userValidated", "yes");
+            System.out.println("Signup.checkUserExists user = " + user.getEmail());
+            System.out.println("Signup.checkUserExists checkUserExists->getSessionId():"+playSessionStore.getOrCreateSessionId(playWebContext)+"\n\n");
+            System.out.println("Signup.checkUserExists playWebContext = " + playWebContext);
+            return (application.formIndex(request,user,playSessionStore,playWebContext));
         }
+        System.out.println( "checkUserExists failed ...what happened?");
         return badRequest("what happened?");
     }
 
