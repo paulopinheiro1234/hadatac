@@ -4,6 +4,7 @@ import be.objectify.deadbolt.java.actions.SubjectNotPresent;
 import com.typesafe.config.ConfigFactory;
 import module.SecurityModule;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hadatac.Constants;
 import org.hadatac.console.controllers.triplestore.UserManagement;
 import org.hadatac.console.models.*;
@@ -341,6 +342,25 @@ public class Signup {
             System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
             application.formIndex(request,user,playSessionStore,playWebContext);
+
+            System.out.println("formData= " + formData);
+
+            String source = formData.get().getSource();
+            String studyIds = formData.get().getStudyId();
+            String studyPageRef = formData.get().getStudyPageRef();
+
+            if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(studyPageRef) && source.equals("studypage")) {
+                studyPageRef = "/" +studyPageRef+"&source="+source;
+                System.out.println("studyPageRef= " + studyPageRef);
+                return ok (studyPageRef).addingToSession(request ,"userValidated", "yes");
+            }
+            else if(StringUtils.isNotBlank(source) && source.equals("generateDataSet")) {
+                String pageRef = "/" +studyPageRef+"&source="+source+"&studyIds="+studyIds;;
+                System.out.println("PageRef= " + pageRef);
+
+                return ok (pageRef).addingToSession(request ,"userValidated", "yes");
+            }
+
             return ok ("/hadatac").addingToSession(request ,"userValidated", "yes");
         }
         return badRequest("what happened?");
