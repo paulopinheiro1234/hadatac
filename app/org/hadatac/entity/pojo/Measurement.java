@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSetRewindable;
 import org.apache.solr.client.solrj.SolrClient;
@@ -1700,7 +1701,7 @@ public class Measurement extends HADatAcThing implements Runnable {
     }
 
     public static void outputAsCSVBySubjectAlignment(String ownerUri, String facets, File file, String fileId,
-                                                     String summaryType, String categoricalOption,
+                                                     String summaryType, String categoricalOption, boolean renameFiles,
                                                      boolean keepSameValue, ColumnMapping columnMapping) {
 
         System.out.println("outputAsCSVBySubjectAlignment: facets=[" + facets + "]");
@@ -1886,12 +1887,24 @@ public class Measurement extends HADatAcThing implements Runnable {
                 // Write harmonized code book
                 alignment.getCodeBook();
                 if (categoricalOption.equals(WITH_CODE_BOOK)) {
-                    fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                    if(renameFiles)
+                    {
+                        fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir(), "CodeBook_");
+                    }
+                    else {
+                        fileCreated = outputHarmonizedCodebook(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir(), null);
+                    }
                 }
 
                 // Write DOI list of sources
                 if (summaryType.equals(SUMMARY_TYPE_NONE)) {
-                    outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir());
+                    if(renameFiles)
+                    {
+                        outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir(), "DOI_");
+                    }
+                    else {
+                        outputProvenance(alignment, file, dataFile.getOwnerEmail(), dataFile.getDir(), null);
+                    }
                 }
 
                 // finalize the main download file
@@ -2406,11 +2419,20 @@ public class Measurement extends HADatAcThing implements Runnable {
         return true;
     }
 
-    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail, String dataDir) {
+    public static boolean outputHarmonizedCodebook(Alignment alignment, File file, String ownerEmail, String dataDir, String newFilePrefix) {
         boolean fileCreated = false;
         try {
+            String fileName;
+
             //File codeBookFile = new File(ConfigProp.getPathDownload() + "/" + file.getName().replace(".csv","_codebook.csv"));
-            String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
+
+            if(StringUtils.isBlank(newFilePrefix)) {
+              fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
+            }
+            else{
+                fileName = newFilePrefix + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_codebook.csv";
+            }
+
             Date date = new Date();
             //String fileName = "download_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(date) + "_codebook.csv";
             //DataFile dataFile = new DataFile(codeBookFile.getName());
@@ -2497,9 +2519,18 @@ public class Measurement extends HADatAcThing implements Runnable {
         return pretty;
     }
 
-    public static void outputProvenance(Alignment alignment, File file, String ownerEmail, String dataDir) {
+    public static void outputProvenance(Alignment alignment, File file, String ownerEmail, String dataDir, String newFilePrefix) {
         try {
-            String fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
+            String fileName;
+
+            if(StringUtils.isBlank(newFilePrefix)) {
+                fileName = "download_" + file.getName().substring(7, file.getName().lastIndexOf("_")) + "_sources.csv";
+            }
+            else
+            {
+                fileName = newFilePrefix + file.getName().substring(7, file.getName().lastIndexOf("_")) + ".csv";
+            }
+
             Date date = new Date();
             DataFile dataFile = DataFile.create(fileName, dataDir, ownerEmail, DataFile.CREATING);
             dataFile.setSubmissionTime(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));

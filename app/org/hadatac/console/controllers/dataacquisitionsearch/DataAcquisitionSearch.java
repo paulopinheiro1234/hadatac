@@ -1,9 +1,12 @@
 package org.hadatac.console.controllers.dataacquisitionsearch;
 
+import java.util.stream.Collectors;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.ConfigFactory;
 import module.DatabaseExecutionContext;
+import org.apache.commons.lang.StringUtils;
 import org.hadatac.Constants;
 import org.hadatac.annotations.SearchActivityAnnotation;
 import org.hadatac.console.controllers.Application;
@@ -13,10 +16,8 @@ import org.hadatac.console.models.*;
 import org.hadatac.console.views.html.dataacquisitionsearch.dataacquisition_browser;
 import org.hadatac.console.views.html.dataacquisitionsearch.facetOnlyBrowser;
 import org.hadatac.data.model.AcquisitionQueryResult;
-import org.hadatac.entity.pojo.Measurement;
-import org.hadatac.entity.pojo.ObjectCollection;
-import org.hadatac.entity.pojo.SPARQLUtilsFacetSearch;
-import org.hadatac.entity.pojo.User;
+import org.hadatac.entity.pojo.*;
+import org.hadatac.utils.ConfigProp;
 import org.pac4j.play.java.Secure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -326,15 +327,39 @@ public class DataAcquisitionSearch extends Controller {
         String categoricalValues = "";
         String timeResolution = "";
         String sameValueSelection = "";
+        boolean renameFiles = false;
 
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
         if (name_map != null) {
             if (name_map.get("facets") != null) {
                 facets = name_map.get("facets")[0];
+            }
+
+            //System.out.println("DataAcquisitionSearch.downloadAlignment : name_map=[" + name_map + "]");
+            if (name_map.get("downloadSrc") != null) {
+                String downloadSrc = name_map.get("downloadSrc")[0].toString();
+                if (downloadSrc.equals("studypage")) {
+                    if (name_map.get("studyIds") != null) {
+                        //System.out.println("DataAcquisitionSearch.downloadAlignment : studyIds=[" + name_map.get("studyIds")[0] + "]");
+                        String studyIds = name_map.get("studyIds")[0].toString();
+                        System.out.println("DataAcquisitionSearch.downloadAlignment : studyIds=[" + studyIds + "]");
+
+                        if (studyIds.contains("!")) {
+                            String[] studyIdsArr = studyIds.split("!");
+                            facets = getStudyFacetS(studyIdsArr);
             } else {
+                            String[] studyIdsArr = {studyIds};
+                            facets = getStudyFacetS(studyIdsArr);
+                        }
+                    }
+                }
+            }
+
+            if (StringUtils.isBlank(facets)) {
                 System.out.println("DataAcquisitionSearch.downloadAlignment - Warning: missing facets information in form.");
             }
+
             if (name_map.get("selObjectType") != null) {
                 objectType = name_map.get("selObjectType")[0].toString();
             }
@@ -346,6 +371,9 @@ public class DataAcquisitionSearch extends Controller {
             }
             if (name_map.get("selDupOpt") != null) {
                 sameValueSelection = name_map.get("selDupOpt")[0].toString();
+            }
+            if (name_map.get("renameFiles") != null && name_map.get("renameFiles")[0].toString().equals("true")) {
+                renameFiles = true;
             }
         }
 
@@ -359,6 +387,7 @@ public class DataAcquisitionSearch extends Controller {
         final String finalFacets = facets;
         final String categoricalOption = categoricalValues;
         final String timeOption = timeResolution;
+        final boolean finalRenameFiles = renameFiles;
         final boolean keepSameValue = "eliminateDuplication".equalsIgnoreCase(sameValueSelection) ? false : true;
         //System.out.println("Object type inside alignment: " + objectType);
 
@@ -367,7 +396,7 @@ public class DataAcquisitionSearch extends Controller {
         if (objectType.equals(Downloader.ALIGNMENT_SUBJECT)) {
             //System.out.println("Selected subject alignment");
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, keepSameValue, null),
+                    ownerUri, finalFacets, email, Measurement.SUMMARY_TYPE_NONE, categoricalOption, finalRenameFiles, keepSameValue, null),
                     databaseExecutionContext);
         } else if (objectType.equals(Downloader.ALIGNMENT_TIME)) {
             //System.out.println("Selected time alignment");
@@ -398,6 +427,7 @@ public class DataAcquisitionSearch extends Controller {
         String facets = "";
         String selSummaryType = "";
         String nonCategoricalVariables = "";
+        boolean renameFiles = false;
 
         List<String> selectedFields = new LinkedList<String>();
         Map<String, String[]> name_map = request.body().asFormUrlEncoded();
@@ -410,6 +440,9 @@ public class DataAcquisitionSearch extends Controller {
             }
             if (name_map.get("selNonCatVariable") != null) {
                 nonCategoricalVariables = name_map.get("selNonCatVariable")[0].toString();
+            }
+            if (name_map.get("renameFiles") != null && name_map.get("renameFiles")[0].toString().equals("true")) {
+                renameFiles = true;
             }
         }
 
@@ -424,6 +457,7 @@ public class DataAcquisitionSearch extends Controller {
         final String finalFacets = facets;
         final String summaryType = selSummaryType;
         final String categoricalOption = nonCategoricalVariables;
+        final boolean finalRenameFiles = renameFiles;
 
         CompletionStage<Integer> promiseOfResult = null;
         long currentTime = System.currentTimeMillis();
@@ -431,7 +465,7 @@ public class DataAcquisitionSearch extends Controller {
         if (selSummaryType.equals(Measurement.SUMMARY_TYPE_SUBGROUP)) {
             // for TYPE_SUBGROUP, keepSameValue is set to 'false'
             promiseOfResult = CompletableFuture.supplyAsync(() -> Downloader.generateCSVFileBySubjectAlignment(
-                    ownerUri, finalFacets, email, summaryType, categoricalOption, false, null),
+                    ownerUri, finalFacets, email, summaryType, categoricalOption, finalRenameFiles, false, null),
                     databaseExecutionContext);
 
             promiseOfResult.whenComplete(
@@ -572,5 +606,173 @@ public class DataAcquisitionSearch extends Controller {
         return preferences(fs, fo, fec, fu, ft, fsp, fp, request);
     }
 
+    private String getStudyFacetS(String[] studyIds) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        //final String studyPrefix = "http://hadatac.org/kb/hhear#STD-";
 
+        Map<String, List<String>> mapStudyDas = createStudyFacetDAFiles(studyIds);
+        String studyFacetQuery = "";
+
+        List<FacetS> facetSet = new ArrayList<>();
+
+        //List<String> studIdList = Arrays.asList(studyIds);
+        //System.out.println("StudyView.getStudyFacetS : studIdList=[" + studIdList + "]");
+        //System.out.println("StudyView.getStudyFacetS : studIdList size =[" + studIdList.size() + "]");
+
+        /*mapStudyDas.forEach((k,v)-> {
+            System.out.println("StudyView.getStudyFacetS [study,  das]: study=" +k + ", das=: "+ v);
+        });*/
+
+        mapStudyDas.forEach((study, das) -> {
+            //System.out.println("StudyView.getStudyFacetS : study=[" + study + "]");
+            //System.out.println("StudyView.getStudyFacetS : das=[" + das + "]");
+
+            //String studyNumber = study.replace(studyPrefix, "");
+            //studyNumber = studyNumber.replace("STD-", "");
+            //System.out.println("StudyView.getStudyFacetS : studyNumber=[" + studyNumber + "]");
+
+            String id = study;
+            String studyUriStr = study;
+            FacetS facetS = new FacetS(id, studyUriStr);
+
+            List<DAChild> lst = new ArrayList<>();
+            das.forEach(da -> {
+                DAChild c = new DAChild(da, da);
+                lst.add(c);
+            });
+            facetS.setChildren(lst);
+            //System.out.println("StudyView.getStudyFacetS : facetS=[" + facetS + "]");
+
+            facetSet.add(facetS);
+            //System.out.println("StudyView.getStudyFacetS : facetSet=[" + facetSet + "]");
+        });
+
+        try {
+            String facetSJson = objectMapper.writeValueAsString(facetSet);
+            //System.out.println("StudyView.getStudyFacetS : facetSJson=[" + facetSJson + "]");
+
+            StringBuilder facets = new StringBuilder();
+            facets.append("{");
+            facets.append("\"facetsS\":");
+            facets.append(facetSJson);
+            facets.append(",");
+            facets.append("\"facetsEC\":[],");
+            facets.append("\"facetsOC\":[],");
+            facets.append("\"facetsU\":[],");
+            facets.append("\"facetsT\":[],");
+            facets.append("\"facetsPI\":[]");
+            facets.append("}");
+
+            System.out.println("\n-----Build FACET----------\n" + facets.toString());
+
+            studyFacetQuery = facets.toString();
+        } catch (Exception e) {
+            log.error("ERROR in StudyView.getStudyFacetQuery", e);
+        }
+
+        return studyFacetQuery;
+    }
+
+    private Map<String, List<String>> createStudyFacetDAFiles(String[] studyIds) {
+        final String studyPrefix = "http://hadatac.org/kb/hhear#STD-";
+        Map<String, List<String>> mapStudyDas = new HashMap<>();
+        Study study = new Study();
+        Facet facet = new Facet();
+
+        Arrays.stream(studyIds).forEach(studyId ->
+        {
+            //System.out.println("StudyView.createStudyFacetDAFiles [study id]: " + studyId);
+            String id = studyPrefix + studyId;
+            facet.putFacet("study_uri_str", id);
+        });
+
+        /*Map<String, List<String>> mapFieldValues = facet.getFieldValues();
+        mapFieldValues.forEach((k,v)-> {
+            System.out.println("StudyView.createStudyFacetDAFiles [study ids]: " + v);
+        });*/
+
+        FacetHandler facetHandler = new FacetHandler();
+        Map<Facetable, List<Facetable>> results = study.getTargetFacetsFromTripleStore(facet, facetHandler);
+
+        /*results.forEach((k,v)-> {
+            System.out.println("StudyView.createStudyFacetDAFiles [getTargetFacetsFromTripleStore]: " + v.get(0).getUri());
+        });*/
+
+        results.forEach((stdy,daList) ->
+        {
+            List<String> lst = daList.stream()
+                    .map((obj) -> obj.getUri())
+                    .collect(Collectors.toList());
+
+            //System.out.println("StudyView.createStudyFacetDAFiles [getTargetFacetsFromTripleStore]: " + lst);
+            //lst.forEach(n -> System.out.println(n));
+            mapStudyDas.put(stdy.getUri(), lst);
+        });
+
+        return mapStudyDas;
+    }
+
+
+    private class FacetS {
+        private String id;
+        private String study_uri_str;
+        private List<DAChild> children;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getStudy_uri_str() {
+            return study_uri_str;
+        }
+
+        public void setStudy_uri_str(String study_uri_str) {
+            this.study_uri_str = study_uri_str;
+        }
+
+        public List<DAChild> getChildren() {
+            return children;
+        }
+
+        public FacetS(String id, String study_uri_str)
+        {
+            this.id = id;
+            this.study_uri_str = study_uri_str;
+        }
+
+        public void setChildren(List<DAChild> children) {
+            this.children = children;
+        }
+    }
+
+    private class DAChild {
+        private String id;
+        private String acquisition_uri_str;
+
+        public DAChild(String id, String acquisition_uri_str)
+        {
+            this.id = id;
+            this.acquisition_uri_str = acquisition_uri_str;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getAcquisition_uri_str() {
+            return acquisition_uri_str;
+        }
+
+        public void setAcquisition_uri_str(String acquisition_uri_str) {
+            this.acquisition_uri_str = acquisition_uri_str;
+        }
+    }
 }
