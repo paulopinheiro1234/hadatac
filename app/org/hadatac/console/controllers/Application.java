@@ -89,7 +89,7 @@ public class Application extends Controller {
             final PlayWebContext context = getPlayWebContext()!=null? getPlayWebContext():new PlayWebContext(request, playSessionStore);
             final ProfileManager<CommonProfile> profileManager = new ProfileManager(context,playSessionStore);
             final String userEmail =  profileManager.get(true).isEmpty() ? "": profileManager.get(true).get().getUsername();
-            System.out.println("getUserEmail:"+userEmail+"\n sessionId:"+playSessionStore.getOrCreateSessionId(context));
+            System.out.println("getUserEmail:"+userEmail+", sessionId:"+playSessionStore.getOrCreateSessionId(context));
             return userEmail;
         }
         final String userEmail = (getProfile(request) == null) ? "" : getProfile(request).getUsername();
@@ -134,10 +134,13 @@ public class Application extends Controller {
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
+//        System.out.println("Application->formindex:"+user.getEmail());
         if(null != user && user.isDataManager()){
+//            System.out.println("Application->formindex->DataManager:"+user.getEmail());
             return ok(protectedIndex.render(user.getEmail()));
         }
-        return ok(portal.render(getUserEmail(request)));
+//        System.out.println("Application->formindex->NormalUser:"+user.getEmail());
+        return ok(portal.render(user.getEmail()));
     }
 
     @Secure(clients = "IndirectBasicAuthClient")
@@ -336,7 +339,6 @@ public class Application extends Controller {
         playSessionStore = sessionStore;
         setSessionStore(sessionStore);
         setPlayWebContext(webContext);
-        formIndex(request);
 
     }
     private SysUser getSysUser(){return sysUser;}

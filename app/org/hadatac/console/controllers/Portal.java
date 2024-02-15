@@ -39,9 +39,9 @@ public class Portal extends Controller {
         SysUser user = AuthApplication.getAuthApplication().getUserProvider().getUser(application.getUserEmail(request));
 
         if (user == null) {
-            return ok(landingPage.render(application.getUserEmail(request)));
+            return ok(landingPage.render(""));
         } else {
-            return ok(portal.render(application.getUserEmail(request)));
+            return ok(portal.render(user.getEmail()));
         }
     }
 

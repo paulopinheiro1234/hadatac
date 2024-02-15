@@ -323,6 +323,7 @@ public class Signup {
     // New users Signup and then login
     // Existing users Login
     public Result checkUserExists(Http.Request request) throws TechnicalException {
+//        System.out.println("\n Inside Third party Portal:"+request.host());
         if("false".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) return badRequest("Operation not allowed");
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
@@ -336,7 +337,6 @@ public class Signup {
             }
             //Create profile for user trying to login
             final PlayWebContext playWebContext = createUserProfile(request,formData.get().getEmail());
-//            System.out.println("checkUserExists create user profile:"+userEmail+"\n application.getSessionStore()):"+application.getSessionStore().getOrCreateSessionId(playWebContext));
 
             //Login user
             System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
@@ -361,7 +361,7 @@ public class Signup {
                 return ok (pageRef).addingToSession(request ,"userValidated", "yes");
             }
 
-            return ok ("/hadatac").addingToSession(request ,"userValidated", "yes");
+            return ok (String.valueOf(routes.Application.formIndex()));
         }
         return badRequest("what happened?");
     }
