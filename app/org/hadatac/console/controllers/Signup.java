@@ -361,6 +361,7 @@ public class Signup {
                 return ok (pageRef).addingToSession(request ,"userValidated", "yes");
             }
 
+            System.out.println("Signup -> checkUserExists-> being redirected to Application->formIndex");
             return ok (String.valueOf(routes.Application.formIndex()));
         }
         return badRequest("what happened?");
@@ -413,7 +414,7 @@ public class Signup {
         profile.setRoles(test.getUserRoles(sysUser));
         profile.setRemembered(true);
         profileManager.save(true, profile, true);
-//        System.out.println("createUserProfile->getSessionId():"+playSessionStore.getOrCreateSessionId(playWebContext)+"\n\n");
+        System.out.println("createUserProfile->getSessionId():"+playSessionStore.getOrCreateSessionId(playWebContext)+"\n\n");
         application.setSessionStore(playSessionStore);
         return playWebContext;
 

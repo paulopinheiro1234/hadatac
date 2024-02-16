@@ -134,12 +134,12 @@ public class Application extends Controller {
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
-//        System.out.println("Application->formindex:"+user.getEmail());
+        System.out.println("Application->formindex:"+user.getEmail());
         if(null != user && user.isDataManager()){
-//            System.out.println("Application->formindex->DataManager:"+user.getEmail());
+            System.out.println("Application->formindex->DataManager:"+user.getEmail());
             return ok(protectedIndex.render(user.getEmail()));
         }
-//        System.out.println("Application->formindex->NormalUser:"+user.getEmail());
+        System.out.println("Application->formindex->NormalUser:"+user.getEmail());
         return ok(portal.render(user.getEmail()));
     }
 
