@@ -8,6 +8,7 @@ import com.typesafe.config.ConfigFactory;
 import module.SecurityModule;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TokenAction;
+import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.account.errorLogin;
@@ -191,8 +192,26 @@ public class Application extends Controller {
 
     public Result loginForm(Http.Request request) throws TechnicalException {
         //If The user has been redirected from portal to Hadatac. To login we go back to the redirected portal
-        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")))
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) {
+            if(null != sysUser){
+                SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
+                final PlayWebContext playWebContext = new PlayWebContext(request, playSessionStore);
+                final ProfileManager<CommonProfile> profileManager = new ProfileManager(playWebContext);
+                final CommonProfile profile = new CommonProfile();
+                profile.setId(sysUser.getEmail());
+                profile.addAttribute(Pac4jConstants.USERNAME, sysUser.getEmail());
+                profile.setRoles(test.getUserRoles(sysUser));
+                profile.setRemembered(true);
+                profileManager.save(true, profile, true);
+                if(null != sysUser && sysUser.isDataManager()){
+                    System.out.println("Application->loginForm->DataManager:"+sysUser.getEmail());
+                    return ok(protectedIndex.render(sysUser.getEmail()));
+                }
+                System.out.println("Application->loginForm->NormalUser:"+sysUser.getEmail());
+                return ok(portal.render(sysUser.getEmail()));
+            }
             return redirect(ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionUrl"));
+        }
 
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         Optional<String> username = request.queryString("username");

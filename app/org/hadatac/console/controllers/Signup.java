@@ -22,7 +22,6 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
@@ -323,7 +322,7 @@ public class Signup {
     // New users Signup and then login
     // Existing users Login
     public Result checkUserExists(Http.Request request) throws TechnicalException {
-//        System.out.println("\n Inside Third party Portal:"+request.host());
+        System.out.println("\n Inside checkUserExists. Play session cookie:"+request.cookies().get("PLAY_SESSION"));
         if("false".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) return badRequest("Operation not allowed");
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
@@ -343,7 +342,7 @@ public class Signup {
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
             application.formIndex(request,user,playSessionStore,playWebContext);
 
-            System.out.println("formData= " + formData);
+//            System.out.println("formData= " + formData);
 
             String source = formData.get().getSource();
             String studyIds = formData.get().getStudyId();
@@ -360,9 +359,7 @@ public class Signup {
 
                 return ok (pageRef).addingToSession(request ,"userValidated", "yes");
             }
-
-            System.out.println("Signup -> checkUserExists-> being redirected to Application->formIndex");
-            return ok (String.valueOf(routes.Application.formIndex()));
+            return ok (String.valueOf(routes.Application.formIndex())).addingToSession(request,"userValidated","yes");
         }
         return badRequest("what happened?");
     }
@@ -414,7 +411,7 @@ public class Signup {
         profile.setRoles(test.getUserRoles(sysUser));
         profile.setRemembered(true);
         profileManager.save(true, profile, true);
-        System.out.println("createUserProfile->getSessionId():"+playSessionStore.getOrCreateSessionId(playWebContext)+"\n\n");
+//        System.out.println("createUserProfile->getSessionId():"+playSessionStore.getOrCreateSessionId(playWebContext)+"\n\n");
         application.setSessionStore(playSessionStore);
         return playWebContext;
 
