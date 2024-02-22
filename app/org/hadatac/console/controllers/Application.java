@@ -57,6 +57,7 @@ public class Application extends Controller {
     @Inject private MailerClient mailerClient;
     private static SysUser sysUser;
     private PlayWebContext playWebContext;
+    private static String studyRefLink;
 
     private List<CommonProfile> getProfiles(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
@@ -135,7 +136,11 @@ public class Application extends Controller {
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
-        System.out.println("Application->formindex:"+user.getEmail());
+        System.out.println("Application->formindex:"+user.getEmail()+",studyRefLink:"+studyRefLink+","+studyRefLink.isEmpty());
+        if(null != user && !studyRefLink.isEmpty()&& !studyRefLink.isEmpty()){
+            System.out.println("Application->formindex->studyRefLink:"+studyRefLink);
+            return redirect (studyRefLink).addingToSession(request ,"userValidated", "yes");
+        }
         if(null != user && user.isDataManager()){
             System.out.println("Application->formindex->DataManager:"+user.getEmail());
             return ok(protectedIndex.render(user.getEmail()));
@@ -203,6 +208,11 @@ public class Application extends Controller {
                 profile.setRoles(test.getUserRoles(sysUser));
                 profile.setRemembered(true);
                 profileManager.save(true, profile, true);
+                System.out.println("Application->loginForm->studyRefLink:"+studyRefLink+","+studyRefLink.isEmpty());
+                if(null != sysUser && studyRefLink!=null && !studyRefLink.isEmpty()){
+                    System.out.println("Inside if Application->loginForm->studyRefLink:"+studyRefLink);
+                    return redirect (studyRefLink).addingToSession(request ,"userValidated", "yes");
+                }
                 if(null != sysUser && sysUser.isDataManager()){
                     System.out.println("Application->loginForm->DataManager:"+sysUser.getEmail());
                     return ok(protectedIndex.render(sysUser.getEmail()));
@@ -353,11 +363,13 @@ public class Application extends Controller {
         return ok(portal.render(email));
     }
 
-    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext){
+    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext, String refLink){
         sysUser = sysUserValue;
         playSessionStore = sessionStore;
         setSessionStore(sessionStore);
         setPlayWebContext(webContext);
+        studyRefLink=refLink;
+//        System.out.println("studyRefLink:"+studyRefLink);
 
     }
     private SysUser getSysUser(){return sysUser;}

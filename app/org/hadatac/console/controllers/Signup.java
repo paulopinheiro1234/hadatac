@@ -340,25 +340,25 @@ public class Signup {
             //Login user
             System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
-            application.formIndex(request,user,playSessionStore,playWebContext);
 
 //            System.out.println("formData= " + formData);
 
             String source = formData.get().getSource();
             String studyIds = formData.get().getStudyId();
             String studyPageRef = formData.get().getStudyPageRef();
+            String studyRefLink="";
 
             if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(studyPageRef) && source.equals("studypage")) {
                 studyPageRef = "/" +studyPageRef+"&source="+source;
-                System.out.println("studyPageRef= " + studyPageRef);
-                return ok (studyPageRef).addingToSession(request ,"userValidated", "yes");
+                System.out.println("checkUserExists->studyPageRef= " + studyPageRef);
+                studyRefLink=studyPageRef;
             }
             else if(StringUtils.isNotBlank(source) && source.equals("generateDataSet")) {
                 String pageRef = "/" +studyPageRef+"&source="+source+"&studyIds="+studyIds;;
-                System.out.println("PageRef= " + pageRef);
-
-                return ok (pageRef).addingToSession(request ,"userValidated", "yes");
+                studyRefLink=pageRef;
+                System.out.println("checkUserExists->PageRef= " + pageRef);
             }
+            application.formIndex(request,user,playSessionStore,playWebContext,studyRefLink);
             return ok (String.valueOf(routes.Application.formIndex())).addingToSession(request,"userValidated","yes");
         }
         return badRequest("what happened?");
