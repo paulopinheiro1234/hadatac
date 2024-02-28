@@ -89,7 +89,7 @@
                 obj.name = obj.username;
                 obj.repeatPassword = obj.password;
                 count=count+1;
-                if(count.valueOf()<3 && e.origin =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.tokenUrl")"){
+                if(count.valueOf()<2 && e.origin =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.origin")" && obj.appGuid =="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.tokenUrl")"){
                     $.ajax({
                         type: 'POST',
                         url: '/hadatac/checkUser/',

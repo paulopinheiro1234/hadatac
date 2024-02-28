@@ -22,7 +22,6 @@ import org.hadatac.metadata.loader.PermissionsContext;
 import org.hadatac.metadata.loader.SpreadsheetProcessing;
 import org.hadatac.utils.Feedback;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
@@ -323,6 +322,7 @@ public class Signup {
     // New users Signup and then login
     // Existing users Login
     public Result checkUserExists(Http.Request request) throws TechnicalException {
+        System.out.println("\n Inside checkUserExists. Play session cookie:"+request.cookies().get("PLAY_SESSION"));
         if("false".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) return badRequest("Operation not allowed");
         final Form<MyUsernamePasswordAuthProvider> formData = form.bindFromRequest(request);
         if ( formData != null && !formData.hasErrors()) {
@@ -336,32 +336,30 @@ public class Signup {
             }
             //Create profile for user trying to login
             final PlayWebContext playWebContext = createUserProfile(request,formData.get().getEmail());
-//            System.out.println("checkUserExists create user profile:"+userEmail+"\n application.getSessionStore()):"+application.getSessionStore().getOrCreateSessionId(playWebContext));
 
             //Login user
             System.out.println("Logging in user redirected from Third party: "+playSessionStore.getOrCreateSessionId(playWebContext));
             SysUser user = SysUser.findByEmail(formData.get().getEmail());
-            application.formIndex(request,user,playSessionStore,playWebContext);
 
-            System.out.println("formData= " + formData);
+//            System.out.println("formData= " + formData);
 
             String source = formData.get().getSource();
             String studyIds = formData.get().getStudyId();
             String studyPageRef = formData.get().getStudyPageRef();
+            String studyRefLink="";
 
             if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(studyPageRef) && source.equals("studypage")) {
                 studyPageRef = "/" +studyPageRef+"&source="+source;
-                System.out.println("studyPageRef= " + studyPageRef);
-                return ok (studyPageRef).addingToSession(request ,"userValidated", "yes");
+                System.out.println("checkUserExists->studyPageRef= " + studyPageRef);
+                studyRefLink=studyPageRef;
             }
             else if(StringUtils.isNotBlank(source) && source.equals("generateDataSet")) {
                 String pageRef = "/" +studyPageRef+"&source="+source+"&studyIds="+studyIds;;
-                System.out.println("PageRef= " + pageRef);
-
-                return ok (pageRef).addingToSession(request ,"userValidated", "yes");
+                studyRefLink=pageRef;
+                System.out.println("checkUserExists->PageRef= " + pageRef);
             }
-
-            return ok ("/hadatac").addingToSession(request ,"userValidated", "yes");
+            application.formIndex(request,user,playSessionStore,playWebContext,studyRefLink);
+            return ok (String.valueOf(routes.Application.formIndex())).addingToSession(request,"userValidated","yes");
         }
         return badRequest("what happened?");
     }
