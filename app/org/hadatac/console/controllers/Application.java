@@ -136,8 +136,8 @@ public class Application extends Controller {
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
-        System.out.println("Application->formindex:"+user.getEmail()+",studyRefLink:"+studyRefLink+","+studyRefLink.isEmpty());
-        if(null != user && !studyRefLink.isEmpty()&& !studyRefLink.isEmpty()){
+        System.out.println("Application->formindex:"+user.getEmail()+",studyRefLink:"+studyRefLink);
+        if(null != user && studyRefLink!=null && !studyRefLink.isEmpty()){
             System.out.println("Application->formindex->studyRefLink:"+studyRefLink);
             return redirect (studyRefLink).addingToSession(request ,"userValidated", "yes");
         }
@@ -208,7 +208,7 @@ public class Application extends Controller {
                 profile.setRoles(test.getUserRoles(sysUser));
                 profile.setRemembered(true);
                 profileManager.save(true, profile, true);
-                System.out.println("Application->loginForm->studyRefLink:"+studyRefLink+","+studyRefLink.isEmpty());
+                System.out.println("Application->loginForm->studyRefLink:"+studyRefLink);
                 if(null != sysUser && studyRefLink!=null && !studyRefLink.isEmpty()){
                     System.out.println("Inside if Application->loginForm->studyRefLink:"+studyRefLink);
                     return redirect (studyRefLink).addingToSession(request ,"userValidated", "yes");
