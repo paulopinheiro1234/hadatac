@@ -79,9 +79,7 @@
                             <li><a href="@org.hadatac.console.controllers.routes.Dashboard.index()">Dashboard</a></li>
                         }
                     }
-                        @if(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")=="true") {
-                            <li class="@("hide".when(!userName.isEmpty))"><a href="@org.hadatac.console.controllers.routes.Signup.createUser()" style="color: white;font: 16px">Sign up</a></li>
-                        }else{
+                        @if(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")=="false") {
                             <li class="@("hide".when(!userName.isEmpty))" ><a href="@org.hadatac.console.controllers.routes.Signup.createUser()">Sign up</a></li>
                         }
                     </ul>
@@ -108,7 +106,9 @@
                             </li>
 
                         </ul>
-                        <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class=" navbar-right btn btn-default navbar-btn @("hide".when(!userName.isEmpty))">Log In</a>
+                        @if(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")=="false") {
+                            <a href="@org.hadatac.console.controllers.routes.Application.formIndex()" class=" navbar-right btn btn-default navbar-btn @("hide".when(!userName.isEmpty))">Log In</a>
+                        }
 
                     </ul>
                 </div>
