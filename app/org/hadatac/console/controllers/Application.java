@@ -8,6 +8,7 @@ import com.typesafe.config.ConfigFactory;
 import module.SecurityModule;
 import org.hadatac.console.models.SysUser;
 import org.hadatac.console.models.TokenAction;
+import org.hadatac.console.providers.SimpleTestUsernamePasswordAuthenticator;
 import org.hadatac.console.views.html.*;
 import org.hadatac.console.views.html.account.signup.unverified;
 import org.hadatac.console.views.html.account.errorLogin;
@@ -56,6 +57,7 @@ public class Application extends Controller {
     @Inject private MailerClient mailerClient;
     private static SysUser sysUser;
     private PlayWebContext playWebContext;
+    private static String studyRefLink;
 
     private List<CommonProfile> getProfiles(Http.Request request) {
         final PlayWebContext context = new PlayWebContext(request, playSessionStore);
@@ -89,7 +91,7 @@ public class Application extends Controller {
             final PlayWebContext context = getPlayWebContext()!=null? getPlayWebContext():new PlayWebContext(request, playSessionStore);
             final ProfileManager<CommonProfile> profileManager = new ProfileManager(context,playSessionStore);
             final String userEmail =  profileManager.get(true).isEmpty() ? "": profileManager.get(true).get().getUsername();
-            System.out.println("getUserEmail:"+userEmail+"\n sessionId:"+playSessionStore.getOrCreateSessionId(context));
+            System.out.println("getUserEmail:"+userEmail+", sessionId:"+playSessionStore.getOrCreateSessionId(context));
             return userEmail;
         }
         final String userEmail = (getProfile(request) == null) ? "" : getProfile(request).getUsername();
@@ -134,10 +136,17 @@ public class Application extends Controller {
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex(Http.Request request) {
         SysUser user = SysUser.findByEmail(getUserEmail(request));
+        System.out.println("Application->formindex:"+user.getEmail()+",studyRefLink:"+studyRefLink);
+        if(null != user && studyRefLink!=null && !studyRefLink.isEmpty()){
+            System.out.println("Application->formindex->studyRefLink:"+studyRefLink);
+            return redirect (studyRefLink).addingToSession(request ,"userValidated", "yes");
+        }
         if(null != user && user.isDataManager()){
+            System.out.println("Application->formindex->DataManager:"+user.getEmail());
             return ok(protectedIndex.render(user.getEmail()));
         }
-        return ok(portal.render(getUserEmail(request)));
+        System.out.println("Application->formindex->NormalUser:"+user.getEmail());
+        return ok(portal.render(user.getEmail()));
     }
 
     @Secure(clients = "IndirectBasicAuthClient")
@@ -188,8 +197,31 @@ public class Application extends Controller {
 
     public Result loginForm(Http.Request request) throws TechnicalException {
         //If The user has been redirected from portal to Hadatac. To login we go back to the redirected portal
-        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection")))
+        if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))) {
+            if(null != sysUser){
+                SimpleTestUsernamePasswordAuthenticator test = new SimpleTestUsernamePasswordAuthenticator();
+                final PlayWebContext playWebContext = new PlayWebContext(request, playSessionStore);
+                final ProfileManager<CommonProfile> profileManager = new ProfileManager(playWebContext);
+                final CommonProfile profile = new CommonProfile();
+                profile.setId(sysUser.getEmail());
+                profile.addAttribute(Pac4jConstants.USERNAME, sysUser.getEmail());
+                profile.setRoles(test.getUserRoles(sysUser));
+                profile.setRemembered(true);
+                profileManager.save(true, profile, true);
+                System.out.println("Application->loginForm->studyRefLink:"+studyRefLink);
+                if(null != sysUser && studyRefLink!=null && !studyRefLink.isEmpty()){
+                    System.out.println("Inside if Application->loginForm->studyRefLink:"+studyRefLink);
+                    return redirect (studyRefLink).addingToSession(request ,"userValidated", "yes");
+                }
+                if(null != sysUser && sysUser.isDataManager()){
+                    System.out.println("Application->loginForm->DataManager:"+sysUser.getEmail());
+                    return ok(protectedIndex.render(sysUser.getEmail()));
+                }
+                System.out.println("Application->loginForm->NormalUser:"+sysUser.getEmail());
+                return ok(portal.render(sysUser.getEmail()));
+            }
             return redirect(ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionUrl"));
+        }
 
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         Optional<String> username = request.queryString("username");
@@ -331,12 +363,13 @@ public class Application extends Controller {
         return ok(portal.render(email));
     }
 
-    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext){
+    public void formIndex(Http.Request request, SysUser sysUserValue, PlaySessionStore sessionStore, PlayWebContext webContext, String refLink){
         sysUser = sysUserValue;
         playSessionStore = sessionStore;
         setSessionStore(sessionStore);
         setPlayWebContext(webContext);
-        formIndex(request);
+        studyRefLink=refLink;
+//        System.out.println("studyRefLink:"+studyRefLink);
 
     }
     private SysUser getSysUser(){return sysUser;}
