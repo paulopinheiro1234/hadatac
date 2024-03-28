@@ -41,7 +41,11 @@
             <div class="col-md-1"></div>
             <div id="textTitle" class="col-md-8">
                 <h3><font color="darkBlue">@ConfigFactory.load().getString("hadatac.community.shortname")@ConfigFactory.load().getString("hadatac.community.pagetitle")</font></h3>
-                <script>showText("@ConfigFactory.load().getString("hadatac.AnonymousUser.landingPage.description")", "textTitle")</script><p>If you are a validated user on the <a href="https://hheardatacenter.mssm.edu/">HHEAR Data Center portal</a>, you may set up an account on this repository. Please <a href="@org.hadatac.console.controllers.routes.WidgetController.listWidgets()"> Sign-up</a> and follow the instructions. Returning users may log in <a href="@org.hadatac.console.controllers.routes.Application.formIndex()"> here.</p>
+                @if("true".equalsIgnoreCase(ConfigFactory.load().getString("hadatac.ThirdPartyUser.userRedirection"))){
+                    <script>showText("@ConfigFactory.load().getString("hadatac.AnonymousUser.landingPage.description")", "textTitle")</script><p>If you are a validated user on the <a href="https://hheardatacenter.mssm.edu/">HHEAR Data Center portal</a>, you may set up an account on this repository. Please <a href="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionHomeSignUp")"> Sign-up</a> and follow the instructions. Returning users may log in <a href="@ConfigFactory.load().getString("hadatac.ThirdPartyUser.oauth.redirectionHomeLogin")"> here.</p>
+                } else{
+                    <script>showText("@ConfigFactory.load().getString("hadatac.AnonymousUser.landingPage.description")", "textTitle")</script><p>If you are a validated user on the <a href="https://hheardatacenter.mssm.edu/">HHEAR Data Center portal</a>, you may set up an account on this repository. Please <a href="@org.hadatac.console.controllers.routes.WidgetController.listWidgets()"> Sign-up</a> and follow the instructions. Returning users may log in <a href="@org.hadatac.console.controllers.routes.Application.formIndex()"> here.</p>
+                }
                 <hr>
             </div>
             <div class="col-md-1"></div>
