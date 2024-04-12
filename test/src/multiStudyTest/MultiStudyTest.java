@@ -83,7 +83,7 @@ public class MultiStudyTest {
             // execute the main codebase to download the data file
             System.out.println("\n\n\n====> working on " + testEntry.getTag() + ", " + testCount + " of " + totalTests);
             ColumnMapping columnMapping = new ColumnMapping();
-            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, Measurement.SUMMARY_TYPE_NONE, categoricalOption, true, columnMapping);
+            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, Measurement.SUMMARY_TYPE_NONE, categoricalOption, true, true, columnMapping);
             // Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, categoricalOption, true, columnMapping);
 
             // System.out.println(columnMapping.toString());
