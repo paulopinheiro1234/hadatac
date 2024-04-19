@@ -112,7 +112,7 @@ public class StudyTest {
             // execute the main codebase to download the data file
             System.out.println("\n\n\n====> working on " + test);
             ColumnMapping columnMapping = new ColumnMapping();
-            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, Measurement.SUMMARY_TYPE_NONE, categoricalOption, true, columnMapping);
+            Downloader.generateCSVFileBySubjectAlignment(ownerUri, facets, ownerEmail, Measurement.SUMMARY_TYPE_NONE, categoricalOption, true, true, columnMapping);
             testDetails.put("columnMapping", columnMapping);
             System.out.println("-------------------------------------------");
             System.out.println(columnMapping.toString());
